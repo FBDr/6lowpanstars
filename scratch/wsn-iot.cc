@@ -39,6 +39,7 @@
 #include "ns3/applications-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/csma-module.h"
+#include "ns3/netanim-module.h"
 
 using namespace ns3;
 
@@ -236,6 +237,8 @@ int main(int argc, char **argv) {
     lrWpanHelper.EnablePcapAll(std::string("ping6wsn"), true);
 
     NS_LOG_INFO("Run Simulation.");
+    AnimationInterface anim ("AWSNanimation.xml");
+    anim.EnablePacketMetadata (true);
     Simulator::Run();
     Simulator::Destroy();
     NS_LOG_INFO("Done.");

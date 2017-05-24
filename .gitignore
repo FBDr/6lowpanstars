@@ -1,6 +1,10 @@
 *.pyc
 *.pcap
 *.tr
+*.rej
+*.orig
+*.diff
+*.xml
 .waf*
 src/NDNabstraction
 build/
