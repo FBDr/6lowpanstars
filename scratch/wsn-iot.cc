@@ -90,11 +90,11 @@ class StackHelper
     }};
 
 int main(int argc, char **argv) {
-    
+
     bool verbose = false;
     unsigned int rngfeed = 43221;
     unsigned int node_num = 10;
-    unsigned int node_periph = 5;
+    unsigned int node_periph = 9;
     unsigned int node_head = 2;
     unsigned int con_per;
     unsigned int pro_per;
@@ -119,8 +119,10 @@ int main(int argc, char **argv) {
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
-    iot[0].Create(9);
-    iot[1].Create(9);
+
+    for (unsigned int jdx = 0; jdx < node_head; jdx++) {
+        iot[jdx].Create(node_periph);
+    }
 
     br.Create(2);
 
