@@ -47,50 +47,47 @@ NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
 class StackHelper
 {
-public:
+    public :
 
-  /**
-   * \brief Add an address to a IPv6 node.
-   * \param n node
-   * \param interface interface index
-   * \param address IPv6 address to add
-   */
-  inline void AddAddress (Ptr<Node>& n, uint32_t interface, Ipv6Address address)
-  {
-    Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
-    ipv6->AddAddress (interface, address);
-  }
+    /**
+     * \brief Add an address to a IPv6 node.
+     * \param n node
+     * \param interface interface index
+     * \param address IPv6 address to add
+     */
+    inline void AddAddress(Ptr<Node>& n, uint32_t interface, Ipv6Address address)
+    {
+        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
+        ipv6->AddAddress(interface, address);
+    }
 
-  /**
-   * \brief Print the routing table.
-   * \param n the node
-   */
-  inline void PrintRoutingTable (Ptr<Node>& n)
-  {
-    Ptr<Ipv6StaticRouting> routing = 0;
-    Ipv6StaticRoutingHelper routingHelper;
-    Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
-    uint32_t nbRoutes = 0;
-    Ipv6RoutingTableEntry route;
+    /**
+     * \brief Print the routing table.
+     * \param n the node
+     */
+    inline void PrintRoutingTable(Ptr<Node>& n)
+    {
+        Ptr<Ipv6StaticRouting> routing = 0;
+        Ipv6StaticRoutingHelper routingHelper;
+        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
+        uint32_t nbRoutes = 0;
+        Ipv6RoutingTableEntry route;
 
-    routing = routingHelper.GetStaticRouting (ipv6);
+        routing = routingHelper.GetStaticRouting(ipv6);
 
-    std::cout << "Routing table of " << n << " : " << std::endl;
-    std::cout << "Destination\t\t\t\t" << "Gateway\t\t\t\t\t" << "Interface\t" <<  "Prefix to use" << std::endl;
+        std::cout << "Routing table of " << n << " : " << std::endl;
+        std::cout << "Destination\t\t\t\t" << "Gateway\t\t\t\t\t" << "Interface\t" << "Prefix to use" << std::endl;
 
-    nbRoutes = routing->GetNRoutes ();
-    for (uint32_t i = 0; i < nbRoutes; i++)
-      {
-        route = routing->GetRoute (i);
-        std::cout << route.GetDest () << "\t"
-                  << route.GetGateway () << "\t"
-                  << route.GetInterface () << "\t"
-                  << route.GetPrefixToUse () << "\t"
-                  << std::endl;
-      }
-  }
-};
-
+        nbRoutes = routing->GetNRoutes();
+        for (uint32_t i = 0; i < nbRoutes; i++) {
+            route = routing->GetRoute(i);
+            std::cout << route.GetDest() << "\t"
+                    << route.GetGateway() << "\t"
+                    << route.GetInterface() << "\t"
+                    << route.GetPrefixToUse() << "\t"
+                    << std::endl;
+        }
+    }};
 
 int main(int argc, char **argv) {
     bool verbose = false;
@@ -98,41 +95,36 @@ int main(int argc, char **argv) {
     unsigned int node_num = 10;
     unsigned int node_periph = 5;
     unsigned int node_head = 2;
+    unsigned int con_per;
+    unsigned int pro_per;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
     cmd.AddValue("rng", "Set feed for random number generator", rngfeed);
     cmd.AddValue("nodes", "Number of nodes", node_num);
-    cmd.AddValue("periph", "Number of peripheral nodes", node_periph );
-    cmd.AddValue("head", "Number of head nodes", node_head );
+    cmd.AddValue("periph", "Number of peripheral nodes", node_periph);
+    cmd.AddValue("head", "Number of head nodes", node_head);
+    cmd.AddValue("ConPercent", "Consumer percentage", con_per);
+    cmd.AddValue("ProPercent", "Producer percentage", pro_per);
     cmd.Parse(argc, argv);
-    
     StackHelper stackHelper;
+
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
-        //LogComponentEnable("Ipv6EndPointDemux", LOG_LEVEL_ALL);
-        //LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
-        //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-        //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-        //LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
-       // LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-        //LogComponentEnable("NdiscCache", LOG_LEVEL_ALL);
-        //LogComponentEnable("SixLowPanNetDevice", LOG_LEVEL_ALL);
+
     }
 
     NS_LOG_INFO("Create nodes.");
-    NodeContainer iot1;
-    NodeContainer iot2;
+    NodeContainer iot[2];
     NodeContainer br;
-    iot1.Create(9);
-    iot2.Create(9);
+    iot[0].Create(9);
+    iot[1].Create(9);
+
     br.Create(2);
 
-    NodeContainer subnet1 = iot1;
-    NodeContainer subnet2 = iot2;
-    subnet1.Add(br.Get(0));
-    subnet2.Add(br.Get(1));
+    iot[0].Add(br.Get(0));
+    iot[1].Add(br.Get(1));
 
     // Set seed for random numbers
     //Seeding RNG
@@ -153,7 +145,7 @@ int main(int argc, char **argv) {
             "LayoutType", StringValue("RowFirst"));
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
-    mobility.Install(iot1);
+    mobility.Install(iot[0]);
 
     mobility.SetPositionAllocator("ns3::GridPositionAllocator",
             "MinX", DoubleValue(20.0),
@@ -162,7 +154,7 @@ int main(int argc, char **argv) {
             "DeltaY", DoubleValue(2),
             "GridWidth", UintegerValue(3),
             "LayoutType", StringValue("RowFirst"));
-    mobility.Install(iot2);
+    mobility.Install(iot[1]);
 
     Ptr<ListPositionAllocator> nodesPositionAlloc = CreateObject<ListPositionAllocator> ();
     nodesPositionAlloc->Add(Vector(2.0, -2.0, 0.0));
@@ -180,9 +172,9 @@ int main(int argc, char **argv) {
     LrWpanHelper lrWpanHelper;
     // Add and install the LrWpanNetDevice for each node
     // lrWpanHelper.EnableLogComponents();
-    NetDeviceContainer devContainer = lrWpanHelper.Install(subnet1);
+    NetDeviceContainer devContainer = lrWpanHelper.Install(iot[0]);
     lrWpanHelper.AssociateToPan(devContainer, 10);
-    NetDeviceContainer devContainer2 = lrWpanHelper.Install(subnet2);
+    NetDeviceContainer devContainer2 = lrWpanHelper.Install(iot[1]);
     lrWpanHelper.AssociateToPan(devContainer2, 11);
 
 
@@ -215,11 +207,11 @@ int main(int argc, char **argv) {
     i3.SetForwarding(1, true);
     i3.SetDefaultRouteInAllNodes(0);
     i3.SetDefaultRouteInAllNodes(1);
-    
-    
-    Ptr<Node> routenode = iot1.Get(0);
-    stackHelper.PrintRoutingTable (routenode);
-    
+
+
+    Ptr<Node> routenode = iot[0].Get(0);
+    stackHelper.PrintRoutingTable(routenode);
+
     NS_LOG_INFO("Create Applications.");
 
     /* Create a Ping6 application to send ICMPv6 echo request from node zero to
@@ -237,7 +229,7 @@ int main(int argc, char **argv) {
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     ping6.SetAttribute("Interval", TimeValue(interPacketInterval));
     ping6.SetAttribute("PacketSize", UintegerValue(packetSize));
-    ApplicationContainer apps = ping6.Install(iot1.Get(0));
+    ApplicationContainer apps = ping6.Install(iot[0].Get(0));
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
 
@@ -246,8 +238,8 @@ int main(int argc, char **argv) {
     lrWpanHelper.EnablePcapAll(std::string("ping6wsn"), true);
 
     NS_LOG_INFO("Run Simulation.");
-    AnimationInterface anim ("AWSNanimation.xml");
-    anim.EnablePacketMetadata (true);
+    AnimationInterface anim("AWSNanimation.xml");
+    anim.EnablePacketMetadata(true);
     Simulator::Run();
     Simulator::Destroy();
     NS_LOG_INFO("Done.");
