@@ -90,6 +90,7 @@ class StackHelper
     }};
 
 int main(int argc, char **argv) {
+    
     bool verbose = false;
     unsigned int rngfeed = 43221;
     unsigned int node_num = 10;
