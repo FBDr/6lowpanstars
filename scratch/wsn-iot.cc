@@ -94,10 +94,19 @@ public:
 
 int main(int argc, char **argv) {
     bool verbose = false;
+    unsigned int rngfeed = 43221;
+    unsigned int node_num = 10;
+    unsigned int node_periph = 5;
+    unsigned int node_head = 2;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
+    cmd.AddValue("rng", "Set feed for random number generator", rngfeed);
+    cmd.AddValue("nodes", "Number of nodes", node_num);
+    cmd.AddValue("periph", "Number of peripheral nodes", node_periph );
+    cmd.AddValue("head", "Number of head nodes", node_head );
     cmd.Parse(argc, argv);
+    
     StackHelper stackHelper;
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
@@ -127,10 +136,10 @@ int main(int argc, char **argv) {
 
     // Set seed for random numbers
     //Seeding RNG
-    time_t time_ran;
-    time(&time_ran);
+    //time_t time_ran;
+    //time(&time_ran);
     RngSeedManager::SetSeed(1);
-    RngSeedManager::SetRun(time_ran);
+    RngSeedManager::SetRun(rngfeed);
 
     // Install mobility
     MobilityHelper mobility;

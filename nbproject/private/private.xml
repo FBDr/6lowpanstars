@@ -10,8 +10,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/floris/ndnSIM/ns-3/examples/routing/dynamic-global-routing.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/README</file>
+            <file>file:/home/floris/ndnSIM/ns-3/examples/routing/simple-routing-ping6.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/lrwpan.cpp</file>
+            <file>file:/home/floris/ndnSIM/ns-3/examples/ipv6/wsn-ping6.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/rnc.cpp</file>
         </group>
     </open-files>
 </project-private>
