@@ -116,8 +116,8 @@ int main(int argc, char **argv) {
 
     }
 
-    NS_LOG_INFO("Create nodes.");
-    NodeContainer iot[2];
+    NS_LOG_INFO("Creating IoT bubbles.");
+    NodeContainer iot[node_head];
     NodeContainer br;
     iot[0].Create(9);
     iot[1].Create(9);
@@ -140,8 +140,8 @@ int main(int argc, char **argv) {
     mobility.SetPositionAllocator("ns3::GridPositionAllocator",
             "MinX", DoubleValue(0.0),
             "MinY", DoubleValue(0.0),
-            "DeltaX", DoubleValue(2),
-            "DeltaY", DoubleValue(2),
+            "DeltaX", DoubleValue(5),
+            "DeltaY", DoubleValue(5),
             "GridWidth", UintegerValue(3),
             "LayoutType", StringValue("RowFirst"));
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
@@ -151,15 +151,15 @@ int main(int argc, char **argv) {
     mobility.SetPositionAllocator("ns3::GridPositionAllocator",
             "MinX", DoubleValue(20.0),
             "MinY", DoubleValue(0.0),
-            "DeltaX", DoubleValue(2),
-            "DeltaY", DoubleValue(2),
+            "DeltaX", DoubleValue(5),
+            "DeltaY", DoubleValue(5),
             "GridWidth", UintegerValue(3),
             "LayoutType", StringValue("RowFirst"));
     mobility.Install(iot[1]);
 
     Ptr<ListPositionAllocator> nodesPositionAlloc = CreateObject<ListPositionAllocator> ();
-    nodesPositionAlloc->Add(Vector(2.0, -2.0, 0.0));
-    nodesPositionAlloc->Add(Vector(22.0, -2.0, 0.0));
+    nodesPositionAlloc->Add(Vector(5.0, -5.0, 0.0));
+    nodesPositionAlloc->Add(Vector(25.0, -5.0, 0.0));
     mobility.SetPositionAllocator(nodesPositionAlloc);
     mobility.Install(br);
 

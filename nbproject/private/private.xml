@@ -12,6 +12,7 @@
         <group>
             <file>file:/home/floris/ndnSIM/ns-3/examples/routing/simple-routing-ping6.cc</file>
             <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/build/ns3/node-container.h</file>
             <file>file:/home/floris/ndnSIM/ns-3/scratch/lrwpan.cpp</file>
             <file>file:/home/floris/ndnSIM/ns-3/examples/ipv6/wsn-ping6.cc</file>
             <file>file:/home/floris/ndnSIM/ns-3/scratch/rnc.cpp</file>
