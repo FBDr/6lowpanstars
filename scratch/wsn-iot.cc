@@ -141,6 +141,10 @@ int main(int argc, char **argv) {
     SixLowPanHelper sixlowpan;
     Ipv6AddressHelper ipv6;
     Ipv6InterfaceContainer i[node_head];
+    ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
+    Ipv6InterfaceContainer i3 = ipv6.Assign(d1);
+    i3.SetForwarding(0, true);
+    i3.SetForwarding(1, true);
 
     for (int jdx = 0; jdx < node_head; jdx++) {
         std::string addresss;
@@ -152,15 +156,14 @@ int main(int argc, char **argv) {
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i[jdx] = ipv6.Assign(six[jdx]);
         //!!!!T o Do 9 vervangen
-        i[jdx].SetForwarding(9, true);
-        i[jdx].SetDefaultRouteInAllNodes(9);
+        i[jdx].SetForwarding(node_periph, true);
+        i[jdx].SetDefaultRouteInAllNodes(node_periph);
+        i3.SetDefaultRouteInAllNodes(jdx);
     };
-    ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
-    Ipv6InterfaceContainer i3 = ipv6.Assign(d1);
-    i3.SetForwarding(0, true);
-    i3.SetForwarding(1, true);
-    i3.SetDefaultRouteInAllNodes(0);
-    i3.SetDefaultRouteInAllNodes(1);
+
+
+    
+
 
 
 
@@ -175,7 +178,7 @@ int main(int argc, char **argv) {
     Ping6Helper ping6;
 
     ping6.SetLocal(i[0].GetAddress(0, 1));
-    ping6.SetRemote(i[1].GetAddress(0, 1));
+    ping6.SetRemote(i[1].GetAddress(1, 1));
     // ping6.SetRemote (Ipv6Address::GetAllNodesMulticast ());
 
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
