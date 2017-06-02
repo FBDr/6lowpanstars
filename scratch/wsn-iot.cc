@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
     int node_head = 2;
     int con_per;
     int pro_per;
+    int dist = 500;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
@@ -75,7 +76,13 @@ int main(int argc, char **argv) {
 
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
+
+        //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
+        //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
+
+        //LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
+
 
     }
 
@@ -96,7 +103,7 @@ int main(int argc, char **argv) {
 
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(jdx * 20),
+                "MinX", DoubleValue(jdx * dist),
                 "MinY", DoubleValue(0.0),
                 "DeltaX", DoubleValue(5),
                 "DeltaY", DoubleValue(5),
@@ -106,7 +113,7 @@ int main(int argc, char **argv) {
 
         mobility.Install(iot[jdx]);
 
-        routerPositionAlloc->Add(Vector(5.0 + jdx * 20, -5.0, 0.0));
+        routerPositionAlloc->Add(Vector(5.0 + jdx * dist, -5.0, 0.0));
 
 
 
@@ -143,10 +150,10 @@ int main(int argc, char **argv) {
     Ipv6InterfaceContainer i[node_head];
     ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
     Ipv6InterfaceContainer i3 = ipv6.Assign(d1);
-    i3.SetForwarding(0, true);
-    i3.SetForwarding(1, true);
+
 
     for (int jdx = 0; jdx < node_head; jdx++) {
+        i3.SetForwarding(jdx, true);
         std::string addresss;
         six[jdx] = sixlowpan.Install(devContainer[jdx]);
         NS_LOG_INFO("Assign addresses.");
@@ -159,10 +166,12 @@ int main(int argc, char **argv) {
         i[jdx].SetForwarding(node_periph, true);
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
         i3.SetDefaultRouteInAllNodes(jdx);
+        i3.SetForwarding(jdx, true);
+
     };
 
 
-    
+
 
 
 
@@ -191,6 +200,7 @@ int main(int argc, char **argv) {
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
     lrWpanHelper.EnablePcapAll(std::string("ping6wsn"), true);
+  
 
     NS_LOG_INFO("Run Simulation.");
     AnimationInterface anim("AWSNanimation.xml");
