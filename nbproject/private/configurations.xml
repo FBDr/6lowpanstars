@@ -6414,6 +6414,8 @@
           </df>
         </df>
       </df>
+      <df name="traces">
+      </df>
       <df name="utils">
         <df name="lcov">
         </df>

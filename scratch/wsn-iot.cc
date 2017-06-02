@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
         //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
         //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
 
-        //LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+        LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
 
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(jdx * dist),
+                "MinX", DoubleValue(jdx * dist ),
                 "MinY", DoubleValue(0.0),
                 "DeltaX", DoubleValue(5),
                 "DeltaY", DoubleValue(5),
@@ -152,8 +152,28 @@ int main(int argc, char **argv) {
     Ipv6InterfaceContainer i3 = ipv6.Assign(d1);
 
 
+    /*
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            i3.SetForwarding(jdx, true);
+            std::string addresss;
+            six[jdx] = sixlowpan.Install(devContainer[jdx]);
+            NS_LOG_INFO("Assign addresses.");
+            addresss = "2001:" + std::to_string(jdx + 1) + "::";
+            const char * c = addresss.c_str();
+            std::cout << c << std::endl;
+            ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+            i[jdx] = ipv6.Assign(six[jdx]);
+            i[jdx].SetForwarding(node_periph, true);
+            i[jdx].SetDefaultRouteInAllNodes(node_periph);
+            i3.SetDefaultRouteInAllNodes(jdx);
+            i3.SetForwarding(jdx, true);
+
+        };
+     */
+
     for (int jdx = 0; jdx < node_head; jdx++) {
-        i3.SetForwarding(jdx, true);
+
+        //Assign IPv6 addresses
         std::string addresss;
         six[jdx] = sixlowpan.Install(devContainer[jdx]);
         NS_LOG_INFO("Assign addresses.");
@@ -162,12 +182,11 @@ int main(int argc, char **argv) {
         std::cout << c << std::endl;
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i[jdx] = ipv6.Assign(six[jdx]);
-        //!!!!T o Do 9 vervangen
-        i[jdx].SetForwarding(node_periph, true);
-        i[jdx].SetDefaultRouteInAllNodes(node_periph);
-        i3.SetDefaultRouteInAllNodes(jdx);
+        //Set forwarding and routing rules.
         i3.SetForwarding(jdx, true);
-
+        i[jdx].SetDefaultRouteInAllNodes(node_periph);
+        i[jdx].SetForwarding(node_periph, true);
+        i3.SetDefaultRouteInAllNodes(jdx);
     };
 
 
@@ -183,7 +202,7 @@ int main(int argc, char **argv) {
      */
     uint32_t packetSize = 10;
     uint32_t maxPacketCount = 1000;
-    Time interPacketInterval = Seconds(0.05);
+    Time interPacketInterval = Seconds(0.5);
     Ping6Helper ping6;
 
     ping6.SetLocal(i[0].GetAddress(0, 1));
@@ -199,8 +218,8 @@ int main(int argc, char **argv) {
 
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
-    lrWpanHelper.EnablePcapAll(std::string("ping6wsn"), true);
-  
+    lrWpanHelper.EnablePcapAll(std::string("./traces/ping6wsn"), true);
+
 
     NS_LOG_INFO("Run Simulation.");
     AnimationInterface anim("AWSNanimation.xml");
