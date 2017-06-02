@@ -1,36 +1,3 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
-/*
- * Copyright (c) 2014 Universita' di Firenze
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Author: Tommaso Pecorella <tommaso.pecorella@unifi.it>
- */
-
-// Network topology
-//
-//       n0    n1
-//       |     |
-//       =================
-//        WSN (802.15.4)
-//
-// - ICMPv6 echo request flows from n0 to n1 and back with ICMPv6 echo reply
-// - DropTail queues 
-// - Tracing of queues and packet receptions to file "wsn-ping6.tr"
-//
-// This example is based on the "ping6.cc" example.
-
 #include <fstream>
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
@@ -72,28 +39,35 @@ int main(int argc, char **argv) {
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
 
-
-
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
-
         //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
         //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-
         LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-
-
     }
 
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
+    NodeContainer master;
+    NodeContainer csmam[node_head];
     br.Create(node_head);
+    master.Create(1);
+
+    for (int jdx = 0; jdx < node_head; jdx++) {
+        csmam[jdx] = br[jdx];
+        csmam[jdx].Add(master.Get(0));
+    }
+
+    //Netdevice aanmaken voor masternode?
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> routerPositionAlloc = CreateObject<ListPositionAllocator> ();
-    NetDeviceContainer devContainer[node_head];
+    Ptr<ListPositionAllocator> masterPositionAlloc = CreateObject<ListPositionAllocator> ();
+
+    NetDeviceContainer LrWpanDevCon[node_head];
     NetDeviceContainer six[node_head];
+    NetDeviceContainer master_csma[node_head];
 
     for (int jdx = 0; jdx < node_head; jdx++) {
         iot[jdx].Create(node_periph);
@@ -103,7 +77,7 @@ int main(int argc, char **argv) {
 
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(jdx * dist ),
+                "MinX", DoubleValue(jdx * dist),
                 "MinY", DoubleValue(0.0),
                 "DeltaX", DoubleValue(5),
                 "DeltaY", DoubleValue(5),
@@ -114,26 +88,28 @@ int main(int argc, char **argv) {
         mobility.Install(iot[jdx]);
 
         routerPositionAlloc->Add(Vector(5.0 + jdx * dist, -5.0, 0.0));
-
-
-
+        masterPositionAlloc->Add(Vector(500, -200, 0.0));
     }
 
     mobility.SetPositionAllocator(routerPositionAlloc);
     mobility.Install(br);
+    mobility.SetPositionAllocator(masterPositionAlloc);
+    mobility.Install(master);
 
     NS_LOG_INFO("Create channels.");
 
     CsmaHelper csma;
     csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
     csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
-    NetDeviceContainer d1 = csma.Install(br);
+    for (int jdx = 0; jdx < node_head; jdx++) {
+        master_csma[jdx] = csma.Install(csmam[jdx]);
+    }
 
 
     LrWpanHelper lrWpanHelper;
     for (int jdx = 0; jdx < node_head; jdx++) {
-        devContainer[jdx] = lrWpanHelper.Install(iot[jdx]);
-        lrWpanHelper.AssociateToPan(devContainer[jdx], jdx + 10);
+        LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
+        lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
 
     }
 
@@ -148,34 +124,18 @@ int main(int argc, char **argv) {
     SixLowPanHelper sixlowpan;
     Ipv6AddressHelper ipv6;
     Ipv6InterfaceContainer i[node_head];
+    Ipv6InterfaceContainer i_csma[node_head];
+
     ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
-    Ipv6InterfaceContainer i3 = ipv6.Assign(d1);
-
-
-    /*
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            i3.SetForwarding(jdx, true);
-            std::string addresss;
-            six[jdx] = sixlowpan.Install(devContainer[jdx]);
-            NS_LOG_INFO("Assign addresses.");
-            addresss = "2001:" + std::to_string(jdx + 1) + "::";
-            const char * c = addresss.c_str();
-            std::cout << c << std::endl;
-            ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-            i[jdx] = ipv6.Assign(six[jdx]);
-            i[jdx].SetForwarding(node_periph, true);
-            i[jdx].SetDefaultRouteInAllNodes(node_periph);
-            i3.SetDefaultRouteInAllNodes(jdx);
-            i3.SetForwarding(jdx, true);
-
-        };
-     */
+    for (int jdx = 0; jdx < node_head; jdx++) {
+        i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
+    }
 
     for (int jdx = 0; jdx < node_head; jdx++) {
 
         //Assign IPv6 addresses
         std::string addresss;
-        six[jdx] = sixlowpan.Install(devContainer[jdx]);
+        six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
         NS_LOG_INFO("Assign addresses.");
         addresss = "2001:" + std::to_string(jdx + 1) + "::";
         const char * c = addresss.c_str();
@@ -183,17 +143,13 @@ int main(int argc, char **argv) {
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i[jdx] = ipv6.Assign(six[jdx]);
         //Set forwarding and routing rules.
-        i3.SetForwarding(jdx, true);
+/*
+        i_csma[jdx].SetForwarding(jdx, true);
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
         i[jdx].SetForwarding(node_periph, true);
-        i3.SetDefaultRouteInAllNodes(jdx);
-    };
-
-
-
-
-
-
+        i_csma[jdx].SetDefaultRouteInAllNodes(jdx);
+*/
+    }
 
     NS_LOG_INFO("Create Applications.");
 
@@ -219,7 +175,6 @@ int main(int argc, char **argv) {
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
     lrWpanHelper.EnablePcapAll(std::string("./traces/ping6wsn"), true);
-
 
     NS_LOG_INFO("Run Simulation.");
     AnimationInterface anim("AWSNanimation.xml");

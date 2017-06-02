@@ -5,6 +5,7 @@
 *.orig
 *.diff
 *.xml
+*.txt
 .waf*
 src/NDNabstraction
 build/
