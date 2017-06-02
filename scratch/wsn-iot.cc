@@ -14,6 +14,50 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
+class StackHelper
+{
+    public :
+
+    /**
+     * \brief Add an address to a IPv6 node.
+     * \param n node
+     * \param interface interface index
+     * \param address IPv6 address to add
+     */
+    inline void AddAddress(Ptr<Node>& n, uint32_t interface, Ipv6Address address)
+    {
+        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
+        ipv6->AddAddress(interface, address);
+    }
+
+    /**
+     * \brief Print the routing table.
+     * \param n the node
+     */
+    inline void PrintRoutingTable(Ptr<Node>& n)
+    {
+        Ptr<Ipv6StaticRouting> routing = 0;
+        Ipv6StaticRoutingHelper routingHelper;
+        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
+        uint32_t nbRoutes = 0;
+        Ipv6RoutingTableEntry route;
+
+        routing = routingHelper.GetStaticRouting(ipv6);
+
+        std::cout << "Routing table of " << n << " : " << std::endl;
+        std::cout << "Destination\t\t\t\t" << "Gateway\t\t\t\t\t" << "Interface\t" << "Prefix to use" << std::endl;
+
+        nbRoutes = routing->GetNRoutes();
+        for (uint32_t i = 0; i < nbRoutes; i++) {
+            route = routing->GetRoute(i);
+            std::cout << route.GetDest() << "*\t\t\t\t"
+                    << route.GetGateway() << "*\t\t\t\t"
+                    << route.GetInterface() << "*\t\t\t\t"
+                    << route.GetPrefixToUse() << "*\t"
+                    << std::endl;
+        }
+    }};
+
 int main(int argc, char **argv) {
 
     bool verbose = false;
@@ -34,11 +78,12 @@ int main(int argc, char **argv) {
     cmd.AddValue("ConPercent", "Consumer percentage", con_per);
     cmd.AddValue("ProPercent", "Producer percentage", pro_per);
     cmd.Parse(argc, argv);
-
+    StackHelper stackHelper;
+    
     // Set seed for random numbers
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
-
+    //Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
         //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
@@ -56,8 +101,10 @@ int main(int argc, char **argv) {
     master.Create(1);
 
     for (int jdx = 0; jdx < node_head; jdx++) {
-        csmam[jdx] = br[jdx];
+        csmam[jdx].Add(br.Get(jdx));
         csmam[jdx].Add(master.Get(0));
+        std::cout << "Number of nodes in container:     " << csmam[jdx].GetN() << std::endl;
+
     }
 
     //Netdevice aanmaken voor masternode?
@@ -126,10 +173,13 @@ int main(int argc, char **argv) {
     Ipv6InterfaceContainer i[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
 
+/*
     ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
     for (int jdx = 0; jdx < node_head; jdx++) {
         i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
     }
+*/
+
 
     for (int jdx = 0; jdx < node_head; jdx++) {
 
@@ -142,13 +192,18 @@ int main(int argc, char **argv) {
         std::cout << c << std::endl;
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i[jdx] = ipv6.Assign(six[jdx]);
+        i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
         //Set forwarding and routing rules.
-/*
-        i_csma[jdx].SetForwarding(jdx, true);
+
+
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
         i[jdx].SetForwarding(node_periph, true);
-        i_csma[jdx].SetDefaultRouteInAllNodes(jdx);
-*/
+        i_csma[jdx].SetDefaultRouteInAllNodes(1);
+        i_csma[jdx].SetDefaultRouteInAllNodes(0);
+        i_csma[jdx].SetForwarding(0, true);
+        i_csma[jdx].SetForwarding(1, true);
+        Ptr<Node> routenode = master.Get(0);
+        stackHelper.PrintRoutingTable(routenode);
     }
 
     NS_LOG_INFO("Create Applications.");
@@ -174,8 +229,8 @@ int main(int argc, char **argv) {
 
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
-    lrWpanHelper.EnablePcapAll(std::string("./traces/ping6wsn"), true);
-
+    lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/ping6wsn"), true);
+    csma.EnablePcapAll("./traces/csma", true);
     NS_LOG_INFO("Run Simulation.");
     AnimationInterface anim("AWSNanimation.xml");
     anim.EnablePacketMetadata(true);

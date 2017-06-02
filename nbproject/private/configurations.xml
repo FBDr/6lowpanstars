@@ -6415,6 +6415,10 @@
         </df>
       </df>
       <df name="traces">
+        <df name="6lowpan">
+        </df>
+        <df name="csma">
+        </df>
       </df>
       <df name="utils">
         <df name="lcov">
