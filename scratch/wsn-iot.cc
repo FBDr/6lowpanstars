@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
         //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
         //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-        LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+        //LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
     }
 
@@ -156,7 +156,8 @@ int main(int argc, char **argv) {
     LrWpanHelper lrWpanHelper;
     for (int jdx = 0; jdx < node_head; jdx++) {
         LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
-        lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
+        //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
+        lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
 
     }
 
@@ -215,9 +216,10 @@ int main(int argc, char **argv) {
     uint32_t maxPacketCount = 1000;
     Time interPacketInterval = Seconds(0.5);
     Ping6Helper ping6;
-
+    
     ping6.SetLocal(i[0].GetAddress(0, 1));
-    ping6.SetRemote(i[1].GetAddress(1, 1));
+    ping6.SetRemote(i[2].GetAddress(0, 1));
+
     // ping6.SetRemote (Ipv6Address::GetAllNodesMulticast ());
 
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
