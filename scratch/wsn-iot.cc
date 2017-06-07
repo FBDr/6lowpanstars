@@ -8,6 +8,8 @@
 #include "ns3/csma-module.h"
 #include "ns3/netanim-module.h"
 #include "src/network/model/node.h"
+#include "ns3/ipv6-static-routing-helper.h"
+#include "ns3/ipv6-routing-table-entry.h"
 #include <string>
 
 
@@ -86,16 +88,17 @@ int main(int argc, char **argv) {
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
-/*
-        LogComponentEnable("Ipv6Extension", LOG_LEVEL_ALL);
-        LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-        LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-        LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
-        LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
-        LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-        LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
+        /*
+                LogComponentEnable("Ipv6Extension", LOG_LEVEL_ALL);
+                LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
+                LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
+                LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+                LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
+                LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
+                LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
+                LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
+         */
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-*/
 
     }
 
@@ -223,6 +226,30 @@ int main(int argc, char **argv) {
     Ptr<Node> routenode = master.Get(0);
     stackHelper.PrintRoutingTable(routenode);
     std::cout << "The master node has: " << master.Get(0)->GetNDevices() << " devices available." << std::endl;
+    /*****
+     *Routing magic
+     *
+     *****
+     */
+
+    Ipv6StaticRoutingHelper routingHelper;
+
+    // manually inject a static route to the second router.
+    Ptr<Ipv6StaticRouting> routing = routingHelper.GetStaticRouting(master.Get(0)->GetObject<Ipv6> ());
+    routing->AddHostRouteTo(i[0].GetAddress(0, 1), i_csma[0].GetAddress(0, 1), i_csma[0].GetInterfaceIndex(1));
+
+    Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+    routingHelper.PrintRoutingTableAt(Seconds(0.0), master.Get(0), routingStream);
+    routingHelper.PrintRoutingTableAt(Seconds(3.0), master.Get(0), routingStream);
+
+
+
+
+
+
+
+
+
     NS_LOG_INFO("Create Applications.");
 
     /* Create a Ping6 application to send ICMPv6 echo request from node zero to
@@ -234,7 +261,7 @@ int main(int argc, char **argv) {
     Ping6Helper ping6;
 
     ping6.SetLocal(i[1].GetAddress(0, 1));
-    ping6.SetRemote(i[0].GetAddress(1, 1));
+    ping6.SetRemote(i[0].GetAddress(0, 1));
 
     // ping6.SetRemote (Ipv6Address::GetAllNodesMulticast ());
 
