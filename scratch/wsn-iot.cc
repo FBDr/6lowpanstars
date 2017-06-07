@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
     int pro_per;
     int dist = 500;
     int subn = 0;
-    StackHelper stackHelper;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
