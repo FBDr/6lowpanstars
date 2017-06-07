@@ -17,50 +17,9 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
-class StackHelper {
-public:
-
-    /**
-     * \brief Add an address to a IPv6 node.
-     * \param n node
-     * \param interface interface index
-     * \param address IPv6 address to add
-     */
-    inline void AddAddress(Ptr<Node>& n, uint32_t interface, Ipv6Address address) {
-        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
-        ipv6->AddAddress(interface, address);
-    }
-
-    /**
-     * \brief Print the routing table.
-     * \param n the node
-     */
-    inline void PrintRoutingTable(Ptr<Node>& n) {
-        Ptr<Ipv6StaticRouting> routing = 0;
-        Ipv6StaticRoutingHelper routingHelper;
-        Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
-        uint32_t nbRoutes = 0;
-        Ipv6RoutingTableEntry route;
-
-        routing = routingHelper.GetStaticRouting(ipv6);
-
-        std::cout << "Routing table of " << n->GetId() << " : " << std::endl;
-        std::cout << "Destination\t\t\t\t" << "Gateway\t\t\t\t\t" << "Interface\t" << "Prefix to use" << std::endl;
-
-        nbRoutes = routing->GetNRoutes();
-        for (uint32_t i = 0; i < nbRoutes; i++) {
-            route = routing->GetRoute(i);
-            std::cout << route.GetDest() << "\t\t\t\t"
-                    << route.GetGateway() << "\t\t\t\t"
-                    << route.GetInterface() << "\t\t\t\t"
-                    << route.GetPrefixToUse() << "\t"
-                    << std::endl;
-        }
-    }
-};
-
 int main(int argc, char **argv) {
 
+    //Variables and simulation configuration
     bool verbose = false;
     int rngfeed = 43221;
     int node_num = 10;
@@ -70,6 +29,7 @@ int main(int argc, char **argv) {
     int pro_per;
     int dist = 500;
     int subn = 0;
+    StackHelper stackHelper;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
@@ -80,12 +40,12 @@ int main(int argc, char **argv) {
     cmd.AddValue("ConPercent", "Consumer percentage", con_per);
     cmd.AddValue("ProPercent", "Producer percentage", pro_per);
     cmd.Parse(argc, argv);
-    StackHelper stackHelper;
 
-    // Set seed for random numbers
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
+
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
+
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
         /*
@@ -99,9 +59,13 @@ int main(int argc, char **argv) {
                 LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
          */
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-
     }
 
+    // Creating NodeContainers
+    // - iot[]: 		NodeContainer with WSN nodes.
+    // - br: 	  		NodeContainer with border gateway routers.
+    // - Master:  	NodeContainer with the top router only.
+    // - lcsmam[]:	NodeContainer with specific border router and master node.
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
@@ -110,27 +74,23 @@ int main(int argc, char **argv) {
     br.Create(node_head);
     master.Create(1);
 
-    for (int jdx = 0; jdx < node_head; jdx++) {
-        csmam[jdx].Add(br.Get(jdx));
-        csmam[jdx].Add(master.Get(0));
-        std::cout << "Number of nodes in container:     " << csmam[jdx].GetN() << std::endl;
-
-    }
-
-    //Netdevice aanmaken voor masternode?
+    // Create mobility objects for master and (border) routers.
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> routerPositionAlloc = CreateObject<ListPositionAllocator> ();
     Ptr<ListPositionAllocator> masterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
+    // Create NetDeviceContainers for LrWpan, 6lowpan and CSMA (LAN).
     NetDeviceContainer LrWpanDevCon[node_head];
     NetDeviceContainer six[node_head];
     NetDeviceContainer master_csma[node_head];
 
     for (int jdx = 0; jdx < node_head; jdx++) {
+        //Add BR and master to csma-NodeContainers
+        csmam[jdx].Add(br.Get(jdx));
+        csmam[jdx].Add(master.Get(0));
+        //Add BR and WSN nodes to IoT[] domain
         iot[jdx].Create(node_periph);
         iot[jdx].Add(br.Get(jdx));
-
-
 
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.SetPositionAllocator("ns3::GridPositionAllocator",
@@ -153,25 +113,24 @@ int main(int argc, char **argv) {
     mobility.SetPositionAllocator(masterPositionAlloc);
     mobility.Install(master);
 
+
     NS_LOG_INFO("Create channels.");
 
+    //Create and install CSMA and LrWpan channels.
     CsmaHelper csma;
     csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
     csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
+    LrWpanHelper lrWpanHelper;
+
     for (int jdx = 0; jdx < node_head; jdx++) {
         master_csma[jdx] = csma.Install(csmam[jdx]);
-    }
-
-
-    LrWpanHelper lrWpanHelper;
-    for (int jdx = 0; jdx < node_head; jdx++) {
         LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
         //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
         lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
 
     }
 
-    /* Install IPv4/IPv6 stack */
+    // Install IPv6 stack
     NS_LOG_INFO("Install Internet stack.");
     InternetStackHelper internetv6;
     internetv6.SetIpv4StackInstall(false);
@@ -184,21 +143,11 @@ int main(int argc, char **argv) {
     Ipv6InterfaceContainer i[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
 
-    /*
-        ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
-        }
-     */
-
-
+    // Assign IPv6 addresses
+    NS_LOG_INFO("Assign addresses.");
     for (int jdx = 0; jdx < node_head; jdx++) {
-
-
-        //Assign IPv6 addresses
         std::string addresss;
         six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
-        NS_LOG_INFO("Assign addresses.");
         subn++;
         addresss = "2001:" + std::to_string(subn) + "::";
         const char * c = addresss.c_str();
@@ -208,33 +157,19 @@ int main(int argc, char **argv) {
         addresss = "2001:" + std::to_string(subn) + "::";
         c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-
         i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
-        //Set forwarding and routing rules.
 
-
+        //Set forwarding rules.
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
         i[jdx].SetForwarding(node_periph, true);
-
         i_csma[jdx].SetDefaultRouteInAllNodes(1);
         i_csma[jdx].SetDefaultRouteInAllNodes(0);
         i_csma[jdx].SetForwarding(0, true); //Is this line really needed? since all interfaces are set by i[jdx].Setforwarding...
-        std::cout << "Enabling forwarding for node with address:" << i_csma[jdx].GetAddress(0, 1) << std::endl;
         i_csma[jdx].SetForwarding(1, true);
-        std::cout << "Enabling forwarding for node with address:" << i_csma[jdx].GetAddress(1, 1) << std::endl;
     }
-    Ptr<Node> routenode = master.Get(0);
-    stackHelper.PrintRoutingTable(routenode);
-    std::cout << "The master node has: " << master.Get(0)->GetNDevices() << " devices available." << std::endl;
-    /*****
-     *Routing magic
-     *
-     *****
-     */
 
+    // Static routing rules
     Ipv6StaticRoutingHelper routingHelper;
-
-    // manually inject a static route to the second router.
     Ptr<Ipv6StaticRouting> routing = routingHelper.GetStaticRouting(master.Get(0)->GetObject<Ipv6> ());
     routing->AddHostRouteTo(i[0].GetAddress(0, 1), i_csma[0].GetAddress(0, 1), i_csma[0].GetInterfaceIndex(1));
 
@@ -242,19 +177,8 @@ int main(int argc, char **argv) {
     routingHelper.PrintRoutingTableAt(Seconds(0.0), master.Get(0), routingStream);
     routingHelper.PrintRoutingTableAt(Seconds(3.0), master.Get(0), routingStream);
 
-
-
-
-
-
-
-
-
+    // Install and create Ping applications.
     NS_LOG_INFO("Create Applications.");
-
-    /* Create a Ping6 application to send ICMPv6 echo request from node zero to
-     * all-nodes (ff02::1).
-     */
     uint32_t packetSize = 10;
     uint32_t maxPacketCount = 1000;
     Time interPacketInterval = Seconds(0.1);
@@ -263,12 +187,11 @@ int main(int argc, char **argv) {
     ping6.SetLocal(i[1].GetAddress(0, 1));
     ping6.SetRemote(i[0].GetAddress(0, 1));
 
-    // ping6.SetRemote (Ipv6Address::GetAllNodesMulticast ());
-
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     ping6.SetAttribute("Interval", TimeValue(interPacketInterval));
     ping6.SetAttribute("PacketSize", UintegerValue(packetSize));
-    ApplicationContainer apps = ping6.Install(iot[1].Get(0));
+
+    ApplicationContainer apps = ping6.Install(iot[1].Get(0)); //Install app on node 1.
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
 
