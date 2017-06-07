@@ -6420,6 +6420,12 @@
         <df name="csma">
         </df>
       </df>
+      <df name="traces_ref">
+        <df name="6lowpan">
+        </df>
+        <df name="csma">
+        </df>
+      </df>
       <df name="utils">
         <df name="lcov">
         </df>

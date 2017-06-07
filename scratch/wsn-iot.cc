@@ -7,6 +7,7 @@
 #include "ns3/mobility-module.h"
 #include "ns3/csma-module.h"
 #include "ns3/netanim-module.h"
+#include "src/network/model/node.h"
 #include <string>
 
 
@@ -14,9 +15,8 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
-class StackHelper
-{
-    public :
+class StackHelper {
+public:
 
     /**
      * \brief Add an address to a IPv6 node.
@@ -24,8 +24,7 @@ class StackHelper
      * \param interface interface index
      * \param address IPv6 address to add
      */
-    inline void AddAddress(Ptr<Node>& n, uint32_t interface, Ipv6Address address)
-    {
+    inline void AddAddress(Ptr<Node>& n, uint32_t interface, Ipv6Address address) {
         Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
         ipv6->AddAddress(interface, address);
     }
@@ -34,8 +33,7 @@ class StackHelper
      * \brief Print the routing table.
      * \param n the node
      */
-    inline void PrintRoutingTable(Ptr<Node>& n)
-    {
+    inline void PrintRoutingTable(Ptr<Node>& n) {
         Ptr<Ipv6StaticRouting> routing = 0;
         Ipv6StaticRoutingHelper routingHelper;
         Ptr<Ipv6> ipv6 = n->GetObject<Ipv6> ();
@@ -44,19 +42,20 @@ class StackHelper
 
         routing = routingHelper.GetStaticRouting(ipv6);
 
-        std::cout << "Routing table of " << n << " : " << std::endl;
+        std::cout << "Routing table of " << n->GetId() << " : " << std::endl;
         std::cout << "Destination\t\t\t\t" << "Gateway\t\t\t\t\t" << "Interface\t" << "Prefix to use" << std::endl;
 
         nbRoutes = routing->GetNRoutes();
         for (uint32_t i = 0; i < nbRoutes; i++) {
             route = routing->GetRoute(i);
-            std::cout << route.GetDest() << "*\t\t\t\t"
-                    << route.GetGateway() << "*\t\t\t\t"
-                    << route.GetInterface() << "*\t\t\t\t"
-                    << route.GetPrefixToUse() << "*\t"
+            std::cout << route.GetDest() << "\t\t\t\t"
+                    << route.GetGateway() << "\t\t\t\t"
+                    << route.GetInterface() << "\t\t\t\t"
+                    << route.GetPrefixToUse() << "\t"
                     << std::endl;
         }
-    }};
+    }
+};
 
 int main(int argc, char **argv) {
 
@@ -68,6 +67,7 @@ int main(int argc, char **argv) {
     int con_per;
     int pro_per;
     int dist = 500;
+    int subn = 0;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
@@ -79,17 +79,24 @@ int main(int argc, char **argv) {
     cmd.AddValue("ProPercent", "Producer percentage", pro_per);
     cmd.Parse(argc, argv);
     StackHelper stackHelper;
-    
+
     // Set seed for random numbers
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
-    //Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
+    Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
-        //LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-        //LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-        //LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+/*
+        LogComponentEnable("Ipv6Extension", LOG_LEVEL_ALL);
+        LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
+        LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
+        LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+        LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
+        LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
+        LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
+*/
+
     }
 
     NS_LOG_INFO("Creating IoT bubbles.");
@@ -174,39 +181,48 @@ int main(int argc, char **argv) {
     Ipv6InterfaceContainer i[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
 
-/*
-    ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
-    for (int jdx = 0; jdx < node_head; jdx++) {
-        i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
-    }
-*/
+    /*
+        ipv6.SetBase(Ipv6Address("2001:99::"), Ipv6Prefix(64));
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
+        }
+     */
 
 
     for (int jdx = 0; jdx < node_head; jdx++) {
+
 
         //Assign IPv6 addresses
         std::string addresss;
         six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
         NS_LOG_INFO("Assign addresses.");
-        addresss = "2001:" + std::to_string(jdx + 1) + "::";
+        subn++;
+        addresss = "2001:" + std::to_string(subn) + "::";
         const char * c = addresss.c_str();
-        std::cout << c << std::endl;
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i[jdx] = ipv6.Assign(six[jdx]);
+        subn++;
+        addresss = "2001:" + std::to_string(subn) + "::";
+        c = addresss.c_str();
+        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+
         i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
         //Set forwarding and routing rules.
 
 
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
         i[jdx].SetForwarding(node_periph, true);
+
         i_csma[jdx].SetDefaultRouteInAllNodes(1);
         i_csma[jdx].SetDefaultRouteInAllNodes(0);
-        i_csma[jdx].SetForwarding(0, true);
+        i_csma[jdx].SetForwarding(0, true); //Is this line really needed? since all interfaces are set by i[jdx].Setforwarding...
+        std::cout << "Enabling forwarding for node with address:" << i_csma[jdx].GetAddress(0, 1) << std::endl;
         i_csma[jdx].SetForwarding(1, true);
-        Ptr<Node> routenode = master.Get(0);
-        stackHelper.PrintRoutingTable(routenode);
+        std::cout << "Enabling forwarding for node with address:" << i_csma[jdx].GetAddress(1, 1) << std::endl;
     }
-
+    Ptr<Node> routenode = master.Get(0);
+    stackHelper.PrintRoutingTable(routenode);
+    std::cout << "The master node has: " << master.Get(0)->GetNDevices() << " devices available." << std::endl;
     NS_LOG_INFO("Create Applications.");
 
     /* Create a Ping6 application to send ICMPv6 echo request from node zero to
@@ -214,18 +230,18 @@ int main(int argc, char **argv) {
      */
     uint32_t packetSize = 10;
     uint32_t maxPacketCount = 1000;
-    Time interPacketInterval = Seconds(0.5);
+    Time interPacketInterval = Seconds(0.1);
     Ping6Helper ping6;
-    
-    ping6.SetLocal(i[0].GetAddress(0, 1));
-    ping6.SetRemote(i[2].GetAddress(0, 1));
+
+    ping6.SetLocal(i[1].GetAddress(0, 1));
+    ping6.SetRemote(i[0].GetAddress(1, 1));
 
     // ping6.SetRemote (Ipv6Address::GetAllNodesMulticast ());
 
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     ping6.SetAttribute("Interval", TimeValue(interPacketInterval));
     ping6.SetAttribute("PacketSize", UintegerValue(packetSize));
-    ApplicationContainer apps = ping6.Install(iot[0].Get(0));
+    ApplicationContainer apps = ping6.Install(iot[1].Get(0));
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
 
