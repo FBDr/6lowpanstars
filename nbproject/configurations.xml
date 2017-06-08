@@ -307,6 +307,7 @@
         <in>iot_comp.cc</in>
         <in>ripng-test.cc</in>
         <in>scratch-simulator.cc</in>
+        <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
         <in>wsn-iot-static.cc</in>
       </df>
@@ -3779,9 +3780,22 @@
             <Elem>NS3_BRITE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/brite/helper">
+        <ccTool>
+          <incDir>
+            <pElem>src/brite/helper</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>build</pElem>
+          </incDir>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -3806,29 +3820,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/brite/examples">
-        <ccTool>
-          <incDir>
-            <pElem>src/brite/examples</pElem>
-            <pElem>../BRITE</pElem>
-            <pElem>../BRITE/Models</pElem>
-            <pElem>build</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/brite/helper">
-        <ccTool>
-          <incDir>
-            <pElem>src/brite/helper</pElem>
-            <pElem>../BRITE</pElem>
-            <pElem>../BRITE/Models</pElem>
-            <pElem>build</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -8494,6 +8485,33 @@
         <ccTool flags="2">
         </ccTool>
       </item>
+      <item path="scratch/wsn-iot-rip-ba.cc" ex="false" tool="1" flavor2="8">
+        <ccTool flags="3">
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+            <pElem>build/ns3/ndnSIM/NFD</pElem>
+            <pElem>ns3/ndnSIM/NFD</pElem>
+            <pElem>build/src/ndnSIM/NFD/core</pElem>
+            <pElem>src/ndnSIM/NFD/core</pElem>
+            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
+            <pElem>src/ndnSIM/NFD/daemon</pElem>
+            <pElem>build/src/ndnSIM/NFD/rib</pElem>
+            <pElem>src/ndnSIM/NFD/rib</pElem>
+            <pElem>build/ns3/ndnSIM</pElem>
+            <pElem>ns3/ndnSIM</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>/usr/include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BRITE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
       <item path="scratch/wsn-iot-rip2.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="3">
           <incDir>
@@ -8819,13 +8837,61 @@
             tool="1"
             flavor2="8">
         <ccTool flags="2">
+          <incDir>
+            <pElem>build/ns3</pElem>
+            <pElem>src/brite/examples</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>build</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/brite/examples/brite-generic-example.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BRITE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/brite/helper/brite-topology-helper.cc"

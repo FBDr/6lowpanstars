@@ -10,6 +10,7 @@
 #include "src/network/model/node.h"
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
+#include "ns3/brite-module.h"
 #include <string>
 
 
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
     // - br: 	  		NodeContainer with border gateway routers.
     // - Master:  	NodeContainer with the top router only.
     // - lcsmam[]:	NodeContainer with specific border router and master node.
-    
+
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
@@ -77,6 +78,10 @@ int main(int argc, char **argv) {
     master.Create(1);
     routers.Add(master);
     routers.Add(br);
+
+    //Brite
+    BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
+    bth.AssignStreams(3);
 
     // Create mobility objects for master and (border) routers.
     MobilityHelper mobility;
@@ -146,7 +151,12 @@ int main(int argc, char **argv) {
     internetv6.Install(endnodes);
     internetv6.SetRoutingHelper(listRH);
     internetv6.Install(routers);
-
+    //BRITE
+    Ipv6AddressHelper ipv66;
+    bth.BuildBriteTopology(internetv6);
+    ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
+    bth.AssignIpv6Addresses(ipv66);
+    
 
 
     // Install 6LowPan layer

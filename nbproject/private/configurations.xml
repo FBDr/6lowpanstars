@@ -2061,6 +2061,7 @@
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
+        <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
         <in>wsn-iot-static.cc</in>
       </df>
