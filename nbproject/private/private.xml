@@ -10,11 +10,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/floris/ndnSIM/ns-3/examples/ipv6/loose-routing-ipv6.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/examples/routing/simple-routing-ping6.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/src/internet/model/ipv6-raw-socket-impl.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/build/ns3/simple-ref-count.h</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/ripng-test.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot-rip2.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot-ripng.cc</file>
         </group>
     </open-files>
 </project-private>

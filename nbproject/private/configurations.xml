@@ -2058,9 +2058,12 @@
         </df>
         <in>iot_comp.cc</in>
         <in>lrwpan.cpp</in>
+        <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
-        <in>wsn-iot.cc</in>
+        <in>wsn-iot-rip2.cc</in>
+        <in>wsn-iot-ripng.cc</in>
+        <in>wsn-iot-static.cc</in>
       </df>
       <df name="src">
         <df name="antenna">
