@@ -2062,7 +2062,6 @@
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
         <in>wsn-iot-rip2.cc</in>
-        <in>wsn-iot-ripng.cc</in>
         <in>wsn-iot-static.cc</in>
       </df>
       <df name="src">

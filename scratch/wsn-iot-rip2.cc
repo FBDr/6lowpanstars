@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
     internetv6.Install(endnodes);
     internetv6.SetRoutingHelper(listRH);
     internetv6.Install(routers);
-    
+
 
 
     // Install 6LowPan layer
@@ -181,15 +181,13 @@ int main(int argc, char **argv) {
     }
 
     // Static routing rules
-    /*
-        Ipv6StaticRoutingHelper routingHelper;
-        Ptr<Ipv6StaticRouting> routing = routingHelper.GetStaticRouting(master.Get(0)->GetObject<Ipv6> ());
-        routing->AddHostRouteTo(i[0].GetAddress(0, 1), i_csma[0].GetAddress(0, 1), i_csma[0].GetInterfaceIndex(1));
 
-        Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-        routingHelper.PrintRoutingTableAt(Seconds(0.0), master.Get(0), routingStream);
-        routingHelper.PrintRoutingTableAt(Seconds(3.0), master.Get(0), routingStream);
-     */
+
+    Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+
+    ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
+
+
 
     // Install and create Ping applications.
     NS_LOG_INFO("Create Applications.");
@@ -199,15 +197,15 @@ int main(int argc, char **argv) {
     Ping6Helper ping6;
 
     ping6.SetLocal(i[1].GetAddress(0, 1));
-    ping6.SetRemote(i[0].GetAddress(0, 1));
+    ping6.SetRemote(i[5].GetAddress(4, 1));
 
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     ping6.SetAttribute("Interval", TimeValue(interPacketInterval));
     ping6.SetAttribute("PacketSize", UintegerValue(packetSize));
 
     ApplicationContainer apps = ping6.Install(iot[1].Get(0)); //Install app on node 1.
-    apps.Start(Seconds(2.0));
-    apps.Stop(Seconds(10.0));
+    apps.Start(Seconds(5.0));
+    apps.Stop(Seconds(15.0));
 
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
@@ -216,7 +214,7 @@ int main(int argc, char **argv) {
     NS_LOG_INFO("Run Simulation.");
     AnimationInterface anim("AWSNanimation.xml");
     anim.EnablePacketMetadata(true);
-    Simulator::Stop (Seconds (20));
+    Simulator::Stop(Seconds(20));
     Simulator::Run();
     Simulator::Destroy();
     NS_LOG_INFO("Done.");
