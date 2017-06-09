@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     for (int jdx = 0; jdx < node_head; jdx++) {
         //Add BR and master to csma-NodeContainers
         csmam[jdx].Add(br.Get(jdx));
-        csmam[jdx].Add(backhaul.Get(jdx));
+        csmam[jdx].Add(backhaul.Get(jdx+5));
         //Add BR and WSN nodes to IoT[] domain
         iot[jdx].Create(node_periph);
         endnodes.Add(iot[jdx]);
@@ -180,7 +180,6 @@ int main(int argc, char **argv) {
     //For outer network
     NS_LOG_INFO("Assign addresses.");
     for (int jdx = 0; jdx < node_head; jdx++) {
-
         six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
         subn++;
         addresss = "2001:0:" + std::to_string(subn) + "::";
@@ -202,8 +201,6 @@ int main(int argc, char **argv) {
         i_csma[jdx].SetForwarding(1, true);
 
     }
-
-
     // Static routing rules
     //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
     //ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
@@ -224,15 +221,15 @@ int main(int argc, char **argv) {
 
     ApplicationContainer apps = ping6.Install(iot[1].Get(0)); //Install app on node 1.
     apps.Start(Seconds(5.0));
-    apps.Stop(Seconds(15.0));
+    apps.Stop(Seconds(60.0));
 
     AsciiTraceHelper ascii;
     //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
     lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/ping6wsn"), true);
     csma.EnablePcapAll(std::string("./traces/csma"), true);
     NS_LOG_INFO("Run Simulation.");
-    AnimationInterface anim("AWSNanimation.xml");
-    anim.EnablePacketMetadata(true);
+    //AnimationInterface anim("AWSNanimation.xml");
+    //anim.EnablePacketMetadata(true);
     Simulator::Stop(Seconds(20));
     Simulator::Run();
     Simulator::Destroy();
