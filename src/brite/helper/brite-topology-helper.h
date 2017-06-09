@@ -94,6 +94,14 @@ public:
    *  \param stack Internet stack to assign to nodes in topology
    */
   void BuildBriteTopology (InternetStackHelper& stack);
+  
+    /**
+   *  Create NS3 topology using information generated from BRITE.
+   *
+   *  \returns NodeContainer
+   */
+  NodeContainer BuildBriteTopology2 ();
+  
 
   /**
    * Create NS3 topology using information generated from BRITE and configure topology for MPI use.

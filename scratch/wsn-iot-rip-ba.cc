@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     // - br: 	  		NodeContainer with border gateway routers.
     // - Master:  	NodeContainer with the top router only.
     // - lcsmam[]:	NodeContainer with specific border router and master node.
-    
+
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
@@ -74,15 +74,20 @@ int main(int argc, char **argv) {
     NodeContainer routers;
     NodeContainer endnodes;
     NodeContainer csmam[node_head];
-    br.Create(node_head);
-    master.Create(1);
-    routers.Add(master);
-    routers.Add(br);
+    NodeContainer backhaul;
 
     //Brite
     BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
     bth.AssignStreams(3);
+    backhaul = bth.BuildBriteTopology2();
 
+    br.Create(node_head);
+    master.Create(1);
+    //routers.Add(master);
+    routers.Add(backhaul);
+    routers.Add(br);
+
+    
     // Create mobility objects for master and (border) routers.
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> routerPositionAlloc = CreateObject<ListPositionAllocator> ();
@@ -96,7 +101,7 @@ int main(int argc, char **argv) {
     for (int jdx = 0; jdx < node_head; jdx++) {
         //Add BR and master to csma-NodeContainers
         csmam[jdx].Add(br.Get(jdx));
-        csmam[jdx].Add(master.Get(0));
+        csmam[jdx].Add(backhaul.Get(jdx));
         //Add BR and WSN nodes to IoT[] domain
         iot[jdx].Create(node_periph);
         endnodes.Add(iot[jdx]);
@@ -138,6 +143,11 @@ int main(int argc, char **argv) {
         lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
     }
 
+    //BRITE
+    Ipv6AddressHelper ipv66;
+
+    ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
+
     // Install IPv6 stack
     NS_LOG_INFO("Install Internet stack.");
     RipNgHelper ripNgRouting;
@@ -149,12 +159,8 @@ int main(int argc, char **argv) {
     internetv6.Install(endnodes);
     internetv6.SetRoutingHelper(listRH);
     internetv6.Install(routers);
-    //BRITE
-    Ipv6AddressHelper ipv66;
-    bth.BuildBriteTopology(internetv6);
-    ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
-    bth.AssignIpv6Addresses(ipv66);
-    
+
+
     // Install 6LowPan layer
     NS_LOG_INFO("Install 6LoWPAN.");
     SixLowPanHelper sixlowpan;

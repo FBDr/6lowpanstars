@@ -416,6 +416,31 @@ BriteTopologyHelper::BuildBriteTopology (InternetStackHelper& stack, const uint3
   ConstructTopology ();
 }
 
+NodeContainer
+BriteTopologyHelper::BuildBriteTopology2 ()
+{
+  NS_LOG_FUNCTION (this);
+
+  GenerateBriteTopology ();
+
+  //not using MPI so each AS is on system number 0
+  for (uint32_t i = 0; i < m_numAs; ++i)
+    {
+      m_systemForAs.push_back (0);
+    }
+
+  //create all nodes with system number 0
+  m_nodes.Create (m_briteNodeInfoList.size ());
+
+  m_numNodes = m_briteNodeInfoList.size ();
+
+  NS_LOG_DEBUG (m_numNodes << " nodes created in BRITE topology");
+
+  ConstructTopology ();
+  
+  return m_nodes;
+}
+
 void
 BriteTopologyHelper::AssignIpv4Addresses (Ipv4AddressHelper& address)
 {
