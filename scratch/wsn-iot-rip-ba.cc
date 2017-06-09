@@ -123,7 +123,6 @@ int main(int argc, char **argv) {
     mobility.SetPositionAllocator(masterPositionAlloc);
     mobility.Install(master);
 
-
     NS_LOG_INFO("Create channels.");
 
     //Create and install CSMA and LrWpan channels.
@@ -156,9 +155,6 @@ int main(int argc, char **argv) {
     ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
     bth.AssignIpv6Addresses(ipv66);
     
-    
-
-
     // Install 6LowPan layer
     NS_LOG_INFO("Install 6LoWPAN.");
     SixLowPanHelper sixlowpan;
@@ -192,13 +188,8 @@ int main(int argc, char **argv) {
     }
 
     // Static routing rules
-
-
     Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-
     ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
-
-
 
     // Install and create Ping applications.
     NS_LOG_INFO("Create Applications.");
