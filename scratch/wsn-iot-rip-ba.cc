@@ -70,33 +70,41 @@ int main(int argc, char **argv) {
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
-    NodeContainer master;
+
     NodeContainer routers;
     NodeContainer endnodes;
     NodeContainer csmam[node_head];
     NodeContainer backhaul;
 
     //Brite
-    BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
+    BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
     bth.AssignStreams(3);
     backhaul = bth.BuildBriteTopology2();
 
     br.Create(node_head);
-    master.Create(1);
-    //routers.Add(master);
     routers.Add(backhaul);
     routers.Add(br);
 
-    
+
     // Create mobility objects for master and (border) routers.
     MobilityHelper mobility;
+    MobilityHelper mobility_backhaul;
+    mobility_backhaul.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    mobility_backhaul.SetPositionAllocator("ns3::GridPositionAllocator",
+                "MinX", DoubleValue(0),
+                "MinY", DoubleValue(0),
+                "DeltaX", DoubleValue(10),
+                "DeltaY", DoubleValue(10),
+                "GridWidth", UintegerValue(20),
+                "LayoutType", StringValue("RowFirst"));
+    mobility_backhaul.Install(backhaul);
     Ptr<ListPositionAllocator> routerPositionAlloc = CreateObject<ListPositionAllocator> ();
-    Ptr<ListPositionAllocator> masterPositionAlloc = CreateObject<ListPositionAllocator> ();
+
 
     // Create NetDeviceContainers for LrWpan, 6lowpan and CSMA (LAN).
     NetDeviceContainer LrWpanDevCon[node_head];
     NetDeviceContainer six[node_head];
-    NetDeviceContainer master_csma[node_head];
+    NetDeviceContainer core_csma[node_head];
 
     for (int jdx = 0; jdx < node_head; jdx++) {
         //Add BR and master to csma-NodeContainers
@@ -116,17 +124,12 @@ int main(int argc, char **argv) {
                 "GridWidth", UintegerValue(3),
                 "LayoutType", StringValue("RowFirst"));
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-
         mobility.Install(iot[jdx]);
-
         routerPositionAlloc->Add(Vector(-495 + jdx * dist, 395, 0.0));
-        masterPositionAlloc->Add(Vector(0, 200, 0.0));
     }
 
     mobility.SetPositionAllocator(routerPositionAlloc);
     mobility.Install(br);
-    mobility.SetPositionAllocator(masterPositionAlloc);
-    mobility.Install(master);
 
     NS_LOG_INFO("Create channels.");
 
@@ -137,17 +140,13 @@ int main(int argc, char **argv) {
     LrWpanHelper lrWpanHelper;
 
     for (int jdx = 0; jdx < node_head; jdx++) {
-        master_csma[jdx] = csma.Install(csmam[jdx]);
+        core_csma[jdx] = csma.Install(csmam[jdx]);
         LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
         //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
         lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
     }
 
     //BRITE
-    Ipv6AddressHelper ipv66;
-
-    ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
-
     // Install IPv6 stack
     NS_LOG_INFO("Install Internet stack.");
     RipNgHelper ripNgRouting;
@@ -158,7 +157,8 @@ int main(int argc, char **argv) {
     internetv6.SetIpv4StackInstall(false);
     internetv6.Install(endnodes);
     internetv6.SetRoutingHelper(listRH);
-    internetv6.Install(routers);
+    internetv6.Install(br);
+    internetv6.Install(backhaul);
 
 
     // Install 6LowPan layer
@@ -167,11 +167,20 @@ int main(int argc, char **argv) {
     Ipv6AddressHelper ipv6;
     Ipv6InterfaceContainer i[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
+    Ipv6InterfaceContainer i_backhaul;
 
     // Assign IPv6 addresses
+    // For backhaul network
+    std::string addresss;
+    addresss = "2001:0:" + std::to_string(1337) + "::";
+    const char * c = addresss.c_str();
+    ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+    bth.AssignIpv6Addresses(ipv6);
+
+    //For outer network
     NS_LOG_INFO("Assign addresses.");
     for (int jdx = 0; jdx < node_head; jdx++) {
-        std::string addresss;
+
         six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
         subn++;
         addresss = "2001:0:" + std::to_string(subn) + "::";
@@ -182,7 +191,7 @@ int main(int argc, char **argv) {
         addresss = "2001:0:" + std::to_string(subn) + "::";
         c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_csma[jdx] = ipv6.Assign(master_csma[jdx]);
+        i_csma[jdx] = ipv6.Assign(core_csma[jdx]);
 
         //Set forwarding rules.
         i[jdx].SetDefaultRouteInAllNodes(node_periph);
@@ -191,11 +200,13 @@ int main(int argc, char **argv) {
         //i_csma[jdx].SetDefaultRouteInAllNodes(0);
         i_csma[jdx].SetForwarding(0, true); //Is this line really needed? since all interfaces are set by i[jdx].Setforwarding...
         i_csma[jdx].SetForwarding(1, true);
+
     }
 
+
     // Static routing rules
-    Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-    ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
+    //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+    //ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
 
     // Install and create Ping applications.
     NS_LOG_INFO("Create Applications.");

@@ -184,6 +184,14 @@ public:
     * \returns the total number of nodes within the brite topology
     */
   uint32_t GetNNodesTopology () const;
+    /**
+    * Returns the netdevicecontainer.
+    * 
+    *
+    * \returns NetDeviceContainer.
+    */
+  
+  NetDeviceContainer ReturnNetDeviceContainer ( uint32_t as);
 
   /**
     * Returns the number of edges created within

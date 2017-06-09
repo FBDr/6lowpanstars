@@ -453,6 +453,14 @@ BriteTopologyHelper::AssignIpv4Addresses (Ipv4AddressHelper& address)
     }
 }
 
+NetDeviceContainer
+BriteTopologyHelper::ReturnNetDeviceContainer ( uint32_t as)
+{
+  NS_LOG_FUNCTION (this);
+  //assign IPs
+   return *m_netDevices[as];
+}
+
 void
 BriteTopologyHelper::AssignIpv6Addresses (Ipv6AddressHelper& address)
 {
@@ -460,8 +468,11 @@ BriteTopologyHelper::AssignIpv6Addresses (Ipv6AddressHelper& address)
 
   for (unsigned int i = 0; i < m_netDevices.size (); ++i)
     {
-      address.Assign (*m_netDevices[i]);
+      Ipv6InterfaceContainer netdc = address.Assign (*m_netDevices[i]);
+      netdc.SetForwarding(0, true);
+      netdc.SetForwarding(1, true);
       address.NewNetwork ();
+      
     }
 }
 
