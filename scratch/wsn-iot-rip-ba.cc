@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     // - br: 	  		NodeContainer with border gateway routers.
     // - Master:  	NodeContainer with the top router only.
     // - lcsmam[]:	NodeContainer with specific border router and master node.
-
+    
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
@@ -104,8 +104,8 @@ int main(int argc, char **argv) {
 
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(jdx * dist),
-                "MinY", DoubleValue(0.0),
+                "MinX", DoubleValue(-500 + jdx * dist),
+                "MinY", DoubleValue(400),
                 "DeltaX", DoubleValue(5),
                 "DeltaY", DoubleValue(5),
                 "GridWidth", UintegerValue(3),
@@ -114,8 +114,8 @@ int main(int argc, char **argv) {
 
         mobility.Install(iot[jdx]);
 
-        routerPositionAlloc->Add(Vector(5.0 + jdx * dist, -5.0, 0.0));
-        masterPositionAlloc->Add(Vector(500, -200, 0.0));
+        routerPositionAlloc->Add(Vector(-495 + jdx * dist, 395, 0.0));
+        masterPositionAlloc->Add(Vector(0, 200, 0.0));
     }
 
     mobility.SetPositionAllocator(routerPositionAlloc);
@@ -137,7 +137,6 @@ int main(int argc, char **argv) {
         LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
         //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
         lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
-
     }
 
     // Install IPv6 stack
@@ -156,6 +155,7 @@ int main(int argc, char **argv) {
     bth.BuildBriteTopology(internetv6);
     ipv66.SetBase(Ipv6Address("2001:1337::"), Ipv6Prefix(64));
     bth.AssignIpv6Addresses(ipv66);
+    
     
 
 

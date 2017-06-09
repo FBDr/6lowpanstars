@@ -6429,6 +6429,10 @@
         <df name="csma">
         </df>
       </df>
+      <df name="tracing">
+        <df name="ip">
+        </df>
+      </df>
       <df name="utils">
         <df name="lcov">
         </df>
