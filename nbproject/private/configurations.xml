@@ -2058,6 +2058,8 @@
         </df>
         <in>iot_comp.cc</in>
         <in>lrwpan.cpp</in>
+        <in>ndn-simple-L3.cc</in>
+        <in>ndn-simple-L3.cpp</in>
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>

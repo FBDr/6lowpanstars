@@ -43,7 +43,8 @@ int main(int argc, char **argv) {
 
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
-
+    
+    //ICMPv6 redirects do not optimise routes in single router case.
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
 
     if (verbose) {
@@ -64,8 +65,8 @@ int main(int argc, char **argv) {
     // Creating NodeContainers
     // - iot[]: 		NodeContainer with WSN nodes.
     // - br: 	  		NodeContainer with border gateway routers.
-    // - Master:  	NodeContainer with the top router only.
-    // - lcsmam[]:	NodeContainer with specific border router and master node.
+    // - csmam[]:               NodeContainer with specific border router and master node.
+    // - backhaul:              NodeContainer with backhaul network nodes.
 
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
@@ -73,7 +74,7 @@ int main(int argc, char **argv) {
 
     NodeContainer routers;
     NodeContainer endnodes;
-    NodeContainer csmam[node_head];
+    NodeContainer border_backhaul[node_head];
     NodeContainer backhaul;
 
     //Brite
@@ -91,25 +92,24 @@ int main(int argc, char **argv) {
     MobilityHelper mobility_backhaul;
     mobility_backhaul.SetMobilityModel("ns3::ConstantPositionMobilityModel");
     mobility_backhaul.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(0),
-                "MinY", DoubleValue(0),
-                "DeltaX", DoubleValue(10),
-                "DeltaY", DoubleValue(10),
-                "GridWidth", UintegerValue(20),
-                "LayoutType", StringValue("RowFirst"));
+            "MinX", DoubleValue(0),
+            "MinY", DoubleValue(0),
+            "DeltaX", DoubleValue(10),
+            "DeltaY", DoubleValue(10),
+            "GridWidth", UintegerValue(20),
+            "LayoutType", StringValue("RowFirst"));
     mobility_backhaul.Install(backhaul);
-    Ptr<ListPositionAllocator> routerPositionAlloc = CreateObject<ListPositionAllocator> ();
-
 
     // Create NetDeviceContainers for LrWpan, 6lowpan and CSMA (LAN).
-    NetDeviceContainer LrWpanDevCon[node_head];
-    NetDeviceContainer six[node_head];
-    NetDeviceContainer core_csma[node_head];
+    NetDeviceContainer LrWpanDevice[node_head];
+    NetDeviceContainer SixLowpanDevice[node_head];
+    NetDeviceContainer CSMADevice[node_head];
+    Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
     for (int jdx = 0; jdx < node_head; jdx++) {
         //Add BR and master to csma-NodeContainers
-        csmam[jdx].Add(br.Get(jdx));
-        csmam[jdx].Add(backhaul.Get(jdx+5));
+        border_backhaul[jdx].Add(br.Get(jdx));
+        border_backhaul[jdx].Add(backhaul.Get(jdx + 5));
         //Add BR and WSN nodes to IoT[] domain
         iot[jdx].Create(node_periph);
         endnodes.Add(iot[jdx]);
@@ -125,10 +125,10 @@ int main(int argc, char **argv) {
                 "LayoutType", StringValue("RowFirst"));
         mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
         mobility.Install(iot[jdx]);
-        routerPositionAlloc->Add(Vector(-495 + jdx * dist, 395, 0.0));
+        BorderRouterPositionAlloc->Add(Vector(-495 + jdx * dist, 395, 0.0));
     }
 
-    mobility.SetPositionAllocator(routerPositionAlloc);
+    mobility.SetPositionAllocator(BorderRouterPositionAlloc);
     mobility.Install(br);
 
     NS_LOG_INFO("Create channels.");
@@ -140,10 +140,10 @@ int main(int argc, char **argv) {
     LrWpanHelper lrWpanHelper;
 
     for (int jdx = 0; jdx < node_head; jdx++) {
-        core_csma[jdx] = csma.Install(csmam[jdx]);
-        LrWpanDevCon[jdx] = lrWpanHelper.Install(iot[jdx]);
+        CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
+        LrWpanDevice[jdx] = lrWpanHelper.Install(iot[jdx]);
         //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
-        lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], 10);
+        lrWpanHelper.AssociateToPan(LrWpanDevice[jdx], 10);
     }
 
     //BRITE
@@ -160,12 +160,11 @@ int main(int argc, char **argv) {
     internetv6.Install(br);
     internetv6.Install(backhaul);
 
-
     // Install 6LowPan layer
     NS_LOG_INFO("Install 6LoWPAN.");
     SixLowPanHelper sixlowpan;
     Ipv6AddressHelper ipv6;
-    Ipv6InterfaceContainer i[node_head];
+    Ipv6InterfaceContainer i_6lowpan[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
     Ipv6InterfaceContainer i_backhaul;
 
@@ -180,24 +179,24 @@ int main(int argc, char **argv) {
     //For outer network
     NS_LOG_INFO("Assign addresses.");
     for (int jdx = 0; jdx < node_head; jdx++) {
-        six[jdx] = sixlowpan.Install(LrWpanDevCon[jdx]);
+        SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
         subn++;
         addresss = "2001:0:" + std::to_string(subn) + "::";
         const char * c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i[jdx] = ipv6.Assign(six[jdx]);
+        i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
         subn++;
         addresss = "2001:0:" + std::to_string(subn) + "::";
         c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_csma[jdx] = ipv6.Assign(core_csma[jdx]);
+        i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
 
         //Set forwarding rules.
-        i[jdx].SetDefaultRouteInAllNodes(node_periph);
-        i[jdx].SetForwarding(node_periph, true);
+        i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
+        i_6lowpan[jdx].SetForwarding(node_periph, true);
         //i_csma[jdx].SetDefaultRouteInAllNodes(1);
         //i_csma[jdx].SetDefaultRouteInAllNodes(0);
-        i_csma[jdx].SetForwarding(0, true); //Is this line really needed? since all interfaces are set by i[jdx].Setforwarding...
+        i_csma[jdx].SetForwarding(0, true); 
         i_csma[jdx].SetForwarding(1, true);
 
     }
@@ -212,8 +211,8 @@ int main(int argc, char **argv) {
     Time interPacketInterval = Seconds(0.1);
     Ping6Helper ping6;
 
-    ping6.SetLocal(i[1].GetAddress(0, 1));
-    ping6.SetRemote(i[2].GetAddress(4, 1));
+    ping6.SetLocal(i_6lowpan[1].GetAddress(0, 1));
+    ping6.SetRemote(i_6lowpan[2].GetAddress(4, 1));
 
     ping6.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     ping6.SetAttribute("Interval", TimeValue(interPacketInterval));
