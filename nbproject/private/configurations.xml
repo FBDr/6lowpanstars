@@ -1143,6 +1143,9 @@
           <in>ref-count-base.h</in>
           <in>regular-wifi-mac.h</in>
           <in>rem-spectrum-phy.h</in>
+          <in>request-response-client.h</in>
+          <in>request-response-helper.h</in>
+          <in>request-response-server.h</in>
           <in>ripng-header.h</in>
           <in>ripng-helper.h</in>
           <in>ripng.h</in>
@@ -2019,6 +2022,7 @@
           <in>third.cc</in>
         </df>
         <df name="udp">
+          <in>request-response.cc</in>
           <in>udp-echo.cc</in>
         </df>
         <df name="udp-client-server">
@@ -2060,6 +2064,7 @@
         <in>lrwpan.cpp</in>
         <in>ndn-simple-L3.cc</in>
         <in>ndn-simple-L3.cpp</in>
+        <in>ping6Icn.cc</in>
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
@@ -2154,6 +2159,8 @@
             <in>ping6-helper.h</in>
             <in>radvd-helper.cc</in>
             <in>radvd-helper.h</in>
+            <in>request-response-helper.cc</in>
+            <in>request-response-helper.h</in>
             <in>udp-client-server-helper.cc</in>
             <in>udp-client-server-helper.h</in>
             <in>udp-echo-helper.cc</in>
@@ -2180,6 +2187,10 @@
             <in>radvd-prefix.h</in>
             <in>radvd.cc</in>
             <in>radvd.h</in>
+            <in>request-response-client.cc</in>
+            <in>request-response-client.h</in>
+            <in>request-response-server.cc</in>
+            <in>request-response-server.h</in>
             <in>seq-ts-header.cc</in>
             <in>seq-ts-header.h</in>
             <in>udp-client.cc</in>
@@ -6418,6 +6429,8 @@
             <in>wimax-tlv-test.cc</in>
           </df>
         </df>
+      </df>
+      <df name="testpy-output">
       </df>
       <df name="traces">
         <df name="6lowpan">

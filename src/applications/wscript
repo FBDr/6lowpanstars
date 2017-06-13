@@ -12,6 +12,8 @@ def build(bld):
         'model/radvd-prefix.cc',
         'model/udp-client.cc',
         'model/udp-server.cc',
+        'model/request-response-client.cc',
+        'model/request-response-server.cc',
         'model/seq-ts-header.cc',
         'model/udp-trace-client.cc',
         'model/packet-loss-counter.cc',
@@ -25,6 +27,7 @@ def build(bld):
         'helper/ping6-helper.cc',
         'helper/udp-client-server-helper.cc',
         'helper/udp-echo-helper.cc',
+        'helper/request-response-helper.cc',
         'helper/v4ping-helper.cc',
         'helper/radvd-helper.cc',
         ]
@@ -51,6 +54,8 @@ def build(bld):
         'model/packet-loss-counter.h',
         'model/udp-echo-client.h',
         'model/udp-echo-server.h',
+        'model/request-response-client.h',
+        'model/request-response-server.h',
         'model/v4ping.h',
         'model/application-packet-probe.h',
         'helper/bulk-send-helper.h',
@@ -59,6 +64,7 @@ def build(bld):
         'helper/ping6-helper.h',
         'helper/udp-client-server-helper.h',
         'helper/udp-echo-helper.h',
+        'helper/request-response-helper.h',
         'helper/v4ping-helper.h',
         'helper/radvd-helper.h',
         ]

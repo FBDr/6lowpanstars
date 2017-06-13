@@ -1,9 +1,19 @@
 // ndn-simple.cpp
 
+#include <fstream>
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/sixlowpan-module.h"
+#include "ns3/lr-wpan-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/csma-module.h"
+#include "ns3/netanim-module.h"
+#include "src/network/model/node.h"
+#include "ns3/ipv6-static-routing-helper.h"
+#include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/point-to-point-module.h"
-#include "ns3/ndnSIM-module.h"
+#include <string>
 
 namespace ns3 {
 
@@ -21,8 +31,10 @@ namespace ns3 {
         // Creating nodes
         NodeContainer nodes;
         nodes.Create(3);
-        NetDeviceContainer netcon;
-        netcon.Add(nodes);
+        NetDeviceContainer nodesCon;
+        nodesCon.Add(nodes.);
+ 
+
         // Connecting nodes using two links
         PointToPointHelper p2p;
         p2p.Install(nodes.Get(0), nodes.Get(1));
@@ -37,7 +49,7 @@ namespace ns3 {
         addresss = "2001:0:" + std::to_string(1337) + "::";
         const char * c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_faces = ipv6.Assign(netcon);
+        i_faces = ipv6.Assign(i_faces);
 
 
         // Install NDN stack on all nodes
