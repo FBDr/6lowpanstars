@@ -51,7 +51,7 @@ main (int argc, char *argv[])
 // Allow the user to override any of the defaults and the above Bind() at
 // run-time, via command-line arguments
 //
-  bool useV6 = false;
+  bool useV6 = true;
   Address serverAddress;
 
   CommandLine cmd;
@@ -121,17 +121,17 @@ main (int argc, char *argv[])
   apps.Start (Seconds (2.0));
   apps.Stop (Seconds (10.0));
 
-#if 0
+#if 1
 //
 // Users may find it convenient to initialize echo packets with actual data;
 // the below lines suggest how to do this
 //
   client.SetFill (apps.Get (0), "Hello World");
 
-  client.SetFill (apps.Get (0), 0xa5, 1024);
+  //client.SetFill (apps.Get (0), 0xa5, 1024);
 
-  uint8_t fill[] = { 0, 1, 2, 3, 4, 5, 6};
-  client.SetFill (apps.Get (0), fill, sizeof(fill), 1024);
+  //uint8_t fill[] = { 0, 1, 2, 3, 4, 5, 6};
+  //client.SetFill (apps.Get (0), fill, sizeof(fill), 1024);
 #endif
 
   AsciiTraceHelper ascii;

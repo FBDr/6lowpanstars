@@ -648,6 +648,9 @@
           <in>chunk.h</in>
           <in>cid-factory.h</in>
           <in>cid.h</in>
+          <in>coap-client.h</in>
+          <in>coap-helper.h</in>
+          <in>coap-server.h</in>
           <in>codel-queue.h</in>
           <in>command-line.h</in>
           <in>config-store-config.h</in>
@@ -2022,6 +2025,7 @@
           <in>third.cc</in>
         </df>
         <df name="udp">
+          <in>coap.cc</in>
           <in>request-response.cc</in>
           <in>udp-echo.cc</in>
         </df>
@@ -2151,6 +2155,8 @@
           <df name="helper">
             <in>bulk-send-helper.cc</in>
             <in>bulk-send-helper.h</in>
+            <in>coap-helper.cc</in>
+            <in>coap-helper.h</in>
             <in>on-off-helper.cc</in>
             <in>on-off-helper.h</in>
             <in>packet-sink-helper.cc</in>
@@ -2173,6 +2179,10 @@
             <in>application-packet-probe.h</in>
             <in>bulk-send-application.cc</in>
             <in>bulk-send-application.h</in>
+            <in>coap-client.cc</in>
+            <in>coap-client.h</in>
+            <in>coap-server.cc</in>
+            <in>coap-server.h</in>
             <in>onoff-application.cc</in>
             <in>onoff-application.h</in>
             <in>packet-loss-counter.cc</in>
