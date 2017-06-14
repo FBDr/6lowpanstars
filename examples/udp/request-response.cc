@@ -50,7 +50,7 @@ main(int argc, char *argv[]) {
     // Allow the user to override any of the defaults and the above Bind() at
     // run-time, via command-line arguments
     //
-    bool useV6 = false;
+    bool useV6 = true;
     Address serverAddress;
 
     CommandLine cmd;

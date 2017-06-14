@@ -14,6 +14,8 @@ def build(bld):
         'model/udp-server.cc',
         'model/request-response-client.cc',
         'model/request-response-server.cc',
+        'model/coap-client.cc',
+        'model/coap-server.cc',
         'model/seq-ts-header.cc',
         'model/udp-trace-client.cc',
         'model/packet-loss-counter.cc',
@@ -28,6 +30,7 @@ def build(bld):
         'helper/udp-client-server-helper.cc',
         'helper/udp-echo-helper.cc',
         'helper/request-response-helper.cc',
+        'helper/coap-helper.cc',
         'helper/v4ping-helper.cc',
         'helper/radvd-helper.cc',
         ]
@@ -56,6 +59,8 @@ def build(bld):
         'model/udp-echo-server.h',
         'model/request-response-client.h',
         'model/request-response-server.h',
+        'model/coap-client.h',
+        'model/coap-server.h',
         'model/v4ping.h',
         'model/application-packet-probe.h',
         'helper/bulk-send-helper.h',
@@ -65,6 +70,7 @@ def build(bld):
         'helper/udp-client-server-helper.h',
         'helper/udp-echo-helper.h',
         'helper/request-response-helper.h',
+        'helper/coap-helper.h',
         'helper/v4ping-helper.h',
         'helper/radvd-helper.h',
         ]
