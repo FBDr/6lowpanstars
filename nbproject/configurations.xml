@@ -2223,7 +2223,7 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="examples/ipv6/fragmentation-ipv6-two-MTU.cc"
@@ -2270,7 +2270,6 @@
       <item path="examples/ipv6/ping6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2319,7 +2318,6 @@
       <item path="examples/ipv6/radvd.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2360,7 +2358,6 @@
       <item path="examples/ipv6/test-ipv6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2401,7 +2398,6 @@
       <item path="examples/ipv6/wsn-ping6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2454,7 +2450,7 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="examples/routing/dynamic-global-routing.cc"
@@ -2468,6 +2464,9 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -2504,14 +2503,10 @@
             flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/global-routing-slash32.cc"
@@ -2520,55 +2515,21 @@
             flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/manet-routing-compare.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/routing</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/mixed-global-routing.cc"
@@ -2577,137 +2538,45 @@
             flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/ripng-simple-network.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/routing</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/simple-alternate-routing.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
             <pElem>build/ns3</pElem>
-            <pElem>examples/routing</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/simple-global-routing.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
             <pElem>build/ns3</pElem>
-            <pElem>examples/routing</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/simple-routing-ping6.cc"
@@ -2716,14 +2585,10 @@
             flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/routing/static-routing-slash32.cc"
@@ -2732,14 +2597,10 @@
             flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/socket/socket-bound-static-routing.cc"
@@ -2748,11 +2609,13 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/socket</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -2792,11 +2655,6 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/socket/socket-options-ipv4.cc"
@@ -2808,52 +2666,17 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/socket/socket-options-ipv6.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/socket</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/stats/wifi-example-apps.cc"
@@ -2873,125 +2696,30 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-bulk-send.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-large-transfer.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-nsc-comparison.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-nsc-lfn.cc" ex="false" tool="1" flavor2="8">
@@ -3000,49 +2728,14 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-nsc-zoo.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-star-server.cc" ex="false" tool="1" flavor2="8">
@@ -3051,11 +2744,6 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tcp/tcp-variants-comparison.cc"
@@ -3064,11 +2752,13 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -3100,41 +2790,11 @@
         </ccTool>
       </item>
       <item path="examples/tutorial/fifth.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tutorial/first.cc" ex="false" tool="1" flavor2="8">
@@ -3143,21 +2803,18 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tutorial/fourth.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -3194,11 +2851,13 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -3235,11 +2894,6 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tutorial/seventh.cc" ex="false" tool="1" flavor2="8">
@@ -3248,11 +2902,6 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tutorial/sixth.cc" ex="false" tool="1" flavor2="8">
@@ -3261,21 +2910,18 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/tutorial/third.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -3310,103 +2956,40 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="examples/udp-client-server/udp-trace-client-server.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="examples/udp/coap.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="3">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/udp/request-response.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/udp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/udp/udp-echo.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
             <pElem>build/ns3</pElem>
-            <pElem>examples/udp</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/wireless/ht-wifi-network.cc"
@@ -3460,7 +3043,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3501,7 +3083,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3574,7 +3155,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3615,7 +3195,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3672,7 +3251,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3711,47 +3289,21 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
       <item path="examples/wireless/wifi-adhoc.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3789,7 +3341,6 @@
       <item path="examples/wireless/wifi-ap.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3825,40 +3376,15 @@
         </ccTool>
       </item>
       <item path="examples/wireless/wifi-blockack.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -3868,7 +3394,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3925,7 +3450,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3966,7 +3490,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4007,7 +3530,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4048,7 +3570,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4118,7 +3639,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -5926,9 +5446,9 @@
             <Elem>HAVE_STD_TO_STRING=1</Elem>
             <Elem>HAVE_SYS_IOCTL_H=1</Elem>
             <Elem>HAVE_VECTOR_INSERT_ERASE_CONST_ITERATOR=1</Elem>
-            <Elem>NS3_ASSERT_ENABLE=1</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
-            <Elem>NS3_LOG_ENABLE=1</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -5939,6 +5459,9 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -5972,47 +5495,9 @@
       <folder path="0/examples/error-model">
         <ccTool>
           <incDir>
-            <pElem>examples/error-model</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/examples/ipv6">
-        <ccTool>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/examples/matrix-topology">
@@ -6022,6 +5507,9 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -6058,48 +5546,14 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/examples/realtime">
         <ccTool>
           <incDir>
-            <pElem>examples/realtime</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </folder>
       <folder path="0/examples/stats">
@@ -6109,6 +5563,9 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -6142,37 +5599,17 @@
       <folder path="0/examples/udp-client-server">
         <ccTool>
           <incDir>
-            <pElem>examples/udp-client-server</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
+        </ccTool>
+      </folder>
+      <folder path="0/examples/wireless">
+        <ccTool>
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -7062,9 +6499,33 @@
             <Elem>NS3_ASSERT_ENABLE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/dsdv/examples">
+        <ccTool>
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/dsdv/helper">
+        <ccTool>
+          <incDir>
+            <pElem>src/dsdv/helper</pElem>
+            <pElem>build</pElem>
+          </incDir>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -7089,25 +6550,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/dsdv/examples">
-        <ccTool>
-          <incDir>
-            <pElem>src/dsdv/examples</pElem>
-            <pElem>build</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/dsdv/helper">
-        <ccTool>
-          <incDir>
-            <pElem>src/dsdv/helper</pElem>
-            <pElem>build</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -7119,7 +6561,34 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
             <Elem>__PIC__=2</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -7146,9 +6615,33 @@
             <Elem>NS3_ASSERT_ENABLE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/dsr/examples">
+        <ccTool>
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/dsr/helper">
+        <ccTool>
+          <incDir>
+            <pElem>src/dsr/helper</pElem>
+            <pElem>build</pElem>
+          </incDir>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -7173,25 +6666,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/dsr/examples">
-        <ccTool>
-          <incDir>
-            <pElem>src/dsr/examples</pElem>
-            <pElem>build</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/dsr/helper">
-        <ccTool>
-          <incDir>
-            <pElem>src/dsr/helper</pElem>
-            <pElem>build</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -7203,7 +6677,34 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
             <Elem>__PIC__=2</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -7706,9 +7207,29 @@
             <Elem>NS3_ASSERT_ENABLE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/mesh/examples">
+        <ccTool>
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/mesh/helper">
+        <ccTool>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -7733,21 +7254,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/mesh/examples">
-        <ccTool>
-          <incDir>
-            <pElem>src/mesh/examples</pElem>
-            <pElem>build</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/mesh/helper">
-        <ccTool>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -7771,7 +7277,34 @@
       <folder path="0/src/mesh/model">
         <ccTool>
           <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
             <Elem>__PIC__=2</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -9764,9 +9297,9 @@
             <Elem>HAVE_STD_TO_STRING=1</Elem>
             <Elem>HAVE_SYS_IOCTL_H=1</Elem>
             <Elem>HAVE_VECTOR_INSERT_ERASE_CONST_ITERATOR=1</Elem>
-            <Elem>NS3_ASSERT_ENABLE=1</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
-            <Elem>NS3_LOG_ENABLE=1</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </folder>
@@ -9777,6 +9310,9 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -10398,6 +9934,10 @@
       </folder>
       <folder path="0/src/sixlowpan/examples">
         <ccTool>
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
           <preprocessorList>
             <Elem>NS3_ASSERT_ENABLE</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
@@ -10783,9 +10323,33 @@
             <Elem>NS3_ASSERT_ENABLE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/topology-read/examples">
+        <ccTool>
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/topology-read/helper">
+        <ccTool>
+          <incDir>
+            <pElem>src/topology-read/helper</pElem>
+            <pElem>build</pElem>
+          </incDir>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -10810,25 +10374,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/topology-read/examples">
-        <ccTool>
-          <incDir>
-            <pElem>src/topology-read/examples</pElem>
-            <pElem>build</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/topology-read/helper">
-        <ccTool>
-          <incDir>
-            <pElem>src/topology-read/helper</pElem>
-            <pElem>build</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -10840,7 +10385,34 @@
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
             <Elem>__PIC__=2</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -11289,9 +10861,29 @@
             <Elem>NS3_ASSERT_ENABLE=1</Elem>
             <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
             <Elem>NS3_LOG_ENABLE=1</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/wimax/examples">
+        <ccTool>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </folder>
+      <folder path="0/src/wimax/helper">
+        <ccTool>
+          <incDir>
+            <pElem>build/ns3</pElem>
+            <pElem>src/wimax/helper</pElem>
+          </incDir>
+          <preprocessorList>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__PIC__=2</Elem>
             <Elem>__REGISTER_PREFIX__=</Elem>
             <Elem>__STDC_UTF_16__=1</Elem>
             <Elem>__STDC_UTF_32__=1</Elem>
@@ -11316,25 +10908,6 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
-        </ccTool>
-      </folder>
-      <folder path="0/src/wimax/examples">
-        <ccTool>
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/wimax/examples</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/wimax/helper">
-        <ccTool>
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/wimax/helper</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>__PIC__=2</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -11342,7 +10915,34 @@
       <folder path="0/src/wimax/model">
         <ccTool>
           <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
             <Elem>__PIC__=2</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
             <Elem>__pic__=2</Elem>
           </preprocessorList>
         </ccTool>
@@ -11770,42 +11370,29 @@
         </ccTool>
       </item>
       <item path="scratch/wsn-iot-rip2.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>scratch</pElem>
-            <pElem>src/network/model</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
+            <pElem>build/ns3/ndnSIM/NFD</pElem>
+            <pElem>ns3/ndnSIM/NFD</pElem>
+            <pElem>build/src/ndnSIM/NFD/core</pElem>
+            <pElem>src/ndnSIM/NFD/core</pElem>
+            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
+            <pElem>src/ndnSIM/NFD/daemon</pElem>
+            <pElem>build/src/ndnSIM/NFD/rib</pElem>
+            <pElem>src/ndnSIM/NFD/rib</pElem>
+            <pElem>build/ns3/ndnSIM</pElem>
+            <pElem>ns3/ndnSIM</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>/usr/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BRITE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -11923,7 +11510,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11982,7 +11568,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12025,7 +11610,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12068,7 +11652,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12111,7 +11694,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12154,7 +11736,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12197,7 +11778,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12240,7 +11820,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12283,7 +11862,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12326,7 +11904,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12369,7 +11946,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12412,7 +11988,6 @@
             flavor2="8">
         <ccTool flags="4">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
@@ -12445,7 +12020,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12488,7 +12062,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12531,7 +12104,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12571,7 +12143,6 @@
       <item path="src/applications/model/ping6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12614,7 +12185,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12657,7 +12227,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12697,7 +12266,6 @@
       <item path="src/applications/model/radvd.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12740,7 +12308,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12783,7 +12350,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12826,7 +12392,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12869,7 +12434,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12912,7 +12476,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12955,7 +12518,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12998,7 +12560,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13041,7 +12602,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13081,7 +12641,6 @@
       <item path="src/applications/model/v4ping.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13795,7 +13354,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/csma/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13850,7 +13408,7 @@
         </ccTool>
       </item>
       <item path="src/dsdv/examples/dsdv-manet.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/dsdv/helper/dsdv-helper.cc" ex="false" tool="1" flavor2="8">
@@ -13880,7 +13438,7 @@
         </ccTool>
       </item>
       <item path="src/dsr/examples/dsr.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/dsr/helper/dsr-helper.cc" ex="false" tool="1" flavor2="8">
@@ -14222,43 +13780,10 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/fd-net-device/examples</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE=1</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
-            <Elem>NS3_LOG_ENABLE=1</Elem>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/fd-net-device/helper/creator-utils.cc"
@@ -15725,39 +15250,11 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/lte/examples</pElem>
-          </incDir>
+        <ccTool flags="3">
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -22498,7 +21995,7 @@
         </ccTool>
       </item>
       <item path="src/mesh/examples/mesh.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/mesh/helper/dot11s/dot11s-installer.cc"
@@ -22988,7 +22485,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/mpi/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -23029,7 +22525,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/mpi/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -23070,7 +22565,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/mpi/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -66592,52 +66086,17 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/netanim/examples/dynamic_linknode.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/netanim/examples/grid-animation.cc"
@@ -66649,52 +66108,17 @@
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/netanim/examples/resources_demo.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/netanim/examples/star-animation.cc"
@@ -66703,11 +66127,13 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -66742,41 +66168,11 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
+            <pElem>.</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/netanim/examples/wireless-animation.cc"
@@ -66785,11 +66181,13 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
           <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
             <Elem>_REENTRANT=1</Elem>
             <Elem>__GNUC_STDC_INLINE__=1</Elem>
             <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
@@ -66960,39 +66358,11 @@
         </ccTool>
       </item>
       <item path="src/network/examples/red-tests.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/network/examples</pElem>
-          </incDir>
+        <ccTool flags="3">
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -67547,7 +66917,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/nix-vector-routing/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -67602,7 +66971,6 @@
       <item path="src/olsr/examples/olsr-hna.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/olsr/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -67817,54 +67185,13 @@
             tool="1"
             flavor2="8">
         <ccTool flags="3">
-          <incDir>
-            <pElem>build</pElem>
-            <pElem>.</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="src/sixlowpan/examples/example-sixlowpan.cc"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/sixlowpan/examples</pElem>
-            <pElem>build</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE=1</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
-            <Elem>NS3_LOG_ENABLE=1</Elem>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
-          </preprocessorList>
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/sixlowpan/helper/sixlowpan-helper.cc"
@@ -67892,39 +67219,11 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
-          <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>src/spectrum/examples</pElem>
-          </incDir>
+        <ccTool flags="3">
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -68796,7 +68095,7 @@
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/topology-read/helper/topology-reader-helper.cc"
@@ -70033,7 +69332,7 @@
         </ccTool>
       </item>
       <item path="src/wimax/examples/wimax-ipv4.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/wimax/examples/wimax-multicast.cc"
@@ -70041,10 +69340,46 @@
             tool="1"
             flavor2="8">
         <ccTool flags="2">
+          <incDir>
+            <pElem>build/ns3</pElem>
+            <pElem>src/wimax/examples</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>NS3_ASSERT_ENABLE=1</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG=1</Elem>
+            <Elem>NS3_LOG_ENABLE=1</Elem>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/wimax/examples/wimax-simple.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
         </ccTool>
       </item>
       <item path="src/wimax/helper/wimax-helper.cc" ex="false" tool="1" flavor2="8">

@@ -39,158 +39,165 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("CoapServerApplication");
+    NS_LOG_COMPONENT_DEFINE("CoapServerApplication");
 
-NS_OBJECT_ENSURE_REGISTERED (CoapServer);
+    NS_OBJECT_ENSURE_REGISTERED(CoapServer);
 
-TypeId
-CoapServer::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::CoapServer")
-    .SetParent<Application> ()
-    .SetGroupName("Applications")
-    .AddConstructor<CoapServer> ()
-    .AddAttribute ("Port", "Port on which we listen for incoming packets.",
-                   UintegerValue (9),
-                   MakeUintegerAccessor (&CoapServer::m_port),
-                   MakeUintegerChecker<uint16_t> ())
-  ;
-  return tid;
-}
+    TypeId
+    CoapServer::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::CoapServer")
+                .SetParent<Application> ()
+                .SetGroupName("Applications")
+                .AddConstructor<CoapServer> ()
+                .AddAttribute("Port", "Port on which we listen for incoming packets.",
+                UintegerValue(9),
+                MakeUintegerAccessor(&CoapServer::m_port),
+                MakeUintegerChecker<uint16_t> ())
+/*
+                .AddAttribute("DataNum", "Number of data pieces available at producer ", 
+                StringValue("0.7"),
+                MakeUintegerAccessor(&CoapServer::SetDataNum,
+                &CoapServer::GetDataNum),
+                MakeUintegerChecker<uint32_t> ())
+*/
+                ;
+        return tid;
+    }
 
-CoapServer::CoapServer ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    CoapServer::CoapServer() {
+        NS_LOG_FUNCTION(this);
+    }
 
-CoapServer::~CoapServer()
-{
-  NS_LOG_FUNCTION (this);
-  m_socket = 0;
-  m_socket6 = 0;
-}
+    CoapServer::~CoapServer() {
+        NS_LOG_FUNCTION(this);
+        m_socket = 0;
+        m_socket6 = 0;
+    }
 
-void
-CoapServer::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  Application::DoDispose ();
-}
+    void
+    CoapServer::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        Application::DoDispose();
+    }
+    
+    void
+    CoapServer::AddSeq(uint32_t newSeq) {
+        m_regSeqVector.push_back(newSeq);
+    }
 
-void 
-CoapServer::StartApplication (void)
-{
-  NS_LOG_FUNCTION (this);
+/*
+    void
+    CoapServer::SetDataNum(uint32_t datanum) {
+        NS_LOG_FUNCTION(this);
+        m_regNum = datanum;
+        m_regSeq = new uint32_t[datanum];
+    }
+    uint32_t
+    CoapServer::GetDataNum(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_regNum;
+        std::vector test;
+        test.
 
-  if (m_socket == 0)
-    {
-      TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
-      m_socket = Socket::CreateSocket (GetNode (), tid);
-      InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), m_port);
-      m_socket->Bind (local);
-      if (addressUtils::IsMulticast (m_local))
-        {
-          Ptr<UdpSocket> udpSocket = DynamicCast<UdpSocket> (m_socket);
-          if (udpSocket)
-            {
-              // equivalent to setsockopt (MCAST_JOIN_GROUP)
-              udpSocket->MulticastJoinGroup (0, m_local);
+    }
+*/
+    
+
+    void
+    CoapServer::StartApplication(void) {
+        NS_LOG_FUNCTION(this);
+
+        if (m_socket == 0) {
+            TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
+            m_socket = Socket::CreateSocket(GetNode(), tid);
+            InetSocketAddress local = InetSocketAddress(Ipv4Address::GetAny(), m_port);
+            m_socket->Bind(local);
+            if (addressUtils::IsMulticast(m_local)) {
+                Ptr<UdpSocket> udpSocket = DynamicCast<UdpSocket> (m_socket);
+                if (udpSocket) {
+                    // equivalent to setsockopt (MCAST_JOIN_GROUP)
+                    udpSocket->MulticastJoinGroup(0, m_local);
+                } else {
+                    NS_FATAL_ERROR("Error: Failed to join multicast group");
+                }
             }
-          else
-            {
-              NS_FATAL_ERROR ("Error: Failed to join multicast group");
+        }
+
+        if (m_socket6 == 0) {
+            TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
+            m_socket6 = Socket::CreateSocket(GetNode(), tid);
+            Inet6SocketAddress local6 = Inet6SocketAddress(Ipv6Address::GetAny(), m_port);
+            m_socket6->Bind(local6);
+            if (addressUtils::IsMulticast(local6)) {
+                Ptr<UdpSocket> udpSocket = DynamicCast<UdpSocket> (m_socket6);
+                if (udpSocket) {
+                    // equivalent to setsockopt (MCAST_JOIN_GROUP)
+                    udpSocket->MulticastJoinGroup(0, local6);
+                } else {
+                    NS_FATAL_ERROR("Error: Failed to join multicast group");
+                }
+            }
+        }
+
+        m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
+        m_socket6->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
+    }
+
+    void
+    CoapServer::StopApplication() {
+        NS_LOG_FUNCTION(this);
+
+        if (m_socket != 0) {
+            m_socket->Close();
+            m_socket->SetRecvCallback(MakeNullCallback<void, Ptr<Socket> > ());
+        }
+        if (m_socket6 != 0) {
+            m_socket6->Close();
+            m_socket6->SetRecvCallback(MakeNullCallback<void, Ptr<Socket> > ());
+        }
+    }
+
+    void
+    CoapServer::HandleRead(Ptr<Socket> socket) {
+        NS_LOG_FUNCTION(this << socket);
+
+        Ptr<Packet> packet;
+        Address from;
+
+
+        while ((packet = socket->RecvFrom(from))) {
+            if (InetSocketAddress::IsMatchingType(from)) {
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << packet->GetSize() << " bytes from " <<
+                        InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
+                        InetSocketAddress::ConvertFrom(from).GetPort());
+            } else if (Inet6SocketAddress::IsMatchingType(from)) {
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << packet->GetSize() << " bytes from " <<
+                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
+                        Inet6SocketAddress::ConvertFrom(from).GetPort());
+            }
+
+            packet->RemoveAllPacketTags();
+            packet->RemoveAllByteTags();
+
+            delete [] m_Rdata;
+            m_Rdata = new uint8_t [packet->GetSize()];
+
+            packet->CopyData(m_Rdata, packet->GetSize());
+            std::cout << m_Rdata << std::endl;
+
+            NS_LOG_LOGIC("Echoing packet");
+            socket->SendTo(packet, 0, from);
+
+            if (InetSocketAddress::IsMatchingType(from)) {
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << packet->GetSize() << " bytes to " <<
+                        InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
+                        InetSocketAddress::ConvertFrom(from).GetPort());
+            } else if (Inet6SocketAddress::IsMatchingType(from)) {
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << packet->GetSize() << " bytes to " <<
+                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
+                        Inet6SocketAddress::ConvertFrom(from).GetPort());
             }
         }
     }
-
-  if (m_socket6 == 0)
-    {
-      TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
-      m_socket6 = Socket::CreateSocket (GetNode (), tid);
-      Inet6SocketAddress local6 = Inet6SocketAddress (Ipv6Address::GetAny (), m_port);
-      m_socket6->Bind (local6);
-      if (addressUtils::IsMulticast (local6))
-        {
-          Ptr<UdpSocket> udpSocket = DynamicCast<UdpSocket> (m_socket6);
-          if (udpSocket)
-            {
-              // equivalent to setsockopt (MCAST_JOIN_GROUP)
-              udpSocket->MulticastJoinGroup (0, local6);
-            }
-          else
-            {
-              NS_FATAL_ERROR ("Error: Failed to join multicast group");
-            }
-        }
-    }
-
-  m_socket->SetRecvCallback (MakeCallback (&CoapServer::HandleRead, this));
-  m_socket6->SetRecvCallback (MakeCallback (&CoapServer::HandleRead, this));
-}
-
-void 
-CoapServer::StopApplication ()
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_socket != 0) 
-    {
-      m_socket->Close ();
-      m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
-    }
-  if (m_socket6 != 0) 
-    {
-      m_socket6->Close ();
-      m_socket6->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
-    }
-}
-
-void 
-CoapServer::HandleRead (Ptr<Socket> socket)
-{
-  NS_LOG_FUNCTION (this << socket);
-
-  Ptr<Packet> packet;
-  Address from;
-  //m_Rdata = new uint8_t [packet->GetSize()];
-  
-  while ((packet = socket->RecvFrom (from)))
-    {
-      if (InetSocketAddress::IsMatchingType (from))
-        {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
-                       InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
-                       InetSocketAddress::ConvertFrom (from).GetPort ());
-        }
-      else if (Inet6SocketAddress::IsMatchingType (from))
-        {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
-                       Inet6SocketAddress::ConvertFrom (from).GetIpv6 () << " port " <<
-                       Inet6SocketAddress::ConvertFrom (from).GetPort ());
-        }
-
-      packet->RemoveAllPacketTags ();
-      packet->RemoveAllByteTags ();
-      std::cout<<packet->GetSize()<<std::endl;
-      //packet->CopyData(m_Rdata, packet->GetSize());
-      //std::cout<<m_Rdata<<std::cout;
-      
-      NS_LOG_LOGIC ("Echoing packet");
-      socket->SendTo (packet, 0, from);
-
-      if (InetSocketAddress::IsMatchingType (from))
-        {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << packet->GetSize () << " bytes to " <<
-                       InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
-                       InetSocketAddress::ConvertFrom (from).GetPort ());
-        }
-      else if (Inet6SocketAddress::IsMatchingType (from))
-        {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << packet->GetSize () << " bytes to " <<
-                       Inet6SocketAddress::ConvertFrom (from).GetIpv6 () << " port " <<
-                       Inet6SocketAddress::ConvertFrom (from).GetPort ());
-        }
-    }
-}
 
 } // Namespace ns3

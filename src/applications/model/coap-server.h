@@ -23,6 +23,7 @@
 #include "ns3/event-id.h"
 #include "ns3/ptr.h"
 #include "ns3/address.h"
+#include <vector>
 
 namespace ns3 {
 
@@ -47,6 +48,20 @@ namespace ns3 {
          * \return the object TypeId
          */
         static TypeId GetTypeId(void);
+        /**
+         * \brief Set the total number of data chunks available at this server.
+         * 
+         */
+       //void SetDataNum(uint32_t datanum);
+        /**
+         * \brief Get the total number of data chunks available at this server.
+         * 
+         */
+        //uint32_t GetDataNum() const;
+        
+        void AddSeq(uint32_t newSeq);
+        
+        
         CoapServer();
         virtual ~CoapServer();
 
@@ -73,6 +88,9 @@ namespace ns3 {
         Address m_local; //!< local multicast address
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_Rdata; //!< packet payload data
+        //        uint32_t *m_regSeq; //!< Available sequence numbers.
+        //        uint32_t m_regNum; //!< Available sequence numbers.
+        std::vector<uint32_t> m_regSeqVector;
     };
 
 } // namespace ns3
