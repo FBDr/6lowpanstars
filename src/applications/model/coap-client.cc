@@ -29,6 +29,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "coap-client.h"
 
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("CoapClientApplication");
@@ -70,6 +71,22 @@ CoapClient::GetTypeId (void)
     .AddTraceSource ("Tx", "A new packet is created and is sent",
                      MakeTraceSourceAccessor (&CoapClient::m_txTrace),
                      "ns3::Packet::TracedCallback")
+  
+    //ZM
+    .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
+                    MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
+                                         &CoapClient::GetNumberOfContents),
+                    MakeUintegerChecker<uint32_t>())
+
+    .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
+                    MakeDoubleAccessor(&CoapClient::SetQ,
+                                       &CoapClient::GetQ),
+                    MakeDoubleChecker<double>())
+
+    .AddAttribute("s", "parameter of power", StringValue("0.7"),
+                    MakeDoubleAccessor(&CoapClient::SetS,
+                                       &CoapClient::GetS),
+                    MakeDoubleChecker<double>());
   ;
   return tid;
 }
@@ -123,6 +140,83 @@ CoapClient::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   Application::DoDispose ();
+}
+
+void
+CoapClient::SetNumberOfContents(uint32_t numOfContents)
+{
+  m_N = numOfContents;
+
+  NS_LOG_DEBUG(m_q << " and " << m_s << " and " << m_N);
+
+  m_Pcum = std::vector<double>(m_N + 1);
+
+  m_Pcum[0] = 0.0;
+  for (uint32_t i = 1; i <= m_N; i++) {
+    m_Pcum[i] = m_Pcum[i - 1] + 1.0 / std::pow(i + m_q, m_s);
+  }
+
+  for (uint32_t i = 1; i <= m_N; i++) {
+    m_Pcum[i] = m_Pcum[i] / m_Pcum[m_N];
+    NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
+  }
+}
+
+uint32_t
+CoapClient::GetNumberOfContents() const
+{
+  return m_N;
+}
+
+void
+CoapClient::SetQ(double q)
+{
+  m_q = q;
+  SetNumberOfContents(m_N);
+}
+
+double
+CoapClient::GetQ() const
+{
+  return m_q;
+}
+
+void
+CoapClient::SetS(double s)
+{
+  m_s = s;
+  SetNumberOfContents(m_N);
+}
+
+double
+CoapClient::GetS() const
+{
+  return m_s;
+}
+
+uint32_t
+CoapClient::GetNextSeq()
+{
+  uint32_t content_index = 1; //[1, m_N]
+  double p_sum = 0;
+
+  double p_random = m_seqRng->GetValue();
+  while (p_random == 0) {
+    p_random = m_seqRng->GetValue();
+  }
+  // if (p_random == 0)
+  NS_LOG_LOGIC("p_random=" << p_random);
+  for (uint32_t i = 1; i <= m_N; i++) {
+    p_sum = m_Pcum[i]; // m_Pcum[i] = m_Pcum[i-1] + p[i], p[0] = 0;   e.g.: p_cum[1] = p[1],
+                       // p_cum[2] = p[1] + p[2]
+    if (p_random <= p_sum) {
+      content_index = i;
+      break;
+    } // if
+  }   // for
+  // content_index = 1;
+  NS_LOG_DEBUG("RandomNumber=" << content_index);
+  return content_index;
 }
 
 void 
