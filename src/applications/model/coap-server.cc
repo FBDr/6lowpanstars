@@ -29,8 +29,13 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
-
+#include <fstream>
+#include "ns3/core-module.h"
 #include "coap-server.h"
+#include "ns3/internet-module.h"
+#include "ns3/applications-module.h"
+#include "src/network/model/node.h"
+#include <string>
 
 namespace ns3 {
 
@@ -147,6 +152,8 @@ CoapServer::HandleRead (Ptr<Socket> socket)
 
   Ptr<Packet> packet;
   Address from;
+  //m_Rdata = new uint8_t [packet->GetSize()];
+  
   while ((packet = socket->RecvFrom (from)))
     {
       if (InetSocketAddress::IsMatchingType (from))
@@ -164,7 +171,10 @@ CoapServer::HandleRead (Ptr<Socket> socket)
 
       packet->RemoveAllPacketTags ();
       packet->RemoveAllByteTags ();
-
+      std::cout<<packet->GetSize()<<std::endl;
+      //packet->CopyData(m_Rdata, packet->GetSize());
+      //std::cout<<m_Rdata<<std::cout;
+      
       NS_LOG_LOGIC ("Echoing packet");
       socket->SendTo (packet, 0, from);
 

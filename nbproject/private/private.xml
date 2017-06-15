@@ -10,8 +10,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/floris/ndnSIM/ns-3/examples/udp/request-response.cc</file>
-            <file>file:/home/floris/ndnSIM/ns-3/examples/udp/udp-echo.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/examples/udp/coap.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/src/applications/model/coap-client.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot.cpp</file>
+            <file>file:/home/floris/ndnSIM/ns-3/src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot.hpp</file>
+            <file>file:/home/floris/ndnSIM/ns-3/src/applications/model/coap-client.h</file>
         </group>
     </open-files>
 </project-private>
