@@ -53,6 +53,10 @@ namespace ns3 {
                 UintegerValue(9),
                 MakeUintegerAccessor(&CoapServer::m_port),
                 MakeUintegerChecker<uint16_t> ())
+                .AddAttribute("Payload", "Response data packet payload size.",
+                UintegerValue(100),
+                MakeUintegerAccessor(&CoapServer::m_packet_payload_size),
+                MakeUintegerChecker<uint32_t> ())
                 /*
                                 .AddAttribute("DataNum", "Number of data pieces available at producer ", 
                                 StringValue("0.7"),
@@ -105,16 +109,13 @@ namespace ns3 {
     }
 
     void
-    CoapServer::CreateResponsePkt(std::string fill) {
+    CoapServer::CreateResponsePkt(std::string fill, uint32_t length) {
         NS_LOG_FUNCTION(this << fill);
-
-        uint32_t dataSize = fill.size() + 1;
-
-        if (dataSize != m_dataSize) {
-            delete [] m_data;
-            m_data = new uint8_t [dataSize];
-            m_dataSize = dataSize;
-        }
+        NS_ASSERT_MSG(length >= fill.size(), "Length of data packet smaller than string size.");
+        uint32_t dataSize = length;
+        delete [] m_data;
+        m_data = new uint8_t [dataSize];
+        m_dataSize = dataSize;
         memcpy(m_data, fill.c_str(), dataSize);
     }
 
@@ -204,12 +205,12 @@ namespace ns3 {
             uint32_t received_Req = FilterReqNum();
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
-                CreateResponsePkt("POST");
+                CreateResponsePkt("POST", 100);
 
 
             } else {
                 NS_LOG_ERROR("Data not available");
-                CreateResponsePkt("ERROR");
+                CreateResponsePkt("Unavailable", m_packet_payload_size);
             }
 
             response_packet = Create<Packet> (m_data, m_dataSize);

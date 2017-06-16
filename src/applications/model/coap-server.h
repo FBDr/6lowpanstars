@@ -94,7 +94,7 @@ namespace ns3 {
          * \brief Fill data buffers for response packet with std::string.
          * \param string A string containing the packet content.
          */
-        void CreateResponsePkt(std::string fill);
+        void CreateResponsePkt(std::string fill, uint32_t);
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
         Ptr<Socket> m_socket; //!< IPv4 Socket
@@ -102,6 +102,7 @@ namespace ns3 {
         Address m_local; //!< local multicast address
         uint32_t m_dataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_data; //!< packet payload data
+        uint32_t m_packet_payload_size; //!< packet payload size (must be equal to m_size)
         /// Callbacks for tracing the packet Tx events Waarvoor nuttig?
         //TracedCallback<Ptr<const Packet> > m_txTrace;
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
