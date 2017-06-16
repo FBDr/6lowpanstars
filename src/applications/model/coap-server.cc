@@ -53,13 +53,13 @@ namespace ns3 {
                 UintegerValue(9),
                 MakeUintegerAccessor(&CoapServer::m_port),
                 MakeUintegerChecker<uint16_t> ())
-/*
-                .AddAttribute("DataNum", "Number of data pieces available at producer ", 
-                StringValue("0.7"),
-                MakeUintegerAccessor(&CoapServer::SetDataNum,
-                &CoapServer::GetDataNum),
-                MakeUintegerChecker<uint32_t> ())
-*/
+                /*
+                                .AddAttribute("DataNum", "Number of data pieces available at producer ", 
+                                StringValue("0.7"),
+                                MakeUintegerAccessor(&CoapServer::SetDataNum,
+                                &CoapServer::GetDataNum),
+                                MakeUintegerChecker<uint32_t> ())
+                 */
                 ;
         return tid;
     }
@@ -79,13 +79,23 @@ namespace ns3 {
         NS_LOG_FUNCTION(this);
         Application::DoDispose();
     }
-    
+
     void
     CoapServer::AddSeq(uint32_t newSeq) {
         m_regSeqVector.push_back(newSeq);
     }
 
-/*
+    uint32_t
+    CoapServer::FilterReqNum(void) {
+        NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
+        std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), sizeof (m_Rdata));
+        std::size_t pos = Rdatastr.find("/"); // position of "live" in str
+        std::string str3 = Rdatastr.substr(pos + 1); // get from "live" to the end
+        std::cout << str3 << std::endl;
+        return std::stoi(str3);
+    }
+
+    /*
     void
     CoapServer::SetDataNum(uint32_t datanum) {
         NS_LOG_FUNCTION(this);
@@ -100,8 +110,8 @@ namespace ns3 {
         test.
 
     }
-*/
-    
+     */
+
 
     void
     CoapServer::StartApplication(void) {
@@ -162,6 +172,7 @@ namespace ns3 {
         NS_LOG_FUNCTION(this << socket);
 
         Ptr<Packet> packet;
+        uint32_t received_Req;
         Address from;
 
 
@@ -179,11 +190,14 @@ namespace ns3 {
             packet->RemoveAllPacketTags();
             packet->RemoveAllByteTags();
 
-            delete [] m_Rdata;
-            m_Rdata = new uint8_t [packet->GetSize()];
 
+            // Copy data from current received packet into buffer. 
+            delete [] m_Rdata; //nodig?
+            m_Rdata = new uint8_t [packet->GetSize()];
             packet->CopyData(m_Rdata, packet->GetSize());
-            std::cout << m_Rdata << std::endl;
+            received_Req = FilterReqNum()
+
+
 
             NS_LOG_LOGIC("Echoing packet");
             socket->SendTo(packet, 0, from);

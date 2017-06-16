@@ -81,6 +81,7 @@ namespace ns3 {
          * \param socket the socket the packet was received to.
          */
         void HandleRead(Ptr<Socket> socket);
+        uint32_t FilterReqNum(void);
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
         Ptr<Socket> m_socket; //!< IPv4 Socket
