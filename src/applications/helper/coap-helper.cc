@@ -103,6 +103,12 @@ CoapClientHelper::SetAttribute (
 }
 
 void
+CoapServerHelper::SetContent (Ptr<Application> app, uint32_t content)
+{
+  app->GetObject<CoapServer>()->AddSeq(content);
+}
+
+void
 CoapClientHelper::SetFill (Ptr<Application> app, std::string fill)
 {
   app->GetObject<CoapClient>()->SetFill (fill);

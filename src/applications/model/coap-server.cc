@@ -82,7 +82,7 @@ namespace ns3 {
 
     void
     CoapServer::AddSeq(uint32_t newSeq) {
-        m_regSeqVector.push_back(newSeq);
+        m_regSeqSet.insert(newSeq);
     }
 
     uint32_t
@@ -93,6 +93,15 @@ namespace ns3 {
         std::string str3 = Rdatastr.substr(pos + 1); // get from "live" to the end
         std::cout << str3 << std::endl;
         return std::stoi(str3);
+    }
+
+    bool
+    CoapServer::CheckReqAv(uint32_t reqnumber) {
+        if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
+            return true;
+        }
+
+        return false;
     }
 
     /*
@@ -172,7 +181,7 @@ namespace ns3 {
         NS_LOG_FUNCTION(this << socket);
 
         Ptr<Packet> packet;
-        uint32_t received_Req;
+
         Address from;
 
 
@@ -195,8 +204,15 @@ namespace ns3 {
             delete [] m_Rdata; //nodig?
             m_Rdata = new uint8_t [packet->GetSize()];
             packet->CopyData(m_Rdata, packet->GetSize());
-            received_Req = FilterReqNum()
-
+            uint32_t received_Req = FilterReqNum();
+            if (CheckReqAv(received_Req) )
+            {
+                NS_LOG_INFO("Well formed request received for available content number" << received_Req);
+            }
+            else
+            {
+                NS_LOG_ERROR("Data not available");
+            }
 
 
             NS_LOG_LOGIC("Echoing packet");

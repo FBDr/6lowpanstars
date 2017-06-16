@@ -81,7 +81,14 @@ namespace ns3 {
          * \param socket the socket the packet was received to.
          */
         void HandleRead(Ptr<Socket> socket);
+         /**
+         * \brief Filter request number out of received payload.
+         */
         uint32_t FilterReqNum(void);
+         /**
+         * \brief Check whether requested data is available at this server.
+         */
+        bool CheckReqAv(uint32_t);
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
         Ptr<Socket> m_socket; //!< IPv4 Socket
@@ -91,7 +98,7 @@ namespace ns3 {
         uint8_t *m_Rdata; //!< packet payload data
         //        uint32_t *m_regSeq; //!< Available sequence numbers.
         //        uint32_t m_regNum; //!< Available sequence numbers.
-        std::vector<uint32_t> m_regSeqVector;
+        std::set<uint32_t> m_regSeqSet;
     };
 
 } // namespace ns3
