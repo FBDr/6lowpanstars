@@ -25,6 +25,8 @@
 #include "ns3/address.h"
 #include <vector>
 #include "ns3/callback.h"
+#include "ns3/trace-source-accessor.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -104,7 +106,7 @@ namespace ns3 {
         uint8_t *m_data; //!< packet payload data
         uint32_t m_packet_payload_size; //!< packet payload size (must be equal to m_size)
         /// Callbacks for tracing the packet Tx events Waarvoor nuttig?
-        //TracedCallback<Ptr<const Packet> > m_txTrace;
+        TracedCallback<Ptr<const Packet> > m_txTrace;
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_Rdata; //!< packet payload data
         //        uint32_t *m_regSeq; //!< Available sequence numbers.

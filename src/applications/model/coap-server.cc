@@ -37,7 +37,8 @@
 #include "src/network/model/node.h"
 #include <string>
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapServerApplication");
 
@@ -57,6 +58,9 @@ namespace ns3 {
                 UintegerValue(100),
                 MakeUintegerAccessor(&CoapServer::m_packet_payload_size),
                 MakeUintegerChecker<uint32_t> ())
+                .AddTraceSource("Tx", "A new packet is created and is sent",
+                MakeTraceSourceAccessor(&CoapServer::m_txTrace),
+                "ns3::Packet::TracedCallback")
                 /*
                                 .AddAttribute("DataNum", "Number of data pieces available at producer ", 
                                 StringValue("0.7"),
