@@ -312,6 +312,7 @@
         <in>ping6Icn.cc</in>
         <in>ripng-test.cc</in>
         <in>scratch-simulator.cc</in>
+        <in>wsn-iot-rip-ba-coap.cc</in>
         <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
         <in>wsn-iot-static.cc</in>
@@ -8978,6 +8979,48 @@
             tool="1"
             flavor2="8">
         <ccTool flags="2">
+        </ccTool>
+      </item>
+      <item path="scratch/wsn-iot-rip-ba-coap.cc" ex="false" tool="1" flavor2="8">
+        <ccTool flags="2">
+          <incDir>
+            <pElem>build/ns3</pElem>
+            <pElem>scratch</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>src/network/model</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>_REENTRANT=1</Elem>
+            <Elem>__GNUC_STDC_INLINE__=1</Elem>
+            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__STDC_UTF_16__=1</Elem>
+            <Elem>__STDC_UTF_32__=1</Elem>
+            <Elem>__STRICT_ANSI__=1</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+            <Elem>__cplusplus=201103L</Elem>
+            <Elem>__cpp_alias_templates=200704</Elem>
+            <Elem>__cpp_attributes=200809</Elem>
+            <Elem>__cpp_constexpr=200704</Elem>
+            <Elem>__cpp_decltype=200707</Elem>
+            <Elem>__cpp_delegating_constructors=200604</Elem>
+            <Elem>__cpp_inheriting_constructors=200802</Elem>
+            <Elem>__cpp_initializer_lists=200806</Elem>
+            <Elem>__cpp_lambdas=200907</Elem>
+            <Elem>__cpp_nsdmi=200809</Elem>
+            <Elem>__cpp_range_based_for=200907</Elem>
+            <Elem>__cpp_raw_strings=200710</Elem>
+            <Elem>__cpp_ref_qualifiers=200710</Elem>
+            <Elem>__cpp_rvalue_reference=200610</Elem>
+            <Elem>__cpp_static_assert=200410</Elem>
+            <Elem>__cpp_unicode_characters=200704</Elem>
+            <Elem>__cpp_unicode_literals=200710</Elem>
+            <Elem>__cpp_user_defined_literals=200809</Elem>
+            <Elem>__cpp_variadic_templates=200704</Elem>
+          </preprocessorList>
         </ccTool>
       </item>
       <item path="scratch/wsn-iot-rip-ba.cc" ex="false" tool="1" flavor2="8">

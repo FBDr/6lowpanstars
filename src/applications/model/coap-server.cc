@@ -214,7 +214,7 @@ namespace ns3
 
             } else {
                 NS_LOG_ERROR("Data not available");
-                CreateResponsePkt("Unavailable", m_packet_payload_size);
+                CreateResponsePkt("Unavailable", sizeof("Unavailable"));
             }
 
             response_packet = Create<Packet> (m_data, m_dataSize);
