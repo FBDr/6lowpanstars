@@ -100,7 +100,7 @@ main (int argc, char *argv[])
 //
 // Create a CoapServer application on node one.
 //
-  uint16_t port = 9;  // well-known echo port number
+  uint16_t port = 9;  
   CoapServerHelper server (port);
   ApplicationContainer apps = server.Install (n.Get (1));
   server.SetContent(apps.Get(0), 32);

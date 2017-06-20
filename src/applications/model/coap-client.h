@@ -145,6 +145,9 @@ namespace ns3 {
          */
         void SetFill(uint8_t *fill, uint32_t fillSize, uint32_t dataSize);
 
+        void
+        SetIPv6Bucket(std::vector<Ipv6Address>* bucket);
+
         uint32_t
         GetNextSeq();
 
@@ -174,6 +177,7 @@ namespace ns3 {
          * \param socket the socket the packet was received to.
          */
         void HandleRead(Ptr<Socket> socket);
+
 
         void
         SetNumberOfContents(uint32_t numOfContents);
@@ -213,7 +217,7 @@ namespace ns3 {
         double m_q; // q in (k+q)^s
         double m_s; // s in (k+q)^s
         std::vector<double> m_Pcum; // cumulative probability
-
+        std::vector<Ipv6Address>* m_IPv6Bucket;
         Ptr<UniformRandomVariable> m_seqRng; // RNG
     };
 

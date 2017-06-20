@@ -94,6 +94,7 @@ namespace ns3 {
 
         void SetContent(Ptr<Application> app, uint32_t content);
 
+
     private:
         /**
          * Install an ns3::CoapServer on the node configured with all the
@@ -228,6 +229,16 @@ namespace ns3 {
          * \returns the applications created, one application per input node.
          */
         ApplicationContainer Install(NodeContainer c) const;
+        
+        /**
+         * Pass the needed IPv6AdressVector to the client application.
+         *
+         * \param std::vector<Ipv6Address>* bucket
+         *
+         * 
+         */
+
+        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address>* bucket);
 
     private:
         /**

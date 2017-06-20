@@ -108,7 +108,6 @@ namespace ns3
         if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
             return true;
         }
-
         return false;
     }
 

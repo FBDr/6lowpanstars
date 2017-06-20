@@ -72,11 +72,12 @@ namespace ns3 {
                 "ns3::Packet::TracedCallback")
 
                 //ZM
+/*
                 .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
                 MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
                 &CoapClient::GetNumberOfContents),
                 MakeUintegerChecker<uint32_t>())
-
+*/
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
                 MakeDoubleAccessor(&CoapClient::SetQ,
                 &CoapClient::GetQ),
@@ -158,6 +159,10 @@ namespace ns3 {
         }
     }
 
+    void
+    CoapClient::SetIPv6Bucket(std::vector<Ipv6Address>* bucket) {
+        m_IPv6Bucket = bucket;
+    }
     uint32_t
     CoapClient::GetNumberOfContents() const {
         return m_N;
@@ -360,7 +365,7 @@ namespace ns3 {
             NS_ASSERT_MSG(m_dataSize == m_size, "CoapClient::Send(): m_size and m_dataSize inconsistent");
             NS_ASSERT_MSG(m_data, "CoapClient::Send(): m_dataSize but no m_data");
             p = Create<Packet> (m_data, m_dataSize);
-       
+
         } else {
             //
             // If m_dataSize is zero, the client has indicated that it doesn't care

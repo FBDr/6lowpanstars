@@ -12,6 +12,7 @@
 #include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/brite-module.h"
 #include <string>
+#include <vector>
 
 
 using namespace ns3;
@@ -190,7 +191,6 @@ int main(int argc, char **argv) {
         c = addresss.c_str();
         ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
         i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
-
         //Set forwarding rules.
         i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
         i_6lowpan[jdx].SetForwarding(node_periph, true);
@@ -200,6 +200,16 @@ int main(int argc, char **argv) {
         i_csma[jdx].SetForwarding(1, true);
 
     }
+
+    //Create IPv6Addressbucket with all IPs of IoT domain.
+    
+    std::vector<Ipv6Address> IPv6Bucket;
+    for (int idx = 0; idx < node_head; idx++) {
+        for (int jdx = 0; jdx < node_periph; jdx++) {
+            IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
+        }
+    }
+
     // Static routing rules
     //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
     //ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
