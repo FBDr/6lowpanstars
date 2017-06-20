@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
     uint32_t packetSize = 1024;
     uint32_t maxPacketCount = 2;
     Time interPacketInterval = Seconds(1.);
-    CoapClientHelper client(i_6lowpan[1].GetAddress(0, 1), port);
+    CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
     client.SetAttribute("PacketSize", UintegerValue(packetSize));
@@ -224,10 +224,8 @@ int main(int argc, char **argv) {
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
 
-
     AsciiTraceHelper ascii;
-    //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("ping6wsn.tr"));
-    lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/ping6wsn"), true);
+    lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
     csma.EnablePcapAll(std::string("./traces/csma"), true);
     NS_LOG_INFO("Run Simulation.");
     //AnimationInterface anim("AWSNanimation.xml");
