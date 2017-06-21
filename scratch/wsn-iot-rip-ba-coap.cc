@@ -233,6 +233,16 @@ int main(int argc, char **argv) {
     apps = client.Install(iot[1].Get(0));
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
+    
+/*
+    CoapClientHelper client2(i_6lowpan[1].GetAddress(4, 1), port);
+    client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount*100));
+    client.SetAttribute("Interval", TimeValue(Seconds(0.01)));
+    client.SetAttribute("PacketSize", UintegerValue(packetSize));
+    apps = client2.Install(iot[1].Get(0));
+    apps.Start(Seconds(2.0));
+    apps.Stop(Seconds(10.0));
+*/
 
     AsciiTraceHelper ascii;
     lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);

@@ -112,6 +112,7 @@ void
 CoapClientHelper::SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address>* bucket)
 {
   app->GetObject<CoapClient>()->SetIPv6Bucket(bucket);
+  SetAttribute ("NumberOfContents", UintegerValue(bucket->size()));
 }
 void
 CoapClientHelper::SetFill (Ptr<Application> app, std::string fill)

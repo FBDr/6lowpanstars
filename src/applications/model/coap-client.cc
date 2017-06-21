@@ -30,7 +30,8 @@
 #include "coap-client.h"
 
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -72,12 +73,10 @@ namespace ns3 {
                 "ns3::Packet::TracedCallback")
 
                 //ZM
-/*
                 .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
                 MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
                 &CoapClient::GetNumberOfContents),
                 MakeUintegerChecker<uint32_t>())
-*/
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
                 MakeDoubleAccessor(&CoapClient::SetQ,
                 &CoapClient::GetQ),
@@ -92,10 +91,10 @@ namespace ns3 {
     }
 
     CoapClient::CoapClient()
-    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-    , m_q(0.7)
-    , m_s(0.7)
-    , m_seqRng(CreateObject<UniformRandomVariable>()) {
+            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+            , m_q(0.7)
+            , m_s(0.7)
+            , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
         m_socket = 0;
@@ -163,6 +162,7 @@ namespace ns3 {
     CoapClient::SetIPv6Bucket(std::vector<Ipv6Address>* bucket) {
         m_IPv6Bucket = bucket;
     }
+
     uint32_t
     CoapClient::GetNumberOfContents() const {
         return m_N;
@@ -223,10 +223,10 @@ namespace ns3 {
             m_socket = Socket::CreateSocket(GetNode(), tid);
             if (Ipv4Address::IsMatchingType(m_peerAddress) == true) {
                 m_socket->Bind();
-                m_socket->Connect(InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort));
+                //m_socket->Connect(InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort));
             } else if (Ipv6Address::IsMatchingType(m_peerAddress) == true) {
                 m_socket->Bind6();
-                m_socket->Connect(Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort));
+                //m_socket->Connect(Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort));
             }
         }
 
@@ -379,7 +379,11 @@ namespace ns3 {
         // call to the trace sinks before the packet is actually sent,
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
-        m_socket->Send(p);
+        //m_socket->Send(p);
+
+        if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
+            std::cout<<"SendTo ERROR!"<<std::endl;
+        };
 
         ++m_sent;
 
