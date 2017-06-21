@@ -19,26 +19,19 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
-
 std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
+
     std::vector<Ipv6Address> returnBucket;
-
-
     Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
     shuffles->SetAttribute("Min", DoubleValue(0));
-    shuffles->SetAttribute("Max", DoubleValue(arrayf.size()-1));
-
+    shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
 
     for (int itx = 0; itx < numContents; itx++) {
-            returnBucket.push_back(arrayf[shuffles->GetValue()]);
-            //std::cout<<arrayf[shuffles->GetValue()]<<std::endl;
-            //returnBucket.push_back(arrayf[1]);
-
+        returnBucket.push_back(arrayf[shuffles->GetValue()]);
     }
-    
+
     return returnBucket;
 }
-
 
 int main(int argc, char **argv) {
 
@@ -52,6 +45,7 @@ int main(int argc, char **argv) {
     int pro_per;
     int dist = 500;
     int subn = 0;
+    int totnumcontents = 100;
 
     CommandLine cmd;
     cmd.AddValue("verbose", "turn on log components", verbose);
@@ -61,6 +55,7 @@ int main(int argc, char **argv) {
     cmd.AddValue("head", "Number of head nodes", node_head);
     cmd.AddValue("ConPercent", "Consumer percentage", con_per);
     cmd.AddValue("ProPercent", "Producer percentage", pro_per);
+    cmd.AddValue("Contents", "Total number of contents", totnumcontents);
     cmd.Parse(argc, argv);
 
     RngSeedManager::SetSeed(1);
@@ -229,8 +224,8 @@ int main(int argc, char **argv) {
             IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
         }
     }
+    std::vector<Ipv6Address> AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
 
-    std::vector<Ipv6Address> test = CreateAddrResBucket(IPv6Bucket, 100);
 
     // Static routing rules
     //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
@@ -252,6 +247,7 @@ int main(int argc, char **argv) {
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
     client.SetAttribute("PacketSize", UintegerValue(packetSize));
+    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
     apps = client.Install(iot[1].Get(0));
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
