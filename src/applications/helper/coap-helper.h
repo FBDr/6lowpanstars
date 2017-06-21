@@ -238,7 +238,7 @@ namespace ns3 {
          * 
          */
 
-        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> bucket);
+        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address>& bucket);
 
     private:
         /**
