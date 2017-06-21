@@ -2231,7 +2231,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2272,7 +2271,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2310,7 +2308,6 @@
       <item path="examples/ipv6/icmpv6-redirect.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2377,7 +2374,6 @@
       <item path="examples/ipv6/radvd-two-prefix.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2415,7 +2411,6 @@
       <item path="examples/ipv6/radvd.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2453,7 +2448,6 @@
       <item path="examples/ipv6/test-ipv6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/ipv6</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2525,7 +2519,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2566,7 +2559,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2607,7 +2599,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2648,7 +2639,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2689,7 +2679,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2746,7 +2735,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2787,7 +2775,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2828,7 +2815,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2869,7 +2855,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/routing</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2910,7 +2895,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/socket</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2951,7 +2935,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/socket</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -2992,7 +2975,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/socket</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3057,7 +3039,6 @@
       <item path="examples/tcp/star.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3095,7 +3076,6 @@
       <item path="examples/tcp/tcp-bulk-send.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3133,7 +3113,6 @@
       <item path="examples/tcp/tcp-large-transfer.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3171,7 +3150,6 @@
       <item path="examples/tcp/tcp-nsc-comparison.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3209,7 +3187,6 @@
       <item path="examples/tcp/tcp-nsc-lfn.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3276,7 +3253,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tcp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3314,7 +3290,6 @@
       <item path="examples/tutorial/fifth.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3352,7 +3327,6 @@
       <item path="examples/tutorial/first.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3390,7 +3364,6 @@
       <item path="examples/tutorial/fourth.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3431,7 +3404,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3469,7 +3441,6 @@
       <item path="examples/tutorial/second.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3507,7 +3478,6 @@
       <item path="examples/tutorial/seventh.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3545,7 +3515,6 @@
       <item path="examples/tutorial/sixth.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/tutorial</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3610,7 +3579,6 @@
       <item path="examples/udp/coap.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/udp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3661,7 +3629,6 @@
       <item path="examples/udp/udp-echo.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/udp</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3702,7 +3669,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3743,7 +3709,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3781,7 +3746,6 @@
       <item path="examples/wireless/multirate.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3822,7 +3786,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3863,7 +3826,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3904,7 +3866,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -3961,7 +3922,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4002,7 +3962,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4043,7 +4002,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4100,7 +4058,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4138,7 +4095,6 @@
       <item path="examples/wireless/wifi-adhoc.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4205,7 +4161,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4246,7 +4201,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4287,7 +4241,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4328,7 +4281,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4369,7 +4321,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4410,7 +4361,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4448,7 +4398,6 @@
       <item path="examples/wireless/wifi-sleep.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -4505,7 +4454,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>examples/wireless</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -10891,44 +10839,29 @@
         </ccTool>
       </item>
       <item path="scratch/wsn-iot-rip-ba-coap.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="2">
+        <ccTool flags="3">
           <incDir>
-            <pElem>build/ns3</pElem>
-            <pElem>scratch</pElem>
-            <pElem>../BRITE</pElem>
-            <pElem>src/network/model</pElem>
-            <pElem>../BRITE/Models</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
+            <pElem>build/ns3/ndnSIM/NFD</pElem>
+            <pElem>ns3/ndnSIM/NFD</pElem>
+            <pElem>build/src/ndnSIM/NFD/core</pElem>
+            <pElem>src/ndnSIM/NFD/core</pElem>
+            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
+            <pElem>src/ndnSIM/NFD/daemon</pElem>
+            <pElem>build/src/ndnSIM/NFD/rib</pElem>
+            <pElem>src/ndnSIM/NFD/rib</pElem>
+            <pElem>build/ns3/ndnSIM</pElem>
+            <pElem>ns3/ndnSIM</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>/usr/include</pElem>
           </incDir>
           <preprocessorList>
-            <Elem>_REENTRANT=1</Elem>
-            <Elem>__GNUC_STDC_INLINE__=1</Elem>
-            <Elem>__GXX_EXPERIMENTAL_CXX0X__=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__STDC_UTF_16__=1</Elem>
-            <Elem>__STDC_UTF_32__=1</Elem>
-            <Elem>__STRICT_ANSI__=1</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-            <Elem>__cplusplus=201103L</Elem>
-            <Elem>__cpp_alias_templates=200704</Elem>
-            <Elem>__cpp_attributes=200809</Elem>
-            <Elem>__cpp_constexpr=200704</Elem>
-            <Elem>__cpp_decltype=200707</Elem>
-            <Elem>__cpp_delegating_constructors=200604</Elem>
-            <Elem>__cpp_inheriting_constructors=200802</Elem>
-            <Elem>__cpp_initializer_lists=200806</Elem>
-            <Elem>__cpp_lambdas=200907</Elem>
-            <Elem>__cpp_nsdmi=200809</Elem>
-            <Elem>__cpp_range_based_for=200907</Elem>
-            <Elem>__cpp_raw_strings=200710</Elem>
-            <Elem>__cpp_ref_qualifiers=200710</Elem>
-            <Elem>__cpp_rvalue_reference=200610</Elem>
-            <Elem>__cpp_static_assert=200410</Elem>
-            <Elem>__cpp_unicode_characters=200704</Elem>
-            <Elem>__cpp_unicode_literals=200710</Elem>
-            <Elem>__cpp_user_defined_literals=200809</Elem>
-            <Elem>__cpp_variadic_templates=200704</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BRITE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>
@@ -11113,7 +11046,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11172,7 +11104,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11215,7 +11146,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11258,7 +11188,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11301,7 +11230,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11344,7 +11272,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11387,7 +11314,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11430,7 +11356,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11473,7 +11398,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/helper</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11516,7 +11440,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11559,7 +11482,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11602,7 +11524,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11661,7 +11582,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11704,7 +11624,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11747,7 +11666,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11787,7 +11705,6 @@
       <item path="src/applications/model/ping6.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11830,7 +11747,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11873,7 +11789,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11913,7 +11828,6 @@
       <item path="src/applications/model/radvd.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11956,7 +11870,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -11999,7 +11912,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12042,7 +11954,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12085,7 +11996,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12128,7 +12038,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12171,7 +12080,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12214,7 +12122,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12257,7 +12164,6 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12297,7 +12203,6 @@
       <item path="src/applications/model/v4ping.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/applications/model</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -12991,7 +12896,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/csma/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13032,7 +12936,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/csma/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13070,7 +12973,6 @@
       <item path="src/csma/examples/csma-ping.cc" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/csma/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -13111,7 +13013,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/csma/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -65585,7 +65486,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -65626,7 +65526,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -65699,7 +65598,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -65756,7 +65654,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/netanim/examples</pElem>
             <pElem>build</pElem>
           </incDir>
@@ -66579,7 +66476,6 @@
             flavor2="8">
         <ccTool flags="2">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>src/sixlowpan/examples</pElem>
             <pElem>build</pElem>
           </incDir>

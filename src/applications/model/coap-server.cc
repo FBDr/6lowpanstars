@@ -116,7 +116,6 @@ namespace ns3
         NS_LOG_FUNCTION(this << fill);
         NS_ASSERT_MSG(length >= fill.size(), "Length of data packet smaller than string size.");
         uint32_t dataSize = length;
-        delete [] m_data;
         m_data = new uint8_t [dataSize];
         m_dataSize = dataSize;
         memcpy(m_data, fill.c_str(), dataSize);
@@ -202,7 +201,6 @@ namespace ns3
 
 
             // Copy data from current received packet into buffer. 
-            delete [] m_Rdata; //nodig?
             m_Rdata = new uint8_t [received_packet->GetSize()];
             received_packet->CopyData(m_Rdata, received_packet->GetSize());
             uint32_t received_Req = FilterReqNum();

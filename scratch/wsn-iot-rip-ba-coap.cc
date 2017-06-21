@@ -19,6 +19,27 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
+
+std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
+    std::vector<Ipv6Address> returnBucket;
+
+
+    Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
+    shuffles->SetAttribute("Min", DoubleValue(0));
+    shuffles->SetAttribute("Max", DoubleValue(arrayf.size()-1));
+
+
+    for (int itx = 0; itx < numContents; itx++) {
+            returnBucket.push_back(arrayf[shuffles->GetValue()]);
+            //std::cout<<arrayf[shuffles->GetValue()]<<std::endl;
+            //returnBucket.push_back(arrayf[1]);
+
+    }
+    
+    return returnBucket;
+}
+
+
 int main(int argc, char **argv) {
 
     //Variables and simulation configuration
@@ -26,7 +47,7 @@ int main(int argc, char **argv) {
     int rngfeed = 43221;
     int node_num = 10;
     int node_periph = 9;
-    int node_head = 2;
+    int node_head = 3;
     int con_per;
     int pro_per;
     int dist = 500;
@@ -201,14 +222,15 @@ int main(int argc, char **argv) {
 
     }
 
-    //Create IPv6Addressbucket with all IPs of IoT domain.
-    
+    //Create IPv6Addressbucket containing all IoT node domains.
     std::vector<Ipv6Address> IPv6Bucket;
     for (int idx = 0; idx < node_head; idx++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
         }
     }
+
+    std::vector<Ipv6Address> test = CreateAddrResBucket(IPv6Bucket, 100);
 
     // Static routing rules
     //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
@@ -224,8 +246,8 @@ int main(int argc, char **argv) {
     apps.Stop(Seconds(10.0));
 
     uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 2;
-    Time interPacketInterval = Seconds(1.);
+    uint32_t maxPacketCount = 20;
+    Time interPacketInterval = Seconds(0.2);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
@@ -233,16 +255,16 @@ int main(int argc, char **argv) {
     apps = client.Install(iot[1].Get(0));
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
-    
-/*
-    CoapClientHelper client2(i_6lowpan[1].GetAddress(4, 1), port);
-    client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount*100));
-    client.SetAttribute("Interval", TimeValue(Seconds(0.01)));
-    client.SetAttribute("PacketSize", UintegerValue(packetSize));
-    apps = client2.Install(iot[1].Get(0));
-    apps.Start(Seconds(2.0));
-    apps.Stop(Seconds(10.0));
-*/
+
+    /*
+        CoapClientHelper client2(i_6lowpan[1].GetAddress(4, 1), port);
+        client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount*100));
+        client.SetAttribute("Interval", TimeValue(Seconds(0.01)));
+        client.SetAttribute("PacketSize", UintegerValue(packetSize));
+        apps = client2.Install(iot[1].Get(0));
+        apps.Start(Seconds(2.0));
+        apps.Stop(Seconds(10.0));
+     */
 
     AsciiTraceHelper ascii;
     lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);

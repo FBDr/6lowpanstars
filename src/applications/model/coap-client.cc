@@ -223,10 +223,10 @@ namespace ns3
             m_socket = Socket::CreateSocket(GetNode(), tid);
             if (Ipv4Address::IsMatchingType(m_peerAddress) == true) {
                 m_socket->Bind();
-                //m_socket->Connect(InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort));
+                //m_socket->Connect(InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort)); SendTo ipv Send, connect onnodig.
             } else if (Ipv6Address::IsMatchingType(m_peerAddress) == true) {
                 m_socket->Bind6();
-                //m_socket->Connect(Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort));
+                //m_socket->Connect(Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)); SendTo ipv Send, connect onnodig.
             }
         }
 
@@ -379,7 +379,7 @@ namespace ns3
         // call to the trace sinks before the packet is actually sent,
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
-        //m_socket->Send(p);
+        //m_socket->Send(p); Vervangen door SendTo
 
         if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
             std::cout<<"SendTo ERROR!"<<std::endl;
