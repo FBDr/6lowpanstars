@@ -145,8 +145,7 @@ namespace ns3 {
          */
         void SetFill(uint8_t *fill, uint32_t fillSize, uint32_t dataSize);
 
-        void
-        SetIPv6Bucket(std::vector<Ipv6Address>& bucket);
+        void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
 
         uint32_t
         GetNextSeq();

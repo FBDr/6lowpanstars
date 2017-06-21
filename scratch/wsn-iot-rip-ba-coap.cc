@@ -247,8 +247,8 @@ int main(int argc, char **argv) {
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
     client.SetAttribute("PacketSize", UintegerValue(packetSize));
-    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
     apps = client.Install(iot[1].Get(0));
+    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
     apps.Start(Seconds(2.0));
     apps.Stop(Seconds(10.0));
 

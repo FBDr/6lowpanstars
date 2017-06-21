@@ -159,10 +159,13 @@ namespace ns3
     }
 
     void
-    CoapClient::SetIPv6Bucket(std::vector<Ipv6Address>& bucket) {
-        std::vector<Ipv6Address> m_IPv6Bucket(bucket.size()+1);
+    CoapClient::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
+        m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
+        std::cout << "Grote van bucket is: " << bucket.size() << std::endl;
         m_IPv6Bucket = bucket;
 
+                
+        std::cout << "Grote van bucket2 is: " << m_IPv6Bucket[10] << std::endl;
     }
 
     uint32_t
@@ -354,7 +357,8 @@ namespace ns3
         NS_LOG_FUNCTION(this);
 
         NS_ASSERT(m_sendEvent.IsExpired());
-        SetFill("GET/" + std::to_string(GetNextSeq()));
+        uint32_t nxtsq = GetNextSeq();
+        SetFill("GET/" + std::to_string(nxtsq));
 
         Ptr<Packet> p;
         if (m_dataSize) {
@@ -383,9 +387,12 @@ namespace ns3
         m_txTrace(p);
         //m_socket->Send(p); Vervangen door SendTo
 
+        std::cout << Ipv6Address::ConvertFrom(m_peerAddress) << " and " << m_IPv6Bucket.size() << std::endl;
+        //std::cout<< Ipv6Address::ConvertFrom(m_peerAddress) <<"and" <<std::endl;
         if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
-            std::cout<<"SendTo ERROR!"<<std::endl;
+            std::cout << "SendTo ERROR!" << std::endl;
         };
+
 
         ++m_sent;
 
