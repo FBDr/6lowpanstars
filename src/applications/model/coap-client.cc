@@ -389,7 +389,8 @@ namespace ns3
 
         std::cout << Ipv6Address::ConvertFrom(m_peerAddress) << " and " << m_IPv6Bucket.size() << std::endl;
         //std::cout<< Ipv6Address::ConvertFrom(m_peerAddress) <<"and" <<std::endl;
-        if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
+        //if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
+        if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
             std::cout << "SendTo ERROR!" << std::endl;
         };
 
@@ -401,7 +402,7 @@ namespace ns3
                     Ipv4Address::ConvertFrom(m_peerAddress) << " port " << m_peerPort);
         } else if (Ipv6Address::IsMatchingType(m_peerAddress)) {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
-                    Ipv6Address::ConvertFrom(m_peerAddress) << " port " << m_peerPort);
+                    m_IPv6Bucket[nxtsq] << " port " << m_peerPort);
         }
 
         if (m_sent < m_count) {
