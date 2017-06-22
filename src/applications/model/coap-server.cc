@@ -131,7 +131,7 @@ namespace ns3 {
         NS_ASSERT_MSG(length >= fill.size(), "Length of data packet smaller than string size.");
         uint32_t dataSize = length;
         m_data = new uint8_t [dataSize];
-        m_dataSize = dataSize;
+            m_dataSize = dataSize;
         memcpy(m_data, fill.c_str(), dataSize);
     }
 

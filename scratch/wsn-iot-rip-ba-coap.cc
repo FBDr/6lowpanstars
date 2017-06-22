@@ -238,13 +238,15 @@ int main(int argc, char **argv) {
     uint16_t port = 9;
     ApplicationContainer apps;
     CoapServerHelper server(port);
-
+    int appnum =0;
     for (int itr = 0; itr < node_head; itr++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             //Install server application on every node, in every IoT domain.
             apps.Add(server.Install(iot[itr].Get(jdx)));
             std::cout << "Er zijn nu apps: " << apps.GetN() << " itr: " << itr << std::endl;
-            server.SetIPv6Bucket(apps.Get((uint32_t) jdx), AddrResBucket);
+            server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
+            appnum++;
+            
         }
 
     }
@@ -256,8 +258,8 @@ int main(int argc, char **argv) {
     apps.Stop(Seconds(20.0));
 
     uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 10;
-    Time interPacketInterval = Seconds(0.5);
+    uint32_t maxPacketCount = 2000;
+    Time interPacketInterval = Seconds(0.05);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
