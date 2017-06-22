@@ -154,7 +154,7 @@ namespace ns3
 
         for (uint32_t i = 1; i <= m_N; i++) {
             m_Pcum[i] = m_Pcum[i] / m_Pcum[m_N];
-            NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
+            //NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
         }
     }
 
@@ -357,7 +357,7 @@ namespace ns3
         NS_LOG_FUNCTION(this);
 
         NS_ASSERT(m_sendEvent.IsExpired());
-        uint32_t nxtsq = GetNextSeq();
+        uint32_t nxtsq = GetNextSeq()-1; //Next sequence spans from [1, N];
         SetFill("GET/" + std::to_string(nxtsq));
 
         Ptr<Packet> p;

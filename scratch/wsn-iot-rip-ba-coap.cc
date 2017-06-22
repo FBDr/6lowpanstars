@@ -28,6 +28,7 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
 
     for (int itx = 0; itx < numContents; itx++) {
         returnBucket.push_back(arrayf[shuffles->GetValue()]);
+        std::cout<< "Content chunk: " << itx<< " is at: "<<returnBucket[itx]<<std::endl;
     }
 
     return returnBucket;
@@ -241,8 +242,8 @@ int main(int argc, char **argv) {
     apps.Stop(Seconds(10.0));
 
     uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 20;
-    Time interPacketInterval = Seconds(0.2);
+    uint32_t maxPacketCount = 2000;
+    Time interPacketInterval = Seconds(0.002);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
