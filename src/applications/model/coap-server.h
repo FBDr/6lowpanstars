@@ -62,7 +62,8 @@ namespace ns3 {
          */
         //uint32_t GetDataNum() const;
 
-        void AddSeq(uint32_t newSeq);
+
+        void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
 
 
         CoapServer();
@@ -75,6 +76,7 @@ namespace ns3 {
 
         virtual void StartApplication(void);
         virtual void StopApplication(void);
+        void AddSeq();
 
         /**
          * \brief Handle a packet reception.
@@ -112,6 +114,7 @@ namespace ns3 {
         //        uint32_t *m_regSeq; //!< Available sequence numbers.
         //        uint32_t m_regNum; //!< Available sequence numbers.
         std::set<uint32_t> m_regSeqSet;
+        std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;
     };
 

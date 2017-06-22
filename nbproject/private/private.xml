@@ -12,6 +12,7 @@
         <group>
             <file>file:/home/floris/ndnSIM/ns-3/scratch/wsn-iot-rip-ba-coap.cc</file>
             <file>file:/home/floris/ndnSIM/ns-3/examples/udp/coap.cc</file>
+            <file>file:/home/floris/ndnSIM/ns-3/src/applications/model/coap-server.h</file>
             <file>file:/home/floris/ndnSIM/ns-3/src/applications/model/coap-server.cc</file>
             <file>file:/home/floris/ndnSIM/ns-3/src/applications/model/coap-client.cc</file>
             <file>file:/home/floris/ndnSIM/ns-3/src/applications/helper/coap-helper.h</file>

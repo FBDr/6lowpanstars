@@ -161,11 +161,8 @@ namespace ns3
     void
     CoapClient::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
         m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
-        std::cout << "Grote van bucket is: " << bucket.size() << std::endl;
         m_IPv6Bucket = bucket;
 
-                
-        std::cout << "Grote van bucket2 is: " << m_IPv6Bucket[10] << std::endl;
     }
 
     uint32_t

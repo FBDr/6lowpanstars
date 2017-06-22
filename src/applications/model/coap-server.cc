@@ -83,14 +83,28 @@ namespace ns3 {
     }
 
     void
+    CoapServer::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
+        m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
+        m_IPv6Bucket = bucket;
+
+    }
+
+    void
     CoapServer::DoDispose(void) {
         NS_LOG_FUNCTION(this);
         Application::DoDispose();
     }
 
     void
-    CoapServer::AddSeq(uint32_t newSeq) {
-        m_regSeqSet.insert(newSeq);
+    CoapServer::AddSeq() {
+        for (unsigned int idx = 0; idx < m_IPv6Bucket.size(); idx++) {
+            NS_LOG_INFO("AddSeq: " << idx << " of " << m_ownip);
+            NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
+            if (m_IPv6Bucket[idx] == m_ownip) {
+                m_regSeqSet.insert(idx);
+                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip);
+            }
+        }
     }
 
     uint32_t
@@ -124,6 +138,11 @@ namespace ns3 {
     void
     CoapServer::StartApplication(void) {
         NS_LOG_FUNCTION(this);
+        Ptr <Node> PtrNode = this->GetNode();
+        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
+        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
+        m_ownip = ownaddr.GetAddress();
+        AddSeq();
 
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
@@ -159,11 +178,6 @@ namespace ns3 {
 
         m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
         m_socket6->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
-
-        Ptr <Node> PtrNode = this->GetNode();
-        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
-        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
-        m_ownip = ownaddr.GetAddress();
 
     }
 

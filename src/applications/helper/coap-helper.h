@@ -92,7 +92,8 @@ namespace ns3 {
          * 
          */
 
-        void SetContent(Ptr<Application> app, uint32_t content);
+
+        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket);
 
 
     private:

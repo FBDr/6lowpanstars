@@ -238,12 +238,20 @@ int main(int argc, char **argv) {
     uint16_t port = 9;
     ApplicationContainer apps;
     CoapServerHelper server(port);
+
     for (int itr = 0; itr < node_head; itr++) {
-        //Install server application on every node, in evry IoT domain.
-         apps = server.Install(iot[itr]);
+        for (int jdx = 0; jdx < node_periph; jdx++) {
+            //Install server application on every node, in every IoT domain.
+            apps.Add(server.Install(iot[itr].Get(jdx)));
+            std::cout << "Er zijn nu apps: " << apps.GetN() << " itr: " << itr << std::endl;
+            server.SetIPv6Bucket(apps.Get((uint32_t) jdx), AddrResBucket);
+        }
+
     }
 
-    server.SetContent(apps.Get(0), 32);
+
+
+
     apps.Start(Seconds(1.0));
     apps.Stop(Seconds(20.0));
 

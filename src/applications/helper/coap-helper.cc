@@ -64,6 +64,13 @@ CoapServerHelper::Install (NodeContainer c) const
   return apps;
 }
 
+void
+CoapServerHelper::SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket)
+{
+  app->GetObject<CoapServer>()->SetIPv6Bucket(bucket);
+}
+
+
 Ptr<Application>
 CoapServerHelper::InstallPriv (Ptr<Node> node) const
 {
@@ -102,11 +109,6 @@ CoapClientHelper::SetAttribute (
   m_factory.Set (name, value);
 }
 
-void
-CoapServerHelper::SetContent (Ptr<Application> app, uint32_t content)
-{
-  app->GetObject<CoapServer>()->AddSeq(content);
-}
 
 void
 CoapClientHelper::SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket)

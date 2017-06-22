@@ -103,7 +103,7 @@ main (int argc, char *argv[])
   uint16_t port = 9;  
   CoapServerHelper server (port);
   ApplicationContainer apps = server.Install (n.Get (1));
-  server.SetContent(apps.Get(0), 32);
+  //server.SetContent(apps.Get(0), 32);
   apps.Start (Seconds (1.0));
   apps.Stop (Seconds (10.0));
 
