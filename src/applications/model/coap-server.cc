@@ -159,6 +159,12 @@ namespace ns3 {
 
         m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
         m_socket6->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
+
+        Ptr <Node> PtrNode = this->GetNode();
+        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
+        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
+        m_ownip = ownaddr.GetAddress();
+
     }
 
     void
@@ -184,15 +190,8 @@ namespace ns3 {
 
         Address from;
         //Move this to startapplication
-        Ptr <Node> PtrNode = this->GetNode();
-        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
-        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
-        Ipv6Address ownip = ownaddr.GetAddress();
 
-        NS_LOG_INFO("Own address is " << ownip);
-
-
-        while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != ownip)) {
+        while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
 
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<

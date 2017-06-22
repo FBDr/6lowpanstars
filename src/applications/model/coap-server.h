@@ -112,6 +112,7 @@ namespace ns3 {
         //        uint32_t *m_regSeq; //!< Available sequence numbers.
         //        uint32_t m_regNum; //!< Available sequence numbers.
         std::set<uint32_t> m_regSeqSet;
+        Ipv6Address m_ownip;
     };
 
 } // namespace ns3
