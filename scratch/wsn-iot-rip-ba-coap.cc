@@ -28,7 +28,7 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
 
     for (int itx = 0; itx < numContents; itx++) {
         returnBucket.push_back(arrayf[shuffles->GetValue()]);
-        std::cout<< "Content chunk: " << itx<< " is at: "<<returnBucket[itx]<<std::endl;
+        std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
     }
 
     return returnBucket;
@@ -223,6 +223,7 @@ int main(int argc, char **argv) {
     for (int idx = 0; idx < node_head; idx++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
+
         }
     }
     std::vector<Ipv6Address> AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
@@ -235,23 +236,28 @@ int main(int argc, char **argv) {
     // Install and create Ping applications.
     NS_LOG_INFO("Create Applications.");
     uint16_t port = 9;
+    ApplicationContainer apps;
     CoapServerHelper server(port);
-    ApplicationContainer apps = server.Install(iot[1].Get(4));
+    for (int itr = 0; itr < node_head; itr++) {
+        //Install server application on every node, in evry IoT domain.
+         apps = server.Install(iot[itr]);
+    }
+
     server.SetContent(apps.Get(0), 32);
     apps.Start(Seconds(1.0));
-    apps.Stop(Seconds(10.0));
+    apps.Stop(Seconds(20.0));
 
     uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 2000;
-    Time interPacketInterval = Seconds(0.002);
+    uint32_t maxPacketCount = 10;
+    Time interPacketInterval = Seconds(0.5);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
     client.SetAttribute("PacketSize", UintegerValue(packetSize));
     apps = client.Install(iot[1].Get(0));
     client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-    apps.Start(Seconds(2.0));
-    apps.Stop(Seconds(10.0));
+    apps.Start(Seconds(10.0));
+    apps.Stop(Seconds(20.0));
 
     /*
         CoapClientHelper client2(i_6lowpan[1].GetAddress(4, 1), port);

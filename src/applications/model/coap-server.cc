@@ -35,10 +35,10 @@
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "src/network/model/node.h"
+#include "src/core/model/log.h"
 #include <string>
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapServerApplication");
 
@@ -183,9 +183,17 @@ namespace ns3
         Ptr<Packet> response_packet;
 
         Address from;
+        //Move this to startapplication
+        Ptr <Node> PtrNode = this->GetNode();
+        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
+        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
+        Ipv6Address ownip = ownaddr.GetAddress();
+
+        NS_LOG_INFO("Own address is " << ownip);
 
 
-        while ((received_packet = socket->RecvFrom(from))) {
+        while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != ownip)) {
+
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
@@ -208,10 +216,9 @@ namespace ns3
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
                 CreateResponsePkt("POST", 100);
 
-
             } else {
                 NS_LOG_ERROR("Data not available");
-                CreateResponsePkt("Unavailable", sizeof("Unavailable"));
+                CreateResponsePkt("Unavailable", sizeof ("Unavailable"));
             }
 
             response_packet = Create<Packet> (m_data, m_dataSize);

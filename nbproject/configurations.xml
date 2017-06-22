@@ -11434,6 +11434,7 @@
             flavor2="8">
         <ccTool flags="4">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
@@ -11450,7 +11451,6 @@
             flavor2="8">
         <ccTool flags="4">
           <incDir>
-            <pElem>build/ns3</pElem>
             <pElem>build</pElem>
             <pElem>.</pElem>
           </incDir>
