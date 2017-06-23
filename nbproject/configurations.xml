@@ -312,6 +312,7 @@
         <in>ping6Icn.cc</in>
         <in>ripng-test.cc</in>
         <in>scratch-simulator.cc</in>
+        <in>wsn-iot-icn.cc</in>
         <in>wsn-iot-rip-ba-coap.cc</in>
         <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
@@ -4571,6 +4572,27 @@
             tool="1"
             flavor2="8">
         <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="scratch/wsn-iot-icn.cc" ex="false" tool="1" flavor2="8">
+        <ccTool flags="1">
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+            <pElem>build/ns3/ndnSIM/NFD</pElem>
+            <pElem>ns3/ndnSIM/NFD</pElem>
+            <pElem>build/src/ndnSIM/NFD/core</pElem>
+            <pElem>src/ndnSIM/NFD/core</pElem>
+            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
+            <pElem>src/ndnSIM/NFD/daemon</pElem>
+            <pElem>build/src/ndnSIM/NFD/rib</pElem>
+            <pElem>src/ndnSIM/NFD/rib</pElem>
+            <pElem>build/ns3/ndnSIM</pElem>
+            <pElem>ns3/ndnSIM</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>/usr/include</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="scratch/wsn-iot-rip-ba-coap.cc" ex="false" tool="1" flavor2="8">

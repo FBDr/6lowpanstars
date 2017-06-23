@@ -515,6 +515,7 @@
                   <in>multi-policy-container.hpp</in>
                   <in>multi-type-container.hpp</in>
                 </df>
+                <in>aggregate-stats-policy.hpp</in>
                 <in>counting-policy.hpp</in>
                 <in>empty-policy.hpp</in>
                 <in>fifo-policy.hpp</in>
@@ -523,6 +524,8 @@
                 <in>multi-policy.hpp</in>
                 <in>payload-policy.hpp</in>
                 <in>payload-with-policy.hpp</in>
+                <in>persistent-policy.hpp</in>
+                <in>random-policy.hpp</in>
                 <in>trie-with-policy.hpp</in>
                 <in>trie.hpp</in>
               </df>
@@ -2069,6 +2072,7 @@
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
+        <in>wsn-iot-icn.cc</in>
         <in>wsn-iot-rip-ba-coap.cc</in>
         <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>

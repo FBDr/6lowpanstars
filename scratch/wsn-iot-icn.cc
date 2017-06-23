@@ -18,26 +18,27 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("wsn-iot-rip-ba-coap");
+NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
 
 std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
-
     std::vector<Ipv6Address> returnBucket;
     Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
     shuffles->SetAttribute("Min", DoubleValue(0));
     shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
-
     for (int itx = 0; itx < numContents; itx++) {
         returnBucket.push_back(arrayf[shuffles->GetValue()]);
         //std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
     }
-
     return returnBucket;
 }
 
 int main(int argc, char **argv) {
 
     //Variables and simulation configuration
+    
+    /**
+     * Generic part. \BEGIN
+     */
     bool verbose = false;
     int rngfeed = 43221;
     int node_num = 10;
@@ -46,7 +47,6 @@ int main(int argc, char **argv) {
     int con_per;
     int pro_per;
     int dist = 500;
-    int subn = 0;
     int totnumcontents = 100;
 
     CommandLine cmd;
@@ -63,21 +63,8 @@ int main(int argc, char **argv) {
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
 
-    //ICMPv6 redirects do not optimise routes in single router case.
-    Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
-
     if (verbose) {
         LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
-        /*
-                LogComponentEnable("Ipv6Extension", LOG_LEVEL_ALL);
-                LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-                LogComponentEnable("Ipv6ListRouting", LOG_LEVEL_ALL);
-                LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
-                LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
-                LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-                LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
-                LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-         */
         LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
     }
 
@@ -90,7 +77,6 @@ int main(int argc, char **argv) {
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;
-
     NodeContainer routers;
     NodeContainer endnodes;
     NodeContainer border_backhaul[node_head];
@@ -121,7 +107,6 @@ int main(int argc, char **argv) {
 
     // Create NetDeviceContainers for LrWpan, 6lowpan and CSMA (LAN).
     NetDeviceContainer LrWpanDevice[node_head];
-    NetDeviceContainer SixLowpanDevice[node_head];
     NetDeviceContainer CSMADevice[node_head];
     Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
@@ -164,109 +149,6 @@ int main(int argc, char **argv) {
         //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
         lrWpanHelper.AssociateToPan(LrWpanDevice[jdx], 10);
     }
-
-    //BRITE
-    // Install IPv6 stack
-    NS_LOG_INFO("Install Internet stack.");
-    RipNgHelper ripNgRouting;
-    Ipv6ListRoutingHelper listRH;
-    listRH.Add(ripNgRouting, 0);
-
-    InternetStackHelper internetv6;
-    internetv6.SetIpv4StackInstall(false);
-    internetv6.Install(endnodes);
-    internetv6.SetRoutingHelper(listRH);
-    internetv6.Install(br);
-    internetv6.Install(backhaul);
-
-    // Install 6LowPan layer
-    NS_LOG_INFO("Install 6LoWPAN.");
-    SixLowPanHelper sixlowpan;
-    Ipv6AddressHelper ipv6;
-    Ipv6InterfaceContainer i_6lowpan[node_head];
-    Ipv6InterfaceContainer i_csma[node_head];
-    Ipv6InterfaceContainer i_backhaul;
-
-    // Assign IPv6 addresses
-    // For backhaul network
-    std::string addresss;
-    addresss = "2001:0:" + std::to_string(1337) + "::";
-    const char * c = addresss.c_str();
-    ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-    bth.AssignIpv6Addresses(ipv6);
-
-    //For outer network
-    NS_LOG_INFO("Assign addresses.");
-    for (int jdx = 0; jdx < node_head; jdx++) {
-        SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
-        subn++;
-        addresss = "2001:0:" + std::to_string(subn) + "::";
-        const char * c = addresss.c_str();
-        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
-        subn++;
-        addresss = "2001:0:" + std::to_string(subn) + "::";
-        c = addresss.c_str();
-        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
-        //Set forwarding rules.
-        i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
-        i_6lowpan[jdx].SetForwarding(node_periph, true);
-        //i_csma[jdx].SetDefaultRouteInAllNodes(1);
-        //i_csma[jdx].SetDefaultRouteInAllNodes(0);
-        i_csma[jdx].SetForwarding(0, true);
-        i_csma[jdx].SetForwarding(1, true);
-
-    }
-
-    //Create IPv6Addressbucket containing all IoT node domains.
-    std::vector<Ipv6Address> IPv6Bucket;
-    for (int idx = 0; idx < node_head; idx++) {
-        for (int jdx = 0; jdx < node_periph; jdx++) {
-            IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
-
-        }
-    }
-    std::vector<Ipv6Address> AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
-
-
-    // Static routing rules
-    //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-    //ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
-
-    // Install and create Ping applications.
-    NS_LOG_INFO("Create Applications.");
-    uint16_t port = 9;
-    ApplicationContainer apps;
-    CoapServerHelper server(port);
-    int appnum = 0;
-    for (int itr = 0; itr < node_head; itr++) {
-        for (int jdx = 0; jdx < node_periph; jdx++) {
-            //Install server application on every node, in every IoT domain.
-            apps.Add(server.Install(iot[itr].Get(jdx)));
-            server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
-            appnum++;
-        }
-    }
-
-
-
-
-    apps.Start(Seconds(1.0));
-    apps.Stop(Seconds(60.0));
-
-    uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 20000;
-    Time interPacketInterval = Seconds(0.05);
-    CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
-    client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
-    client.SetAttribute("Interval", TimeValue(interPacketInterval));
-    client.SetAttribute("PacketSize", UintegerValue(packetSize));
-    apps = client.Install(iot[1].Get(0));
-    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-    apps.Start(Seconds(10.0));
-    apps.Stop(Seconds(60.0));
-
     /*Tracing*/
     //Flowmonitor
     Ptr<FlowMonitor> flowMonitor;
