@@ -253,10 +253,10 @@ int main(int argc, char **argv) {
 
 
     apps.Start(Seconds(1.0));
-    apps.Stop(Seconds(20.0));
+    apps.Stop(Seconds(60.0));
 
     uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 2000;
+    uint32_t maxPacketCount = 20000;
     Time interPacketInterval = Seconds(0.05);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
     apps = client.Install(iot[1].Get(0));
     client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
     apps.Start(Seconds(10.0));
-    apps.Stop(Seconds(20.0));
+    apps.Stop(Seconds(60.0));
 
     /*Tracing*/
     //Flowmonitor
@@ -282,7 +282,7 @@ int main(int argc, char **argv) {
     //anim.EnablePacketMetadata(true);
 
 
-    Simulator::Stop(Seconds(20));
+    Simulator::Stop(Seconds(60));
     Simulator::Run();
     flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
     Simulator::Destroy();
