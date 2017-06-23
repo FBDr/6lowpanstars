@@ -2068,6 +2068,7 @@
         <in>lrwpan.cpp</in>
         <in>ndn-simple-L3.cc</in>
         <in>ndn-simple-L3.cpp</in>
+        <in>nrc.cc</in>
         <in>ping6Icn.cc</in>
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
@@ -6445,6 +6446,12 @@
       <df name="testpy-output">
       </df>
       <df name="traces">
+        <df name="6lowpan">
+        </df>
+        <df name="csma">
+        </df>
+      </df>
+      <df name="traces2">
         <df name="6lowpan">
         </df>
         <df name="csma">

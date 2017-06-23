@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
 
     if (verbose) {
-        LogComponentEnable("Ping6WsnExample", LOG_LEVEL_INFO);
+        LogComponentEnable("wsn-iot-rip-ba-coap", LOG_LEVEL_INFO);
         /*
                 LogComponentEnable("Ipv6Extension", LOG_LEVEL_ALL);
                 LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
