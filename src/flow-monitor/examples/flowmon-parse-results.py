@@ -40,6 +40,7 @@ class Flow(object):
         rxPackets = long(flow_el.get('rxPackets'))
         txPackets = long(flow_el.get('txPackets'))
         tx_duration = float(long(flow_el.get('timeLastTxPacket')[:-4]) - long(flow_el.get('timeFirstTxPacket')[:-4]))*1e-9
+        print tx_duration
         rx_duration = float(long(flow_el.get('timeLastRxPacket')[:-4]) - long(flow_el.get('timeFirstRxPacket')[:-4]))*1e-9
         self.rx_duration = rx_duration
         self.probe_stats_unsorted = []
@@ -51,8 +52,8 @@ class Flow(object):
             self.delayMean = float(flow_el.get('delaySum')[:-4]) / rxPackets * 1e-9
             self.packetSizeMean = float(flow_el.get('rxBytes')) / rxPackets
         else:
-            self.delayMean = None
-            self.packetSizeMean = None
+            self.delayMean = 1337
+            self.packetSizeMean = 1337
         if rx_duration > 0:
             self.rxBitrate = long(flow_el.get('rxBytes'))*8 / rx_duration
         else:
@@ -64,7 +65,7 @@ class Flow(object):
         lost = float(flow_el.get('lostPackets'))
         #print "rxBytes: %s; txPackets: %s; rxPackets: %s; lostPackets: %s" % (flow_el.get('rxBytes'), txPackets, rxPackets, lost)
         if rxPackets == 0:
-            self.packetLossRatio = None
+            self.packetLossRatio = 1337
         else:
             self.packetLossRatio = (lost / (rxPackets + lost))
 
@@ -81,7 +82,7 @@ class ProbeFlowStats(object):
 class Simulation(object):
     def __init__(self, simulation_el):
         self.flows = []
-        FlowClassifier_el, = simulation_el.findall("Ipv4FlowClassifier")
+        FlowClassifier_el, = simulation_el.findall("Ipv6FlowClassifier")
         flow_map = {}
         for flow_el in simulation_el.findall("FlowStats/Flow"):
             flow = Flow(flow_el)
@@ -133,8 +134,8 @@ def main(argv):
             proto = {6: 'TCP', 17: 'UDP'} [t.protocol]
             print "FlowID: %i (%s %s/%s --> %s/%i)" % \
                 (flow.flowId, proto, t.sourceAddress, t.sourcePort, t.destinationAddress, t.destinationPort)
-            print "\tTX bitrate: %.2f kbit/s" % (flow.txBitrate*1e-3,)
-            print "\tRX bitrate: %.2f kbit/s" % (flow.rxBitrate*1e-3,)
+            #print "\tTX bitrate: %.2f kbit/s" % (flow.txBitrate*1e-3,)
+            #print "\tRX bitrate: %.2f kbit/s" % (flow.rxBitrate*1e-3,)
             print "\tMean Delay: %.2f ms" % (flow.delayMean*1e3,)
             print "\tPacket Loss Ratio: %.2f %%" % (flow.packetLossRatio*100)
 

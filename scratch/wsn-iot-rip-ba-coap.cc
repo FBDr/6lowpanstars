@@ -11,6 +11,7 @@
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/brite-module.h"
+#include "ns3/flow-monitor-module.h"
 #include <string>
 #include <vector>
 
@@ -238,16 +239,14 @@ int main(int argc, char **argv) {
     uint16_t port = 9;
     ApplicationContainer apps;
     CoapServerHelper server(port);
-    int appnum =0;
+    int appnum = 0;
     for (int itr = 0; itr < node_head; itr++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             //Install server application on every node, in every IoT domain.
             apps.Add(server.Install(iot[itr].Get(jdx)));
             server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
             appnum++;
-            
         }
-
     }
 
 
@@ -268,24 +267,24 @@ int main(int argc, char **argv) {
     apps.Start(Seconds(10.0));
     apps.Stop(Seconds(20.0));
 
-    /*
-        CoapClientHelper client2(i_6lowpan[1].GetAddress(4, 1), port);
-        client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount*100));
-        client.SetAttribute("Interval", TimeValue(Seconds(0.01)));
-        client.SetAttribute("PacketSize", UintegerValue(packetSize));
-        apps = client2.Install(iot[1].Get(0));
-        apps.Start(Seconds(2.0));
-        apps.Stop(Seconds(10.0));
-     */
+    /*Tracing*/
+    //Flowmonitor
+    Ptr<FlowMonitor> flowMonitor;
+    FlowMonitorHelper flowHelper;
+    flowMonitor = flowHelper.InstallAll();
 
+    //PCAP
     AsciiTraceHelper ascii;
     lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
     csma.EnablePcapAll(std::string("./traces/csma"), true);
     NS_LOG_INFO("Run Simulation.");
     //AnimationInterface anim("AWSNanimation.xml");
     //anim.EnablePacketMetadata(true);
+
+
     Simulator::Stop(Seconds(20));
     Simulator::Run();
+    flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
     Simulator::Destroy();
     NS_LOG_INFO("Done.");
 }
