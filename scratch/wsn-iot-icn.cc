@@ -14,6 +14,7 @@
 #include "ns3/flow-monitor-module.h"
 #include "helper/ndn-stack-helper.hpp"
 #include "src/ndnSIM/helper/ndn-global-routing-helper.hpp"
+#include "ns3/ndnSIM-module.h"
 #include <string>
 #include <vector>
 
@@ -155,6 +156,24 @@ namespace ns3
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute");
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndnGlobalRoutingHelper.InstallAll();
+
+
+        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+        // Consumer will request /prefix/0, /prefix/1, ...
+        consumerHelper.SetPrefix("/prefix");
+        consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
+        consumerHelper.Install(iot[2].Get(1)); // first node
+
+        // Producer
+        ndn::AppHelper producerHelper("ns3::ndn::Producer");
+        // Producer will reply to all requests starting with /prefix
+        producerHelper.SetPrefix("/prefix");
+        producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+        producerHelper.Install(iot[2].Get(0)); // last node
+        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[2].Get(0));
+        std::cout << "Filling routing tables..." << std::endl;
+        ndn::GlobalRoutingHelper::CalculateRoutes();
+        std::cout << "Done, now starting simulator..." << std::endl;
 
         /*Tracing*/
         //Flowmonitor
