@@ -28,7 +28,7 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
 
     for (int itx = 0; itx < numContents; itx++) {
         returnBucket.push_back(arrayf[shuffles->GetValue()]);
-        std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
+        //std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
     }
 
     return returnBucket;
@@ -243,7 +243,6 @@ int main(int argc, char **argv) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             //Install server application on every node, in every IoT domain.
             apps.Add(server.Install(iot[itr].Get(jdx)));
-            std::cout << "Er zijn nu apps: " << apps.GetN() << " itr: " << itr << std::endl;
             server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
             appnum++;
             
