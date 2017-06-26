@@ -1,15 +1,12 @@
 #include <fstream>
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/sixlowpan-module.h"
 #include "ns3/lr-wpan-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/csma-module.h"
 #include "ns3/netanim-module.h"
 #include "src/network/model/node.h"
-#include "ns3/ipv6-static-routing-helper.h"
-#include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/brite-module.h"
 #include "ns3/flow-monitor-module.h"
 #include "helper/ndn-stack-helper.hpp"
@@ -19,23 +16,10 @@
 #include <vector>
 
 
-namespace ns3
-{
+namespace ns3 {
 
 
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
-
-    std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
-        std::vector<Ipv6Address> returnBucket;
-        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
-        shuffles->SetAttribute("Min", DoubleValue(0));
-        shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
-        for (int itx = 0; itx < numContents; itx++) {
-            returnBucket.push_back(arrayf[shuffles->GetValue()]);
-            //std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
-        }
-        return returnBucket;
-    }
 
     int main(int argc, char **argv) {
 
@@ -63,11 +47,6 @@ namespace ns3
 
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-
-        if (verbose) {
-            LogComponentEnable("wsn-iot-icn", LOG_LEVEL_INFO);
-            LogComponentEnable("Ping6Application", LOG_LEVEL_ALL);
-        }
 
         // Creating NodeContainers
         // - iot[]: 		NodeContainer with WSN nodes.
@@ -106,7 +85,7 @@ namespace ns3
                 "LayoutType", StringValue("RowFirst"));
         mobility_backhaul.Install(backhaul);
 
-        // Create NetDeviceContainers for LrWpan, 6lowpan and CSMA (LAN).
+        // Create NetDeviceContainers for LrWpan and CSMA (LAN).
         NetDeviceContainer LrWpanDevice[node_head];
         NetDeviceContainer CSMADevice[node_head];
         Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
@@ -149,9 +128,11 @@ namespace ns3
             LrWpanDevice[jdx] = lrWpanHelper.Install(iot[jdx]);
             //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
             lrWpanHelper.AssociateToPan(LrWpanDevice[jdx], 10);
+
         }
 
         ndn::StackHelper ndnHelper;
+        ndnHelper.SetDefaultRoutes(true);
         ndnHelper.InstallAll();
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute");
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
@@ -161,32 +142,34 @@ namespace ns3
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
         // Consumer will request /prefix/0, /prefix/1, ...
         consumerHelper.SetPrefix("/prefix");
-        consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
-        consumerHelper.Install(iot[2].Get(1)); // first node
-
+        consumerHelper.SetAttribute("Frequency", StringValue("0.025")); // 10 interests a second
+        //consumerHelper.Install(backhaul.Get(0)); // first node
+        consumerHelper.Install(iot[1].Get(5));
         // Producer
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         // Producer will reply to all requests starting with /prefix
         producerHelper.SetPrefix("/prefix");
         producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-        producerHelper.Install(iot[2].Get(0)); // last node
-        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[2].Get(0));
+        producerHelper.Install(iot[1].Get(1)); // last node
+        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[0].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
         std::cout << "Done, now starting simulator..." << std::endl;
 
         /*Tracing*/
         //Flowmonitor
-        Ptr<FlowMonitor> flowMonitor;
-        FlowMonitorHelper flowHelper;
-        flowMonitor = flowHelper.InstallAll();
+        //Ptr<FlowMonitor> flowMonitor;
+        //FlowMonitorHelper flowHelper;
+        //flowMonitor = flowHelper.InstallAll();
 
         //PCAP
         AsciiTraceHelper ascii;
         lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
         csma.EnablePcapAll(std::string("./traces/csma"), true);
+        lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("123123.tr"));
         NS_LOG_INFO("Run Simulation.");
-        //AnimationInterface anim("AWSNanimation.xml");
+
+        //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
 
 
