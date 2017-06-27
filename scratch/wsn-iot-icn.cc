@@ -16,7 +16,8 @@
 #include <vector>
 
 
-namespace ns3 {
+namespace ns3
+{
 
 
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
@@ -33,6 +34,11 @@ namespace ns3 {
         int pro_per;
         int dist = 500;
         int totnumcontents = 100;
+        int totnumnodes = 0;
+
+
+
+
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -45,8 +51,12 @@ namespace ns3 {
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.Parse(argc, argv);
 
+        //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
+        Ptr<UniformRandomVariable> Rnodes = CreateObject<UniformRandomVariable> ();
+        Rnodes->SetAttribute("Min", DoubleValue(0));
+
 
         // Creating NodeContainers
         // - iot[]: 		NodeContainer with WSN nodes.
@@ -71,6 +81,9 @@ namespace ns3 {
         routers.Add(backhaul);
         routers.Add(br);
 
+        //Set the highest value for the node random variable.        
+        totnumnodes = bth.GetNNodesTopology();
+        Rnodes->SetAttribute("Max", DoubleValue(totnumnodes));
 
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
@@ -93,7 +106,7 @@ namespace ns3 {
         for (int jdx = 0; jdx < node_head; jdx++) {
             //Add BR and master to csma-NodeContainers
             border_backhaul[jdx].Add(br.Get(jdx));
-            border_backhaul[jdx].Add(backhaul.Get(jdx + 5));
+            border_backhaul[jdx].Add(backhaul.Get(Rnodes->GetValue()));
             //Add BR and WSN nodes to IoT[] domain
             iot[jdx].Create(node_periph);
             endnodes.Add(iot[jdx]);
