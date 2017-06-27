@@ -514,14 +514,14 @@ Forwarder::onOutgoingNack(const shared_ptr<pit::Entry>& pitEntry, const Face& ou
   }
 
   // if multi-access face, drop
-  if (outFace.getLinkType() == ndn::nfd::LINK_TYPE_MULTI_ACCESS) {
+  if ((outFace.getLinkType() == ndn::nfd::LINK_TYPE_MULTI_ACCESS) || true ) { //No nacks for Wireless domains.
     NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                   " nack=" << pitEntry->getInterest().getName() <<
                   "~" << nack.getReason() << " face-is-multi-access");
     return;
   }
   
-  return;
+
 
   NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                 " nack=" << pitEntry->getInterest().getName() <<
