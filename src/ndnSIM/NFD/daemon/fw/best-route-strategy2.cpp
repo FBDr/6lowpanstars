@@ -65,20 +65,29 @@ isNextHopEligible(const Face& inFace, const Interest& interest,
 
   // do not forward back to the same face
   if (&outFace == &inFace)
+  {
+    NFD_LOG_DEBUG("&outFace == &inFace ==> Reject");
     return false;
+      
+  }
+
 
   // forwarding would violate scope
   if (wouldViolateScope(inFace, interest, outFace))
+  {
+    NFD_LOG_DEBUG("Violates scope! ==> Reject");
     return false;
+  }
 
   if (wantUnused) {
     // nexthop must not have unexpired out-record
     pit::OutRecordCollection::iterator outRecord = pitEntry->getOutRecord(outFace);
     if (outRecord != pitEntry->out_end() && outRecord->getExpiry() > now) {
+      NFD_LOG_DEBUG("PIT expired."); 
       return false;
     }
   }
-
+  
   return true;
 }
 

@@ -137,6 +137,7 @@ Strategy::lookupFib(const pit::Entry& pitEntry) const
     // FIB lookup with Interest name
     const fib::Entry& fibEntry = fib.findLongestPrefixMatch(pitEntry);
     NFD_LOG_TRACE("lookupFib noLinkObject found=" << fibEntry.getPrefix());
+    NFD_LOG_TRACE("lookupFib noLinkObject has next hops?=" << fibEntry.hasNextHops());
     return fibEntry;
   }
 

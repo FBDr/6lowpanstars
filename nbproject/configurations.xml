@@ -306,8 +306,6 @@
         <df name="subdir">
           <in>scratch-simulator-subdir.cc</in>
         </df>
-        <in>iot_comp.cc</in>
-        <in>ndn-simple-L3.cc</in>
         <in>ndn-simple-L3.cpp</in>
         <in>nrc.cc</in>
         <in>ping6Icn.cc</in>
@@ -1924,7 +1922,6 @@
                  commonFlags="-mtune=generic -march=x86-64 -std=c++11 -std=c++11 -fPIC -fstack-protector-strong -fstack-protector-strong"/>
         <element flagsID="2"
                  commonFlags="-mtune=generic -march=x86-64 -std=c++11 -std=c++11 -fstack-protector-strong"/>
-        <element flagsID="3" commonFlags="-std=c++0x -std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -10116,60 +10113,6 @@
           </preprocessorList>
         </ccTool>
       </folder>
-      <item path="scratch/iot_comp.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="3">
-          <incDir>
-            <pElem>build</pElem>
-            <pElem>.</pElem>
-            <pElem>build/ns3/ndnSIM/NFD</pElem>
-            <pElem>ns3/ndnSIM/NFD</pElem>
-            <pElem>build/src/ndnSIM/NFD/core</pElem>
-            <pElem>src/ndnSIM/NFD/core</pElem>
-            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
-            <pElem>src/ndnSIM/NFD/daemon</pElem>
-            <pElem>build/src/ndnSIM/NFD/rib</pElem>
-            <pElem>src/ndnSIM/NFD/rib</pElem>
-            <pElem>build/ns3/ndnSIM</pElem>
-            <pElem>ns3/ndnSIM</pElem>
-            <pElem>../BRITE</pElem>
-            <pElem>../BRITE/Models</pElem>
-            <pElem>/usr/include</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BRITE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
-        </ccTool>
-      </item>
-      <item path="scratch/ndn-simple-L3.cc" ex="false" tool="1" flavor2="8">
-        <ccTool flags="3">
-          <incDir>
-            <pElem>build</pElem>
-            <pElem>.</pElem>
-            <pElem>build/ns3/ndnSIM/NFD</pElem>
-            <pElem>ns3/ndnSIM/NFD</pElem>
-            <pElem>build/src/ndnSIM/NFD/core</pElem>
-            <pElem>src/ndnSIM/NFD/core</pElem>
-            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
-            <pElem>src/ndnSIM/NFD/daemon</pElem>
-            <pElem>build/src/ndnSIM/NFD/rib</pElem>
-            <pElem>src/ndnSIM/NFD/rib</pElem>
-            <pElem>build/ns3/ndnSIM</pElem>
-            <pElem>ns3/ndnSIM</pElem>
-            <pElem>../BRITE</pElem>
-            <pElem>../BRITE/Models</pElem>
-            <pElem>/usr/include</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>NS3_ASSERT_ENABLE</Elem>
-            <Elem>NS3_BRITE</Elem>
-            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
-            <Elem>NS3_LOG_ENABLE</Elem>
-          </preprocessorList>
-        </ccTool>
-      </item>
       <item path="scratch/ndn-simple-L3.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="2">
           <incDir>

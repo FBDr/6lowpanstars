@@ -428,6 +428,7 @@
                   <in>forwarder-counters.hpp</in>
                   <in>forwarder.hpp</in>
                   <in>multicast-strategy.hpp</in>
+                  <in>multicast-strategy1.hpp</in>
                   <in>ncc-strategy.hpp</in>
                   <in>retx-suppression-exponential.hpp</in>
                   <in>retx-suppression-fixed.hpp</in>
@@ -547,6 +548,7 @@
           <in>a3-rsrp-handover-algorithm.h</in>
           <in>aarf-wifi-manager.h</in>
           <in>aarfcd-wifi-manager.h</in>
+          <in>abort.h</in>
           <in>acoustic-modem-energy-model-helper.h</in>
           <in>acoustic-modem-energy-model.h</in>
           <in>address-utils.h</in>
@@ -561,9 +563,16 @@
           <in>amsdu-subframe-header.h</in>
           <in>angles.h</in>
           <in>animation-interface.h</in>
+          <in>antenna-model.h</in>
           <in>antenna-module.h</in>
+          <in>aodv-dpd.h</in>
           <in>aodv-helper.h</in>
+          <in>aodv-id-cache.h</in>
           <in>aodv-module.h</in>
+          <in>aodv-neighbor.h</in>
+          <in>aodv-packet.h</in>
+          <in>aodv-routing-protocol.h</in>
+          <in>aodv-rqueue.h</in>
           <in>aodv-rtable.h</in>
           <in>ap-wifi-mac.h</in>
           <in>aparf-wifi-manager.h</in>
@@ -580,6 +589,8 @@
           <in>assert.h</in>
           <in>athstats-helper.h</in>
           <in>attribute-accessor-helper.h</in>
+          <in>attribute-construction-list.h</in>
+          <in>attribute-helper.h</in>
           <in>attribute.h</in>
           <in>average.h</in>
           <in>backoff.h</in>
@@ -592,12 +603,15 @@
           <in>block-ack-cache.h</in>
           <in>block-ack-manager.h</in>
           <in>boolean-probe.h</in>
+          <in>boolean.h</in>
           <in>box.h</in>
           <in>breakpoint.h</in>
           <in>bridge-channel.h</in>
           <in>bridge-helper.h</in>
           <in>bridge-module.h</in>
+          <in>bridge-net-device.h</in>
           <in>brite-module.h</in>
+          <in>brite-topology-helper.h</in>
           <in>bs-net-device.h</in>
           <in>bs-scheduler-rtps.h</in>
           <in>bs-scheduler-simple.h</in>
@@ -609,12 +623,20 @@
           <in>bs-uplink-scheduler.h</in>
           <in>bsm-application.h</in>
           <in>buffer.h</in>
+          <in>build-profile.h</in>
+          <in>building-allocator.h</in>
+          <in>building-container.h</in>
+          <in>building-list.h</in>
           <in>building-position-allocator.h</in>
           <in>building.h</in>
+          <in>buildings-helper.h</in>
           <in>buildings-module.h</in>
+          <in>buildings-propagation-loss-model.h</in>
+          <in>bulk-send-application.h</in>
           <in>bulk-send-helper.h</in>
           <in>bvec.h</in>
           <in>byte-tag-list.h</in>
+          <in>calendar-scheduler.h</in>
           <in>callback.h</in>
           <in>candidate-queue.h</in>
           <in>capability-information.h</in>
@@ -627,11 +649,15 @@
           <in>chunk.h</in>
           <in>cid-factory.h</in>
           <in>cid.h</in>
+          <in>coap-client.h</in>
+          <in>coap-helper.h</in>
           <in>coap-server.h</in>
           <in>codel-queue.h</in>
+          <in>command-line.h</in>
           <in>config-store-config.h</in>
           <in>config-store-module.h</in>
           <in>config-store.h</in>
+          <in>config.h</in>
           <in>connection-manager.h</in>
           <in>constant-acceleration-mobility-model.h</in>
           <in>constant-position-mobility-model.h</in>
@@ -641,14 +667,18 @@
           <in>constant-velocity-mobility-model.h</in>
           <in>core-config.h</in>
           <in>core-module.h</in>
+          <in>cosine-antenna-model.h</in>
           <in>cost231-propagation-loss-model.h</in>
           <in>cqa-ff-mac-scheduler.h</in>
           <in>crc32.h</in>
           <in>crc8.h</in>
           <in>cs-parameters.h</in>
           <in>csma-channel.h</in>
+          <in>csma-helper.h</in>
           <in>csma-layout-module.h</in>
           <in>csma-module.h</in>
+          <in>csma-net-device.h</in>
+          <in>csma-star-helper.h</in>
           <in>ctrl-headers.h</in>
           <in>data-calculator.h</in>
           <in>data-collection-object.h</in>
@@ -659,6 +689,8 @@
           <in>dcf-manager.h</in>
           <in>dcf.h</in>
           <in>default-channel-scheduler.h</in>
+          <in>default-deleter.h</in>
+          <in>default-simulator-impl.h</in>
           <in>delay-jitter-estimation.h</in>
           <in>deprecated.h</in>
           <in>device-energy-model-container.h</in>
@@ -667,10 +699,12 @@
           <in>dot11s-installer.h</in>
           <in>dot11s-mac-header.h</in>
           <in>double-probe.h</in>
+          <in>double.h</in>
           <in>drop-tail-queue.h</in>
           <in>dsdv-helper.h</in>
           <in>dsdv-module.h</in>
           <in>dsdv-packet-queue.h</in>
+          <in>dsdv-packet.h</in>
           <in>dsdv-routing-protocol.h</in>
           <in>dsdv-rtable.h</in>
           <in>dsr-errorbuff.h</in>
@@ -690,6 +724,7 @@
           <in>dsr-rsendbuff.h</in>
           <in>dsss-error-rate-model.h</in>
           <in>edca-txop-n.h</in>
+          <in>empty.h</in>
           <in>emu-epc-helper.h</in>
           <in>emu-fd-net-device-helper.h</in>
           <in>energy-harvester-container.h</in>
@@ -699,6 +734,7 @@
           <in>energy-module.h</in>
           <in>energy-source-container.h</in>
           <in>energy-source.h</in>
+          <in>enum.h</in>
           <in>epc-enb-application.h</in>
           <in>epc-enb-s1-sap.h</in>
           <in>epc-gtpu-header.h</in>
@@ -719,8 +755,11 @@
           <in>error-rate-model.h</in>
           <in>ethernet-header.h</in>
           <in>ethernet-trailer.h</in>
+          <in>event-garbage-collector.h</in>
           <in>event-id.h</in>
           <in>event-impl.h</in>
+          <in>fatal-error.h</in>
+          <in>fatal-impl.h</in>
           <in>fd-net-device-helper.h</in>
           <in>fd-net-device-module.h</in>
           <in>fd-net-device.h</in>
@@ -760,8 +799,11 @@
           <in>half-duplex-ideal-phy-signal-parameters.h</in>
           <in>half-duplex-ideal-phy.h</in>
           <in>hash-fnv.h</in>
+          <in>hash-function.h</in>
+          <in>hash-murmur3.h</in>
           <in>hash.h</in>
           <in>header.h</in>
+          <in>heap-scheduler.h</in>
           <in>hierarchical-mobility-model.h</in>
           <in>higher-tx-tag.h</in>
           <in>histogram.h</in>
@@ -769,6 +811,7 @@
           <in>ht-wifi-mac-helper.h</in>
           <in>hwmp-protocol.h</in>
           <in>hwmp-rtable.h</in>
+          <in>hybrid-buildings-propagation-loss-model.h</in>
           <in>icmpv4-l4-protocol.h</in>
           <in>icmpv4.h</in>
           <in>icmpv6-header.h</in>
@@ -787,7 +830,9 @@
           <in>inet-socket-address.h</in>
           <in>inet-topology-reader.h</in>
           <in>inet6-socket-address.h</in>
+          <in>int-to-type.h</in>
           <in>int64x64-128.h</in>
+          <in>int64x64-double.h</in>
           <in>int64x64.h</in>
           <in>integer.h</in>
           <in>interference-helper.h</in>
@@ -851,6 +896,7 @@
           <in>ipv6-static-routing-helper.h</in>
           <in>ipv6-static-routing.h</in>
           <in>ipv6.h</in>
+          <in>isotropic-antenna-model.h</in>
           <in>itu-r-1238-propagation-loss-model.h</in>
           <in>itu-r-1411-los-propagation-loss-model.h</in>
           <in>itu-r-1411-nlos-over-rooftop-propagation-loss-model.h</in>
@@ -858,9 +904,11 @@
           <in>jakes-propagation-loss-model.h</in>
           <in>kun-2600-mhz-propagation-loss-model.h</in>
           <in>li-ion-energy-source.h</in>
+          <in>list-scheduler.h</in>
           <in>llc-snap-header.h</in>
           <in>log-macros-disabled.h</in>
           <in>log-macros-enabled.h</in>
+          <in>log.h</in>
           <in>loopback-net-device.h</in>
           <in>lr-wpan-csmaca.h</in>
           <in>lr-wpan-error-model.h</in>
@@ -954,6 +1002,7 @@
           <in>mac16-address.h</in>
           <in>mac48-address.h</in>
           <in>mac64-address.h</in>
+          <in>make-event.h</in>
           <in>map-scheduler.h</in>
           <in>math.h</in>
           <in>mesh-helper.h</in>
@@ -995,12 +1044,14 @@
           <in>node-list.h</in>
           <in>node.h</in>
           <in>non-communicating-net-device.h</in>
+          <in>non-copyable.h</in>
           <in>nqos-wifi-mac-helper.h</in>
           <in>ns2-mobility-helper.h</in>
           <in>nstime.h</in>
           <in>object-base.h</in>
           <in>object-factory.h</in>
           <in>object-map.h</in>
+          <in>object-ptr-container.h</in>
           <in>object-vector.h</in>
           <in>object.h</in>
           <in>ocb-wifi-mac.h</in>
@@ -1014,7 +1065,9 @@
           <in>olsr-routing-protocol.h</in>
           <in>olsr-state.h</in>
           <in>omnet-data-output.h</in>
+          <in>on-off-helper.h</in>
           <in>onoe-wifi-manager.h</in>
+          <in>onoff-application.h</in>
           <in>orbis-topology-reader.h</in>
           <in>originator-block-ack-agreement.h</in>
           <in>output-stream-wrapper.h</in>
@@ -1023,6 +1076,8 @@
           <in>packet-loss-counter.h</in>
           <in>packet-metadata.h</in>
           <in>packet-probe.h</in>
+          <in>packet-sink-helper.h</in>
+          <in>packet-sink.h</in>
           <in>packet-socket-address.h</in>
           <in>packet-socket-client.h</in>
           <in>packet-socket-factory.h</in>
@@ -1032,6 +1087,7 @@
           <in>packet-tag-list.h</in>
           <in>packet.h</in>
           <in>packetbb.h</in>
+          <in>parabolic-antenna-model.h</in>
           <in>parallel-communication-interface.h</in>
           <in>parf-wifi-manager.h</in>
           <in>pcap-file-wrapper.h</in>
@@ -1056,6 +1112,7 @@
           <in>point-to-point-net-device.h</in>
           <in>point-to-point-remote-channel.h</in>
           <in>point-to-point-star.h</in>
+          <in>pointer.h</in>
           <in>position-allocator.h</in>
           <in>ppp-header.h</in>
           <in>probe.h</in>
@@ -1065,6 +1122,7 @@
           <in>propagation-loss-model.h</in>
           <in>propagation-module.h</in>
           <in>pss-ff-mac-scheduler.h</in>
+          <in>ptr.h</in>
           <in>pyviz.h</in>
           <in>qos-tag.h</in>
           <in>qos-utils.h</in>
@@ -1080,17 +1138,22 @@
           <in>radvd.h</in>
           <in>random-direction-2d-mobility-model.h</in>
           <in>random-variable-stream-helper.h</in>
+          <in>random-variable-stream.h</in>
           <in>random-walk-2d-mobility-model.h</in>
           <in>random-waypoint-mobility-model.h</in>
           <in>realtime-simulator-impl.h</in>
           <in>rectangle.h</in>
           <in>red-queue.h</in>
+          <in>ref-count-base.h</in>
           <in>regular-wifi-mac.h</in>
           <in>rem-spectrum-phy.h</in>
+          <in>request-response-client.h</in>
           <in>request-response-helper.h</in>
+          <in>request-response-server.h</in>
           <in>ripng-header.h</in>
           <in>ripng-helper.h</in>
           <in>ripng.h</in>
+          <in>rng-seed-manager.h</in>
           <in>rng-stream.h</in>
           <in>rocketfuel-topology-reader.h</in>
           <in>rr-ff-mac-scheduler.h</in>
@@ -1100,6 +1163,7 @@
           <in>rv-battery-model.h</in>
           <in>scheduler.h</in>
           <in>send-params.h</in>
+          <in>seq-ts-header.h</in>
           <in>sequence-number.h</in>
           <in>service-flow-manager.h</in>
           <in>service-flow-record.h</in>
@@ -1114,6 +1178,8 @@
           <in>simple-ofdm-wimax-phy.h</in>
           <in>simple-ref-count.h</in>
           <in>simulation-singleton.h</in>
+          <in>simulator-impl.h</in>
+          <in>simulator.h</in>
           <in>single-model-spectrum-channel.h</in>
           <in>singleton.h</in>
           <in>sixlowpan-header.h</in>
@@ -1155,7 +1221,10 @@
           <in>supported-rates.h</in>
           <in>synchronizer.h</in>
           <in>system-condition.h</in>
+          <in>system-mutex.h</in>
           <in>system-path.h</in>
+          <in>system-thread.h</in>
+          <in>system-wall-clock-ms.h</in>
           <in>tag-buffer.h</in>
           <in>tag.h</in>
           <in>tap-bridge-helper.h</in>
@@ -1183,6 +1252,7 @@
           <in>time-data-calculators.h</in>
           <in>time-probe.h</in>
           <in>time-series-adaptor.h</in>
+          <in>timer-impl.h</in>
           <in>timer.h</in>
           <in>topology-read-module.h</in>
           <in>topology-reader-helper.h</in>
@@ -1190,11 +1260,13 @@
           <in>trace-fading-loss-model.h</in>
           <in>trace-helper.h</in>
           <in>trace-source-accessor.h</in>
+          <in>traced-callback.h</in>
           <in>traced-value.h</in>
           <in>trailer.h</in>
           <in>tta-ff-mac-scheduler.h</in>
           <in>tv-spectrum-transmitter-helper.h</in>
           <in>tv-spectrum-transmitter.h</in>
+          <in>type-id.h</in>
           <in>type-name.h</in>
           <in>type-traits.h</in>
           <in>uan-address.h</in>
@@ -1222,6 +1294,9 @@
           <in>uan-tx-mode.h</in>
           <in>udp-client-server-helper.h</in>
           <in>udp-client.h</in>
+          <in>udp-echo-client.h</in>
+          <in>udp-echo-helper.h</in>
+          <in>udp-echo-server.h</in>
           <in>udp-header.h</in>
           <in>udp-l4-protocol.h</in>
           <in>udp-server.h</in>
@@ -1234,6 +1309,10 @@
           <in>uinteger.h</in>
           <in>ul-job.h</in>
           <in>ul-mac-messages.h</in>
+          <in>unix-fd-reader.h</in>
+          <in>unused.h</in>
+          <in>v4ping-helper.h</in>
+          <in>v4ping.h</in>
           <in>valgrind.h</in>
           <in>vector.h</in>
           <in>vendor-specific-action.h</in>
@@ -1986,13 +2065,10 @@
         <df name="subdir">
           <in>scratch-simulator-subdir.cc</in>
         </df>
-        <in>iot_comp.cc</in>
         <in>lrwpan.cpp</in>
-        <in>ndn-iot-2.cc</in>
-        <in>ndn-simple-L3.cc</in>
+        <in>ndn-iot-3.cc</in>
         <in>ndn-simple-L3.cpp</in>
         <in>nrc.cc</in>
-        <in>old.cc</in>
         <in>ping6Icn.cc</in>
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
@@ -6374,24 +6450,6 @@
         <df name="6lowpan">
         </df>
         <df name="csma">
-        </df>
-      </df>
-      <df name="traces2">
-        <df name="6lowpan">
-        </df>
-        <df name="csma">
-        </df>
-      </df>
-      <df name="traces_ref">
-        <df name="6lowpan">
-        </df>
-        <df name="csma">
-        </df>
-      </df>
-      <df name="tracing">
-        <df name="ip">
-        </df>
-        <df name="ndn">
         </df>
       </df>
       <df name="utils">

@@ -121,20 +121,20 @@ namespace ns3 {
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
         csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
-        LrWpanHelper lrWpanHelper;
+        LrWpanHelper lrWpanHelper[node_head];
 
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
-            LrWpanDevice[jdx] = lrWpanHelper.Install(iot[jdx]);
+            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
             //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
-            lrWpanHelper.AssociateToPan(LrWpanDevice[jdx], 10);
+            lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
 
         }
 
         ndn::StackHelper ndnHelper;
         ndnHelper.SetDefaultRoutes(true);
         ndnHelper.InstallAll();
-        ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute");
+        ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndnGlobalRoutingHelper.InstallAll();
 
@@ -142,20 +142,23 @@ namespace ns3 {
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
         // Consumer will request /prefix/0, /prefix/1, ...
         consumerHelper.SetPrefix("/prefix");
-        consumerHelper.SetAttribute("Frequency", StringValue("0.025")); // 10 interests a second
+        consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
         //consumerHelper.Install(backhaul.Get(0)); // first node
-        consumerHelper.Install(iot[1].Get(5));
+        consumerHelper.Install(iot[0].Get(5));
         // Producer
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         // Producer will reply to all requests starting with /prefix
         producerHelper.SetPrefix("/prefix");
         producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
         producerHelper.Install(iot[1].Get(1)); // last node
-        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[0].Get(1));
+        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[1].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
+        //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
+        
         std::cout << "Done, now starting simulator..." << std::endl;
 
+        //ndn::FibHelper::AddRoute(br.Get(0), "/prefix", 258, 0);
         /*Tracing*/
         //Flowmonitor
         //Ptr<FlowMonitor> flowMonitor;
@@ -164,9 +167,9 @@ namespace ns3 {
 
         //PCAP
         AsciiTraceHelper ascii;
-        lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
+        //lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
         csma.EnablePcapAll(std::string("./traces/csma"), true);
-        lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("123123.tr"));
+        //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("123123.tr"));
         NS_LOG_INFO("Run Simulation.");
 
         //AnimationInterface anim("AWSNanimation2.xml");
