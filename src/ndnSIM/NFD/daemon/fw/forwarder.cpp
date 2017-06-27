@@ -520,6 +520,8 @@ Forwarder::onOutgoingNack(const shared_ptr<pit::Entry>& pitEntry, const Face& ou
                   "~" << nack.getReason() << " face-is-multi-access");
     return;
   }
+  
+  return;
 
   NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                 " nack=" << pitEntry->getInterest().getName() <<

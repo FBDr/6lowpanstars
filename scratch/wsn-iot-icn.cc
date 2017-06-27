@@ -129,6 +129,7 @@ namespace ns3 {
             //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
 
+
         }
 
         ndn::StackHelper ndnHelper;
@@ -149,13 +150,13 @@ namespace ns3 {
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         // Producer will reply to all requests starting with /prefix
         producerHelper.SetPrefix("/prefix");
-        producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+        producerHelper.SetAttribute("PayloadSize", StringValue("10"));
         producerHelper.Install(iot[1].Get(1)); // last node
         ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[1].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
         //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
-        
+
         std::cout << "Done, now starting simulator..." << std::endl;
 
         //ndn::FibHelper::AddRoute(br.Get(0), "/prefix", 258, 0);
@@ -174,7 +175,9 @@ namespace ns3 {
 
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
-
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            lrWpanHelper[jdx].EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
+        }
 
         Simulator::Stop(Seconds(60));
         Simulator::Run();
