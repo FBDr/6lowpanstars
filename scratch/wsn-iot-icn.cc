@@ -74,6 +74,7 @@ namespace ns3
 
         //Brite
         BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
+        //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
         bth.AssignStreams(3);
         backhaul = bth.BuildBriteTopologyNDN();
 
@@ -87,12 +88,6 @@ namespace ns3
 
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
-        MobilityHelper mobility_backhaul;
-        mobility_backhaul.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-        mobility_backhaul.SetPositionAllocator("ns3::RandomRectanglePositionAllocator",
-                "X", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"), "Y", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"));
-
-        mobility_backhaul.Install(backhaul);
 
         // Create NetDeviceContainers for LrWpan and CSMA (LAN).
         NetDeviceContainer LrWpanDevice[node_head];
