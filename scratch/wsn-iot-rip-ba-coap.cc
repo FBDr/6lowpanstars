@@ -35,6 +35,95 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
     return returnBucket;
 }
 
+void sixlowpan_stack(int &node_periph, int &node_head, int &subn, int &totnumcontents, BriteTopologyHelper &bth,
+        NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
+        Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
+        std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket, NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
+
+    RipNgHelper ripNgRouting;
+    Ipv6ListRoutingHelper listRH;
+    InternetStackHelper internetv6;
+    SixLowPanHelper sixlowpan;
+    Ipv6AddressHelper ipv6;
+    listRH.Add(ripNgRouting, 0);
+    internetv6.SetIpv4StackInstall(false);
+    internetv6.Install(endnodes);
+    internetv6.SetRoutingHelper(listRH);
+    internetv6.Install(br);
+    internetv6.Install(backhaul);
+
+    std::string addresss;
+    addresss = "2001:0:" + std::to_string(1337) + "::";
+    const char * c = addresss.c_str();
+    ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+    bth.AssignIpv6Addresses(ipv6);
+
+    //For outer network
+    NS_LOG_INFO("Assign addresses.");
+    for (int jdx = 0; jdx < node_head; jdx++) {
+        SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
+        subn++;
+        addresss = "2001:0:" + std::to_string(subn) + "::";
+        const char * c = addresss.c_str();
+        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+        i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
+        subn++;
+        addresss = "2001:0:" + std::to_string(subn) + "::";
+        c = addresss.c_str();
+        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+        i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
+        //Set forwarding rules.
+        i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
+        i_6lowpan[jdx].SetForwarding(node_periph, true);
+        //i_csma[jdx].SetDefaultRouteInAllNodes(1);
+        //i_csma[jdx].SetDefaultRouteInAllNodes(0);
+        i_csma[jdx].SetForwarding(0, true);
+        i_csma[jdx].SetForwarding(1, true);
+
+    }
+
+    //Create IPv6Addressbucket containing all IoT node domains.
+
+    for (int idx = 0; idx < node_head; idx++) {
+        for (int jdx = 0; jdx < node_periph; jdx++) {
+            IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
+
+        }
+    }
+    AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
+}
+
+void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
+        std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
+        Ipv6InterfaceContainer i_6lowpan[]) {
+
+    int appnum = 0;
+    uint16_t port = 9;
+    uint32_t packetSize = 1024;
+    uint32_t maxPacketCount = 20000;
+    Time interPacketInterval = Seconds(0.05);
+    CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
+    CoapServerHelper server(port);
+
+    for (int itr = 0; itr < node_head; itr++) {
+        for (int jdx = 0; jdx < node_periph; jdx++) {
+            //Install server application on every node, in every IoT domain.
+            apps.Add(server.Install(iot[itr].Get(jdx)));
+            server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
+            appnum++;
+        }
+    }
+    apps.Start(Seconds(1.0));
+    apps.Stop(Seconds(60.0));
+    client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
+    client.SetAttribute("Interval", TimeValue(interPacketInterval));
+    client.SetAttribute("PacketSize", UintegerValue(packetSize));
+    apps = client.Install(iot[1].Get(0));
+    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+    apps.Start(Seconds(10.0));
+    apps.Stop(Seconds(60.0));
+}
+
 int main(int argc, char **argv) {
 
     //Variables and simulation configuration
@@ -168,107 +257,22 @@ int main(int argc, char **argv) {
     //BRITE
     // Install IPv6 stack
     NS_LOG_INFO("Install Internet stack.");
-    RipNgHelper ripNgRouting;
-    Ipv6ListRoutingHelper listRH;
-    listRH.Add(ripNgRouting, 0);
 
-    InternetStackHelper internetv6;
-    internetv6.SetIpv4StackInstall(false);
-    internetv6.Install(endnodes);
-    internetv6.SetRoutingHelper(listRH);
-    internetv6.Install(br);
-    internetv6.Install(backhaul);
 
-    // Install 6LowPan layer
-    NS_LOG_INFO("Install 6LoWPAN.");
-    SixLowPanHelper sixlowpan;
-    Ipv6AddressHelper ipv6;
+
     Ipv6InterfaceContainer i_6lowpan[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
     Ipv6InterfaceContainer i_backhaul;
-
-    // Assign IPv6 addresses
-    // For backhaul network
-    std::string addresss;
-    addresss = "2001:0:" + std::to_string(1337) + "::";
-    const char * c = addresss.c_str();
-    ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-    bth.AssignIpv6Addresses(ipv6);
-
-    //For outer network
-    NS_LOG_INFO("Assign addresses.");
-    for (int jdx = 0; jdx < node_head; jdx++) {
-        SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
-        subn++;
-        addresss = "2001:0:" + std::to_string(subn) + "::";
-        const char * c = addresss.c_str();
-        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
-        subn++;
-        addresss = "2001:0:" + std::to_string(subn) + "::";
-        c = addresss.c_str();
-        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
-        i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
-        //Set forwarding rules.
-        i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
-        i_6lowpan[jdx].SetForwarding(node_periph, true);
-        //i_csma[jdx].SetDefaultRouteInAllNodes(1);
-        //i_csma[jdx].SetDefaultRouteInAllNodes(0);
-        i_csma[jdx].SetForwarding(0, true);
-        i_csma[jdx].SetForwarding(1, true);
-
-    }
-
-    //Create IPv6Addressbucket containing all IoT node domains.
     std::vector<Ipv6Address> IPv6Bucket;
-    for (int idx = 0; idx < node_head; idx++) {
-        for (int jdx = 0; jdx < node_periph; jdx++) {
-            IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
-
-        }
-    }
-    std::vector<Ipv6Address> AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
-
-
-    // Static routing rules
-    //Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-    //ripNgRouting.PrintRoutingTableEvery(Seconds(1.0), master.Get(0), routingStream);
-
-    // Install and create Ping applications.
-    NS_LOG_INFO("Create Applications.");
-    uint16_t port = 9;
+    std::vector<Ipv6Address> AddrResBucket;
     ApplicationContainer apps;
-    CoapServerHelper server(port);
-    int appnum = 0;
-    for (int itr = 0; itr < node_head; itr++) {
-        for (int jdx = 0; jdx < node_periph; jdx++) {
-            //Install server application on every node, in every IoT domain.
-            apps.Add(server.Install(iot[itr].Get(jdx)));
-            server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
-            appnum++;
-        }
-    }
 
+    NS_LOG_INFO("Install 6lowpan stack.");
+    sixlowpan_stack(node_periph, node_head, subn, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
+    NS_LOG_INFO("Create Applications.");
+    sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan);
 
-
-    apps.Start(Seconds(1.0));
-    apps.Stop(Seconds(60.0));
-
-    uint32_t packetSize = 1024;
-    uint32_t maxPacketCount = 20000;
-    Time interPacketInterval = Seconds(0.05);
-    CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
-    client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
-    client.SetAttribute("Interval", TimeValue(interPacketInterval));
-    client.SetAttribute("PacketSize", UintegerValue(packetSize));
-    apps = client.Install(iot[1].Get(0));
-    client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-    apps.Start(Seconds(10.0));
-    apps.Stop(Seconds(60.0));
-
-    /*Tracing*/
-    //Flowmonitor
     Ptr<FlowMonitor> flowMonitor;
     FlowMonitorHelper flowHelper;
     flowMonitor = flowHelper.InstallAll();

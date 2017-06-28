@@ -2,6 +2,7 @@
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/lr-wpan-module.h"
+#include "ns3/sixlowpan-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/csma-module.h"
@@ -12,11 +13,12 @@
 #include "helper/ndn-stack-helper.hpp"
 #include "src/ndnSIM/helper/ndn-global-routing-helper.hpp"
 #include "ns3/ndnSIM-module.h"
+#include "ns3/ipv6-static-routing-helper.h"
+#include "ns3/ipv6-routing-table-entry.h"
 #include <string>
 #include <vector>
 
-namespace ns3
-{
+namespace ns3 {
 
     Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
 
@@ -27,17 +29,58 @@ namespace ns3
         Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
 
-        selAS = Ras->GetValue((double)(0), (double)(totAS - 1));
+        selAS = Ras->GetValue((double) (0), (double) (totAS - 1));
         leafnum = briteth.GetNLeafNodesForAs(selAS);
-        selLN = Rleaf->GetValue((double)(0), (double)(leafnum - 1));
-        
+        selLN = Rleaf->GetValue((double) (0), (double) (leafnum - 1));
+
         return briteth.GetLeafNodeForAs(selAS, selLN);
+    }
+
+    std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
+
+        std::vector<Ipv6Address> returnBucket;
+        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
+        shuffles->SetAttribute("Min", DoubleValue(0));
+        shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
+
+        for (int itx = 0; itx < numContents; itx++) {
+            returnBucket.push_back(arrayf[shuffles->GetValue()]);
+            //std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
+        }
+
+        return returnBucket;
     }
 
 
 
 
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
+
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer &backhaul, ndn::StackHelper &ndnHelper, ndn::GlobalRoutingHelper &ndnGlobalRoutingHelper, ndn::AppHelper &consumerHelper, ndn::AppHelper &producerHelper) {
+        ndnHelper.SetDefaultRoutes(true);
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
+        }
+        ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
+        ndnHelper.Install(backhaul);
+        ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
+        ndnGlobalRoutingHelper.InstallAll();
+        // Consumer will request /prefix/0, /prefix/1, ...
+        consumerHelper.SetPrefix("/prefix");
+        consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
+        //consumerHelper.Install(backhaul.Get(0)); // first node
+        consumerHelper.Install(iot[0].Get(5));
+        // Producer
+        // Producer will reply to all requests starting with /prefix
+        producerHelper.SetPrefix("/prefix");
+        producerHelper.SetAttribute("PayloadSize", StringValue("10"));
+        producerHelper.Install(iot[1].Get(1)); // last node
+        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[1].Get(1));
+        std::cout << "Filling routing tables..." << std::endl;
+        ndn::GlobalRoutingHelper::CalculateRoutes();
+        //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
+        std::cout << "Done, now starting simulator..." << std::endl;
+    }
 
     int main(int argc, char **argv) {
 
@@ -51,6 +94,8 @@ namespace ns3
         int pro_per;
         int dist = 100;
         int totnumcontents = 100;
+        int subn = 0;
+        bool ndn = false;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -142,39 +187,20 @@ namespace ns3
 
         }
 
-        //NDN
+
+        /*
+         NDN 
+         */
 
         ndn::StackHelper ndnHelper;
-        ndnHelper.SetDefaultRoutes(true);
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
-        }
-        ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
-        ndnHelper.Install(backhaul);
-        ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-        ndnGlobalRoutingHelper.InstallAll();
-
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-        // Consumer will request /prefix/0, /prefix/1, ...
-        consumerHelper.SetPrefix("/prefix");
-        consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
-        //consumerHelper.Install(backhaul.Get(0)); // first node
-        consumerHelper.Install(iot[0].Get(5));
-        // Producer
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
-        // Producer will reply to all requests starting with /prefix
-        producerHelper.SetPrefix("/prefix");
-        producerHelper.SetAttribute("PayloadSize", StringValue("10"));
-        producerHelper.Install(iot[1].Get(1)); // last node
-        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[1].Get(1));
-        std::cout << "Filling routing tables..." << std::endl;
-        ndn::GlobalRoutingHelper::CalculateRoutes();
-        //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
+        if (ndn) {
+            NDN_stack(node_head, iot, backhaul, ndnHelper, ndnGlobalRoutingHelper, consumerHelper, producerHelper);
+        }
 
-        std::cout << "Done, now starting simulator..." << std::endl;
 
-        //ndn::FibHelper::AddRoute(br.Get(0), "/prefix", 258, 0);
         /*Tracing*/
         //Flowmonitor
         //Ptr<FlowMonitor> flowMonitor;

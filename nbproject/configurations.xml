@@ -317,6 +317,7 @@
         <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
         <in>wsn-iot-static.cc</in>
+        <in>wsn-iot-v1.cc</in>
         <in>wsn-test.cc</in>
       </df>
       <df name="src">
@@ -9244,6 +9245,46 @@
             <Elem>__cpp_unicode_literals=200710</Elem>
             <Elem>__cpp_user_defined_literals=200809</Elem>
             <Elem>__cpp_variadic_templates=200704</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="scratch/wsn-iot-v1.cc" ex="false" tool="1" flavor2="8">
+        <ccTool flags="3">
+          <incDir>
+            <pElem>build</pElem>
+            <pElem>.</pElem>
+            <pElem>build/ns3/ndnSIM/NFD</pElem>
+            <pElem>ns3/ndnSIM/NFD</pElem>
+            <pElem>build/src/ndnSIM/NFD/core</pElem>
+            <pElem>src/ndnSIM/NFD/core</pElem>
+            <pElem>build/src/ndnSIM/NFD/daemon</pElem>
+            <pElem>src/ndnSIM/NFD/daemon</pElem>
+            <pElem>build/src/ndnSIM/NFD/rib</pElem>
+            <pElem>src/ndnSIM/NFD/rib</pElem>
+            <pElem>build/ns3/ndnSIM</pElem>
+            <pElem>ns3/ndnSIM</pElem>
+            <pElem>../BRITE</pElem>
+            <pElem>../BRITE/Models</pElem>
+            <pElem>/usr/include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_IF_NETS_H=1</Elem>
+            <Elem>HAVE_IF_TUN_H=1</Elem>
+            <Elem>HAVE_IS_DEFAULT_CONSTRUCTIBLE=1</Elem>
+            <Elem>HAVE_IS_NOTHROW_MOVE_ASSIGNABLE=1</Elem>
+            <Elem>HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE=1</Elem>
+            <Elem>HAVE_NET_ETHERNET_H=1</Elem>
+            <Elem>HAVE_OPENSSL=1</Elem>
+            <Elem>HAVE_PACKET_H=1</Elem>
+            <Elem>HAVE_PTHREAD=1</Elem>
+            <Elem>HAVE_SQLITE3=1</Elem>
+            <Elem>HAVE_STD_TO_STRING=1</Elem>
+            <Elem>HAVE_SYS_IOCTL_H=1</Elem>
+            <Elem>HAVE_VECTOR_INSERT_ERASE_CONST_ITERATOR=1</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BRITE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
           </preprocessorList>
         </ccTool>
       </item>

@@ -2078,6 +2078,7 @@
         <in>wsn-iot-rip-ba.cc</in>
         <in>wsn-iot-rip2.cc</in>
         <in>wsn-iot-static.cc</in>
+        <in>wsn-iot-v1.cc</in>
         <in>wsn-test.cc</in>
       </df>
       <df name="src">
