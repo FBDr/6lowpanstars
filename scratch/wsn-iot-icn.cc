@@ -89,13 +89,9 @@ namespace ns3
         MobilityHelper mobility;
         MobilityHelper mobility_backhaul;
         mobility_backhaul.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-        mobility_backhaul.SetPositionAllocator("ns3::GridPositionAllocator",
-                "MinX", DoubleValue(0),
-                "MinY", DoubleValue(0),
-                "DeltaX", DoubleValue(10),
-                "DeltaY", DoubleValue(10),
-                "GridWidth", UintegerValue(20),
-                "LayoutType", StringValue("RowFirst"));
+        mobility_backhaul.SetPositionAllocator("ns3::RandomRectanglePositionAllocator",
+                "X", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"), "Y", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"));
+
         mobility_backhaul.Install(backhaul);
 
         // Create NetDeviceContainers for LrWpan and CSMA (LAN).
