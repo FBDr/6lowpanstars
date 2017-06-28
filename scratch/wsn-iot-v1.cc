@@ -82,6 +82,102 @@ namespace ns3 {
         std::cout << "Done, now starting simulator..." << std::endl;
     }
 
+    void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
+            NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
+            Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
+            std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
+            NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
+        int subn = 0;
+        RipNgHelper ripNgRouting;
+        Ipv6ListRoutingHelper listRH;
+        InternetStackHelper internetv6;
+        SixLowPanHelper sixlowpan;
+        Ipv6AddressHelper ipv6;
+
+        //Install internet stack.
+        listRH.Add(ripNgRouting, 0);
+        internetv6.SetIpv4StackInstall(false);
+        internetv6.Install(endnodes);
+        internetv6.SetRoutingHelper(listRH);
+        internetv6.Install(br);
+        internetv6.Install(backhaul);
+
+        //Assign addresses for backhaul.
+        std::string addresss;
+        addresss = "2001:0:" + std::to_string(1337) + "::";
+        const char * c = addresss.c_str();
+        ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+        bth.AssignIpv6Addresses(ipv6);
+
+        //Assign addresses for iot domains.
+        NS_LOG_INFO("Assign addresses.");
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
+            subn++;
+            addresss = "2001:0:" + std::to_string(subn) + "::";
+            const char * c = addresss.c_str();
+            ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+            i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
+            subn++;
+            addresss = "2001:0:" + std::to_string(subn) + "::";
+            c = addresss.c_str();
+            ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
+            i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
+            //Set forwarding rules.
+            i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
+            i_6lowpan[jdx].SetForwarding(node_periph, true);
+            //i_csma[jdx].SetDefaultRouteInAllNodes(1);
+            //i_csma[jdx].SetDefaultRouteInAllNodes(0);
+            i_csma[jdx].SetForwarding(0, true);
+            i_csma[jdx].SetForwarding(1, true);
+
+        }
+
+        //Create IPv6Addressbucket containing all IoT node domains.
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < node_periph; jdx++) {
+                IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
+
+            }
+        }
+        AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
+    }
+
+    void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
+            std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
+            Ipv6InterfaceContainer i_6lowpan[]) {
+
+        uint32_t appnum = 0;
+        uint32_t packetSize = 1024;
+        uint32_t maxPacketCount = 20000;
+        uint16_t port = 9;
+
+        Time interPacketInterval = Seconds(0.05);
+        CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
+        CoapServerHelper server(port);
+
+        //Server
+        for (int itr = 0; itr < node_head; itr++) {
+            for (int jdx = 0; jdx < node_periph; jdx++) {
+                //Install server application on every node, in every IoT domain.
+                apps.Add(server.Install(iot[itr].Get(jdx)));
+                server.SetIPv6Bucket(apps.Get(appnum), AddrResBucket);
+                appnum++;
+            }
+        }
+        apps.Start(Seconds(1.0));
+        apps.Stop(Seconds(60.0));
+
+        //Client
+        client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
+        client.SetAttribute("Interval", TimeValue(interPacketInterval));
+        client.SetAttribute("PacketSize", UintegerValue(packetSize));
+        apps = client.Install(iot[1].Get(0));
+        client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+        apps.Start(Seconds(10.0));
+        apps.Stop(Seconds(60.0));
+    }
+
     int main(int argc, char **argv) {
 
         //Variables and simulation configuration
@@ -94,8 +190,7 @@ namespace ns3 {
         int pro_per;
         int dist = 100;
         int totnumcontents = 100;
-        int subn = 0;
-        bool ndn = false;
+        bool ndn = true;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -106,6 +201,7 @@ namespace ns3 {
         cmd.AddValue("ConPercent", "Consumer percentage", con_per);
         cmd.AddValue("ProPercent", "Producer percentage", pro_per);
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
+        cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -199,6 +295,26 @@ namespace ns3 {
         if (ndn) {
             NDN_stack(node_head, iot, backhaul, ndnHelper, ndnGlobalRoutingHelper, consumerHelper, producerHelper);
         }
+
+        /*
+         IP
+         */
+        NetDeviceContainer SixLowpanDevice[node_head];
+        Ipv6InterfaceContainer i_6lowpan[node_head];
+        Ipv6InterfaceContainer i_csma[node_head];
+        Ipv6InterfaceContainer i_backhaul;
+        std::vector<Ipv6Address> IPv6Bucket;
+        std::vector<Ipv6Address> AddrResBucket;
+        ApplicationContainer apps;
+
+        if (!ndn) {
+            NS_LOG_INFO("Install 6lowpan stack.");
+            sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
+
+            NS_LOG_INFO("Create Applications.");
+            sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan);
+        }
+
 
 
         /*Tracing*/
