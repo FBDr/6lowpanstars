@@ -50,7 +50,7 @@ namespace ns3
         int node_head = 3;
         int con_per;
         int pro_per;
-        int dist = 500;
+        int dist = 100;
         int totnumcontents = 100;
 
 
@@ -120,7 +120,7 @@ namespace ns3
 
             mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
             mobility.SetPositionAllocator("ns3::GridPositionAllocator",
-                    "MinX", DoubleValue(-500 + jdx * dist),
+                    "MinX", DoubleValue(-100 + jdx * dist),
                     "MinY", DoubleValue(400),
                     "DeltaX", DoubleValue(5),
                     "DeltaY", DoubleValue(5),
@@ -128,7 +128,7 @@ namespace ns3
                     "LayoutType", StringValue("RowFirst"));
             mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
             mobility.Install(iot[jdx]);
-            BorderRouterPositionAlloc->Add(Vector(-495 + jdx * dist, 395, 0.0));
+            BorderRouterPositionAlloc->Add(Vector(-95 + jdx * dist, 395, 0.0));
         }
 
         mobility.SetPositionAllocator(BorderRouterPositionAlloc);
