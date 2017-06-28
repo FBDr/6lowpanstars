@@ -141,13 +141,18 @@ namespace ns3
 
         }
 
+        //NDN
+
         ndn::StackHelper ndnHelper;
         ndnHelper.SetDefaultRoutes(true);
-        ndnHelper.InstallAll();
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
+        }
+        ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
+        ndnHelper.Install(backhaul);
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndnGlobalRoutingHelper.InstallAll();
-
 
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
         // Consumer will request /prefix/0, /prefix/1, ...
