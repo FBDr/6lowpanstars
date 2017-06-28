@@ -15,9 +15,27 @@
 #include <string>
 #include <vector>
 
-
 namespace ns3
 {
+
+    Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
+
+        uint32_t totAS = briteth.GetNAs();
+        uint32_t leafnum = 0;
+        uint32_t selAS = 0;
+        uint32_t selLN = 0;
+        Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
+        Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
+
+        selAS = Ras->GetValue((double)(0), (double)(totAS - 1));
+
+        leafnum = briteth.GetNLeafNodesForAs(selAS);
+        selLN = Rleaf->GetValue((double)(0), (double)(leafnum - 1));
+        
+        return briteth.GetLeafNodeForAs(selAS, selLN);
+    }
+
+
 
 
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
@@ -34,7 +52,6 @@ namespace ns3
         int pro_per;
         int dist = 500;
         int totnumcontents = 100;
-        int totnumnodes = 0;
 
 
 
@@ -54,8 +71,7 @@ namespace ns3
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-        Ptr<UniformRandomVariable> Rnodes = CreateObject<UniformRandomVariable> ();
-        Rnodes->SetAttribute("Min", DoubleValue(0));
+
 
 
         // Creating NodeContainers
@@ -73,8 +89,8 @@ namespace ns3
         NodeContainer backhaul;
 
         //Brite
-        BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
-        //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
+        //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
+        BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
         bth.AssignStreams(3);
         backhaul = bth.BuildBriteTopologyNDN();
 
@@ -82,9 +98,7 @@ namespace ns3
         routers.Add(backhaul);
         routers.Add(br);
 
-        //Set the highest value for the node random variable.        
-        totnumnodes = bth.GetNNodesTopology();
-        Rnodes->SetAttribute("Max", DoubleValue(totnumnodes));
+
 
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
@@ -95,9 +109,10 @@ namespace ns3
         Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
         for (int jdx = 0; jdx < node_head; jdx++) {
+
             //Add BR and master to csma-NodeContainers
             border_backhaul[jdx].Add(br.Get(jdx));
-            border_backhaul[jdx].Add(backhaul.Get(Rnodes->GetValue()));
+            border_backhaul[jdx].Add(SelectRandomLeafNode(bth));
             //Add BR and WSN nodes to IoT[] domain
             iot[jdx].Create(node_periph);
             endnodes.Add(iot[jdx]);
