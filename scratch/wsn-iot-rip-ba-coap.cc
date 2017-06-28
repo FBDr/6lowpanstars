@@ -35,16 +35,19 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
     return returnBucket;
 }
 
-void sixlowpan_stack(int &node_periph, int &node_head, int &subn, int &totnumcontents, BriteTopologyHelper &bth,
+void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
         NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
         Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
-        std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket, NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
-
+        std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket, 
+        NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
+    int subn = 0;
     RipNgHelper ripNgRouting;
     Ipv6ListRoutingHelper listRH;
     InternetStackHelper internetv6;
     SixLowPanHelper sixlowpan;
     Ipv6AddressHelper ipv6;
+
+    //Install internet stack.
     listRH.Add(ripNgRouting, 0);
     internetv6.SetIpv4StackInstall(false);
     internetv6.Install(endnodes);
@@ -52,13 +55,14 @@ void sixlowpan_stack(int &node_periph, int &node_head, int &subn, int &totnumcon
     internetv6.Install(br);
     internetv6.Install(backhaul);
 
+    //Assign addresses for backhaul.
     std::string addresss;
     addresss = "2001:0:" + std::to_string(1337) + "::";
     const char * c = addresss.c_str();
     ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
     bth.AssignIpv6Addresses(ipv6);
 
-    //For outer network
+    //Assign addresses for iot domains.
     NS_LOG_INFO("Assign addresses.");
     for (int jdx = 0; jdx < node_head; jdx++) {
         SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
@@ -83,7 +87,6 @@ void sixlowpan_stack(int &node_periph, int &node_head, int &subn, int &totnumcon
     }
 
     //Create IPv6Addressbucket containing all IoT node domains.
-
     for (int idx = 0; idx < node_head; idx++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
@@ -97,24 +100,28 @@ void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
         std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
         Ipv6InterfaceContainer i_6lowpan[]) {
 
-    int appnum = 0;
-    uint16_t port = 9;
+    uint32_t appnum = 0;
     uint32_t packetSize = 1024;
     uint32_t maxPacketCount = 20000;
+    uint16_t port = 9;
+    
     Time interPacketInterval = Seconds(0.05);
     CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
     CoapServerHelper server(port);
-
+    
+    //Server
     for (int itr = 0; itr < node_head; itr++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
             //Install server application on every node, in every IoT domain.
             apps.Add(server.Install(iot[itr].Get(jdx)));
-            server.SetIPv6Bucket(apps.Get((uint32_t) appnum), AddrResBucket);
+            server.SetIPv6Bucket(apps.Get(appnum), AddrResBucket);
             appnum++;
         }
     }
     apps.Start(Seconds(1.0));
     apps.Stop(Seconds(60.0));
+    
+    //Client
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
     client.SetAttribute("PacketSize", UintegerValue(packetSize));
@@ -135,7 +142,7 @@ int main(int argc, char **argv) {
     int con_per;
     int pro_per;
     int dist = 500;
-    int subn = 0;
+    
     int totnumcontents = 100;
 
     CommandLine cmd;
@@ -254,12 +261,11 @@ int main(int argc, char **argv) {
         lrWpanHelper.AssociateToPan(LrWpanDevice[jdx], 10);
     }
 
-    //BRITE
-    // Install IPv6 stack
-    NS_LOG_INFO("Install Internet stack.");
 
-
-
+    /*
+     IP
+     */
+    
     Ipv6InterfaceContainer i_6lowpan[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
     Ipv6InterfaceContainer i_backhaul;
@@ -268,7 +274,7 @@ int main(int argc, char **argv) {
     ApplicationContainer apps;
 
     NS_LOG_INFO("Install 6lowpan stack.");
-    sixlowpan_stack(node_periph, node_head, subn, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
+    sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
     NS_LOG_INFO("Create Applications.");
     sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan);
