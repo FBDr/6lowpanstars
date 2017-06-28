@@ -19,9 +19,10 @@
 #include <vector>
 
 namespace ns3 {
-
+    NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
+    
     Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
-
+        
         uint32_t totAS = briteth.GetNAs();
         uint32_t leafnum = 0;
         uint32_t selAS = 0;
@@ -51,12 +52,8 @@ namespace ns3 {
         return returnBucket;
     }
 
-
-
-
-    NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
-
     void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer &backhaul, ndn::StackHelper &ndnHelper, ndn::GlobalRoutingHelper &ndnGlobalRoutingHelper, ndn::AppHelper &consumerHelper, ndn::AppHelper &producerHelper) {
+        
         ndnHelper.SetDefaultRoutes(true);
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
