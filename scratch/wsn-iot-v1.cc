@@ -15,11 +15,11 @@
 #include "ns3/ndnSIM-module.h"
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
+#include "src/network/helper/node-container.h"
 #include <string>
 #include <vector>
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
 
     Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
@@ -37,6 +37,18 @@ namespace ns3
 
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
+
+    void
+    shuffle_array(std::vector<int>& arrayf) {
+        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
+        shuffles->SetAttribute("Min", DoubleValue(2));
+        shuffles->SetAttribute("Max", DoubleValue(20));
+
+        for (int cnt = 0; cnt < (int) (shuffles->GetValue()); cnt++) {
+
+            std::random_shuffle(arrayf.begin(), arrayf.end());
+        }
+    };
 
     std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
 
@@ -62,7 +74,7 @@ namespace ns3
 
 
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, int &totnumcontents) {
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents) {
         ndn::StackHelper ndnHelper;
         std::string prefix = "/SensorData";
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
@@ -86,9 +98,22 @@ namespace ns3
 
         // Producer
         // Producer will reply to all requests starting with /prefix
-        producerHelper.SetPrefix(prefix + "/1");
-        producerHelper.SetAttribute("PayloadSize", StringValue("10"));
-        producerHelper.Install(iot[1].Get(1)); // last node
+
+        //Create vector with content numbers.
+        std::vector<int> content_chunks(totnumcontents);
+        std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
+        shuffle_array(content_chunks);
+
+        for (int jdx = 0; jdx < totnumcontents; jdx++) {
+            std::string cur_prefix;
+            int cur_node= jdx % ((int) endnodes.GetN());
+            cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
+            producerHelper.SetPrefix(cur_prefix);
+            producerHelper.SetAttribute("PayloadSize", StringValue("10"));
+            
+            producerHelper.Install(endnodes.Get(cur_node));
+            ndnGlobalRoutingHelper.AddOrigin(cur_prefix,endnodes.Get(cur_node));
+        }
         ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
@@ -248,7 +273,7 @@ namespace ns3
         br.Create(node_head);
         routers.Add(backhaul);
         routers.Add(br);
-        totalnodes =  node_head*node_periph;
+        totalnodes = node_head*node_periph;
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
 
@@ -307,7 +332,7 @@ namespace ns3
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, totnumcontents);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents);
         }
 
         /*

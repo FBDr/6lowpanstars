@@ -170,7 +170,7 @@ ConsumerZipfMandelbrotV2::SendPacket()
   Name seqname(std::to_string(seq).c_str());
   nameWithSequence->append(seqname);
   
-  nameWithSequence->appendSequenceNumber(1);
+  nameWithSequence->appendSequenceNumber(seq);
   //
 
   shared_ptr<Interest> interest = make_shared<Interest>();
