@@ -85,7 +85,7 @@ namespace ns3 {
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
         }
-        ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
+        //ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
         ndnHelper.Install(backhaul);
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndnGlobalRoutingHelper.InstallAll();
@@ -93,7 +93,6 @@ namespace ns3 {
         consumerHelper.SetPrefix(prefix);
         consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
         consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
-
         consumerHelper.Install(iot[0].Get(5));
 
         // Producer
@@ -106,13 +105,13 @@ namespace ns3 {
 
         for (int jdx = 0; jdx < totnumcontents; jdx++) {
             std::string cur_prefix;
-            int cur_node= jdx % ((int) endnodes.GetN());
+            int cur_node = jdx % ((int) endnodes.GetN());
             cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
             producerHelper.SetPrefix(cur_prefix);
             producerHelper.SetAttribute("PayloadSize", StringValue("10"));
-            
+
             producerHelper.Install(endnodes.Get(cur_node));
-            ndnGlobalRoutingHelper.AddOrigin(cur_prefix,endnodes.Get(cur_node));
+            ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node));
         }
         ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
@@ -358,9 +357,12 @@ namespace ns3 {
 
         /*Tracing*/
         //Flowmonitor
-        //Ptr<FlowMonitor> flowMonitor;
-        //FlowMonitorHelper flowHelper;
-        //flowMonitor = flowHelper.InstallAll();
+        if (!ndn) {
+            Ptr<FlowMonitor> flowMonitor;
+            FlowMonitorHelper flowHelper;
+            flowMonitor = flowHelper.InstallAll();
+        }
+
 
         //PCAP
         AsciiTraceHelper ascii;
