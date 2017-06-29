@@ -357,10 +357,10 @@ namespace ns3 {
 
         /*Tracing*/
         //Flowmonitor
-        
+        Ptr<FlowMonitor> flowMonitor;
+        FlowMonitorHelper flowHelper;
+
         if (!ndn) {
-            Ptr<FlowMonitor> flowMonitor;
-            FlowMonitorHelper flowHelper;
             flowMonitor = flowHelper.InstallAll();
         }
 
@@ -375,7 +375,7 @@ namespace ns3 {
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
         for (int jdx = 0; jdx < node_head; jdx++) {
-            lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
+            //lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
         }
 
         Simulator::Stop(Seconds(60));
