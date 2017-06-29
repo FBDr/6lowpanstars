@@ -53,13 +53,23 @@ namespace ns3
         return returnBucket;
     }
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer &backhaul) {
+    /*  -
+        -
+        - NDN and IP specific functions.
+        -
+     */
+
+
+
+
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, int &totnumcontents) {
         ndn::StackHelper ndnHelper;
+        std::string prefix = "/SensorData";
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         ndnHelper.SetDefaultRoutes(true);
-        
+
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
         }
@@ -68,16 +78,18 @@ namespace ns3
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndnGlobalRoutingHelper.InstallAll();
         // Consumer will request /prefix/0, /prefix/1, ...
-        consumerHelper.SetPrefix("/prefix");
+        consumerHelper.SetPrefix(prefix);
         consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
-        //consumerHelper.Install(backhaul.Get(0)); // first node
+        consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
+
         consumerHelper.Install(iot[0].Get(5));
+
         // Producer
         // Producer will reply to all requests starting with /prefix
-        producerHelper.SetPrefix("/prefix");
+        producerHelper.SetPrefix(prefix + "/1");
         producerHelper.SetAttribute("PayloadSize", StringValue("10"));
         producerHelper.Install(iot[1].Get(1)); // last node
-        ndnGlobalRoutingHelper.AddOrigin("/prefix", iot[1].Get(1));
+        ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1));
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
         //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
@@ -190,8 +202,11 @@ namespace ns3
         int node_head = 3;
         int con_per;
         int pro_per;
+        int num_Con;
+        int num_Pro;
         int dist = 100;
         int totnumcontents = 100;
+        int totalnodes = 0;
         bool ndn = true;
 
         CommandLine cmd;
@@ -233,7 +248,7 @@ namespace ns3
         br.Create(node_head);
         routers.Add(backhaul);
         routers.Add(br);
-
+        totalnodes =  node_head*node_periph;
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
 
@@ -292,7 +307,7 @@ namespace ns3
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul);
+            NDN_stack(node_head, iot, backhaul, totnumcontents);
         }
 
         /*
@@ -307,10 +322,10 @@ namespace ns3
         ApplicationContainer apps;
 
         if (!ndn) {
-            NS_LOG_INFO("Install 6lowpan stack.");
+            NS_LOG_INFO("Installing 6lowpan stack.");
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
-            NS_LOG_INFO("Create Applications.");
+            NS_LOG_INFO("Creating Applications.");
             sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan);
         }
 

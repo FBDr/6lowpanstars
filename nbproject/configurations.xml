@@ -1033,6 +1033,7 @@
             <in>ndn-consumer-batches.cpp</in>
             <in>ndn-consumer-cbr.cpp</in>
             <in>ndn-consumer-window.cpp</in>
+            <in>ndn-consumer-zipf-mandelbrot-v2.cpp</in>
             <in>ndn-consumer-zipf-mandelbrot.cpp</in>
             <in>ndn-consumer.cpp</in>
             <in>ndn-producer.cpp</in>
@@ -1925,6 +1926,7 @@
         <element flagsID="2"
                  commonFlags="-mtune=generic -march=x86-64 -std=c++11 -std=c++11 -fstack-protector-strong"/>
         <element flagsID="3" commonFlags="-std=c++0x -std=c++11"/>
+        <element flagsID="4" commonFlags="-std=c++0x -std=c++11 -fPIC"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -5170,13 +5172,6 @@
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
             <pElem>ns3/ndnSIM/ndn-cxx</pElem>
             <pElem>/usr/include</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/ndnSIM/apps">
-        <ccTool>
-          <incDir>
-            <pElem>build/ns3</pElem>
           </incDir>
         </ccTool>
       </folder>
@@ -35156,6 +35151,7 @@
       <item path="src/ndnSIM/apps/ndn-app.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
             <pElem>/usr/include/boost/asio/detail</pElem>
@@ -35356,6 +35352,7 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
@@ -35557,6 +35554,7 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
@@ -35758,6 +35756,7 @@
             flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
@@ -35953,12 +35952,43 @@
           </preprocessorList>
         </ccTool>
       </item>
+      <item path="src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot-v2.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="4">
+          <incDir>
+            <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
+            <pElem>ns3/ndnSIM/ndn-cxx</pElem>
+            <pElem>/usr/include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_IF_NETS_H=1</Elem>
+            <Elem>HAVE_IF_TUN_H=1</Elem>
+            <Elem>HAVE_IS_DEFAULT_CONSTRUCTIBLE=1</Elem>
+            <Elem>HAVE_IS_NOTHROW_MOVE_ASSIGNABLE=1</Elem>
+            <Elem>HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE=1</Elem>
+            <Elem>HAVE_NET_ETHERNET_H=1</Elem>
+            <Elem>HAVE_OPENSSL=1</Elem>
+            <Elem>HAVE_PACKET_H=1</Elem>
+            <Elem>HAVE_PTHREAD=1</Elem>
+            <Elem>HAVE_SQLITE3=1</Elem>
+            <Elem>HAVE_STD_TO_STRING=1</Elem>
+            <Elem>HAVE_SYS_IOCTL_H=1</Elem>
+            <Elem>HAVE_VECTOR_INSERT_ERASE_CONST_ITERATOR=1</Elem>
+            <Elem>NS3_ASSERT_ENABLE</Elem>
+            <Elem>NS3_BUILD_PROFILE_DEBUG</Elem>
+            <Elem>NS3_LOG_ENABLE</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
       <item path="src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot.cpp"
             ex="false"
             tool="1"
             flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>
@@ -36110,6 +36140,7 @@
       <item path="src/ndnSIM/apps/ndn-consumer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/exception</pElem>
             <pElem>/usr/include/boost</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
@@ -36308,6 +36339,7 @@
       <item path="src/ndnSIM/apps/ndn-producer.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
           <incDir>
+            <pElem>build/ns3</pElem>
             <pElem>/usr/include/boost/system</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx/encoding</pElem>
             <pElem>build/ns3/ndnSIM/ndn-cxx</pElem>

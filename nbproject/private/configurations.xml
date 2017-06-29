@@ -67,6 +67,7 @@
               <in>ndn-consumer-batches.hpp</in>
               <in>ndn-consumer-cbr.hpp</in>
               <in>ndn-consumer-window.hpp</in>
+              <in>ndn-consumer-zipf-mandelbrot-v2.hpp</in>
               <in>ndn-consumer-zipf-mandelbrot.hpp</in>
               <in>ndn-consumer.hpp</in>
               <in>ndn-producer.hpp</in>
@@ -3740,6 +3741,8 @@
             <in>ndn-consumer-cbr.hpp</in>
             <in>ndn-consumer-window.cpp</in>
             <in>ndn-consumer-window.hpp</in>
+            <in>ndn-consumer-zipf-mandelbrot-v2.cpp</in>
+            <in>ndn-consumer-zipf-mandelbrot-v2.hpp</in>
             <in>ndn-consumer-zipf-mandelbrot.cpp</in>
             <in>ndn-consumer-zipf-mandelbrot.hpp</in>
             <in>ndn-consumer.cpp</in>
