@@ -18,11 +18,12 @@
 #include <string>
 #include <vector>
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
-    
+
     Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
-        
+
         uint32_t totAS = briteth.GetNAs();
         uint32_t leafnum = 0;
         uint32_t selAS = 0;
@@ -52,9 +53,13 @@ namespace ns3 {
         return returnBucket;
     }
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer &backhaul, ndn::StackHelper &ndnHelper, ndn::GlobalRoutingHelper &ndnGlobalRoutingHelper, ndn::AppHelper &consumerHelper, ndn::AppHelper &producerHelper) {
-        
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer &backhaul) {
+        ndn::StackHelper ndnHelper;
+        ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+        ndn::AppHelper producerHelper("ns3::ndn::Producer");
         ndnHelper.SetDefaultRoutes(true);
+        
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
         }
@@ -285,12 +290,9 @@ namespace ns3 {
          NDN 
          */
 
-        ndn::StackHelper ndnHelper;
-        ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-        ndn::AppHelper producerHelper("ns3::ndn::Producer");
+
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, ndnHelper, ndnGlobalRoutingHelper, consumerHelper, producerHelper);
+            NDN_stack(node_head, iot, backhaul);
         }
 
         /*
