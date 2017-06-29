@@ -357,6 +357,7 @@ namespace ns3 {
 
         /*Tracing*/
         //Flowmonitor
+        
         if (!ndn) {
             Ptr<FlowMonitor> flowMonitor;
             FlowMonitorHelper flowHelper;
@@ -367,14 +368,14 @@ namespace ns3 {
         //PCAP
         AsciiTraceHelper ascii;
         //lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
-        csma.EnablePcapAll(std::string("./traces/csma"), true);
+        csma.EnablePcapAll(std::string("traces/csma"), true);
         //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("123123.tr"));
         NS_LOG_INFO("Run Simulation.");
 
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
         for (int jdx = 0; jdx < node_head; jdx++) {
-            lrWpanHelper[jdx].EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
+            lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
         }
 
         Simulator::Stop(Seconds(60));
