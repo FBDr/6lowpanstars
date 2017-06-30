@@ -384,7 +384,7 @@ namespace ns3
         m_txTrace(p);
         //m_socket->Send(p); Vervangen door SendTo
 
-        std::cout << Ipv6Address::ConvertFrom(m_peerAddress) << " and " << m_IPv6Bucket.size() << std::endl;
+        //std::cout << Ipv6Address::ConvertFrom(m_peerAddress) << " and " << m_IPv6Bucket.size() << std::endl;
         //std::cout<< Ipv6Address::ConvertFrom(m_peerAddress) <<"and" <<std::endl;
         //if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
         if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {

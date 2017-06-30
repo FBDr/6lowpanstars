@@ -31,46 +31,50 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
-
-et=ElementTree.parse(sys.argv[1])
-bitrates=[]
-losses=[]
-delays=[]
+et = ElementTree.parse(sys.argv[1])
+bitrates = []
+losses = []
+delays = []
 for flow in et.findall("FlowStats/Flow"):
-	#filteroutOLSR
-	for tpl in et.findall("Ipv6FlowClassifier/Flow"):
-		if tpl.get('flowId') == flow.get('flowId'):
-			break
-	if tpl.get("destinationPort")=='698':
-		continue
-	losses.append(int(flow.get('lostPackets')))
-	rxPackets=int(flow.get('rxPackets'))
-	if rxPackets==0:
-		bitrates.append(0)
-	else:
-		t0=long(flow.get('timeFirstRxPacket')[:-4])
-		t1=long(flow.get('timeLastRxPacket')[:-4])
-		#duration=(t1 -t0)*1e-9
-		#bitrates.append(8 * long(flow.get('rxBytes'))/duration *1e-3)
-		delays.append(float(flow.get('delaySum')[: -4])*1e-9/rxPackets)
-#pylab.subplot(311)
-#pylab.hist(bitrates,bins=40)
-#pylab.xlabel("Flowbitrate(bit/s)")
-#pylab.ylabel("Numberofflows")
-#pylab.subplot(312)
-#pylab.hist(losses,bins=40)
-#pylab.xlabel("Numberoflostpackets")
-#pylab.ylabel("Numberofflows")
+    # filteroutOLSR
+    for tpl in et.findall("Ipv6FlowClassifier/Flow"):
+        if tpl.get('flowId') == flow.get('flowId'):
+            break
+    if tpl.get("destinationPort") == '698':
+        continue
+    losses.append(int(flow.get('lostPackets')))
+    rxPackets = int(flow.get('rxPackets'))
+    if rxPackets == 0:
+        bitrates.append(0)
+    else:
+        t0 = long(flow.get('timeFirstRxPacket')[:-4])
+        t1 = long(flow.get('timeLastRxPacket')[:-4])
+        # duration=(t1 -t0)*1e-9
+        # bitrates.append(8 * long(flow.get('rxBytes'))/duration *1e-3)
+        if long(flow.get('timeFirstTxPacket')[:-4]) >= 1e10:
+            delays.append(float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets)
+            print flow.get('timeFirstTxPacket')[:-4]
+            print float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
+
+
+# pylab.subplot(311)
+# pylab.hist(bitrates,bins=40)
+# pylab.xlabel("Flowbitrate(bit/s)")
+# pylab.ylabel("Numberofflows")
+# pylab.subplot(312)
+# pylab.hist(losses,bins=40)
+# pylab.xlabel("Numberoflostpackets")
+# pylab.ylabel("Numberofflows")
 pylab.subplot(211)
-pylab.hist(delays,bins=1200)
+pylab.hist(delays, bins=100)
 pylab.xlabel("Delay(s)")
 pylab.ylabel("Number of flows")
-pylab.axis([0, 0.01, 0, 110])
+pylab.axis([0, 0.2, 0, 10])
 pylab.grid(True)
 pylab.subplot(212)
 pylab.plot(delays)
 pylab.show()
 
-#pylab.subplots_adjust(hspace=0.4)
-#pylab.plot(delays,'bo', label='sampled')
+# pylab.subplots_adjust(hspace=0.4)
+# pylab.plot(delays,'bo', label='sampled')
 pylab.savefig("results.pdf")

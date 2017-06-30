@@ -113,7 +113,7 @@ namespace ns3 {
         std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), sizeof (m_Rdata));
         std::size_t pos = Rdatastr.find("/"); // position of "live" in str
         std::string str3 = Rdatastr.substr(pos + 1); // get from "live" to the end
-        std::cout << str3 << std::endl;
+        //std::cout << str3 << std::endl;
         return std::stoi(str3);
     }
 

@@ -183,7 +183,7 @@ namespace ns3 {
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
-            Ipv6InterfaceContainer i_6lowpan[]) {
+            Ipv6InterfaceContainer i_6lowpan[], int &simtime) {
 
         uint32_t appnum = 0;
         uint32_t packetSize = 1024;
@@ -204,7 +204,7 @@ namespace ns3 {
             }
         }
         apps.Start(Seconds(1.0));
-        apps.Stop(Seconds(60.0));
+        apps.Stop(Seconds(simtime));
 
         //Client
         client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
@@ -213,7 +213,7 @@ namespace ns3 {
         apps = client.Install(iot[1].Get(0));
         client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
         apps.Start(Seconds(10.0));
-        apps.Stop(Seconds(60.0));
+        apps.Stop(Seconds(simtime-5));
     }
 
     int main(int argc, char **argv) {
@@ -231,6 +231,7 @@ namespace ns3 {
         int dist = 100;
         int totnumcontents = 100;
         int totalnodes = 0;
+        int simtime = 60;
         bool ndn = true;
 
         CommandLine cmd;
@@ -243,6 +244,7 @@ namespace ns3 {
         cmd.AddValue("ProPercent", "Producer percentage", pro_per);
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
+        cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -350,7 +352,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan);
+            sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan, simtime);
         }
 
 
@@ -375,10 +377,10 @@ namespace ns3 {
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
         for (int jdx = 0; jdx < node_head; jdx++) {
-            //lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
+            lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
         }
 
-        Simulator::Stop(Seconds(60));
+        Simulator::Stop(Seconds(simtime));
         Simulator::Run();
         flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
         Simulator::Destroy();
