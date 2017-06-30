@@ -25,10 +25,12 @@ from __future__ import division
 import pylab
 import sys
 import os
+
 try:
     from xml.etree import cElementTree as ElementTree
 except ImportError:
     from xml.etree import ElementTree
+
 
 et=ElementTree.parse(sys.argv[1])
 bitrates=[]
@@ -59,10 +61,16 @@ for flow in et.findall("FlowStats/Flow"):
 #pylab.hist(losses,bins=40)
 #pylab.xlabel("Numberoflostpackets")
 #pylab.ylabel("Numberofflows")
-#pylab.subplot(313)
-pylab.hist(delays,bins=100)
+pylab.subplot(211)
+pylab.hist(delays,bins=1200)
 pylab.xlabel("Delay(s)")
 pylab.ylabel("Number of flows")
+pylab.axis([0, 0.01, 0, 110])
+pylab.grid(True)
+pylab.subplot(212)
+pylab.plot(delays)
+pylab.show()
+
 #pylab.subplots_adjust(hspace=0.4)
 #pylab.plot(delays,'bo', label='sampled')
 pylab.savefig("results.pdf")

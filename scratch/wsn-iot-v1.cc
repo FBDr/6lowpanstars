@@ -380,7 +380,7 @@ namespace ns3 {
 
         Simulator::Stop(Seconds(60));
         Simulator::Run();
-        //flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
+        flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
         Simulator::Destroy();
         NS_LOG_INFO("Done.");
         return 0;
