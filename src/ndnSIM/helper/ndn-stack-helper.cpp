@@ -214,8 +214,8 @@ StackHelper::Install(Ptr<Node> node) const
     Ptr<NetDevice> device = node->GetDevice(index);
     // This check does not make sense: LoopbackNetDevice is installed only if IP stack is installed,
     // Normally, ndnSIM works without IP stack, so no reason to check
-    // if (DynamicCast<LoopbackNetDevice> (device) != 0)
-    //   continue; // don't create face for a LoopbackNetDevice
+     if (DynamicCast<LoopbackNetDevice> (device) != 0)
+       continue; // don't create face for a LoopbackNetDevice
 
     faces->Add(this->createAndRegisterFace(node, ndn, device));
   }

@@ -113,7 +113,7 @@ namespace ns3 {
             producerHelper.Install(endnodes.Get(cur_node));
             ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node));
         }
-        ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1));
+        ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1)); //BUG?
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
         //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);

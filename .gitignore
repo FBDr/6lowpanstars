@@ -1,4 +1,5 @@
 *.xml
+*.cap
 *.pyc
 *.pdf
 *.pcap

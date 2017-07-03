@@ -2074,6 +2074,7 @@
         <in>ripng-test.cc</in>
         <in>rnc.cpp</in>
         <in>scratch-simulator.cc</in>
+        <in>virtual-net-device2.cc</in>
         <in>wsn-iot-icn.cc</in>
         <in>wsn-iot-rip-ba-coap.cc</in>
         <in>wsn-iot-rip-ba.cc</in>
