@@ -280,8 +280,11 @@ namespace ns3 {
 
         ndn::StackHelper ndnHelper;
         ndnHelper.SetDefaultRoutes(true);
-        ndnHelper.InstallAll();
-
+        //ndnHelper.InstallAll();
+        ndnHelper.Install(c.Get(0));
+        ndnHelper.Install(c.Get(1));
+        //ndnHelper.Install(c.Get(2));
+        ndnHelper.Install(c.Get(3));
 
         // Choosing forwarding strategy
         ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/multicast");
