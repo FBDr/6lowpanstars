@@ -24,6 +24,7 @@
 #include "ns3/string.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-channel.h"
+#include "ns3/loopback-net-device.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
