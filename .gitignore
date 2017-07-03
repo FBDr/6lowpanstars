@@ -14,6 +14,7 @@ src/NDNabstraction
 build/
 doc/html/
 doc/latex/
+nbproject/
 \.rej$
 \.orig$
 \.o$
