@@ -35,9 +35,9 @@ et = ElementTree.parse(sys.argv[1])
 bitrates = []
 losses = []
 delays = []
-idx = 0
+totalpackets = 0
+flownum = 0
 for flow in et.findall("FlowStats/Flow"):
-    idx += 1
     # filteroutOLSR
     for tpl in et.findall("Ipv6FlowClassifier/Flow"):
         if tpl.get('flowId') == flow.get('flowId'):
@@ -62,9 +62,11 @@ for flow in et.findall("FlowStats/Flow"):
         print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
         print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
         print "Flow: received packets:", rxPackets
-        idx = idx + rxPackets;
+        totalpackets = totalpackets + rxPackets
+        flownum+=1
 
-print "Total received packets: ", idx
+print "Total received packets: ", totalpackets
+print "Total flows: ", flownum
 # pylab.hist(bitrates,bins=40)
 # pylab.xlabel("Flowbitrate(bit/s)")
 # pylab.ylabel("Numberofflows")
@@ -73,7 +75,7 @@ print "Total received packets: ", idx
 # pylab.xlabel("Numberoflostpackets")
 # pylab.ylabel("Numberofflows")
 pylab.subplot(211)
-pylab.hist(delays, bins=100)
+pylab.hist(delays, bins=10)
 pylab.xlabel("Delay(s)")
 pylab.ylabel("Number of flows")
 pylab.axis([0, 0.2, 0, 10])
