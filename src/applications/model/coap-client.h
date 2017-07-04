@@ -144,6 +144,7 @@ namespace ns3 {
          * \param dataSize The desired size of the final echo data.
          */
         void SetFill(uint8_t *fill, uint32_t fillSize, uint32_t dataSize);
+        void SetNumberOfContents(uint32_t numOfContents);
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
 
@@ -176,10 +177,6 @@ namespace ns3 {
          * \param socket the socket the packet was received to.
          */
         void HandleRead(Ptr<Socket> socket);
-
-
-        void
-        SetNumberOfContents(uint32_t numOfContents);
 
         uint32_t
         GetNumberOfContents() const;

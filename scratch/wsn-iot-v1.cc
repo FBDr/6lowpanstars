@@ -59,7 +59,7 @@ namespace ns3 {
 
         for (int itx = 0; itx < numContents; itx++) {
             returnBucket.push_back(arrayf[shuffles->GetValue()]);
-            //std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
+            std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
         }
 
         return returnBucket;
@@ -175,22 +175,24 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
-
+                NS_LOG_INFO("Filling IPv6 bucket " << i_6lowpan[idx].GetAddress(jdx, 1));
             }
         }
         AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
     }
 
-    void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
+    void sixlowpan_apps(int &node_periph, int &node_head, int &num_Con, NodeContainer iot[], NodeContainer all,
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
-            Ipv6InterfaceContainer i_6lowpan[], int &simtime) {
+            Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth) {
 
         uint32_t appnum = 0;
         uint32_t packetSize = 1024;
         uint32_t maxPacketCount = 20000;
         uint16_t port = 9;
+        int cur_con = 0;
+        Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
+        Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
-        Time interPacketInterval = Seconds(0.05);
         CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
         CoapServerHelper server(port);
 
@@ -208,12 +210,19 @@ namespace ns3 {
 
         //Client
         client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
-        client.SetAttribute("Interval", TimeValue(interPacketInterval));
         client.SetAttribute("PacketSize", UintegerValue(packetSize));
-        apps = client.Install(iot[1].Get(0));
-        client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-        apps.Start(Seconds(10.0));
-        apps.Stop(Seconds(simtime - 5));
+
+        for (int jdx = 0; jdx < num_Con; jdx++) {
+            cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
+            NS_LOG_INFO("Selected: " << cur_con << " as consumer. ");
+            client.SetAttribute("Interval", TimeValue(Seconds(Rinterval->GetValue((double) (0.01), (double) (1)))));
+
+            apps = client.Install(SelectRandomLeafNode(briteth));
+            client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+            apps.Start(Seconds(50.0));
+            apps.Stop(Seconds(simtime - 5));
+        }
+
     }
 
     int main(int argc, char **argv) {
@@ -224,9 +233,9 @@ namespace ns3 {
         int node_num = 10;
         int node_periph = 9;
         int node_head = 3;
-        int con_per;
-        int pro_per;
-        //int num_Con;
+        int con_per = 50;
+        int pro_per = 0;
+        int num_Con = 0;
         //int num_Pro;
         int dist = 100;
         int totnumcontents = 100;
@@ -266,6 +275,7 @@ namespace ns3 {
         NodeContainer endnodes;
         NodeContainer border_backhaul[node_head];
         NodeContainer backhaul;
+        NodeContainer all;
 
         //Brite
         //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
@@ -276,7 +286,12 @@ namespace ns3 {
         br.Create(node_head);
         routers.Add(backhaul);
         routers.Add(br);
-        totalnodes = node_head*node_periph;
+        totalnodes = node_head * node_periph + node_head + bth.GetNNodesTopology();
+        num_Con = totalnodes * (float) con_per / 100.0;
+        all.Add(routers);
+        all.Add(endnodes);
+        all.Add(backhaul);
+
         // Create mobility objects for master and (border) routers.
         MobilityHelper mobility;
 
@@ -356,7 +371,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, AddrResBucket, apps, i_6lowpan, simtime);
+            sixlowpan_apps(node_periph, node_head, num_Con, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth);
         }
 
 

@@ -25,147 +25,126 @@
 
 namespace ns3 {
 
-CoapServerHelper::CoapServerHelper (uint16_t port)
-{
-  m_factory.SetTypeId (CoapServer::GetTypeId ());
-  SetAttribute ("Port", UintegerValue (port));
-}
-
-void 
-CoapServerHelper::SetAttribute (
-  std::string name, 
-  const AttributeValue &value)
-{
-  m_factory.Set (name, value);
-}
-
-ApplicationContainer
-CoapServerHelper::Install (Ptr<Node> node) const
-{
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-CoapServerHelper::Install (std::string nodeName) const
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-CoapServerHelper::Install (NodeContainer c) const
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      apps.Add (InstallPriv (*i));
+    CoapServerHelper::CoapServerHelper(uint16_t port) {
+        m_factory.SetTypeId(CoapServer::GetTypeId());
+        SetAttribute("Port", UintegerValue(port));
     }
 
-  return apps;
-}
-
-void
-CoapServerHelper::SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket)
-{
-  app->GetObject<CoapServer>()->SetIPv6Bucket(bucket);
-}
-
-
-Ptr<Application>
-CoapServerHelper::InstallPriv (Ptr<Node> node) const
-{
-  Ptr<Application> app = m_factory.Create<CoapServer> ();
-  node->AddApplication (app);
-
-  return app;
-}
-
-CoapClientHelper::CoapClientHelper (Address address, uint16_t port)
-{
-  m_factory.SetTypeId (CoapClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (address));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-CoapClientHelper::CoapClientHelper (Ipv4Address address, uint16_t port)
-{
-  m_factory.SetTypeId (CoapClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (Address(address)));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-CoapClientHelper::CoapClientHelper (Ipv6Address address, uint16_t port)
-{
-  m_factory.SetTypeId (CoapClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (Address(address)));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-void 
-CoapClientHelper::SetAttribute (
-  std::string name, 
-  const AttributeValue &value)
-{
-  m_factory.Set (name, value);
-}
-
-
-void
-CoapClientHelper::SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket)
-{
-  app->GetObject<CoapClient>()->SetIPv6Bucket(bucket);
-  SetAttribute ("NumberOfContents", UintegerValue(bucket.size()));
-}
-void
-CoapClientHelper::SetFill (Ptr<Application> app, std::string fill)
-{
-  app->GetObject<CoapClient>()->SetFill (fill);
-}
-
-void
-CoapClientHelper::SetFill (Ptr<Application> app, uint8_t fill, uint32_t dataLength)
-{
-  app->GetObject<CoapClient>()->SetFill (fill, dataLength);
-}
-
-void
-CoapClientHelper::SetFill (Ptr<Application> app, uint8_t *fill, uint32_t fillLength, uint32_t dataLength)
-{
-  app->GetObject<CoapClient>()->SetFill (fill, fillLength, dataLength);
-}
-
-ApplicationContainer
-CoapClientHelper::Install (Ptr<Node> node) const
-{
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-CoapClientHelper::Install (std::string nodeName) const
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-CoapClientHelper::Install (NodeContainer c) const
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      apps.Add (InstallPriv (*i));
+    void
+    CoapServerHelper::SetAttribute(
+            std::string name,
+            const AttributeValue &value) {
+        m_factory.Set(name, value);
     }
 
-  return apps;
-}
+    ApplicationContainer
+    CoapServerHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
 
-Ptr<Application>
-CoapClientHelper::InstallPriv (Ptr<Node> node) const
-{
-  Ptr<Application> app = m_factory.Create<CoapClient> ();
-  node->AddApplication (app);
+    ApplicationContainer
+    CoapServerHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
 
-  return app;
-}
+    ApplicationContainer
+    CoapServerHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    void
+    CoapServerHelper::SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket) {
+        app->GetObject<CoapServer>()->SetIPv6Bucket(bucket);
+    }
+
+    Ptr<Application>
+    CoapServerHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<CoapServer> ();
+        node->AddApplication(app);
+
+        return app;
+    }
+
+    CoapClientHelper::CoapClientHelper(Address address, uint16_t port) {
+        m_factory.SetTypeId(CoapClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(address));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    CoapClientHelper::CoapClientHelper(Ipv4Address address, uint16_t port) {
+        m_factory.SetTypeId(CoapClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(Address(address)));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    CoapClientHelper::CoapClientHelper(Ipv6Address address, uint16_t port) {
+        m_factory.SetTypeId(CoapClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(Address(address)));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    void
+    CoapClientHelper::SetAttribute(
+            std::string name,
+            const AttributeValue &value) {
+        m_factory.Set(name, value);
+    }
+
+    void
+    CoapClientHelper::SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket) {
+        app->GetObject<CoapClient>()->SetIPv6Bucket(bucket);
+        SetAttribute("NumberOfContents", UintegerValue(bucket.size()));
+        app->GetObject<CoapClient>()->SetNumberOfContents((uint32_t)bucket.size());
+    }
+
+    void
+    CoapClientHelper::SetFill(Ptr<Application> app, std::string fill) {
+        app->GetObject<CoapClient>()->SetFill(fill);
+    }
+
+    void
+    CoapClientHelper::SetFill(Ptr<Application> app, uint8_t fill, uint32_t dataLength) {
+        app->GetObject<CoapClient>()->SetFill(fill, dataLength);
+    }
+
+    void
+    CoapClientHelper::SetFill(Ptr<Application> app, uint8_t *fill, uint32_t fillLength, uint32_t dataLength) {
+        app->GetObject<CoapClient>()->SetFill(fill, fillLength, dataLength);
+    }
+
+    ApplicationContainer
+    CoapClientHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    CoapClientHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    CoapClientHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    Ptr<Application>
+    CoapClientHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<CoapClient> ();
+        node->AddApplication(app);
+
+        return app;
+    }
 
 } // namespace ns3

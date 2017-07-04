@@ -388,7 +388,7 @@ namespace ns3
         //std::cout<< Ipv6Address::ConvertFrom(m_peerAddress) <<"and" <<std::endl;
         //if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
         if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
-            std::cout << "SendTo ERROR!" << std::endl;
+            NS_LOG_INFO( "SendTo ERROR! Trying to send to "<< m_IPv6Bucket[nxtsq]);
         };
 
 
