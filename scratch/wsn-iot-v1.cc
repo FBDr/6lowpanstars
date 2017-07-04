@@ -213,7 +213,7 @@ namespace ns3 {
         apps = client.Install(iot[1].Get(0));
         client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
         apps.Start(Seconds(10.0));
-        apps.Stop(Seconds(simtime-5));
+        apps.Stop(Seconds(simtime - 5));
     }
 
     int main(int argc, char **argv) {
@@ -226,13 +226,14 @@ namespace ns3 {
         int node_head = 3;
         int con_per;
         int pro_per;
-        int num_Con;
-        int num_Pro;
+        //int num_Con;
+        //int num_Pro;
         int dist = 100;
         int totnumcontents = 100;
         int totalnodes = 0;
         int simtime = 60;
         bool ndn = true;
+        bool pcaptracing = true;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -245,6 +246,7 @@ namespace ns3 {
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
+        cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -305,6 +307,8 @@ namespace ns3 {
             mobility.Install(iot[jdx]);
             BorderRouterPositionAlloc->Add(Vector(-95 + jdx * dist, 395, 0.0));
         }
+
+        NS_ASSERT_MSG(endnodes.GetN() <= (uint32_t) totnumcontents, "The number of contents should be larger than the number of endnodes in the current implementation");
 
         mobility.SetPositionAllocator(BorderRouterPositionAlloc);
         mobility.Install(br);
@@ -376,13 +380,16 @@ namespace ns3 {
 
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
-        }
+        if (pcaptracing)
+            for (int jdx = 0; jdx < node_head; jdx++) {
+                lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
+            }
 
         Simulator::Stop(Seconds(simtime));
         Simulator::Run();
-        flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
+        if (!ndn) {
+            flowMonitor->SerializeToXmlFile("Flows.xml", true, true);
+        }
         Simulator::Destroy();
         NS_LOG_INFO("Done.");
         return 0;
