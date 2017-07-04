@@ -375,7 +375,7 @@ namespace ns3 {
         AsciiTraceHelper ascii;
         //lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
         csma.EnablePcapAll(std::string("traces/csma"), true);
-        //lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("123123.tr"));
+
         NS_LOG_INFO("Run Simulation.");
 
         //AnimationInterface anim("AWSNanimation2.xml");
