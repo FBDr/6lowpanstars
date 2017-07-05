@@ -151,7 +151,7 @@ namespace ns3 {
         internetv6.Install(br);
         internetv6.Install(backhaul);
         Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("Routing table.txt", ios_base::trunc);
-        ripNgRouting.PrintRoutingTableAllEvery(Seconds(40.0), routingStream);
+        //ripNgRouting.PrintRoutingTableAllEvery(Seconds(40.0), routingStream);
         
         //Assign addresses for backhaul.
         std::string addresss;
@@ -329,7 +329,7 @@ namespace ns3 {
                     "MinY", DoubleValue(400),
                     "DeltaX", DoubleValue(5),
                     "DeltaY", DoubleValue(5),
-                    "GridWidth", UintegerValue(3),
+                    "GridWidth", UintegerValue(5),
                     "LayoutType", StringValue("RowFirst"));
             mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
             mobility.Install(iot[jdx]);
