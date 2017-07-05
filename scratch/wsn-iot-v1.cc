@@ -16,6 +16,7 @@
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
 #include "src/network/helper/node-container.h"
+#include "src/network/utils/output-stream-wrapper.h"
 #include <string>
 #include <vector>
 
@@ -99,7 +100,7 @@ namespace ns3 {
 
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
-            consumerHelper.SetAttribute("Frequency",  StringValue(boost::lexical_cast<std::string>(Rinterval->GetValue((double) (0.01), (double) (1)))));
+            consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(Rinterval->GetValue((double) (0.01), (double) (1)))));
             apps = consumerHelper.Install(SelectRandomLeafNode(bth));
             apps.Start(Seconds(120.0));
             apps.Stop(Seconds(simtime - 5));
@@ -149,7 +150,9 @@ namespace ns3 {
         internetv6.SetRoutingHelper(listRH);
         internetv6.Install(br);
         internetv6.Install(backhaul);
-
+        Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("Routing table.txt", ios_base::trunc);
+        ripNgRouting.PrintRoutingTableAllEvery(Seconds(40.0), routingStream);
+        
         //Assign addresses for backhaul.
         std::string addresss;
         addresss = "2001:0:" + std::to_string(1337) + "::";
@@ -162,12 +165,12 @@ namespace ns3 {
         for (int jdx = 0; jdx < node_head; jdx++) {
             SixLowpanDevice[jdx] = sixlowpan.Install(LrWpanDevice[jdx]);
             subn++;
-            addresss = "2001:0:" + std::to_string(subn) + "::";
+            addresss = "2001:" + std::to_string(subn) + "::";
             const char * c = addresss.c_str();
             ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
             i_6lowpan[jdx] = ipv6.Assign(SixLowpanDevice[jdx]);
             subn++;
-            addresss = "2001:0:" + std::to_string(subn) + "::";
+            addresss = "2001:" + std::to_string(subn) + "::";
             c = addresss.c_str();
             ipv6.SetBase(Ipv6Address(c), Ipv6Prefix(64));
             i_csma[jdx] = ipv6.Assign(CSMADevice[jdx]);
