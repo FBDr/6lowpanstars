@@ -49,19 +49,19 @@ for flow in et.findall("FlowStats/Flow"):
     if rxPackets == 0:
         bitrates.append(0)
     else:
-        t0 = long(flow.get('timeFirstRxPacket')[:-4])
-        t1 = long(flow.get('timeLastRxPacket')[:-4])
+        # t0 = long(flow.get('timeFirstRxPacket')[:-4])
+        # t1 = long(flow.get('timeLastRxPacket')[:-4])
         # duration=(t1 -t0)*1e-9
         # bitrates.append(8 * long(flow.get('rxBytes'))/duration *1e-3)
         # if long(flow.get('timeFirstTxPacket')[:-4]) >= 1e10:
         delays.append(float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets)
         print "FlowID:", flow.get('flowId')  # pylab.subplot(311)
-        print "timeFirstTxPacket:", long(flow.get('timeFirstTxPacket')[:-4]) * 1e-9
-        print "timeLastTxPacket:", long(flow.get('timeLastTxPacket')[:-4]) * 1e-9
-        print "timeFirstRxPacket:", long(flow.get('timeFirstRxPacket')[:-4]) * 1e-9
-        print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
-        print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
-        print "Flow: received packets:", rxPackets
+        #print "timeFirstTxPacket:", long(flow.get('timeFirstTxPacket')[:-4]) * 1e-9
+        #print "timeLastTxPacket:", long(flow.get('timeLastTxPacket')[:-4]) * 1e-9
+        #print "timeFirstRxPacket:", long(flow.get('timeFirstRxPacket')[:-4]) * 1e-9
+        #print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
+        #print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
+        #print "Flow: received packets:", rxPackets
         totalpackets = totalpackets + rxPackets
         flownum+=1
 
@@ -78,7 +78,7 @@ pylab.subplot(211)
 pylab.hist(delays, bins=10)
 pylab.xlabel("Delay(s)")
 pylab.ylabel("Number of flows")
-pylab.axis([0, 0.2, 0, 10])
+# pylab.axis([0, 0.2, 0, 10])
 pylab.grid(True)
 pylab.subplot(212)
 pylab.plot(delays)

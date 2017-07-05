@@ -36,7 +36,7 @@ namespace ns3 {
         NS_LOG_INFO("Selected AS num: " << selAS);
         leafnum = briteth.GetNLeafNodesForAs(selAS);
         selLN = round(Rleaf->GetValue((double) (0), (double) (leafnum - 1)));
-        NS_LOG_INFO("Selected leafnode num: " <<selLN);
+        NS_LOG_INFO("Selected leafnode num: " << selLN);
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
 
@@ -76,13 +76,15 @@ namespace ns3 {
 
 
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents) {
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con) {
         ndn::StackHelper ndnHelper;
         std::string prefix = "/SensorData";
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         ndnHelper.SetDefaultRoutes(true);
+        Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
+        ApplicationContainer apps;
 
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
@@ -93,9 +95,15 @@ namespace ns3 {
         ndnGlobalRoutingHelper.InstallAll();
         // Consumer will request /prefix/0, /prefix/1, ...
         consumerHelper.SetPrefix(prefix);
-        consumerHelper.SetAttribute("Frequency", StringValue("0.5")); // 10 interests a second
         consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
-        consumerHelper.Install(iot[0].Get(5));
+
+
+        for (int jdx = 0; jdx < num_Con; jdx++) {
+            consumerHelper.SetAttribute("Frequency",  StringValue(boost::lexical_cast<std::string>(Rinterval->GetValue((double) (0.01), (double) (1)))));
+            apps = consumerHelper.Install(SelectRandomLeafNode(bth));
+            apps.Start(Seconds(120.0));
+            apps.Stop(Seconds(simtime - 5));
+        }
 
         // Producer
         // Producer will reply to all requests starting with /prefix
@@ -354,7 +362,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con);
         }
 
         /*
