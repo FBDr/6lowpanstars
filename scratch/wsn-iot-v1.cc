@@ -25,16 +25,18 @@ namespace ns3 {
     Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
 
         uint32_t totAS = briteth.GetNAs();
+        NS_LOG_INFO("The total number of AS is: " << totAS);
         uint32_t leafnum = 0;
         uint32_t selAS = 0;
         uint32_t selLN = 0;
         Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
 
-        selAS = Ras->GetValue((double) (0), (double) (totAS - 1));
+        selAS = round(Ras->GetValue((double) (0), (double) (totAS - 1)));
+        NS_LOG_INFO("Selected AS num: " << selAS);
         leafnum = briteth.GetNLeafNodesForAs(selAS);
-        selLN = Rleaf->GetValue((double) (0), (double) (leafnum - 1));
-
+        selLN = round(Rleaf->GetValue((double) (0), (double) (leafnum - 1)));
+        NS_LOG_INFO("Selected leafnode num: " <<selLN);
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
 
@@ -185,7 +187,7 @@ namespace ns3 {
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth) {
 
-        uint32_t appnum = 0;
+
         uint32_t packetSize = 1024;
         uint32_t maxPacketCount = 20000;
         uint16_t port = 9;
@@ -200,9 +202,9 @@ namespace ns3 {
         for (int itr = 0; itr < node_head; itr++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 //Install server application on every node, in every IoT domain.
-                apps.Add(server.Install(iot[itr].Get(jdx)));
-                server.SetIPv6Bucket(apps.Get(appnum), AddrResBucket);
-                appnum++;
+                apps = server.Install(iot[itr].Get(jdx));
+                server.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+
             }
         }
         apps.Start(Seconds(1.0));
@@ -219,7 +221,7 @@ namespace ns3 {
 
             apps = client.Install(SelectRandomLeafNode(briteth));
             client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-            apps.Start(Seconds(50.0));
+            apps.Start(Seconds(120.0));
             apps.Stop(Seconds(simtime - 5));
         }
 
