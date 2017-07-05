@@ -60,7 +60,7 @@ for flow in et.findall("FlowStats/Flow"):
         #print "timeLastTxPacket:", long(flow.get('timeLastTxPacket')[:-4]) * 1e-9
         #print "timeFirstRxPacket:", long(flow.get('timeFirstRxPacket')[:-4]) * 1e-9
         #print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
-        #print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
+        print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
         #print "Flow: received packets:", rxPackets
         totalpackets = totalpackets + rxPackets
         flownum+=1

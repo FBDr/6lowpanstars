@@ -363,6 +363,7 @@ namespace ns3 {
 
         if (ndn) {
             NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con);
+            ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
         /*
