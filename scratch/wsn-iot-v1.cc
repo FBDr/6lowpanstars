@@ -77,7 +77,8 @@ namespace ns3 {
 
 
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache) {
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
+            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness) {
         ndn::StackHelper ndnHelper;
         std::string prefix = "/SensorData";
         double interval_sel;
@@ -87,6 +88,9 @@ namespace ns3 {
         ndnHelper.SetDefaultRoutes(true);
         if (!cache) {
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
+        }
+        if (freshness) {
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru");
         }
 
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
@@ -127,7 +131,7 @@ namespace ns3 {
             cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
             producerHelper.SetPrefix(cur_prefix);
             producerHelper.SetAttribute("PayloadSize", StringValue("10"));
-
+            producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
             producerHelper.Install(endnodes.Get(cur_node));
             ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node));
         }
@@ -264,6 +268,7 @@ namespace ns3 {
         bool ndn = true;
         bool pcaptracing = true;
         bool cache = true;
+        double freshness = 0;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -278,6 +283,7 @@ namespace ns3 {
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.AddValue("cache", "Enable caching.", cache);
+        cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -374,7 +380,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
