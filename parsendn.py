@@ -32,9 +32,10 @@ time, node, appid, seq, delay, delayu, rtx, hops = numpy.loadtxt(sys.argv[1], sk
 
 delay_filtered = []
 hops_filtered =[]
+time_filtered = []
 idx = 0
 zero_entries = 0
-for delay_i, hop_i in zip(delay, hops):
+for delay_i, hop_i, time_i in zip(delay, hops, time):
     idx += 1
     if delay_i == 0:
         zero_entries += 1
@@ -42,6 +43,7 @@ for delay_i, hop_i in zip(delay, hops):
     if idx % 2:
         delay_filtered.append(delay_i)
         hops_filtered.append(hop_i)
+        time_filtered.append(time_i)
 
 print "Found:", zero_entries, "zero delay entries. From a total of", idx, "received packets. So", zero_entries * 100 / idx, "% of the total entries is 0."
 
@@ -52,8 +54,8 @@ pylab.ylabel("Number of packets")
 # pylab.axis([0, 0.2, 0, 10])
 pylab.grid(True)
 pylab.subplot(222)
-pylab.plot(delay_filtered, 'go')
-pylab.xlabel("Packet sequence number")
+pylab.plot(time_filtered,delay_filtered, 'go')
+pylab.xlabel("Simulation time (s)")
 pylab.ylabel("Delay (s)")
 pylab.grid(True)
 

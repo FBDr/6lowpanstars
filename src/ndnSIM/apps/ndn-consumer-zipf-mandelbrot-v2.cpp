@@ -86,7 +86,7 @@ ConsumerZipfMandelbrotV2::SetNumberOfContents(uint32_t numOfContents)
 
   for (uint32_t i = 1; i <= m_N; i++) {
     m_Pcum[i] = m_Pcum[i] / m_Pcum[m_N];
-    NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
+    //NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
   }
 }
 

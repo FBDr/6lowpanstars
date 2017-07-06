@@ -80,6 +80,7 @@ namespace ns3 {
     void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache) {
         ndn::StackHelper ndnHelper;
         std::string prefix = "/SensorData";
+        double interval_sel;
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
@@ -89,6 +90,7 @@ namespace ns3 {
         }
 
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
+
         ApplicationContainer apps;
 
         for (int jdx = 0; jdx < node_head; jdx++) {
@@ -104,9 +106,10 @@ namespace ns3 {
 
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
-            consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(Rinterval->GetValue((double) (0.01), (double) (1)))));
+            interval_sel = Rinterval->GetValue((double) (0.01), (double) (1));
+            consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
             apps = consumerHelper.Install(SelectRandomLeafNode(bth));
-            apps.Start(Seconds(120.0));
+            apps.Start(Seconds(120.0 + interval_sel));
             apps.Stop(Seconds(simtime - 5));
         }
 
