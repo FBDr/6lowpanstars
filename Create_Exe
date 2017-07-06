@@ -1,2 +1,7 @@
-#!/bin/bash 
+#!/bin/bash
+echo "Pulling latest commits from git..."
+git pull
+echo "Compiling latest version of executable..."
+./waf shell && ./ErmineLightTrial.x86_64  build/scratch/wsn-iot-v1 --output static_exe
+
 
