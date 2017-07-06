@@ -77,13 +77,17 @@ namespace ns3 {
 
 
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con) {
+    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes, int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache) {
         ndn::StackHelper ndnHelper;
         std::string prefix = "/SensorData";
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         ndnHelper.SetDefaultRoutes(true);
+        if (!cache) {
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
+        }
+
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         ApplicationContainer apps;
 
@@ -152,7 +156,7 @@ namespace ns3 {
         internetv6.Install(backhaul);
         Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("Routing table.txt", ios_base::trunc);
         //ripNgRouting.PrintRoutingTableAllEvery(Seconds(40.0), routingStream);
-        
+
         //Assign addresses for backhaul.
         std::string addresss;
         addresss = "2001:0:" + std::to_string(1337) + "::";
@@ -256,6 +260,7 @@ namespace ns3 {
         int simtime = 60;
         bool ndn = true;
         bool pcaptracing = true;
+        bool cache = true;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -269,6 +274,7 @@ namespace ns3 {
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
+        cmd.AddValue("cache", "Enable caching.", cache);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -365,7 +371,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 

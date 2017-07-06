@@ -23,27 +23,49 @@
 #
 import numpy
 import pylab
+import sys
+import os
 
-time, node, appid, seq, delay, delayu, rtx, hop = numpy.loadtxt('app-delays-trace.txt', skiprows=1,
-                                                                usecols=(0, 1, 2, 3, 5, 6, 7, 8),
-                                                                unpack=True)
+time, node, appid, seq, delay, delayu, rtx, hops = numpy.loadtxt(sys.argv[1], skiprows=1,
+                                                                 usecols=(0, 1, 2, 3, 5, 6, 7, 8),
+                                                                 unpack=True)
 
 delay_filtered = []
+hops_filtered =[]
 idx = 0
-for delay_i in delay:
-    idx +=1
-    if delay_i != 0 and idx % 2:
+zero_entries = 0
+for delay_i, hop_i in zip(delay, hops):
+    idx += 1
+    if delay_i == 0:
+        zero_entries += 1
+        continue
+    if idx % 2:
         delay_filtered.append(delay_i)
-        print delay_i
+        hops_filtered.append(hop_i)
 
-pylab.subplot(211)
+print "Found:", zero_entries, "zero delay entries. From a total of", idx, "received packets. So", zero_entries * 100 / idx, "% of the total entries is 0."
+
+pylab.subplot(221)
 pylab.hist(delay_filtered, bins=500)
 pylab.xlabel("Delay(s)")
 pylab.ylabel("Number of packets")
 # pylab.axis([0, 0.2, 0, 10])
 pylab.grid(True)
-pylab.subplot(212)
+pylab.subplot(222)
 pylab.plot(delay_filtered, 'go')
-pylab.xlabel("Packet number")
+pylab.xlabel("Packet sequence number")
 pylab.ylabel("Delay (s)")
+pylab.grid(True)
+
+pylab.subplot(223)
+
+pylab.hist(hops_filtered, bins=14)
+pylab.xlabel("Hops")
+pylab.ylabel("Number of packets")
+pylab.grid(True)
+pylab.subplot(224)
+pylab.plot(hops_filtered, 'go')
+pylab.ylabel("Hops")
+pylab.xlabel("Packet sequence number")
+pylab.grid(True)
 pylab.show()
