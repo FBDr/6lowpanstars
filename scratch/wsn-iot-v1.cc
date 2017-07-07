@@ -281,20 +281,20 @@ namespace ns3 {
         int payloadsize = 10;
 
         CommandLine cmd;
-        cmd.AddValue("verbose", "turn on log components", verbose);
+        cmd.AddValue("verbose", "turn on log components", verbose); //Not implemented
         cmd.AddValue("rng", "Set feed for random number generator", rngfeed);
-        cmd.AddValue("nodes", "Number of nodes", node_num);
+        cmd.AddValue("nodes", "Number of nodes", node_num); //Not implemented
         cmd.AddValue("periph", "Number of peripheral nodes", node_periph);
         cmd.AddValue("head", "Number of head nodes", node_head);
         cmd.AddValue("ConPercent", "Consumer percentage", con_per);
-        cmd.AddValue("ProPercent", "Producer percentage", pro_per);
+        cmd.AddValue("ProPercent", "Producer percentage", pro_per); //Not implemented
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.AddValue("cache", "Enable caching.", cache);
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
-        cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul);
+        cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
         cmd.Parse(argc, argv);
 
@@ -430,16 +430,18 @@ namespace ns3 {
         //PCAP
         AsciiTraceHelper ascii;
         //lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
-        csma.EnablePcapAll(std::string("traces/csma"), true);
 
         NS_LOG_INFO("Run Simulation.");
 
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
-        if (pcaptracing)
+        if (pcaptracing) {
+            csma.EnablePcapAll(std::string("traces/csma"), true);
             for (int jdx = 0; jdx < node_head; jdx++) {
                 lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
             }
+        }
+
 
         Simulator::Stop(Seconds(simtime));
         Simulator::Run();
