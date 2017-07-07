@@ -78,14 +78,22 @@ namespace ns3 {
 
 
     void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
-            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness) {
-        ndn::StackHelper ndnHelper;
+            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize) {
+
+        //Variables declaration
         std::string prefix = "/SensorData";
         double interval_sel;
+        ndn::StackHelper ndnHelper;
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
+        Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
+        ApplicationContainer apps;
+
+        //Set default route / in FIBs
         ndnHelper.SetDefaultRoutes(true);
+
+        //Scenario specific functions
         if (!cache) {
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
         }
@@ -93,36 +101,37 @@ namespace ns3 {
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru");
         }
 
-        Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
-
-        ApplicationContainer apps;
-
+        // Install NDN stack on iot endnodes
         for (int jdx = 0; jdx < node_head; jdx++) {
             ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
         }
-        //ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.
+
+        //Install NDN stack on backhaul nodes
+        if (ipbackhaul) {
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.  
+        }
         ndnHelper.Install(backhaul);
+
+        //Install strategy and routing objects on all nodes.
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndnGlobalRoutingHelper.InstallAll();
-        // Consumer will request /prefix/0, /prefix/1, ...
+
+        //Consumer application
         consumerHelper.SetPrefix(prefix);
         consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
 
-
         for (int jdx = 0; jdx < num_Con; jdx++) {
-            interval_sel = Rinterval->GetValue((double) (0.01), (double) (1));
+            interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
             apps = consumerHelper.Install(SelectRandomLeafNode(bth));
             apps.Start(Seconds(120.0 + interval_sel));
             apps.Stop(Seconds(simtime - 5));
         }
 
-        // Producer
-        // Producer will reply to all requests starting with /prefix
-
-        //Create vector with content numbers.
+        // Producer application
         std::vector<int> content_chunks(totnumcontents);
         std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
+        shuffle_array(content_chunks);
         shuffle_array(content_chunks);
 
         for (int jdx = 0; jdx < totnumcontents; jdx++) {
@@ -130,15 +139,14 @@ namespace ns3 {
             int cur_node = jdx % ((int) endnodes.GetN());
             cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
             producerHelper.SetPrefix(cur_prefix);
-            producerHelper.SetAttribute("PayloadSize", StringValue("10"));
+            producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
             producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
-            producerHelper.Install(endnodes.Get(cur_node));
-            ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node));
+            producerHelper.Install(endnodes.Get(cur_node)); // All producers have at least one data packet.
+            ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node)); //Install routing entry for every node in FIB
         }
-        ndnGlobalRoutingHelper.AddOrigin(prefix, iot[1].Get(1)); //BUG?
+
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
-        //ndn::FibHelper::AddRoute(br.Get(0),"/prefix", 256, 3);
         std::cout << "Done, now starting simulator..." << std::endl;
     }
 
@@ -269,6 +277,8 @@ namespace ns3 {
         bool pcaptracing = true;
         bool cache = true;
         double freshness = 0;
+        bool ipbackhaul = false;
+        int payloadsize = 10;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose);
@@ -284,6 +294,8 @@ namespace ns3 {
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.AddValue("cache", "Enable caching.", cache);
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
+        cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul);
+        cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -380,7 +392,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness, ipbackhaul, payloadsize);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
