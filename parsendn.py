@@ -21,20 +21,31 @@
 #  MA 02110-1301, USA.
 #
 #
-import numpy
+import numpy as np
 import pylab
 import sys
 import os
+from matplotlib import rcParams
 
-time, node, appid, seq, delay, delayu, rtx, hops = numpy.loadtxt(sys.argv[1], skiprows=1,
-                                                                 usecols=(0, 1, 2, 3, 5, 6, 7, 8),
-                                                                 unpack=True)
+# rcParams['font.family'] = 'sans-serif'
+# rcParams['font.sans-serif'] = ['Bitstream Vera Sans']
+# rcParams['font.serif'] = ['Bitstream Vera Sans']
+# rcParams["font.size"] = "6"
 
 delay_filtered = []
 hops_filtered = []
 time_filtered = []
+cumsum = [0]
+moving_aves = []
+time_moving = []
+N = 150
 idx = 0
 zero_entries = 0
+
+time, node, appid, seq, delay, delayu, rtx, hops = np.loadtxt(sys.argv[1], skiprows=1,
+                                                                 usecols=(0, 1, 2, 3, 5, 6, 7, 8),
+                                                                 unpack=True)
+
 for delay_i, hop_i, time_i in zip(delay, hops, time):
     idx += 1
     if delay_i == 0:
@@ -43,6 +54,15 @@ for delay_i, hop_i, time_i in zip(delay, hops, time):
         delay_filtered.append(delay_i)
         hops_filtered.append(hop_i)
         time_filtered.append(time_i)
+
+for i, x in enumerate(delay_filtered, 1):
+    cumsum.append(cumsum[i - 1] + x)
+    if i >= N:
+        moving_ave = (cumsum[i] - cumsum[i - N]) / N
+        # can do stuff with moving_ave here
+        moving_aves.append(moving_ave)
+
+time_moving = np.linspace(np.amin(time_filtered), np.amax(time_filtered), num=len(moving_aves))
 
 print "Found:", zero_entries, "zero delay entries. From a total of", idx, "received packets. So", zero_entries * 100 / idx, "% of the total entries is 0."
 
@@ -54,7 +74,7 @@ pylab.ylabel("Number of packets")
 pylab.grid(True)
 
 pylab.subplot(222)
-pylab.plot(time_filtered, delay_filtered, 'go')
+pylab.plot(time_moving, moving_aves)
 pylab.xlabel("Simulation time (s)")
 pylab.ylabel("Delay (s)")
 pylab.grid(True)
