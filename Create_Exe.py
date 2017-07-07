@@ -30,5 +30,5 @@ subprocess.call(["git", "pull"])
 print "Compiling"
 subprocess.call("./waf")
 print "Building executable"
-subprocess.call(["./ErmineLightTrial.x86_64", "build/scratch/wsn-iot-v1", "--output", "static_exe"])
+subprocess.call(["./ErmineLightTrial.x86_64", "build/scratch/wsn-iot-v1", "--output", "static_exe.run"])
 print "Done!"
