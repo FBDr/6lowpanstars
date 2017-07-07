@@ -319,7 +319,7 @@ namespace ns3 {
 
         //Brite
         //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
-        BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/TD_ASBarabasi_RTWaxman.conf"));
+        BriteTopologyHelper bth(std::string("./TD_ASBarabasi_RTWaxman.conf"));
         bth.AssignStreams(3);
         backhaul = bth.BuildBriteTopology2();
 
