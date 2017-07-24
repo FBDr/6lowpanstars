@@ -184,7 +184,7 @@ namespace ns3
         internetv6.SetRoutingHelper(listRH);
         internetv6.Install(br);
         internetv6.Install(backhaul);
-        Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("Routing table.txt", ios_base::trunc);
+        // Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("Routing table.txt", ios_base::trunc);
         //ripNgRouting.PrintRoutingTableAllEvery(Seconds(40.0), routingStream);
 
         //Assign addresses for backhaul.
@@ -211,14 +211,12 @@ namespace ns3
             //Set forwarding rules.
             i_6lowpan[jdx].SetDefaultRouteInAllNodes(node_periph);
             i_6lowpan[jdx].SetForwarding(node_periph, true);
-            //i_csma[jdx].SetDefaultRouteInAllNodes(1);
-            //i_csma[jdx].SetDefaultRouteInAllNodes(0);
             i_csma[jdx].SetForwarding(0, true);
             i_csma[jdx].SetForwarding(1, true);
 
         }
 
-        //Create IPv6Addressbucket containing all IoT node domains.
+        //Create IPv6AddrResBucket.
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
@@ -232,15 +230,16 @@ namespace ns3
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth) {
 
-
-        uint32_t packetSize = 1024;
-        uint32_t maxPacketCount = 20000;
+        //This function installs the specific IP applications. 
+        
+        uint32_t packetSize = 1024;         //TODO
+        uint32_t maxPacketCount = 20000;    //TODO
         uint16_t port = 9;
         int cur_con = 0;
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
-        CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
+        CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port); //TODO
         CoapServerHelper server(port);
 
         //Server
@@ -262,8 +261,7 @@ namespace ns3
         for (int jdx = 0; jdx < num_Con; jdx++) {
             cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
             NS_LOG_INFO("Selected: " << cur_con << " as consumer. ");
-            client.SetAttribute("Interval", TimeValue(Seconds(Rinterval->GetValue((double) (0.01), (double) (1)))));
-
+            client.SetAttribute("Interval", TimeValue(Seconds(Rinterval->GetValue((double) (0.0166), (double) (5))))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             apps = client.Install(SelectRandomLeafNode(briteth));
             client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
             apps.Start(Seconds(120.0));
