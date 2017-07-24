@@ -239,7 +239,7 @@ namespace ns3
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
-        CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port); //TODO
+        CoapClientHelper client(port);
         CoapServerHelper server(port);
 
         //Server
@@ -260,7 +260,7 @@ namespace ns3
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
             cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
-            NS_LOG_INFO("Selected: " << cur_con << " as consumer. ");
+            NS_LOG_INFO("Selected: " << cur_con << " as Coap consumer. ");
             interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5));
             client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             apps = client.Install(SelectRandomLeafNode(briteth));

@@ -106,7 +106,7 @@ void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
     uint16_t port = 9;
     
     Time interPacketInterval = Seconds(0.05);
-    CoapClientHelper client(i_6lowpan[1].GetAddress(4, 1), port);
+    CoapClientHelper client(port);
     CoapServerHelper server(port);
     
     //Server

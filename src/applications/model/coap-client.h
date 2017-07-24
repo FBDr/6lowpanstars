@@ -57,24 +57,24 @@ namespace ns3 {
 
         virtual ~CoapClient();
 
-        /**
-         * \brief set the remote address and port
-         * \param ip remote IPv4 address
-         * \param port remote port
-         */
-        void SetRemote(Ipv4Address ip, uint16_t port);
-        /**
-         * \brief set the remote address and port
-         * \param ip remote IPv6 address
-         * \param port remote port
-         */
-        void SetRemote(Ipv6Address ip, uint16_t port);
-        /**
-         * \brief set the remote address and port
-         * \param ip remote IP address
-         * \param port remote port
-         */
-        void SetRemote(Address ip, uint16_t port);
+//        /**
+//         * \brief set the remote address and port
+//         * \param ip remote IPv4 address
+//         * \param port remote port
+//         */
+//        void SetRemote(Ipv4Address ip, uint16_t port);
+//        /**
+//         * \brief set the remote address and port
+//         * \param ip remote IPv6 address
+//         * \param port remote port
+//         */
+//        void SetRemote(Ipv6Address ip, uint16_t port);
+//        /**
+//         * \brief set the remote address and port
+//         * \param ip remote IP address
+//         * \param port remote port
+//         */
+//        void SetRemote(Address ip, uint16_t port);
 
         /**
          * Set the data size of the packet (the number of bytes that are sent as data

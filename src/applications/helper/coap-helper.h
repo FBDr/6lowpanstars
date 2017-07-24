@@ -119,26 +119,10 @@ namespace ns3 {
          * Create CoapClientHelper which will make life easier for people trying
          * to set up simulations with echos.
          *
-         * \param ip The IP address of the remote udp echo server
+         * 
          * \param port The port number of the remote udp echo server
          */
-        CoapClientHelper(Address ip, uint16_t port);
-        /**
-         * Create CoapClientHelper which will make life easier for people trying
-         * to set up simulations with echos.
-         *
-         * \param ip The IPv4 address of the remote udp echo server
-         * \param port The port number of the remote udp echo server
-         */
-        CoapClientHelper(Ipv4Address ip, uint16_t port);
-        /**
-         * Create CoapClientHelper which will make life easier for people trying
-         * to set up simulations with echos.
-         *
-         * \param ip The IPv6 address of the remote udp echo server
-         * \param port The port number of the remote udp echo server
-         */
-        CoapClientHelper(Ipv6Address ip, uint16_t port);
+        CoapClientHelper(uint16_t port);
 
         /**
          * Record an attribute to be set in each Application after it is is created.

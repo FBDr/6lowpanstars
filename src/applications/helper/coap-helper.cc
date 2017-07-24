@@ -71,21 +71,8 @@ namespace ns3 {
         return app;
     }
 
-    CoapClientHelper::CoapClientHelper(Address address, uint16_t port) {
+    CoapClientHelper::CoapClientHelper(uint16_t port) {
         m_factory.SetTypeId(CoapClient::GetTypeId());
-        SetAttribute("RemoteAddress", AddressValue(address));
-        SetAttribute("RemotePort", UintegerValue(port));
-    }
-
-    CoapClientHelper::CoapClientHelper(Ipv4Address address, uint16_t port) {
-        m_factory.SetTypeId(CoapClient::GetTypeId());
-        SetAttribute("RemoteAddress", AddressValue(Address(address)));
-        SetAttribute("RemotePort", UintegerValue(port));
-    }
-
-    CoapClientHelper::CoapClientHelper(Ipv6Address address, uint16_t port) {
-        m_factory.SetTypeId(CoapClient::GetTypeId());
-        SetAttribute("RemoteAddress", AddressValue(Address(address)));
         SetAttribute("RemotePort", UintegerValue(port));
     }
 

@@ -53,11 +53,6 @@ namespace ns3
                 TimeValue(Seconds(1.0)),
                 MakeTimeAccessor(&CoapClient::m_interval),
                 MakeTimeChecker())
-                .AddAttribute("RemoteAddress",
-                "The destination Address of the outbound packets",
-                AddressValue(),
-                MakeAddressAccessor(&CoapClient::m_peerAddress),
-                MakeAddressChecker())
                 .AddAttribute("RemotePort",
                 "The destination port of the outbound packets",
                 UintegerValue(0),
@@ -110,27 +105,6 @@ namespace ns3
         delete [] m_data;
         m_data = 0;
         m_dataSize = 0;
-    }
-
-    void
-    CoapClient::SetRemote(Address ip, uint16_t port) {
-        NS_LOG_FUNCTION(this << ip << port);
-        m_peerAddress = ip;
-        m_peerPort = port;
-    }
-
-    void
-    CoapClient::SetRemote(Ipv4Address ip, uint16_t port) {
-        NS_LOG_FUNCTION(this << ip << port);
-        m_peerAddress = Address(ip);
-        m_peerPort = port;
-    }
-
-    void
-    CoapClient::SetRemote(Ipv6Address ip, uint16_t port) {
-        NS_LOG_FUNCTION(this << ip << port);
-        m_peerAddress = Address(ip);
-        m_peerPort = port;
     }
 
     void

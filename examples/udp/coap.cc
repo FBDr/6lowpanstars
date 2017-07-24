@@ -114,7 +114,7 @@ main (int argc, char *argv[])
   uint32_t packetSize = 1024;
   uint32_t maxPacketCount = 2;
   Time interPacketInterval = Seconds (1.);
-  CoapClientHelper client (serverAddress, port);
+  CoapClientHelper client (port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   client.SetAttribute ("PacketSize", UintegerValue (packetSize));
