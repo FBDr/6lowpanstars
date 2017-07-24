@@ -20,10 +20,14 @@
 #include <string>
 #include <vector>
 
-namespace ns3 {
-    NS_LOG_COMPONENT_DEFINE("wsn-iot-icn");
+namespace ns3
+{
+    NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
-    Ptr< Node > SelectRandomLeafNode(BriteTopologyHelper & briteth) {
+    Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
+
+        //Select a random leafnode at the edges of the generated brite network. 
+        //This function is used for assigning consumer roles to clients.
 
         uint32_t totAS = briteth.GetNAs();
         NS_LOG_INFO("The total number of AS is: " << totAS);
@@ -38,11 +42,14 @@ namespace ns3 {
         leafnum = briteth.GetNLeafNodesForAs(selAS);
         selLN = round(Rleaf->GetValue((double) (0), (double) (leafnum - 1)));
         NS_LOG_INFO("Selected leafnode num: " << selLN);
+
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
 
-    void
-    shuffle_array(std::vector<int>& arrayf) {
+    void shuffle_array(std::vector<int>& arrayf) {
+
+        //Shuffles std::vector array a random number of times.
+
         Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
         shuffles->SetAttribute("Min", DoubleValue(2));
         shuffles->SetAttribute("Max", DoubleValue(20));
@@ -55,13 +62,16 @@ namespace ns3 {
 
     std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
 
+        // Function to generate an address resolution vector, which maps content number (array iterator) to a specific producer.
+        // (!) This function assumes that the total number of contents is larger than the total number of nodes.
+
         std::vector<Ipv6Address> returnBucket;
         Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
         shuffles->SetAttribute("Min", DoubleValue(0));
         shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
 
         for (int itx = 0; itx < numContents; itx++) {
-            returnBucket.push_back(arrayf[shuffles->GetValue()]);
+            returnBucket.push_back(arrayf[round(shuffles->GetValue())]);
             std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
         }
 
@@ -76,9 +86,10 @@ namespace ns3 {
 
 
 
-
     void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize) {
+
+        //This function installs NDN stack on nodes if ndn is selected as networking protocol.
 
         //Variables declaration
         std::string prefix = "/SensorData";
@@ -103,12 +114,12 @@ namespace ns3 {
 
         // Install NDN stack on iot endnodes
         for (int jdx = 0; jdx < node_head; jdx++) {
-            ndnHelper.Install(iot[jdx]); //We want caching in the IoT domains.
+            ndnHelper.Install(iot[jdx]);
         }
 
         //Install NDN stack on backhaul nodes
         if (ipbackhaul) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in the backhaul network.  
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in an IP based backhaul network.  
         }
         ndnHelper.Install(backhaul);
 
@@ -123,7 +134,7 @@ namespace ns3 {
         for (int jdx = 0; jdx < num_Con; jdx++) {
             interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-            apps = consumerHelper.Install(SelectRandomLeafNode(bth));
+            apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
             apps.Start(Seconds(120.0 + interval_sel));
             apps.Stop(Seconds(simtime - 5));
         }
@@ -135,6 +146,7 @@ namespace ns3 {
         shuffle_array(content_chunks);
 
         for (int jdx = 0; jdx < totnumcontents; jdx++) {
+            //This function assumes the total number of contents to be higher than the total number of producers.
             std::string cur_prefix;
             int cur_node = jdx % ((int) endnodes.GetN());
             cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
