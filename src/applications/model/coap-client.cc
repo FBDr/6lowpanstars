@@ -30,8 +30,7 @@
 #include "coap-client.h"
 
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -86,10 +85,10 @@ namespace ns3
     }
 
     CoapClient::CoapClient()
-            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-            , m_q(0.7)
-            , m_s(0.7)
-            , m_seqRng(CreateObject<UniformRandomVariable>()) {
+    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+    , m_q(0.7)
+    , m_s(0.7)
+    , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
         m_socket = 0;
@@ -197,13 +196,7 @@ namespace ns3
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
-            if (Ipv4Address::IsMatchingType(m_peerAddress) == true) {
-                m_socket->Bind();
-                //m_socket->Connect(InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort)); SendTo ipv Send, connect onnodig.
-            } else if (Ipv6Address::IsMatchingType(m_peerAddress) == true) {
-                m_socket->Bind6();
-                //m_socket->Connect(Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)); SendTo ipv Send, connect onnodig.
-            }
+            m_socket->Bind6();
         }
 
         m_socket->SetRecvCallback(MakeCallback(&CoapClient::HandleRead, this));
@@ -328,7 +321,7 @@ namespace ns3
         NS_LOG_FUNCTION(this);
 
         NS_ASSERT(m_sendEvent.IsExpired());
-        uint32_t nxtsq = GetNextSeq()-1; //Next sequence spans from [1, N];
+        uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
         SetFill("GET/" + std::to_string(nxtsq));
 
         Ptr<Packet> p;
@@ -356,22 +349,15 @@ namespace ns3
         // call to the trace sinks before the packet is actually sent,
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
-        //m_socket->Send(p); Vervangen door SendTo
 
-        //std::cout << Ipv6Address::ConvertFrom(m_peerAddress) << " and " << m_IPv6Bucket.size() << std::endl;
-        //std::cout<< Ipv6Address::ConvertFrom(m_peerAddress) <<"and" <<std::endl;
-        //if (m_socket->SendTo(p, 0, Inet6SocketAddress(Ipv6Address::ConvertFrom(m_peerAddress), m_peerPort)) == -1) {
         if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
-            NS_LOG_INFO( "SendTo ERROR! Trying to send to "<< m_IPv6Bucket[nxtsq]);
+            NS_LOG_INFO("SendTo ERROR! Trying to send to " << m_IPv6Bucket[nxtsq]);
         };
 
 
         ++m_sent;
 
-        if (Ipv4Address::IsMatchingType(m_peerAddress)) {
-            NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
-                    Ipv4Address::ConvertFrom(m_peerAddress) << " port " << m_peerPort);
-        } else if (Ipv6Address::IsMatchingType(m_peerAddress)) {
+        if (Ipv6Address::IsMatchingType(m_IPv6Bucket[nxtsq])) {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
                     m_IPv6Bucket[nxtsq] << " port " << m_peerPort);
         }
