@@ -167,6 +167,9 @@ namespace ns3
             Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
             std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
             NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
+
+        //This function installs 6LowPAN stack on nodes if IP is selected as networking protocol.
+
         int subn = 0;
         RipNgHelper ripNgRouting;
         Ipv6ListRoutingHelper listRH;
@@ -315,12 +318,15 @@ namespace ns3
         RngSeedManager::SetRun(rngfeed);
 
         // Creating NodeContainers
-        // - iot[]: 		NodeContainer with WSN nodes.
-        // - br: 	  		NodeContainer with border gateway routers.
-        // - csmam[]:               NodeContainer with specific border router and master node.
+        // - iot[]:                 NodeContainer with WSN nodes + border gateway nodes.
+        // - br:                    NodeContainer with border gateway routers.
+        // - border_backhaul[]:     NodeContainer with specific connected border router and master node pair.
         // - backhaul:              NodeContainer with backhaul network nodes.
+        // - routers:               NodeContainer with all nodes doing routing = backhaul + br.
+        // - endnodes:              NodeContainer with all IoT sensor nodes in all bubbles.
+        // - all                    NodeContainer with all nodes.
 
-        NS_LOG_INFO("Creating IoT bubbles.");
+        NS_LOG_INFO("Creating NodeContainers.");
         NodeContainer iot[node_head];
         NodeContainer br;
         NodeContainer routers;
@@ -344,7 +350,7 @@ namespace ns3
         all.Add(endnodes);
         all.Add(backhaul);
 
-        // Create mobility objects for master and (border) routers.
+        // Create mobility objects for IoT sensor and (border) routers.
         MobilityHelper mobility;
 
         // Create NetDeviceContainers for LrWpan and CSMA (LAN).
@@ -359,7 +365,7 @@ namespace ns3
             border_backhaul[jdx].Add(SelectRandomLeafNode(bth));
             //Add BR and WSN nodes to IoT[] domain
             iot[jdx].Create(node_periph);
-            endnodes.Add(iot[jdx]);
+            endnodes.Add(iot[jdx]); // Add iot[] container to endnodes container before adding br.
             iot[jdx].Add(br.Get(jdx));
 
             mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
@@ -408,9 +414,12 @@ namespace ns3
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
+        
         /*
          IP
          */
+        
+        
         NetDeviceContainer SixLowpanDevice[node_head];
         Ipv6InterfaceContainer i_6lowpan[node_head];
         Ipv6InterfaceContainer i_csma[node_head];
