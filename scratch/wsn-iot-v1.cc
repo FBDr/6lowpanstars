@@ -231,11 +231,11 @@ namespace ns3
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize) {
 
         //This function installs the specific IP applications. 
-        
-        uint32_t packetSize = 1024;         //TODO
-        uint32_t maxPacketCount = 20000;    //TODO
+
+        uint32_t maxPacketCount = 99999999; //Optional
         uint16_t port = 9;
         int cur_con = 0;
+        double interval_sel;
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
@@ -257,15 +257,15 @@ namespace ns3
 
         //Client
         client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
-        client.SetAttribute("PacketSize", UintegerValue(packetSize));
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
             cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
             NS_LOG_INFO("Selected: " << cur_con << " as consumer. ");
-            client.SetAttribute("Interval", TimeValue(Seconds(Rinterval->GetValue((double) (0.0166), (double) (5))))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+            interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5));
+            client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             apps = client.Install(SelectRandomLeafNode(briteth));
             client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-            apps.Start(Seconds(120.0));
+            apps.Start(Seconds(120.0 + interval_sel));
             apps.Stop(Seconds(simtime - 5));
         }
 
