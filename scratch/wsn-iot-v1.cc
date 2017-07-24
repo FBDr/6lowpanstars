@@ -414,18 +414,18 @@ namespace ns3
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
-        
+
         /*
          IP
          */
-        
-        
+
+
         NetDeviceContainer SixLowpanDevice[node_head];
         Ipv6InterfaceContainer i_6lowpan[node_head];
         Ipv6InterfaceContainer i_csma[node_head];
         Ipv6InterfaceContainer i_backhaul;
-        std::vector<Ipv6Address> IPv6Bucket;
-        std::vector<Ipv6Address> AddrResBucket;
+        std::vector<Ipv6Address> IPv6Bucket; //Vector containing all producer IPv6 addresses.
+        std::vector<Ipv6Address> AddrResBucket; //Content address lookup vector.
         ApplicationContainer apps;
 
         if (!ndn) {
@@ -438,24 +438,21 @@ namespace ns3
 
 
 
-        /*Tracing*/
-        //Flowmonitor
+        /*
+         Tracing
+         */
         Ptr<FlowMonitor> flowMonitor;
         FlowMonitorHelper flowHelper;
+        AsciiTraceHelper ascii;
 
         if (!ndn) {
             flowMonitor = flowHelper.InstallAll();
         }
 
 
-        //PCAP
-        AsciiTraceHelper ascii;
-        //lrWpanHelper.EnablePcapAll(std::string("./traces/6lowpan/wsn"), true);
-
-        NS_LOG_INFO("Run Simulation.");
-
         //AnimationInterface anim("AWSNanimation2.xml");
         //anim.EnablePacketMetadata(true);
+
         if (pcaptracing) {
             csma.EnablePcapAll(std::string("traces/csma"), true);
             for (int jdx = 0; jdx < node_head; jdx++) {
@@ -464,6 +461,7 @@ namespace ns3
         }
 
 
+        NS_LOG_INFO("Run Simulation.");
         Simulator::Stop(Seconds(simtime));
         Simulator::Run();
         if (!ndn) {
