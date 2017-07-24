@@ -360,7 +360,7 @@ namespace ns3
         Ptr<Packet> p;
         if (m_dataSize) {
             //
-            // If m_dataSize is non-zerol, we have a data buffer of the same size that we
+            // If m_dataSize is non-zero, we have a data buffer of the same size that we
             // are expected to copy and send.  This state of affairs is created if one of
             // the Fill functions is called.  In this case, m_size must have been set
             // to agree with m_dataSize

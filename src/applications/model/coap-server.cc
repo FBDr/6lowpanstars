@@ -97,6 +97,9 @@ namespace ns3 {
 
     void
     CoapServer::AddSeq() {
+
+        //This function reads in the AddrResBucket and searches for its own producer IP. Corresponding sequences are copied into m_regSeqSet-set.
+
         for (unsigned int idx = 0; idx < m_IPv6Bucket.size(); idx++) {
             //NS_LOG_INFO("AddSeq: " << idx << " of " << m_ownip);
             //NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
@@ -109,11 +112,14 @@ namespace ns3 {
 
     uint32_t
     CoapServer::FilterReqNum(void) {
+
+        // This function filters the request number from the received payload.
+
         NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
         std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), sizeof (m_Rdata));
-        std::size_t pos = Rdatastr.find("/"); // position of "live" in str
-        std::string str3 = Rdatastr.substr(pos + 1); // get from "live" to the end
-        //std::cout << str3 << std::endl;
+        std::size_t pos = Rdatastr.find("/"); // Find position of "/" leading the sequence number.
+        std::string str3 = Rdatastr.substr(pos + 1); // filter this sequence number to the end.
+
         return std::stoi(str3);
     }
 
@@ -127,11 +133,13 @@ namespace ns3 {
 
     void
     CoapServer::CreateResponsePkt(std::string fill, uint32_t length) {
+
+        //When a Coap request is correctly received, this function will generate a response packet.
         NS_LOG_FUNCTION(this << fill);
         NS_ASSERT_MSG(length >= fill.size(), "Length of data packet smaller than string size.");
         uint32_t dataSize = length;
         m_data = new uint8_t [dataSize];
-            m_dataSize = dataSize;
+        m_dataSize = dataSize;
         memcpy(m_data, fill.c_str(), dataSize);
     }
 
@@ -203,7 +211,6 @@ namespace ns3 {
         Ptr<Packet> response_packet;
 
         Address from;
-        //Move this to startapplication
 
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
 
@@ -227,7 +234,7 @@ namespace ns3 {
             uint32_t received_Req = FilterReqNum();
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
-                CreateResponsePkt("POST", 100);
+                CreateResponsePkt("POST", m_packet_payload_size);
 
             } else {
                 NS_LOG_ERROR("Data not available");
