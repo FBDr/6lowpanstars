@@ -106,6 +106,9 @@ LrWpanHelper::EnableLogComponents (void)
   LogComponentEnable ("LrWpanErrorModel", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanInterferenceHelper", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("LrWpanNullMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("LrWpanContikiMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("LrWpanRadioEnergyModel", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanNetDevice", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanPhy", LOG_LEVEL_ALL);
   LogComponentEnable ("LrWpanSpectrumSignalParameters", LOG_LEVEL_ALL);
@@ -159,8 +162,6 @@ LrWpanHelper::LrWpanMacStatePrinter (LrWpanMacState e)
       return std::string ("CHANNEL_ACCESS_FAILURE");
     case CHANNEL_IDLE:
       return std::string ("CHANNEL_IDLE");
-    case SET_PHY_TX_ON:
-      return std::string ("SET_PHY_TX_ON");
     default:
       return std::string ("INVALID");
     }
@@ -367,13 +368,13 @@ LrWpanHelper::EnableAsciiInternal (
       // The Mac and Phy objects have the trace sources for these
       //
 
-      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<LrWpanNetDevice> (device, "MacRx", theStream);
+      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<LrWpanMac> (device->GetMac (), "MacRx", theStream);
 
       device->GetMac ()->TraceConnectWithoutContext ("MacTx", MakeBoundCallback (&AsciiLrWpanMacTransmitSinkWithoutContext, theStream));
 
-      asciiTraceHelper.HookDefaultEnqueueSinkWithoutContext<LrWpanNetDevice> (device, "MacTxEnqueue", theStream);
-      asciiTraceHelper.HookDefaultDequeueSinkWithoutContext<LrWpanNetDevice> (device, "MacTxDequeue", theStream);
-      asciiTraceHelper.HookDefaultDropSinkWithoutContext<LrWpanNetDevice> (device, "MacTxDrop", theStream);
+      asciiTraceHelper.HookDefaultEnqueueSinkWithoutContext<LrWpanMac> (device->GetMac (), "MacTxEnqueue", theStream);
+      asciiTraceHelper.HookDefaultDequeueSinkWithoutContext<LrWpanMac> (device->GetMac (), "MacTxDequeue", theStream);
+      asciiTraceHelper.HookDefaultDropSinkWithoutContext<LrWpanMac> (device->GetMac (), "MacTxDrop", theStream);
 
       return;
     }

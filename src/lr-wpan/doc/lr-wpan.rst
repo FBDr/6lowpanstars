@@ -1,11 +1,19 @@
-PageBreak
+.. include:: replace.txt
+.. highlight:: cpp
+
+.. heading hierarchy:
+   ------------- Chapter
+   ************* Section (#.#)
+   ============= Subsection (#.#.#)
+   ############# Paragraph (no number)
+
 
 Low-Rate Wireless Personal Area Network (LR-WPAN)
 -------------------------------------------------
 
 This chapter describes the implementation of ns-3 models for the
 low-rate, wireless personal area network (LR-WPAN) as specified by
-IEEE standard 802.15.4 (2006).
+IEEE standard 802.15.4 (2006) (see [IEEE-802.15.4-2006]_).
 
 Model Description
 *****************
@@ -29,7 +37,7 @@ show the scope of the model.
 The Spectrum NetDevice from Nicola Baldo is the basis for the implementation.
 
 The implementation also plans to borrow from the ns-2 models developed by 
-Zheng and Lee in the future.
+Zheng and Lee in the future (see [Zheng]_).
 
 APIs
 ####
@@ -89,20 +97,39 @@ This maps to ns-3 classes and methods such as:::
 MAC
 ###
 
-The MAC at present implements the unslotted CSMA/CA variant, without beaconing.
-Currently there is no support for coordinators and the relavant APIs.
+The 802.15.4 standard defines a number of features, but some are left to
+the implementation. In particular, the choice of when to shut down the radio 
+(sleep periods) and how to efficiently wakeup and coordinate the transmissions is 
+not clearly defined. As a consequence, it is possible to have multiple MAC protocols
+that are compliant with the 802.15.4 specifications and, up to some extent, also
+compatible with each other.
 
-The implemented MAC is similar to Contiki's NullMAC, i.e., a MAC without sleep
+The |ns3| MAC implementation consists of a base LrWpanMac class and two MAC variants:
+
+* ``LrWpanNullMac``:  A simple MAC protocol.
+* ``LrWpanContikiMac``:  The MAC protocol implemented in ContikiOS.
+
+Further MAC models can be developed by subclassing the LrWpanMac class, 
+which defines all the primitives and messages between the layers as 
+defined by the 802.15.4 standard. 
+
+The LrWpanNullMac is similar to Contiki's NullMAC, i.e., a MAC without sleep
 features. The radio is assumed to be always active (receiving or transmitting),
-of completely shut down. Frame reception is not disabled while performing the
+or completely shut down. Frame reception is not disabled while performing the
 CCA.
+
+The LrWpanContikiMac is based on the ContikiMAC radio duty-cycling protocol.
+The implementaiton is based on [ContikiMAC]_ 
+
+Note that both MACs are currently only supporting the unslotted CSMA/CA variant
+without beaconing. Currently there is no support for coordinators and the relavant APIs.
 
 The main API supported is the data transfer API
 (McpsDataRequest/Indication/Confirm).  CSMA/CA according to Stc 802.15.4-2006,
 section 7.5.1.4 is supported. Frame reception and rejection according to
 Std 802.15.4-2006, section 7.5.6.2 is supported, including acknowledgements.
 Only short addressing completely implemented. Various trace sources are
-supported, and trace sources can be hooked to sinks.
+supported, and trace sources can be hooked to sinks. 
 
 PHY
 ###
@@ -146,12 +173,63 @@ Although it is expected that other technology profiles (such as
 LrWpanNetDevice is provided, which encapsulates the common operations
 of creating a generic LrWpan device and hooking things together.
 
+LrWpan Radio Energy Model
+#########################
+
+The LrWpan Radio Energy Model models the energy consumption of a 
+LrWpan net device. 
+
+The node's energy consumption is modeled as a function of the 
+three main states of the radio transceiver:
+
+* Transceiver disabled (TRX_OFF).
+* Transmitter enabled (TX_ON).
+* Receiver enabled (RX_ON).
+
+Each state is associated with a value (in Ampere) of the current draw.
+For most radios, there is no difference between *_ON and BUSY_* states 
+with respect to the radio transceiver circuitry. 
+As a consequence, the energy consumed in these states is approximately 
+the same.
+
+The amount of energy consumed by the radio depends on the current draw 
+in the specific state and by the time spent in that state. 
+The current draw for various states can be found in the datasheets of 
+radio transceivers. For example, for a Texas Instruments CC2420 (see [CC2420]_):
+
+* TRX_OFF (sleep): 426 uA
+* TX_ON (transmit): 17.4 mA @ 0 dBm
+* RX_ON (recv/idle): 18.8 mA
+
+The EnergySource is updated periodically or after each transition, using 
+the formula stateDuration * stateCurrent * supplyVoltage
+
+The transient energy when switching from one mode to another also impacts 
+the total power consumption. Hence, it is important to precisely characterize 
+the transition time between transceiver states. 
+In the Three States Model described, six different transitions are possible:
+
+* TRX_OFF -> TX_ON and viceversa.
+* TRX_OFF -> RX_ON and viceversa.
+* TX_ON -> RX_ON and viceversa.
+
+The transition times have been modeled according to the values given 
+in transceiver datasheets.
+The state transition energy is evaluated by multiplying the transition time 
+by the power in the arrival state.
+
+A LrWpan Radio Energy Model PHY Listener is registered with the LrWpan PHY 
+in order to be notified of every LrWpan PHY state transition. 
+At every transition, the energy consumed in the previous state is computed 
+and the energy source is notified in order to update its remaining energy.
+
+
 Scope and Limitations
 =====================
 
 Future versions of this document will contain a PICS proforma similar to
 Appendix D of IEEE 802.15.4-2006.  The current emphasis is on the 
-unslotted mode of 802.15.4 operation for use in Zigbee, and the scope
+unslotted mode of 802.15.4 operation for use in ZigBee, and the scope
 is limited to enabling a single mode (CSMA/CA) with basic data transfer
 capabilities. Association with PAN coordinators is not yet supported, nor the
 use of extended addressing. Interference is modeled as AWGN but this is
@@ -164,8 +242,10 @@ retries or channel access failure.
 References
 ==========
 
-* Wireless Medium Access Control (MAC) and Physical Layer (PHY) Specifications for Low-Rate Wireless Personal Area Networks (WPANs), IEEE Computer Society, IEEE Std 802.15.4-2006, 8 September 2006.
-* J. Zheng and Myung J. Lee, "A comprehensive performance study of IEEE 802.15.4," Sensor Network Operations, IEEE Press, Wiley Interscience, Chapter 4, pp. 218-237, 2006.
+.. [IEEE-802.15.4-2006] IEEE Standard for Information technology-- Local and metropolitan area networks-- Specific requirements-- Part 15.4: Wireless Medium Access Control (MAC) and Physical Layer (PHY) Specifications for Low Rate Wireless Personal Area Networks (WPANs)," IEEE Std 802.15.4-2006 (Revision of IEEE Std 802.15.4-2003) , vol., no., pp.1,320, Sept. 7 2006, doi: 10.1109/IEEESTD.2006.232110
+.. [Zheng]  J. Zheng and Myung J. Lee, "A comprehensive performance study of IEEE 802.15.4," Sensor Network Operations, IEEE Press, Wiley Interscience, Chapter 4, pp. 218-237, 2006.
+.. [ContikiMAC] A. Dunkels, "The ContikiMAC Radio Duty Cycling Protocol", SICS Technical Report T2011:13, ISSN 1100-3154
+.. [CC2420] CC2420 Datasheet, available at http://www.ti.com/product/cc2420
 
 Usage
 *****

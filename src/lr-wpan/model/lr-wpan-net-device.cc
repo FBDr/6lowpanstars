@@ -73,7 +73,7 @@ LrWpanNetDevice::LrWpanNetDevice ()
   : m_configComplete (false)
 {
   NS_LOG_FUNCTION (this);
-  m_mac = CreateObject<LrWpanMac> ();
+  m_mac = CreateObject<LrWpanNullMac> ();
   m_phy = CreateObject<LrWpanPhy> ();
   m_csmaca = CreateObject<LrWpanCsmaCa> ();
   CompleteConfig ();
@@ -146,7 +146,7 @@ LrWpanNetDevice::CompleteConfig (void)
   m_phy->SetPlmeSetAttributeConfirmCallback (MakeCallback (&LrWpanMac::PlmeSetAttributeConfirm, m_mac));
 
   m_csmaca->SetLrWpanMacStateCallback (MakeCallback (&LrWpanMac::SetLrWpanMacState, m_mac));
-  m_phy->SetPlmeCcaConfirmCallback (MakeCallback (&LrWpanCsmaCa::PlmeCcaConfirm, m_csmaca));
+  m_phy->SetPlmeCcaConfirmCallback (MakeCallback (&LrWpanMac::PlmeCcaConfirm, m_mac));    //Changed, previously: (&LrWpanCsmaCa::PlmeCcaConfirm, m_csmaca)
   m_configComplete = true;
 }
 
@@ -186,7 +186,7 @@ LrWpanNetDevice::SetChannel (Ptr<SpectrumChannel> channel)
 Ptr<LrWpanMac>
 LrWpanNetDevice::GetMac (void) const
 {
-  // NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
   return m_mac;
 }
 
@@ -203,6 +203,7 @@ LrWpanNetDevice::GetCsmaCa (void) const
   NS_LOG_FUNCTION (this);
   return m_csmaca;
 }
+
 void
 LrWpanNetDevice::SetIfIndex (const uint32_t index)
 {
