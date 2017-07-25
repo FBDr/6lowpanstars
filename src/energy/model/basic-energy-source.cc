@@ -230,7 +230,15 @@ BasicEnergySource::CalculateRemainingEnergy (void)
   NS_ASSERT (duration.GetSeconds () >= 0);
   // energy = current * voltage * time
   double energyToDecreaseJ = totalCurrentA * m_supplyVoltageV * duration.GetSeconds ();
-  m_remainingEnergyJ -= energyToDecreaseJ;
+  double remainingEnergyJ = m_remainingEnergyJ - energyToDecreaseJ;
+  if (remainingEnergyJ <= 0)
+    {
+      m_remainingEnergyJ = 0; // energy never goes below 0
+    }
+  else
+    {
+      m_remainingEnergyJ -= energyToDecreaseJ;
+    }
   NS_LOG_DEBUG ("BasicEnergySource:Remaining energy = " << m_remainingEnergyJ);
 }
 
