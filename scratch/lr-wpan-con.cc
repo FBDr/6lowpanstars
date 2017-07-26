@@ -15,8 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author:  Tom Henderson <thomas.r.henderson@boeing.com>
- *  	    Vishwesh Rege <vrege2012@gmail.com>
+ * Author: Vishwesh Rege <vrege2012@gmail.com>
  */
 
 /*
@@ -35,8 +34,6 @@
 #include <ns3/single-model-spectrum-channel.h>
 #include <ns3/constant-position-mobility-model.h>
 #include <ns3/packet.h>
-#include "ns3/lr-wpan-radio-energy-model.h"
-#include "ns3/basic-energy-source.h"
 
 #include <iostream>
 
@@ -59,12 +56,6 @@ static void StateChangeNotification (std::string context, Time now, LrWpanPhyEnu
                        << " to " << LrWpanHelper::LrWpanPhyEnumerationPrinter (newState) << "\n";
 }
 
-static void GetTotalEnergyConsumption (std::string context, Time now, double oldValue, double newValue)
-{
-  std::cout << now.GetSeconds() << context << " TotalEnergyConsumption: " << newValue
-                       << " from " << oldValue << "\n";
-}
-
 int main (int argc, char *argv[])
 {
   bool verbose = false;
@@ -75,26 +66,35 @@ int main (int argc, char *argv[])
 
   cmd.Parse (argc, argv);
 
-  LrWpanHelper lrWpanHelper;
-  if (verbose)
-    {
-      lrWpanHelper.EnableLogComponents ();
-    }
-
-  LogComponentEnable ("BasicEnergySource", LOG_LEVEL_DEBUG);
+  LogComponentEnableAll (LOG_PREFIX_TIME);
+  //LogComponentEnableAll (LOG_PREFIX_FUNC);
+  LogComponentEnable ("LrWpanCsmaCa", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("LrWpanContikiMac", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("LrWpanPhy", LOG_LEVEL_DEBUG);
 
   // Enable calculation of FCS in the trailers. Only necessary when interacting with real devices or wireshark.
   // GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
 
-  // Create 2 nodes, and a NetDevice for each one
+  // Create 3 nodes, and a NetDevice for each one
   Ptr<Node> n0 = CreateObject <Node> ();
   Ptr<Node> n1 = CreateObject <Node> ();
+  Ptr<Node> n2 = CreateObject <Node> ();
 
   Ptr<LrWpanNetDevice> dev0 = CreateObject<LrWpanNetDevice> ();
   Ptr<LrWpanNetDevice> dev1 = CreateObject<LrWpanNetDevice> ();
+  Ptr<LrWpanNetDevice> dev2 = CreateObject<LrWpanNetDevice> ();
+
+  Ptr<LrWpanContikiMac> mac0 = CreateObject<LrWpanContikiMac> ();     //Change Mac
+  Ptr<LrWpanContikiMac> mac1 = CreateObject<LrWpanContikiMac> ();     //Change Mac
+  Ptr<LrWpanContikiMac> mac2 = CreateObject<LrWpanContikiMac> ();     //Change Mac
+
+  dev0->SetMac (mac0);
+  dev1->SetMac (mac1);
+  dev2->SetMac (mac2);
 
   dev0->SetAddress (Mac16Address ("00:01"));
   dev1->SetAddress (Mac16Address ("00:02"));
+  dev2->SetAddress (Mac16Address ("00:03"));
 
   // Each device must be attached to the same channel
   Ptr<SingleModelSpectrumChannel> channel = CreateObject<SingleModelSpectrumChannel> ();
@@ -105,53 +105,35 @@ int main (int argc, char *argv[])
 
   dev0->SetChannel (channel);
   dev1->SetChannel (channel);
+  dev2->SetChannel (channel);
 
   // To complete configuration, a LrWpanNetDevice must be added to a node
   n0->AddDevice (dev0);
   n1->AddDevice (dev1);
-  
-  Ptr<LrWpanRadioEnergyModel> em[2];
-
-  em[0] = CreateObject<LrWpanRadioEnergyModel> ();
-  em[1] = CreateObject<LrWpanRadioEnergyModel> ();
-
-  Ptr<BasicEnergySource> es0 = CreateObject<BasicEnergySource> ();
-  es0->SetSupplyVoltage(3.3);
-  Ptr<BasicEnergySource> es1 = CreateObject<BasicEnergySource> ();
-  es1->SetSupplyVoltage(3.3);
-
-  es0->SetNode (n0);
-  es0->AppendDeviceEnergyModel (em[0]);
-  em[0]->SetEnergySource (es0);
-  em[0]->AttachPhy (dev0->GetPhy());
-
-  es1->SetNode (n1);
-  es1->AppendDeviceEnergyModel (em[1]);
-  em[1]->SetEnergySource (es1);
-  em[1]->AttachPhy (dev1->GetPhy());
-
-  es0->TraceConnect ("RemainingEnergy", std::string ("phy0"), MakeCallback (&GetTotalEnergyConsumption));
-  es1->TraceConnect ("RemainingEnergy", std::string ("phy1"), MakeCallback (&GetTotalEnergyConsumption));
+  n2->AddDevice (dev2);
 
   // Trace state changes in the phy
-  dev0->GetPhy ()->TraceConnect ("TrxState", std::string ("phy0"), MakeCallback (&StateChangeNotification));
-  dev1->GetPhy ()->TraceConnect ("TrxState", std::string ("phy1"), MakeCallback (&StateChangeNotification));
+  dev0->GetPhy ()->TraceConnect ("TrxState", std::string ("phy1"), MakeCallback (&StateChangeNotification));
+  dev1->GetPhy ()->TraceConnect ("TrxState", std::string ("phy2"), MakeCallback (&StateChangeNotification));
+  dev2->GetPhy ()->TraceConnect ("TrxState", std::string ("phy3"), MakeCallback (&StateChangeNotification));
 
   Ptr<ConstantPositionMobilityModel> sender0Mobility = CreateObject<ConstantPositionMobilityModel> ();
-  // Configure position 0 m distance
   sender0Mobility->SetPosition (Vector (0,0,0));
   dev0->GetPhy ()->SetMobility (sender0Mobility);
-
   Ptr<ConstantPositionMobilityModel> sender1Mobility = CreateObject<ConstantPositionMobilityModel> ();
   // Configure position 10 m distance
   sender1Mobility->SetPosition (Vector (0,10,0));
   dev1->GetPhy ()->SetMobility (sender1Mobility);
+  Ptr<ConstantPositionMobilityModel> sender2Mobility = CreateObject<ConstantPositionMobilityModel> ();
+  // Configure position
+  sender2Mobility->SetPosition (Vector (0,20,20));
+  dev2->GetPhy ()->SetMobility (sender2Mobility);
 
-  McpsDataConfirmCallback cb0;          // Set the callback for the confirmation of a data transmission request
+  McpsDataConfirmCallback cb0;
   cb0 = MakeCallback (&DataConfirm);
   dev0->GetMac ()->SetMcpsDataConfirmCallback (cb0);
 
-  McpsDataIndicationCallback cb1;       // Set the callback for the indication of an incoming data packet
+  McpsDataIndicationCallback cb1;
   cb1 = MakeCallback (&DataIndication);
   dev0->GetMac ()->SetMcpsDataIndicationCallback (cb1);
 
@@ -163,11 +145,9 @@ int main (int argc, char *argv[])
   cb3 = MakeCallback (&DataIndication);
   dev1->GetMac ()->SetMcpsDataIndicationCallback (cb3);
 
-  // Tracing
-  lrWpanHelper.EnablePcapAll (std::string ("lr-wpan-data"), true);
-  AsciiTraceHelper ascii;
-  Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream ("lr-wpan-data.tr");
-  lrWpanHelper.EnableAsciiAll (stream);
+  dev2->GetMac ()->SetMcpsDataConfirmCallback (MakeCallback (&DataConfirm));
+  dev2->GetMac ()->SetMcpsDataIndicationCallback (MakeCallback (&DataIndication));
+  dev2->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
 
   // The below should trigger two callbacks when end-to-end data is working
   // 1) DataConfirm callback is called
@@ -180,19 +160,22 @@ int main (int argc, char *argv[])
   params.m_dstAddr = Mac16Address ("00:02");
   params.m_msduHandle = 0;
   params.m_txOptions = TX_OPTION_ACK;
-//  dev0->GetMac ()->McpsDataRequest (params, p0);
-  Simulator::ScheduleWithContext (1, Seconds (0.0),
-                                  &LrWpanMac::McpsDataRequest,
-                                  dev0->GetMac (), params, p0);
+  //Ptr<LrWpanContikiMac> lrWpanMac = DynamicCast<LrWpanContikiMac> (dev0->GetMac ());
+  Simulator::Schedule (Seconds (0.1), &LrWpanMac::McpsDataRequest, dev0->GetMac (), params, p0);        //phy3 wakeup&sleep, phy2 wakeup&recv
 
-  // Send a packet back at time 2 seconds
-  Ptr<Packet> p2 = Create<Packet> (60);  // 60 bytes of dummy data
-  params.m_dstAddr = Mac16Address ("00:01");
-  Simulator::ScheduleWithContext (2, Seconds (2.0),
-                                  &LrWpanMac::McpsDataRequest,
-                                  dev1->GetMac (), params, p2);
+  Ptr<Packet> p1 = Create<Packet> (50);  // 50 bytes of dummy data
+  params.m_dstAddr = Mac16Address ("00:03");
+  Simulator::Schedule (Seconds (0.12), &LrWpanMac::McpsDataRequest, dev0->GetMac (), params, p1);       //phy1 drop pkt to phy3
 
-  Simulator::Stop (Seconds (5));
+  Ptr<Packet> p2 = Create<Packet> (50);  // 50 bytes of dummy data
+  params.m_dstAddr = Mac16Address ("ff:ff");
+  Simulator::Schedule (Seconds (0.5), &LrWpanMac::McpsDataRequest, dev2->GetMac (), params, p2);        //phy1&2 recv broadcast
+
+  Ptr<Packet> p3 = Create<Packet> (50);  // 50 bytes of dummy data
+  params.m_txOptions = TX_OPTION_NONE;
+  Simulator::Schedule (Seconds (0.52), &LrWpanMac::McpsDataRequest, dev2->GetMac (), params, p3);
+
+  Simulator::Stop (Seconds (0.75));
   Simulator::Run ();
 
   Simulator::Destroy ();

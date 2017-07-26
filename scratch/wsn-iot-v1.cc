@@ -79,8 +79,17 @@ namespace ns3 {
     }
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
-        std::cout << context << " TotalEnergyConsumption: " << newValue
-                << " from " << oldValue << "\n";
+        double nodenum = std::stoi(context);
+        std::ofstream outfile;
+        outfile.open("energy.txt", std::ios_base::app);
+        outfile << nodenum << " " << Simulator::Now().GetSeconds()<<" "<< newValue << std::endl;
+    }
+
+    static void StateChangeNotification(std::string context, Time now, LrWpanPhyEnumeration oldState, LrWpanPhyEnumeration newState) {
+        std::cout << context << " state change at " << now.GetSeconds()
+                << " from " << LrWpanHelper::LrWpanPhyEnumerationPrinter(oldState)
+                << " to " << LrWpanHelper::LrWpanPhyEnumerationPrinter(newState) << "\n";
+
     }
 
     /*  -
@@ -320,6 +329,9 @@ namespace ns3 {
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
+        
+        //Clean up old files
+        remove("energy.txt");
 
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
@@ -419,12 +431,15 @@ namespace ns3 {
             em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
             es[endN] = CreateObject<BasicEnergySource> ();
             es[endN]->SetSupplyVoltage(3.3);
+            es[endN]->SetInitialEnergy(5400); //1 AA battery
             es[endN]->SetNode(endnodes.Get(endN));
             es[endN]->AppendDeviceEnergyModel(em[endN]);
             em[endN]->SetEnergySource(es[endN]);
+
             Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (endnodes.Get(endN)->GetDevice(0));
             em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-            es[endN]->TraceConnect("RemainingEnergy", std::string("phy0"), MakeCallback(&GetTotalEnergyConsumption));
+            es[endN]->TraceConnect("RemainingEnergy", std::to_string(endnodes.Get(endN)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+            // device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
         }
 
         /*
