@@ -315,6 +315,9 @@ namespace ns3
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
+        
+        //Paramter settings
+        //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
 
         // Creating NodeContainers
         // - iot[]:                 NodeContainer with WSN nodes + border gateway nodes.
@@ -398,6 +401,14 @@ namespace ns3
             LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
             //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
+            
+            
+            //Energy framework
+            
+            
+            
+            
+            
 
 
         }
