@@ -21,32 +21,49 @@
 #  MA 02110-1301, USA.
 #
 #
+from __future__ import division
 import numpy as np
 import pylab
 import sys
 import os
+import itertools
 from matplotlib import rcParams
+
+
+def mean(a):
+    a = [x for x in a if x is not None]
+    return sum(a) / len(a)
+
 
 # rcParams['font.family'] = 'sans-serif'
 # rcParams['font.sans-serif'] = ['Bitstream Vera Sans']
 # rcParams['font.serif'] = ['Bitstream Vera Sans']
 # rcParams["font.size"] = "6"
-totenergy = []
+
+
+idx = 0
 
 node, time, energy = np.loadtxt(sys.argv[1], unpack=True)
 
 node = map(int, node)
-sort_node =np.sort(node)
+sort_node = np.sort(node)
 sort_node = list(set(sort_node))
+totenergy = [[] for x in xrange(max(sort_node) - min(sort_node) + 1)]
 
 for p in sort_node:
     print p
     indices = [i for i, x in enumerate(node) if x == p]
     cur_energy = [energy[i] for i in indices]
-    totenergy.append(cur_energy)
+    totenergy[idx] = cur_energy
+    idx += 1
 
-pylab.plot(time,energy)
+tot_trans = list(map(list, itertools.izip_longest(*totenergy)))
+
+res = map(mean, zip(*tot_trans))
+
+pylab.plot(totenergy[1])
 pylab.grid(True)
 fig = pylab.gcf()
 fig.canvas.set_window_title(sys.argv[1])
+
 pylab.show()
