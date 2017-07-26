@@ -2,6 +2,7 @@
 #include "ns3/core-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/lr-wpan-module.h"
+#include "ns3/basic-energy-source.h"
 #include "ns3/sixlowpan-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/mobility-module.h"
@@ -20,8 +21,7 @@
 #include <string>
 #include <vector>
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
@@ -76,6 +76,11 @@ namespace ns3
         }
 
         return returnBucket;
+    }
+
+    static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
+        std::cout << context << " TotalEnergyConsumption: " << newValue
+                << " from " << oldValue << "\n";
     }
 
     /*  -
@@ -315,7 +320,7 @@ namespace ns3
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-        
+
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
 
@@ -401,18 +406,26 @@ namespace ns3
             LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
             //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
-            
-            
-            //Energy framework
-            
-            
-            
-            
-            
-
-
         }
 
+
+
+        //Energy framework
+
+        Ptr<LrWpanRadioEnergyModel> em[endnodes.GetN()];
+        Ptr<BasicEnergySource> es[endnodes.GetN()];
+
+        for (uint32_t endN = 0; endN < endnodes.GetN(); endN++) {
+            em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
+            es[endN] = CreateObject<BasicEnergySource> ();
+            es[endN]->SetSupplyVoltage(3.3);
+            es[endN]->SetNode(endnodes.Get(endN));
+            es[endN]->AppendDeviceEnergyModel(em[endN]);
+            em[endN]->SetEnergySource(es[endN]);
+            Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (endnodes.Get(endN)->GetDevice(0));
+            em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
+            es[endN]->TraceConnect("RemainingEnergy", std::string("phy0"), MakeCallback(&GetTotalEnergyConsumption));
+        }
 
         /*
          NDN 
