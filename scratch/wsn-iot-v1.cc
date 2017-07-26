@@ -85,12 +85,14 @@ namespace ns3 {
         outfile << nodenum << " " << Simulator::Now().GetSeconds()<<" "<< newValue << std::endl;
     }
 
+/*
     static void StateChangeNotification(std::string context, Time now, LrWpanPhyEnumeration oldState, LrWpanPhyEnumeration newState) {
         std::cout << context << " state change at " << now.GetSeconds()
                 << " from " << LrWpanHelper::LrWpanPhyEnumerationPrinter(oldState)
                 << " to " << LrWpanHelper::LrWpanPhyEnumerationPrinter(newState) << "\n";
 
     }
+*/
 
     /*  -
         -
