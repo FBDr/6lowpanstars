@@ -93,10 +93,10 @@ ax.get_yaxis().get_major_formatter().set_useOffset(False)
 
 
 for cu_e, cu_t in zip(totenergy, tottime):
-    ax2.plot(cu_t, cu_e)
+    ax2.plot(cu_t, cu_e, "go-")
 
 ax2.set_xlabel("Simulation time (s)")
-ax2.set_ylabel("Energy usage (J)")
+ax2.set_ylabel("Battery capacity (J)")
 
 pylab.show()
 # Onjuist
