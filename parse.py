@@ -61,10 +61,12 @@ for flow in et.findall("FlowStats/Flow"):
         #print "timeLastTxPacket:", long(flow.get('timeLastTxPacket')[:-4]) * 1e-9
         #print "timeFirstRxPacket:", long(flow.get('timeFirstRxPacket')[:-4]) * 1e-9
         #print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
-        print "HOPS:", flow.get('timesForwarded')
-        hops.append(int(flow.get('timesForwarded')))
+        hop_cur = float(flow.get('timesForwarded'))/float(rxPackets) +1
+        print "HOPS:", hop_cur
+        hops.append(hop_cur)
         print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
         print "Flow: received packets:", rxPackets
+        print "Raw hops", flow.get('timesForwarded')
         totalpackets = totalpackets + rxPackets
         flownum+=1
 
@@ -85,8 +87,8 @@ print "Total flows: ", flownum
 
 pylab.subplot(221)
 pylab.hist(delays, bins=50)
-pylab.xlabel("Delay(s)")
-pylab.ylabel("Number of packets")
+pylab.xlabel("Average Delay per flow (s)")
+pylab.ylabel("Number of packets per flow")
 # pylab.axis([0, 0.2, 0, 10])
 pylab.grid(True)
 
@@ -98,13 +100,13 @@ pylab.grid(True)
 
 pylab.subplot(223)
 pylab.hist(hops, bins=14)
-pylab.xlabel("Hops")
+pylab.xlabel("Average number of hops")
 pylab.ylabel("Number of packets")
 pylab.grid(True)
 
 pylab.subplot(224)
 pylab.plot(hops, 'go')
-pylab.ylabel("Hops")
+pylab.ylabel("Average number of hops")
 pylab.xlabel("Packet sequence number")
 pylab.grid(True)
 
