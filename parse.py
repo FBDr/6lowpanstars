@@ -35,6 +35,7 @@ et = ElementTree.parse(sys.argv[1])
 bitrates = []
 losses = []
 delays = []
+hops = []
 totalpackets = 0
 flownum = 0
 for flow in et.findall("FlowStats/Flow"):
@@ -61,9 +62,9 @@ for flow in et.findall("FlowStats/Flow"):
         #print "timeFirstRxPacket:", long(flow.get('timeFirstRxPacket')[:-4]) * 1e-9
         #print "TimeLastRxPacket:", long(flow.get('timeLastRxPacket')[:-4]) * 1e-9
         print "HOPS:", flow.get('timesForwarded')
-
+        hops.append(int(flow.get('timesForwarded')))
         print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
-        #print "Flow: received packets:", rxPackets
+        print "Flow: received packets:", rxPackets
         totalpackets = totalpackets + rxPackets
         flownum+=1
 
@@ -76,16 +77,40 @@ print "Total flows: ", flownum
 # pylab.hist(losses,bins=40)
 # pylab.xlabel("Numberoflostpackets")
 # pylab.ylabel("Numberofflows")
-pylab.subplot(211)
-pylab.hist(delays, bins=10)
-pylab.xlabel("Delay(s)")
-pylab.ylabel("Number of flows")
-# pylab.axis([0, 0.2, 0, 10])
-pylab.grid(True)
-pylab.subplot(212)
-pylab.plot(delays)
-pylab.show()
 
 # pylab.subplots_adjust(hspace=0.4)
 # pylab.plot(delays,'bo', label='sampled')
+
+
+
+pylab.subplot(221)
+pylab.hist(delays, bins=50)
+pylab.xlabel("Delay(s)")
+pylab.ylabel("Number of packets")
+# pylab.axis([0, 0.2, 0, 10])
+pylab.grid(True)
+
+#pylab.subplot(222)
+#pylab.plot(time_moving, moving_aves)
+#pylab.xlabel("Simulation time (s)")
+#pylab.ylabel("Delay (s)")
+#pylab.grid(True)
+
+pylab.subplot(223)
+pylab.hist(hops, bins=14)
+pylab.xlabel("Hops")
+pylab.ylabel("Number of packets")
+pylab.grid(True)
+
+pylab.subplot(224)
+pylab.plot(hops, 'go')
+pylab.ylabel("Hops")
+pylab.xlabel("Packet sequence number")
+pylab.grid(True)
+
+fig = pylab.gcf()
+fig.canvas.set_window_title(sys.argv[1])
+pylab.show()
+
+
 pylab.savefig("results.pdf")

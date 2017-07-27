@@ -41,14 +41,6 @@ def energyConsumption(a):
     return maxe - mine
 
 
-def printmatrix(matrix):
-    s = [[str(e) for e in row] for row in matrix]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    print '\n'.join(table)
-
-
 # rcParams['font.family'] = 'sans-serif'
 # rcParams['font.sans-serif'] = ['Bitstream Vera Sans']
 # rcParams['font.serif'] = ['Bitstream Vera Sans']
@@ -99,6 +91,3 @@ ax2.set_xlabel("Simulation time (s)")
 ax2.set_ylabel("Battery capacity (J)")
 
 pylab.show()
-# Onjuist
-# tot_trans = list(map(list, itertools.izip_longest(*totenergy)))
-# res = map(mean, zip(*tot_trans))
