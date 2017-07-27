@@ -63,12 +63,14 @@ node = map(int, node)
 sort_node = np.sort(node)
 sort_node = list(set(sort_node))
 totenergy = [[] for x in xrange(max(sort_node) - min(sort_node) + 1)]
-
+tottime = [[] for x in xrange(max(sort_node) - min(sort_node) + 1)]
 
 for p in sort_node:
     indices = [i for i, x in enumerate(node) if x == p]
     cur_energy = [energy[i] for i in indices]
+    cur_time = [time[i] for i in indices]
     totenergy[idx] = cur_energy
+    tottime[idx] =cur_time
     idx += 1
 
 used_energy_v = map(energyConsumption, totenergy)
@@ -89,8 +91,11 @@ ax.set_xlabel("Node number")
 ax.set_ylabel("Energy usage (J)")
 ax.get_yaxis().get_major_formatter().set_useOffset(False)
 
-ax2.bar(sort_node, used_energy_v)
-ax2.set_xlabel("Node number")
+
+for cu_e, cu_t in zip(totenergy, tottime):
+    ax2.plot(cu_t, cu_e)
+
+ax2.set_xlabel("Simulation time (s)")
 ax2.set_ylabel("Energy usage (J)")
 
 pylab.show()
