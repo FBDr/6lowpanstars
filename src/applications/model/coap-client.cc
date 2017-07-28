@@ -30,6 +30,9 @@
 #include "ns3/coap-client.h"
 #include "ns3/coap-packet-tag.h"
 #include "ns3/ipv6-packet-info-tag.h"
+#include "src/network/model/node.h"
+#include <fstream>
+#include "ns3/node.h"
 
 
 
@@ -390,15 +393,30 @@ namespace ns3
                 packet->RemovePacketTag(coaptag);
                 packet->RemovePacketTag(hoplimitTag);
                 Time e2edelay = Simulator::Now() - coaptag.GetTs();
+                int64_t delay = e2edelay.GetMilliSeconds();
+                int hops = 64 - (int) hoplimitTag.GetHopLimit();
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                         Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
-                        << 64 - (int) hoplimitTag.GetHopLimit());
+                        << hops);
+
+                PrintToFile(hops, delay);
 
 
 
             }
         }
     }
+
+    void
+    CoapClient::PrintToFile(int &hops, int64_t & delay) {
+        Ptr <Node> PtrNode = this->GetNode();
+        uint32_t nodenum = PtrNode->GetId();
+        std::ofstream outfile;
+        outfile.open("hopdelay.txt", std::ios_base::app);
+        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
+
+    }
+
 
 } // Namespace ns3

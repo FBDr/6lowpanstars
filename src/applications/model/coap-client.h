@@ -147,6 +147,7 @@ namespace ns3 {
         void SetNumberOfContents(uint32_t numOfContents);
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        
 
         uint32_t
         GetNextSeq();
@@ -192,6 +193,9 @@ namespace ns3 {
 
         double
         GetS() const;
+        
+        void
+        PrintToFile(int &hops, int64_t &delay);
 
         uint32_t m_count; //!< Maximum number of packets the application will send
         Time m_interval; //!< Packet inter-send time

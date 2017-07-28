@@ -334,6 +334,7 @@ namespace ns3 {
 
         //Clean up old files
         remove("energy.txt");
+        remove("hopdelay.txt");
         LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
 
         //Paramter settings
