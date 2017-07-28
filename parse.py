@@ -66,7 +66,7 @@ for flow in et.findall("FlowStats/Flow"):
         hops.append(hop_cur)
         print "Delay:", float(flow.get('delaySum')[: -4]) * 1e-9 / rxPackets
         print "Flow: received packets:", rxPackets
-        print "Raw hops", flow.get('timesForwarded')
+        print "Raw hops", flow.get('timesForwarded')r
         totalpackets = totalpackets + rxPackets
         flownum+=1
 

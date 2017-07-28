@@ -319,7 +319,8 @@ namespace ns3 {
     void
     CoapClient::Send(void) {
         NS_LOG_FUNCTION(this);
-
+        //SeqTsHeader test;
+        
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
         SetFill("GET/" + std::to_string(nxtsq));
