@@ -380,7 +380,7 @@ namespace ns3
         Address from;
         CoapPacketTag coaptag;
         SocketIpv6HopLimitTag hoplimitTag;
-        
+
         while ((packet = socket->RecvFrom(from))) {
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
@@ -391,9 +391,9 @@ namespace ns3
                 packet->RemovePacketTag(hoplimitTag);
                 Time e2edelay = Simulator::Now() - coaptag.GetTs();
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetPort() << " E2E Delay:" << e2edelay.GetMilliSeconds()<< " Hopcount (64): "
-                        << (int) hoplimitTag.GetHopLimit());
+                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
+                        Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
+                        << 64 - (int) hoplimitTag.GetHopLimit());
 
 
 
