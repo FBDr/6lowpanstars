@@ -18,61 +18,77 @@
  * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  */
 #include "ns3/tag.h"
+#include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
+#include "ns3/simulator.h"
 #include <iostream>
 #include "ns3/coap-packet-tag.h"
 
 namespace ns3
 {
+    NS_LOG_COMPONENT_DEFINE("CoapPacketTag");
+
+    CoapPacketTag::CoapPacketTag()
+            : m_seq(0),
+            m_ts(Simulator::Now().GetTimeStep()) {
+        NS_LOG_FUNCTION(this);
+    }
 
     TypeId
-    MyTag::GetTypeId(void) {
-        static TypeId tid = TypeId("ns3::MyTag")
+    CoapPacketTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::CoapPacketTag")
                 .SetParent<Tag> ()
-                .AddConstructor<MyTag> ()
-                .AddAttribute("SimpleValue",
-                "A simple value",
-                EmptyAttributeValue(),
-                MakeUintegerAccessor(&MyTag::GetSimpleValue),
-                MakeUintegerChecker<uint8_t> ())
+                .AddConstructor<CoapPacketTag> ()
                 ;
         return tid;
     }
 
     TypeId
-    MyTag::GetInstanceTypeId(void) const {
+    CoapPacketTag::GetInstanceTypeId(void) const {
         return GetTypeId();
     }
 
     uint32_t
-    MyTag::GetSerializedSize(void) const {
-        return 1;
+    CoapPacketTag::GetSerializedSize(void) const {
+        NS_LOG_FUNCTION(this);
+        return 4 + 8;
     }
 
     void
-    MyTag::Serialize(TagBuffer i) const {
-        i.WriteU8(m_simpleValue);
+    CoapPacketTag::Serialize(TagBuffer i) const {
+        i.WriteU32(m_seq);
+        i.WriteU64(m_ts);
     }
 
     void
-    MyTag::Deserialize(TagBuffer i) {
-        m_simpleValue = i.ReadU8();
+    CoapPacketTag::Deserialize(TagBuffer i) {
+        m_seq = i.ReadU32();
+        m_ts = i.ReadU64();
     }
 
     void
-    MyTag::Print(std::ostream & os) const {
-        os << "v=" << (uint32_t) m_simpleValue;
+    CoapPacketTag::Print(std::ostream & os) const {
+        NS_LOG_FUNCTION(this << &os);
+        os << "(seq=" << m_seq << " time=" << TimeStep(m_ts).GetSeconds() << ")";
     }
 
     void
-    MyTag::SetSimpleValue(uint8_t value) {
-        m_simpleValue = value;
+    CoapPacketTag::SetSeq(uint32_t seq) {
+        NS_LOG_FUNCTION(this << seq);
+        m_seq = seq;
     }
 
-    uint8_t
-    MyTag::GetSimpleValue(void) const {
-        return m_simpleValue;
+    uint32_t
+    CoapPacketTag::GetSeq(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_seq;
+    }
+
+    Time
+    CoapPacketTag::GetTs(void) const {
+        NS_LOG_FUNCTION(this);
+        return TimeStep(m_ts);
     }
 
 }

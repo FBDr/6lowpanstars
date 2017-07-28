@@ -20,13 +20,14 @@
 #include "ns3/tag.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
+#include "ns3/nstime.h"
 #include <iostream>
 
 namespace ns3 {
 
     // define this class in a public header
 
-    class MyTag : public Tag {
+    class CoapPacketTag : public Tag {
     public:
         static TypeId GetTypeId(void);
         virtual TypeId GetInstanceTypeId(void) const;
@@ -36,10 +37,13 @@ namespace ns3 {
         virtual void Print(std::ostream &os) const;
 
         // these are our accessors to our tag structure
-        void SetSimpleValue(uint8_t value);
-        uint8_t GetSimpleValue(void) const;
+        CoapPacketTag();
+        void SetSeq(uint32_t);
+        uint32_t GetSeq(void) const;
+        Time GetTs(void) const;
     private:
-        uint8_t m_simpleValue;
+        uint32_t m_seq; //!< Sequence number
+        uint64_t m_ts; //!< Timestamp
     };
 
 }
