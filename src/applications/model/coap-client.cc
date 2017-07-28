@@ -28,6 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
 #include "coap-client.h"
+#include "seq-ts-header.h"
 
 
 namespace ns3 {
@@ -319,8 +320,9 @@ namespace ns3 {
     void
     CoapClient::Send(void) {
         NS_LOG_FUNCTION(this);
-        //SeqTsHeader test;
-        
+        SeqTsHeader seqTs;
+        seqTs.SetSeq(m_sent);
+
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
         SetFill("GET/" + std::to_string(nxtsq));
@@ -335,8 +337,8 @@ namespace ns3 {
             //
             NS_ASSERT_MSG(m_dataSize == m_size, "CoapClient::Send(): m_size and m_dataSize inconsistent");
             NS_ASSERT_MSG(m_data, "CoapClient::Send(): m_dataSize but no m_data");
-            p = Create<Packet> (m_data, m_dataSize);
-
+            p = Create<Packet> (m_data, m_dataSize + (8 + 4)); // To Do should be changed later.
+            p->AddHeader (seqTs);
         } else {
             //
             // If m_dataSize is zero, the client has indicated that it doesn't care

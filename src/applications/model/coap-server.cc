@@ -37,6 +37,7 @@
 #include "src/network/model/node.h"
 #include "src/core/model/log.h"
 #include <string>
+#include "seq-ts-header.h"
 
 namespace ns3 {
 
@@ -226,7 +227,10 @@ namespace ns3 {
 
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
-
+            
+            SeqTsHeader seqTs;
+            received_packet->RemoveHeader(seqTs);
+            uint32_t currentSequenceNumber = seqTs.GetSeq();
 
             // Copy data from current received packet into buffer. 
             m_Rdata = new uint8_t [received_packet->GetSize()];
