@@ -1046,6 +1046,7 @@ UdpSocketImpl::ForwardUp6 (Ptr<Packet> packet, Ipv6Header header, uint16_t port,
     {
       SocketIpv6HopLimitTag ipHopLimitTag;
       ipHopLimitTag.SetHopLimit (header.GetHopLimit ());
+      
       packet->AddPacketTag (ipHopLimitTag);
     }
 

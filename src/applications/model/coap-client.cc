@@ -27,11 +27,14 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
-#include "coap-client.h"
-#include "seq-ts-header.h"
+#include "ns3/coap-client.h"
+#include "ns3/coap-packet-tag.h"
+#include "ns3/ipv6-packet-info-tag.h"
 
 
-namespace ns3 {
+
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -86,10 +89,10 @@ namespace ns3 {
     }
 
     CoapClient::CoapClient()
-    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-    , m_q(0.7)
-    , m_s(0.7)
-    , m_seqRng(CreateObject<UniformRandomVariable>()) {
+            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+            , m_q(0.7)
+            , m_s(0.7)
+            , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
         m_socket = 0;
@@ -198,10 +201,11 @@ namespace ns3 {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
             m_socket->Bind6();
+
         }
 
         m_socket->SetRecvCallback(MakeCallback(&CoapClient::HandleRead, this));
-
+        m_socket->SetIpv6RecvHopLimit(true);
         ScheduleTransmit(Seconds(0.));
     }
 
@@ -320,9 +324,8 @@ namespace ns3 {
     void
     CoapClient::Send(void) {
         NS_LOG_FUNCTION(this);
-        SeqTsHeader seqTs;
-        seqTs.SetSeq(m_sent);
-
+        CoapPacketTag coaptag;
+        coaptag.SetSeq(m_sent);
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
         SetFill("GET/" + std::to_string(nxtsq));
@@ -337,8 +340,8 @@ namespace ns3 {
             //
             NS_ASSERT_MSG(m_dataSize == m_size, "CoapClient::Send(): m_size and m_dataSize inconsistent");
             NS_ASSERT_MSG(m_data, "CoapClient::Send(): m_dataSize but no m_data");
-            p = Create<Packet> (m_data, m_dataSize + (8 + 4)); // To Do should be changed later.
-            p->AddHeader (seqTs);
+            p = Create<Packet> (m_data, m_dataSize); // To Do should be changed later.
+            p->AddPacketTag(coaptag);
         } else {
             //
             // If m_dataSize is zero, the client has indicated that it doesn't care
@@ -375,15 +378,25 @@ namespace ns3 {
         NS_LOG_FUNCTION(this << socket);
         Ptr<Packet> packet;
         Address from;
+        CoapPacketTag coaptag;
+        SocketIpv6HopLimitTag hoplimitTag;
+        
         while ((packet = socket->RecvFrom(from))) {
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
+                packet->RemovePacketTag(coaptag);
+                packet->RemovePacketTag(hoplimitTag);
+                Time e2edelay = Simulator::Now() - coaptag.GetTs();
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetPort());
+                        Inet6SocketAddress::ConvertFrom(from).GetPort() << " E2E Delay:" << e2edelay.GetMilliSeconds()<< " Hopcount (64): "
+                        << (int) hoplimitTag.GetHopLimit());
+
+
+
             }
         }
     }

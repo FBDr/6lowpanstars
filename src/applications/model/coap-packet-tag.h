@@ -23,6 +23,10 @@
 #include "ns3/nstime.h"
 #include <iostream>
 
+#ifndef COAP_TAG_HEADER_H
+#define COAP_TAG_HEADER_H
+
+
 namespace ns3 {
 
     // define this class in a public header
@@ -41,9 +45,12 @@ namespace ns3 {
         void SetSeq(uint32_t);
         uint32_t GetSeq(void) const;
         Time GetTs(void) const;
+        uint64_t GetT(void) const;
     private:
         uint32_t m_seq; //!< Sequence number
         uint64_t m_ts; //!< Timestamp
     };
 
 }
+
+#endif

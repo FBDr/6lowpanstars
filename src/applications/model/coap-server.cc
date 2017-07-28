@@ -37,7 +37,7 @@
 #include "src/network/model/node.h"
 #include "src/core/model/log.h"
 #include <string>
-#include "seq-ts-header.h"
+#include "ns3/coap-packet-tag.h"
 
 namespace ns3 {
 
@@ -225,12 +225,14 @@ namespace ns3 {
                         Inet6SocketAddress::ConvertFrom(from).GetPort());
             }
 
+            CoapPacketTag coaptag;
+
+            received_packet->RemovePacketTag(coaptag);
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
             
-            SeqTsHeader seqTs;
-            received_packet->RemoveHeader(seqTs);
-            uint32_t currentSequenceNumber = seqTs.GetSeq();
+            uint32_t currentSequenceNumber = coaptag.GetSeq();
+            uint64_t currentDelay = coaptag.GetT();
 
             // Copy data from current received packet into buffer. 
             m_Rdata = new uint8_t [received_packet->GetSize()];
@@ -246,7 +248,7 @@ namespace ns3 {
             }
 
             response_packet = Create<Packet> (m_data, m_dataSize);
-
+            response_packet->AddPacketTag(coaptag);
 
             NS_LOG_LOGIC("Echoing packet");
             socket->SendTo(response_packet, 0, from);

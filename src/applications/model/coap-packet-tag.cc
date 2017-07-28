@@ -91,4 +91,10 @@ namespace ns3
         return TimeStep(m_ts);
     }
 
+    uint64_t
+    CoapPacketTag::GetT(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_ts;
+    }
+
 }
