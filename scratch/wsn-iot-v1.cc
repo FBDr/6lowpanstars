@@ -309,13 +309,12 @@ namespace ns3 {
         int node_num = 10;
         int node_periph = 9;
         int node_head = 3;
-        int con_per = 50;
-        int pro_per = 0;
         int num_Con = 0;
+        int con_per = 0;
         //int num_Pro;
         int dist = 100;
         int totnumcontents = 100;
-        int totalnodes = 0;
+        int totalleafs = 0;
         int simtime = 60;
         bool ndn = true;
         bool pcaptracing = true;
@@ -330,8 +329,7 @@ namespace ns3 {
         cmd.AddValue("nodes", "Number of nodes", node_num); //Not implemented
         cmd.AddValue("periph", "Number of peripheral nodes", node_periph);
         cmd.AddValue("head", "Number of head nodes", node_head);
-        cmd.AddValue("ConPercent", "Consumer percentage", con_per);
-        cmd.AddValue("ProPercent", "Producer percentage", pro_per); //Not implemented
+        cmd.AddValue("ConPer", "Percentage of leafnodes being consumers.", con_per);
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
@@ -382,8 +380,11 @@ namespace ns3 {
         br.Create(node_head);
         routers.Add(backhaul);
         routers.Add(br);
-        totalnodes = node_head * node_periph + node_head + bth.GetNNodesTopology();
-        num_Con = totalnodes * (float) con_per / 100.0;
+        //totalnodes = node_head* node_periph + node_head + bth.GetNNodesTopology();
+        totalleafs = bth.GetNLeafNodes();
+        num_Con = (float) totalleafs * con_per / 100;
+        
+        NS_LOG_INFO("This topology contains: " << (int) totalleafs << " leafnodes.");
         all.Add(routers);
         all.Add(endnodes);
         all.Add(backhaul);
@@ -397,7 +398,6 @@ namespace ns3 {
         Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
         for (int jdx = 0; jdx < node_head; jdx++) {
-
             //Add BR and master to csma-NodeContainers
             border_backhaul[jdx].Add(br.Get(jdx));
             border_backhaul[jdx].Add(SelectRandomLeafNode(bth));

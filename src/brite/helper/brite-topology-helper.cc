@@ -267,6 +267,15 @@ namespace ns3 {
     }
 
     uint32_t
+    BriteTopologyHelper::GetNLeafNodes() {
+        uint32_t totalL = 0;
+        for (uint32_t  idx = 0; idx < m_numAs; idx++) {
+            totalL += m_asLeafNodes[idx]->GetN();
+        }
+        return totalL;
+    }
+
+    uint32_t
     BriteTopologyHelper::GetNNodesTopology() const {
         return m_numNodes;
     }

@@ -130,6 +130,14 @@ namespace ns3 {
         Ptr<Node> GetLeafNodeForAs(uint32_t asNum, uint32_t leafNum);
 
         /**
+         * Returns the total number of leafnodes in topology.
+         *
+         * \returns the total number of leafnodes.
+         */
+        uint32_t GetNLeafNodes();
+
+
+        /**
          * Returns the total number of nodes for a given AS
          *
          * \param asNum the AS number
