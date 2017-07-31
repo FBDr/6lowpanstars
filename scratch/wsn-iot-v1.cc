@@ -322,6 +322,8 @@ namespace ns3 {
         double freshness = 0;
         bool ipbackhaul = false;
         int payloadsize = 10;
+        float zm_alpha = 0.7;
+        float zm_beta = 0.7;
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose); //Not implemented
@@ -338,6 +340,8 @@ namespace ns3 {
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
         cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
+        cmd.AddValue("zm_alpha", "Set the alpha parameter of the ZM distribution", zm_alpha);
+        cmd.AddValue("zm_beta", "Set the alpha parameter of the ZM distribution", zm_beta);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -383,7 +387,7 @@ namespace ns3 {
         //totalnodes = node_head* node_periph + node_head + bth.GetNNodesTopology();
         totalleafs = bth.GetNLeafNodes();
         num_Con = (float) totalleafs * con_per / 100;
-        
+
         NS_LOG_INFO("This topology contains: " << (int) totalleafs << " leafnodes.");
         all.Add(routers);
         all.Add(endnodes);
