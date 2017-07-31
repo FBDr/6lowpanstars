@@ -18,6 +18,7 @@
 #include "ns3/ipv6-routing-table-entry.h"
 #include "src/network/helper/node-container.h"
 #include "src/network/utils/output-stream-wrapper.h"
+#include "src/core/model/log.h"
 #include <string>
 #include <vector>
 
@@ -34,12 +35,25 @@ namespace ns3 {
         uint32_t leafnum = 0;
         uint32_t selAS = 0;
         uint32_t selLN = 0;
+        int max_tries = 5;
         Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
 
-        selAS = round(Ras->GetValue((double) (0), (double) (totAS - 1)));
-        NS_LOG_INFO("Selected AS num: " << selAS);
-        leafnum = briteth.GetNLeafNodesForAs(selAS);
+        for (int tries = 0; tries <= max_tries; tries++) {
+
+            NS_ASSERT_MSG(tries<max_tries, "Tried max_tries to find leafnode. No luck. Check Brite config.");
+
+            selAS = round(Ras->GetValue((double) (0), (double) (totAS - 1)));
+            NS_LOG_INFO("Selected AS num: " << selAS);
+            leafnum = briteth.GetNLeafNodesForAs(selAS);
+            NS_LOG_INFO("Total number of leafnodes in this AS is: " << leafnum);
+
+            if (leafnum) {
+                break;
+            }
+            NS_LOG_WARN("No leafnodes in this AS! Check config! ");
+        }
+
         selLN = round(Rleaf->GetValue((double) (0), (double) (leafnum - 1)));
         NS_LOG_INFO("Selected leafnode num: " << selLN);
 
@@ -335,6 +349,7 @@ namespace ns3 {
         //Clean up old files
         remove("energy.txt");
         remove("hopdelay.txt");
+        remove("pktloss.txt");
         LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
 
         //Paramter settings

@@ -36,8 +36,7 @@
 
 
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -92,12 +91,13 @@ namespace ns3
     }
 
     CoapClient::CoapClient()
-            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-            , m_q(0.7)
-            , m_s(0.7)
-            , m_seqRng(CreateObject<UniformRandomVariable>()) {
+    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+    , m_q(0.7)
+    , m_s(0.7)
+    , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
+        m_received = 0;
         m_socket = 0;
         m_sendEvent = EventId();
         m_data = 0;
@@ -215,6 +215,14 @@ namespace ns3
     void
     CoapClient::StopApplication() {
         NS_LOG_FUNCTION(this);
+        float pktloss = 100.0 - (float) m_received / (float) m_sent * 100.0;
+        std::ofstream outfile;
+        outfile.open("pktloss.txt", std::ios_base::app);
+        outfile << GetNode()->GetId() << " " << m_sent << " " << m_received << " " << pktloss <<std::endl;
+
+        NS_LOG_INFO("Total transmitted packets: " << m_sent);
+        NS_LOG_INFO("Total received packets: " << m_received);
+        NS_LOG_INFO("Packet loss: " << pktloss);
 
         if (m_socket != 0) {
             m_socket->Close();
@@ -389,6 +397,7 @@ namespace ns3
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
+                m_received++;
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
                 packet->RemovePacketTag(coaptag);
                 packet->RemovePacketTag(hoplimitTag);
@@ -401,8 +410,7 @@ namespace ns3
                         << hops);
 
                 PrintToFile(hops, delay);
-
-
+                m_received++;
 
             }
         }

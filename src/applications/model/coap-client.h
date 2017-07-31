@@ -205,6 +205,7 @@ namespace ns3 {
         uint8_t *m_data; //!< packet payload data
 
         uint32_t m_sent; //!< Counter for sent packets
+        uint32_t m_received; //!< Counter for received packets
         Ptr<Socket> m_socket; //!< Socket
         Address m_peerAddress; //!< Remote peer address
         uint16_t m_peerPort; //!< Remote peer port
