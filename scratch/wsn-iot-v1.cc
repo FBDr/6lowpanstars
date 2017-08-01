@@ -117,7 +117,8 @@ namespace ns3 {
 
 
     void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
-            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize) {
+            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize,
+            std::string zm_q, std::string zm_s) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
 
@@ -159,6 +160,8 @@ namespace ns3 {
 
         //Consumer application
         consumerHelper.SetPrefix(prefix);
+        consumerHelper.SetAttribute("q", StringValue(zm_q)); // 10 different contents
+        consumerHelper.SetAttribute("s", StringValue(zm_s)); // 10 different contents
         consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
@@ -322,8 +325,8 @@ namespace ns3 {
         double freshness = 0;
         bool ipbackhaul = false;
         int payloadsize = 10;
-        float zm_alpha = 0.7;
-        float zm_beta = 0.7;
+        std::string zm_q = "0.7";
+        std::string zm_s = "0.7";
 
         CommandLine cmd;
         cmd.AddValue("verbose", "turn on log components", verbose); //Not implemented
@@ -340,8 +343,8 @@ namespace ns3 {
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
         cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
-        cmd.AddValue("zm_alpha", "Set the alpha parameter of the ZM distribution", zm_alpha);
-        cmd.AddValue("zm_beta", "Set the alpha parameter of the ZM distribution", zm_beta);
+        cmd.AddValue("zm_q", "Set the alpha parameter of the ZM distribution", zm_q);
+        cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -352,6 +355,7 @@ namespace ns3 {
         remove("energy.txt");
         remove("hopdelay.txt");
         remove("pktloss.txt");
+
         LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
 
         //Paramter settings
@@ -474,7 +478,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness, ipbackhaul, payloadsize);
+            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
