@@ -261,7 +261,8 @@ namespace ns3 {
 
     void sixlowpan_apps(int &node_periph, int &node_head, int &num_Con, NodeContainer iot[], NodeContainer all,
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
-            Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize) {
+            Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
+            std::string zm_q, std::string zm_s) {
 
         //This function installs the specific IP applications. 
 
@@ -290,6 +291,8 @@ namespace ns3 {
 
         //Client
         client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
+        client.SetAttribute("q", StringValue(zm_q)); // 10 different contents
+        client.SetAttribute("s", StringValue(zm_s)); // 10 different contents
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
             cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
@@ -501,7 +504,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, num_Con, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize);
+            sixlowpan_apps(node_periph, node_head, num_Con, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s);
         }
 
 
