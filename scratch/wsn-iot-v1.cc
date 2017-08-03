@@ -129,7 +129,8 @@ namespace ns3
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
-            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s) {
+            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s, 
+            double &min_freq, double &max_freq) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
 
@@ -195,9 +196,9 @@ namespace ns3
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 std::string cur_prefix;
-                cur_prefix =  "/Home_" + std::to_string(idx) + prefix;
+                cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
-                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + interval_sel));
@@ -209,9 +210,9 @@ namespace ns3
             for (int jdx = 0; jdx < con_inside; jdx++) {
 
                 std::string cur_prefix;
-                cur_prefix =  "/Home_" + std::to_string(idx) + prefix;
+                cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
-                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[idx])); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + interval_sel));
@@ -225,9 +226,9 @@ namespace ns3
 
                 std::string cur_prefix;
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
-                NS_LOG_INFO("Setting prefix to: "<<cur_prefix);
+                NS_LOG_INFO("Setting prefix to: " << cur_prefix);
                 consumerHelper.SetPrefix(cur_prefix);
-                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install((iot[idx].Get(node_periph))); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + interval_sel));
@@ -384,6 +385,8 @@ namespace ns3
         double freshness = 0;
         bool ipbackhaul = false;
         int payloadsize = 10;
+        double min_freq = 0.0166;
+        double max_freq = 5;
         std::string zm_q = "0.7";
         std::string zm_s = "0.7";
 
@@ -396,7 +399,8 @@ namespace ns3
         cmd.AddValue("con_leaf", "Number of leafnodes acting as consumers", con_leaf);
         cmd.AddValue("con_inside", "Number of nodes inside domains acting as consumers", con_inside);
         cmd.AddValue("con_gtw", "Number of consumers on gateway nodes.", con_gtw);
-
+        cmd.AddValue("min_freq", "Minimum packet transmission frequency in pkts/s", min_freq);
+        cmd.AddValue("max_freq", "Maximum packet transmission frequency in pkts/s", max_freq);
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
@@ -540,7 +544,7 @@ namespace ns3
 
         if (ndn) {
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
-                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s);
+                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
