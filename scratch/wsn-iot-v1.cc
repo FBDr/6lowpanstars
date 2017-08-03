@@ -22,7 +22,8 @@
 #include <string>
 #include <vector>
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
@@ -60,6 +61,14 @@ namespace ns3 {
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
 
+    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
+        Ptr<Node> selNode;
+        Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+        selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
+
+        return selNode;
+    }
+
     void shuffle_array(std::vector<int>& arrayf) {
 
         //Shuffles std::vector array a random number of times.
@@ -85,6 +94,7 @@ namespace ns3 {
         shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
 
         for (int itx = 0; itx < numContents; itx++) {
+
             returnBucket.push_back(arrayf[round(shuffles->GetValue())]);
             std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
         }
@@ -93,6 +103,7 @@ namespace ns3 {
     }
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
+
         double nodenum = std::stoi(context);
         std::ofstream outfile;
         outfile.open("energy.txt", std::ios_base::app);
@@ -116,9 +127,9 @@ namespace ns3 {
 
 
 
-    void NDN_stack(int &node_head, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
-            int &totnumcontents, BriteTopologyHelper &bth, int &simtime, int &num_Con, bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize,
-            std::string zm_q, std::string zm_s) {
+    void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
+            BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
+            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
 
@@ -158,37 +169,72 @@ namespace ns3 {
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
         ndnGlobalRoutingHelper.InstallAll();
 
-        //Consumer application
-        consumerHelper.SetPrefix(prefix);
-        consumerHelper.SetAttribute("q", StringValue(zm_q)); // 10 different contents
-        consumerHelper.SetAttribute("s", StringValue(zm_s)); // 10 different contents
-        consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(totnumcontents))); // 10 different contents
-
-        for (int jdx = 0; jdx < num_Con; jdx++) {
-            interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-            consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-            apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
-            apps.Start(Seconds(120.0 + interval_sel));
-            apps.Stop(Seconds(simtime - 5));
-        }
-
-        // Producer application
-        std::vector<int> content_chunks(totnumcontents);
+        //Producer install
+        std::vector<int> content_chunks(node_periph);
         std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
         shuffle_array(content_chunks);
         shuffle_array(content_chunks);
 
-        for (int jdx = 0; jdx < totnumcontents; jdx++) {
-            //This function assumes the total number of contents to be higher than the total number of producers.
-            std::string cur_prefix;
-            int cur_node = jdx % ((int) endnodes.GetN());
-            cur_prefix = prefix + "/" + std::to_string(content_chunks[jdx]);
-            producerHelper.SetPrefix(cur_prefix);
-            producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
-            producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
-            producerHelper.Install(endnodes.Get(cur_node)); // All producers have at least one data packet.
-            ndnGlobalRoutingHelper.AddOrigin(cur_prefix, endnodes.Get(cur_node)); //Install routing entry for every node in FIB
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < node_periph; jdx++) {
+                std::string cur_prefix;
+                cur_prefix = "Home_" + node_head + prefix + "/" + std::to_string(content_chunks[jdx]);
+                producerHelper.SetPrefix(cur_prefix);
+                producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
+                producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
+                producerHelper.Install(iot[node_head].Get(node_periph)); // All producers have at least one data packet.
+                ndnGlobalRoutingHelper.AddOrigin(cur_prefix, iot[node_head].Get(node_periph)); //Install routing entry for every node in FIB
+            }
         }
+
+        //Consumer leafnode install
+        consumerHelper.SetAttribute("q", StringValue(zm_q));
+        consumerHelper.SetAttribute("s", StringValue(zm_s));
+        consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(node_periph)));
+
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_leaf; jdx++) {
+                std::string cur_prefix;
+                cur_prefix = "Home_" + node_head + prefix;
+                consumerHelper.SetPrefix(prefix);
+                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
+                apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
+        }
+        //Consumer inside install
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_inside; jdx++) {
+
+                std::string cur_prefix;
+                cur_prefix = "Home_" + node_head + prefix;
+                consumerHelper.SetPrefix(prefix);
+                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
+                apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[node_head])); //Consumers are at leaf nodes.
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
+        }
+
+        //Consumer inside install
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_gtw; jdx++) {
+
+                std::string cur_prefix;
+                cur_prefix = "Home_" + node_head + prefix;
+                consumerHelper.SetPrefix(prefix);
+                interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
+                apps = consumerHelper.Install((iot[node_head].Get(node_periph))); //Consumers are at leaf nodes.
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
+        }
+
+
 
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
@@ -252,6 +298,7 @@ namespace ns3 {
         //Create IPv6AddrResBucket.
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
+
                 IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
                 NS_LOG_INFO("Filling IPv6 bucket " << i_6lowpan[idx].GetAddress(jdx, 1));
             }
@@ -295,6 +342,7 @@ namespace ns3 {
         client.SetAttribute("s", StringValue(zm_s)); // 10 different contents
 
         for (int jdx = 0; jdx < num_Con; jdx++) {
+
             cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
             NS_LOG_INFO("Selected: " << cur_con << " as Coap consumer. ");
             interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5));
@@ -316,7 +364,14 @@ namespace ns3 {
         int node_periph = 9;
         int node_head = 3;
         int num_Con = 0;
-        int con_per = 0;
+
+        //Consumers
+        int con_leaf = 0;
+        int con_inside = 0;
+        int con_gtw = 0;
+
+
+
         //int num_Pro;
         int dist = 100;
         int totnumcontents = 100;
@@ -337,7 +392,10 @@ namespace ns3 {
         cmd.AddValue("nodes", "Number of nodes", node_num); //Not implemented
         cmd.AddValue("periph", "Number of peripheral nodes", node_periph);
         cmd.AddValue("head", "Number of head nodes", node_head);
-        cmd.AddValue("ConPer", "Percentage of leafnodes being consumers.", con_per);
+        cmd.AddValue("con_leaf", "Number of leafnodes acting as consumers", con_leaf);
+        cmd.AddValue("con_inside", "Number of nodes inside domains acting as consumers", con_inside);
+        cmd.AddValue("con_gtw", "Number of consumers on gateway nodes.", con_gtw);
+
         cmd.AddValue("Contents", "Total number of contents", totnumcontents);
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
@@ -393,7 +451,6 @@ namespace ns3 {
         routers.Add(br);
         //totalnodes = node_head* node_periph + node_head + bth.GetNNodesTopology();
         totalleafs = bth.GetNLeafNodes();
-        num_Con = (float) totalleafs * con_per / 100;
 
         NS_LOG_INFO("This topology contains: " << (int) totalleafs << " leafnodes.");
         all.Add(routers);
@@ -481,7 +538,8 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, iot, backhaul, endnodes, totnumcontents, bth, simtime, num_Con, cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s);
+            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
+                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
         }
 
@@ -540,6 +598,7 @@ namespace ns3 {
         }
         Simulator::Destroy();
         NS_LOG_INFO("Done.");
+
         return 0;
     }
 }
