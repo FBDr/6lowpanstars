@@ -178,12 +178,12 @@ namespace ns3
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 std::string cur_prefix;
-                cur_prefix = "Home_" + node_head + prefix + "/" + std::to_string(content_chunks[jdx]);
+                cur_prefix = "/Home_" + std::to_string(idx) + prefix + "/" + std::to_string(content_chunks[jdx]);
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
                 producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
-                producerHelper.Install(iot[node_head].Get(node_periph)); // All producers have at least one data packet.
-                ndnGlobalRoutingHelper.AddOrigin(cur_prefix, iot[node_head].Get(node_periph)); //Install routing entry for every node in FIB
+                producerHelper.Install(iot[idx].Get(jdx)); // All producers have at least one data packet.
+                ndnGlobalRoutingHelper.AddOrigin(cur_prefix, iot[idx].Get(jdx)); //Install routing entry for every node in FIB
             }
         }
 
@@ -195,8 +195,8 @@ namespace ns3
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 std::string cur_prefix;
-                cur_prefix = "Home_" + node_head + prefix;
-                consumerHelper.SetPrefix(prefix);
+                cur_prefix =  "/Home_" + std::to_string(idx) + prefix;
+                consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
@@ -209,26 +209,27 @@ namespace ns3
             for (int jdx = 0; jdx < con_inside; jdx++) {
 
                 std::string cur_prefix;
-                cur_prefix = "Home_" + node_head + prefix;
-                consumerHelper.SetPrefix(prefix);
+                cur_prefix =  "/Home_" + std::to_string(idx) + prefix;
+                consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[node_head])); //Consumers are at leaf nodes.
+                apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[idx])); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + interval_sel));
                 apps.Stop(Seconds(simtime - 5));
             }
         }
 
-        //Consumer inside install
+        //Consumer gtw install
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_gtw; jdx++) {
 
                 std::string cur_prefix;
-                cur_prefix = "Home_" + node_head + prefix;
-                consumerHelper.SetPrefix(prefix);
+                cur_prefix = "/Home_" + std::to_string(idx) + prefix;
+                NS_LOG_INFO("Setting prefix to: "<<cur_prefix);
+                consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5)); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                apps = consumerHelper.Install((iot[node_head].Get(node_periph))); //Consumers are at leaf nodes.
+                apps = consumerHelper.Install((iot[idx].Get(node_periph))); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + interval_sel));
                 apps.Stop(Seconds(simtime - 5));
             }
