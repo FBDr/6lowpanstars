@@ -73,10 +73,6 @@ namespace ns3 {
                 "ns3::Packet::TracedCallback")
 
                 //ZM
-                .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
-                MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
-                &CoapClient::GetNumberOfContents),
-                MakeUintegerChecker<uint32_t>())
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
                 MakeDoubleAccessor(&CoapClient::SetQ,
                 &CoapClient::GetQ),
@@ -85,7 +81,12 @@ namespace ns3 {
                 .AddAttribute("s", "parameter of power", StringValue("0.7"),
                 MakeDoubleAccessor(&CoapClient::SetS,
                 &CoapClient::GetS),
-                MakeDoubleChecker<double>());
+                MakeDoubleChecker<double>())
+                .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
+                MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
+                &CoapClient::GetNumberOfContents),
+                MakeUintegerChecker<uint32_t>());
+
         ;
         return tid;
     }
@@ -142,6 +143,7 @@ namespace ns3 {
     CoapClient::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
         m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
         m_IPv6Bucket = bucket;
+        // SetNumberOfContents((uint32_t)bucket.size());
 
     }
 
@@ -153,7 +155,7 @@ namespace ns3 {
     void
     CoapClient::SetQ(double q) {
         m_q = q;
-        SetNumberOfContents(m_N);
+        NS_LOG_INFO("Setting q to: " << q);
     }
 
     double
@@ -164,7 +166,7 @@ namespace ns3 {
     void
     CoapClient::SetS(double s) {
         m_s = s;
-        SetNumberOfContents(m_N);
+        NS_LOG_INFO("Setting s to: " << s);
     }
 
     double
@@ -218,7 +220,7 @@ namespace ns3 {
         float pktloss = 100.0 - (float) m_received / (float) m_sent * 100.0;
         std::ofstream outfile;
         outfile.open("pktloss.txt", std::ios_base::app);
-        outfile << GetNode()->GetId() << " " << m_sent << " " << m_received << " " << pktloss <<std::endl;
+        outfile << GetNode()->GetId() << " " << m_sent << " " << m_received << " " << pktloss << std::endl;
 
         NS_LOG_INFO("Total transmitted packets: " << m_sent);
         NS_LOG_INFO("Total received packets: " << m_received);

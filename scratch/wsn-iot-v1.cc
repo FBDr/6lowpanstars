@@ -336,7 +336,8 @@ namespace ns3
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 apps = client.Install(SelectRandomLeafNode(briteth));
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 NS_LOG_INFO("Size of generated bucket: " << AddrResBucket[idx].size());
@@ -347,9 +348,10 @@ namespace ns3
 
         //Client inside nodes
         for (int idx = 0; idx < node_head; idx++) {
-            for (int jdx = 0; jdx < con_leaf; jdx++) {
+            for (int jdx = 0; jdx < con_inside; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 apps = client.Install(SelectRandomNodeFromContainer(iot[idx]));
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 apps.Start(Seconds(120.0 + interval_sel));
@@ -360,9 +362,10 @@ namespace ns3
         
         //Client gateway nodes
         for (int idx = 0; idx < node_head; idx++) {
-            for (int jdx = 0; jdx < con_leaf; jdx++) {
+            for (int jdx = 0; jdx < con_gtw; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 apps = client.Install(iot[idx].Get(node_periph));
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 apps.Start(Seconds(120.0 + interval_sel));

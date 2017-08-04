@@ -86,9 +86,6 @@ namespace ns3 {
     void
     CoapClientHelper::SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket) {
         app->GetObject<CoapClient>()->SetIPv6Bucket(bucket);
-        SetAttribute("NumberOfContents", UintegerValue(bucket.size()));
-        std::cout<<"Number of addresses in bucket is: " << bucket.size()<<std::endl;
-        app->GetObject<CoapClient>()->SetNumberOfContents((uint32_t)bucket.size());
     }
 
     void
