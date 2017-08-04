@@ -83,23 +83,13 @@ namespace ns3
         }
     };
 
-    std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, int numContents) {
+    std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain) {
 
         // Function to generate an address resolution vector, which maps content number (array iterator) to a specific producer.
         // (!) This function assumes that the total number of contents is larger than the total number of nodes.
 
-        std::vector<Ipv6Address> returnBucket;
-        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
-        shuffles->SetAttribute("Min", DoubleValue(0));
-        shuffles->SetAttribute("Max", DoubleValue(arrayf.size() - 1));
-
-        for (int itx = 0; itx < numContents; itx++) {
-
-            returnBucket.push_back(arrayf[round(shuffles->GetValue())]);
-            std::cout << "Content chunk: " << itx << " is at: " << returnBucket[itx] << std::endl;
-        }
-
-        return returnBucket;
+        // For the smart home case we use one content per producer node.
+        return arrayf;
     }
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
@@ -129,7 +119,7 @@ namespace ns3
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
-            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s, 
+            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
@@ -246,7 +236,7 @@ namespace ns3
     void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
             NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
             Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
-            std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
+            std::vector< std::vector<Ipv6Address> > &IPv6Bucket, std::vector< std::vector<Ipv6Address> > &AddrResBucket,
             NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
 
         //This function installs 6LowPAN stack on nodes if IP is selected as networking protocol.
@@ -301,23 +291,23 @@ namespace ns3
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
 
-                IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
-                NS_LOG_INFO("Filling IPv6 bucket " << i_6lowpan[idx].GetAddress(jdx, 1));
+                IPv6Bucket[idx].push_back(i_6lowpan[idx].GetAddress(jdx, 1));
+                NS_LOG_INFO("Filling IPv6 bucket " << IPv6Bucket[idx][jdx]);
             }
         }
-        AddrResBucket = CreateAddrResBucket(IPv6Bucket, totnumcontents);
+        AddrResBucket = CreateAddrResBucket(IPv6Bucket, node_periph);
     }
 
-    void sixlowpan_apps(int &node_periph, int &node_head, int &num_Con, NodeContainer iot[], NodeContainer all,
-            std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
+    void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all,
+            std::vector< std::vector<Ipv6Address> > &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
-            std::string zm_q, std::string zm_s) {
+            std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
+            double &min_freq, double &max_freq) {
 
         //This function installs the specific IP applications. 
 
         uint32_t maxPacketCount = 99999999; //Optional
         uint16_t port = 9;
-        int cur_con = 0;
         double interval_sel;
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
@@ -331,30 +321,54 @@ namespace ns3
                 //Install server application on every node, in every IoT domain.
                 server.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
                 apps = server.Install(iot[itr].Get(jdx));
-                server.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+                server.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
 
             }
         }
         apps.Start(Seconds(1.0));
         apps.Stop(Seconds(simtime));
 
-        //Client
+        // Client leafnode
         client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
         client.SetAttribute("q", StringValue(zm_q)); // 10 different contents
         client.SetAttribute("s", StringValue(zm_s)); // 10 different contents
 
-        for (int jdx = 0; jdx < num_Con; jdx++) {
-
-            cur_con = (int) (Rcon->GetValue()*(all.GetN() - 1));
-            NS_LOG_INFO("Selected: " << cur_con << " as Coap consumer. ");
-            interval_sel = Rinterval->GetValue((double) (0.0166), (double) (5));
-            client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-            apps = client.Install(SelectRandomLeafNode(briteth));
-            client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
-            apps.Start(Seconds(120.0 + interval_sel));
-            apps.Stop(Seconds(simtime - 5));
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_leaf; jdx++) {
+                interval_sel = Rinterval->GetValue(min_freq, max_freq);
+                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                apps = client.Install(SelectRandomLeafNode(briteth));
+                client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
+                NS_LOG_INFO("Size of generated bucket: " << AddrResBucket[idx].size());
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
         }
 
+        //Client inside nodes
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_leaf; jdx++) {
+                interval_sel = Rinterval->GetValue(min_freq, max_freq);
+                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                apps = client.Install(SelectRandomNodeFromContainer(iot[idx]));
+                client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
+        }
+        
+        
+        //Client gateway nodes
+        for (int idx = 0; idx < node_head; idx++) {
+            for (int jdx = 0; jdx < con_leaf; jdx++) {
+                interval_sel = Rinterval->GetValue(min_freq, max_freq);
+                client.SetAttribute("Interval", TimeValue(Seconds(interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                apps = client.Install(iot[idx].Get(node_periph));
+                client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
+                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Stop(Seconds(simtime - 5));
+            }
+        }
     }
 
     int main(int argc, char **argv) {
@@ -365,7 +379,6 @@ namespace ns3
         int node_num = 10;
         int node_periph = 9;
         int node_head = 3;
-        int num_Con = 0;
 
         //Consumers
         int con_leaf = 0;
@@ -558,8 +571,11 @@ namespace ns3
         Ipv6InterfaceContainer i_6lowpan[node_head];
         Ipv6InterfaceContainer i_csma[node_head];
         Ipv6InterfaceContainer i_backhaul;
-        std::vector<Ipv6Address> IPv6Bucket; //Vector containing all producer IPv6 addresses.
-        std::vector<Ipv6Address> AddrResBucket; //Content address lookup vector.
+        std::vector< std::vector<Ipv6Address> > IPv6Bucket; //Vector containing all producer IPv6 addresses.
+        std::vector< std::vector<Ipv6Address> > AddrResBucket; //Content address lookup vector.
+        IPv6Bucket.resize(node_head);
+        AddrResBucket.resize(node_head);
+        
         ApplicationContainer apps;
 
         if (!ndn) {
@@ -567,7 +583,7 @@ namespace ns3
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, num_Con, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s);
+            sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq);
         }
 
 
