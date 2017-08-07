@@ -89,7 +89,7 @@ namespace ns3 {
         /**
          * \brief Filter request number out of received payload.
          */
-        uint32_t FilterReqNum(void);
+        uint32_t FilterReqNum(uint32_t size);
         /**
          * \brief Check whether requested data is available at this server.
          */

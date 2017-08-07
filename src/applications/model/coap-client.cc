@@ -260,7 +260,7 @@ namespace ns3 {
     CoapClient::SetFill(std::string fill) {
         NS_LOG_FUNCTION(this << fill);
 
-        uint32_t dataSize = fill.size() + 1;
+        uint32_t dataSize = 20; //CoAp GET message is 20 bytes long.
 
         if (dataSize != m_dataSize) {
             delete [] m_data;
@@ -341,7 +341,7 @@ namespace ns3 {
         coaptag.SetSeq(m_sent);
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
-        SetFill("GET/" + std::to_string(nxtsq));
+        SetFill("Sensordata/" + std::to_string(nxtsq));
 
         Ptr<Packet> p;
         if (m_dataSize) {
@@ -375,7 +375,7 @@ namespace ns3 {
 
 
         ++m_sent;
-        std::cout<<"s: "<< m_sent<<std::endl;
+        //std::cout<<"s: "<< m_sent<<std::endl;
 
         if (Ipv6Address::IsMatchingType(m_IPv6Bucket[nxtsq])) {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
@@ -414,7 +414,7 @@ namespace ns3 {
 
                 PrintToFile(hops, delay);
                 m_received++;
-                std::cout<<"r: "<< m_received<<std::endl;
+                //std::cout<<"r: "<< m_received<<std::endl;
 
             }
         }

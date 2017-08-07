@@ -112,15 +112,14 @@ namespace ns3 {
     }
 
     uint32_t
-    CoapServer::FilterReqNum(void) {
+    CoapServer::FilterReqNum(uint32_t size) {
 
         // This function filters the request number from the received payload.
 
         NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
-        std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), sizeof (m_Rdata));
+        std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), size);
         std::size_t pos = Rdatastr.find("/"); // Find position of "/" leading the sequence number.
         std::string str3 = Rdatastr.substr(pos + 1); // filter this sequence number to the end.
-
         return std::stoi(str3);
     }
 
@@ -237,7 +236,7 @@ namespace ns3 {
             // Copy data from current received packet into buffer. 
             m_Rdata = new uint8_t [received_packet->GetSize()];
             received_packet->CopyData(m_Rdata, received_packet->GetSize());
-            uint32_t received_Req = FilterReqNum();
+            uint32_t received_Req = FilterReqNum(received_packet->GetSize());
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
                 CreateResponsePkt("POST", m_packet_payload_size);
