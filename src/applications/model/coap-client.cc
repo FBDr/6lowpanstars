@@ -375,6 +375,7 @@ namespace ns3 {
 
 
         ++m_sent;
+        std::cout<<"s: "<< m_sent<<std::endl;
 
         if (Ipv6Address::IsMatchingType(m_IPv6Bucket[nxtsq])) {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
@@ -413,6 +414,7 @@ namespace ns3 {
 
                 PrintToFile(hops, delay);
                 m_received++;
+                std::cout<<"r: "<< m_received<<std::endl;
 
             }
         }
