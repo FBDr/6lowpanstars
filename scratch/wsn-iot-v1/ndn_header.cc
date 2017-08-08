@@ -1,11 +1,11 @@
 #include "stacks_header.h"
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ndn-stack");
+
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
-            bool &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
+            int &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
@@ -28,7 +28,10 @@ namespace ns3
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
         }
         if (freshness) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru");
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+        } else {
+            //Then the default CS is being used.
+            ndnHelper.setCsSize(cache);
         }
 
         // Install NDN stack on iot endnodes

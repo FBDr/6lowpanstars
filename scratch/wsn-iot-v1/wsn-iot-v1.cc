@@ -59,7 +59,7 @@ namespace ns3 {
         int simtime = 60;
         bool ndn = true;
         bool pcaptracing = true;
-        bool cache = true;
+        int cache = 100;
         double freshness = 0;
         bool ipbackhaul = false;
         int payloadsize = 10;
@@ -83,7 +83,7 @@ namespace ns3 {
         cmd.AddValue("ndn", "ndn=0 --> ip, ndn=1 --> NDN", ndn);
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
-        cmd.AddValue("cache", "Enable caching.", cache);
+        cmd.AddValue("cache", "Enable caching. Set the number of items in caches", cache);
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
         cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
