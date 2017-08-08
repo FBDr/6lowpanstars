@@ -218,6 +218,7 @@ namespace ns3 {
             Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (endnodes.Get(endN)->GetDevice(0));
             em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
             es[endN]->TraceConnect("RemainingEnergy", std::to_string(endnodes.Get(endN)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+            //device->SetMac(mac[endN]); Meerdere devices hebben hetzelfde mac address!
             // device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
 
         }
