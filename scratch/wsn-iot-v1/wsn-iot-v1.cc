@@ -182,7 +182,7 @@ namespace ns3 {
         //Create and install CSMA and LrWpan channels.
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
-        if (ndn) {
+        if (ndn && ipbackhaul) {
             csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(csma_delay)));
         } else {
             csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
