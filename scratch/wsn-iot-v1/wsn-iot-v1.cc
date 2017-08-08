@@ -172,7 +172,7 @@ namespace ns3 {
             BorderRouterPositionAlloc->Add(Vector(-95 + jdx * dist, 395, 0.0));
         }
 
-        NS_ASSERT_MSG(endnodes.GetN() <= (uint32_t) totnumcontents, "The number of contents should be larger than the number of endnodes in the current implementation");
+        //NS_ASSERT_MSG(endnodes.GetN() <= (uint32_t) totnumcontents, "The number of contents should be larger than the number of endnodes in the current implementation");
 
         mobility.SetPositionAllocator(BorderRouterPositionAlloc);
         mobility.Install(br);
@@ -182,7 +182,12 @@ namespace ns3 {
         //Create and install CSMA and LrWpan channels.
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
-        csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(csma_delay)));
+        if (ndn) {
+            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(csma_delay)));
+        } else {
+            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
+        }
+
         LrWpanHelper lrWpanHelper[node_head];
 
         for (int jdx = 0; jdx < node_head; jdx++) {
