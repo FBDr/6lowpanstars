@@ -25,7 +25,8 @@
 #include "stacks_header.h"
 #include "g_function_header.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
@@ -218,8 +219,9 @@ namespace ns3 {
             Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (endnodes.Get(endN)->GetDevice(0));
             em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
             es[endN]->TraceConnect("RemainingEnergy", std::to_string(endnodes.Get(endN)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
-            //device->SetMac(mac[endN]); Meerdere devices hebben hetzelfde mac address!
-            // device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
+            //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
+            //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
+            //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
 
         }
 

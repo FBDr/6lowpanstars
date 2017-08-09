@@ -24,6 +24,7 @@
 #include "lr-wpan-phy.h"
 #include "lr-wpan-csmaca.h"
 #include "lr-wpan-error-model.h"
+#include "lr-wpan-contikimac.h"
 #include <ns3/abort.h>
 #include <ns3/node.h>
 #include <ns3/log.h>
@@ -74,6 +75,7 @@ LrWpanNetDevice::LrWpanNetDevice ()
 {
   NS_LOG_FUNCTION (this);
   m_mac = CreateObject<LrWpanNullMac> ();
+  //m_mac = CreateObject<LrWpanContikiMac> ();
   m_phy = CreateObject<LrWpanPhy> ();
   m_csmaca = CreateObject<LrWpanCsmaCa> ();
   CompleteConfig ();
