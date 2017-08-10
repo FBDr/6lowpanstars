@@ -103,7 +103,9 @@ namespace ns3
         remove("hopdelay.txt");
         remove("pktloss.txt");
 
-        LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
+        //LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
+        //LogComponentEnable("LrWpanNetDevice", LOG_LEVEL_DEBUG);
+        
 
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
@@ -190,10 +192,10 @@ namespace ns3
         }
 
         LrWpanHelper lrWpanHelper[node_head];
-
+        bool useContiki = false;
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
-            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx], true);
+            LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot, node_periph, node_head, useContiki, node_periph);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
         }
 
@@ -220,6 +222,7 @@ namespace ns3
                 Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
                 em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
                 es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+      
                 //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
                 //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));

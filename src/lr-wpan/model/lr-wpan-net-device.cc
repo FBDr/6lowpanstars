@@ -87,10 +87,12 @@ LrWpanNetDevice::LrWpanNetDevice (bool useContiki)
   if (useContiki)
   {
      m_mac = CreateObject<LrWpanContikiMac> ();
+     std::cout<<"Installed ContikiMac."<<std::endl;
   }
   else
   {
       m_mac = CreateObject<LrWpanNullMac> ();
+      std::cout<<"Installed nullMac."<<std::endl;
   }
   m_phy = CreateObject<LrWpanPhy> ();
   m_csmaca = CreateObject<LrWpanCsmaCa> ();
