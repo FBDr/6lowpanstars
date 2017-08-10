@@ -1232,7 +1232,6 @@ void
 LrWpanPhy::EndTx (void)
 {
   NS_LOG_FUNCTION (this);
-  std::cout<< m_trxState <<std::endl;
   NS_ABORT_IF ( (m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF));
 
   if (m_currentTxPacket.second == false)
