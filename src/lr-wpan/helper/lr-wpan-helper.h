@@ -102,6 +102,12 @@ public:
    * \param c a set of nodes
    * \returns A container holding the added net devices.
    */
+  NetDeviceContainer Install (NodeContainer c, bool useContiki);
+    /**
+   * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
+   * \param c a set of nodes
+   * \returns A container holding the added net devices.
+   */
   NetDeviceContainer Install (NodeContainer c);
 
   /**

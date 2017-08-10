@@ -58,6 +58,7 @@ public:
   static TypeId GetTypeId (void);
 
   LrWpanNetDevice (void);
+  LrWpanNetDevice (bool useContiki);
   virtual ~LrWpanNetDevice (void);
 
   /**

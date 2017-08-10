@@ -192,6 +192,25 @@ LrWpanHelper::Install (NodeContainer c)
   return devices;
 }
 
+NetDeviceContainer
+LrWpanHelper::Install (NodeContainer c, bool usecontiki)
+{
+  NetDeviceContainer devices;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+    {
+      Ptr<Node> node = *i;
+
+      Ptr<LrWpanNetDevice> netDevice = CreateObject<LrWpanNetDevice> (usecontiki);
+      netDevice->SetChannel (m_channel);
+      node->AddDevice (netDevice);
+      netDevice->SetNode (node);
+      // \todo add the capability to change short address, extended
+      // address and panId. Right now they are hardcoded in LrWpanMac::LrWpanMac ()
+      devices.Add (netDevice);
+    }
+  return devices;
+}
+
 
 Ptr<SpectrumChannel>
 LrWpanHelper::GetChannel (void)

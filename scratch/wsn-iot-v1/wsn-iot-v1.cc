@@ -193,7 +193,7 @@ namespace ns3
 
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
-            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
+            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx], true);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
         }
 

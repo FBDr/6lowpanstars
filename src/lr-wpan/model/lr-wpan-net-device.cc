@@ -80,6 +80,22 @@ LrWpanNetDevice::LrWpanNetDevice ()
   m_csmaca = CreateObject<LrWpanCsmaCa> ();
   CompleteConfig ();
 }
+LrWpanNetDevice::LrWpanNetDevice (bool useContiki)
+  : m_configComplete (false)
+{
+  NS_LOG_FUNCTION (this);
+  if (useContiki)
+  {
+     m_mac = CreateObject<LrWpanContikiMac> ();
+  }
+  else
+  {
+      m_mac = CreateObject<LrWpanNullMac> ();
+  }
+  m_phy = CreateObject<LrWpanPhy> ();
+  m_csmaca = CreateObject<LrWpanCsmaCa> ();
+  CompleteConfig ();
+}
 
 LrWpanNetDevice::~LrWpanNetDevice ()
 {
