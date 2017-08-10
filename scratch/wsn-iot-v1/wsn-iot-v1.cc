@@ -194,7 +194,6 @@ namespace ns3
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
             LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
-            //lrWpanHelper.AssociateToPan(LrWpanDevCon[jdx], jdx + 10);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
         }
 
@@ -205,24 +204,26 @@ namespace ns3
         Ptr<LrWpanRadioEnergyModel> em[endnodes.GetN()];
         Ptr<BasicEnergySource> es[endnodes.GetN()];
         Ptr<LrWpanContikiMac> mac[endnodes.GetN()]; //Change Mac
+        int endN = 0;
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            for (int idx = 0; idx < node_periph; idx++) {
+                endN++;
+                em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
+                es[endN] = CreateObject<BasicEnergySource> ();
+                mac[endN] = CreateObject<LrWpanContikiMac> ();
+                es[endN]->SetSupplyVoltage(3.3);
+                es[endN]->SetInitialEnergy(5400); //1 AA battery
+                es[endN]->SetNode(iot[jdx].Get(idx));
+                es[endN]->AppendDeviceEnergyModel(em[endN]);
+                em[endN]->SetEnergySource(es[endN]);
 
-        for (uint32_t endN = 0; endN < endnodes.GetN(); endN++) {
-            em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
-            es[endN] = CreateObject<BasicEnergySource> ();
-            mac[endN] = CreateObject<LrWpanContikiMac> ();
-            es[endN]->SetSupplyVoltage(3.3);
-            es[endN]->SetInitialEnergy(5400); //1 AA battery
-            es[endN]->SetNode(endnodes.Get(endN));
-            es[endN]->AppendDeviceEnergyModel(em[endN]);
-            em[endN]->SetEnergySource(es[endN]);
-
-            Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (endnodes.Get(endN)->GetDevice(0));
-            em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-            es[endN]->TraceConnect("RemainingEnergy", std::to_string(endnodes.Get(endN)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
-            //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-            //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
-            //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
-
+                Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
+                em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
+                es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+                //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
+                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
+                //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
+            }
         }
 
         /*
