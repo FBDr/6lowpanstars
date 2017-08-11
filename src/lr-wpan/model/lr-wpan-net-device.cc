@@ -91,6 +91,7 @@ LrWpanNetDevice::LrWpanNetDevice (bool useContiki)
   }
   else
   {
+      //m_mac = CreateObject<LrWpanNullMac> ();
       m_mac = CreateObject<LrWpanNullMac> ();
       std::cout<<"Installed nullMac."<<std::endl;
   }

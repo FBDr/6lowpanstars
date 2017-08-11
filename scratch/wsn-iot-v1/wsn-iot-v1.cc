@@ -24,6 +24,7 @@
 
 #include "stacks_header.h"
 #include "g_function_header.h"
+#include "src/wifi/model/qos-tag.h"
 
 namespace ns3
 {
@@ -63,6 +64,7 @@ namespace ns3
         int cache = 100;
         double freshness = 0;
         bool ipbackhaul = false;
+        bool useContiki = false;
         int payloadsize = 10;
         double min_freq = 0.0166;
         double max_freq = 5;
@@ -92,6 +94,7 @@ namespace ns3
         cmd.AddValue("zm_q", "Set the alpha parameter of the ZM distribution", zm_q);
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.AddValue("csma_delay", "Set the delay for the Br <-> Backhaul connection.", csma_delay);
+        cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -104,8 +107,7 @@ namespace ns3
         remove("pktloss.txt");
 
         //LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
-        //LogComponentEnable("LrWpanNetDevice", LOG_LEVEL_DEBUG);
-        
+        //LogComponentEnable("LrWpanPhy", LOG_LEVEL_DEBUG);
 
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
@@ -192,7 +194,7 @@ namespace ns3
         }
 
         LrWpanHelper lrWpanHelper[node_head];
-        bool useContiki = true;
+        
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
             LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot[jdx], node_periph, node_head, useContiki, node_periph);
@@ -227,7 +229,7 @@ namespace ns3
                 es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
       
                 //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.125));
+                //device->GetMac ()->SetAttribute ("CcaInterval", DoubleValue (0.008));
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
             }
         }
