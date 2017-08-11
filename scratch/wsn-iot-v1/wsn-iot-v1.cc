@@ -195,7 +195,8 @@ namespace ns3
         bool useContiki = false;
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
-            LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot, node_periph, node_head, useContiki, node_periph);
+            //LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot, node_periph, node_head, useContiki, node_periph);
+            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
         }
 
@@ -203,9 +204,11 @@ namespace ns3
 
         //Energy framework
 
-        Ptr<LrWpanRadioEnergyModel> em[endnodes.GetN()];
-        Ptr<BasicEnergySource> es[endnodes.GetN()];
-        Ptr<LrWpanContikiMac> mac[endnodes.GetN()]; //Change Mac
+        int size = node_head*node_periph +1 ; 
+        Ptr<LrWpanRadioEnergyModel> em[size];
+        Ptr<BasicEnergySource> es[size];
+        Ptr<LrWpanContikiMac> mac[size]; //Change Mac
+        
         int endN = 0;
         for (int jdx = 0; jdx < node_head; jdx++) {
             for (int idx = 0; idx < node_periph; idx++) {
