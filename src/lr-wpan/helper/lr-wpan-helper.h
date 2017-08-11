@@ -114,7 +114,7 @@ public:
    * \param c a set of nodes
    * \returns A container holding the added net devices.
    */
-  NetDeviceContainer InstallIoT(NodeContainer c[], int &node_periph, int &node_head, bool &usecontiki, int &gtw_num);
+  NetDeviceContainer InstallIoT(NodeContainer c, int &node_periph, int &node_head, bool &usecontiki, int &gtw_num);
 
   /**
    * \brief Associate the nodes to the same PAN

@@ -194,25 +194,22 @@ namespace ns3 {
     }
 
     NetDeviceContainer
-    LrWpanHelper::InstallIoT(NodeContainer c[], int &node_periph, int &node_head, bool &usecontiki, int &gtw_num) {
+    LrWpanHelper::InstallIoT(NodeContainer c, int &node_periph, int &node_head, bool &usecontiki, int &gtw_num) {
         NetDeviceContainer devices;
-        for (int jdx = 0; jdx < node_head; jdx++) {
 
-            for (int idx = 0; idx < (node_periph +1); idx++) {
-                std::cout<< idx<< std::endl;
-                Ptr<LrWpanNetDevice> netDevice;
-                Ptr<Node> node = c[jdx].Get(idx);
-                if (idx == gtw_num) {
-                    netDevice = CreateObject<LrWpanNetDevice> (false);
-                } else {
-                    netDevice = CreateObject<LrWpanNetDevice> (usecontiki);
-                }
-                netDevice->SetChannel(m_channel);
-                node->AddDevice(netDevice);
-                netDevice->SetNode(node);
-                devices.Add(netDevice);
-
+        for (int idx = 0; idx < (node_periph + 1); idx++) {
+            std::cout << idx << std::endl;
+            Ptr<LrWpanNetDevice> netDevice;
+            Ptr<Node> node = c.Get(idx);
+            if (idx == gtw_num) {
+                netDevice = CreateObject<LrWpanNetDevice> (false);
+            } else {
+                netDevice = CreateObject<LrWpanNetDevice> (usecontiki);
             }
+            netDevice->SetChannel(m_channel);
+            node->AddDevice(netDevice);
+            netDevice->SetNode(node);
+            devices.Add(netDevice);
 
         }
         return devices;

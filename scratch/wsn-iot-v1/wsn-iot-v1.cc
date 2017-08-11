@@ -192,11 +192,11 @@ namespace ns3
         }
 
         LrWpanHelper lrWpanHelper[node_head];
-        bool useContiki = false;
+        bool useContiki = true;
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
-            //LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot, node_periph, node_head, useContiki, node_periph);
-            LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
+            LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot[jdx], node_periph, node_head, useContiki, node_periph);
+            //LrWpanDevice[jdx] = lrWpanHelper[jdx].Install(iot[jdx]);
             lrWpanHelper[jdx].AssociateToPan(LrWpanDevice[jdx], 10);
         }
 
