@@ -202,7 +202,7 @@ namespace ns3 {
             Ptr<LrWpanNetDevice> netDevice;
             Ptr<Node> node = c.Get(idx);
             if (idx == gtw_num) {
-                netDevice = CreateObject<LrWpanNetDevice> (usecontiki);
+                netDevice = CreateObject<LrWpanNetDevice> (false);
             } else {
                 netDevice = CreateObject<LrWpanNetDevice> (usecontiki);
             }
