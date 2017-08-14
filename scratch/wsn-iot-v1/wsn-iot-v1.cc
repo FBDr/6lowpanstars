@@ -24,7 +24,6 @@
 
 #include "stacks_header.h"
 #include "g_function_header.h"
-#include "src/wifi/model/qos-tag.h"
 
 namespace ns3
 {
@@ -229,7 +228,7 @@ namespace ns3
                 es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
       
                 //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-                //device->GetMac ()->SetAttribute ("CcaInterval", DoubleValue (0.008));
+                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
             }
         }

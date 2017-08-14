@@ -92,6 +92,7 @@ namespace ns3 {
         uint32_t maxPacketCount = 99999999; //Optional
         uint16_t port = 9;
         double interval_sel;
+        double start_delay;
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
@@ -121,12 +122,13 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
+                start_delay = Rinterval->GetValue(0.1, 5.0);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 apps = client.Install(SelectRandomLeafNode(briteth));
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 NS_LOG_INFO("Size of generated bucket: " << AddrResBucket[idx].size());
-                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
         }
