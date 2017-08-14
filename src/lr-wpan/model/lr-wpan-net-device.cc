@@ -70,16 +70,6 @@ LrWpanNetDevice::GetTypeId (void)
   return tid;
 }
 
-LrWpanNetDevice::LrWpanNetDevice ()
-  : m_configComplete (false)
-{
-  NS_LOG_FUNCTION (this);
-  m_mac = CreateObject<LrWpanNullMac> ();
-  //m_mac = CreateObject<LrWpanContikiMac> ();
-  m_phy = CreateObject<LrWpanPhy> ();
-  m_csmaca = CreateObject<LrWpanCsmaCa> ();
-  CompleteConfig ();
-}
 LrWpanNetDevice::LrWpanNetDevice (bool useContiki)
   : m_configComplete (false)
 {
@@ -95,6 +85,18 @@ LrWpanNetDevice::LrWpanNetDevice (bool useContiki)
       m_mac = CreateObject<LrWpanNullMac> ();
       std::cout<<"Installed nullMac."<<std::endl;
   }
+  m_phy = CreateObject<LrWpanPhy> ();
+  m_csmaca = CreateObject<LrWpanCsmaCa> ();
+  CompleteConfig ();
+}
+
+
+
+LrWpanNetDevice::LrWpanNetDevice ()
+  : m_configComplete (false)
+{
+  NS_LOG_FUNCTION (this);
+  m_mac = CreateObject<LrWpanNullMac> ();
   m_phy = CreateObject<LrWpanPhy> ();
   m_csmaca = CreateObject<LrWpanCsmaCa> ();
   CompleteConfig ();
