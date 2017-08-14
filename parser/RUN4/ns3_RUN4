@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# reserve 1 cores and 8 GB of memory on 1 host
+#
+#BSUB -n 1
+#BSUB -R "rusage[mem=12000]"
+#BSUB -R "span[hosts=1]"
+#
+#BSUB -u floris.drijver@tno.nl
+
+#BSUB -J ns3_4
+#
+NS_LOG=ndn.Producer:ndn.ConsumerZipfMandelbrotV2:wsn-iot-icn  ../static_exe.run --ndn=1 --pcap=0 --simtime=1000 --periph=25 --head=30 --con_leaf=2 --con_gtw=2 --freshness=300 --zm_q=0 --zm_s=0.64 --min_freq=0.0167 --max_freq=0.0083 --cache=590 --payloadsize=5 --ipbackhaul=1 --csma_delay=25 --rng=2203 &> RUN4.txt

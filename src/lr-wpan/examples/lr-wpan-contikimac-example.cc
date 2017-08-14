@@ -173,7 +173,7 @@ int main (int argc, char *argv[])
 
   Ptr<Packet> p3 = Create<Packet> (50);  // 50 bytes of dummy data
   params.m_txOptions = TX_OPTION_NONE;
-  Simulator::Schedule (Seconds (0.52), &LrWpanMac::McpsDataRequest, dev2->GetMac (), params, p3);
+  Simulator::Schedule (Seconds (0.5), &LrWpanMac::McpsDataRequest, dev2->GetMac (), params, p3);
 
   Simulator::Stop (Seconds (0.75));
   Simulator::Run ();

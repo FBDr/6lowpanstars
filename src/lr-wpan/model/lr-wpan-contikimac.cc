@@ -59,6 +59,7 @@ LrWpanContikiMac::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute ("PktInterval",
                    "The interval between each packet transmission",
+                   //TimeValue (Seconds (0.00055)),
                    TimeValue (Seconds (0.00055)),
                    MakeTimeAccessor (&LrWpanContikiMac::m_pktInterval),
                    MakeTimeChecker ())

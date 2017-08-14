@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  parse.py
+#  old_parse.py
 #
 #  Copyright 2017 Floris <floris@ndn-icarus-simulator>
 #
@@ -48,7 +48,6 @@ def energyConsumption(a):
 
 
 idx = 0
-
 node, time, energy = np.loadtxt(sys.argv[1], unpack=True)
 print "File loaded, now busy parsing..."
 node = map(int, node)
@@ -82,6 +81,8 @@ ax.grid(True)
 ax.set_xlabel("Node number")
 ax.set_ylabel("Energy usage (J)")
 ax.get_yaxis().get_major_formatter().set_useOffset(False)
+ax.text(1.02, mean_used_energy, 'Average used energy: ' + str(mean_used_energy) + ' J ' + 'Std. deviation: ' + str(std_used_energy) + ' J', style='italic',
+        bbox={'facecolor':'red', 'alpha':0.5, 'pad':10})
 
 
 for cu_e, cu_t in zip(totenergy, tottime):
@@ -89,5 +90,5 @@ for cu_e, cu_t in zip(totenergy, tottime):
 
 ax2.set_xlabel("Simulation time (s)")
 ax2.set_ylabel("Battery capacity (J)")
-
+pylab.savefig("energy.pdf")
 pylab.show()
