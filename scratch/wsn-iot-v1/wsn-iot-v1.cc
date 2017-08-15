@@ -242,6 +242,7 @@ namespace ns3
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
+            L2RateTracer::InstallAll("drop-trace.txt", Seconds(0.5));
         }
 
 

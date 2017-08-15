@@ -26,14 +26,26 @@ import pylab
 import sys
 import os
 from matplotlib import rcParams
+
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Bitstream Vera Sans']
 rcParams['font.serif'] = ['Bitstream Vera Sans']
 rcParams["font.size"] = "6"
 
 time, node, appid, seq, delay, delayu, rtx, hops = np.loadtxt(sys.argv[1], skiprows=1,
-                                                                 usecols=(0, 1, 2, 3, 5, 6, 7, 8),
-                                                                 unpack=True)
+                                                              usecols=(0, 1, 2, 3, 5, 6, 7, 8),
+                                                              unpack=True)
+
+Time_d, Packets_d = np.loadtxt(sys.argv[2], skiprows=1,
+                           usecols=(0,4),
+                           unpack=True)
+tot_drop = sum(Packets_d)
+if tot_drop:
+    print "L2 packet drops!", tot_drop, "Packets were dropped"
+else:
+    
+    print "No L2 packet drops"
+
 
 delay_filtered = []
 hops_filtered = []
@@ -55,14 +67,15 @@ N = 150
 cumsum, moving_aves, time_moving = [0], [], []
 
 for i, x in enumerate(delay_filtered, 1):
-    cumsum.append(cumsum[i-1] + x)
-    if i>=N:
-        moving_ave = (cumsum[i] - cumsum[i-N])/N
-        #can do stuff with moving_ave here
+    cumsum.append(cumsum[i - 1] + x)
+    if i >= N:
+        moving_ave = (cumsum[i] - cumsum[i - N]) / N
+        # can do stuff with moving_ave here
         moving_aves.append(moving_ave)
 
 time_moving = np.linspace(np.amin(time_filtered), np.amax(time_filtered), num=len(moving_aves))
 
+pylab.figure(0)
 pylab.subplot(221)
 pylab.hist(delay_filtered, bins=50)
 pylab.xlabel("Delay(s)")
@@ -71,7 +84,7 @@ pylab.ylabel("Number of packets")
 pylab.grid(True)
 
 pylab.subplot(222)
-pylab.plot(time_moving,moving_aves)
+pylab.plot(time_moving, moving_aves)
 pylab.xlabel("Simulation time (s)")
 pylab.ylabel("Delay (s)")
 pylab.axis([np.amin(time_filtered), np.amax(time_filtered), 0.001, 0.02])
@@ -91,6 +104,5 @@ pylab.grid(True)
 
 fig = pylab.gcf()
 fig.canvas.set_window_title(sys.argv[1])
-# pylab.show()
-pylab.savefig("results.pdf")
-pylab.savefig("metricsndn.png", dpi = 500)
+pylab.savefig("metricsndn.png", dpi=500)
+pylab.show()
