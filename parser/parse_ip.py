@@ -54,6 +54,7 @@ txPackets_over = []
 rxBytes_over = []
 txBytes_over = []
 
+
 # Parse
 N = len(node)
 x = range(N)
@@ -80,6 +81,20 @@ for flow in flowxml.findall("FlowStats/Flow"):
         rxBytes_over.append(int(flow.get('rxBytes')))
         txBytes_over.append(int(flow.get('txBytes')))
 
+txPacketsTotal_coap = sum(txPackets_coap)
+rxPacketsTotal_coap = sum(rxPackets_coap)
+txPacketsTotal_over = sum(txPackets_over)
+rxPacketsTotal_over = sum(rxPackets_over)
+txBytesTotal_coap = sum(txBytes_coap)
+rxBytesTotal_coap = sum(rxBytes_coap)
+txBytesTotal_over = sum(txBytes_over)
+rxBytesTotal_over = sum(rxBytes_over)
+lostpktsTotal_coap = sum(lostpkts_coap)
+lostpktsTotal_over = sum(lostpkts_over)
+
+
+txBytesTotal_coap = sum(txBytes_coap)
+
 # Plotting
 pylab.figure(0)
 pylab.subplot(221)
@@ -102,7 +117,7 @@ pylab.grid(True)
 pylab.axis([0, max(x), -2, 100])
 pylab.text(0.05 * max(x), 90, 'Total tx/rx pkts: ' + str(int(tot_trans)) + "/" + str(int(tot_received)), style='italic',
            bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})
-
+pylab.bar(x, (num_tx - num_rx) / num_tx * 100, color='g',align='center')
 pylab.subplot(224)
 pylab.plot(hops, 'go')
 pylab.ylabel("Average number of hops")
@@ -114,23 +129,19 @@ pylab.savefig("metricsip.pdf")
 
 pylab.figure(1)
 pylab.subplot(231)
-pylab.title("Lost packets")
-pylab.plot(lostpkts_coap, 'go')
-pylab.plot(lostpkts_over, 'ro')
+pylab.title("TxPackets")
+pylab.bar([1, 2], [txPacketsTotal_coap, txPacketsTotal_over], color=['red', 'blue'])
 pylab.subplot(232)
-pylab.title("Tx packets")
-pylab.plot(txPackets_coap, 'go')
-pylab.plot(txPackets_over, 'ro')
+pylab.title("RxPackets")
+pylab.bar([1, 2], [rxPacketsTotal_coap, rxPacketsTotal_over], color=['red', 'blue'])
 pylab.subplot(233)
-pylab.title("Rx packets")
-pylab.plot(rxPackets_coap, 'go')
-pylab.plot(rxPackets_over, 'ro')
+pylab.title("TxBytes")
+pylab.bar([1, 2], [txBytesTotal_coap, txBytesTotal_over], color=['red', 'blue'])
 pylab.subplot(234)
-pylab.title("Tx bytes")
-pylab.plot(txBytes_coap, 'go')
-pylab.plot(txBytes_over, 'ro')
+pylab.title("RxBytes")
+pylab.bar([1, 2], [rxBytesTotal_coap, rxBytesTotal_over], color=['red', 'blue'])
 pylab.subplot(235)
-pylab.title("Rx bytes")
-pylab.plot(rxBytes_coap, 'go')
-pylab.plot(rxBytes_over, 'ro')
+pylab.title("Lost packets")
+pylab.bar([1, 2], [lostpktsTotal_coap, lostpktsTotal_over], color=['red', 'blue'])
+
 pylab.show()
