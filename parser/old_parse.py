@@ -38,9 +38,11 @@ delays = []
 hops = []
 totalpackets = 0
 flownum = 0
+portset = []
 for flow in et.findall("FlowStats/Flow"):
     # filteroutOLSR
     for tpl in et.findall("Ipv6FlowClassifier/Flow"):
+        portset.append(tpl.get("destinationPort"))
         if tpl.get('flowId') == flow.get('flowId'):
             break
     if tpl.get("destinationPort") == '698' or tpl.get("destinationPort") == '521':
@@ -72,6 +74,7 @@ for flow in et.findall("FlowStats/Flow"):
 
 print "Total received packets: ", totalpackets
 print "Total flows: ", flownum
+print "Ports", set(portset)
 # pylab.hist(bitrates,bins=40)
 # pylab.xlabel("Flowbitrate(bit/s)")
 # pylab.ylabel("Numberofflows")

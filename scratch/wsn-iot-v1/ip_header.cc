@@ -92,7 +92,7 @@ namespace ns3 {
         uint32_t maxPacketCount = 99999999; //Optional
         uint16_t port = 9;
         double interval_sel;
-        double start_delay;
+        double start_delay; //Prevent nodes from starting at the same time.
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
 
