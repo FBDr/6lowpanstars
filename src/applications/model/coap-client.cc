@@ -342,7 +342,8 @@ namespace ns3 {
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
         SetFill("Sensordata/" + std::to_string(nxtsq));
-
+        coaptag.SetReq(nxtsq);
+        NS_LOG_INFO("Added REQ to label: "<< coaptag.GetReq());
         Ptr<Packet> p;
         if (m_dataSize) {
             //
@@ -376,7 +377,7 @@ namespace ns3 {
 
         ++m_sent;
         //std::cout<<"s: "<< m_sent<<std::endl;
-
+        m_PenSeqSet.insert(nxtsq);
         if (Ipv6Address::IsMatchingType(m_IPv6Bucket[nxtsq])) {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
                     m_IPv6Bucket[nxtsq] << " port " << m_peerPort);
@@ -404,18 +405,24 @@ namespace ns3 {
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
                 packet->RemovePacketTag(coaptag);
                 packet->RemovePacketTag(hoplimitTag);
-                Time e2edelay = Simulator::Now() - coaptag.GetTs();
-                int64_t delay = e2edelay.GetMilliSeconds();
-                int hops = 64 - (int) hoplimitTag.GetHopLimit();
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
-                        << hops);
+                NS_LOG_INFO("Pending sequence list contains "<<m_PenSeqSet.size() << " entries before Rx." );
+                NS_LOG_INFO("Tag: " << coaptag.GetReq());
+                // NS_LOG_INFO("IT: " << m_PenSeqSet[m_PenSeqSet.find(coaptag.GetReq())]);
+                
+                if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
+                    Time e2edelay = Simulator::Now() - coaptag.GetTs();
+                    int64_t delay = e2edelay.GetMilliSeconds();
+                    int hops = 64 - (int) hoplimitTag.GetHopLimit();
+                    NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
+                            Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
+                            Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
+                            << hops);
 
-                PrintToFile(hops, delay);
-                m_received++;
-                //std::cout<<"r: "<< m_received<<std::endl;
-
+                    PrintToFile(hops, delay);
+                    m_received++;
+                    m_PenSeqSet.erase(m_PenSeqSet.find(coaptag.GetReq()));
+                }
+                NS_LOG_INFO("Pending sequence list contains " << m_PenSeqSet.size() << " entries after Rx.");
             }
         }
     }

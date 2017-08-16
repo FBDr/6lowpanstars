@@ -44,10 +44,13 @@ namespace ns3 {
         CoapPacketTag();
         void SetSeq(uint32_t);
         uint32_t GetSeq(void) const;
+        void SetReq(uint32_t);
+        uint32_t GetReq(void) const;
         Time GetTs(void) const;
         uint64_t GetT(void) const;
     private:
         uint32_t m_seq; //!< Sequence number
+        uint32_t m_req; //!< Request number
         uint64_t m_ts; //!< Timestamp
     };
 

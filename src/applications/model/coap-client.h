@@ -220,6 +220,7 @@ namespace ns3 {
         std::vector<double> m_Pcum; // cumulative probability
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ptr<UniformRandomVariable> m_seqRng; // RNG
+        std::set<uint32_t> m_PenSeqSet; //Pending sequences 
     };
 
 } // namespace ns3
