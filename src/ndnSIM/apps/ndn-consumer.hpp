@@ -139,6 +139,10 @@ protected:
   EventId m_sendEvent; ///< @brief EventId of pending "send packet" event
   Time m_retxTimer;    ///< @brief Currently estimated retransmission timer
   EventId m_retxEvent; ///< @brief Event to check whether or not retransmission should be performed
+  uint64_t m_tx_bytes; ///< @brief Total transmitted bytes
+  uint64_t m_rx_bytes; ///< @brief Total received bytes
+  uint64_t m_tx_packets; ///< @brief Total transmitted bytes
+  uint64_t m_rx_packets; ///< @brief Total received bytes
 
   Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
 

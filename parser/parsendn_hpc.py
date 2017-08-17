@@ -95,8 +95,7 @@ for i, x in enumerate(delay_filtered, 1):
         # can do stuff with moving_ave here
         moving_aves.append(moving_ave)
 
-time_moving\
-    = np.linspace(np.amin(time_filtered), np.amax(time_filtered), num=len(moving_aves))
+time_moving = np.linspace(np.amin(time_filtered), np.amax(time_filtered), num=len(moving_aves))
 
 pylab.figure(0)
 pylab.subplot(221)

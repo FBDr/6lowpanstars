@@ -104,6 +104,7 @@ namespace ns3
         remove("energy.txt");
         remove("hopdelay.txt");
         remove("pktloss.txt");
+        remove("bytes.txt");
 
         //LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
         //LogComponentEnable("LrWpanPhy", LOG_LEVEL_DEBUG);

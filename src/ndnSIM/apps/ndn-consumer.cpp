@@ -37,6 +37,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 
+#include <fstream>
+
 NS_LOG_COMPONENT_DEFINE("ndn.Consumer");
 
 namespace ns3 {
@@ -82,6 +84,10 @@ Consumer::Consumer()
   : m_rand(CreateObject<UniformRandomVariable>())
   , m_seq(0)
   , m_seqMax(0) // don't request anything
+  , m_tx_bytes(0)
+  , m_rx_bytes(0)
+  , m_tx_packets(0)
+  , m_rx_packets(0)
 {
   NS_LOG_FUNCTION_NOARGS();
 
@@ -151,6 +157,11 @@ Consumer::StopApplication() // Called at time specified by Stop
   // cancel periodic packet generation
   Simulator::Cancel(m_sendEvent);
 
+  //Write results to file
+  std::ofstream outfile;
+  outfile.open("bytes.txt", std::ios_base::app);
+  outfile << GetNode()->GetId() << " " << m_tx_bytes << " " << m_rx_bytes <<" " <<m_tx_packets<<" "<<m_rx_packets<< std::endl;
+        
   // cleanup base stuff
   App::StopApplication();
 }
@@ -200,7 +211,8 @@ Consumer::SendPacket()
 
   m_transmittedInterests(interest, this, m_face);
   m_appLink->onReceiveInterest(*interest);
-
+  m_tx_bytes += (uint64_t) interest->wireEncode().size();
+  m_tx_packets++;
   ScheduleNextPacket();
 }
 
@@ -240,7 +252,8 @@ Consumer::OnData(shared_ptr<const Data> data)
   if (entry != m_seqFullDelay.end()) {
     m_firstInterestDataDelay(this, seq, Simulator::Now() - entry->time, m_seqRetxCounts[seq], hopCount);
   }
-
+  m_rx_bytes += (uint64_t) (data->wireEncode().size());
+  m_rx_packets++;
   m_seqRetxCounts.erase(seq);
   m_seqFullDelay.erase(seq);
   m_seqLastDelay.erase(seq);

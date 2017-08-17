@@ -167,7 +167,8 @@ namespace ns3 {
             shared_ptr<Interest> interest = make_shared<Interest>();
             interest->setNonce(m_rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
             interest->setName(*nameWithSequence);
-
+            m_tx_bytes += (uint64_t) interest->wireEncode().size();
+            m_tx_packets++;
             NS_LOG_INFO("Requesting Interest: \n" << *interest);
             NS_LOG_INFO("> Interest for " << seq << ", Total: " << m_seq << ", face: " << m_face->getId());
             NS_LOG_DEBUG("Trying to add " << seq << " with " << Simulator::Now() << ". already "
