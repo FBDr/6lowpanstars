@@ -1,5 +1,6 @@
 last_seed_file
 *.run
+*.png
 *.x86_64
 *.xml
 *.cap

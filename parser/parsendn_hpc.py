@@ -129,7 +129,7 @@ pylab.subplot(224)
 pylab.plot(time_moving, moving_aves)
 pylab.xlabel("Simulation time (s)")
 pylab.ylabel("Delay (s)")
-pylab.axis([np.amin(time_filtered), np.amax(time_filtered), 0.001, 0.1])
+pylab.axis([np.amin(time_filtered)-5, np.amax(time_filtered)+5, 0, max(moving_aves)*1.2])
 pylab.grid(True)
 
 fig = pylab.gcf()
