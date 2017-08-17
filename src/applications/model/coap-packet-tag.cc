@@ -29,7 +29,7 @@ namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("CoapPacketTag");
 
     CoapPacketTag::CoapPacketTag()
-    : m_seq(0),
+    : m_seq(0), m_req(0),
     m_ts(Simulator::Now().GetTimeStep()) {
         NS_LOG_FUNCTION(this);
     }
@@ -51,18 +51,20 @@ namespace ns3 {
     uint32_t
     CoapPacketTag::GetSerializedSize(void) const {
         NS_LOG_FUNCTION(this);
-        return 4 + 8;
+        return 4 + 8 + 4;
     }
 
     void
     CoapPacketTag::Serialize(TagBuffer i) const {
         i.WriteU32(m_seq);
+        i.WriteU32(m_req);
         i.WriteU64(m_ts);
     }
 
     void
     CoapPacketTag::Deserialize(TagBuffer i) {
         m_seq = i.ReadU32();
+        m_req = i.ReadU32();
         m_ts = i.ReadU64();
     }
 

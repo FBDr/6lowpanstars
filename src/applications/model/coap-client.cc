@@ -338,11 +338,11 @@ namespace ns3 {
     CoapClient::Send(void) {
         NS_LOG_FUNCTION(this);
         CoapPacketTag coaptag;
-        coaptag.SetSeq(m_sent);
         NS_ASSERT(m_sendEvent.IsExpired());
         uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
-        SetFill("Sensordata/" + std::to_string(nxtsq));
         coaptag.SetReq(nxtsq);
+        coaptag.SetSeq(m_sent);
+        SetFill("Sensordata/" + std::to_string(nxtsq));
         NS_LOG_INFO("Added REQ to label: "<< coaptag.GetReq());
         Ptr<Packet> p;
         if (m_dataSize) {
@@ -382,7 +382,6 @@ namespace ns3 {
             NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
                     m_IPv6Bucket[nxtsq] << " port " << m_peerPort);
         }
-
         if (m_sent < m_count) {
             ScheduleTransmit(m_interval);
         }
@@ -406,7 +405,9 @@ namespace ns3 {
                 packet->RemovePacketTag(coaptag);
                 packet->RemovePacketTag(hoplimitTag);
                 NS_LOG_INFO("Pending sequence list contains "<<m_PenSeqSet.size() << " entries before Rx." );
-                NS_LOG_INFO("Tag: " << coaptag.GetReq());
+                uint32_t cur_req = coaptag.GetReq();
+                NS_LOG_INFO("Req Tag: " << (int) cur_req);
+                NS_LOG_INFO("Seq Tag: " << coaptag.GetSeq());
                 // NS_LOG_INFO("IT: " << m_PenSeqSet[m_PenSeqSet.find(coaptag.GetReq())]);
                 
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
