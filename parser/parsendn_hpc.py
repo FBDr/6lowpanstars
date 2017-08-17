@@ -54,6 +54,15 @@ tot_drop = sum(Packets_d)
 
 print tot_drop, "Packets were dropped at L2."
 
+node_cnt, tx_bytes, rx_bytes, tx_packets, rx_packets = np.loadtxt(sys.argv[3],
+                                                                  usecols=(0, 1, 2, 3, 4),
+                                                                  unpack=True)
+
+tot_tx_bytes = sum(tx_bytes)
+tot_rx_bytes = sum(rx_bytes)
+tot_tx_packets = sum(tx_packets)
+tot_rx_packets = sum(rx_packets)
+
 delay_filtered = []
 hops_filtered = []
 time_filtered = []
@@ -84,7 +93,6 @@ print sum(rtx_filtered_zero), "Times a retransmission occured."
 tot_trans = sum(rtx_filtered)
 tot_rec = len(rtx_filtered)
 
-
 N = 150
 cumsum, moving_aves, time_moving = [0], [], []
 
@@ -111,7 +119,6 @@ pylab.ylabel("Dropped packets")
 pylab.grid(True)
 pylab.title('Total tx/rx pkts: ' + str(int(tot_trans)) + "/" + str(int(tot_rec)))
 
-
 pylab.subplot(223)
 pylab.hist(hops_filtered, bins=14)
 pylab.xlabel("Hops")
@@ -128,4 +135,23 @@ pylab.grid(True)
 fig = pylab.gcf()
 fig.canvas.set_window_title(sys.argv[1])
 pylab.savefig("metricsndn.png", dpi=500)
+
+pylab.figure(1)
+pylab.subplot(231)
+pylab.title("TxPackets")
+pylab.bar(1, tot_tx_packets, color=['red'])
+pylab.subplot(232)
+pylab.title("RxPackets")
+pylab.bar(1, tot_rx_packets, color=['red'])
+pylab.subplot(233)
+pylab.title("TxBytes")
+pylab.bar(1, tot_tx_bytes, color=['red'])
+pylab.subplot(234)
+pylab.title("RxBytes")
+pylab.bar(1, tot_rx_bytes, color=['red'])
+pylab.subplot(235)
+pylab.title("Lost packets")
+pylab.bar(1, tot_tx_packets-tot_rx_packets, color=['red'])
+
+
 pylab.show()
