@@ -136,10 +136,11 @@ pylab.savefig("metricsndn.png", dpi=500)
 
 pylab.figure(1)
 pylab.subplot(121)
+lostpkts = tot_tx_packets - tot_rx_packets
 pylab.title("Packets")
-objects = ('Txpackets', 'Rxpackets')
+objects = ('Txpackets', 'Rxpackets', 'Lost packets')
 y_pos = np.arange(len(objects))
-pkts = [tot_tx_packets, tot_rx_packets]
+pkts = [tot_tx_packets, tot_rx_packets, lostpkts]
 pylab.bar(y_pos, pkts, align='center', alpha=0.5)
 pylab.xticks(y_pos, objects)
 pylab.subplot(122)
