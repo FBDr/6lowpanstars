@@ -202,10 +202,10 @@ L3Protocol::~L3Protocol()
 }
 
 void
-L3Protocol::initialize()
+L3Protocol::initialize(Ptr<Node> node)
 {
   m_impl->m_forwarder = make_shared<nfd::Forwarder>();
-
+  m_impl->m_forwarder->setNode(node);
   initializeManagement();
 
   nfd::FaceTable& faceTable = m_impl->m_forwarder->getFaceTable();
@@ -390,7 +390,7 @@ L3Protocol::NotifyNewAggregate()
   if (m_node == nullptr) {
     m_node = GetObject<Node>();
     if (m_node != nullptr) {
-      initialize();
+      initialize(m_node);
 
       NS_ASSERT(m_impl->m_forwarder != nullptr);
       m_impl->m_csFromNdnSim = GetObject<ContentStore>();

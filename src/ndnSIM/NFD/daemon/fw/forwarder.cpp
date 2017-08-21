@@ -31,6 +31,10 @@
 #include <ndn-cxx/lp/tags.hpp>
 #include "face/null-face.hpp"
 #include <boost/random/uniform_int_distribution.hpp>
+#include "ns3/node.h"
+#include "ns3/pointer.h"
+#include "ns3/core-module.h"
+#include "ns3/object.h"
 
 namespace nfd {
 
@@ -68,6 +72,20 @@ Forwarder::Forwarder()
 }
 
 Forwarder::~Forwarder() = default;
+
+void
+Forwarder::setNode (ns3::Ptr<ns3::Node> node)
+{
+  m_node = node;
+}
+
+ns3::Ptr<ns3::Node>
+Forwarder::getNode ()
+{
+  return m_node;
+}
+
+
 
 void
 Forwarder::startProcessInterest(Face& face, const Interest& interest)
@@ -266,6 +284,7 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
   // send Interest
   outFace.sendInterest(interest);
   ++m_counters.nOutInterests;
+  std::cout<<m_node->GetId() <<std::endl;
 }
 
 void

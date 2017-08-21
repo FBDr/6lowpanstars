@@ -190,7 +190,7 @@ protected:
 
 private:
   void
-  initialize();
+  initialize(Ptr<Node> node);
 
   void
   initializeManagement();
