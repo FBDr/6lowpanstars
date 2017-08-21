@@ -192,6 +192,7 @@ private:
 
 L3Protocol::L3Protocol()
   : m_impl(new Impl())
+  , m_isGTW(1)
 {
   NS_LOG_FUNCTION(this);
 }
@@ -200,6 +201,20 @@ L3Protocol::~L3Protocol()
 {
   NS_LOG_FUNCTION(this);
 }
+
+void 
+L3Protocol::setGTW(bool setGTW)
+{
+    m_isGTW = setGTW;
+}
+
+bool
+L3Protocol::getGTW()
+{
+    return m_isGTW;
+}
+
+
 
 void
 L3Protocol::initialize(Ptr<Node> node)

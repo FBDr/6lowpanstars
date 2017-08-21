@@ -35,6 +35,7 @@
 #include "ns3/pointer.h"
 #include "ns3/core-module.h"
 #include "ns3/object.h"
+#include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 
 namespace nfd {
 
@@ -284,7 +285,8 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
   // send Interest
   outFace.sendInterest(interest);
   ++m_counters.nOutInterests;
-  std::cout<<m_node->GetId() <<std::endl;
+  ns3::Ptr<ns3::ndn::L3Protocol> retval = m_node->GetObject<ns3::ndn::L3Protocol>();
+  std::cout<<retval->getGTW()<<std::endl;
 }
 
 void

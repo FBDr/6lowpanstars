@@ -94,6 +94,17 @@ public:
   L3Protocol();
 
   virtual ~L3Protocol();
+  
+   /**
+   * \brief Set this node to be a gateway.
+   */
+  void setGTW(bool setGTW);
+   /**
+   * \brief Return whether this node is a gateway.
+   */
+  bool getGTW();
+          
+          
 
   /**
    * \brief Get smart pointer to nfd::Forwarder installed on the node
@@ -204,6 +215,7 @@ private:
 
   // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
+  bool m_isGTW;
 
   TracedCallback<const Interest&, const Face&>
     m_inInterests; ///< @brief trace of incoming Interests
