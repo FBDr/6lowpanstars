@@ -45,6 +45,12 @@ namespace nfd {
         RETX_SUPPRESSION_MAX) {
         }
 
+        void
+        BestRouteStrategy2::CustomSendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest) {
+
+            this->sendInterest(pitEntry, outFace, interest);
+        }
+
         /** \brief determines whether a NextHop is eligible
          *  \param inFace incoming face of current Interest
          *  \param interest incoming Interest
@@ -141,7 +147,8 @@ namespace nfd {
                 }
 
                 Face& outFace = it->getFace();
-                this->sendInterest(pitEntry, outFace, interest);
+                //this->sendInterest(pitEntry, outFace, interest);
+                CustomSendInterest(pitEntry, outFace, interest);
                 NFD_LOG_DEBUG(interest << " from=" << inFace.getId()
                         << " newPitEntry-to=" << outFace.getId());
                 return;
@@ -153,7 +160,8 @@ namespace nfd {
                     true, time::steady_clock::now()));
             if (it != nexthops.end()) {
                 Face& outFace = it->getFace();
-                this->sendInterest(pitEntry, outFace, interest);
+                //this->sendInterest(pitEntry, outFace, interest);
+                CustomSendInterest(pitEntry, outFace, interest);
                 NFD_LOG_DEBUG(interest << " from=" << inFace.getId()
                         << " retransmit-unused-to=" << outFace.getId());
                 return;
@@ -165,7 +173,8 @@ namespace nfd {
                 NFD_LOG_DEBUG(interest << " from=" << inFace.getId() << " retransmitNoNextHop");
             } else {
                 Face& outFace = it->getFace();
-                this->sendInterest(pitEntry, outFace, interest);
+                //this->sendInterest(pitEntry, outFace, interest);
+                CustomSendInterest(pitEntry, outFace, interest);
                 NFD_LOG_DEBUG(interest << " from=" << inFace.getId()
                         << " retransmit-retry-to=" << outFace.getId());
             }

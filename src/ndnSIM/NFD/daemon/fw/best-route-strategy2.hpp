@@ -51,6 +51,10 @@ namespace nfd {
          */
         class BestRouteStrategy2 : public Strategy {
         public:
+            
+            void 
+            CustomSendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest);
+            
             explicit
             BestRouteStrategy2(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
