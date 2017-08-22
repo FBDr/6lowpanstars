@@ -35,43 +35,42 @@
 
 namespace ns3 {
 
-class SSRecord;
-class ServiceFlow;
-class UlJob;
-class UplinkScheduler;
+    class SSRecord;
+    class ServiceFlow;
+    class UlJob;
+    class UplinkScheduler;
 
-/**
- * \ingroup wimax
- * \brief This class manage the bandwidth request and grant mechanism.
- * The bandwidth request and grant mechanism is supported by the Bandwidth
- * Manager. Both BS and SS maintain a bandwidth manager. Furthermore BS's
- * bandwidth manager works together with the uplink scheduler to determine
- * total bandwidth available and allocation size for each service flow.
- * Bandwidth request mechanism is a key feature of the WiMAX scheduler
- * since all three non-UGS services explicitly request for bandwidth by
- * sending a bandwidth request to BS.
- */
-class BandwidthManager : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  BandwidthManager (Ptr<WimaxNetDevice> device);
-  ~BandwidthManager (void);
-  void DoDispose (void);
+    /**
+     * \ingroup wimax
+     * \brief This class manage the bandwidth request and grant mechanism.
+     * The bandwidth request and grant mechanism is supported by the Bandwidth
+     * Manager. Both BS and SS maintain a bandwidth manager. Furthermore BS's
+     * bandwidth manager works together with the uplink scheduler to determine
+     * total bandwidth available and allocation size for each service flow.
+     * Bandwidth request mechanism is a key feature of the WiMAX scheduler
+     * since all three non-UGS services explicitly request for bandwidth by
+     * sending a bandwidth request to BS.
+     */
+    class BandwidthManager : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        BandwidthManager(Ptr<WimaxNetDevice> device);
+        ~BandwidthManager(void);
+        void DoDispose(void);
 
-  uint32_t CalculateAllocationSize (const SSRecord *ssRecord, const ServiceFlow *serviceFlow);
-  ServiceFlow* SelectFlowForRequest (uint32_t &bytesToRequest);
-  void SendBandwidthRequest (uint8_t uiuc, uint16_t allocationSize);
-  void ProcessBandwidthRequest (const BandwidthRequestHeader &bwRequestHdr);
-  void SetSubframeRatio (void);
-  uint32_t GetSymbolsPerFrameAllocated (void);
-private:
-  BandwidthManager (const BandwidthManager &);
-  BandwidthManager& operator= (const BandwidthManager &);
+        uint32_t CalculateAllocationSize(const SSRecord *ssRecord, const ServiceFlow *serviceFlow);
+        ServiceFlow* SelectFlowForRequest(uint32_t &bytesToRequest);
+        void SendBandwidthRequest(uint8_t uiuc, uint16_t allocationSize);
+        void ProcessBandwidthRequest(const BandwidthRequestHeader &bwRequestHdr);
+        void SetSubframeRatio(void);
+        uint32_t GetSymbolsPerFrameAllocated(void);
+    private:
+        BandwidthManager(const BandwidthManager &);
+        BandwidthManager& operator=(const BandwidthManager &);
 
-  Ptr<WimaxNetDevice> m_device;
-  uint16_t m_nrBwReqsSent;
-};
+        Ptr<WimaxNetDevice> m_device;
+        uint16_t m_nrBwReqsSent;
+    };
 
 } // namespace ns3
 

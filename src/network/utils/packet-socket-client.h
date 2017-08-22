@@ -28,72 +28,71 @@
 
 namespace ns3 {
 
-class Socket;
-class Packet;
+    class Socket;
+    class Packet;
 
-/**
- * \ingroup socket
- *
- * \brief A simple client.
- *
- * Sends packets using PacketSocket. It does not require (or use) IP.
- *
- * Packets are sent as soon as PacketSocketClient::Start is called.
- * The application has the same requirements as the PacketSocket for
- * what concerns the underlying NetDevice and the Address scheme.
- * It is meant to be used in ns-3 tests.
- *
- * The application will send `MaxPackets' packets, one every `Interval'
- * time. Packet size (`PacketSize') can be configured.
- * Provides a "Tx" Traced Callback (transmitted packets, source address).
- *
- * Note: packets larger than the NetDevice MTU will not be sent.
- */
-class PacketSocketClient : public Application
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup socket
+     *
+     * \brief A simple client.
+     *
+     * Sends packets using PacketSocket. It does not require (or use) IP.
+     *
+     * Packets are sent as soon as PacketSocketClient::Start is called.
+     * The application has the same requirements as the PacketSocket for
+     * what concerns the underlying NetDevice and the Address scheme.
+     * It is meant to be used in ns-3 tests.
+     *
+     * The application will send `MaxPackets' packets, one every `Interval'
+     * time. Packet size (`PacketSize') can be configured.
+     * Provides a "Tx" Traced Callback (transmitted packets, source address).
+     *
+     * Note: packets larger than the NetDevice MTU will not be sent.
+     */
+    class PacketSocketClient : public Application {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-  PacketSocketClient ();
+        PacketSocketClient();
 
-  virtual ~PacketSocketClient ();
+        virtual ~PacketSocketClient();
 
-  /**
-   * \brief set the remote address and protocol to be used
-   * \param addr remote address
-   */
-  void SetRemote (PacketSocketAddress addr);
+        /**
+         * \brief set the remote address and protocol to be used
+         * \param addr remote address
+         */
+        void SetRemote(PacketSocketAddress addr);
 
-protected:
-  virtual void DoDispose (void);
+    protected:
+        virtual void DoDispose(void);
 
-private:
+    private:
 
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
+        virtual void StartApplication(void);
+        virtual void StopApplication(void);
 
-  /**
-   * \brief Send a packet
-   */
-  void Send (void);
+        /**
+         * \brief Send a packet
+         */
+        void Send(void);
 
-  uint32_t m_maxPackets; //!< Maximum number of packets the application will send
-  Time m_interval;       //!< Packet inter-send time
-  uint32_t m_size;       //!< Size of the sent packet
+        uint32_t m_maxPackets; //!< Maximum number of packets the application will send
+        Time m_interval; //!< Packet inter-send time
+        uint32_t m_size; //!< Size of the sent packet
 
-  uint32_t m_sent;       //!< Counter for sent packets
-  Ptr<Socket> m_socket;  //!< Socket
-  PacketSocketAddress m_peerAddress; //!< Remote peer address
-  bool m_peerAddressSet; //!< Sanity check
-  EventId m_sendEvent;   //!< Event to send the next packet
+        uint32_t m_sent; //!< Counter for sent packets
+        Ptr<Socket> m_socket; //!< Socket
+        PacketSocketAddress m_peerAddress; //!< Remote peer address
+        bool m_peerAddressSet; //!< Sanity check
+        EventId m_sendEvent; //!< Event to send the next packet
 
-  /// Traced Callback: sent packets, source address.
-  TracedCallback<Ptr<const Packet>, const Address &> m_txTrace;
-};
+        /// Traced Callback: sent packets, source address.
+        TracedCallback<Ptr<const Packet>, const Address &> m_txTrace;
+    };
 
 } // namespace ns3
 

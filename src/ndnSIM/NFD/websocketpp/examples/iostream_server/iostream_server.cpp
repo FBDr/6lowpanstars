@@ -15,20 +15,21 @@ using websocketpp::lib::bind;
 typedef server::message_ptr message_ptr;
 
 // Define a callback to handle incoming messages
+
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     if (msg->get_opcode() == websocketpp::frame::opcode::text) {
         s->get_alog().write(websocketpp::log::alevel::app,
-                    "Text Message Received: "+msg->get_payload());
+                "Text Message Received: " + msg->get_payload());
     } else {
         s->get_alog().write(websocketpp::log::alevel::app,
-                    "Binary Message Received: "+websocketpp::utility::to_hex(msg->get_payload()));
+                "Binary Message Received: " + websocketpp::utility::to_hex(msg->get_payload()));
     }
 
     try {
         s->send(hdl, msg->get_payload(), msg->get_opcode());
     } catch (const websocketpp::lib::error_code& e) {
         s->get_alog().write(websocketpp::log::alevel::app,
-                    "Echo Failed: "+e.message());
+                "Echo Failed: " + e.message());
     }
 }
 
@@ -53,7 +54,7 @@ int main() {
         s.register_ostream(&std::cout);
 
         // Register our message handler
-        s.set_message_handler(bind(&on_message,&s,::_1,::_2));
+        s.set_message_handler(bind(&on_message, &s, ::_1, ::_2));
 
         server::connection_ptr con = s.get_connection();
 
@@ -77,8 +78,8 @@ int main() {
             con->eof();
         } else {
             char a;
-            while(std::cin.get(a)) {
-                con->read_some(&a,1);
+            while (std::cin.get(a)) {
+                con->read_some(&a, 1);
             }
             con->eof();
         }

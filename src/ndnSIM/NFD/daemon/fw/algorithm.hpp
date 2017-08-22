@@ -34,89 +34,89 @@
 
 namespace nfd {
 
-/** \brief contain name prefixes that affect namespace-based scope control
- *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
- */
-namespace scope_prefix {
+    /** \brief contain name prefixes that affect namespace-based scope control
+     *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
+     */
+    namespace scope_prefix {
 
-/** \brief ndn:/localhost
- *
- *  The localhost scope limits propagation to the applications on the originating host.
- *
- *  Interest and Data packets under prefix ndn:/localhost are restricted by these rules:
- *  \li Interest can come from and go to local faces only.
- *  \li Data can come from and go to local faces only.
- */
-extern const Name LOCALHOST;
+        /** \brief ndn:/localhost
+         *
+         *  The localhost scope limits propagation to the applications on the originating host.
+         *
+         *  Interest and Data packets under prefix ndn:/localhost are restricted by these rules:
+         *  \li Interest can come from and go to local faces only.
+         *  \li Data can come from and go to local faces only.
+         */
+        extern const Name LOCALHOST;
 
-/** \brief ndn:/localhop
- *
- *  The localhop scope limits propagation to no further than the next node.
- *
- *  Interest packets under prefix ndn:/localhop are restricted by these rules:
- *  \li If an Interest is received from a local face, it can be forwarded to a non-local face.
- *  \li If an Interest is received from a non-local face, it cannot be forwarded to a non-local face.
- *  \li In either case the Interest can be forwarded to a local face.
- *  \li PIT entry can be satisfied by Data from any source.
- *
- *  Data packets under prefix ndn:/localhop are unrestricted.
- */
-extern const Name LOCALHOP;
+        /** \brief ndn:/localhop
+         *
+         *  The localhop scope limits propagation to no further than the next node.
+         *
+         *  Interest packets under prefix ndn:/localhop are restricted by these rules:
+         *  \li If an Interest is received from a local face, it can be forwarded to a non-local face.
+         *  \li If an Interest is received from a non-local face, it cannot be forwarded to a non-local face.
+         *  \li In either case the Interest can be forwarded to a local face.
+         *  \li PIT entry can be satisfied by Data from any source.
+         *
+         *  Data packets under prefix ndn:/localhop are unrestricted.
+         */
+        extern const Name LOCALHOP;
 
-} // namespace scope_prefix
+    } // namespace scope_prefix
 
-namespace fw {
+    namespace fw {
 
-/** \brief determine whether forwarding the Interest in \p pitEntry to \p outFace would violate scope
- *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
- */
-bool
-wouldViolateScope(const Face& inFace, const Interest& interest, const Face& outFace);
+        /** \brief determine whether forwarding the Interest in \p pitEntry to \p outFace would violate scope
+         *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
+         */
+        bool
+        wouldViolateScope(const Face& inFace, const Interest& interest, const Face& outFace);
 
-/** \brief determine whether forwarding the Interest in \p pitEntry to \p outFace would violate scope
- *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
- *  \deprecated use violatesScope(inFace, interest, outFace) instead
- */
-DEPRECATED(
-bool
-violatesScope(const pit::Entry& pitEntry, const Face& outFace));
+        /** \brief determine whether forwarding the Interest in \p pitEntry to \p outFace would violate scope
+         *  \sa https://redmine.named-data.net/projects/nfd/wiki/ScopeControl
+         *  \deprecated use violatesScope(inFace, interest, outFace) instead
+         */
+        DEPRECATED(
+                bool
+                violatesScope(const pit::Entry& pitEntry, const Face& outFace));
 
-/** \brief decide whether Interest can be forwarded to face
- *
- *  \return true if out-record of this face does not exist or has expired,
- *          and there is an in-record not of this face
- *
- *  \note This algorithm has a weakness that it does not permit consumer retransmissions
- *        before out-record expires. Therefore, it's not recommended to use this function
- *        in new strategies.
- *  \todo find a better name for this function
- */
-bool
-canForwardToLegacy(const pit::Entry& pitEntry, const Face& face);
+        /** \brief decide whether Interest can be forwarded to face
+         *
+         *  \return true if out-record of this face does not exist or has expired,
+         *          and there is an in-record not of this face
+         *
+         *  \note This algorithm has a weakness that it does not permit consumer retransmissions
+         *        before out-record expires. Therefore, it's not recommended to use this function
+         *        in new strategies.
+         *  \todo find a better name for this function
+         */
+        bool
+        canForwardToLegacy(const pit::Entry& pitEntry, const Face& face);
 
-/** \brief indicates where duplicate Nonces are found
- */
-enum DuplicateNonceWhere {
-  DUPLICATE_NONCE_NONE      = 0,        ///< no duplicate Nonce is found
-  DUPLICATE_NONCE_IN_SAME   = (1 << 0), ///< in-record of same face
-  DUPLICATE_NONCE_IN_OTHER  = (1 << 1), ///< in-record of other face
-  DUPLICATE_NONCE_OUT_SAME  = (1 << 2), ///< out-record of same face
-  DUPLICATE_NONCE_OUT_OTHER = (1 << 3)  ///< out-record of other face
-};
+        /** \brief indicates where duplicate Nonces are found
+         */
+        enum DuplicateNonceWhere {
+            DUPLICATE_NONCE_NONE = 0, ///< no duplicate Nonce is found
+            DUPLICATE_NONCE_IN_SAME = (1 << 0), ///< in-record of same face
+            DUPLICATE_NONCE_IN_OTHER = (1 << 1), ///< in-record of other face
+            DUPLICATE_NONCE_OUT_SAME = (1 << 2), ///< out-record of same face
+            DUPLICATE_NONCE_OUT_OTHER = (1 << 3) ///< out-record of other face
+        };
 
-/** \brief determine whether \p pitEntry has duplicate Nonce \p nonce
- *  \return OR'ed DuplicateNonceWhere
- */
-int
-findDuplicateNonce(const pit::Entry& pitEntry, uint32_t nonce, const Face& face);
+        /** \brief determine whether \p pitEntry has duplicate Nonce \p nonce
+         *  \return OR'ed DuplicateNonceWhere
+         */
+        int
+        findDuplicateNonce(const pit::Entry& pitEntry, uint32_t nonce, const Face& face);
 
-/** \brief determine whether \p pitEntry has any pending out-records
- *  \return true if there is at least one out-record waiting for Data
- */
-bool
-hasPendingOutRecords(const pit::Entry& pitEntry);
+        /** \brief determine whether \p pitEntry has any pending out-records
+         *  \return true if there is at least one out-record waiting for Data
+         */
+        bool
+        hasPendingOutRecords(const pit::Entry& pitEntry);
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_PIT_ALGORITHM_HPP

@@ -35,70 +35,69 @@
 
 namespace ns3 {
 
-/**
- * \ingroup fd-net-device
- * \brief build a set of FdNetDevice objects attached to a virtual TAP network
- * interface
- *
- */
-class PlanetLabFdNetDeviceHelper : public EmuFdNetDeviceHelper
-{
-public:
-  /**
-   * Construct a PlanetLabFdNetDeviceHelper.
-   */
-  PlanetLabFdNetDeviceHelper ();
-  virtual ~PlanetLabFdNetDeviceHelper ()
-  {
-  }
+    /**
+     * \ingroup fd-net-device
+     * \brief build a set of FdNetDevice objects attached to a virtual TAP network
+     * interface
+     *
+     */
+    class PlanetLabFdNetDeviceHelper : public EmuFdNetDeviceHelper {
+    public:
+        /**
+         * Construct a PlanetLabFdNetDeviceHelper.
+         */
+        PlanetLabFdNetDeviceHelper();
 
-  /**
-   * Set the device IPv4 address.
-   *
-   * \param address The IPv4 address for the TAP device.
-   */
-  void SetTapIpAddress (Ipv4Address address);
+        virtual ~PlanetLabFdNetDeviceHelper() {
+        }
 
-  /**
-   * Set the network mask for the TAP device.
-   *
-   * \param mask The network mask for the TAP device.
-   */
-  void SetTapMask (Ipv4Mask mask);
+        /**
+         * Set the device IPv4 address.
+         *
+         * \param address The IPv4 address for the TAP device.
+         */
+        void SetTapIpAddress(Ipv4Address address);
 
-protected:
+        /**
+         * Set the network mask for the TAP device.
+         *
+         * \param mask The network mask for the TAP device.
+         */
+        void SetTapMask(Ipv4Mask mask);
 
-  /**
-   * This method creates an ns3::FdNetDevice attached to a virtual TAP network
-   * interface
-   *
-   * \param node The node to install the device in
-   * \returns A container holding the added net device.
-   */
-  Ptr<NetDevice> InstallPriv (Ptr<Node> node) const;
+    protected:
 
-  /**
-   * Sets a file descriptor on the FileDescriptorNetDevice.
-   */
-  virtual void SetFileDescriptor (Ptr<FdNetDevice> device) const;
+        /**
+         * This method creates an ns3::FdNetDevice attached to a virtual TAP network
+         * interface
+         *
+         * \param node The node to install the device in
+         * \returns A container holding the added net device.
+         */
+        Ptr<NetDevice> InstallPriv(Ptr<Node> node) const;
 
-  /**
-   * Call out to a separate process running as suid root in order to create a
-   * TAP device and obtain the file descriptor associated to it.
-   */
-  virtual int CreateFileDescriptor (void) const;
+        /**
+         * Sets a file descriptor on the FileDescriptorNetDevice.
+         */
+        virtual void SetFileDescriptor(Ptr<FdNetDevice> device) const;
 
-  /**
-   * The IP address for the TAP device.
-   */
-  Ipv4Address m_tapIp;
+        /**
+         * Call out to a separate process running as suid root in order to create a
+         * TAP device and obtain the file descriptor associated to it.
+         */
+        virtual int CreateFileDescriptor(void) const;
 
-  /**
-   * The network mask for the TAP device.
-   */
-  Ipv4Mask m_tapMask;
+        /**
+         * The IP address for the TAP device.
+         */
+        Ipv4Address m_tapIp;
 
-};
+        /**
+         * The network mask for the TAP device.
+         */
+        Ipv4Mask m_tapMask;
+
+    };
 
 } // namespace ns3
 

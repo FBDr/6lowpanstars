@@ -51,7 +51,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("WifiSimpleOcb");
+NS_LOG_COMPONENT_DEFINE("WifiSimpleOcb");
 
 /*
  * In WAVE module, there is no net device class named like "Wifi80211pNetDevice",
@@ -74,107 +74,99 @@ NS_LOG_COMPONENT_DEFINE ("WifiSimpleOcb");
  * MAC class that enables OCB mode.
  */
 
-void ReceivePacket (Ptr<Socket> socket)
-{
-  while (socket->Recv ())
-    {
-      NS_LOG_UNCOND ("Received one packet!");
+void ReceivePacket(Ptr<Socket> socket) {
+    while (socket->Recv()) {
+        NS_LOG_UNCOND("Received one packet!");
     }
 }
 
-static void GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize,
-                             uint32_t pktCount, Time pktInterval )
-{
-  if (pktCount > 0)
-    {
-      socket->Send (Create<Packet> (pktSize));
-      Simulator::Schedule (pktInterval, &GenerateTraffic,
-                           socket, pktSize,pktCount - 1, pktInterval);
-    }
-  else
-    {
-      socket->Close ();
+static void GenerateTraffic(Ptr<Socket> socket, uint32_t pktSize,
+        uint32_t pktCount, Time pktInterval) {
+    if (pktCount > 0) {
+        socket->Send(Create<Packet> (pktSize));
+        Simulator::Schedule(pktInterval, &GenerateTraffic,
+                socket, pktSize, pktCount - 1, pktInterval);
+    } else {
+        socket->Close();
     }
 }
 
-int main (int argc, char *argv[])
-{
-  std::string phyMode ("OfdmRate6MbpsBW10MHz");
-  uint32_t packetSize = 1000; // bytes
-  uint32_t numPackets = 1;
-  double interval = 1.0; // seconds
-  bool verbose = false;
+int main(int argc, char *argv[]) {
+    std::string phyMode("OfdmRate6MbpsBW10MHz");
+    uint32_t packetSize = 1000; // bytes
+    uint32_t numPackets = 1;
+    double interval = 1.0; // seconds
+    bool verbose = false;
 
-  CommandLine cmd;
+    CommandLine cmd;
 
-  cmd.AddValue ("phyMode", "Wifi Phy mode", phyMode);
-  cmd.AddValue ("packetSize", "size of application packet sent", packetSize);
-  cmd.AddValue ("numPackets", "number of packets generated", numPackets);
-  cmd.AddValue ("interval", "interval (seconds) between packets", interval);
-  cmd.AddValue ("verbose", "turn on all WifiNetDevice log components", verbose);
-  cmd.Parse (argc, argv);
-  // Convert to time object
-  Time interPacketInterval = Seconds (interval);
+    cmd.AddValue("phyMode", "Wifi Phy mode", phyMode);
+    cmd.AddValue("packetSize", "size of application packet sent", packetSize);
+    cmd.AddValue("numPackets", "number of packets generated", numPackets);
+    cmd.AddValue("interval", "interval (seconds) between packets", interval);
+    cmd.AddValue("verbose", "turn on all WifiNetDevice log components", verbose);
+    cmd.Parse(argc, argv);
+    // Convert to time object
+    Time interPacketInterval = Seconds(interval);
 
 
-  NodeContainer c;
-  c.Create (2);
+    NodeContainer c;
+    c.Create(2);
 
-  // The below set of helpers will help us to put together the wifi NICs we want
-  YansWifiPhyHelper wifiPhy =  YansWifiPhyHelper::Default ();
-  YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
-  Ptr<YansWifiChannel> channel = wifiChannel.Create ();
-  wifiPhy.SetChannel (channel);
-  // ns-3 supports generate a pcap trace
-  wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11);
-  NqosWaveMacHelper wifi80211pMac = NqosWaveMacHelper::Default ();
-  Wifi80211pHelper wifi80211p = Wifi80211pHelper::Default ();
-  if (verbose)
-    {
-      wifi80211p.EnableLogComponents ();      // Turn on all Wifi 802.11p logging
+    // The below set of helpers will help us to put together the wifi NICs we want
+    YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default();
+    YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default();
+    Ptr<YansWifiChannel> channel = wifiChannel.Create();
+    wifiPhy.SetChannel(channel);
+    // ns-3 supports generate a pcap trace
+    wifiPhy.SetPcapDataLinkType(YansWifiPhyHelper::DLT_IEEE802_11);
+    NqosWaveMacHelper wifi80211pMac = NqosWaveMacHelper::Default();
+    Wifi80211pHelper wifi80211p = Wifi80211pHelper::Default();
+    if (verbose) {
+        wifi80211p.EnableLogComponents(); // Turn on all Wifi 802.11p logging
     }
 
-  wifi80211p.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                      "DataMode",StringValue (phyMode),
-                                      "ControlMode",StringValue (phyMode));
-  NetDeviceContainer devices = wifi80211p.Install (wifiPhy, wifi80211pMac, c);
+    wifi80211p.SetRemoteStationManager("ns3::ConstantRateWifiManager",
+            "DataMode", StringValue(phyMode),
+            "ControlMode", StringValue(phyMode));
+    NetDeviceContainer devices = wifi80211p.Install(wifiPhy, wifi80211pMac, c);
 
-  // Tracing
-  wifiPhy.EnablePcap ("wave-simple-80211p", devices);
+    // Tracing
+    wifiPhy.EnablePcap("wave-simple-80211p", devices);
 
-  MobilityHelper mobility;
-  Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  mobility.Install (c);
+    MobilityHelper mobility;
+    Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+    positionAlloc->Add(Vector(0.0, 0.0, 0.0));
+    positionAlloc->Add(Vector(5.0, 0.0, 0.0));
+    mobility.SetPositionAllocator(positionAlloc);
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    mobility.Install(c);
 
-  InternetStackHelper internet;
-  internet.Install (c);
+    InternetStackHelper internet;
+    internet.Install(c);
 
-  Ipv4AddressHelper ipv4;
-  NS_LOG_INFO ("Assign IP Addresses.");
-  ipv4.SetBase ("10.1.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer i = ipv4.Assign (devices);
+    Ipv4AddressHelper ipv4;
+    NS_LOG_INFO("Assign IP Addresses.");
+    ipv4.SetBase("10.1.1.0", "255.255.255.0");
+    Ipv4InterfaceContainer i = ipv4.Assign(devices);
 
-  TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
-  Ptr<Socket> recvSink = Socket::CreateSocket (c.Get (0), tid);
-  InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 80);
-  recvSink->Bind (local);
-  recvSink->SetRecvCallback (MakeCallback (&ReceivePacket));
+    TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
+    Ptr<Socket> recvSink = Socket::CreateSocket(c.Get(0), tid);
+    InetSocketAddress local = InetSocketAddress(Ipv4Address::GetAny(), 80);
+    recvSink->Bind(local);
+    recvSink->SetRecvCallback(MakeCallback(&ReceivePacket));
 
-  Ptr<Socket> source = Socket::CreateSocket (c.Get (1), tid);
-  InetSocketAddress remote = InetSocketAddress (Ipv4Address ("255.255.255.255"), 80);
-  source->SetAllowBroadcast (true);
-  source->Connect (remote);
+    Ptr<Socket> source = Socket::CreateSocket(c.Get(1), tid);
+    InetSocketAddress remote = InetSocketAddress(Ipv4Address("255.255.255.255"), 80);
+    source->SetAllowBroadcast(true);
+    source->Connect(remote);
 
-  Simulator::ScheduleWithContext (source->GetNode ()->GetId (),
-                                  Seconds (1.0), &GenerateTraffic,
-                                  source, packetSize, numPackets, interPacketInterval);
+    Simulator::ScheduleWithContext(source->GetNode()->GetId(),
+            Seconds(1.0), &GenerateTraffic,
+            source, packetSize, numPackets, interPacketInterval);
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

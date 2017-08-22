@@ -29,267 +29,262 @@
 #include "topology-tester.hpp"
 
 namespace nfd {
-namespace fw {
-namespace asf {
-namespace tests {
+    namespace fw {
+        namespace asf {
+            namespace tests {
 
-using namespace nfd::fw::tests;
+                using namespace nfd::fw::tests;
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_FIXTURE_TEST_SUITE(TestAsfStrategy, UnitTestTimeFixture)
+                BOOST_AUTO_TEST_SUITE(Fw)
+                BOOST_FIXTURE_TEST_SUITE(TestAsfStrategy, UnitTestTimeFixture)
 
-class AsfGridFixture : public UnitTestTimeFixture
-{
-protected:
-  AsfGridFixture()
-  {
-    /*
-     *                  +---------+
-     *           +----->|  nodeB  |<------+
-     *           |      +---------+       |
-     *      10ms |                        | 10ms
-     *           v                        v
-     *      +---------+              +---------+
-     *      |  nodeA  |              |  nodeC  |
-     *      +---------+              +---------+
-     *           ^                        ^
-     *     100ms |                        | 100ms
-     *           |      +---------+       |
-     *           +----->|  nodeD  |<------+
-     *                  +---------+
-     */
+                class AsfGridFixture : public UnitTestTimeFixture {
+                protected:
 
-    nodeA = topo.addForwarder("A");
-    nodeB = topo.addForwarder("B");
-    nodeC = topo.addForwarder("C");
-    nodeD = topo.addForwarder("D");
+                    AsfGridFixture() {
+                        /*
+                         *                  +---------+
+                         *           +----->|  nodeB  |<------+
+                         *           |      +---------+       |
+                         *      10ms |                        | 10ms
+                         *           v                        v
+                         *      +---------+              +---------+
+                         *      |  nodeA  |              |  nodeC  |
+                         *      +---------+              +---------+
+                         *           ^                        ^
+                         *     100ms |                        | 100ms
+                         *           |      +---------+       |
+                         *           +----->|  nodeD  |<------+
+                         *                  +---------+
+                         */
 
-    topo.setStrategy<fw::AsfStrategy>(nodeA);
-    topo.setStrategy<fw::AsfStrategy>(nodeB);
-    topo.setStrategy<fw::AsfStrategy>(nodeC);
-    topo.setStrategy<fw::AsfStrategy>(nodeD);
+                        nodeA = topo.addForwarder("A");
+                        nodeB = topo.addForwarder("B");
+                        nodeC = topo.addForwarder("C");
+                        nodeD = topo.addForwarder("D");
 
-    linkAB = topo.addLink("AB", time::milliseconds(10), {nodeA, nodeB});
-    linkAD = topo.addLink("AD", time::milliseconds(100), {nodeA, nodeD});
-    linkBC = topo.addLink("BC", time::milliseconds(10), {nodeB, nodeC});
-    linkCD = topo.addLink("CD", time::milliseconds(100), {nodeC, nodeD});
+                        topo.setStrategy<fw::AsfStrategy>(nodeA);
+                        topo.setStrategy<fw::AsfStrategy>(nodeB);
+                        topo.setStrategy<fw::AsfStrategy>(nodeC);
+                        topo.setStrategy<fw::AsfStrategy>(nodeD);
 
-    consumer = topo.addAppFace("c", nodeA);
-    producer = topo.addAppFace("p", nodeC, PRODUCER_PREFIX);
-    topo.addEchoProducer(producer->getClientFace());
+                        linkAB = topo.addLink("AB", time::milliseconds(10),{nodeA, nodeB});
+                        linkAD = topo.addLink("AD", time::milliseconds(100),{nodeA, nodeD});
+                        linkBC = topo.addLink("BC", time::milliseconds(10),{nodeB, nodeC});
+                        linkCD = topo.addLink("CD", time::milliseconds(100),{nodeC, nodeD});
 
-    // Register producer prefix on consumer node
-    topo.registerPrefix(nodeA, linkAB->getFace(nodeA), PRODUCER_PREFIX, 10);
-    topo.registerPrefix(nodeA, linkAD->getFace(nodeA), PRODUCER_PREFIX, 5);
-  }
+                        consumer = topo.addAppFace("c", nodeA);
+                        producer = topo.addAppFace("p", nodeC, PRODUCER_PREFIX);
+                        topo.addEchoProducer(producer->getClientFace());
 
-  void
-  runConsumer()
-  {
-    topo.addIntervalConsumer(consumer->getClientFace(), PRODUCER_PREFIX, time::seconds(1), 30);
-    this->advanceClocks(time::milliseconds(10), time::seconds(30));
-  }
+                        // Register producer prefix on consumer node
+                        topo.registerPrefix(nodeA, linkAB->getFace(nodeA), PRODUCER_PREFIX, 10);
+                        topo.registerPrefix(nodeA, linkAD->getFace(nodeA), PRODUCER_PREFIX, 5);
+                    }
 
-protected:
-  TopologyTester topo;
+                    void
+                    runConsumer() {
+                        topo.addIntervalConsumer(consumer->getClientFace(), PRODUCER_PREFIX, time::seconds(1), 30);
+                        this->advanceClocks(time::milliseconds(10), time::seconds(30));
+                    }
 
-  TopologyNode nodeA;
-  TopologyNode nodeB;
-  TopologyNode nodeC;
-  TopologyNode nodeD;
+                protected:
+                    TopologyTester topo;
 
-  shared_ptr<TopologyLink> linkAB;
-  shared_ptr<TopologyLink> linkAD;
-  shared_ptr<TopologyLink> linkBC;
-  shared_ptr<TopologyLink> linkCD;
+                    TopologyNode nodeA;
+                    TopologyNode nodeB;
+                    TopologyNode nodeC;
+                    TopologyNode nodeD;
 
-  shared_ptr<TopologyAppLink> consumer;
-  shared_ptr<TopologyAppLink> producer;
+                    shared_ptr<TopologyLink> linkAB;
+                    shared_ptr<TopologyLink> linkAD;
+                    shared_ptr<TopologyLink> linkBC;
+                    shared_ptr<TopologyLink> linkCD;
 
-  static const Name PRODUCER_PREFIX;
-};
+                    shared_ptr<TopologyAppLink> consumer;
+                    shared_ptr<TopologyAppLink> producer;
 
-const Name AsfGridFixture::PRODUCER_PREFIX = Name("ndn:/hr/C");
+                    static const Name PRODUCER_PREFIX;
+                };
 
-BOOST_FIXTURE_TEST_CASE(Basic, AsfGridFixture)
-{
-  // Both nodeB and nodeD have FIB entries to reach the producer
-  topo.registerPrefix(nodeB, linkBC->getFace(nodeB), PRODUCER_PREFIX);
-  topo.registerPrefix(nodeD, linkCD->getFace(nodeD), PRODUCER_PREFIX);
+                const Name AsfGridFixture::PRODUCER_PREFIX = Name("ndn:/hr/C");
 
-  runConsumer();
+                BOOST_FIXTURE_TEST_CASE(Basic, AsfGridFixture) {
+                    // Both nodeB and nodeD have FIB entries to reach the producer
+                    topo.registerPrefix(nodeB, linkBC->getFace(nodeB), PRODUCER_PREFIX);
+                    topo.registerPrefix(nodeD, linkCD->getFace(nodeD), PRODUCER_PREFIX);
 
-  // ASF should use the Face to nodeD because it has lower routing cost.
-  // After 5 seconds, a probe Interest should be sent to the Face to nodeB,
-  // and the probe should return Data quicker. ASF should then use the Face
-  // to nodeB to forward the remaining Interests.
-  BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 30);
-  BOOST_CHECK_GE(linkAB->getFace(nodeA).getCounters().nOutInterests, 24);
-  BOOST_CHECK_LE(linkAD->getFace(nodeA).getCounters().nOutInterests, 6);
+                    runConsumer();
 
-  // If the link from nodeA to nodeB fails, ASF should start using the Face
-  // to nodeD again.
-  linkAB->fail();
+                    // ASF should use the Face to nodeD because it has lower routing cost.
+                    // After 5 seconds, a probe Interest should be sent to the Face to nodeB,
+                    // and the probe should return Data quicker. ASF should then use the Face
+                    // to nodeB to forward the remaining Interests.
+                    BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 30);
+                    BOOST_CHECK_GE(linkAB->getFace(nodeA).getCounters().nOutInterests, 24);
+                    BOOST_CHECK_LE(linkAD->getFace(nodeA).getCounters().nOutInterests, 6);
 
-  runConsumer();
+                    // If the link from nodeA to nodeB fails, ASF should start using the Face
+                    // to nodeD again.
+                    linkAB->fail();
 
-  // Only 59 Data because the first Interest to nodeB after the failure should timeout
-  BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 59);
-  BOOST_CHECK_LE(linkAB->getFace(nodeA).getCounters().nOutInterests, 30);
-  BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 30);
+                    runConsumer();
 
-  // If the link from nodeA to nodeB recovers, ASF should probe the Face
-  // to nodeB and start using it again.
-  linkAB->recover();
+                    // Only 59 Data because the first Interest to nodeB after the failure should timeout
+                    BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 59);
+                    BOOST_CHECK_LE(linkAB->getFace(nodeA).getCounters().nOutInterests, 30);
+                    BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 30);
 
-  // Advance time to ensure probing is due
-  this->advanceClocks(time::milliseconds(10), time::seconds(10));
+                    // If the link from nodeA to nodeB recovers, ASF should probe the Face
+                    // to nodeB and start using it again.
+                    linkAB->recover();
 
-  runConsumer();
+                    // Advance time to ensure probing is due
+                    this->advanceClocks(time::milliseconds(10), time::seconds(10));
 
-  BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 89);
-  BOOST_CHECK_GE(linkAB->getFace(nodeA).getCounters().nOutInterests, 50);
-  BOOST_CHECK_LE(linkAD->getFace(nodeA).getCounters().nOutInterests, 40);
+                    runConsumer();
 
-  // If both links fail, nodeA should forward to the next hop with the lowest cost
-  linkAB->fail();
-  linkAD->fail();
+                    BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 89);
+                    BOOST_CHECK_GE(linkAB->getFace(nodeA).getCounters().nOutInterests, 50);
+                    BOOST_CHECK_LE(linkAD->getFace(nodeA).getCounters().nOutInterests, 40);
 
-  runConsumer();
+                    // If both links fail, nodeA should forward to the next hop with the lowest cost
+                    linkAB->fail();
+                    linkAD->fail();
 
-  BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 89);
-  BOOST_CHECK_LE(linkAB->getFace(nodeA).getCounters().nOutInterests, 61); // FIXME #3830
-  BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 59); // FIXME #3830
-}
+                    runConsumer();
 
-BOOST_FIXTURE_TEST_CASE(Nack, AsfGridFixture)
-{
-  // nodeB has a FIB entry to reach the producer, but nodeD does not
-  topo.registerPrefix(nodeB, linkBC->getFace(nodeB), PRODUCER_PREFIX);
+                    BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 89);
+                    BOOST_CHECK_LE(linkAB->getFace(nodeA).getCounters().nOutInterests, 61); // FIXME #3830
+                    BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 59); // FIXME #3830
+                }
 
-  // The strategy should first try to send to nodeD. But since nodeD does not have a route for
-  // the producer's prefix, it should return a NO_ROUTE Nack. The strategy should then start using the Face to
-  // nodeB.
-  runConsumer();
+                BOOST_FIXTURE_TEST_CASE(Nack, AsfGridFixture) {
+                    // nodeB has a FIB entry to reach the producer, but nodeD does not
+                    topo.registerPrefix(nodeB, linkBC->getFace(nodeB), PRODUCER_PREFIX);
 
-  BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nInNacks, 1);
-  BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 29);
-  BOOST_CHECK_EQUAL(linkAB->getFace(nodeA).getCounters().nOutInterests, 29);
+                    // The strategy should first try to send to nodeD. But since nodeD does not have a route for
+                    // the producer's prefix, it should return a NO_ROUTE Nack. The strategy should then start using the Face to
+                    // nodeB.
+                    runConsumer();
 
-  // nodeD should receive 2 Interests: one for the very first Interest and
-  // another from a probe
-  BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 2);
-}
+                    BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nInNacks, 1);
+                    BOOST_CHECK_EQUAL(consumer->getForwarderFace().getCounters().nOutData, 29);
+                    BOOST_CHECK_EQUAL(linkAB->getFace(nodeA).getCounters().nOutInterests, 29);
 
-BOOST_AUTO_TEST_CASE(NoPitOutRecord)
-{
-  /*                 +---------+
-  *                  |  nodeD  |
-  *                  +---------+
-  *                       |
-  *                       | 80ms
-  *                       |
-  *                       |
-  *                  +---------+
-  *           +----->|  nodeB  |<------+
-  *           |      +---------+       |
-  *      15ms |                        | 16ms
-  *           v                        v
-  *      +---------+              +---------+
-  *      |  nodeA  |--------------|  nodeC  |
-  *      +---------+     14ms      +---------+
-  */
+                    // nodeD should receive 2 Interests: one for the very first Interest and
+                    // another from a probe
+                    BOOST_CHECK_GE(linkAD->getFace(nodeA).getCounters().nOutInterests, 2);
+                }
 
-  const Name PRODUCER_PREFIX = "/ndn/edu/nodeD/ping";
+                BOOST_AUTO_TEST_CASE(NoPitOutRecord) {
+                    /*                 +---------+
+                     *                  |  nodeD  |
+                     *                  +---------+
+                     *                       |
+                     *                       | 80ms
+                     *                       |
+                     *                       |
+                     *                  +---------+
+                     *           +----->|  nodeB  |<------+
+                     *           |      +---------+       |
+                     *      15ms |                        | 16ms
+                     *           v                        v
+                     *      +---------+              +---------+
+                     *      |  nodeA  |--------------|  nodeC  |
+                     *      +---------+     14ms      +---------+
+                     */
 
-  TopologyTester topo;
-  TopologyNode nodeA = topo.addForwarder("A"),
-               nodeB = topo.addForwarder("B"),
-               nodeC = topo.addForwarder("C"),
-               nodeD = topo.addForwarder("D");
+                    const Name PRODUCER_PREFIX = "/ndn/edu/nodeD/ping";
 
-  for (TopologyNode node : {nodeA, nodeB, nodeC, nodeD}) {
-    topo.setStrategy<fw::AsfStrategy>(node);
-  }
+                    TopologyTester topo;
+                    TopologyNode nodeA = topo.addForwarder("A"),
+                            nodeB = topo.addForwarder("B"),
+                            nodeC = topo.addForwarder("C"),
+                            nodeD = topo.addForwarder("D");
 
-  shared_ptr<TopologyLink> linkAB = topo.addLink("AB", time::milliseconds(15), {nodeA, nodeB}),
-                           linkAC = topo.addLink("AC", time::milliseconds(14), {nodeA, nodeC}),
-                           linkBC = topo.addLink("BC", time::milliseconds(16), {nodeB, nodeC}),
-                           linkBD = topo.addLink("BD", time::milliseconds(80), {nodeB, nodeD});
+                    for (TopologyNode node :{nodeA, nodeB, nodeC, nodeD}) {
+                        topo.setStrategy<fw::AsfStrategy>(node);
+                    }
 
-  shared_ptr<TopologyAppLink> ping = topo.addAppFace("c", nodeA),
-                        pingServer = topo.addAppFace("p", nodeD, PRODUCER_PREFIX);
-  topo.addEchoProducer(pingServer->getClientFace());
+                    shared_ptr<TopologyLink> linkAB = topo.addLink("AB", time::milliseconds(15),{nodeA, nodeB}),
+                    linkAC = topo.addLink("AC", time::milliseconds(14),{nodeA, nodeC}),
+                    linkBC = topo.addLink("BC", time::milliseconds(16),{nodeB, nodeC}),
+                    linkBD = topo.addLink("BD", time::milliseconds(80),{nodeB, nodeD});
 
-  // Register prefixes
-  topo.registerPrefix(nodeA, linkAB->getFace(nodeA), PRODUCER_PREFIX, 15);
-  topo.registerPrefix(nodeA, linkAC->getFace(nodeA), PRODUCER_PREFIX, 14);
-  topo.registerPrefix(nodeC, linkBC->getFace(nodeC), PRODUCER_PREFIX, 16);
-  topo.registerPrefix(nodeB, linkBD->getFace(nodeB), PRODUCER_PREFIX, 80);
+                    shared_ptr<TopologyAppLink> ping = topo.addAppFace("c", nodeA),
+                            pingServer = topo.addAppFace("p", nodeD, PRODUCER_PREFIX);
+                    topo.addEchoProducer(pingServer->getClientFace());
 
-  // Send 6 interest since probes can be scheduled b/w 0-5 seconds
-  for (int i = 1; i < 7; i++) {
-    // Send ping number i
-    Name name(PRODUCER_PREFIX);
-    name.appendTimestamp();
-    shared_ptr<Interest> interest = makeInterest(name);
-    ping->getClientFace().expressInterest(*interest, nullptr, nullptr, nullptr);
+                    // Register prefixes
+                    topo.registerPrefix(nodeA, linkAB->getFace(nodeA), PRODUCER_PREFIX, 15);
+                    topo.registerPrefix(nodeA, linkAC->getFace(nodeA), PRODUCER_PREFIX, 14);
+                    topo.registerPrefix(nodeC, linkBC->getFace(nodeC), PRODUCER_PREFIX, 16);
+                    topo.registerPrefix(nodeB, linkBD->getFace(nodeB), PRODUCER_PREFIX, 80);
 
-    // Don't know when the probe will be triggered since it is random between 0-5 seconds
-    // or whether it will be triggered for this interest
-    int j = 1;
-    while (linkAB->getFace(nodeA).getCounters().nOutInterests != 1) {
-      this->advanceClocks(time::milliseconds(1));
-      ++j;
-      // Probe was not scheduled with this ping interest
-      if (j > 1000) {
-        break;
-      }
-    }
+                    // Send 6 interest since probes can be scheduled b/w 0-5 seconds
+                    for (int i = 1; i < 7; i++) {
+                        // Send ping number i
+                        Name name(PRODUCER_PREFIX);
+                        name.appendTimestamp();
+                        shared_ptr<Interest> interest = makeInterest(name);
+                        ping->getClientFace().expressInterest(*interest, nullptr, nullptr, nullptr);
 
-    // Check if probe is sent to B else send another ping
-    if (linkAB->getFace(nodeA).getCounters().nOutInterests == 1) {
-      // B should not have received the probe interest yet
-      BOOST_CHECK_EQUAL(linkAB->getFace(nodeB).getCounters().nInInterests, 0);
+                        // Don't know when the probe will be triggered since it is random between 0-5 seconds
+                        // or whether it will be triggered for this interest
+                        int j = 1;
+                        while (linkAB->getFace(nodeA).getCounters().nOutInterests != 1) {
+                            this->advanceClocks(time::milliseconds(1));
+                            ++j;
+                            // Probe was not scheduled with this ping interest
+                            if (j > 1000) {
+                                break;
+                            }
+                        }
 
-      // i-1 interests through B when no probe
-      BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nOutInterests, i - 1);
+                        // Check if probe is sent to B else send another ping
+                        if (linkAB->getFace(nodeA).getCounters().nOutInterests == 1) {
+                            // B should not have received the probe interest yet
+                            BOOST_CHECK_EQUAL(linkAB->getFace(nodeB).getCounters().nInInterests, 0);
 
-      // After 15ms, B should get the probe interest
-      this->advanceClocks(time::milliseconds(1), time::milliseconds(15));
-      BOOST_CHECK_EQUAL(linkAB->getFace(nodeB).getCounters().nInInterests, 1);
-      BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nOutInterests, i);
+                            // i-1 interests through B when no probe
+                            BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nOutInterests, i - 1);
 
-      shared_ptr<pit::Entry> pitEntry = topo.getForwarder(nodeB).getPit().find(*interest);
+                            // After 15ms, B should get the probe interest
+                            this->advanceClocks(time::milliseconds(1), time::milliseconds(15));
+                            BOOST_CHECK_EQUAL(linkAB->getFace(nodeB).getCounters().nInInterests, 1);
+                            BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nOutInterests, i);
 
-      // Get outRecord associated with face towards D.
-      pit::OutRecordCollection::const_iterator outRecord = pitEntry->getOutRecord(linkBD->getFace(nodeB));
+                            shared_ptr<pit::Entry> pitEntry = topo.getForwarder(nodeB).getPit().find(*interest);
 
-      BOOST_CHECK(outRecord != pitEntry->out_end());
+                            // Get outRecord associated with face towards D.
+                            pit::OutRecordCollection::const_iterator outRecord = pitEntry->getOutRecord(linkBD->getFace(nodeB));
 
-      // RTT between B and D
-      this->advanceClocks(time::milliseconds(5), time::milliseconds(160));
-      outRecord = pitEntry->getOutRecord(linkBD->getFace(nodeB));
+                            BOOST_CHECK(outRecord != pitEntry->out_end());
 
-      BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nInData, i);
+                            // RTT between B and D
+                            this->advanceClocks(time::milliseconds(5), time::milliseconds(160));
+                            outRecord = pitEntry->getOutRecord(linkBD->getFace(nodeB));
 
-      BOOST_CHECK(outRecord == pitEntry->out_end());
+                            BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nInData, i);
 
-      // Data is returned for the ping after 15 ms - will result in false measurement
-      // 14+16-15 = 15ms
-      // Since outRecord == pitEntry->out_end()
-      this->advanceClocks(time::milliseconds(1), time::milliseconds(15));
-      BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nInData, i+1);
+                            BOOST_CHECK(outRecord == pitEntry->out_end());
 
-      break;
-    }
-  }
-}
+                            // Data is returned for the ping after 15 ms - will result in false measurement
+                            // 14+16-15 = 15ms
+                            // Since outRecord == pitEntry->out_end()
+                            this->advanceClocks(time::milliseconds(1), time::milliseconds(15));
+                            BOOST_CHECK_EQUAL(linkBD->getFace(nodeB).getCounters().nInData, i + 1);
 
-BOOST_AUTO_TEST_SUITE_END() // TestAsfStrategy
-BOOST_AUTO_TEST_SUITE_END() // Fw
+                            break;
+                        }
+                    }
+                }
 
-} // namespace tests
-} // namespace asf
-} // namespace fw
+                BOOST_AUTO_TEST_SUITE_END() // TestAsfStrategy
+                BOOST_AUTO_TEST_SUITE_END() // Fw
+
+            } // namespace tests
+        } // namespace asf
+    } // namespace fw
 } // namespace nfd

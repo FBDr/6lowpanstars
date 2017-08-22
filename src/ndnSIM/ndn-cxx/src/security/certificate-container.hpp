@@ -26,68 +26,68 @@
 #include "v1/identity-certificate.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibImpl;
+        class PibImpl;
 
-/// @brief A handler to search or enumerate certificates of a key.
-class CertificateContainer
-{
-public:
-  class const_iterator
-  {
-  public:
-    friend class CertificateContainer;
+        /// @brief A handler to search or enumerate certificates of a key.
 
-  public:
-    v1::IdentityCertificate
-    operator*();
+        class CertificateContainer {
+        public:
 
-    const_iterator&
-    operator++();
+            class const_iterator {
+            public:
+                friend class CertificateContainer;
 
-    const_iterator
-    operator++(int);
+            public:
+                v1::IdentityCertificate
+                operator*();
 
-    bool
-    operator==(const const_iterator& other);
+                const_iterator&
+                operator++();
 
-    bool
-    operator!=(const const_iterator& other);
+                const_iterator
+                operator++(int);
 
-  private:
-    const_iterator(std::set<Name>::const_iterator it, shared_ptr<PibImpl> impl);
+                bool
+                operator==(const const_iterator& other);
 
-  private:
-    std::set<Name>::const_iterator m_it;
-    shared_ptr<PibImpl> m_impl;
-  };
+                bool
+                operator!=(const const_iterator& other);
 
-  typedef const_iterator iterator;
+            private:
+                const_iterator(std::set<Name>::const_iterator it, shared_ptr<PibImpl> impl);
 
-public:
-  CertificateContainer();
+            private:
+                std::set<Name>::const_iterator m_it;
+                shared_ptr<PibImpl> m_impl;
+            };
 
-  CertificateContainer(std::set<Name>&& certNames, shared_ptr<PibImpl> impl);
+            typedef const_iterator iterator;
 
-  const_iterator
-  begin() const;
+        public:
+            CertificateContainer();
 
-  const_iterator
-  end() const;
+            CertificateContainer(std::set<Name>&& certNames, shared_ptr<PibImpl> impl);
 
-  const_iterator
-  find(const Name& certName) const;
+            const_iterator
+            begin() const;
 
-  size_t
-  size() const;
+            const_iterator
+            end() const;
 
-private:
-  std::set<Name> m_certNames;
-  shared_ptr<PibImpl> m_impl;
-};
+            const_iterator
+            find(const Name& certName) const;
 
-} // namespace security
+            size_t
+            size() const;
+
+        private:
+            std::set<Name> m_certNames;
+            shared_ptr<PibImpl> m_impl;
+        };
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_CERTIFICATE_CONTAINER_HPP

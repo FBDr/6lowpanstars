@@ -31,103 +31,97 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("BasicEnergyHarvesterTestSuite");
+NS_LOG_COMPONENT_DEFINE("BasicEnergyHarvesterTestSuite");
 
 class BasicEnergyHarvesterTestCase : public TestCase
 {
-public:
-	BasicEnergyHarvesterTestCase ();
-  ~BasicEnergyHarvesterTestCase ();
+    public :
+    BasicEnergyHarvesterTestCase();
+    ~BasicEnergyHarvesterTestCase();
 
-  void DoRun (void);
+    void DoRun(void);
 
-  double m_timeS;     // in seconds
-  double m_tolerance; // tolerance for energy estimation
+    double m_timeS; // in seconds
+    double m_tolerance; // tolerance for energy estimation
 
-  ObjectFactory m_energySource;
-  ObjectFactory m_energyHarvester;
-
+    ObjectFactory m_energySource;
+    ObjectFactory m_energyHarvester;
 };
 
-BasicEnergyHarvesterTestCase::BasicEnergyHarvesterTestCase ()
-  : TestCase ("Basic Energy Harvester test case")
-{
-	m_timeS = 15; // harvest energy for 15 seconds
-	m_tolerance = 1.0e-13;  //
+BasicEnergyHarvesterTestCase::BasicEnergyHarvesterTestCase()
+: TestCase("Basic Energy Harvester test case") {
+    m_timeS = 15; // harvest energy for 15 seconds
+    m_tolerance = 1.0e-13; //
 }
 
-BasicEnergyHarvesterTestCase::~BasicEnergyHarvesterTestCase ()
-{
+BasicEnergyHarvesterTestCase::~BasicEnergyHarvesterTestCase() {
 }
 
 void
-BasicEnergyHarvesterTestCase::DoRun ()
-{
-	// set types
-	m_energySource.SetTypeId ("ns3::BasicEnergySource");
-	m_energyHarvester.SetTypeId ("ns3::BasicEnergyHarvester");
-  // create node
-  Ptr<Node> node = CreateObject<Node> ();
+BasicEnergyHarvesterTestCase::DoRun() {
+    // set types
+    m_energySource.SetTypeId("ns3::BasicEnergySource");
+    m_energyHarvester.SetTypeId("ns3::BasicEnergyHarvester");
+    // create node
+    Ptr<Node> node = CreateObject<Node> ();
 
-  // create Energy Source
-  Ptr<BasicEnergySource> source = m_energySource.Create<BasicEnergySource> ();
-  // aggregate Energy Source to the node
-  node->AggregateObject (source);
+    // create Energy Source
+    Ptr<BasicEnergySource> source = m_energySource.Create<BasicEnergySource> ();
+    // aggregate Energy Source to the node
+    node->AggregateObject(source);
 
-  //create energy harvester
-  Ptr<BasicEnergyHarvester> harvester = m_energyHarvester.Create<BasicEnergyHarvester> ();
-  // Set the Energy Harvesting update interval to a value grater than the
-  // simulation duration, so that the power provided by the harvester is constant
-  harvester->SetHarvestedPowerUpdateInterval (Seconds (m_timeS + 1.0));
-	// Connect the Basic Energy Harvester to the Energy Source
-	source->ConnectEnergyHarvester (harvester);
-	harvester->SetNode (node);
-	harvester->SetEnergySource (source);
+    //create energy harvester
+    Ptr<BasicEnergyHarvester> harvester = m_energyHarvester.Create<BasicEnergyHarvester> ();
+    // Set the Energy Harvesting update interval to a value grater than the
+    // simulation duration, so that the power provided by the harvester is constant
+    harvester->SetHarvestedPowerUpdateInterval(Seconds(m_timeS + 1.0));
+    // Connect the Basic Energy Harvester to the Energy Source
+    source->ConnectEnergyHarvester(harvester);
+    harvester->SetNode(node);
+    harvester->SetEnergySource(source);
 
-  Time now = Simulator::Now ();
+    Time now = Simulator::Now();
 
-  /*
-	 * The energy harvester will recharge the energy source for m_timeS seconds.
-	 */
+    /*
+     * The energy harvester will recharge the energy source for m_timeS seconds.
+     */
 
-  // Calculate remaining energy at simulation stop time
-  Simulator::Schedule (Seconds (m_timeS),
-                       &BasicEnergySource::UpdateEnergySource, source);
+    // Calculate remaining energy at simulation stop time
+    Simulator::Schedule(Seconds(m_timeS),
+            &BasicEnergySource::UpdateEnergySource, source);
 
-  double timeDelta = 0.000000001; // 1 nanosecond
-  // run simulation; stop just after last scheduled event
-  Simulator::Stop (Seconds (m_timeS + timeDelta));
-  Simulator::Run ();
+    double timeDelta = 0.000000001; // 1 nanosecond
+    // run simulation; stop just after last scheduled event
+    Simulator::Stop(Seconds(m_timeS + timeDelta));
+    Simulator::Run();
 
-  // calculate energy harvested
-  double estRemainingEnergy = source->GetInitialEnergy ();
-  // energy = power * time
-  estRemainingEnergy += harvester->GetPower () * m_timeS;
+    // calculate energy harvested
+    double estRemainingEnergy = source->GetInitialEnergy();
+    // energy = power * time
+    estRemainingEnergy += harvester->GetPower() * m_timeS;
 
-  // obtain remaining energy from source
-	double remainingEnergy = source->GetRemainingEnergy ();
-	NS_LOG_DEBUG ("Remaining energy is " << remainingEnergy);
-	NS_LOG_DEBUG ("Estimated remaining energy is " << estRemainingEnergy);
-	NS_LOG_DEBUG ("Difference is " << estRemainingEnergy - remainingEnergy);
+    // obtain remaining energy from source
+    double remainingEnergy = source->GetRemainingEnergy();
+    NS_LOG_DEBUG("Remaining energy is " << remainingEnergy);
+    NS_LOG_DEBUG("Estimated remaining energy is " << estRemainingEnergy);
+    NS_LOG_DEBUG("Difference is " << estRemainingEnergy - remainingEnergy);
 
-	Simulator::Destroy ();
+    Simulator::Destroy();
 
-	// check remaining energy
-  NS_TEST_ASSERT_MSG_EQ_TOL (remainingEnergy, estRemainingEnergy, m_tolerance,
-                             "Incorrect Remaining energy!");
+    // check remaining energy
+    NS_TEST_ASSERT_MSG_EQ_TOL(remainingEnergy, estRemainingEnergy, m_tolerance,
+            "Incorrect Remaining energy!");
 
 }
 
 class BasicEnergyHarvesterTestSuite : public TestSuite
 {
-public:
-  BasicEnergyHarvesterTestSuite ();
-};
+    public :
+    BasicEnergyHarvesterTestSuite();};
 
-BasicEnergyHarvesterTestSuite::BasicEnergyHarvesterTestSuite ()
-  : TestSuite ("basic-energy-harvester", UNIT)
-{
-  AddTestCase (new BasicEnergyHarvesterTestCase, TestCase::QUICK);
+BasicEnergyHarvesterTestSuite::BasicEnergyHarvesterTestSuite()
+: TestSuite("basic-energy-harvester", UNIT) {
+    AddTestCase(new BasicEnergyHarvesterTestCase, TestCase::QUICK);
 }
 
 // create an instance of the test suite

@@ -29,49 +29,48 @@
 #include "module.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-using ndn::nfd::ChannelStatus;
+            using ndn::nfd::ChannelStatus;
 
-/** \brief provides access to NFD channel dataset
- *  \sa https://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Channel-Dataset
- */
-class ChannelModule : public Module, noncopyable
-{
-public:
-  virtual void
-  fetchStatus(Controller& controller,
-              const function<void()>& onSuccess,
-              const Controller::DatasetFailCallback& onFailure,
-              const CommandOptions& options) override;
+            /** \brief provides access to NFD channel dataset
+             *  \sa https://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Channel-Dataset
+             */
+            class ChannelModule : public Module, noncopyable {
+            public:
+                virtual void
+                fetchStatus(Controller& controller,
+                        const function<void()>& onSuccess,
+                        const Controller::DatasetFailCallback& onFailure,
+                        const CommandOptions& options) override;
 
-  virtual void
-  formatStatusXml(std::ostream& os) const override;
+                virtual void
+                formatStatusXml(std::ostream& os) const override;
 
-  /** \brief format a single status item as XML
-   *  \param os output stream
-   *  \param item status item
-   */
-  void
-  formatItemXml(std::ostream& os, const ChannelStatus& item) const;
+                /** \brief format a single status item as XML
+                 *  \param os output stream
+                 *  \param item status item
+                 */
+                void
+                formatItemXml(std::ostream& os, const ChannelStatus& item) const;
 
-  virtual void
-  formatStatusText(std::ostream& os) const override;
+                virtual void
+                formatStatusText(std::ostream& os) const override;
 
-  /** \brief format a single status item as text
-   *  \param os output stream
-   *  \param item status item
-   */
-  void
-  formatItemText(std::ostream& os, const ChannelStatus& item) const;
+                /** \brief format a single status item as text
+                 *  \param os output stream
+                 *  \param item status item
+                 */
+                void
+                formatItemText(std::ostream& os, const ChannelStatus& item) const;
 
-private:
-  std::vector<ChannelStatus> m_status;
-};
+            private:
+                std::vector<ChannelStatus> m_status;
+            };
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_CHANNEL_MODULE_HPP

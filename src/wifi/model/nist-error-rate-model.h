@@ -28,111 +28,110 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- *
- * A model for the error rate for different modulations.  For OFDM modulation,
- * the model description and validation can be found in
- * http://www.nsnam.org/~pei/80211ofdm.pdf.  For DSSS modulations (802.11b),
- * the model uses the DsssErrorRateModel.
- */
-class NistErrorRateModel : public ErrorRateModel
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup wifi
+     *
+     * A model for the error rate for different modulations.  For OFDM modulation,
+     * the model description and validation can be found in
+     * http://www.nsnam.org/~pei/80211ofdm.pdf.  For DSSS modulations (802.11b),
+     * the model uses the DsssErrorRateModel.
+     */
+    class NistErrorRateModel : public ErrorRateModel {
+    public:
+        static TypeId GetTypeId(void);
 
-  NistErrorRateModel ();
+        NistErrorRateModel();
 
-  virtual double GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbits) const;
+        virtual double GetChunkSuccessRate(WifiMode mode, double snr, uint32_t nbits) const;
 
 
-private:
-  /**
-   * Return the coded BER for the given p and b.
-   *
-   * \param p
-   * \param bValue
-   *
-   * \return BER
-   */
-  double CalculatePe (double p, uint32_t bValue) const;
-  /**
-   * Return BER of BPSK at the given SNR.
-   *
-   * \param snr snr value
-   *
-   * \return BER of BPSK at the given SNR
-   */
-  double GetBpskBer (double snr) const;
-  /**
-   * Return BER of QPSK at the given SNR.
-   *
-   * \param snr snr value
-   *
-   * \return BER of QPSK at the given SNR
-   */
-  double GetQpskBer (double snr) const;
-  /**
-   * Return BER of QAM16 at the given SNR.
-   *
-   * \param snr snr value
-   *
-   * \return BER of QAM16 at the given SNR
-   */
-  double Get16QamBer (double snr) const;
-  /**
-   * Return BER of QAM64 at the given SNR.
-   *
-   * \param snr snr value
-   *
-   * \return BER of QAM64 at the given SNR
-   */
-  double Get64QamBer (double snr) const;
-  /**
-   * Return BER of BPSK at the given SNR after applying FEC.
-   *
-   * \param snr snr value
-   * \param nbits the number of bits in the chunk
-   * \param bValue
-   *
-   * \return BER of BPSK at the given SNR after applying FEC
-   */
-  double GetFecBpskBer (double snr, uint32_t nbits,
-                        uint32_t bValue) const;
-  /**
-   * Return BER of QPSK at the given SNR after applying FEC.
-   *
-   * \param snr snr value
-   * \param nbits the number of bits in the chunk
-   * \param bValue
-   *
-   * \return BER of QPSK at the given SNR after applying FEC
-   */
-  double GetFecQpskBer (double snr, uint32_t nbits,
-                        uint32_t bValue) const;
-  /**
-   * Return BER of QAM16 at the given SNR after applying FEC.
-   *
-   * \param snr snr value
-   * \param nbits the number of bits in the chunk
-   * \param bValue
-   *
-   * \return BER of QAM16 at the given SNR after applying FEC
-   */
-  double GetFec16QamBer (double snr, uint32_t nbits,
-                         uint32_t bValue) const;
-  /**
-   * Return BER of QAM64 at the given SNR after applying FEC.
-   *
-   * \param snr snr value
-   * \param nbits the number of bits in the chunk
-   * \param bValue
-   *
-   * \return BER of QAM64 at the given SNR after applying FEC
-   */
-  double GetFec64QamBer (double snr, uint32_t nbits,
-                         uint32_t bValue) const;
-};
+    private:
+        /**
+         * Return the coded BER for the given p and b.
+         *
+         * \param p
+         * \param bValue
+         *
+         * \return BER
+         */
+        double CalculatePe(double p, uint32_t bValue) const;
+        /**
+         * Return BER of BPSK at the given SNR.
+         *
+         * \param snr snr value
+         *
+         * \return BER of BPSK at the given SNR
+         */
+        double GetBpskBer(double snr) const;
+        /**
+         * Return BER of QPSK at the given SNR.
+         *
+         * \param snr snr value
+         *
+         * \return BER of QPSK at the given SNR
+         */
+        double GetQpskBer(double snr) const;
+        /**
+         * Return BER of QAM16 at the given SNR.
+         *
+         * \param snr snr value
+         *
+         * \return BER of QAM16 at the given SNR
+         */
+        double Get16QamBer(double snr) const;
+        /**
+         * Return BER of QAM64 at the given SNR.
+         *
+         * \param snr snr value
+         *
+         * \return BER of QAM64 at the given SNR
+         */
+        double Get64QamBer(double snr) const;
+        /**
+         * Return BER of BPSK at the given SNR after applying FEC.
+         *
+         * \param snr snr value
+         * \param nbits the number of bits in the chunk
+         * \param bValue
+         *
+         * \return BER of BPSK at the given SNR after applying FEC
+         */
+        double GetFecBpskBer(double snr, uint32_t nbits,
+                uint32_t bValue) const;
+        /**
+         * Return BER of QPSK at the given SNR after applying FEC.
+         *
+         * \param snr snr value
+         * \param nbits the number of bits in the chunk
+         * \param bValue
+         *
+         * \return BER of QPSK at the given SNR after applying FEC
+         */
+        double GetFecQpskBer(double snr, uint32_t nbits,
+                uint32_t bValue) const;
+        /**
+         * Return BER of QAM16 at the given SNR after applying FEC.
+         *
+         * \param snr snr value
+         * \param nbits the number of bits in the chunk
+         * \param bValue
+         *
+         * \return BER of QAM16 at the given SNR after applying FEC
+         */
+        double GetFec16QamBer(double snr, uint32_t nbits,
+                uint32_t bValue) const;
+        /**
+         * Return BER of QAM64 at the given SNR after applying FEC.
+         *
+         * \param snr snr value
+         * \param nbits the number of bits in the chunk
+         * \param bValue
+         *
+         * \return BER of QAM64 at the given SNR after applying FEC
+         */
+        double GetFec64QamBer(double snr, uint32_t nbits,
+                uint32_t bValue) const;
+    };
 
 } //namespace ns3
 

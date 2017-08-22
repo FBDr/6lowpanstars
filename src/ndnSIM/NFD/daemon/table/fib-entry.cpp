@@ -26,57 +26,52 @@
 #include "fib-entry.hpp"
 
 namespace nfd {
-namespace fib {
+    namespace fib {
 
-Entry::Entry(const Name& prefix)
-  : m_prefix(prefix)
-  , m_nameTreeEntry(nullptr)
-{
-}
+        Entry::Entry(const Name& prefix)
+        : m_prefix(prefix)
+        , m_nameTreeEntry(nullptr) {
+        }
 
-NextHopList::iterator
-Entry::findNextHop(const Face& face)
-{
-  return std::find_if(m_nextHops.begin(), m_nextHops.end(),
-                      [&face] (const NextHop& nexthop) {
+        NextHopList::iterator
+        Entry::findNextHop(const Face& face) {
+            return std::find_if(m_nextHops.begin(), m_nextHops.end(),
+                    [&face] (const NextHop & nexthop) {
                         return &nexthop.getFace() == &face;
-                      });
-}
+                    });
+        }
 
-bool
-Entry::hasNextHop(const Face& face) const
-{
-  return const_cast<Entry*>(this)->findNextHop(face) != m_nextHops.end();
-}
+        bool
+        Entry::hasNextHop(const Face& face) const {
+            return const_cast<Entry*> (this)->findNextHop(face) != m_nextHops.end();
+        }
 
-void
-Entry::addNextHop(Face& face, uint64_t cost)
-{
-  auto it = this->findNextHop(face);
-  if (it == m_nextHops.end()) {
-    m_nextHops.emplace_back(face);
-    it = std::prev(m_nextHops.end());
-  }
+        void
+        Entry::addNextHop(Face& face, uint64_t cost) {
+            auto it = this->findNextHop(face);
+            if (it == m_nextHops.end()) {
+                m_nextHops.emplace_back(face);
+                it = std::prev(m_nextHops.end());
+            }
 
-  it->setCost(cost);
-  this->sortNextHops();
-}
+            it->setCost(cost);
+            this->sortNextHops();
+        }
 
-void
-Entry::removeNextHop(const Face& face)
-{
-  auto it = this->findNextHop(face);
-  if (it != m_nextHops.end()) {
-    m_nextHops.erase(it);
-  }
-}
+        void
+        Entry::removeNextHop(const Face& face) {
+            auto it = this->findNextHop(face);
+            if (it != m_nextHops.end()) {
+                m_nextHops.erase(it);
+            }
+        }
 
-void
-Entry::sortNextHops()
-{
-  std::sort(m_nextHops.begin(), m_nextHops.end(),
-            [] (const NextHop& a, const NextHop& b) { return a.getCost() < b.getCost(); });
-}
+        void
+        Entry::sortNextHops() {
+            std::sort(m_nextHops.begin(), m_nextHops.end(),
+                    [] (const NextHop& a, const NextHop & b) {
+                        return a.getCost() < b.getCost(); });
+        }
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd

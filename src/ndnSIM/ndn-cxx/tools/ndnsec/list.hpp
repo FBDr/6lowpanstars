@@ -28,147 +28,143 @@
 
 void
 printCertificate(ndn::KeyChain& keyChain,
-                 const ndn::Name& certName,
-                 bool isDefault,
-                 int verboseLevel)
-{
-  if (isDefault)
-    std::cout << "       +->* ";
-  else
-    std::cout << "       +->  ";
+        const ndn::Name& certName,
+        bool isDefault,
+        int verboseLevel) {
+    if (isDefault)
+        std::cout << "       +->* ";
+    else
+        std::cout << "       +->  ";
 
-  std::cout << certName << std::endl;
+    std::cout << certName << std::endl;
 
-  if (verboseLevel >= 3) {
-    ndn::shared_ptr<ndn::security::v1::IdentityCertificate> certificate = keyChain.getCertificate(certName);
-    if (static_cast<bool>(certificate))
-      certificate->printCertificate(std::cout, "            ");
-  }
+    if (verboseLevel >= 3) {
+        ndn::shared_ptr<ndn::security::v1::IdentityCertificate> certificate = keyChain.getCertificate(certName);
+        if (static_cast<bool> (certificate))
+            certificate->printCertificate(std::cout, "            ");
+    }
 }
 
 void
 printKey(ndn::KeyChain& keyChain,
-         const ndn::Name& keyName,
-         bool isDefault,
-         int verboseLevel)
-{
-  if (isDefault)
-    std::cout << "  +->* ";
-  else
-    std::cout << "  +->  ";
+        const ndn::Name& keyName,
+        bool isDefault,
+        int verboseLevel) {
+    if (isDefault)
+        std::cout << "  +->* ";
+    else
+        std::cout << "  +->  ";
 
-  std::cout << keyName << std::endl;
+    std::cout << keyName << std::endl;
 
-  if (verboseLevel >= 2) {
-    std::vector<ndn::Name> defaultCertificates;
-    keyChain.getAllCertificateNamesOfKey(keyName, defaultCertificates, true);
+    if (verboseLevel >= 2) {
+        std::vector<ndn::Name> defaultCertificates;
+        keyChain.getAllCertificateNamesOfKey(keyName, defaultCertificates, true);
 
-    for (const auto& certName : defaultCertificates)
-      printCertificate(keyChain, certName, true, verboseLevel);
+        for (const auto& certName : defaultCertificates)
+            printCertificate(keyChain, certName, true, verboseLevel);
 
-    std::vector<ndn::Name> otherCertificates;
-    keyChain.getAllCertificateNamesOfKey(keyName, otherCertificates, false);
-    for (const auto& certName : otherCertificates)
-      printCertificate(keyChain, certName, false, verboseLevel);
-  }
+        std::vector<ndn::Name> otherCertificates;
+        keyChain.getAllCertificateNamesOfKey(keyName, otherCertificates, false);
+        for (const auto& certName : otherCertificates)
+            printCertificate(keyChain, certName, false, verboseLevel);
+    }
 }
 
 void
 printIdentity(ndn::KeyChain& keyChain,
-              const ndn::Name& identity,
-              bool isDefault,
-              int verboseLevel)
-{
-  if (isDefault)
-    std::cout << "* ";
-  else
-    std::cout << "  ";
+        const ndn::Name& identity,
+        bool isDefault,
+        int verboseLevel) {
+    if (isDefault)
+        std::cout << "* ";
+    else
+        std::cout << "  ";
 
-  std::cout << identity << std::endl;
+    std::cout << identity << std::endl;
 
-  if (verboseLevel >= 1) {
-    std::vector<ndn::Name> defaultKeys;
-    keyChain.getAllKeyNamesOfIdentity(identity, defaultKeys, true);
-    for (const auto& keyName : defaultKeys)
-      printKey(keyChain, keyName, true, verboseLevel);
+    if (verboseLevel >= 1) {
+        std::vector<ndn::Name> defaultKeys;
+        keyChain.getAllKeyNamesOfIdentity(identity, defaultKeys, true);
+        for (const auto& keyName : defaultKeys)
+            printKey(keyChain, keyName, true, verboseLevel);
 
-    std::vector<ndn::Name> otherKeys;
-    keyChain.getAllKeyNamesOfIdentity(identity, otherKeys, false);
-    for (const auto& keyName : otherKeys) {
-      printKey(keyChain, keyName, false, verboseLevel);
+        std::vector<ndn::Name> otherKeys;
+        keyChain.getAllKeyNamesOfIdentity(identity, otherKeys, false);
+        for (const auto& keyName : otherKeys) {
+            printKey(keyChain, keyName, false, verboseLevel);
+        }
+
+        std::cout << std::endl;
     }
-
-    std::cout << std::endl;
-  }
 }
 
 int
-ndnsec_list(int argc, char** argv)
-{
-  using namespace ndn;
-  namespace po = boost::program_options;
+ndnsec_list(int argc, char** argv) {
+    using namespace ndn;
+    namespace po = boost::program_options;
 
-  int verboseLevel = 0; // 0 print identity only
-                        // 1 print key name
-                        // 2 print cert name
-                        // 3 print cert content
+    int verboseLevel = 0; // 0 print identity only
+    // 1 print key name
+    // 2 print cert name
+    // 3 print cert content
 
-  po::options_description options("General Usage\n  ndnsec list [-h] [-k|c]\nGeneral options");
-  options.add_options()
-    ("help,h",    "produce help message")
-    ("key,k",     "granularity: key")
-    ("cert,c",    "granularity: certificate")
-    ("verbose,v", accumulator<int>(&verboseLevel),
-                  "verbose mode: -v is equivalent to -k, -vv is equivalent to -c")
-    ;
+    po::options_description options("General Usage\n  ndnsec list [-h] [-k|c]\nGeneral options");
+    options.add_options()
+            ("help,h", "produce help message")
+            ("key,k", "granularity: key")
+            ("cert,c", "granularity: certificate")
+            ("verbose,v", accumulator<int>(&verboseLevel),
+            "verbose mode: -v is equivalent to -k, -vv is equivalent to -c")
+            ;
 
-  po::options_description oldOptions;
-  oldOptions.add_options()
-    ("key2,K",         "granularity: key")
-    ("cert2,C",        "granularity: certificate");
+    po::options_description oldOptions;
+    oldOptions.add_options()
+            ("key2,K", "granularity: key")
+            ("cert2,C", "granularity: certificate");
 
-  po::options_description allOptions;
-  allOptions.add(options).add(oldOptions);
+    po::options_description allOptions;
+    allOptions.add(options).add(oldOptions);
 
-  po::variables_map vm;
-  try {
-    po::store(po::parse_command_line(argc, argv, allOptions), vm);
-    po::notify(vm);
-  }
-  catch (const std::exception& e) {
-    std::cerr << "ERROR: " << e.what() << std::endl;
-    std::cerr << options << std::endl;
-    return 1;
-  }
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, allOptions), vm);
+        po::notify(vm);
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        std::cerr << options << std::endl;
+        return 1;
+    }
 
-  if (vm.count("help") != 0) {
-    std::cerr << options << std::endl;;
+    if (vm.count("help") != 0) {
+        std::cerr << options << std::endl;
+        ;
+        return 0;
+    }
+
+    int tmpVerboseLevel = 0;
+    if (vm.count("cert") != 0 || vm.count("cert2") != 0)
+        tmpVerboseLevel = 2;
+    else if (vm.count("key") != 0 || vm.count("key2") != 0)
+        tmpVerboseLevel = 1;
+
+    verboseLevel = std::max(verboseLevel, tmpVerboseLevel);
+
+    KeyChain keyChain;
+
+    std::vector<Name> defaultIdentities;
+    keyChain.getAllIdentities(defaultIdentities, true);
+    for (const auto& identity : defaultIdentities) {
+        printIdentity(keyChain, identity, true, verboseLevel);
+    }
+
+    std::vector<Name> otherIdentities;
+    keyChain.getAllIdentities(otherIdentities, false);
+    for (const auto& identity : otherIdentities) {
+        printIdentity(keyChain, identity, false, verboseLevel);
+    }
+
     return 0;
-  }
-
-  int tmpVerboseLevel = 0;
-  if (vm.count("cert") != 0 || vm.count("cert2") != 0)
-    tmpVerboseLevel = 2;
-  else if(vm.count("key") != 0 || vm.count("key2") != 0)
-    tmpVerboseLevel = 1;
-
-  verboseLevel = std::max(verboseLevel, tmpVerboseLevel);
-
-  KeyChain keyChain;
-
-  std::vector<Name> defaultIdentities;
-  keyChain.getAllIdentities(defaultIdentities, true);
-  for (const auto& identity : defaultIdentities) {
-    printIdentity(keyChain, identity, true, verboseLevel);
-  }
-
-  std::vector<Name> otherIdentities;
-  keyChain.getAllIdentities(otherIdentities, false);
-  for (const auto& identity : otherIdentities) {
-    printIdentity(keyChain, identity, false, verboseLevel);
-  }
-
-  return 0;
 }
 
 #endif // NDN_TOOLS_NDNSEC_LIST_HPP

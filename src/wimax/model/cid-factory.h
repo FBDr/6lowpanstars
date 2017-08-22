@@ -29,67 +29,66 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- * This class is used exclusively by the BS to allocate CIDs to new connections.
- * This class uses the definitions from Table 345 in ieee-802.16-2004 to
- * allocate cids in different integer ranges according to their type.
- * The relative allocation of the ranges is controlled by the parameter 'm'
- * introduced in the above-mentionned table.
- *
- * Note: The current implementation merely allocates cids sequentially from
- * the start of the allowed range. A proper implementation would be able
- * to recycle cids from previous dead connections and should instead look
- * at a bitmap of free cids. Some other day :)
- */
-class CidFactory
-{
-public:
-  /**
-   * Create a cid factory with a default value for m of 0x5500.
-   */
-  CidFactory (void);
-  /**
-   * \brief This function returns the next basic CID.
-   * \returns the next basic CID.
-   */
-  Cid AllocateBasic (void);
-  /**
-   * \brief This function returns the next primary basic CID.
-   * \returns the next primary CID.
-   */
-  Cid AllocatePrimary (void);
-  /**
-   * \brief This function returns the next Transport (or Secondary) CID.
-   * \returns the next Transport (or Secondary) CID.
-   */
-  Cid AllocateTransportOrSecondary (void);
-  /**
-   * \brief This function returns the next Multicast CID.
-   * \returns the next Multicast CID.
-   */
-  Cid AllocateMulticast (void);
+    /**
+     * \ingroup wimax
+     * This class is used exclusively by the BS to allocate CIDs to new connections.
+     * This class uses the definitions from Table 345 in ieee-802.16-2004 to
+     * allocate cids in different integer ranges according to their type.
+     * The relative allocation of the ranges is controlled by the parameter 'm'
+     * introduced in the above-mentionned table.
+     *
+     * Note: The current implementation merely allocates cids sequentially from
+     * the start of the allowed range. A proper implementation would be able
+     * to recycle cids from previous dead connections and should instead look
+     * at a bitmap of free cids. Some other day :)
+     */
+    class CidFactory {
+    public:
+        /**
+         * Create a cid factory with a default value for m of 0x5500.
+         */
+        CidFactory(void);
+        /**
+         * \brief This function returns the next basic CID.
+         * \returns the next basic CID.
+         */
+        Cid AllocateBasic(void);
+        /**
+         * \brief This function returns the next primary basic CID.
+         * \returns the next primary CID.
+         */
+        Cid AllocatePrimary(void);
+        /**
+         * \brief This function returns the next Transport (or Secondary) CID.
+         * \returns the next Transport (or Secondary) CID.
+         */
+        Cid AllocateTransportOrSecondary(void);
+        /**
+         * \brief This function returns the next Multicast CID.
+         * \returns the next Multicast CID.
+         */
+        Cid AllocateMulticast(void);
 
-  Cid Allocate (enum Cid::Type type);
+        Cid Allocate(enum Cid::Type type);
 
-  bool IsTransport (Cid cid) const;
-  bool IsPrimary (Cid cid) const;
-  bool IsBasic (Cid cid) const;
+        bool IsTransport(Cid cid) const;
+        bool IsPrimary(Cid cid) const;
+        bool IsBasic(Cid cid) const;
 
-  /**
-   * Notify the factory that the connection associated to this
-   * cid has been killed and that this cid can be reused.
-   */
-  void FreeCid (Cid cid);
+        /**
+         * Notify the factory that the connection associated to this
+         * cid has been killed and that this cid can be reused.
+         */
+        void FreeCid(Cid cid);
 
-private:
-  uint16_t m_m;
+    private:
+        uint16_t m_m;
 
-  uint16_t m_basicIdentifier;
-  uint16_t m_primaryIdentifier;
-  uint16_t m_transportOrSecondaryIdentifier;
-  uint16_t m_multicastPollingIdentifier;
-};
+        uint16_t m_basicIdentifier;
+        uint16_t m_primaryIdentifier;
+        uint16_t m_transportOrSecondaryIdentifier;
+        uint16_t m_multicastPollingIdentifier;
+    };
 
 } // namespace ns3
 

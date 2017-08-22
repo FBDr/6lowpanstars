@@ -27,27 +27,26 @@
 
 namespace ns3 {
 
-class WimaxPhy;
+    class WimaxPhy;
 
-/**
- * \ingroup wimax
- * \brief The SendParams class defines the parameters with which Send() function of
- *  a particular PHY is called. The sole purpose of this class is to allow
- *  defining the pure virtual Send() function in the PHY base-class (WimaxPhy).
- *  This class shall be sub-classed every time a new PHY is integrated (i.e.,
- *  a new sub-class of WimaxPhy is created) which requires different or
- *  additional parameters to call its Send() function. For example as it is
- *  seen here, it has been sub-classed for the OFDM PHY layer since its Send()
- *  function requires two additional parameters.
- */
-class SendParams
-{
-public:
-  SendParams ();
-  virtual ~SendParams ();
+    /**
+     * \ingroup wimax
+     * \brief The SendParams class defines the parameters with which Send() function of
+     *  a particular PHY is called. The sole purpose of this class is to allow
+     *  defining the pure virtual Send() function in the PHY base-class (WimaxPhy).
+     *  This class shall be sub-classed every time a new PHY is integrated (i.e.,
+     *  a new sub-class of WimaxPhy is created) which requires different or
+     *  additional parameters to call its Send() function. For example as it is
+     *  seen here, it has been sub-classed for the OFDM PHY layer since its Send()
+     *  function requires two additional parameters.
+     */
+    class SendParams {
+    public:
+        SendParams();
+        virtual ~SendParams();
 
-private:
-};
+    private:
+    };
 
 } // namespace ns3
 
@@ -61,35 +60,32 @@ private:
 
 namespace ns3 {
 
-class OfdmSendParams : public SendParams
-{
-  /**
-   * \see SendParams
-   */
-public:
-  OfdmSendParams (Ptr<PacketBurst> burst, uint8_t modulationType,
-                  uint8_t direction);
-  ~OfdmSendParams ();
-  Ptr<PacketBurst> GetBurst () const
-  {
-    return m_burst;
-  }
+    class OfdmSendParams : public SendParams {
+        /**
+         * \see SendParams
+         */
+    public:
+        OfdmSendParams(Ptr<PacketBurst> burst, uint8_t modulationType,
+                uint8_t direction);
+        ~OfdmSendParams();
 
-  uint8_t GetModulationType () const
-  {
-    return m_modulationType;
-  }
+        Ptr<PacketBurst> GetBurst() const {
+            return m_burst;
+        }
 
-  uint8_t GetDirection () const
-  {
-    return m_direction;
-  }
+        uint8_t GetModulationType() const {
+            return m_modulationType;
+        }
 
-private:
-  Ptr<PacketBurst> m_burst;
-  uint8_t m_modulationType;
-  uint8_t m_direction;
-};
+        uint8_t GetDirection() const {
+            return m_direction;
+        }
+
+    private:
+        Ptr<PacketBurst> m_burst;
+        uint8_t m_modulationType;
+        uint8_t m_direction;
+    };
 
 } // namespace ns3
 

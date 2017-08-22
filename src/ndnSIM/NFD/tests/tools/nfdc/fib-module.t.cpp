@@ -28,14 +28,14 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestFibModule, ModuleFixture<FibModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestFibModule, ModuleFixture<FibModule>)
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <fib>
     <fibEntry>
       <prefix>/</prefix>
@@ -70,35 +70,34 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </fib>
 )XML");
 
-const std::string STATUS_TEXT = std::string(R"TEXT(
+                const std::string STATUS_TEXT = std::string(R"TEXT(
 FIB:
   / nexthops={faceid=262 (cost=9), faceid=272 (cost=50), faceid=274 (cost=78)}
   /localhost/nfd nexthops={faceid=1 (cost=0), faceid=274 (cost=0)}
 )TEXT").substr(1);
 
-BOOST_AUTO_TEST_CASE(Status)
-{
-  this->fetchStatus();
-  FibEntry payload1;
-  payload1.setPrefix("/")
-          .addNextHopRecord(NextHopRecord().setFaceId(262).setCost(9))
-          .addNextHopRecord(NextHopRecord().setFaceId(272).setCost(50))
-          .addNextHopRecord(NextHopRecord().setFaceId(274).setCost(78));
-  FibEntry payload2;
-  payload2.setPrefix("/localhost/nfd")
-          .addNextHopRecord(NextHopRecord().setFaceId(1).setCost(0))
-          .addNextHopRecord(NextHopRecord().setFaceId(274).setCost(0));
-  this->sendDataset("/localhost/nfd/fib/list", payload1, payload2);
-  this->prepareStatusOutput();
+                BOOST_AUTO_TEST_CASE(Status) {
+                    this->fetchStatus();
+                    FibEntry payload1;
+                    payload1.setPrefix("/")
+                            .addNextHopRecord(NextHopRecord().setFaceId(262).setCost(9))
+                            .addNextHopRecord(NextHopRecord().setFaceId(272).setCost(50))
+                            .addNextHopRecord(NextHopRecord().setFaceId(274).setCost(78));
+                    FibEntry payload2;
+                    payload2.setPrefix("/localhost/nfd")
+                            .addNextHopRecord(NextHopRecord().setFaceId(1).setCost(0))
+                            .addNextHopRecord(NextHopRecord().setFaceId(274).setCost(0));
+                    this->sendDataset("/localhost/nfd/fib/list", payload1, payload2);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestFibModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestFibModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

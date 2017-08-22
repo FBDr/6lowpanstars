@@ -32,98 +32,94 @@
 #include <boost/mpl/vector.hpp>
 
 namespace nfd {
-namespace fw {
-namespace tests {
+    namespace fw {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-class UnsolicitedDataPolicyFixture : public UnitTestTimeFixture
-{
-protected:
-  UnsolicitedDataPolicyFixture()
-    : cs(forwarder.getCs())
-  {
-  }
+            class UnsolicitedDataPolicyFixture : public UnitTestTimeFixture {
+            protected:
 
-  /** \tparam Policy policy type, or void to keep default policy
-   */
-  template<typename Policy>
-  void
-  setPolicy()
-  {
-    forwarder.setUnsolicitedDataPolicy(make_unique<Policy>());
-  }
+                UnsolicitedDataPolicyFixture()
+                : cs(forwarder.getCs()) {
+                }
 
-  bool
-  isInCs(const Data& data)
-  {
-    using namespace boost::logic;
+                /** \tparam Policy policy type, or void to keep default policy
+                 */
+                template<typename Policy>
+                void
+                setPolicy() {
+                    forwarder.setUnsolicitedDataPolicy(make_unique<Policy>());
+                }
 
-    tribool isFound = indeterminate;
-    cs.find(Interest(data.getFullName()),
-      bind([&] { isFound = true; }),
-      bind([&] { isFound = false; }));
+                bool
+                isInCs(const Data& data) {
+                    using namespace boost::logic;
 
-    this->advanceClocks(time::milliseconds(1));
-    BOOST_REQUIRE(!indeterminate(isFound));
-    return isFound;
-  }
+                    tribool isFound = indeterminate;
+                    cs.find(Interest(data.getFullName()),
+                            bind([&] {
+                                isFound = true; }),
+                    bind([&] {
+                        isFound = false; }));
 
-protected:
-  Forwarder forwarder;
-  Cs& cs;
-};
+                    this->advanceClocks(time::milliseconds(1));
+                    BOOST_REQUIRE(!indeterminate(isFound));
+                    return isFound;
+                }
 
-template<>
-void
-UnsolicitedDataPolicyFixture::setPolicy<void>()
-{
-  // void keeps the default policy
-}
+            protected:
+                Forwarder forwarder;
+                Cs& cs;
+            };
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_FIXTURE_TEST_SUITE(TestUnsolicitedDataPolicy, UnsolicitedDataPolicyFixture)
+            template<>
+            void
+            UnsolicitedDataPolicyFixture::setPolicy<void>() {
+                // void keeps the default policy
+            }
 
-template<typename Policy, bool shouldAdmitLocal, bool shouldAdmitNonLocal>
-struct FaceScopePolicyTest
-{
-  typedef Policy PolicyType;
-  typedef std::integral_constant<bool, shouldAdmitLocal> ShouldAdmitLocal;
-  typedef std::integral_constant<bool, shouldAdmitNonLocal> ShouldAdmitNonLocal;
-};
+            BOOST_AUTO_TEST_SUITE(Fw)
+            BOOST_FIXTURE_TEST_SUITE(TestUnsolicitedDataPolicy, UnsolicitedDataPolicyFixture)
 
-typedef boost::mpl::vector<
-  FaceScopePolicyTest<void, false, false>, // default policy
-  FaceScopePolicyTest<DropAllUnsolicitedDataPolicy, false, false>,
-  FaceScopePolicyTest<AdmitLocalUnsolicitedDataPolicy, true, false>,
-  FaceScopePolicyTest<AdmitNetworkUnsolicitedDataPolicy, false, true>,
-  FaceScopePolicyTest<AdmitAllUnsolicitedDataPolicy, true, true>
-> FaceScopePolicyTests;
+            template<typename Policy, bool shouldAdmitLocal, bool shouldAdmitNonLocal>
+            struct FaceScopePolicyTest {
+                typedef Policy PolicyType;
+                typedef std::integral_constant<bool, shouldAdmitLocal> ShouldAdmitLocal;
+                typedef std::integral_constant<bool, shouldAdmitNonLocal> ShouldAdmitNonLocal;
+            };
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(FaceScopePolicy, T, FaceScopePolicyTests)
-{
-  setPolicy<typename T::PolicyType>();
+            typedef boost::mpl::vector<
+            FaceScopePolicyTest<void, false, false>, // default policy
+            FaceScopePolicyTest<DropAllUnsolicitedDataPolicy, false, false>,
+            FaceScopePolicyTest<AdmitLocalUnsolicitedDataPolicy, true, false>,
+            FaceScopePolicyTest<AdmitNetworkUnsolicitedDataPolicy, false, true>,
+            FaceScopePolicyTest<AdmitAllUnsolicitedDataPolicy, true, true>
+            > FaceScopePolicyTests;
 
-  auto face1 = make_shared<DummyFace>("dummy://", "dummy://",
-                                      ndn::nfd::FACE_SCOPE_LOCAL);
-  forwarder.addFace(face1);
+            BOOST_AUTO_TEST_CASE_TEMPLATE(FaceScopePolicy, T, FaceScopePolicyTests) {
+                setPolicy<typename T::PolicyType > ();
 
-  shared_ptr<Data> data1 = makeData("/unsolicited-from-local");
-  forwarder.onIncomingData(*face1, *data1);
-  BOOST_CHECK_EQUAL(isInCs(*data1), T::ShouldAdmitLocal::value);
+                auto face1 = make_shared<DummyFace>("dummy://", "dummy://",
+                        ndn::nfd::FACE_SCOPE_LOCAL);
+                forwarder.addFace(face1);
 
-  auto face2 = make_shared<DummyFace>("dummy://", "dummy://",
-                                      ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  forwarder.addFace(face2);
+                shared_ptr<Data> data1 = makeData("/unsolicited-from-local");
+                forwarder.onIncomingData(*face1, *data1);
+                BOOST_CHECK_EQUAL(isInCs(*data1), T::ShouldAdmitLocal::value);
 
-  shared_ptr<Data> data2 = makeData("/unsolicited-from-non-local");
-  forwarder.onIncomingData(*face2, *data2);
-  BOOST_CHECK_EQUAL(isInCs(*data2), T::ShouldAdmitNonLocal::value);
-}
+                auto face2 = make_shared<DummyFace>("dummy://", "dummy://",
+                        ndn::nfd::FACE_SCOPE_NON_LOCAL);
+                forwarder.addFace(face2);
 
-BOOST_AUTO_TEST_SUITE_END() // TestUnsolicitedDataPolicy
-BOOST_AUTO_TEST_SUITE_END() // Fw
+                shared_ptr<Data> data2 = makeData("/unsolicited-from-non-local");
+                forwarder.onIncomingData(*face2, *data2);
+                BOOST_CHECK_EQUAL(isInCs(*data2), T::ShouldAdmitNonLocal::value);
+            }
 
-} // namespace tests
-} // namespace fw
+            BOOST_AUTO_TEST_SUITE_END() // TestUnsolicitedDataPolicy
+            BOOST_AUTO_TEST_SUITE_END() // Fw
+
+        } // namespace tests
+    } // namespace fw
 } // namespace nfd

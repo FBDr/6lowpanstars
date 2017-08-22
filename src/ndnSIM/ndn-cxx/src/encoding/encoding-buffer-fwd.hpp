@@ -23,35 +23,35 @@
 #define NDN_ENCODING_ENCODING_BUFFER_FWD_HPP
 
 namespace ndn {
-namespace encoding {
+    namespace encoding {
 
-typedef bool Tag;
+        typedef bool Tag;
 
-/**
- * @brief Tag for EncodingImpl to indicate that Encoder is requested
- * Implementation of the tag may change to class. Use of true directly
- * as a template parameter is discouraged.
- */
-static const Tag EncoderTag = true;
+        /**
+         * @brief Tag for EncodingImpl to indicate that Encoder is requested
+         * Implementation of the tag may change to class. Use of true directly
+         * as a template parameter is discouraged.
+         */
+        static const Tag EncoderTag = true;
 
-/**
- * @brief Tag for EncodingImpl to indicate that Estimator is requested
- * Implementation of the tag may change to class. Use of false directly
- * as a template parameter is discouraged.
- */
-static const Tag EstimatorTag = false;
+        /**
+         * @brief Tag for EncodingImpl to indicate that Estimator is requested
+         * Implementation of the tag may change to class. Use of false directly
+         * as a template parameter is discouraged.
+         */
+        static const Tag EstimatorTag = false;
 
-template<Tag TAG>
-class EncodingImpl;
+        template<Tag TAG>
+        class EncodingImpl;
 
-typedef EncodingImpl<EncoderTag> EncodingBuffer;
-typedef EncodingImpl<EstimatorTag> EncodingEstimator;
+        typedef EncodingImpl<EncoderTag> EncodingBuffer;
+        typedef EncodingImpl<EstimatorTag> EncodingEstimator;
 
-} // namespace encoding
+    } // namespace encoding
 
-using encoding::EncodingImpl;
-using encoding::EncodingBuffer;
-using encoding::EncodingEstimator;
+    using encoding::EncodingImpl;
+    using encoding::EncodingBuffer;
+    using encoding::EncodingEstimator;
 
 } // namespace ndn
 

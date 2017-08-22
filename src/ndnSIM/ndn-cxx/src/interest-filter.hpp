@@ -26,112 +26,108 @@
 
 namespace ndn {
 
-class RegexPatternListMatcher;
+    class RegexPatternListMatcher;
 
-/**
- * @brief declares the set of Interests a producer can serve,
- *        which starts with a name prefix, plus an optional regular expression
- */
-class InterestFilter
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+    /**
+     * @brief declares the set of Interests a producer can serve,
+     *        which starts with a name prefix, plus an optional regular expression
+     */
+    class InterestFilter {
+    public:
 
-  /**
-   * @brief Construct an InterestFilter to match Interests by prefix
-   *
-   * This filter matches Interests whose name start with the given prefix.
-   *
-   * @note InterestFilter is implicitly convertible from Name.
-   */
-  InterestFilter(const Name& prefix);
+        class Error : public std::runtime_error {
+        public:
 
-  /**
-   * @brief Construct an InterestFilter to match Interests by prefix
-   *
-   * This filter matches Interests whose name start with the given prefix.
-   *
-   * @param prefixUri name prefix, interpreted as ndn URI
-   * @note InterestFilter is implicitly convertible from null-terminated byte string.
-   */
-  InterestFilter(const char* prefixUri);
+            explicit
+            Error(const std::string& what)
+            : std::runtime_error(what) {
+            }
+        };
 
-  /**
-   * @brief Construct an InterestFilter to match Interests by prefix
-   *
-   * This filter matches Interests whose name start with the given prefix.
-   *
-   * @param prefixUri name prefix, interpreted as ndn URI
-   * @note InterestFilter is implicitly convertible from std::string.
-   */
-  InterestFilter(const std::string& prefixUri);
+        /**
+         * @brief Construct an InterestFilter to match Interests by prefix
+         *
+         * This filter matches Interests whose name start with the given prefix.
+         *
+         * @note InterestFilter is implicitly convertible from Name.
+         */
+        InterestFilter(const Name& prefix);
 
-  /**
-   * @brief Construct an InterestFilter to match Interests by prefix and regular expression
-   *
-   * This filter matches Interests whose name start with the given prefix and
-   * the remaining components match the given regular expression.
-   * For example, the following InterestFilter:
-   *
-   *    InterestFilter("/hello", "<world><>+")
-   *
-   * matches Interests whose name has prefix `/hello` followed by component `world`
-   * and has at least one more component after it, such as:
-   *
-   *    /hello/world/%21
-   *    /hello/world/x/y/z
-   *
-   * Note that regular expression will need to match all components (e.g., there are
-   * implicit heading `^` and trailing `$` symbols in the regular expression).
-   */
-  InterestFilter(const Name& prefix, const std::string& regexFilter);
+        /**
+         * @brief Construct an InterestFilter to match Interests by prefix
+         *
+         * This filter matches Interests whose name start with the given prefix.
+         *
+         * @param prefixUri name prefix, interpreted as ndn URI
+         * @note InterestFilter is implicitly convertible from null-terminated byte string.
+         */
+        InterestFilter(const char* prefixUri);
 
-  /**
-   * @brief Implicit conversion to Name
-   * @note This allows InterestCallback to be declared with `Name` rather than `InterestFilter`,
-   *       but this does not work if InterestFilter has regular expression.
-   */
-  operator const Name&() const;
+        /**
+         * @brief Construct an InterestFilter to match Interests by prefix
+         *
+         * This filter matches Interests whose name start with the given prefix.
+         *
+         * @param prefixUri name prefix, interpreted as ndn URI
+         * @note InterestFilter is implicitly convertible from std::string.
+         */
+        InterestFilter(const std::string& prefixUri);
 
-  /**
-   * @brief Check if specified Interest name matches the filter
-   */
-  bool
-  doesMatch(const Name& name) const;
+        /**
+         * @brief Construct an InterestFilter to match Interests by prefix and regular expression
+         *
+         * This filter matches Interests whose name start with the given prefix and
+         * the remaining components match the given regular expression.
+         * For example, the following InterestFilter:
+         *
+         *    InterestFilter("/hello", "<world><>+")
+         *
+         * matches Interests whose name has prefix `/hello` followed by component `world`
+         * and has at least one more component after it, such as:
+         *
+         *    /hello/world/%21
+         *    /hello/world/x/y/z
+         *
+         * Note that regular expression will need to match all components (e.g., there are
+         * implicit heading `^` and trailing `$` symbols in the regular expression).
+         */
+        InterestFilter(const Name& prefix, const std::string& regexFilter);
 
-  const Name&
-  getPrefix() const
-  {
-    return m_prefix;
-  }
+        /**
+         * @brief Implicit conversion to Name
+         * @note This allows InterestCallback to be declared with `Name` rather than `InterestFilter`,
+         *       but this does not work if InterestFilter has regular expression.
+         */
+        operator const Name&() const;
 
-  bool
-  hasRegexFilter() const
-  {
-    return m_regexFilter != nullptr;
-  }
+        /**
+         * @brief Check if specified Interest name matches the filter
+         */
+        bool
+        doesMatch(const Name& name) const;
 
-  const RegexPatternListMatcher&
-  getRegexFilter() const
-  {
-    return *m_regexFilter;
-  }
+        const Name&
+        getPrefix() const {
+            return m_prefix;
+        }
 
-private:
-  Name m_prefix;
-  shared_ptr<RegexPatternListMatcher> m_regexFilter;
-};
+        bool
+        hasRegexFilter() const {
+            return m_regexFilter != nullptr;
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const InterestFilter& filter);
+        const RegexPatternListMatcher&
+        getRegexFilter() const {
+            return *m_regexFilter;
+        }
+
+    private:
+        Name m_prefix;
+        shared_ptr<RegexPatternListMatcher> m_regexFilter;
+    };
+
+    std::ostream&
+    operator<<(std::ostream& os, const InterestFilter& filter);
 
 } // namespace ndn
 

@@ -30,31 +30,29 @@
 #else
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-class NetworkMonitor::Impl
-{
-public:
-  Impl(NetworkMonitor& nm, boost::asio::io_service& io)
-  {
-    BOOST_THROW_EXCEPTION(Error("Network monitoring is not supported on this platform"));
-  }
-};
+        class NetworkMonitor::Impl {
+        public:
 
-} // namespace util
+            Impl(NetworkMonitor& nm, boost::asio::io_service& io) {
+                BOOST_THROW_EXCEPTION(Error("Network monitoring is not supported on this platform"));
+            }
+        };
+
+    } // namespace util
 } // namespace ndn
 
 #endif
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-NetworkMonitor::NetworkMonitor(boost::asio::io_service& io)
-  : m_impl(new Impl(*this, io))
-{
-}
+        NetworkMonitor::NetworkMonitor(boost::asio::io_service& io)
+        : m_impl(new Impl(*this, io)) {
+        }
 
-NetworkMonitor::~NetworkMonitor() = default;
+        NetworkMonitor::~NetworkMonitor() = default;
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

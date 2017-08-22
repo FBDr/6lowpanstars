@@ -31,69 +31,63 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("ItuR1411NlosOverRooftopPropagationLossModelTest");
+NS_LOG_COMPONENT_DEFINE("ItuR1411NlosOverRooftopPropagationLossModelTest");
 
 class ItuR1411NlosOverRooftopPropagationLossModelTestCase : public TestCase
 {
-public:
-  ItuR1411NlosOverRooftopPropagationLossModelTestCase (double freq, double dist, double hb, double hm, EnvironmentType env, CitySize city, double refValue, std::string name);
-  virtual ~ItuR1411NlosOverRooftopPropagationLossModelTestCase ();
+    public :
+    ItuR1411NlosOverRooftopPropagationLossModelTestCase(double freq, double dist, double hb, double hm, EnvironmentType env, CitySize city, double refValue, std::string name);
+    virtual ~ItuR1411NlosOverRooftopPropagationLossModelTestCase();
 
 private:
-  virtual void DoRun (void);
-  Ptr<MobilityModel> CreateMobilityModel (uint16_t index);
+    virtual void DoRun(void);
+    Ptr<MobilityModel> CreateMobilityModel(uint16_t index);
 
-  double m_freq;
-  double m_dist;
-  double m_hb;
-  double m_hm;
-  EnvironmentType m_env;
-  CitySize m_city;
-  double m_lossRef;
-
+    double m_freq;
+    double m_dist;
+    double m_hb;
+    double m_hm;
+    EnvironmentType m_env;
+    CitySize m_city;
+    double m_lossRef;
 };
 
-ItuR1411NlosOverRooftopPropagationLossModelTestCase::ItuR1411NlosOverRooftopPropagationLossModelTestCase (double freq, double dist, double hb, double hm, EnvironmentType env, CitySize city, double refValue, std::string name)
-  : TestCase (name),
-    m_freq (freq),
-    m_dist (dist),
-    m_hb (hb),
-    m_hm (hm),
-    m_env (env),
-    m_city (city),
-    m_lossRef (refValue)
-{
+ItuR1411NlosOverRooftopPropagationLossModelTestCase::ItuR1411NlosOverRooftopPropagationLossModelTestCase(double freq, double dist, double hb, double hm, EnvironmentType env, CitySize city, double refValue, std::string name)
+: TestCase(name),
+m_freq(freq),
+m_dist(dist),
+m_hb(hb),
+m_hm(hm),
+m_env(env),
+m_city(city),
+m_lossRef(refValue) {
 }
 
-ItuR1411NlosOverRooftopPropagationLossModelTestCase::~ItuR1411NlosOverRooftopPropagationLossModelTestCase ()
-{
+ItuR1411NlosOverRooftopPropagationLossModelTestCase::~ItuR1411NlosOverRooftopPropagationLossModelTestCase() {
 }
-
-
 
 void
-ItuR1411NlosOverRooftopPropagationLossModelTestCase::DoRun (void)
-{
-  NS_LOG_FUNCTION (this);
+ItuR1411NlosOverRooftopPropagationLossModelTestCase::DoRun(void) {
+    NS_LOG_FUNCTION(this);
 
 
-  Ptr<MobilityModel> mma = CreateObject<ConstantPositionMobilityModel> ();
-  mma->SetPosition (Vector (0.0, 0.0, m_hb));
+    Ptr<MobilityModel> mma = CreateObject<ConstantPositionMobilityModel> ();
+    mma->SetPosition(Vector(0.0, 0.0, m_hb));
 
-  Ptr<MobilityModel> mmb = CreateObject<ConstantPositionMobilityModel> ();
-  mmb->SetPosition (Vector (m_dist, 0.0, m_hm));
+    Ptr<MobilityModel> mmb = CreateObject<ConstantPositionMobilityModel> ();
+    mmb->SetPosition(Vector(m_dist, 0.0, m_hm));
 
-  Ptr<ItuR1411NlosOverRooftopPropagationLossModel> propagationLossModel = CreateObject<ItuR1411NlosOverRooftopPropagationLossModel> ();
-  propagationLossModel->SetAttribute ("Frequency", DoubleValue (m_freq));
-  propagationLossModel->SetAttribute ("Environment", EnumValue (m_env));
-  propagationLossModel->SetAttribute ("CitySize", EnumValue (m_city));
+    Ptr<ItuR1411NlosOverRooftopPropagationLossModel> propagationLossModel = CreateObject<ItuR1411NlosOverRooftopPropagationLossModel> ();
+    propagationLossModel->SetAttribute("Frequency", DoubleValue(m_freq));
+    propagationLossModel->SetAttribute("Environment", EnumValue(m_env));
+    propagationLossModel->SetAttribute("CitySize", EnumValue(m_city));
 
-  double loss = propagationLossModel->GetLoss (mma, mmb);
+    double loss = propagationLossModel->GetLoss(mma, mmb);
 
-  NS_LOG_INFO ("Calculated loss: " << loss);
-  NS_LOG_INFO ("Theoretical loss: " << m_lossRef);
- 
-  NS_TEST_ASSERT_MSG_EQ_TOL (loss, m_lossRef, 0.1, "Wrong loss!");
+    NS_LOG_INFO("Calculated loss: " << loss);
+    NS_LOG_INFO("Theoretical loss: " << m_lossRef);
+
+    NS_TEST_ASSERT_MSG_EQ_TOL(loss, m_lossRef, 0.1, "Wrong loss!");
 
 }
 
@@ -101,23 +95,19 @@ ItuR1411NlosOverRooftopPropagationLossModelTestCase::DoRun (void)
 
 class ItuR1411NlosOverRooftopPropagationLossModelTestSuite : public TestSuite
 {
-public:
-  ItuR1411NlosOverRooftopPropagationLossModelTestSuite ();
-};
+    public :
+    ItuR1411NlosOverRooftopPropagationLossModelTestSuite();};
 
+ItuR1411NlosOverRooftopPropagationLossModelTestSuite::ItuR1411NlosOverRooftopPropagationLossModelTestSuite()
+: TestSuite("itu-r-1411-nlos-over-rooftop", SYSTEM) {
 
+    LogComponentEnable("ItuR1411NlosOverRooftopPropagationLossModelTest", LOG_LEVEL_ALL);
 
-ItuR1411NlosOverRooftopPropagationLossModelTestSuite::ItuR1411NlosOverRooftopPropagationLossModelTestSuite ()
-  : TestSuite ("itu-r-1411-nlos-over-rooftop", SYSTEM)
-{
+    // reference values obtained with the octave scripts in src/propagation/test/reference/
 
-  LogComponentEnable ("ItuR1411NlosOverRooftopPropagationLossModelTest", LOG_LEVEL_ALL);
+    AddTestCase(new ItuR1411NlosOverRooftopPropagationLossModelTestCase(2.1140e9, 900, 30, 1, UrbanEnvironment, LargeCity, 143.68, "f=2114Mhz, dist=900, urban large city"), TestCase::QUICK);
 
-  // reference values obtained with the octave scripts in src/propagation/test/reference/
-
-  AddTestCase (new ItuR1411NlosOverRooftopPropagationLossModelTestCase (2.1140e9, 900, 30, 1, UrbanEnvironment, LargeCity, 143.68, "f=2114Mhz, dist=900, urban large city"), TestCase::QUICK);
-
-  AddTestCase (new ItuR1411NlosOverRooftopPropagationLossModelTestCase (1.865e9, 500, 30, 1, UrbanEnvironment, LargeCity,  132.84, "f=2114Mhz, dist=900, urban large city"), TestCase::QUICK);
+    AddTestCase(new ItuR1411NlosOverRooftopPropagationLossModelTestCase(1.865e9, 500, 30, 1, UrbanEnvironment, LargeCity, 132.84, "f=2114Mhz, dist=900, urban large city"), TestCase::QUICK);
 
 }
 

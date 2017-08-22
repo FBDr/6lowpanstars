@@ -28,41 +28,39 @@
 #include "validator.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class ValidatorNull : public Validator
-{
-public:
-  virtual
-  ~ValidatorNull()
-  {
-  }
+        class ValidatorNull : public Validator {
+        public:
 
-protected:
-  virtual void
-  checkPolicy(const Data& data,
-              int nSteps,
-              const OnDataValidated& onValidated,
-              const OnDataValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest> >& nextSteps)
-  {
-    onValidated(data.shared_from_this());
-  }
+            virtual
+            ~ValidatorNull() {
+            }
 
-  virtual void
-  checkPolicy(const Interest& interest,
-              int nSteps,
-              const OnInterestValidated& onValidated,
-              const OnInterestValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest> >& nextSteps)
-  {
-    onValidated(interest.shared_from_this());
-  }
-};
+        protected:
 
-} // namespace security
+            virtual void
+            checkPolicy(const Data& data,
+                    int nSteps,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest> >& nextSteps) {
+                onValidated(data.shared_from_this());
+            }
 
-using security::ValidatorNull;
+            virtual void
+            checkPolicy(const Interest& interest,
+                    int nSteps,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest> >& nextSteps) {
+                onValidated(interest.shared_from_this());
+            }
+        };
+
+    } // namespace security
+
+    using security::ValidatorNull;
 
 } // namespace ndn
 

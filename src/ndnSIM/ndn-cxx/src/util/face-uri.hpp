@@ -36,163 +36,162 @@
 #include "time.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** \brief represents the underlying protocol and address used by a Face
- *  \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#FaceUri
- */
-class FaceUri
-{
-public:
-  class Error : public std::invalid_argument
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::invalid_argument(what)
-    {
-    }
-  };
+        /** \brief represents the underlying protocol and address used by a Face
+         *  \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#FaceUri
+         */
+        class FaceUri {
+        public:
 
-  FaceUri();
+            class Error : public std::invalid_argument {
+            public:
 
-  /** \brief construct by parsing
-   *
-   *  \param uri scheme://host[:port]/path
-   *  \throw FaceUri::Error if URI cannot be parsed
-   */
-  explicit
-  FaceUri(const std::string& uri);
+                explicit
+                Error(const std::string& what)
+                : std::invalid_argument(what) {
+                }
+            };
 
-  // This overload is needed so that calls with string literal won't be
-  // resolved to boost::asio::local::stream_protocol::endpoint overload.
-  explicit
-  FaceUri(const char* uri);
+            FaceUri();
 
-  /// exception-safe parsing
-  bool
-  parse(const std::string& uri);
+            /** \brief construct by parsing
+             *
+             *  \param uri scheme://host[:port]/path
+             *  \throw FaceUri::Error if URI cannot be parsed
+             */
+            explicit
+            FaceUri(const std::string& uri);
 
-public: // scheme-specific construction
-  /// construct udp4 or udp6 canonical FaceUri
-  explicit
-  FaceUri(const boost::asio::ip::udp::endpoint& endpoint);
+            // This overload is needed so that calls with string literal won't be
+            // resolved to boost::asio::local::stream_protocol::endpoint overload.
+            explicit
+            FaceUri(const char* uri);
 
-  /// construct tcp4 or tcp6 canonical FaceUri
-  explicit
-  FaceUri(const boost::asio::ip::tcp::endpoint& endpoint);
+            /// exception-safe parsing
+            bool
+            parse(const std::string& uri);
 
-  /// construct tcp canonical FaceUri with customized scheme
-  FaceUri(const boost::asio::ip::tcp::endpoint& endpoint, const std::string& scheme);
+        public: // scheme-specific construction
+            /// construct udp4 or udp6 canonical FaceUri
+            explicit
+            FaceUri(const boost::asio::ip::udp::endpoint& endpoint);
+
+            /// construct tcp4 or tcp6 canonical FaceUri
+            explicit
+            FaceUri(const boost::asio::ip::tcp::endpoint& endpoint);
+
+            /// construct tcp canonical FaceUri with customized scheme
+            FaceUri(const boost::asio::ip::tcp::endpoint& endpoint, const std::string& scheme);
 
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-  /// construct unix canonical FaceUri
-  explicit
-  FaceUri(const boost::asio::local::stream_protocol::endpoint& endpoint);
+            /// construct unix canonical FaceUri
+            explicit
+            FaceUri(const boost::asio::local::stream_protocol::endpoint& endpoint);
 #endif // BOOST_ASIO_HAS_LOCAL_SOCKETS
 
-  /// create fd FaceUri from file descriptor
-  static FaceUri
-  fromFd(int fd);
+            /// create fd FaceUri from file descriptor
+            static FaceUri
+            fromFd(int fd);
 
-  /// construct ether canonical FaceUri
-  explicit
-  FaceUri(const ethernet::Address& address);
+            /// construct ether canonical FaceUri
+            explicit
+            FaceUri(const ethernet::Address& address);
 
-  /// create dev FaceUri from network device name
-  static FaceUri
-  fromDev(const std::string& ifname);
+            /// create dev FaceUri from network device name
+            static FaceUri
+            fromDev(const std::string& ifname);
 
-  /// create udp4 or udp6 NIC-associated FaceUri from endpoint and network device name
-  static FaceUri
-  fromUdpDev(const boost::asio::ip::udp::endpoint& endpoint, const std::string& ifname);
+            /// create udp4 or udp6 NIC-associated FaceUri from endpoint and network device name
+            static FaceUri
+            fromUdpDev(const boost::asio::ip::udp::endpoint& endpoint, const std::string& ifname);
 
-public: // getters
-  /// get scheme (protocol)
-  const std::string&
-  getScheme() const
-  {
-    return m_scheme;
-  }
+        public: // getters
+            /// get scheme (protocol)
 
-  /// get host (domain)
-  const std::string&
-  getHost() const
-  {
-    return m_host;
-  }
+            const std::string&
+            getScheme() const {
+                return m_scheme;
+            }
 
-  /// get port
-  const std::string&
-  getPort() const
-  {
-    return m_port;
-  }
+            /// get host (domain)
 
-  /// get path
-  const std::string&
-  getPath() const
-  {
-    return m_path;
-  }
+            const std::string&
+            getHost() const {
+                return m_host;
+            }
 
-  /// write as a string
-  std::string
-  toString() const;
+            /// get port
 
-public: // EqualityComparable concept
-  bool
-  operator==(const FaceUri& rhs) const;
+            const std::string&
+            getPort() const {
+                return m_port;
+            }
 
-  bool
-  operator!=(const FaceUri& rhs) const;
+            /// get path
 
-public: // canonical FaceUri
-  /** \return whether a FaceUri of the scheme can be canonized
-   */
-  static bool
-  canCanonize(const std::string& scheme);
+            const std::string&
+            getPath() const {
+                return m_path;
+            }
 
-  /** \brief determine whether this FaceUri is in canonical form
-   *  \return true if this FaceUri is in canonical form,
-   *          false if this FaceUri is not in canonical form or
-   *          or it's undetermined whether this FaceUri is in canonical form
-   */
-  bool
-  isCanonical() const;
+            /// write as a string
+            std::string
+            toString() const;
 
-  typedef function<void(const FaceUri&)> CanonizeSuccessCallback;
-  typedef function<void(const std::string& reason)> CanonizeFailureCallback;
+        public: // EqualityComparable concept
+            bool
+            operator==(const FaceUri& rhs) const;
 
-  /** \brief asynchronously convert this FaceUri to canonical form
-   *  \param onSuccess function to call after this FaceUri is converted to canonical form
-   *  \note A new FaceUri in canonical form will be created; this FaceUri is unchanged.
-   *  \param onFailure function to call if this FaceUri cannot be converted to canonical form
-   *  \param io        reference to `boost::asio::io_service` instance
-   *  \param timeout   maximum allowable duration of the operations.
-   *                   It's intentional not to provide a default value: the caller should set
-   *                   a reasonable value in balance between network delay and user experience.
-   */
-  void
-  canonize(const CanonizeSuccessCallback& onSuccess,
-           const CanonizeFailureCallback& onFailure,
-           boost::asio::io_service& io, const time::nanoseconds& timeout) const;
+            bool
+            operator!=(const FaceUri& rhs) const;
 
-private:
-  std::string m_scheme;
-  std::string m_host;
-  /// whether to add [] around host when writing string
-  bool m_isV6;
-  std::string m_port;
-  std::string m_path;
+        public: // canonical FaceUri
+            /** \return whether a FaceUri of the scheme can be canonized
+             */
+            static bool
+            canCanonize(const std::string& scheme);
 
-  friend std::ostream& operator<<(std::ostream& os, const FaceUri& uri);
-};
+            /** \brief determine whether this FaceUri is in canonical form
+             *  \return true if this FaceUri is in canonical form,
+             *          false if this FaceUri is not in canonical form or
+             *          or it's undetermined whether this FaceUri is in canonical form
+             */
+            bool
+            isCanonical() const;
 
-std::ostream&
-operator<<(std::ostream& os, const FaceUri& uri);
+            typedef function<void(const FaceUri&) > CanonizeSuccessCallback;
+            typedef function<void(const std::string& reason) > CanonizeFailureCallback;
 
-} // namespace util
+            /** \brief asynchronously convert this FaceUri to canonical form
+             *  \param onSuccess function to call after this FaceUri is converted to canonical form
+             *  \note A new FaceUri in canonical form will be created; this FaceUri is unchanged.
+             *  \param onFailure function to call if this FaceUri cannot be converted to canonical form
+             *  \param io        reference to `boost::asio::io_service` instance
+             *  \param timeout   maximum allowable duration of the operations.
+             *                   It's intentional not to provide a default value: the caller should set
+             *                   a reasonable value in balance between network delay and user experience.
+             */
+            void
+            canonize(const CanonizeSuccessCallback& onSuccess,
+                    const CanonizeFailureCallback& onFailure,
+                    boost::asio::io_service& io, const time::nanoseconds& timeout) const;
+
+        private:
+            std::string m_scheme;
+            std::string m_host;
+            /// whether to add [] around host when writing string
+            bool m_isV6;
+            std::string m_port;
+            std::string m_path;
+
+            friend std::ostream& operator<<(std::ostream& os, const FaceUri& uri);
+        };
+
+        std::ostream&
+        operator<<(std::ostream& os, const FaceUri& uri);
+
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_FACE_URI_HPP

@@ -33,201 +33,179 @@
 #include "ns3/cost231-propagation-loss-model.h"
 #include "simple-ofdm-send-param.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("simpleOfdmWimaxChannel");
-  
-// NS_OBJECT_ENSURE_REGISTERED (simpleOfdmWimaxChannel);
-
-
-SimpleOfdmWimaxChannel::SimpleOfdmWimaxChannel (void)
+namespace ns3
 {
-  m_loss = 0;
-}
 
-SimpleOfdmWimaxChannel::~SimpleOfdmWimaxChannel (void)
-{
-  m_phyList.clear ();
-}
+    NS_LOG_COMPONENT_DEFINE("simpleOfdmWimaxChannel");
 
-/* static */
-TypeId
-SimpleOfdmWimaxChannel::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SimpleOfdmWimaxChannel")
-    .SetParent<WimaxChannel> ()
-    .SetGroupName ("Wimax")
-    .AddConstructor<SimpleOfdmWimaxChannel> ()
-    ;
-  return tid;
-}
+    // NS_OBJECT_ENSURE_REGISTERED (simpleOfdmWimaxChannel);
 
-SimpleOfdmWimaxChannel::SimpleOfdmWimaxChannel (PropModel propModel)
-{
-  switch (propModel)
-    {
-    case RANDOM_PROPAGATION:
-      m_loss = CreateObject<RandomPropagationLossModel> ();
-      break;
-
-    case FRIIS_PROPAGATION:
-      m_loss = CreateObject<FriisPropagationLossModel> ();
-      break;
-    case LOG_DISTANCE_PROPAGATION:
-      m_loss = CreateObject<LogDistancePropagationLossModel> ();
-      break;
-
-    case COST231_PROPAGATION:
-      m_loss = CreateObject<Cost231PropagationLossModel> ();
-      break;
-
-    default:
-      m_loss = 0;
+    SimpleOfdmWimaxChannel::SimpleOfdmWimaxChannel(void) {
+        m_loss = 0;
     }
 
-}
-
-void
-SimpleOfdmWimaxChannel::SetPropagationModel (PropModel propModel)
-{
-
-  switch (propModel)
-    {
-    case RANDOM_PROPAGATION:
-      m_loss = CreateObject<RandomPropagationLossModel> ();
-      break;
-
-    case FRIIS_PROPAGATION:
-      m_loss = CreateObject<FriisPropagationLossModel> ();
-      break;
-    case LOG_DISTANCE_PROPAGATION:
-      m_loss = CreateObject<LogDistancePropagationLossModel> ();
-      break;
-
-    case COST231_PROPAGATION:
-      m_loss = CreateObject<Cost231PropagationLossModel> ();
-      break;
-
-    default:
-      m_loss = 0;
+    SimpleOfdmWimaxChannel::~SimpleOfdmWimaxChannel(void) {
+        m_phyList.clear();
     }
 
-}
+    /* static */
+    TypeId
+    SimpleOfdmWimaxChannel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SimpleOfdmWimaxChannel")
+                .SetParent<WimaxChannel> ()
+                .SetGroupName("Wimax")
+                .AddConstructor<SimpleOfdmWimaxChannel> ()
+                ;
+        return tid;
+    }
 
-void
-SimpleOfdmWimaxChannel::DoAttach (Ptr<WimaxPhy> phy)
-{
-  Ptr<SimpleOfdmWimaxPhy> o_phy = phy->GetObject<SimpleOfdmWimaxPhy> ();
-  m_phyList.push_back (o_phy);
-}
+    SimpleOfdmWimaxChannel::SimpleOfdmWimaxChannel(PropModel propModel) {
+        switch (propModel) {
+            case RANDOM_PROPAGATION:
+                m_loss = CreateObject<RandomPropagationLossModel> ();
+                break;
 
-uint32_t
-SimpleOfdmWimaxChannel::DoGetNDevices (void) const
-{
-  return m_phyList.size ();
-}
+            case FRIIS_PROPAGATION:
+                m_loss = CreateObject<FriisPropagationLossModel> ();
+                break;
+            case LOG_DISTANCE_PROPAGATION:
+                m_loss = CreateObject<LogDistancePropagationLossModel> ();
+                break;
 
-Ptr<NetDevice>
-SimpleOfdmWimaxChannel::DoGetDevice (uint32_t index) const
-{
-  uint32_t j = 0;
-  for (std::list<Ptr<SimpleOfdmWimaxPhy> >::const_iterator iter = m_phyList.begin (); iter != m_phyList.end (); ++iter)
-    {
-      if (j == index)
-        {
-          return (*iter)->GetDevice ();
+            case COST231_PROPAGATION:
+                m_loss = CreateObject<Cost231PropagationLossModel> ();
+                break;
+
+            default:
+                m_loss = 0;
         }
-      j++;
+
     }
 
-  NS_FATAL_ERROR ("Unable to get device");
-  return 0;
-}
+    void
+    SimpleOfdmWimaxChannel::SetPropagationModel(PropModel propModel) {
 
-void
-SimpleOfdmWimaxChannel::Send (Time BlockTime,
-                              uint32_t burstSize,
-                              Ptr<WimaxPhy> phy,
-                              bool isFirstBlock,
-                              bool isLastBlock,
-                              uint64_t frequency,
-                              WimaxPhy::ModulationType modulationType,
-                              uint8_t direction,
-                              double txPowerDbm,
-                              Ptr<PacketBurst> burst)
-{
-  double rxPowerDbm = 0;
-  Ptr<MobilityModel> senderMobility = 0;
-  Ptr<MobilityModel> receiverMobility = 0;
-  senderMobility = phy->GetDevice ()->GetNode ()->GetObject<MobilityModel> ();
-  simpleOfdmSendParam * param;
-  for (std::list<Ptr<SimpleOfdmWimaxPhy> >::iterator iter = m_phyList.begin (); iter != m_phyList.end (); ++iter)
-    {
-      Time delay = Seconds (0);
-      if (phy != *iter)
-        {
-          double distance = 0;
-          receiverMobility = (*iter)->GetDevice ()->GetNode ()->GetObject<MobilityModel> ();
-          if (receiverMobility != 0 && senderMobility != 0 && m_loss != 0)
-            {
-              distance = senderMobility->GetDistanceFrom (receiverMobility);
-              delay =  Seconds (distance/300000000.0);
-              rxPowerDbm = m_loss->CalcRxPower (txPowerDbm, senderMobility, receiverMobility);
-            }
+        switch (propModel) {
+            case RANDOM_PROPAGATION:
+                m_loss = CreateObject<RandomPropagationLossModel> ();
+                break;
 
-          param = new simpleOfdmSendParam (burstSize,
-                                           isFirstBlock,
-                                           frequency,
-                                           modulationType,
-                                           direction,
-                                           rxPowerDbm,
-                                           burst);
-          Ptr<Object> dstNetDevice = (*iter)->GetDevice ();
-          uint32_t dstNode;
-          if (dstNetDevice == 0)
-            {
-              dstNode = 0xffffffff;
-            }
-          else
-            {
-              dstNode = dstNetDevice->GetObject<NetDevice> ()->GetNode ()->GetId ();
-            }
-          Simulator::ScheduleWithContext (dstNode,
-                                          delay,
-                                          &SimpleOfdmWimaxChannel::EndSendDummyBlock,
-                                          this,
-                                          *iter,
-                                          param);
+            case FRIIS_PROPAGATION:
+                m_loss = CreateObject<FriisPropagationLossModel> ();
+                break;
+            case LOG_DISTANCE_PROPAGATION:
+                m_loss = CreateObject<LogDistancePropagationLossModel> ();
+                break;
+
+            case COST231_PROPAGATION:
+                m_loss = CreateObject<Cost231PropagationLossModel> ();
+                break;
+
+            default:
+                m_loss = 0;
         }
+
     }
 
-}
-
-void
-SimpleOfdmWimaxChannel::EndSendDummyBlock (Ptr<SimpleOfdmWimaxPhy> rxphy, simpleOfdmSendParam * param)
-{
-  rxphy->StartReceive (param->GetBurstSize (),
-                       param->GetIsFirstBlock (),
-                       param->GetFrequency (),
-                       param->GetModulationType (),
-                       param->GetDirection (),
-                       param->GetRxPowerDbm (),
-                       param->GetBurst ());
-  delete param;
-}
-
-int64_t
-SimpleOfdmWimaxChannel::AssignStreams (int64_t stream)
-{
-  int64_t currentStream = stream;
-  typedef std::list<Ptr<SimpleOfdmWimaxPhy> > PhyList;
-  for (PhyList::const_iterator i = m_phyList.begin (); i != m_phyList.end (); i++)
-    {
-      Ptr<SimpleOfdmWimaxPhy> simpleOfdm = (*i);
-      currentStream += simpleOfdm->AssignStreams (currentStream);
+    void
+    SimpleOfdmWimaxChannel::DoAttach(Ptr<WimaxPhy> phy) {
+        Ptr<SimpleOfdmWimaxPhy> o_phy = phy->GetObject<SimpleOfdmWimaxPhy> ();
+        m_phyList.push_back(o_phy);
     }
-  return (currentStream - stream);
-}
+
+    uint32_t
+    SimpleOfdmWimaxChannel::DoGetNDevices(void) const {
+        return m_phyList.size();
+    }
+
+    Ptr<NetDevice>
+            SimpleOfdmWimaxChannel::DoGetDevice(uint32_t index) const {
+        uint32_t j = 0;
+        for (std::list<Ptr<SimpleOfdmWimaxPhy> >::const_iterator iter = m_phyList.begin(); iter != m_phyList.end(); ++iter) {
+            if (j == index) {
+                return (*iter)->GetDevice();
+            }
+            j++;
+        }
+
+        NS_FATAL_ERROR("Unable to get device");
+        return 0;
+    }
+
+    void
+    SimpleOfdmWimaxChannel::Send(Time BlockTime,
+            uint32_t burstSize,
+            Ptr<WimaxPhy> phy,
+            bool isFirstBlock,
+            bool isLastBlock,
+            uint64_t frequency,
+            WimaxPhy::ModulationType modulationType,
+            uint8_t direction,
+            double txPowerDbm,
+            Ptr<PacketBurst> burst) {
+        double rxPowerDbm = 0;
+        Ptr<MobilityModel> senderMobility = 0;
+        Ptr<MobilityModel> receiverMobility = 0;
+        senderMobility = phy->GetDevice()->GetNode()->GetObject<MobilityModel> ();
+        simpleOfdmSendParam * param;
+        for (std::list<Ptr<SimpleOfdmWimaxPhy> >::iterator iter = m_phyList.begin(); iter != m_phyList.end(); ++iter) {
+            Time delay = Seconds(0);
+            if (phy != *iter) {
+                double distance = 0;
+                receiverMobility = (*iter)->GetDevice()->GetNode()->GetObject<MobilityModel> ();
+                if (receiverMobility != 0 && senderMobility != 0 && m_loss != 0) {
+                    distance = senderMobility->GetDistanceFrom(receiverMobility);
+                    delay = Seconds(distance / 300000000.0);
+                    rxPowerDbm = m_loss->CalcRxPower(txPowerDbm, senderMobility, receiverMobility);
+                }
+
+                param = new simpleOfdmSendParam(burstSize,
+                        isFirstBlock,
+                        frequency,
+                        modulationType,
+                        direction,
+                        rxPowerDbm,
+                        burst);
+                Ptr<Object> dstNetDevice = (*iter)->GetDevice();
+                uint32_t dstNode;
+                if (dstNetDevice == 0) {
+                    dstNode = 0xffffffff;
+                } else {
+                    dstNode = dstNetDevice->GetObject<NetDevice> ()->GetNode()->GetId();
+                }
+                Simulator::ScheduleWithContext(dstNode,
+                        delay,
+                        &SimpleOfdmWimaxChannel::EndSendDummyBlock,
+                        this,
+                        *iter,
+                        param);
+            }
+        }
+
+    }
+
+    void
+    SimpleOfdmWimaxChannel::EndSendDummyBlock(Ptr<SimpleOfdmWimaxPhy> rxphy, simpleOfdmSendParam * param) {
+        rxphy->StartReceive(param->GetBurstSize(),
+                param->GetIsFirstBlock(),
+                param->GetFrequency(),
+                param->GetModulationType(),
+                param->GetDirection(),
+                param->GetRxPowerDbm(),
+                param->GetBurst());
+        delete param;
+    }
+
+    int64_t
+    SimpleOfdmWimaxChannel::AssignStreams(int64_t stream) {
+        int64_t currentStream = stream;
+        typedef std::list<Ptr<SimpleOfdmWimaxPhy> > PhyList;
+        for (PhyList::const_iterator i = m_phyList.begin(); i != m_phyList.end(); i++) {
+            Ptr<SimpleOfdmWimaxPhy> simpleOfdm = (*i);
+            currentStream += simpleOfdm->AssignStreams(currentStream);
+        }
+        return (currentStream - stream);
+    }
 
 }
 // namespace ns3

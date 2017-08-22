@@ -24,28 +24,27 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_AUTO_TEST_SUITE(TestDummyClientFace)
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_AUTO_TEST_SUITE(TestDummyClientFace)
 
-BOOST_AUTO_TEST_CASE(ProcessEventsOverride)
-{
-  bool isOverrideInvoked = false;
-  auto override = [&] (time::milliseconds timeout) {
-    isOverrideInvoked = true;
-    BOOST_CHECK_EQUAL(timeout, time::milliseconds(200));
-  };
+            BOOST_AUTO_TEST_CASE(ProcessEventsOverride) {
+                bool isOverrideInvoked = false;
+                auto override = [&] (time::milliseconds timeout) {
+                    isOverrideInvoked = true;
+                    BOOST_CHECK_EQUAL(timeout, time::milliseconds(200));
+                };
 
-  DummyClientFace face({false, false, override});
-  face.processEvents(time::milliseconds(200));
-  BOOST_CHECK(isOverrideInvoked);
-}
+                DummyClientFace face({false, false, override});
+                face.processEvents(time::milliseconds(200));
+                BOOST_CHECK(isOverrideInvoked);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestDummyClientFace
-BOOST_AUTO_TEST_SUITE_END() // Util
+            BOOST_AUTO_TEST_SUITE_END() // TestDummyClientFace
+            BOOST_AUTO_TEST_SUITE_END() // Util
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

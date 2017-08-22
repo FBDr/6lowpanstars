@@ -38,407 +38,377 @@
   } while (false)
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class PrivateKey::Impl
-{
-public:
-  Impl()
-    : key(nullptr)
-  {
-  }
+            class PrivateKey::Impl {
+            public:
 
-  ~Impl()
-  {
-    EVP_PKEY_free(key);
-  }
+                Impl()
+                : key(nullptr) {
+                }
 
-public:
-  EVP_PKEY* key;
-};
+                ~Impl() {
+                    EVP_PKEY_free(key);
+                }
 
-PrivateKey::PrivateKey()
-  : m_impl(new Impl)
-{
-}
+            public:
+                EVP_PKEY* key;
+            };
 
-PrivateKey::~PrivateKey() = default;
+            PrivateKey::PrivateKey()
+            : m_impl(new Impl) {
+            }
 
-void
-PrivateKey::loadPkcs1(const uint8_t* buf, size_t size)
-{
-  detail::Bio mem(BIO_s_mem());
-  BIO_write(mem.get(), buf, size);
+            PrivateKey::~PrivateKey() = default;
 
-  d2i_PrivateKey_bio(mem.get(), &m_impl->key);
+            void
+            PrivateKey::loadPkcs1(const uint8_t* buf, size_t size) {
+                detail::Bio mem(BIO_s_mem());
+                BIO_write(mem.get(), buf, size);
 
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
-}
+                d2i_PrivateKey_bio(mem.get(), &m_impl->key);
 
-void
-PrivateKey::loadPkcs1(std::istream& is)
-{
-  OBufferStream os;
-  streamSource(is) >> streamSink(os);
-  this->loadPkcs1(os.buf()->buf(), os.buf()->size());
-}
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            }
 
-void
-PrivateKey::loadPkcs1Base64(const uint8_t* buf, size_t size)
-{
-  OBufferStream os;
-  bufferSource(buf, size) >> base64Decode() >> streamSink(os);
-  this->loadPkcs1(os.buf()->buf(), os.buf()->size());
-}
+            void
+            PrivateKey::loadPkcs1(std::istream& is) {
+                OBufferStream os;
+                streamSource(is) >> streamSink(os);
+                this->loadPkcs1(os.buf()->buf(), os.buf()->size());
+            }
 
-void
-PrivateKey::loadPkcs1Base64(std::istream& is)
-{
-  OBufferStream os;
-  streamSource(is) >> base64Decode() >> streamSink(os);
-  this->loadPkcs1(os.buf()->buf(), os.buf()->size());
-}
+            void
+            PrivateKey::loadPkcs1Base64(const uint8_t* buf, size_t size) {
+                OBufferStream os;
+                bufferSource(buf, size) >> base64Decode() >> streamSink(os);
+                this->loadPkcs1(os.buf()->buf(), os.buf()->size());
+            }
 
-void
-PrivateKey::loadPkcs8(const uint8_t* buf, size_t size, const char* pw, size_t pwLen)
-{
-  BOOST_ASSERT(std::strlen(pw) == pwLen);
+            void
+            PrivateKey::loadPkcs1Base64(std::istream& is) {
+                OBufferStream os;
+                streamSource(is) >> base64Decode() >> streamSink(os);
+                this->loadPkcs1(os.buf()->buf(), os.buf()->size());
+            }
 
-  detail::Bio mem(BIO_s_mem());
-  BIO_write(mem.get(), buf, size);
+            void
+            PrivateKey::loadPkcs8(const uint8_t* buf, size_t size, const char* pw, size_t pwLen) {
+                BOOST_ASSERT(std::strlen(pw) == pwLen);
 
-  m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, nullptr, const_cast<char*>(pw));
+                detail::Bio mem(BIO_s_mem());
+                BIO_write(mem.get(), buf, size);
 
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
-}
+                m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, nullptr, const_cast<char*> (pw));
 
-static inline int
-passwordCallback(char* buf, int size, int rwflag, void* u)
-{
-  auto cb = reinterpret_cast<PrivateKey::PasswordCallback*>(u);
-  return (*cb)(buf, size, rwflag);
-}
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            }
 
-void
-PrivateKey::loadPkcs8(const uint8_t* buf, size_t size, PasswordCallback pwCallback)
-{
-  OpenSSL_add_all_algorithms();
-  detail::Bio mem(BIO_s_mem());
-  BIO_write(mem.get(), buf, size);
+            static inline int
+            passwordCallback(char* buf, int size, int rwflag, void* u) {
+                auto cb = reinterpret_cast<PrivateKey::PasswordCallback*> (u);
+                return (*cb)(buf, size, rwflag);
+            }
 
-  if (pwCallback)
-    m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, passwordCallback, &pwCallback);
-  else
-    m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, nullptr, nullptr);
+            void
+            PrivateKey::loadPkcs8(const uint8_t* buf, size_t size, PasswordCallback pwCallback) {
+                OpenSSL_add_all_algorithms();
+                detail::Bio mem(BIO_s_mem());
+                BIO_write(mem.get(), buf, size);
 
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
-}
+                if (pwCallback)
+                    m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, passwordCallback, &pwCallback);
+                else
+                    m_impl->key = d2i_PKCS8PrivateKey_bio(mem.get(), &m_impl->key, nullptr, nullptr);
 
-void
-PrivateKey::loadPkcs8(std::istream& is, const char* pw, size_t pwLen)
-{
-  OBufferStream os;
-  streamSource(is) >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
-}
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            }
 
-void
-PrivateKey::loadPkcs8(std::istream& is, PasswordCallback pwCallback)
-{
-  OBufferStream os;
-  streamSource(is) >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
-}
+            void
+            PrivateKey::loadPkcs8(std::istream& is, const char* pw, size_t pwLen) {
+                OBufferStream os;
+                streamSource(is) >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
+            }
 
-void
-PrivateKey::loadPkcs8Base64(const uint8_t* buf, size_t size, const char* pw, size_t pwLen)
-{
-  OBufferStream os;
-  bufferSource(buf, size) >> base64Decode() >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
-}
+            void
+            PrivateKey::loadPkcs8(std::istream& is, PasswordCallback pwCallback) {
+                OBufferStream os;
+                streamSource(is) >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
+            }
 
-void
-PrivateKey::loadPkcs8Base64(const uint8_t* buf, size_t size, PasswordCallback pwCallback)
-{
-  OBufferStream os;
-  bufferSource(buf, size) >> base64Decode() >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
-}
+            void
+            PrivateKey::loadPkcs8Base64(const uint8_t* buf, size_t size, const char* pw, size_t pwLen) {
+                OBufferStream os;
+                bufferSource(buf, size) >> base64Decode() >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
+            }
 
-void
-PrivateKey::loadPkcs8Base64(std::istream& is, const char* pw, size_t pwLen)
-{
-  OBufferStream os;
-  streamSource(is) >> base64Decode() >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
-}
+            void
+            PrivateKey::loadPkcs8Base64(const uint8_t* buf, size_t size, PasswordCallback pwCallback) {
+                OBufferStream os;
+                bufferSource(buf, size) >> base64Decode() >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
+            }
 
-void
-PrivateKey::loadPkcs8Base64(std::istream& is, PasswordCallback pwCallback)
-{
-  OBufferStream os;
-  streamSource(is) >> base64Decode() >> streamSink(os);
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
-}
+            void
+            PrivateKey::loadPkcs8Base64(std::istream& is, const char* pw, size_t pwLen) {
+                OBufferStream os;
+                streamSource(is) >> base64Decode() >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pw, pwLen);
+            }
 
-void
-PrivateKey::savePkcs1(std::ostream& os) const
-{
-  bufferSource(*this->toPkcs1()) >> streamSink(os);
-}
+            void
+            PrivateKey::loadPkcs8Base64(std::istream& is, PasswordCallback pwCallback) {
+                OBufferStream os;
+                streamSource(is) >> base64Decode() >> streamSink(os);
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size(), pwCallback);
+            }
 
-void
-PrivateKey::savePkcs1Base64(std::ostream& os) const
-{
-  bufferSource(*this->toPkcs1()) >> base64Encode() >> streamSink(os);
-}
+            void
+            PrivateKey::savePkcs1(std::ostream& os) const {
+                bufferSource(*this->toPkcs1()) >> streamSink(os);
+            }
 
-void
-PrivateKey::savePkcs8(std::ostream& os, const char* pw, size_t pwLen) const
-{
-  bufferSource(*this->toPkcs8(pw, pwLen)) >> streamSink(os);
-}
+            void
+            PrivateKey::savePkcs1Base64(std::ostream& os) const {
+                bufferSource(*this->toPkcs1()) >> base64Encode() >> streamSink(os);
+            }
 
-void
-PrivateKey::savePkcs8(std::ostream& os, PasswordCallback pwCallback) const
-{
-  bufferSource(*this->toPkcs8(pwCallback)) >> streamSink(os);
-}
+            void
+            PrivateKey::savePkcs8(std::ostream& os, const char* pw, size_t pwLen) const {
+                bufferSource(*this->toPkcs8(pw, pwLen)) >> streamSink(os);
+            }
 
-void
-PrivateKey::savePkcs8Base64(std::ostream& os, const char* pw, size_t pwLen) const
-{
-  bufferSource(*this->toPkcs8(pw, pwLen)) >> base64Encode() >> streamSink(os);
-}
+            void
+            PrivateKey::savePkcs8(std::ostream& os, PasswordCallback pwCallback) const {
+                bufferSource(*this->toPkcs8(pwCallback)) >> streamSink(os);
+            }
 
-void
-PrivateKey::savePkcs8Base64(std::ostream& os, PasswordCallback pwCallback) const
-{
-  bufferSource(*this->toPkcs8(pwCallback)) >> base64Encode() >> streamSink(os);
-}
+            void
+            PrivateKey::savePkcs8Base64(std::ostream& os, const char* pw, size_t pwLen) const {
+                bufferSource(*this->toPkcs8(pw, pwLen)) >> base64Encode() >> streamSink(os);
+            }
 
-ConstBufferPtr
-PrivateKey::derivePublicKey() const
-{
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            void
+            PrivateKey::savePkcs8Base64(std::ostream& os, PasswordCallback pwCallback) const {
+                bufferSource(*this->toPkcs8(pwCallback)) >> base64Encode() >> streamSink(os);
+            }
 
-  uint8_t* pkcs8 = nullptr;
-  int len = i2d_PUBKEY(m_impl->key, &pkcs8);
+            ConstBufferPtr
+            PrivateKey::derivePublicKey() const {
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
 
-  if (len <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to derive public key"));
+                uint8_t* pkcs8 = nullptr;
+                int len = i2d_PUBKEY(m_impl->key, &pkcs8);
 
-  auto result = make_shared<Buffer>(pkcs8, len);
-  OPENSSL_free(pkcs8);
+                if (len <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to derive public key"));
 
-  return result;
-}
+                auto result = make_shared<Buffer>(pkcs8, len);
+                OPENSSL_free(pkcs8);
 
-ConstBufferPtr
-PrivateKey::decrypt(const uint8_t* cipherText, size_t cipherLen) const
-{
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+                return result;
+            }
+
+            ConstBufferPtr
+            PrivateKey::decrypt(const uint8_t* cipherText, size_t cipherLen) const {
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  switch (EVP_PKEY_type(m_impl->key->type)) {
+                switch (EVP_PKEY_type(m_impl->key->type)) {
 #else
-  switch (EVP_PKEY_base_id(m_impl->key)) {
+                switch (EVP_PKEY_base_id(m_impl->key)) {
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
-  case EVP_PKEY_RSA:
-    return rsaDecrypt(cipherText, cipherLen);
-  default:
-    BOOST_THROW_EXCEPTION(Error("Decryption is not supported for this key type"));
-  }
-}
+                    case EVP_PKEY_RSA:
+                        return rsaDecrypt(cipherText, cipherLen);
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("Decryption is not supported for this key type"));
+                }
+            }
 
-void*
-PrivateKey::getEvpPkey() const
-{
-  return m_impl->key;
-}
+            void*
+            PrivateKey::getEvpPkey() const {
+                return m_impl->key;
+            }
 
-ConstBufferPtr
-PrivateKey::toPkcs1() const
-{
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            ConstBufferPtr
+            PrivateKey::toPkcs1() const {
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
 
-  OpenSSL_add_all_algorithms();
-  detail::Bio mem(BIO_s_mem());
-  int ret = i2d_PrivateKey_bio(mem.get(), m_impl->key);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS1 format"));
+                OpenSSL_add_all_algorithms();
+                detail::Bio mem(BIO_s_mem());
+                int ret = i2d_PrivateKey_bio(mem.get(), m_impl->key);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS1 format"));
 
-  int len8 = BIO_pending(mem.get());
-  auto buffer = make_shared<Buffer>(len8);
-  BIO_read(mem.get(), buffer->buf(), len8);
+                int len8 = BIO_pending(mem.get());
+                auto buffer = make_shared<Buffer>(len8);
+                BIO_read(mem.get(), buffer->buf(), len8);
 
-  return buffer;
-}
+                return buffer;
+            }
 
-ConstBufferPtr
-PrivateKey::toPkcs8(const char* pw, size_t pwLen) const
-{
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            ConstBufferPtr
+            PrivateKey::toPkcs8(const char* pw, size_t pwLen) const {
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
 
-  BOOST_ASSERT(std::strlen(pw) == pwLen);
+                BOOST_ASSERT(std::strlen(pw) == pwLen);
 
-  OpenSSL_add_all_algorithms();
-  detail::Bio mem(BIO_s_mem());
-  int ret = i2d_PKCS8PrivateKey_bio(mem.get(), m_impl->key, EVP_des_cbc(),
-                                    const_cast<char*>(pw), pwLen, nullptr, nullptr);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS8 format"));
+                OpenSSL_add_all_algorithms();
+                detail::Bio mem(BIO_s_mem());
+                int ret = i2d_PKCS8PrivateKey_bio(mem.get(), m_impl->key, EVP_des_cbc(),
+                        const_cast<char*> (pw), pwLen, nullptr, nullptr);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS8 format"));
 
-  int len8 = BIO_pending(mem.get());
-  auto buffer = make_shared<Buffer>(len8);
-  BIO_read(mem.get(), buffer->buf(), len8);
+                int len8 = BIO_pending(mem.get());
+                auto buffer = make_shared<Buffer>(len8);
+                BIO_read(mem.get(), buffer->buf(), len8);
 
-  return buffer;
-}
+                return buffer;
+            }
 
-ConstBufferPtr
-PrivateKey::toPkcs8(PasswordCallback pwCallback) const
-{
-  ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
+            ConstBufferPtr
+            PrivateKey::toPkcs8(PasswordCallback pwCallback) const {
+                ENSURE_PRIVATE_KEY_LOADED(m_impl->key);
 
-  OpenSSL_add_all_algorithms();
-  detail::Bio mem(BIO_s_mem());
-  int ret = i2d_PKCS8PrivateKey_bio(mem.get(), m_impl->key, EVP_des_cbc(),
-                                    nullptr, 0,
-                                    passwordCallback, &pwCallback);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS8 format"));
+                OpenSSL_add_all_algorithms();
+                detail::Bio mem(BIO_s_mem());
+                int ret = i2d_PKCS8PrivateKey_bio(mem.get(), m_impl->key, EVP_des_cbc(),
+                        nullptr, 0,
+                        passwordCallback, &pwCallback);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(Error("Cannot convert key into PKCS8 format"));
 
-  int len8 = BIO_pending(mem.get());
-  auto buffer = make_shared<Buffer>(len8);
-  BIO_read(mem.get(), buffer->buf(), len8);
+                int len8 = BIO_pending(mem.get());
+                auto buffer = make_shared<Buffer>(len8);
+                BIO_read(mem.get(), buffer->buf(), len8);
 
-  return buffer;
-}
+                return buffer;
+            }
 
-ConstBufferPtr
-PrivateKey::rsaDecrypt(const uint8_t* cipherText, size_t cipherLen) const
-{
-  detail::EvpPkeyCtx ctx(m_impl->key);
+            ConstBufferPtr
+            PrivateKey::rsaDecrypt(const uint8_t* cipherText, size_t cipherLen) const {
+                detail::EvpPkeyCtx ctx(m_impl->key);
 
-  if (EVP_PKEY_decrypt_init(ctx.get()) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to initialize decryption context"));
+                if (EVP_PKEY_decrypt_init(ctx.get()) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to initialize decryption context"));
 
-  if (EVP_PKEY_CTX_set_rsa_padding(ctx.get(), RSA_PKCS1_OAEP_PADDING) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to set padding"));
+                if (EVP_PKEY_CTX_set_rsa_padding(ctx.get(), RSA_PKCS1_OAEP_PADDING) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to set padding"));
 
-  size_t outlen = 0;
-  // Determine buffer length
-  if (EVP_PKEY_decrypt(ctx.get(), nullptr, &outlen, cipherText, cipherLen) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to estimate output length"));
+                size_t outlen = 0;
+                // Determine buffer length
+                if (EVP_PKEY_decrypt(ctx.get(), nullptr, &outlen, cipherText, cipherLen) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to estimate output length"));
 
-  auto out = make_shared<Buffer>(outlen);
+                auto out = make_shared<Buffer>(outlen);
 
-  if (EVP_PKEY_decrypt(ctx.get(), out->buf(), &outlen, cipherText, cipherLen) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to decrypt cipher text"));
+                if (EVP_PKEY_decrypt(ctx.get(), out->buf(), &outlen, cipherText, cipherLen) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to decrypt cipher text"));
 
-  out->resize(outlen);
-  return out;
-}
+                out->resize(outlen);
+                return out;
+            }
 
-static unique_ptr<PrivateKey>
-generateRsaKey(uint32_t keySize)
-{
-  detail::EvpPkeyCtx kctx(EVP_PKEY_RSA);
+            static unique_ptr<PrivateKey>
+            generateRsaKey(uint32_t keySize) {
+                detail::EvpPkeyCtx kctx(EVP_PKEY_RSA);
 
-  int ret = EVP_PKEY_keygen_init(kctx.get());
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
+                int ret = EVP_PKEY_keygen_init(kctx.get());
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
 
-  ret = EVP_PKEY_CTX_set_rsa_keygen_bits(kctx.get(), keySize);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
+                ret = EVP_PKEY_CTX_set_rsa_keygen_bits(kctx.get(), keySize);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
 
-  detail::EvpPkey key;
-  ret = EVP_PKEY_keygen(kctx.get(), &key);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
+                detail::EvpPkey key;
+                ret = EVP_PKEY_keygen(kctx.get(), &key);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate RSA key"));
 
-  detail::Bio mem(BIO_s_mem());
-  i2d_PrivateKey_bio(mem.get(), key.get());
-  int len = BIO_pending(mem.get());
-  Buffer buffer(len);
-  BIO_read(mem.get(), buffer.buf(), len);
+                detail::Bio mem(BIO_s_mem());
+                i2d_PrivateKey_bio(mem.get(), key.get());
+                int len = BIO_pending(mem.get());
+                Buffer buffer(len);
+                BIO_read(mem.get(), buffer.buf(), len);
 
-  auto privateKey = make_unique<PrivateKey>();
-  privateKey->loadPkcs1(buffer.buf(), buffer.size());
+                auto privateKey = make_unique<PrivateKey>();
+                privateKey->loadPkcs1(buffer.buf(), buffer.size());
 
-  return privateKey;
-}
+                return privateKey;
+            }
 
-static unique_ptr<PrivateKey>
-generateEcKey(uint32_t keySize)
-{
-  detail::EvpPkeyCtx ctx(EVP_PKEY_EC);
+            static unique_ptr<PrivateKey>
+            generateEcKey(uint32_t keySize) {
+                detail::EvpPkeyCtx ctx(EVP_PKEY_EC);
 
-  int ret = EVP_PKEY_paramgen_init(ctx.get());
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                int ret = EVP_PKEY_paramgen_init(ctx.get());
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
 
-  switch (keySize) {
-    case 256:
-      ret = EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx.get(), NID_X9_62_prime256v1);
-      break;
-    case 384:
-      ret = EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx.get(), NID_secp384r1);
-      break;
-    default:
-      BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
-  }
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                switch (keySize) {
+                    case 256:
+                        ret = EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx.get(), NID_X9_62_prime256v1);
+                        break;
+                    case 384:
+                        ret = EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx.get(), NID_secp384r1);
+                        break;
+                    default:
+                        BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                }
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
 
-  detail::EvpPkey params;
-  ret = EVP_PKEY_paramgen(ctx.get(), &params);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                detail::EvpPkey params;
+                ret = EVP_PKEY_paramgen(ctx.get(), &params);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
 
-  detail::EvpPkeyCtx kctx(params.get());
-  ret = EVP_PKEY_keygen_init(kctx.get());
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                detail::EvpPkeyCtx kctx(params.get());
+                ret = EVP_PKEY_keygen_init(kctx.get());
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
 
-  detail::EvpPkey key;
-  ret = EVP_PKEY_keygen(kctx.get(), &key);
-  if (ret != 1)
-    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
+                detail::EvpPkey key;
+                ret = EVP_PKEY_keygen(kctx.get(), &key);
+                if (ret != 1)
+                    BOOST_THROW_EXCEPTION(PrivateKey::Error("Fail to generate EC key"));
 
-  detail::Bio mem(BIO_s_mem());
-  i2d_PrivateKey_bio(mem.get(), key.get());
-  int len = BIO_pending(mem.get());
-  Buffer buffer(len);
-  BIO_read(mem.get(), buffer.buf(), len);
+                detail::Bio mem(BIO_s_mem());
+                i2d_PrivateKey_bio(mem.get(), key.get());
+                int len = BIO_pending(mem.get());
+                Buffer buffer(len);
+                BIO_read(mem.get(), buffer.buf(), len);
 
-  auto privateKey = make_unique<PrivateKey>();
-  privateKey->loadPkcs1(buffer.buf(), buffer.size());
+                auto privateKey = make_unique<PrivateKey>();
+                privateKey->loadPkcs1(buffer.buf(), buffer.size());
 
-  return privateKey;
-}
+                return privateKey;
+            }
 
-unique_ptr<PrivateKey>
-generatePrivateKey(const KeyParams& keyParams)
-{
-  switch (keyParams.getKeyType()) {
-    case KeyType::RSA: {
-      const RsaKeyParams& rsaParams = static_cast<const RsaKeyParams&>(keyParams);
-      return generateRsaKey(rsaParams.getKeySize());
-    }
-    case KeyType::EC: {
-      const EcdsaKeyParams& ecdsaParams = static_cast<const EcdsaKeyParams&>(keyParams);
-      return generateEcKey(ecdsaParams.getKeySize());
-    }
-    default:
-      BOOST_THROW_EXCEPTION(std::invalid_argument("Unsupported asymmetric key type"));
-  }
-}
+            unique_ptr<PrivateKey>
+            generatePrivateKey(const KeyParams& keyParams) {
+                switch (keyParams.getKeyType()) {
+                    case KeyType::RSA:
+                    {
+                        const RsaKeyParams& rsaParams = static_cast<const RsaKeyParams&> (keyParams);
+                        return generateRsaKey(rsaParams.getKeySize());
+                    }
+                    case KeyType::EC:
+                    {
+                        const EcdsaKeyParams& ecdsaParams = static_cast<const EcdsaKeyParams&> (keyParams);
+                        return generateEcKey(ecdsaParams.getKeySize());
+                    }
+                    default:
+                        BOOST_THROW_EXCEPTION(std::invalid_argument("Unsupported asymmetric key type"));
+                }
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

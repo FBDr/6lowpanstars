@@ -12,7 +12,7 @@ using websocketpp::lib::bind;
 using websocketpp::lib::ref;
 
 void custom_on_msg(server & s, connection_hdl hdl, server::message_ptr msg) {
-        std::cout << "Message sent to custom handler" << std::endl;
+    std::cout << "Message sent to custom handler" << std::endl;
 }
 
 void default_on_msg(server & s, connection_hdl hdl, server::message_ptr msg) {
@@ -24,7 +24,7 @@ void default_on_msg(server & s, connection_hdl hdl, server::message_ptr msg) {
 
         // Change the on message handler for this connection only to
         // custom_on_mesage
-        con->set_message_handler(bind(&custom_on_msg,ref(s),::_1,::_2));
+        con->set_message_handler(bind(&custom_on_msg, ref(s), ::_1, ::_2));
         std::cout << "Upgrading connection to custom handler" << std::endl;
     }
 }
@@ -32,7 +32,7 @@ void default_on_msg(server & s, connection_hdl hdl, server::message_ptr msg) {
 int main() {
     server s;
 
-    s.set_message_handler(bind(&default_on_msg,ref(s),::_1,::_2));
+    s.set_message_handler(bind(&default_on_msg, ref(s), ::_1, ::_2));
 
     s.init_asio();
     s.listen(9002);

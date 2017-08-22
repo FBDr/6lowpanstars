@@ -23,28 +23,27 @@
 #define NDN_TESTS_NETWORK_CONFIGURATION_DETECTOR_HPP
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-class NetworkConfigurationDetector
-{
-public:
-  static bool
-  hasIpv4();
+        class NetworkConfigurationDetector {
+        public:
+            static bool
+            hasIpv4();
 
-  static bool
-  hasIpv6();
+            static bool
+            hasIpv6();
 
-private:
-  static void
-  detect();
+        private:
+            static void
+            detect();
 
-private:
-  static bool m_isInitialized;
-  static bool m_hasIpv4;
-  static bool m_hasIpv6;
-};
+        private:
+            static bool m_isInitialized;
+            static bool m_hasIpv4;
+            static bool m_hasIpv6;
+        };
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn
 
 #endif // NDN_TESTS_NETWORK_CONFIGURATION_DETECTOR_HPP

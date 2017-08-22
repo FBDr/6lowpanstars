@@ -24,154 +24,140 @@
 #include <sstream>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-template<typename Hash>
-Digest<Hash>::Digest()
-{
-  reset();
-}
+        template<typename Hash>
+        Digest<Hash>::Digest() {
+            reset();
+        }
 
-template<typename Hash>
-Digest<Hash>::Digest(std::istream& is)
-  : m_isInProcess(false)
-  , m_isFinalized(true)
-{
-  using namespace CryptoPP;
+        template<typename Hash>
+        Digest<Hash>::Digest(std::istream& is)
+        : m_isInProcess(false)
+        , m_isFinalized(true) {
+            using namespace CryptoPP;
 
-  m_buffer = make_shared<Buffer>(m_hash.DigestSize());
-  FileSource(is, true,
-             new HashFilter(m_hash,
-                            new ArraySink(m_buffer->get(), m_buffer->size())));
-}
+            m_buffer = make_shared<Buffer>(m_hash.DigestSize());
+            FileSource(is, true,
+                    new HashFilter(m_hash,
+                    new ArraySink(m_buffer->get(), m_buffer->size())));
+        }
 
-template<typename Hash>
-void
-Digest<Hash>::reset()
-{
-  m_hash.Restart();
-  m_buffer = make_shared<Buffer>(m_hash.DigestSize());
-  m_isInProcess = false;
-  m_isFinalized = false;
-}
+        template<typename Hash>
+        void
+        Digest<Hash>::reset() {
+            m_hash.Restart();
+            m_buffer = make_shared<Buffer>(m_hash.DigestSize());
+            m_isInProcess = false;
+            m_isFinalized = false;
+        }
 
-template<typename Hash>
-void
-Digest<Hash>::finalize()
-{
-  // return immediately if Digest is finalized already.
-  if (m_isFinalized)
-    return;
+        template<typename Hash>
+        void
+        Digest<Hash>::finalize() {
+            // return immediately if Digest is finalized already.
+            if (m_isFinalized)
+                return;
 
-  m_hash.Final(m_buffer->get());
+            m_hash.Final(m_buffer->get());
 
-  m_isFinalized = true;
-}
+            m_isFinalized = true;
+        }
 
-template<typename Hash>
-ConstBufferPtr
-Digest<Hash>::computeDigest()
-{
-  finalize();
-  return m_buffer;
-}
+        template<typename Hash>
+        ConstBufferPtr
+        Digest<Hash>::computeDigest() {
+            finalize();
+            return m_buffer;
+        }
 
-template<typename Hash>
-bool
-Digest<Hash>::operator==(Digest<Hash>& digest)
-{
-  return *computeDigest() == *digest.computeDigest();
-}
+        template<typename Hash>
+        bool
+        Digest<Hash>::operator==(Digest<Hash>& digest) {
+            return *computeDigest() == *digest.computeDigest();
+        }
 
-template<typename Hash>
-Digest<Hash>&
-Digest<Hash>::operator<<(Digest<Hash>& src)
-{
-  ConstBufferPtr buffer = src.computeDigest();
-  update(buffer->get(), buffer->size());
+        template<typename Hash>
+        Digest<Hash>&
+        Digest<Hash>::operator<<(Digest<Hash>& src) {
+            ConstBufferPtr buffer = src.computeDigest();
+            update(buffer->get(), buffer->size());
 
-  return *this;
-}
+            return *this;
+        }
 
-template<typename Hash>
-Digest<Hash>&
-Digest<Hash>::operator<<(const std::string& str)
-{
-  update(reinterpret_cast<const uint8_t*>(str.c_str()), str.size());
+        template<typename Hash>
+        Digest<Hash>&
+        Digest<Hash>::operator<<(const std::string& str) {
+            update(reinterpret_cast<const uint8_t*> (str.c_str()), str.size());
 
-  return *this;
-}
+            return *this;
+        }
 
-template<typename Hash>
-Digest<Hash>&
-Digest<Hash>::operator<<(const Block& block)
-{
-  update(block.wire(), block.size());
+        template<typename Hash>
+        Digest<Hash>&
+        Digest<Hash>::operator<<(const Block& block) {
+            update(block.wire(), block.size());
 
-  return *this;
-}
+            return *this;
+        }
 
-template<typename Hash>
-Digest<Hash>&
-Digest<Hash>::operator<<(uint64_t value)
-{
-  update(reinterpret_cast<const uint8_t*>(&value), sizeof(uint64_t));
+        template<typename Hash>
+        Digest<Hash>&
+        Digest<Hash>::operator<<(uint64_t value) {
+            update(reinterpret_cast<const uint8_t*> (&value), sizeof (uint64_t));
 
-  return *this;
-}
+            return *this;
+        }
 
-template<typename Hash>
-void
-Digest<Hash>::update(const uint8_t* buffer, size_t size)
-{
-  // cannot update Digest when it has been finalized
-  if (m_isFinalized)
-    BOOST_THROW_EXCEPTION(Error("Digest has been already finalized"));
+        template<typename Hash>
+        void
+        Digest<Hash>::update(const uint8_t* buffer, size_t size) {
+            // cannot update Digest when it has been finalized
+            if (m_isFinalized)
+                BOOST_THROW_EXCEPTION(Error("Digest has been already finalized"));
 
-  m_hash.Update(buffer, size);
+            m_hash.Update(buffer, size);
 
-  m_isInProcess = true;
-}
+            m_isInProcess = true;
+        }
 
-template<typename Hash>
-ConstBufferPtr
-Digest<Hash>::computeDigest(const uint8_t* buffer, size_t size)
-{
-  Hash hash;
-  BufferPtr result = make_shared<Buffer>(hash.DigestSize());
-  hash.Update(buffer, size);
-  hash.Final(result->get());
+        template<typename Hash>
+        ConstBufferPtr
+        Digest<Hash>::computeDigest(const uint8_t* buffer, size_t size) {
+            Hash hash;
+            BufferPtr result = make_shared<Buffer>(hash.DigestSize());
+            hash.Update(buffer, size);
+            hash.Final(result->get());
 
-  return result;
-}
+            return result;
+        }
 
-template<typename Hash>
-std::string
-Digest<Hash>::toString()
-{
-  std::ostringstream os;
-  os << *this;
+        template<typename Hash>
+        std::string
+        Digest<Hash>::toString() {
+            std::ostringstream os;
+            os << *this;
 
-  return os.str();
-}
+            return os.str();
+        }
 
-template<typename Hash>
-std::ostream&
-operator<<(std::ostream& os, Digest<Hash>& digest)
-{
-  ConstBufferPtr buffer = digest.computeDigest();
-  printHex(os, buffer->buf(), buffer->size());
+        template<typename Hash>
+        std::ostream&
+        operator<<(std::ostream& os, Digest<Hash>& digest) {
+            ConstBufferPtr buffer = digest.computeDigest();
+            printHex(os, buffer->buf(), buffer->size());
 
-  return os;
-}
+            return os;
+        }
 
-template
-class Digest<CryptoPP::SHA256>;
+        template
+        class Digest<CryptoPP::SHA256>;
 
-template
-std::ostream&
-operator<<(std::ostream& os, Digest<CryptoPP::SHA256>& digest);
+        template
+        std::ostream&
+        operator<<(std::ostream& os, Digest<CryptoPP::SHA256>& digest);
 
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

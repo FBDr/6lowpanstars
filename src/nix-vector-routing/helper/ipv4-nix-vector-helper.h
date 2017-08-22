@@ -26,53 +26,52 @@
 
 namespace ns3 {
 
-/**
- * \brief Helper class that adds Nix-vector routing to nodes.
- *
- * This class is expected to be used in conjunction with 
- * ns3::InternetStackHelper::SetRoutingHelper
- *
- */
-class Ipv4NixVectorHelper : public Ipv4RoutingHelper
-{
-public:
-  /**
-   * Construct an Ipv4NixVectorHelper to make life easier while adding Nix-vector
-   * routing to nodes.
-   */
-  Ipv4NixVectorHelper ();
+    /**
+     * \brief Helper class that adds Nix-vector routing to nodes.
+     *
+     * This class is expected to be used in conjunction with 
+     * ns3::InternetStackHelper::SetRoutingHelper
+     *
+     */
+    class Ipv4NixVectorHelper : public Ipv4RoutingHelper {
+    public:
+        /**
+         * Construct an Ipv4NixVectorHelper to make life easier while adding Nix-vector
+         * routing to nodes.
+         */
+        Ipv4NixVectorHelper();
 
-  /**
-   * \brief Construct an Ipv4NixVectorHelper from another previously 
-   * initialized instance (Copy Constructor).
-   */
-  Ipv4NixVectorHelper (const Ipv4NixVectorHelper &);
+        /**
+         * \brief Construct an Ipv4NixVectorHelper from another previously 
+         * initialized instance (Copy Constructor).
+         */
+        Ipv4NixVectorHelper(const Ipv4NixVectorHelper &);
 
-  /**
-   * \returns pointer to clone of this Ipv4NixVectorHelper 
-   * 
-   * This method is mainly for internal use by the other helpers;
-   * clients are expected to free the dynamic memory allocated by this method
-   */
-  Ipv4NixVectorHelper* Copy (void) const;
+        /**
+         * \returns pointer to clone of this Ipv4NixVectorHelper 
+         * 
+         * This method is mainly for internal use by the other helpers;
+         * clients are expected to free the dynamic memory allocated by this method
+         */
+        Ipv4NixVectorHelper* Copy(void) const;
 
-  /**
-  * \param node the node on which the routing protocol will run
-  * \returns a newly-created routing protocol
-  *
-  * This method will be called by ns3::InternetStackHelper::Install
-  */
-  virtual Ptr<Ipv4RoutingProtocol> Create (Ptr<Node> node) const;
+        /**
+         * \param node the node on which the routing protocol will run
+         * \returns a newly-created routing protocol
+         *
+         * This method will be called by ns3::InternetStackHelper::Install
+         */
+        virtual Ptr<Ipv4RoutingProtocol> Create(Ptr<Node> node) const;
 
-private:
-  /**
-   * \brief Assignment operator declared private and not implemented to disallow
-   * assignment and prevent the compiler from happily inserting its own.
-   */
-  Ipv4NixVectorHelper &operator = (const Ipv4NixVectorHelper &);
+    private:
+        /**
+         * \brief Assignment operator declared private and not implemented to disallow
+         * assignment and prevent the compiler from happily inserting its own.
+         */
+        Ipv4NixVectorHelper &operator=(const Ipv4NixVectorHelper &);
 
-  ObjectFactory m_agentFactory; //!< Object factory
-};
+        ObjectFactory m_agentFactory; //!< Object factory
+    };
 } // namespace ns3
 
 #endif /* IPV4_NIX_VECTOR_HELPER_H */

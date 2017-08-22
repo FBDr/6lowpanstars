@@ -41,150 +41,149 @@
 #include <ndn-cxx/mgmt/nfd/control-parameters.hpp>
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-using ndn::nfd::ControlCommand;
-using ndn::nfd::ControlResponse;
-using ndn::nfd::ControlParameters;
+        using ndn::nfd::ControlCommand;
+        using ndn::nfd::ControlResponse;
+        using ndn::nfd::ControlParameters;
 
-using ndn::nfd::FaceEventNotification;
+        using ndn::nfd::FaceEventNotification;
 
-class RibManager : public nfd::ManagerBase
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        class RibManager : public nfd::ManagerBase {
+        public:
 
-public:
-  RibManager(Dispatcher& dispatcher, ndn::Face& face, ndn::KeyChain& keyChain);
+            class Error : public std::runtime_error {
+            public:
 
-  ~RibManager();
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
 
-  void
-  registerWithNfd();
+        public:
+            RibManager(Dispatcher& dispatcher, ndn::Face& face, ndn::KeyChain& keyChain);
 
-  void
-  enableLocalFields();
+            ~RibManager();
 
-  void
-  setConfigFile(ConfigFile& configFile);
+            void
+            registerWithNfd();
 
-  void
-  onRibUpdateSuccess(const RibUpdate& update);
+            void
+            enableLocalFields();
 
-  void
-  onRibUpdateFailure(const RibUpdate& update, uint32_t code, const std::string& error);
+            void
+            setConfigFile(ConfigFile& configFile);
 
-private: // initialization helpers
-  void
-  onConfig(const ConfigSection& configSection, bool isDryRun, const std::string& filename);
+            void
+            onRibUpdateSuccess(const RibUpdate& update);
 
-  void
-  registerTopPrefix(const Name& topPrefix);
+            void
+            onRibUpdateFailure(const RibUpdate& update, uint32_t code, const std::string& error);
 
-private: // ControlCommand and StatusDataset
-  void
-  registerEntry(const Name& topPrefix, const Interest& interest,
-                ControlParameters parameters,
-                const ndn::mgmt::CommandContinuation& done);
+        private: // initialization helpers
+            void
+            onConfig(const ConfigSection& configSection, bool isDryRun, const std::string& filename);
 
-  void
-  unregisterEntry(const Name& topPrefix, const Interest& interest,
-                  ControlParameters parameters,
-                  const ndn::mgmt::CommandContinuation& done);
+            void
+            registerTopPrefix(const Name& topPrefix);
 
-  void
-  listEntries(const Name& topPrefix, const Interest& interest,
-              ndn::mgmt::StatusDatasetContext& context);
+        private: // ControlCommand and StatusDataset
+            void
+            registerEntry(const Name& topPrefix, const Interest& interest,
+                    ControlParameters parameters,
+                    const ndn::mgmt::CommandContinuation& done);
 
-  void
-  setFaceForSelfRegistration(const Interest& request, ControlParameters& parameters);
+            void
+            unregisterEntry(const Name& topPrefix, const Interest& interest,
+                    ControlParameters parameters,
+                    const ndn::mgmt::CommandContinuation& done);
 
-  virtual ndn::mgmt::Authorization
-  makeAuthorization(const std::string& verb) override;
+            void
+            listEntries(const Name& topPrefix, const Interest& interest,
+                    ndn::mgmt::StatusDatasetContext& context);
 
-private: // Face monitor
-  void
-  fetchActiveFaces();
+            void
+            setFaceForSelfRegistration(const Interest& request, ControlParameters& parameters);
 
-  void
-  onFetchActiveFacesFailure(uint32_t code, const std::string& reason);
+            virtual ndn::mgmt::Authorization
+            makeAuthorization(const std::string& verb) override;
 
-  void
-  onFaceDestroyedEvent(uint64_t faceId);
+        private: // Face monitor
+            void
+            fetchActiveFaces();
 
-PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  void
-  scheduleActiveFaceFetch(const time::seconds& timeToWait);
+            void
+            onFetchActiveFacesFailure(uint32_t code, const std::string& reason);
 
-  /**
-   * @brief remove invalid faces
-   *
-   * @param status Face dataset
-  */
-  void
-  removeInvalidFaces(const std::vector<ndn::nfd::FaceStatus>& activeFaces);
-
-  /**
-   * @brief response to face events
-   *
-   * @param notification
-   */
-  void
-  onNotification(const FaceEventNotification& notification);
-
-private:
-  void
-  onCommandPrefixAddNextHopSuccess(const Name& prefix,
-                                   const ndn::nfd::ControlParameters& result);
-
-  void
-  onCommandPrefixAddNextHopError(const Name& name, const ndn::nfd::ControlResponse& response);
-
-  void
-  onEnableLocalFieldsSuccess();
-
-  void
-  onEnableLocalFieldsError(const ndn::nfd::ControlResponse& response);
-
-private:
-  ndn::Face& m_face;
-  ndn::KeyChain& m_keyChain;
-  ndn::nfd::Controller m_nfdController;
-  ndn::nfd::FaceMonitor m_faceMonitor;
-  ndn::ValidatorConfig m_localhostValidator;
-  ndn::ValidatorConfig m_localhopValidator;
-  bool m_isLocalhopEnabled;
-  AutoPrefixPropagator m_prefixPropagator;
+            void
+            onFaceDestroyedEvent(uint64_t faceId);
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  Rib m_rib;
-  FibUpdater m_fibUpdater;
+            void
+            scheduleActiveFaceFetch(const time::seconds& timeToWait);
 
-private:
-  static const Name LOCAL_HOST_TOP_PREFIX;
-  static const Name LOCAL_HOP_TOP_PREFIX;
-  static const std::string MGMT_MODULE_NAME;
-  static const Name FACES_LIST_DATASET_PREFIX;
-  static const time::seconds ACTIVE_FACE_FETCH_INTERVAL;
-  scheduler::EventId m_activeFaceFetchEvent;
+            /**
+             * @brief remove invalid faces
+             *
+             * @param status Face dataset
+             */
+            void
+            removeInvalidFaces(const std::vector<ndn::nfd::FaceStatus>& activeFaces);
 
-  typedef std::set<uint64_t> FaceIdSet;
-  /** \brief contains FaceIds with one or more Routes in the RIB
-  */
-  FaceIdSet m_registeredFaces;
+            /**
+             * @brief response to face events
+             *
+             * @param notification
+             */
+            void
+            onNotification(const FaceEventNotification& notification);
 
-  std::function<void(const Name& topPrefix)> m_addTopPrefix;
-};
+        private:
+            void
+            onCommandPrefixAddNextHopSuccess(const Name& prefix,
+                    const ndn::nfd::ControlParameters& result);
 
-} // namespace rib
+            void
+            onCommandPrefixAddNextHopError(const Name& name, const ndn::nfd::ControlResponse& response);
+
+            void
+            onEnableLocalFieldsSuccess();
+
+            void
+            onEnableLocalFieldsError(const ndn::nfd::ControlResponse& response);
+
+        private:
+            ndn::Face& m_face;
+            ndn::KeyChain& m_keyChain;
+            ndn::nfd::Controller m_nfdController;
+            ndn::nfd::FaceMonitor m_faceMonitor;
+            ndn::ValidatorConfig m_localhostValidator;
+            ndn::ValidatorConfig m_localhopValidator;
+            bool m_isLocalhopEnabled;
+            AutoPrefixPropagator m_prefixPropagator;
+
+PUBLIC_WITH_TESTS_ELSE_PRIVATE:
+            Rib m_rib;
+            FibUpdater m_fibUpdater;
+
+        private:
+            static const Name LOCAL_HOST_TOP_PREFIX;
+            static const Name LOCAL_HOP_TOP_PREFIX;
+            static const std::string MGMT_MODULE_NAME;
+            static const Name FACES_LIST_DATASET_PREFIX;
+            static const time::seconds ACTIVE_FACE_FETCH_INTERVAL;
+            scheduler::EventId m_activeFaceFetchEvent;
+
+            typedef std::set<uint64_t> FaceIdSet;
+            /** \brief contains FaceIds with one or more Routes in the RIB
+             */
+            FaceIdSet m_registeredFaces;
+
+            std::function<void(const Name& topPrefix) > m_addTopPrefix;
+        };
+
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_RIB_MANAGER_HPP

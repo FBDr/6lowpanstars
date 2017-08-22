@@ -31,11 +31,13 @@
 
 class scoped_timer {
 public:
-    scoped_timer(std::string i) : m_id(i),m_start(std::chrono::steady_clock::now()) {
+
+    scoped_timer(std::string i) : m_id(i), m_start(std::chrono::steady_clock::now()) {
         std::cout << "Clock " << i << ": ";
     }
+
     ~scoped_timer() {
-        std::chrono::nanoseconds time_taken = std::chrono::steady_clock::now()-m_start;
+        std::chrono::nanoseconds time_taken = std::chrono::steady_clock::now() - m_start;
 
         //nanoseconds_per_test
 
@@ -43,7 +45,7 @@ public:
 
         //1000000000.0/(double(time_taken.count())/1000.0)
 
-        std::cout << 1000000000.0/(double(time_taken.count())/1000.0) << std::endl;
+        std::cout << 1000000000.0 / (double(time_taken.count()) / 1000.0) << std::endl;
 
         //std::cout << (1.0/double(time_taken.count())) * double(1000000000*1000) << std::endl;
     }
@@ -68,7 +70,7 @@ int main() {
             websocketpp::http::parser::request r;
 
             try {
-                r.consume(raw.c_str(),raw.size());
+                r.consume(raw.c_str(), raw.size());
             } catch (...) {
                 std::cout << "exception" << std::endl;
             }
@@ -86,7 +88,7 @@ int main() {
             websocketpp::http::parser::request r;
 
             try {
-                r.consume2(firefox.c_str(),firefox.size());
+                r.consume2(firefox.c_str(), firefox.size());
             } catch (...) {
                 std::cout << "exception" << std::endl;
             }
@@ -104,7 +106,7 @@ int main() {
             websocketpp::http::parser::request r;
 
             try {
-                r.consume(firefox.c_str(),firefox.size());
+                r.consume(firefox.c_str(), firefox.size());
             } catch (...) {
                 std::cout << "exception" << std::endl;
             }
@@ -124,8 +126,8 @@ int main() {
             websocketpp::http::parser::request r;
 
             try {
-                r.consume(firefox1.c_str(),firefox1.size());
-                r.consume(firefox2.c_str(),firefox2.size());
+                r.consume(firefox1.c_str(), firefox1.size());
+                r.consume(firefox2.c_str(), firefox2.size());
             } catch (...) {
                 std::cout << "exception" << std::endl;
             }

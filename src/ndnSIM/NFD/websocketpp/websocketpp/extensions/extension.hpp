@@ -36,65 +36,67 @@
 
 namespace websocketpp {
 
-/**
- * Some generic information about extensions
- *
- * Each extension object has an implemented flag. It can be retrieved by calling
- * is_implemented(). This compile time flag indicates whether or not the object
- * in question actually implements the extension or if it is a placeholder stub
- *
- * Each extension object also has an enabled flag. It can be retrieved by
- * calling is_enabled(). This runtime flag indicates whether or not the
- * extension has been negotiated for this connection.
- */
-namespace extensions {
+    /**
+     * Some generic information about extensions
+     *
+     * Each extension object has an implemented flag. It can be retrieved by calling
+     * is_implemented(). This compile time flag indicates whether or not the object
+     * in question actually implements the extension or if it is a placeholder stub
+     *
+     * Each extension object also has an enabled flag. It can be retrieved by
+     * calling is_enabled(). This runtime flag indicates whether or not the
+     * extension has been negotiated for this connection.
+     */
+    namespace extensions {
 
-namespace error {
-enum value {
-    /// Catch all
-    general = 1,
+        namespace error {
 
-    /// Extension disabled
-    disabled
-};
+            enum value {
+                /// Catch all
+                general = 1,
 
-class category : public lib::error_category {
-public:
-    category() {}
+                /// Extension disabled
+                disabled
+            };
 
-    const char *name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
-        return "websocketpp.extension";
-    }
+            class category : public lib::error_category {
+            public:
 
-    std::string message(int value) const {
-        switch(value) {
-            case general:
-                return "Generic extension error";
-            case disabled:
-                return "Use of methods from disabled extension";
-            default:
-                return "Unknown permessage-compress error";
-        }
-    }
-};
+                category() {
+                }
 
-inline lib::error_category const & get_category() {
-    static category instance;
-    return instance;
-}
+                const char *name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
+                    return "websocketpp.extension";
+                }
 
-inline lib::error_code make_error_code(error::value e) {
-    return lib::error_code(static_cast<int>(e), get_category());
-}
+                std::string message(int value) const {
+                    switch (value) {
+                        case general:
+                            return "Generic extension error";
+                        case disabled:
+                            return "Use of methods from disabled extension";
+                        default:
+                            return "Unknown permessage-compress error";
+                    }
+                }
+            };
 
-} // namespace error
-} // namespace extensions
+            inline lib::error_category const & get_category() {
+                static category instance;
+                return instance;
+            }
+
+            inline lib::error_code make_error_code(error::value e) {
+                return lib::error_code(static_cast<int> (e), get_category());
+            }
+
+        } // namespace error
+    } // namespace extensions
 } // namespace websocketpp
 
 _WEBSOCKETPP_ERROR_CODE_ENUM_NS_START_
 template<> struct is_error_code_enum
-    <websocketpp::extensions::error::value>
-{
+<websocketpp::extensions::error::value> {
     static const bool value = true;
 };
 _WEBSOCKETPP_ERROR_CODE_ENUM_NS_END_

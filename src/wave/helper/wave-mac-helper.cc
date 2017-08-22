@@ -24,97 +24,94 @@
 #include "ns3/boolean.h"
 #include "wave-mac-helper.h"
 
-namespace ns3 {
-
-NqosWaveMacHelper::NqosWaveMacHelper (void)
+namespace ns3
 {
 
-}
-NqosWaveMacHelper::~NqosWaveMacHelper (void)
-{
+    NqosWaveMacHelper::NqosWaveMacHelper(void) {
 
-}
-NqosWaveMacHelper
-NqosWaveMacHelper::Default (void)
-{
-  NqosWaveMacHelper helper;
-  // We're making non QoS-enabled Wi-Fi MACs here, so we set the
-  // necessary attribute. I've carefully positioned this here so that
-  // someone who knows what they're doing can override with explicit
-  // attributes.
-  helper.SetType ("ns3::OcbWifiMac", "QosSupported", BooleanValue (false));
-  return helper;
-}
-void
-NqosWaveMacHelper::SetType (std::string type,
-                            std::string n0, const AttributeValue &v0,
-                            std::string n1, const AttributeValue &v1,
-                            std::string n2, const AttributeValue &v2,
-                            std::string n3, const AttributeValue &v3,
-                            std::string n4, const AttributeValue &v4,
-                            std::string n5, const AttributeValue &v5,
-                            std::string n6, const AttributeValue &v6,
-                            std::string n7, const AttributeValue &v7)
-{
-  if (type.compare ("ns3::OcbWifiMac") != 0)
-    {
-      NS_FATAL_ERROR ("QosWaveMacHelper shall set OcbWifiMac");
     }
-  NqosWifiMacHelper::SetType ("ns3::OcbWifiMac",
-                              n0, v0,
-                              n1, v1,
-                              n2, v2,
-                              n3, v3,
-                              n4, v4,
-                              n5, v5,
-                              n6, v6,
-                              n7, v7);
-}
 
-/**********  QosWifi80211pMacHelper *********/
-QosWaveMacHelper::QosWaveMacHelper ()
-{
-}
-QosWaveMacHelper::~QosWaveMacHelper ()
-{
-}
-QosWaveMacHelper
-QosWaveMacHelper::Default (void)
-{
-  QosWaveMacHelper helper;
+    NqosWaveMacHelper::~NqosWaveMacHelper(void) {
 
-  // We're making QoS-enabled Wi-Fi MACs here, so we set the necessary
-  // attribute. I've carefully positioned this here so that someone
-  // who knows what they're doing can override with explicit
-  // attributes.
-  helper.SetType ("ns3::OcbWifiMac", "QosSupported", BooleanValue (true));
-
-  return helper;
-}
-void
-QosWaveMacHelper::SetType (std::string type,
-                           std::string n0, const AttributeValue &v0,
-                           std::string n1, const AttributeValue &v1,
-                           std::string n2, const AttributeValue &v2,
-                           std::string n3, const AttributeValue &v3,
-                           std::string n4, const AttributeValue &v4,
-                           std::string n5, const AttributeValue &v5,
-                           std::string n6, const AttributeValue &v6,
-                           std::string n7, const AttributeValue &v7)
-{
-  if (type.compare ("ns3::OcbWifiMac") != 0)
-    {
-      NS_FATAL_ERROR ("QosWaveMacHelper shall set OcbWifiMac");
     }
-  QosWifiMacHelper::SetType ("ns3::OcbWifiMac",
-                             n0, v0,
-                             n1, v1,
-                             n2, v2,
-                             n3, v3,
-                             n4, v4,
-                             n5, v5,
-                             n6, v6,
-                             n7, v7);
-}
+
+    NqosWaveMacHelper
+    NqosWaveMacHelper::Default(void) {
+        NqosWaveMacHelper helper;
+        // We're making non QoS-enabled Wi-Fi MACs here, so we set the
+        // necessary attribute. I've carefully positioned this here so that
+        // someone who knows what they're doing can override with explicit
+        // attributes.
+        helper.SetType("ns3::OcbWifiMac", "QosSupported", BooleanValue(false));
+        return helper;
+    }
+
+    void
+    NqosWaveMacHelper::SetType(std::string type,
+            std::string n0, const AttributeValue &v0,
+            std::string n1, const AttributeValue &v1,
+            std::string n2, const AttributeValue &v2,
+            std::string n3, const AttributeValue &v3,
+            std::string n4, const AttributeValue &v4,
+            std::string n5, const AttributeValue &v5,
+            std::string n6, const AttributeValue &v6,
+            std::string n7, const AttributeValue & v7) {
+        if (type.compare("ns3::OcbWifiMac") != 0) {
+            NS_FATAL_ERROR("QosWaveMacHelper shall set OcbWifiMac");
+        }
+        NqosWifiMacHelper::SetType("ns3::OcbWifiMac",
+                n0, v0,
+                n1, v1,
+                n2, v2,
+                n3, v3,
+                n4, v4,
+                n5, v5,
+                n6, v6,
+                n7, v7);
+    }
+
+    /**********  QosWifi80211pMacHelper *********/
+    QosWaveMacHelper::QosWaveMacHelper() {
+    }
+
+    QosWaveMacHelper::~QosWaveMacHelper() {
+    }
+
+    QosWaveMacHelper
+    QosWaveMacHelper::Default(void) {
+        QosWaveMacHelper helper;
+
+        // We're making QoS-enabled Wi-Fi MACs here, so we set the necessary
+        // attribute. I've carefully positioned this here so that someone
+        // who knows what they're doing can override with explicit
+        // attributes.
+        helper.SetType("ns3::OcbWifiMac", "QosSupported", BooleanValue(true));
+
+        return helper;
+    }
+
+    void
+    QosWaveMacHelper::SetType(std::string type,
+            std::string n0, const AttributeValue &v0,
+            std::string n1, const AttributeValue &v1,
+            std::string n2, const AttributeValue &v2,
+            std::string n3, const AttributeValue &v3,
+            std::string n4, const AttributeValue &v4,
+            std::string n5, const AttributeValue &v5,
+            std::string n6, const AttributeValue &v6,
+            std::string n7, const AttributeValue & v7) {
+        if (type.compare("ns3::OcbWifiMac") != 0) {
+            NS_FATAL_ERROR("QosWaveMacHelper shall set OcbWifiMac");
+        }
+        QosWifiMacHelper::SetType("ns3::OcbWifiMac",
+                n0, v0,
+                n1, v1,
+                n2, v2,
+                n3, v3,
+                n4, v4,
+                n5, v5,
+                n6, v6,
+                n7, v7);
+    }
 
 } // namespace ns3

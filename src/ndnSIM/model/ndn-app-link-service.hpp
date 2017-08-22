@@ -25,62 +25,60 @@
 
 namespace ns3 {
 
-class Packet;
-class Node;
+    class Packet;
+    class Node;
 
-namespace ndn {
+    namespace ndn {
 
-class App;
+        class App;
 
-/**
- * \ingroup ndn-face
- * \brief Implementation of LinkService for ndnSIM application
- *
- * \see NetDeviceLinkService
- */
-class AppLinkService : public nfd::face::LinkService
-{
-public:
-  /**
-   * \brief Default constructor
-   */
-  AppLinkService(Ptr<App> app);
+        /**
+         * \ingroup ndn-face
+         * \brief Implementation of LinkService for ndnSIM application
+         *
+         * \see NetDeviceLinkService
+         */
+        class AppLinkService : public nfd::face::LinkService {
+        public:
+            /**
+             * \brief Default constructor
+             */
+            AppLinkService(Ptr<App> app);
 
-  virtual ~AppLinkService();
+            virtual ~AppLinkService();
 
-public:
-  void
-  onReceiveInterest(const Interest& interest);
+        public:
+            void
+            onReceiveInterest(const Interest& interest);
 
-  void
-  onReceiveData(const Data& data);
+            void
+            onReceiveData(const Data& data);
 
-  void
-  onReceiveNack(const lp::Nack& nack);
+            void
+            onReceiveNack(const lp::Nack& nack);
 
-private:
-  virtual void
-  doSendInterest(const Interest& interest) override;
+        private:
+            virtual void
+            doSendInterest(const Interest& interest) override;
 
-  virtual void
-  doSendData(const Data& data) override;
+            virtual void
+            doSendData(const Data& data) override;
 
-  virtual void
-  doSendNack(const lp::Nack& nack) override;
+            virtual void
+            doSendNack(const lp::Nack& nack) override;
 
-  virtual void
-  doReceivePacket(nfd::face::Transport::Packet&& packet) override
-  {
-    // does nothing (all operations for now handled by LinkService)
-    BOOST_ASSERT(false);
-  }
+            virtual void
+            doReceivePacket(nfd::face::Transport::Packet&& packet) override {
+                // does nothing (all operations for now handled by LinkService)
+                BOOST_ASSERT(false);
+            }
 
-private:
-  Ptr<Node> m_node;
-  Ptr<App> m_app;
-};
+        private:
+            Ptr<Node> m_node;
+            Ptr<App> m_app;
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_APP_LINK_SERVICE_HPP

@@ -29,72 +29,67 @@
 
 namespace ndn {
 
-/** \brief Base class to store tag information (e.g., inside Interest and Data packets)
- */
-class TagHost
-{
-public:
-  /** \brief get a tag item
-   *  \tparam T type of the tag, which must be a subclass of ndn::Tag
-   *  \retval nullptr if no Tag of type T is stored
-   */
-  template<typename T>
-  shared_ptr<T>
-  getTag() const;
+    /** \brief Base class to store tag information (e.g., inside Interest and Data packets)
+     */
+    class TagHost {
+    public:
+        /** \brief get a tag item
+         *  \tparam T type of the tag, which must be a subclass of ndn::Tag
+         *  \retval nullptr if no Tag of type T is stored
+         */
+        template<typename T>
+        shared_ptr<T>
+        getTag() const;
 
-  /** \brief set a tag item
-   *  \tparam T type of the tag, which must be a subclass of ndn::Tag
-   *  \note Tag can be set even on a const tag host instance
-   */
-  template<typename T>
-  void
-  setTag(shared_ptr<T> tag) const;
+        /** \brief set a tag item
+         *  \tparam T type of the tag, which must be a subclass of ndn::Tag
+         *  \note Tag can be set even on a const tag host instance
+         */
+        template<typename T>
+        void
+        setTag(shared_ptr<T> tag) const;
 
-  /** \brief remove tag item
-   *  \note Tag can be removed even on a const tag host instance
-   */
-  template<typename T>
-  void
-  removeTag() const;
+        /** \brief remove tag item
+         *  \note Tag can be removed even on a const tag host instance
+         */
+        template<typename T>
+        void
+        removeTag() const;
 
-private:
-  mutable std::map<size_t, shared_ptr<Tag>> m_tags;
-};
+    private:
+        mutable std::map<size_t, shared_ptr<Tag>> m_tags;
+    };
 
+    template<typename T>
+    inline shared_ptr<T>
+    TagHost::getTag() const {
+        static_assert(std::is_base_of<Tag, T>::value, "T must inherit from Tag");
 
-template<typename T>
-inline shared_ptr<T>
-TagHost::getTag() const
-{
-  static_assert(std::is_base_of<Tag, T>::value, "T must inherit from Tag");
+        auto it = m_tags.find(T::getTypeId());
+        if (it == m_tags.end()) {
+            return nullptr;
+        }
+        return static_pointer_cast<T>(it->second);
+    }
 
-  auto it = m_tags.find(T::getTypeId());
-  if (it == m_tags.end()) {
-    return nullptr;
-  }
-  return static_pointer_cast<T>(it->second);
-}
+    template<typename T>
+    inline void
+    TagHost::setTag(shared_ptr<T> tag) const {
+        static_assert(std::is_base_of<Tag, T>::value, "T must inherit from Tag");
 
-template<typename T>
-inline void
-TagHost::setTag(shared_ptr<T> tag) const
-{
-  static_assert(std::is_base_of<Tag, T>::value, "T must inherit from Tag");
+        if (tag == nullptr) {
+            m_tags.erase(T::getTypeId());
+            return;
+        }
 
-  if (tag == nullptr) {
-    m_tags.erase(T::getTypeId());
-    return;
-  }
+        m_tags[T::getTypeId()] = tag;
+    }
 
-  m_tags[T::getTypeId()] = tag;
-}
-
-template<typename T>
-inline void
-TagHost::removeTag() const
-{
-  setTag<T>(nullptr);
-}
+    template<typename T>
+    inline void
+    TagHost::removeTag() const {
+        setTag<T>(nullptr);
+    }
 
 } // namespace ndn
 

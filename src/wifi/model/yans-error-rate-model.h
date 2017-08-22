@@ -28,141 +28,140 @@
 
 namespace ns3 {
 
-/**
- * \brief Model the error rate for different modulations.
- * \ingroup wifi
- *
- * A packet of interest (e.g., a packet can potentially be received by the MAC)
- * is divided into chunks. Each chunk is related to an start/end receiving event.
- * For each chunk, it calculates the ratio (SINR) between received power of packet
- * of interest and summation of noise and interfering power of all the other incoming
- * packets. Then, it will calculate the success rate of the chunk based on
- * BER of the modulation. The success reception rate of the packet is derived from
- * the success rate of all chunks.
- *
- * The 802.11b modulations:
- *    - 1 Mbps mode is based on DBPSK. BER is from equation 5.2-69 from John G. Proakis
- *      Digitial Communications, 2001 edition
- *    - 2 Mbps model is based on DQPSK. Equation 8 from "Tight bounds and accurate
- *      approximations for dqpsk transmission bit error rate", G. Ferrari and G.E. Corazza
- *      ELECTRONICS LETTERS, 40(20):1284-1285, September 2004
- *    - 5.5 Mbps and 11 Mbps are based on equations (18) and (17) from "Properties and
- *      performance of the ieee 802.11b complementarycode-key signal sets",
- *      Michael B. Pursley and Thomas C. Royster. IEEE TRANSACTIONS ON COMMUNICATIONS,
- *      57(2):440-449, February 2009.
- *    - More detailed description and validation can be found in
- *      http://www.nsnam.org/~pei/80211b.pdf
- */
-class YansErrorRateModel : public ErrorRateModel
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Model the error rate for different modulations.
+     * \ingroup wifi
+     *
+     * A packet of interest (e.g., a packet can potentially be received by the MAC)
+     * is divided into chunks. Each chunk is related to an start/end receiving event.
+     * For each chunk, it calculates the ratio (SINR) between received power of packet
+     * of interest and summation of noise and interfering power of all the other incoming
+     * packets. Then, it will calculate the success rate of the chunk based on
+     * BER of the modulation. The success reception rate of the packet is derived from
+     * the success rate of all chunks.
+     *
+     * The 802.11b modulations:
+     *    - 1 Mbps mode is based on DBPSK. BER is from equation 5.2-69 from John G. Proakis
+     *      Digitial Communications, 2001 edition
+     *    - 2 Mbps model is based on DQPSK. Equation 8 from "Tight bounds and accurate
+     *      approximations for dqpsk transmission bit error rate", G. Ferrari and G.E. Corazza
+     *      ELECTRONICS LETTERS, 40(20):1284-1285, September 2004
+     *    - 5.5 Mbps and 11 Mbps are based on equations (18) and (17) from "Properties and
+     *      performance of the ieee 802.11b complementarycode-key signal sets",
+     *      Michael B. Pursley and Thomas C. Royster. IEEE TRANSACTIONS ON COMMUNICATIONS,
+     *      57(2):440-449, February 2009.
+     *    - More detailed description and validation can be found in
+     *      http://www.nsnam.org/~pei/80211b.pdf
+     */
+    class YansErrorRateModel : public ErrorRateModel {
+    public:
+        static TypeId GetTypeId(void);
 
-  YansErrorRateModel ();
+        YansErrorRateModel();
 
-  virtual double GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbits) const;
+        virtual double GetChunkSuccessRate(WifiMode mode, double snr, uint32_t nbits) const;
 
 
-private:
-  /**
-   * Return the logarithm of the given value to base 2.
-   *
-   * \param val
-   *
-   * \return the logarithm of val to base 2.
-   */
-  double Log2 (double val) const;
-  /**
-   * Return BER of BPSK with the given parameters.
-   *
-   * \param snr snr value
-   * \param signalSpread
-   * \param phyRate
-   *
-   * \return BER of BPSK at the given SNR
-   */
-  double GetBpskBer (double snr, uint32_t signalSpread, uint32_t phyRate) const;
-  /**
-   * Return BER of QAM-m with the given parameters.
-   *
-   * \param snr snr value
-   * \param m
-   * \param signalSpread
-   * \param phyRate
-   *
-   * \return BER of BPSK at the given SNR
-   */
-  double GetQamBer (double snr, unsigned int m, uint32_t signalSpread, uint32_t phyRate) const;
-  /**
-   * Return k!
-   *
-   * \param k
-   *
-   * \return k!
-   */
-  uint32_t Factorial (uint32_t k) const;
-  /**
-   * Return Binomial distribution for a given k, p, and n
-   *
-   * \param k
-   * \param p
-   * \param n
-   *
-   * \return a Binomial distribution
-   */
-  double Binomial (uint32_t k, double p, uint32_t n) const;
-  /**
-   * \param ber
-   * \param d
-   *
-   * \return double
-   */
-  double CalculatePdOdd (double ber, unsigned int d) const;
-  /**
-   * \param ber
-   * \param d
-   *
-   * \return double
-   */
-  double CalculatePdEven (double ber, unsigned int d) const;
-  /**
-   * \param ber
-   * \param d
-   *
-   * \return double
-   */
-  double CalculatePd (double ber, unsigned int d) const;
-  /**
-   * \param snr
-   * \param nbits
-   * \param signalSpread
-   * \param phyRate
-   * \param dFree
-   * \param adFree
-   *
-   * \return double
-   */
-  double GetFecBpskBer (double snr, double nbits,
-                        uint32_t signalSpread, uint32_t phyRate,
-                        uint32_t dFree, uint32_t adFree) const;
-  /**
-   * \param snr
-   * \param nbits
-   * \param signalSpread
-   * \param phyRate
-   * \param m
-   * \param dfree
-   * \param adFree
-   * \param adFreePlusOne
-   *
-   * \return double
-   */
-  double GetFecQamBer (double snr, uint32_t nbits,
-                       uint32_t signalSpread,
-                       uint32_t phyRate,
-                       uint32_t m, uint32_t dfree,
-                       uint32_t adFree, uint32_t adFreePlusOne) const;
-};
+    private:
+        /**
+         * Return the logarithm of the given value to base 2.
+         *
+         * \param val
+         *
+         * \return the logarithm of val to base 2.
+         */
+        double Log2(double val) const;
+        /**
+         * Return BER of BPSK with the given parameters.
+         *
+         * \param snr snr value
+         * \param signalSpread
+         * \param phyRate
+         *
+         * \return BER of BPSK at the given SNR
+         */
+        double GetBpskBer(double snr, uint32_t signalSpread, uint32_t phyRate) const;
+        /**
+         * Return BER of QAM-m with the given parameters.
+         *
+         * \param snr snr value
+         * \param m
+         * \param signalSpread
+         * \param phyRate
+         *
+         * \return BER of BPSK at the given SNR
+         */
+        double GetQamBer(double snr, unsigned int m, uint32_t signalSpread, uint32_t phyRate) const;
+        /**
+         * Return k!
+         *
+         * \param k
+         *
+         * \return k!
+         */
+        uint32_t Factorial(uint32_t k) const;
+        /**
+         * Return Binomial distribution for a given k, p, and n
+         *
+         * \param k
+         * \param p
+         * \param n
+         *
+         * \return a Binomial distribution
+         */
+        double Binomial(uint32_t k, double p, uint32_t n) const;
+        /**
+         * \param ber
+         * \param d
+         *
+         * \return double
+         */
+        double CalculatePdOdd(double ber, unsigned int d) const;
+        /**
+         * \param ber
+         * \param d
+         *
+         * \return double
+         */
+        double CalculatePdEven(double ber, unsigned int d) const;
+        /**
+         * \param ber
+         * \param d
+         *
+         * \return double
+         */
+        double CalculatePd(double ber, unsigned int d) const;
+        /**
+         * \param snr
+         * \param nbits
+         * \param signalSpread
+         * \param phyRate
+         * \param dFree
+         * \param adFree
+         *
+         * \return double
+         */
+        double GetFecBpskBer(double snr, double nbits,
+                uint32_t signalSpread, uint32_t phyRate,
+                uint32_t dFree, uint32_t adFree) const;
+        /**
+         * \param snr
+         * \param nbits
+         * \param signalSpread
+         * \param phyRate
+         * \param m
+         * \param dfree
+         * \param adFree
+         * \param adFreePlusOne
+         *
+         * \return double
+         */
+        double GetFecQamBer(double snr, uint32_t nbits,
+                uint32_t signalSpread,
+                uint32_t phyRate,
+                uint32_t m, uint32_t dfree,
+                uint32_t adFree, uint32_t adFreePlusOne) const;
+    };
 
 } //namespace ns3
 

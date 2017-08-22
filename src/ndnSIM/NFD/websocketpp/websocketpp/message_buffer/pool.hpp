@@ -33,197 +33,209 @@
 #include <string>
 
 namespace websocketpp {
-namespace message_buffer {
+    namespace message_buffer {
 
-/* # message:
- * object that stores a message while it is being sent or received. Contains
- * the message payload itself, the message header, the extension data, and the
- * opcode.
- *
- * # connection_message_manager:
- * An object that manages all of the message_buffers associated with a given
- * connection. Implements the get_message_buffer(size) method that returns
- * a message buffer at least size bytes long.
- *
- * Message buffers are reference counted with shared ownership semantics. Once
- * requested from the manager the requester and it's associated downstream code
- * may keep a pointer to the message indefinitely at a cost of extra resource
- * usage. Once the reference count drops to the point where the manager is the
- * only reference the messages is recycled using whatever method is implemented
- * in the manager.
- *
- * # endpoint_message_manager:
- * An object that manages connection_message_managers. Implements the
- * get_message_manager() method. This is used once by each connection to
- * request the message manager that they are supposed to use to manage message
- * buffers for their own use.
- *
- * TYPES OF CONNECTION_MESSAGE_MANAGERS
- * - allocate a message with the exact size every time one is requested
- * - maintain a pool of pre-allocated messages and return one when needed.
- *   Recycle previously used messages back into the pool
- *
- * TYPES OF ENDPOINT_MESSAGE_MANAGERS
- *  - allocate a new connection manager for each connection. Message pools
- *    become connection specific. This increases memory usage but improves
- *    concurrency.
- *  - allocate a single connection manager and share a pointer to it with all
- *    connections created by this endpoint. The message pool will be shared
- *    among all connections, improving memory usage and performance at the cost
- *    of reduced concurrency
- */
+        /* # message:
+         * object that stores a message while it is being sent or received. Contains
+         * the message payload itself, the message header, the extension data, and the
+         * opcode.
+         *
+         * # connection_message_manager:
+         * An object that manages all of the message_buffers associated with a given
+         * connection. Implements the get_message_buffer(size) method that returns
+         * a message buffer at least size bytes long.
+         *
+         * Message buffers are reference counted with shared ownership semantics. Once
+         * requested from the manager the requester and it's associated downstream code
+         * may keep a pointer to the message indefinitely at a cost of extra resource
+         * usage. Once the reference count drops to the point where the manager is the
+         * only reference the messages is recycled using whatever method is implemented
+         * in the manager.
+         *
+         * # endpoint_message_manager:
+         * An object that manages connection_message_managers. Implements the
+         * get_message_manager() method. This is used once by each connection to
+         * request the message manager that they are supposed to use to manage message
+         * buffers for their own use.
+         *
+         * TYPES OF CONNECTION_MESSAGE_MANAGERS
+         * - allocate a message with the exact size every time one is requested
+         * - maintain a pool of pre-allocated messages and return one when needed.
+         *   Recycle previously used messages back into the pool
+         *
+         * TYPES OF ENDPOINT_MESSAGE_MANAGERS
+         *  - allocate a new connection manager for each connection. Message pools
+         *    become connection specific. This increases memory usage but improves
+         *    concurrency.
+         *  - allocate a single connection manager and share a pointer to it with all
+         *    connections created by this endpoint. The message pool will be shared
+         *    among all connections, improving memory usage and performance at the cost
+         *    of reduced concurrency
+         */
 
-/// Custom deleter for use in shared_ptrs to message.
-/**
- * This is used to catch messages about to be deleted and offer the manager the
- * ability to recycle them instead. Message::recycle will return true if it was
- * successfully recycled and false otherwise. In the case of exceptions or error
- * this deleter frees the memory.
- */
-template <typename T>
-void message_deleter(T* msg) {
-    try {
-        if (!msg->recycle()) {
-            delete msg;
+        /// Custom deleter for use in shared_ptrs to message.
+
+        /**
+         * This is used to catch messages about to be deleted and offer the manager the
+         * ability to recycle them instead. Message::recycle will return true if it was
+         * successfully recycled and false otherwise. In the case of exceptions or error
+         * this deleter frees the memory.
+         */
+        template <typename T>
+        void message_deleter(T* msg) {
+            try {
+                if (!msg->recycle()) {
+                    delete msg;
+                }
+            } catch (...) {
+                // TODO: is there a better way to ensure this function doesn't throw?
+                delete msg;
+            }
         }
-    } catch (...) {
-        // TODO: is there a better way to ensure this function doesn't throw?
-        delete msg;
-    }
-}
 
-/// Represents a buffer for a single WebSocket message.
-/**
- *
- *
- */
-template <typename con_msg_manager>
-class message {
-public:
-    typedef lib::shared_ptr<message> ptr;
+        /// Represents a buffer for a single WebSocket message.
 
-    typedef typename con_msg_manager::weak_ptr con_msg_man_ptr;
+        /**
+         *
+         *
+         */
+        template <typename con_msg_manager>
+        class message {
+        public:
+            typedef lib::shared_ptr<message> ptr;
 
-    message(con_msg_man_ptr manager, size_t size = 128)
-      : m_manager(manager)
-      , m_payload(size) {}
+            typedef typename con_msg_manager::weak_ptr con_msg_man_ptr;
 
-    frame::opcode::value get_opcode() const {
-        return m_opcode;
-    }
-    const std::string& get_header() const {
-        return m_header;
-    }
-    const std::string& get_extension_data() const {
-        return m_extension_data;
-    }
-    const std::string& get_payload() const {
-        return m_payload;
-    }
+            message(con_msg_man_ptr manager, size_t size = 128)
+            : m_manager(manager)
+            , m_payload(size) {
+            }
 
-    /// Recycle the message
-    /**
-     * A request to recycle this message was received. Forward that request to
-     * the connection message manager for processing. Errors and exceptions
-     * from the manager's recycle member function should be passed back up the
-     * call chain. The caller to message::recycle will deal with them.
-     *
-     * Recycle must *only* be called by the message shared_ptr's destructor.
-     * Once recycled successfully, ownership of the memory has been passed to
-     * another system and must not be accessed again.
-     *
-     * @return true if the message was successfully recycled, false otherwise.
-     */
-    bool recycle() {
-        typename con_msg_manager::ptr shared = m_manager.lock();
+            frame::opcode::value get_opcode() const {
+                return m_opcode;
+            }
 
-        if (shared) {
-            return shared->(recycle(this));
-        } else {
-            return false;
-        }
-    }
-private:
-    con_msg_man_ptr             m_manager;
+            const std::string& get_header() const {
+                return m_header;
+            }
 
-    frame::opcode::value        m_opcode;
-    std::string                 m_header;
-    std::string                 m_extension_data;
-    std::string                 m_payload;
-};
+            const std::string& get_extension_data() const {
+                return m_extension_data;
+            }
 
-namespace alloc {
+            const std::string& get_payload() const {
+                return m_payload;
+            }
 
-/// A connection message manager that allocates a new message for each
-/// request.
-template <typename message>
-class con_msg_manager {
-public:
-    typedef lib::shared_ptr<con_msg_manager> ptr;
-    typedef lib::weak_ptr<con_msg_manager> weak_ptr;
+            /// Recycle the message
 
-    typedef typename message::ptr message_ptr;
+            /**
+             * A request to recycle this message was received. Forward that request to
+             * the connection message manager for processing. Errors and exceptions
+             * from the manager's recycle member function should be passed back up the
+             * call chain. The caller to message::recycle will deal with them.
+             *
+             * Recycle must *only* be called by the message shared_ptr's destructor.
+             * Once recycled successfully, ownership of the memory has been passed to
+             * another system and must not be accessed again.
+             *
+             * @return true if the message was successfully recycled, false otherwise.
+             */
+            bool recycle() {
+                typename con_msg_manager::ptr shared = m_manager.lock();
 
-    /// Get a message buffer with specified size
-    /**
-     * @param size Minimum size in bytes to request for the message payload.
-     *
-     * @return A shared pointer to a new message with specified size.
-     */
-    message_ptr get_message(size_t size) const {
-        return lib::make_shared<message>(size);
-    }
+                if (shared) {
+                    return shared->(recycle(this));
+                } else {
+                    return false;
+                }
+            }
+        private:
+            con_msg_man_ptr m_manager;
 
-    /// Recycle a message
-    /**
-     * This method shouldn't be called. If it is, return false to indicate an
-     * error. The rest of the method recycle chain should notice this and free
-     * the memory.
-     *
-     * @param msg The message to be recycled.
-     *
-     * @return true if the message was successfully recycled, false otherwse.
-     */
-    bool recycle(message * msg) {
-        return false;
-    }
-};
+            frame::opcode::value m_opcode;
+            std::string m_header;
+            std::string m_extension_data;
+            std::string m_payload;
+        };
 
-/// An endpoint message manager that allocates a new manager for each
-/// connection.
-template <typename con_msg_manager>
-class endpoint_msg_manager {
-public:
-    typedef typename con_msg_manager::ptr con_msg_man_ptr;
+        namespace alloc {
 
-    /// Get a pointer to a connection message manager
-    /**
-     * @return A pointer to the requested connection message manager.
-     */
-    con_msg_man_ptr get_manager() const {
-        return lib::make_shared<con_msg_manager>();
-    }
-};
+            /// A connection message manager that allocates a new message for each
+            /// request.
 
-} // namespace alloc
+            template <typename message>
+            class con_msg_manager {
+            public:
+                typedef lib::shared_ptr<con_msg_manager> ptr;
+                typedef lib::weak_ptr<con_msg_manager> weak_ptr;
 
-namespace pool {
+                typedef typename message::ptr message_ptr;
 
-/// A connection messages manager that maintains a pool of messages that is
-/// used to fulfill get_message requests.
-class con_msg_manager {
+                /// Get a message buffer with specified size
 
-};
+                /**
+                 * @param size Minimum size in bytes to request for the message payload.
+                 *
+                 * @return A shared pointer to a new message with specified size.
+                 */
+                message_ptr get_message(size_t size) const {
+                    return lib::make_shared<message>(size);
+                }
 
-/// An endpoint manager that maintains a shared pool of connection managers
-/// and returns an appropriate one for the requesting connection.
-class endpoint_msg_manager {
+                /// Recycle a message
 
-};
+                /**
+                 * This method shouldn't be called. If it is, return false to indicate an
+                 * error. The rest of the method recycle chain should notice this and free
+                 * the memory.
+                 *
+                 * @param msg The message to be recycled.
+                 *
+                 * @return true if the message was successfully recycled, false otherwse.
+                 */
+                bool recycle(message * msg) {
+                    return false;
+                }
+            };
 
-} // namespace pool
+            /// An endpoint message manager that allocates a new manager for each
+            /// connection.
 
-} // namespace message_buffer
+            template <typename con_msg_manager>
+            class endpoint_msg_manager {
+            public:
+                typedef typename con_msg_manager::ptr con_msg_man_ptr;
+
+                /// Get a pointer to a connection message manager
+
+                /**
+                 * @return A pointer to the requested connection message manager.
+                 */
+                con_msg_man_ptr get_manager() const {
+                    return lib::make_shared<con_msg_manager>();
+                }
+            };
+
+        } // namespace alloc
+
+        namespace pool {
+
+            /// A connection messages manager that maintains a pool of messages that is
+            /// used to fulfill get_message requests.
+
+            class con_msg_manager {
+            };
+
+            /// An endpoint manager that maintains a shared pool of connection managers
+            /// and returns an appropriate one for the requesting connection.
+
+            class endpoint_msg_manager {
+            };
+
+        } // namespace pool
+
+    } // namespace message_buffer
 } // namespace websocketpp
 
 #endif // WEBSOCKETPP_MESSAGE_BUFFER_ALLOC_HPP

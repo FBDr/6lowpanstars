@@ -30,13 +30,13 @@
  * (Deprecated) ns3::RefCountBase implementation.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("RefCountBase");
-
-RefCountBase::~RefCountBase ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
+
+    NS_LOG_COMPONENT_DEFINE("RefCountBase");
+
+    RefCountBase::~RefCountBase() {
+        NS_LOG_FUNCTION(this);
+    }
 
 } // namespace ns3

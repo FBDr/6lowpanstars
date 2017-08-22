@@ -28,35 +28,36 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Table)
-BOOST_FIXTURE_TEST_SUITE(TestNetworkRegionTable, BaseFixture)
+        BOOST_AUTO_TEST_SUITE(Table)
+        BOOST_FIXTURE_TEST_SUITE(TestNetworkRegionTable, BaseFixture)
 
-BOOST_AUTO_TEST_CASE(InProducerRegion)
-{
-  shared_ptr<Link> link = makeLink("/net/ndnsim", {{10, "/telia/terabits"}, {20, "/ucla/cs"}});
+        BOOST_AUTO_TEST_CASE(InProducerRegion) {
+            shared_ptr<Link> link = makeLink("/net/ndnsim",{
+                {10, "/telia/terabits"},
+                {20, "/ucla/cs"}});
 
-  NetworkRegionTable nrt1;
-  nrt1.insert("/verizon");
-  BOOST_CHECK_EQUAL(nrt1.isInProducerRegion(*link), false);
+            NetworkRegionTable nrt1;
+            nrt1.insert("/verizon");
+            BOOST_CHECK_EQUAL(nrt1.isInProducerRegion(*link), false);
 
-  NetworkRegionTable nrt2;
-  nrt2.insert("/ucla");
-  BOOST_CHECK_EQUAL(nrt2.isInProducerRegion(*link), false);
+            NetworkRegionTable nrt2;
+            nrt2.insert("/ucla");
+            BOOST_CHECK_EQUAL(nrt2.isInProducerRegion(*link), false);
 
-  NetworkRegionTable nrt3;
-  nrt3.insert("/ucla/cs");
-  BOOST_CHECK_EQUAL(nrt3.isInProducerRegion(*link), true);
+            NetworkRegionTable nrt3;
+            nrt3.insert("/ucla/cs");
+            BOOST_CHECK_EQUAL(nrt3.isInProducerRegion(*link), true);
 
-  NetworkRegionTable nrt4;
-  nrt4.insert("/ucla/cs/software");
-  nrt4.insert("/ucla/cs/irl");
-  BOOST_CHECK_EQUAL(nrt4.isInProducerRegion(*link), true);
-}
+            NetworkRegionTable nrt4;
+            nrt4.insert("/ucla/cs/software");
+            nrt4.insert("/ucla/cs/irl");
+            BOOST_CHECK_EQUAL(nrt4.isInProducerRegion(*link), true);
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

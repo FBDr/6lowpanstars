@@ -29,75 +29,69 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
 #define CHANNEL_PATH1 "unix-stream-test.1.sock"
 #define CHANNEL_PATH2 "unix-stream-test.2.sock"
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestUnixStreamFactory, BaseFixture)
+        BOOST_AUTO_TEST_SUITE(Face)
+        BOOST_FIXTURE_TEST_SUITE(TestUnixStreamFactory, BaseFixture)
 
-using nfd::Face;
+        using nfd::Face;
 
-BOOST_AUTO_TEST_CASE(ChannelMap)
-{
-  UnixStreamFactory factory;
+        BOOST_AUTO_TEST_CASE(ChannelMap) {
+            UnixStreamFactory factory;
 
-  shared_ptr<UnixStreamChannel> channel1 = factory.createChannel(CHANNEL_PATH1);
-  shared_ptr<UnixStreamChannel> channel1a = factory.createChannel(CHANNEL_PATH1);
-  BOOST_CHECK_EQUAL(channel1, channel1a);
-  std::string channel1uri = channel1->getUri().toString();
-  BOOST_CHECK_EQUAL(channel1uri.find("unix:///"), 0); // third '/' is the path separator
-  BOOST_CHECK_EQUAL(channel1uri.rfind(CHANNEL_PATH1),
+            shared_ptr<UnixStreamChannel> channel1 = factory.createChannel(CHANNEL_PATH1);
+            shared_ptr<UnixStreamChannel> channel1a = factory.createChannel(CHANNEL_PATH1);
+            BOOST_CHECK_EQUAL(channel1, channel1a);
+            std::string channel1uri = channel1->getUri().toString();
+            BOOST_CHECK_EQUAL(channel1uri.find("unix:///"), 0); // third '/' is the path separator
+            BOOST_CHECK_EQUAL(channel1uri.rfind(CHANNEL_PATH1),
                     channel1uri.size() - std::string(CHANNEL_PATH1).size());
 
-  shared_ptr<UnixStreamChannel> channel2 = factory.createChannel(CHANNEL_PATH2);
-  BOOST_CHECK_NE(channel1, channel2);
-}
+            shared_ptr<UnixStreamChannel> channel2 = factory.createChannel(CHANNEL_PATH2);
+            BOOST_CHECK_NE(channel1, channel2);
+        }
 
-BOOST_AUTO_TEST_CASE(GetChannels)
-{
-  UnixStreamFactory factory;
-  BOOST_CHECK(factory.getChannels().empty());
+        BOOST_AUTO_TEST_CASE(GetChannels) {
+            UnixStreamFactory factory;
+            BOOST_CHECK(factory.getChannels().empty());
 
-  std::vector<shared_ptr<const Channel>> expectedChannels;
-  expectedChannels.push_back(factory.createChannel(CHANNEL_PATH1));
-  expectedChannels.push_back(factory.createChannel(CHANNEL_PATH2));
+            std::vector<shared_ptr<const Channel>> expectedChannels;
+            expectedChannels.push_back(factory.createChannel(CHANNEL_PATH1));
+            expectedChannels.push_back(factory.createChannel(CHANNEL_PATH2));
 
-  for (const auto& channel : factory.getChannels()) {
-    auto pos = std::find(expectedChannels.begin(), expectedChannels.end(), channel);
-    BOOST_REQUIRE(pos != expectedChannels.end());
-    expectedChannels.erase(pos);
-  }
+            for (const auto& channel : factory.getChannels()) {
+                auto pos = std::find(expectedChannels.begin(), expectedChannels.end(), channel);
+                BOOST_REQUIRE(pos != expectedChannels.end());
+                expectedChannels.erase(pos);
+            }
 
-  BOOST_CHECK_EQUAL(expectedChannels.size(), 0);
-}
+            BOOST_CHECK_EQUAL(expectedChannels.size(), 0);
+        }
 
-BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate)
-{
-  UnixStreamFactory factory;
+        BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate) {
+            UnixStreamFactory factory;
 
-  createFace(factory,
-             FaceUri("unix:///var/run/nfd.sock"),
-             ndn::nfd::FACE_PERSISTENCY_PERMANENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("unix:///var/run/nfd.sock"),
+                    ndn::nfd::FACE_PERSISTENCY_PERMANENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("unix:///var/run/nfd.sock"),
-             ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("unix:///var/run/nfd.sock"),
+                    ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("unix:///var/run/nfd.sock"),
-             ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
-}
+            createFace(factory,
+                    FaceUri("unix:///var/run/nfd.sock"),
+                    ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestUnixStreamFactory
-BOOST_AUTO_TEST_SUITE_END() // Face
+        BOOST_AUTO_TEST_SUITE_END() // TestUnixStreamFactory
+        BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

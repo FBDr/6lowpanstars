@@ -34,71 +34,64 @@
 #include "security/key-chain.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-class SimpleNotification
-{
-public:
-  SimpleNotification()
-  {
-  }
+            class SimpleNotification {
+            public:
 
-  explicit
-  SimpleNotification(const Block& block)
-  {
-    wireDecode(block);
-  }
+                SimpleNotification() {
+                }
 
-  SimpleNotification(const std::string& message)
-    : m_message(message)
-  {
-  }
+                explicit
+                SimpleNotification(const Block& block) {
+                    wireDecode(block);
+                }
 
-  ~SimpleNotification()
-  {
-  }
+                SimpleNotification(const std::string& message)
+                : m_message(message) {
+                }
 
-  Block
-  wireEncode() const
-  {
-    ndn::EncodingBuffer buffer;
-    buffer.prependByteArrayBlock(0x8888,
-                                 reinterpret_cast<const uint8_t*>(m_message.c_str()),
-                                 m_message.size());
-    return buffer.block();
-  }
+                ~SimpleNotification() {
+                }
 
-  void
-  wireDecode(const Block& block)
-  {
-    m_message.assign(reinterpret_cast<const char*>(block.value()),
-                     block.value_size());
+                Block
+                wireEncode() const {
+                    ndn::EncodingBuffer buffer;
+                    buffer.prependByteArrayBlock(0x8888,
+                            reinterpret_cast<const uint8_t*> (m_message.c_str()),
+                            m_message.size());
+                    return buffer.block();
+                }
 
-    // error for testing
-    if (!m_message.empty() && m_message[0] == '\x07')
-      BOOST_THROW_EXCEPTION(tlv::Error("0x07 error"));
-  }
+                void
+                wireDecode(const Block& block) {
+                    m_message.assign(reinterpret_cast<const char*> (block.value()),
+                            block.value_size());
 
-public:
-  const std::string&
-  getMessage() const
-  {
-    return m_message;
-  }
+                    // error for testing
+                    if (!m_message.empty() && m_message[0] == '\x07')
+                        BOOST_THROW_EXCEPTION(tlv::Error("0x07 error"));
+                }
 
-  void
-  setMessage(const std::string& message)
-  {
-    m_message = message;
-  }
+            public:
 
-private:
-  std::string m_message;
-};
+                const std::string&
+                getMessage() const {
+                    return m_message;
+                }
 
-} // namespace tests
-} // namespace util
+                void
+                setMessage(const std::string& message) {
+                    m_message = message;
+                }
+
+            private:
+                std::string m_message;
+            };
+
+        } // namespace tests
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UNIT_TESTS_UTIL_CORE_SIMPLE_NOTIFICATION_HPP

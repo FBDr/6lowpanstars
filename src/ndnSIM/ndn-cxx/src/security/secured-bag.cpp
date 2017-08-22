@@ -25,55 +25,49 @@
 
 namespace ndn {
 
-//BOOST_CONCEPT_ASSERT((boost::EqualityComparable<SecuredBag>));
-BOOST_CONCEPT_ASSERT((WireEncodable<SecuredBag>));
-BOOST_CONCEPT_ASSERT((WireDecodable<SecuredBag>));
-static_assert(std::is_base_of<tlv::Error, SecuredBag::Error>::value,
-              "SecuredBag::Error must inherit from tlv::Error");
+    //BOOST_CONCEPT_ASSERT((boost::EqualityComparable<SecuredBag>));
+    BOOST_CONCEPT_ASSERT((WireEncodable<SecuredBag>));
+    BOOST_CONCEPT_ASSERT((WireDecodable<SecuredBag>));
+    static_assert(std::is_base_of<tlv::Error, SecuredBag::Error>::value,
+            "SecuredBag::Error must inherit from tlv::Error");
 
-SecuredBag::SecuredBag()
-  : m_wire(tlv::security::IdentityPackage)
-{
-}
+    SecuredBag::SecuredBag()
+    : m_wire(tlv::security::IdentityPackage) {
+    }
 
-SecuredBag::SecuredBag(const Block& wire)
-{
-  this->wireDecode(wire);
-}
+    SecuredBag::SecuredBag(const Block& wire) {
+        this->wireDecode(wire);
+    }
 
-SecuredBag::SecuredBag(const v1::IdentityCertificate& cert, ConstBufferPtr key)
-  : m_cert(cert)
-  , m_key(key)
-  , m_wire(tlv::security::IdentityPackage)
-{
-  Block wireKey(tlv::security::KeyPackage, m_key);
-  Block wireCert(tlv::security::CertificatePackage, cert.wireEncode());
-  m_wire.push_back(wireCert);
-  m_wire.push_back(wireKey);
-}
+    SecuredBag::SecuredBag(const v1::IdentityCertificate& cert, ConstBufferPtr key)
+    : m_cert(cert)
+    , m_key(key)
+    , m_wire(tlv::security::IdentityPackage) {
+        Block wireKey(tlv::security::KeyPackage, m_key);
+        Block wireCert(tlv::security::CertificatePackage, cert.wireEncode());
+        m_wire.push_back(wireCert);
+        m_wire.push_back(wireKey);
+    }
 
-SecuredBag::~SecuredBag()
-{
-}
+    SecuredBag::~SecuredBag() {
+    }
 
-void
-SecuredBag::wireDecode(const Block& wire)
-{
-  m_wire = wire;
-  m_wire.parse();
+    void
+    SecuredBag::wireDecode(const Block& wire) {
+        m_wire = wire;
+        m_wire.parse();
 
-  m_cert.wireDecode(m_wire.get(tlv::security::CertificatePackage).blockFromValue());
+        m_cert.wireDecode(m_wire.get(tlv::security::CertificatePackage).blockFromValue());
 
-  Block wireKey = m_wire.get(tlv::security::KeyPackage);
-  shared_ptr<Buffer> key = make_shared<Buffer>(wireKey.value(), wireKey.value_size());
-  m_key = key;
-}
+        Block wireKey = m_wire.get(tlv::security::KeyPackage);
+        shared_ptr<Buffer> key = make_shared<Buffer>(wireKey.value(), wireKey.value_size());
+        m_key = key;
+    }
 
-const Block&
-SecuredBag::wireEncode() const
-{
-  m_wire.encode();
-  return m_wire;
-}
+    const Block&
+    SecuredBag::wireEncode() const {
+        m_wire.encode();
+        return m_wire;
+    }
 
 } // namespace ndn

@@ -22,16 +22,14 @@
 #include "ns3/lte-mac-sap.h"
 
 
-namespace ns3 {
-
-
-LteMacSapProvider::~LteMacSapProvider ()
+namespace ns3
 {
-}
 
-LteMacSapUser::~LteMacSapUser ()
-{
-}
+    LteMacSapProvider::~LteMacSapProvider() {
+    }
+
+    LteMacSapUser::~LteMacSapUser() {
+    }
 
 
 

@@ -26,56 +26,55 @@
 
 namespace ns3 {
 
-struct OnoeWifiRemoteStation;
+    struct OnoeWifiRemoteStation;
 
-/**
- * \brief an implementation of the rate control algorithm developed
- *        by Atsushi Onoe
- *
- * \ingroup wifi
- *
- * This algorithm is well known because it has been used as the default
- * rate control algorithm for the madwifi driver. I am not aware of
- * any publication or reference about this algorithm beyond the madwifi
- * source code.
- */
-class OnoeWifiManager : public WifiRemoteStationManager
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \brief an implementation of the rate control algorithm developed
+     *        by Atsushi Onoe
+     *
+     * \ingroup wifi
+     *
+     * This algorithm is well known because it has been used as the default
+     * rate control algorithm for the madwifi driver. I am not aware of
+     * any publication or reference about this algorithm beyond the madwifi
+     * source code.
+     */
+    class OnoeWifiManager : public WifiRemoteStationManager {
+    public:
+        static TypeId GetTypeId(void);
 
-  OnoeWifiManager ();
+        OnoeWifiManager();
 
 
-private:
-  //overriden from base class
-  virtual WifiRemoteStation * DoCreateStation (void) const;
-  virtual void DoReportRxOk (WifiRemoteStation *station,
-                             double rxSnr, WifiMode txMode);
-  virtual void DoReportRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportDataFailed (WifiRemoteStation *station);
-  virtual void DoReportRtsOk (WifiRemoteStation *station,
-                              double ctsSnr, WifiMode ctsMode, double rtsSnr);
-  virtual void DoReportDataOk (WifiRemoteStation *station,
-                               double ackSnr, WifiMode ackMode, double dataSnr);
-  virtual void DoReportFinalRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportFinalDataFailed (WifiRemoteStation *station);
-  virtual WifiTxVector DoGetDataTxVector (WifiRemoteStation *station, uint32_t size);
-  virtual WifiTxVector DoGetRtsTxVector (WifiRemoteStation *station);
-  virtual bool IsLowLatency (void) const;
+    private:
+        //overriden from base class
+        virtual WifiRemoteStation * DoCreateStation(void) const;
+        virtual void DoReportRxOk(WifiRemoteStation *station,
+                double rxSnr, WifiMode txMode);
+        virtual void DoReportRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportDataFailed(WifiRemoteStation *station);
+        virtual void DoReportRtsOk(WifiRemoteStation *station,
+                double ctsSnr, WifiMode ctsMode, double rtsSnr);
+        virtual void DoReportDataOk(WifiRemoteStation *station,
+                double ackSnr, WifiMode ackMode, double dataSnr);
+        virtual void DoReportFinalRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportFinalDataFailed(WifiRemoteStation *station);
+        virtual WifiTxVector DoGetDataTxVector(WifiRemoteStation *station, uint32_t size);
+        virtual WifiTxVector DoGetRtsTxVector(WifiRemoteStation *station);
+        virtual bool IsLowLatency(void) const;
 
-  /**
-   * Update the number of retry (both short and long).
-   *
-   * \param station
-   */
-  void UpdateRetry (OnoeWifiRemoteStation *station);
-  void UpdateMode (OnoeWifiRemoteStation *station);
+        /**
+         * Update the number of retry (both short and long).
+         *
+         * \param station
+         */
+        void UpdateRetry(OnoeWifiRemoteStation *station);
+        void UpdateMode(OnoeWifiRemoteStation *station);
 
-  Time m_updatePeriod;
-  uint32_t m_addCreditThreshold;
-  uint32_t m_raiseThreshold;
-};
+        Time m_updatePeriod;
+        uint32_t m_addCreditThreshold;
+        uint32_t m_raiseThreshold;
+    };
 
 } //namespace ns3
 

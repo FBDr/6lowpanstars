@@ -28,7 +28,7 @@
 
 namespace ndn {
 
-typedef RegexTopMatcher Regex;
+    typedef RegexTopMatcher Regex;
 
 } // namespace ndn
 

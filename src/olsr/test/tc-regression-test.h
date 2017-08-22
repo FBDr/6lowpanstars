@@ -27,90 +27,88 @@
 #include "ns3/ipv4-raw-socket-impl.h"
 #include "ns3/node-container.h"
 
-namespace ns3
-{
-namespace olsr
-{
-/**
- * \ingroup olsr
- * \brief Less trivial test of OLSR Topology Control message generation
- * 
- * This test simulates 3 Wi-Fi stations with chain topology and runs OLSR without any extra traffic.
- * It is expected that only second station will send TC messages.
- * 
- * Expected trace (20 seconds, note random b-cast jitter):
-   \verbatim
-         1       2       3
-         |<------|------>|              HELLO (empty) src = 10.1.1.2
-         |       |<------|------>       HELLO (empty) src = 10.1.1.3
-  <------|------>|       |              HELLO (empty) src = 10.1.1.1
-  <------|------>|       |              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<------|------>|              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.3; Link Type: Asymmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-         |<------|------>|              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.3; Link Type: Asymmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-  <------|------>|       |              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: Symmetric, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<======|======>|              TC (10.1.1.3; 10.1.1.1) + HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-         |<======|======>|              TC (10.1.1.3; 10.1.1.1) src = 10.1.1.2
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-  <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
-         |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
-         |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
-   \endverbatim 
- */
-class TcRegressionTest : public TestCase
-{
-public:
-  TcRegressionTest(); 
-  ~TcRegressionTest();
-private:
-  /// Total simulation time
-  const Time m_time;
-  /// Create & configure test network
-  void CreateNodes ();
-  /// Go
-  void DoRun ();
+namespace ns3 {
+    namespace olsr {
 
-  /// Receive raw data on node A
-  void ReceivePktProbeA (Ptr<Socket> socket);
-  /// Packet counter on node A
-  uint8_t m_countA;
-  /// Receiving socket on node A
-  Ptr<Ipv4RawSocketImpl> m_rxSocketA;
+        /**
+         * \ingroup olsr
+         * \brief Less trivial test of OLSR Topology Control message generation
+         * 
+         * This test simulates 3 Wi-Fi stations with chain topology and runs OLSR without any extra traffic.
+         * It is expected that only second station will send TC messages.
+         * 
+         * Expected trace (20 seconds, note random b-cast jitter):
+           \verbatim
+                 1       2       3
+                 |<------|------>|              HELLO (empty) src = 10.1.1.2
+                 |       |<------|------>       HELLO (empty) src = 10.1.1.3
+          <------|------>|       |              HELLO (empty) src = 10.1.1.1
+          <------|------>|       |              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<------|------>|              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.3; Link Type: Asymmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+                 |<------|------>|              HELLO (Link Type: Asymmetric, Neighbor: 10.1.1.3; Link Type: Asymmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+          <------|------>|       |              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: Symmetric, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<======|======>|              TC (10.1.1.3; 10.1.1.1) + HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+                 |<======|======>|              TC (10.1.1.3; 10.1.1.1) src = 10.1.1.2
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+          <------|------>|       |              HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.1
+                 |       |<------|------>       HELLO (Link Type: MPR Link, Neighbor: 10.1.1.2) src = 10.1.1.3
+                 |<------|------>|              HELLO (Link Type: Symmetric, Neighbor: 10.1.1.3; Link Type: Symmetric, Neighbor: 10.1.1.1) src = 10.1.1.2
+           \endverbatim 
+         */
+        class TcRegressionTest : public TestCase {
+        public:
+            TcRegressionTest();
+            ~TcRegressionTest();
+        private:
+            /// Total simulation time
+            const Time m_time;
+            /// Create & configure test network
+            void CreateNodes();
+            /// Go
+            void DoRun();
 
-  /// Receive raw data on node B
-  void ReceivePktProbeB (Ptr<Socket> socket);
-  /// Packet counter on node B
-  uint8_t m_countB;
-  /// Receiving socket on node B
-  Ptr<Ipv4RawSocketImpl> m_rxSocketB;
+            /// Receive raw data on node A
+            void ReceivePktProbeA(Ptr<Socket> socket);
+            /// Packet counter on node A
+            uint8_t m_countA;
+            /// Receiving socket on node A
+            Ptr<Ipv4RawSocketImpl> m_rxSocketA;
 
-  /// Receive raw data on node C
-  void ReceivePktProbeC (Ptr<Socket> socket);
-  /// Packet counter on node C
-  uint8_t m_countC;
-  /// Receiving socket on node C
-  Ptr<Ipv4RawSocketImpl> m_rxSocketC;
+            /// Receive raw data on node B
+            void ReceivePktProbeB(Ptr<Socket> socket);
+            /// Packet counter on node B
+            uint8_t m_countB;
+            /// Receiving socket on node B
+            Ptr<Ipv4RawSocketImpl> m_rxSocketB;
 
-};
+            /// Receive raw data on node C
+            void ReceivePktProbeC(Ptr<Socket> socket);
+            /// Packet counter on node C
+            uint8_t m_countC;
+            /// Receiving socket on node C
+            Ptr<Ipv4RawSocketImpl> m_rxSocketC;
 
-}
+        };
+
+    }
 }
 
 #endif /* TC_REGRESSION_TEST_H */

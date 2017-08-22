@@ -21,49 +21,40 @@
 
 #include "qos-blocked-destinations.h"
 
-namespace ns3 {
-
-QosBlockedDestinations::QosBlockedDestinations ()
+namespace ns3
 {
-}
 
-QosBlockedDestinations::~QosBlockedDestinations ()
-{
-}
+    QosBlockedDestinations::QosBlockedDestinations() {
+    }
 
-bool
-QosBlockedDestinations::IsBlocked (Mac48Address dest, uint8_t tid) const
-{
-  for (BlockedPacketsCI i = m_blockedQosPackets.begin (); i != m_blockedQosPackets.end (); i++)
-    {
-      if (i->first == dest && i->second == tid)
-        {
-          return true;
+    QosBlockedDestinations::~QosBlockedDestinations() {
+    }
+
+    bool
+    QosBlockedDestinations::IsBlocked(Mac48Address dest, uint8_t tid) const {
+        for (BlockedPacketsCI i = m_blockedQosPackets.begin(); i != m_blockedQosPackets.end(); i++) {
+            if (i->first == dest && i->second == tid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void
+    QosBlockedDestinations::Block(Mac48Address dest, uint8_t tid) {
+        if (!IsBlocked(dest, tid)) {
+            m_blockedQosPackets.push_back(std::make_pair(dest, tid));
         }
     }
-  return false;
-}
 
-void
-QosBlockedDestinations::Block (Mac48Address dest, uint8_t tid)
-{
-  if (!IsBlocked (dest, tid))
-    {
-      m_blockedQosPackets.push_back (std::make_pair (dest, tid));
-    }
-}
-
-void
-QosBlockedDestinations::Unblock (Mac48Address dest, uint8_t tid)
-{
-  for (BlockedPacketsI i = m_blockedQosPackets.begin (); i != m_blockedQosPackets.end (); i++)
-    {
-      if (i->first == dest && i->second == tid)
-        {
-          m_blockedQosPackets.erase (i);
-          break;
+    void
+    QosBlockedDestinations::Unblock(Mac48Address dest, uint8_t tid) {
+        for (BlockedPacketsI i = m_blockedQosPackets.begin(); i != m_blockedQosPackets.end(); i++) {
+            if (i->first == dest && i->second == tid) {
+                m_blockedQosPackets.erase(i);
+                break;
+            }
         }
     }
-}
 
 } //namespace ns3

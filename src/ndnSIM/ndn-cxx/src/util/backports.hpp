@@ -33,43 +33,42 @@
 namespace ndn {
 
 #if __cpp_lib_make_unique
-using std::make_unique;
+    using std::make_unique;
 #else
+
 template<typename T, typename ...Args>
-inline unique_ptr<T>
-make_unique(Args&&... args)
-{
-  return unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
+    inline unique_ptr<T>
+    make_unique(Args&&... args) {
+        return unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
 #endif // __cpp_lib_make_unique
 
 #ifdef NDN_CXX_HAVE_STD_TO_STRING
-using std::to_string;
+    using std::to_string;
 #else
+
 template<typename V>
-inline std::string
-to_string(const V& v)
-{
-  return boost::lexical_cast<std::string>(v);
-}
+    inline std::string
+    to_string(const V& v) {
+        return boost::lexical_cast<std::string>(v);
+    }
 #endif // NDN_CXX_HAVE_STD_TO_STRING
 
 #if __cpp_lib_clamp >= 201603
-using std::clamp;
+    using std::clamp;
 #else
-template<typename T, typename Compare>
-constexpr const T&
-clamp(const T& v, const T& lo, const T& hi, Compare comp)
-{
-  return comp(v, lo) ? lo : comp(hi, v) ? hi : v;
-}
 
-template<typename T>
-constexpr const T&
-clamp(const T& v, const T& lo, const T& hi)
-{
-  return (v < lo) ? lo : (hi < v) ? hi : v;
-}
+template<typename T, typename Compare>
+    constexpr const T&
+    clamp(const T& v, const T& lo, const T& hi, Compare comp) {
+        return comp(v, lo) ? lo : comp(hi, v) ? hi : v;
+    }
+
+    template<typename T>
+    constexpr const T&
+    clamp(const T& v, const T& lo, const T& hi) {
+        return (v < lo) ? lo : (hi < v) ? hi : v;
+    }
 #endif // __cpp_lib_clamp
 
 } // namespace ndn

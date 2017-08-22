@@ -29,162 +29,132 @@
 #include "ns3/names.h"
 #include "ipv6-routing-helper.h"
 
-namespace ns3 {
-
-Ipv6RoutingHelper::~Ipv6RoutingHelper ()
+namespace ns3
 {
-}
 
-void
-Ipv6RoutingHelper::PrintRoutingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream)
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printTime, &Ipv6RoutingHelper::Print, node, stream);
+    Ipv6RoutingHelper::~Ipv6RoutingHelper() {
     }
-}
 
-void
-Ipv6RoutingHelper::PrintRoutingTableAllEvery (Time printInterval, Ptr<OutputStreamWrapper> stream)
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
-    }
-}
-
-void
-Ipv6RoutingHelper::PrintRoutingTableAt (Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Simulator::Schedule (printTime, &Ipv6RoutingHelper::Print, node, stream);
-}
-
-void
-Ipv6RoutingHelper::PrintRoutingTableEvery (Time printInterval,Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
-}
-
-void
-Ipv6RoutingHelper::Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Ptr<Ipv6> ipv6 = node->GetObject<Ipv6> ();
-  if (ipv6)
-    {
-      Ptr<Ipv6RoutingProtocol> rp = ipv6->GetRoutingProtocol ();
-      NS_ASSERT (rp);
-      rp->PrintRoutingTable (stream);
-    }
-}
-
-void
-Ipv6RoutingHelper::PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Ptr<Ipv6> ipv6 = node->GetObject<Ipv6> ();
-  if (ipv6)
-    {
-      Ptr<Ipv6RoutingProtocol> rp = ipv6->GetRoutingProtocol ();
-      NS_ASSERT (rp);
-      rp->PrintRoutingTable (stream);
-      Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
-    }
-}
-
-void
-Ipv6RoutingHelper::PrintNeighborCacheAllAt (Time printTime, Ptr<OutputStreamWrapper> stream)
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printTime, &Ipv6RoutingHelper::PrintNdiscCache, node, stream);
-    }
-}
-
-void
-Ipv6RoutingHelper::PrintNeighborCacheAllEvery (Time printInterval, Ptr<OutputStreamWrapper> stream)
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
-    }
-}
-
-void
-Ipv6RoutingHelper::PrintNeighborCacheAt (Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Simulator::Schedule (printTime, &Ipv6RoutingHelper::PrintNdiscCache, node, stream);
-}
-
-void
-Ipv6RoutingHelper::PrintNeighborCacheEvery (Time printInterval,Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
-}
-
-void
-Ipv6RoutingHelper::PrintNdiscCache (Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-  if (ipv6)
-    {
-      std::ostream* os = stream->GetStream ();
-
-      *os << "NDISC Cache of node ";
-      std::string found = Names::FindName (node);
-      if (Names::FindName (node) != "")
-        {
-          *os << found;
+    void
+    Ipv6RoutingHelper::PrintRoutingTableAllAt(Time printTime, Ptr<OutputStreamWrapper> stream) {
+        for (uint32_t i = 0; i < NodeList::GetNNodes(); i++) {
+            Ptr<Node> node = NodeList::GetNode(i);
+            Simulator::Schedule(printTime, &Ipv6RoutingHelper::Print, node, stream);
         }
-      else
-        {
-          *os << static_cast<int> (node->GetId ());
-        }
-      *os << " at time " << Simulator::Now ().GetSeconds () << "\n";
+    }
 
-      for (uint32_t i=0; i<ipv6->GetNInterfaces(); i++)
-        {
-          Ptr<NdiscCache> ndiscCache = ipv6->GetInterface (i)->GetNdiscCache ();
-          if (ndiscCache)
-            {
-              ndiscCache->PrintNdiscCache (stream);
+    void
+    Ipv6RoutingHelper::PrintRoutingTableAllEvery(Time printInterval, Ptr<OutputStreamWrapper> stream) {
+        for (uint32_t i = 0; i < NodeList::GetNNodes(); i++) {
+            Ptr<Node> node = NodeList::GetNode(i);
+            Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
+        }
+    }
+
+    void
+    Ipv6RoutingHelper::PrintRoutingTableAt(Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Simulator::Schedule(printTime, &Ipv6RoutingHelper::Print, node, stream);
+    }
+
+    void
+    Ipv6RoutingHelper::PrintRoutingTableEvery(Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
+    }
+
+    void
+    Ipv6RoutingHelper::Print(Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Ptr<Ipv6> ipv6 = node->GetObject<Ipv6> ();
+        if (ipv6) {
+            Ptr<Ipv6RoutingProtocol> rp = ipv6->GetRoutingProtocol();
+            NS_ASSERT(rp);
+            rp->PrintRoutingTable(stream);
+        }
+    }
+
+    void
+    Ipv6RoutingHelper::PrintEvery(Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Ptr<Ipv6> ipv6 = node->GetObject<Ipv6> ();
+        if (ipv6) {
+            Ptr<Ipv6RoutingProtocol> rp = ipv6->GetRoutingProtocol();
+            NS_ASSERT(rp);
+            rp->PrintRoutingTable(stream);
+            Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintEvery, printInterval, node, stream);
+        }
+    }
+
+    void
+    Ipv6RoutingHelper::PrintNeighborCacheAllAt(Time printTime, Ptr<OutputStreamWrapper> stream) {
+        for (uint32_t i = 0; i < NodeList::GetNNodes(); i++) {
+            Ptr<Node> node = NodeList::GetNode(i);
+            Simulator::Schedule(printTime, &Ipv6RoutingHelper::PrintNdiscCache, node, stream);
+        }
+    }
+
+    void
+    Ipv6RoutingHelper::PrintNeighborCacheAllEvery(Time printInterval, Ptr<OutputStreamWrapper> stream) {
+        for (uint32_t i = 0; i < NodeList::GetNNodes(); i++) {
+            Ptr<Node> node = NodeList::GetNode(i);
+            Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
+        }
+    }
+
+    void
+    Ipv6RoutingHelper::PrintNeighborCacheAt(Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Simulator::Schedule(printTime, &Ipv6RoutingHelper::PrintNdiscCache, node, stream);
+    }
+
+    void
+    Ipv6RoutingHelper::PrintNeighborCacheEvery(Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
+    }
+
+    void
+    Ipv6RoutingHelper::PrintNdiscCache(Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
+        if (ipv6) {
+            std::ostream* os = stream->GetStream();
+
+            *os << "NDISC Cache of node ";
+            std::string found = Names::FindName(node);
+            if (Names::FindName(node) != "") {
+                *os << found;
+            } else {
+                *os << static_cast<int> (node->GetId());
+            }
+            *os << " at time " << Simulator::Now().GetSeconds() << "\n";
+
+            for (uint32_t i = 0; i < ipv6->GetNInterfaces(); i++) {
+                Ptr<NdiscCache> ndiscCache = ipv6->GetInterface(i)->GetNdiscCache();
+                if (ndiscCache) {
+                    ndiscCache->PrintNdiscCache(stream);
+                }
             }
         }
     }
-}
 
-void
-Ipv6RoutingHelper::PrintNdiscCacheEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream)
-{
-  Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-  if (ipv6)
-    {
-      std::ostream* os = stream->GetStream ();
+    void
+    Ipv6RoutingHelper::PrintNdiscCacheEvery(Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) {
+        Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
+        if (ipv6) {
+            std::ostream* os = stream->GetStream();
 
-      *os << "NDISC Cache of node ";
-      std::string found = Names::FindName (node);
-      if (Names::FindName (node) != "")
-        {
-          *os << found;
-        }
-      else
-        {
-          *os << static_cast<int> (node->GetId ());
-        }
-      *os << " at time " << Simulator::Now ().GetSeconds () << "\n";
-
-      for (uint32_t i=0; i<ipv6->GetNInterfaces(); i++)
-        {
-          Ptr<NdiscCache> ndiscCache = ipv6->GetInterface (i)->GetNdiscCache ();
-          if (ndiscCache)
-            {
-              ndiscCache->PrintNdiscCache (stream);
+            *os << "NDISC Cache of node ";
+            std::string found = Names::FindName(node);
+            if (Names::FindName(node) != "") {
+                *os << found;
+            } else {
+                *os << static_cast<int> (node->GetId());
             }
+            *os << " at time " << Simulator::Now().GetSeconds() << "\n";
+
+            for (uint32_t i = 0; i < ipv6->GetNInterfaces(); i++) {
+                Ptr<NdiscCache> ndiscCache = ipv6->GetInterface(i)->GetNdiscCache();
+                if (ndiscCache) {
+                    ndiscCache->PrintNdiscCache(stream);
+                }
+            }
+            Simulator::Schedule(printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
         }
-      Simulator::Schedule (printInterval, &Ipv6RoutingHelper::PrintNdiscCacheEvery, printInterval, node, stream);
     }
-}
 
 } // namespace ns3

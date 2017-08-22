@@ -30,51 +30,50 @@
 #include <ndn-cxx/mgmt/nfd/controller.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-using ndn::nfd::Controller;
-using ndn::nfd::CommandOptions;
+            using ndn::nfd::Controller;
+            using ndn::nfd::CommandOptions;
 
-/** \brief provides access to an NFD management module
- *  \note This type is an interface. It should not have member fields.
- */
-class Module
-{
-public:
-  virtual
-  ~Module() = default;
+            /** \brief provides access to an NFD management module
+             *  \note This type is an interface. It should not have member fields.
+             */
+            class Module {
+            public:
+                virtual
+                ~Module() = default;
 
-  /** \brief collect status from NFD
-   *  \pre no other fetchStatus is in progress
-   *  \param controller a controller through which StatusDataset can be requested
-   *  \param onSuccess invoked when status has been collected into this instance
-   *  \param onFailure passed to controller.fetch
-   *  \param options passed to controller.fetch
-   */
-  virtual void
-  fetchStatus(Controller& controller,
-              const function<void()>& onSuccess,
-              const Controller::DatasetFailCallback& onFailure,
-              const CommandOptions& options) = 0;
+                /** \brief collect status from NFD
+                 *  \pre no other fetchStatus is in progress
+                 *  \param controller a controller through which StatusDataset can be requested
+                 *  \param onSuccess invoked when status has been collected into this instance
+                 *  \param onFailure passed to controller.fetch
+                 *  \param options passed to controller.fetch
+                 */
+                virtual void
+                fetchStatus(Controller& controller,
+                        const function<void()>& onSuccess,
+                        const Controller::DatasetFailCallback& onFailure,
+                        const CommandOptions& options) = 0;
 
-  /** \brief format collected status as XML
-   *  \pre fetchStatus has been successful
-   *  \param os output stream
-   */
-  virtual void
-  formatStatusXml(std::ostream& os) const = 0;
+                /** \brief format collected status as XML
+                 *  \pre fetchStatus has been successful
+                 *  \param os output stream
+                 */
+                virtual void
+                formatStatusXml(std::ostream& os) const = 0;
 
-  /** \brief format collected status as text
-   *  \pre fetchStatus has been successful
-   *  \param os output stream
-   */
-  virtual void
-  formatStatusText(std::ostream& os) const = 0;
-};
+                /** \brief format collected status as text
+                 *  \pre fetchStatus has been successful
+                 *  \param os output stream
+                 */
+                virtual void
+                formatStatusText(std::ostream& os) const = 0;
+            };
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_MODULE_HPP

@@ -26,84 +26,83 @@
 #include "../security-common.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to encrypt data using block cipher.
- *
- * The padding scheme of the block cipher is set to the default padding scheme of OpenSSl,
- * which is PKCS padding.
- */
-class BlockCipher : public Transform
-{
-public:
-  /**
-   * @brief Create a block cipher
-   *
-   * @param algo   The block cipher algorithm (e.g., EncryptMode::AES_CBC).
-   * @param op     The operation that the cipher needs to perform, e.g., CipherOperator::ENCRYPT or CipherOperator::DECRYPT
-   * @param key    The pointer to the key.
-   * @param keyLen The size of the key.
-   * @param iv     The pointer to the initial vector.
-   * @param ivLen  The length of the initial vector.
-   */
-  BlockCipher(BlockCipherAlgorithm algo, CipherOperator op,
-              const uint8_t* key, size_t keyLen,
-              const uint8_t* iv, size_t ivLen);
+            /**
+             * @brief The module to encrypt data using block cipher.
+             *
+             * The padding scheme of the block cipher is set to the default padding scheme of OpenSSl,
+             * which is PKCS padding.
+             */
+            class BlockCipher : public Transform {
+            public:
+                /**
+                 * @brief Create a block cipher
+                 *
+                 * @param algo   The block cipher algorithm (e.g., EncryptMode::AES_CBC).
+                 * @param op     The operation that the cipher needs to perform, e.g., CipherOperator::ENCRYPT or CipherOperator::DECRYPT
+                 * @param key    The pointer to the key.
+                 * @param keyLen The size of the key.
+                 * @param iv     The pointer to the initial vector.
+                 * @param ivLen  The length of the initial vector.
+                 */
+                BlockCipher(BlockCipherAlgorithm algo, CipherOperator op,
+                        const uint8_t* key, size_t keyLen,
+                        const uint8_t* iv, size_t ivLen);
 
-private:
-  /**
-   * @brief Read partial transformation result (if exists) from BIO
-   */
-  virtual void
-  preTransform() final;
+            private:
+                /**
+                 * @brief Read partial transformation result (if exists) from BIO
+                 */
+                virtual void
+                preTransform() final;
 
-  /**
-   * @brief Write @p data into the cipher
-   *
-   * @return number of bytes that are actually accepted
-   */
-  virtual size_t
-  convert(const uint8_t* data, size_t dataLen) final;
+                /**
+                 * @brief Write @p data into the cipher
+                 *
+                 * @return number of bytes that are actually accepted
+                 */
+                virtual size_t
+                convert(const uint8_t* data, size_t dataLen) final;
 
-  /**
-   * @brief Finalize the encryption
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize the encryption
+                 */
+                virtual void
+                finalize() final;
 
-  /**
-   * @brief Fill output buffer with the encryption result from BIO.
-   */
-  void
-  fillOutputBuffer();
+                /**
+                 * @brief Fill output buffer with the encryption result from BIO.
+                 */
+                void
+                fillOutputBuffer();
 
-  /**
-   * @return true if the cipher does not have partial result.
-   */
-  bool
-  isConverterEmpty() const;
+                /**
+                 * @return true if the cipher does not have partial result.
+                 */
+                bool
+                isConverterEmpty() const;
 
-private:
+            private:
 
-  void
-  initializeAesCbc(const uint8_t* key, size_t keyLen,
-                   const uint8_t* iv, size_t ivLen,
-                   CipherOperator op);
+                void
+                initializeAesCbc(const uint8_t* key, size_t keyLen,
+                        const uint8_t* iv, size_t ivLen,
+                        CipherOperator op);
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-blockCipher(BlockCipherAlgorithm algo, CipherOperator op,
-            const uint8_t* key, size_t keyLen,
-            const uint8_t* iv, size_t ivLen);
+            unique_ptr<Transform>
+            blockCipher(BlockCipherAlgorithm algo, CipherOperator op,
+                    const uint8_t* key, size_t keyLen,
+                    const uint8_t* iv, size_t ivLen);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_BLOCK_CIPHER_HPP

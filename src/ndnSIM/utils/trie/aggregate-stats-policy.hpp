@@ -24,141 +24,133 @@
 #include <boost/intrusive/list.hpp>
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-/// @cond include_hidden
+            /// @cond include_hidden
 
-/**
- * @brief Traits for policy that just keeps track of number of elements
- * It's doing a rather expensive job, but just in case it needs to be extended later
- */
-struct aggregate_stats_policy_traits {
-  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string
-  GetName()
-  {
-    return "AggregateStats";
-  }
-  struct policy_hook_type {
-  };
+            /**
+             * @brief Traits for policy that just keeps track of number of elements
+             * It's doing a rather expensive job, but just in case it needs to be extended later
+             */
+            struct aggregate_stats_policy_traits {
+                /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
 
-  template<class Container>
-  struct container_hook {
-    struct type {
-    };
-  };
+                static std::string
+                GetName() {
+                    return "AggregateStats";
+                }
 
-  template<class Base, class Container, class Hook>
-  struct policy {
-    // typedef typename boost::intrusive::list< Container, Hook > policy_container;
+                struct policy_hook_type {
+                };
 
-    // could be just typedef
-    class type {
-    public:
-      typedef Container parent_trie;
+                template<class Container>
+                struct container_hook {
 
-      type(Base& base)
-        : base_(base)
-        , m_updates(0)
-        , m_inserts(0)
-        , m_lookups(0)
-        , m_erases(0)
-      {
-      }
+                    struct type {
+                    };
+                };
 
-      inline void
-      update(typename parent_trie::iterator item)
-      {
-        m_updates++;
-        // do nothing
-      }
+                template<class Base, class Container, class Hook>
+                struct policy {
+                    // typedef typename boost::intrusive::list< Container, Hook > policy_container;
 
-      inline bool
-      insert(typename parent_trie::iterator item)
-      {
-        m_inserts++;
-        return true;
-      }
+                    // could be just typedef
 
-      inline void
-      lookup(typename parent_trie::iterator item)
-      {
-        m_lookups++;
-      }
+                    class type {
+                    public:
+                        typedef Container parent_trie;
 
-      inline void
-      erase(typename parent_trie::iterator item)
-      {
-        m_erases++;
-      }
+                        type(Base& base)
+                        : base_(base)
+                        , m_updates(0)
+                        , m_inserts(0)
+                        , m_lookups(0)
+                        , m_erases(0) {
+                        }
 
-      inline void set_max_size(uint32_t)
-      {
-      }
+                        inline void
+                        update(typename parent_trie::iterator item) {
+                            m_updates++;
+                            // do nothing
+                        }
 
-      inline uint32_t
-      get_max_size() const
-      {
-        return 0;
-      }
+                        inline bool
+                        insert(typename parent_trie::iterator item) {
+                            m_inserts++;
+                            return true;
+                        }
 
-      inline void
-      clear()
-      {
-        // is called only at the end of simulation
-      }
+                        inline void
+                        lookup(typename parent_trie::iterator item) {
+                            m_lookups++;
+                        }
 
-      inline void
-      ResetStats()
-      {
-        m_updates = 0;
-        m_inserts = 0;
-        m_lookups = 0;
-        m_erases = 0;
-      }
+                        inline void
+                        erase(typename parent_trie::iterator item) {
+                            m_erases++;
+                        }
 
-      inline uint64_t
-      GetUpdates() const
-      {
-        return m_updates;
-      }
+                        inline void set_max_size(uint32_t) {
+                        }
 
-      inline uint64_t
-      GetInserts() const
-      {
-        return m_inserts;
-      }
+                        inline uint32_t
+                        get_max_size() const {
+                            return 0;
+                        }
 
-      inline uint64_t
-      GetLookups() const
-      {
-        return m_lookups;
-      }
+                        inline void
+                        clear() {
+                            // is called only at the end of simulation
+                        }
 
-      inline uint64_t
-      GetErases() const
-      {
-        return m_erases;
-      }
+                        inline void
+                        ResetStats() {
+                            m_updates = 0;
+                            m_inserts = 0;
+                            m_lookups = 0;
+                            m_erases = 0;
+                        }
 
-    private:
-      type()
-        : base_(*((Base*)0)){};
+                        inline uint64_t
+                        GetUpdates() const {
+                            return m_updates;
+                        }
 
-    private:
-      Base& base_;
+                        inline uint64_t
+                        GetInserts() const {
+                            return m_inserts;
+                        }
 
-      uint64_t m_updates;
-      uint64_t m_inserts;
-      uint64_t m_lookups;
-      uint64_t m_erases;
-    };
-  };
-};
+                        inline uint64_t
+                        GetLookups() const {
+                            return m_lookups;
+                        }
 
-} // ndnSIM
-} // ndn
+                        inline uint64_t
+                        GetErases() const {
+                            return m_erases;
+                        }
+
+                    private:
+
+                        type()
+                        : base_(*((Base*) 0)) {
+                        };
+
+                    private:
+                        Base& base_;
+
+                        uint64_t m_updates;
+                        uint64_t m_inserts;
+                        uint64_t m_lookups;
+                        uint64_t m_erases;
+                    };
+                };
+            };
+
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

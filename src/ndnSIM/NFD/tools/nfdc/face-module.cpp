@@ -47,126 +47,120 @@
 #include "format-helpers.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-void
-FaceModule::fetchStatus(Controller& controller,
-                        const function<void()>& onSuccess,
-                        const Controller::DatasetFailCallback& onFailure,
-                        const CommandOptions& options)
-{
-  controller.fetch<ndn::nfd::FaceDataset>(
-    [this, onSuccess] (const std::vector<FaceStatus>& result) {
-      m_status = result;
-      onSuccess();
-    },
-    onFailure, options);
-}
+            void
+            FaceModule::fetchStatus(Controller& controller,
+                    const function<void()>& onSuccess,
+                    const Controller::DatasetFailCallback& onFailure,
+                    const CommandOptions& options) {
+                controller.fetch<ndn::nfd::FaceDataset>(
+                        [this, onSuccess] (const std::vector<FaceStatus>& result) {
+                            m_status = result;
+                            onSuccess();
+                        },
+                onFailure, options);
+            }
 
-void
-FaceModule::formatStatusXml(std::ostream& os) const
-{
-  os << "<faces>";
-  for (const FaceStatus& item : m_status) {
-    this->formatItemXml(os, item);
-  }
-  os << "</faces>";
-}
+            void
+            FaceModule::formatStatusXml(std::ostream& os) const {
+                os << "<faces>";
+                for (const FaceStatus& item : m_status) {
+                    this->formatItemXml(os, item);
+                }
+                os << "</faces>";
+            }
 
-void
-FaceModule::formatItemXml(std::ostream& os, const FaceStatus& item) const
-{
-  os << "<face>";
+            void
+            FaceModule::formatItemXml(std::ostream& os, const FaceStatus& item) const {
+                os << "<face>";
 
-  os << "<faceId>" << item.getFaceId() << "</faceId>";
-  os << "<remoteUri>" << xml::Text{item.getRemoteUri()} << "</remoteUri>";
-  os << "<localUri>" << xml::Text{item.getLocalUri()} << "</localUri>";
+                os << "<faceId>" << item.getFaceId() << "</faceId>";
+                os << "<remoteUri>" << xml::Text{item.getRemoteUri()} << "</remoteUri>";
+                os << "<localUri>" << xml::Text{item.getLocalUri()} << "</localUri>";
 
-  if (item.hasExpirationPeriod()) {
-    os << "<expirationPeriod>" << xml::formatDuration(item.getExpirationPeriod())
-       << "</expirationPeriod>";
-  }
-  os << "<faceScope>" << item.getFaceScope() << "</faceScope>";
-  os << "<facePersistency>" << item.getFacePersistency() << "</facePersistency>";
-  os << "<linkType>" << item.getLinkType() << "</linkType>";
+                if (item.hasExpirationPeriod()) {
+                    os << "<expirationPeriod>" << xml::formatDuration(item.getExpirationPeriod())
+                            << "</expirationPeriod>";
+                }
+                os << "<faceScope>" << item.getFaceScope() << "</faceScope>";
+                os << "<facePersistency>" << item.getFacePersistency() << "</facePersistency>";
+                os << "<linkType>" << item.getLinkType() << "</linkType>";
 
-  if (item.getFlags() == 0) {
-    os << "<flags/>";
-  }
-  else {
-    os << "<flags>";
-    if (item.getFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED)) {
-      os << "<localFieldsEnabled/>";
-    }
-    os << "</flags>";
-  }
+                if (item.getFlags() == 0) {
+                    os << "<flags/>";
+                } else {
+                    os << "<flags>";
+                    if (item.getFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED)) {
+                        os << "<localFieldsEnabled/>";
+                    }
+                    os << "</flags>";
+                }
 
-  os << "<packetCounters>";
-  os << "<incomingPackets>"
-     << "<nInterests>" << item.getNInInterests() << "</nInterests>"
-     << "<nDatas>" << item.getNInDatas() << "</nDatas>"
-     << "<nNacks>" << item.getNInNacks() << "</nNacks>"
-     << "</incomingPackets>";
-  os << "<outgoingPackets>"
-     << "<nInterests>" << item.getNOutInterests() << "</nInterests>"
-     << "<nDatas>" << item.getNOutDatas() << "</nDatas>"
-     << "<nNacks>" << item.getNOutNacks() << "</nNacks>"
-     << "</outgoingPackets>";
-  os << "</packetCounters>";
+                os << "<packetCounters>";
+                os << "<incomingPackets>"
+                        << "<nInterests>" << item.getNInInterests() << "</nInterests>"
+                        << "<nDatas>" << item.getNInDatas() << "</nDatas>"
+                        << "<nNacks>" << item.getNInNacks() << "</nNacks>"
+                        << "</incomingPackets>";
+                os << "<outgoingPackets>"
+                        << "<nInterests>" << item.getNOutInterests() << "</nInterests>"
+                        << "<nDatas>" << item.getNOutDatas() << "</nDatas>"
+                        << "<nNacks>" << item.getNOutNacks() << "</nNacks>"
+                        << "</outgoingPackets>";
+                os << "</packetCounters>";
 
-  os << "<byteCounters>";
-  os << "<incomingBytes>" << item.getNInBytes() << "</incomingBytes>";
-  os << "<outgoingBytes>" << item.getNOutBytes() << "</outgoingBytes>";
-  os << "</byteCounters>";
+                os << "<byteCounters>";
+                os << "<incomingBytes>" << item.getNInBytes() << "</incomingBytes>";
+                os << "<outgoingBytes>" << item.getNOutBytes() << "</outgoingBytes>";
+                os << "</byteCounters>";
 
-  os << "</face>";
-}
+                os << "</face>";
+            }
 
-void
-FaceModule::formatStatusText(std::ostream& os) const
-{
-  os << "Faces:\n";
-  for (const FaceStatus& item : m_status) {
-    this->formatItemText(os, item);
-  }
-}
+            void
+            FaceModule::formatStatusText(std::ostream& os) const {
+                os << "Faces:\n";
+                for (const FaceStatus& item : m_status) {
+                    this->formatItemText(os, item);
+                }
+            }
 
-void
-FaceModule::formatItemText(std::ostream& os, const FaceStatus& item) const
-{
-  os << "  faceid=" << item.getFaceId();
-  os << " remote=" << item.getRemoteUri();
-  os << " local=" << item.getLocalUri();
+            void
+            FaceModule::formatItemText(std::ostream& os, const FaceStatus& item) const {
+                os << "  faceid=" << item.getFaceId();
+                os << " remote=" << item.getRemoteUri();
+                os << " local=" << item.getLocalUri();
 
-  if (item.hasExpirationPeriod()) {
-    os << " expires=" << text::formatDuration(item.getExpirationPeriod());
-  }
+                if (item.hasExpirationPeriod()) {
+                    os << " expires=" << text::formatDuration(item.getExpirationPeriod());
+                }
 
-  os << " counters={in={"
-     << item.getNInInterests() << "i "
-     << item.getNInDatas() << "d "
-     << item.getNInNacks() << "n "
-     << item.getNInBytes() << "B} ";
-  os << "out={"
-     << item.getNOutInterests() << "i "
-     << item.getNOutDatas() << "d "
-     << item.getNOutNacks() << "n "
-     << item.getNOutBytes() << "B}}";
+                os << " counters={in={"
+                        << item.getNInInterests() << "i "
+                        << item.getNInDatas() << "d "
+                        << item.getNInNacks() << "n "
+                        << item.getNInBytes() << "B} ";
+                os << "out={"
+                        << item.getNOutInterests() << "i "
+                        << item.getNOutDatas() << "d "
+                        << item.getNOutNacks() << "n "
+                        << item.getNOutBytes() << "B}}";
 
-  os << " " << item.getFaceScope();
-  os << " " << item.getFacePersistency();
-  os << " " << item.getLinkType();
+                os << " " << item.getFaceScope();
+                os << " " << item.getFacePersistency();
+                os << " " << item.getLinkType();
 
-  os << " flags={";
-  if (item.getFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED)) {
-    os << "local-fields";
-  }
-  os << "}";
+                os << " flags={";
+                if (item.getFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED)) {
+                    os << "local-fields";
+                }
+                os << "}";
 
-  os << "\n";
-}
+                os << "\n";
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

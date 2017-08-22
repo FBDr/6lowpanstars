@@ -26,287 +26,220 @@
 #include "lte-net-device.h"
 #include "lte-ue-net-device.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("LteControlMessage");
-
-LteControlMessage::LteControlMessage (void)
-{
-}
-
-
-LteControlMessage::~LteControlMessage (void)
-{
-}
-
-
-void
-LteControlMessage::SetMessageType (LteControlMessage::MessageType type)
-{
-  m_type = type;
-}
-
-
-LteControlMessage::MessageType
-LteControlMessage::GetMessageType (void)
-{
-  return m_type;
-}
-
-
-// ----------------------------------------------------------------------------------------------------------
-
-
-DlDciLteControlMessage::DlDciLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::DL_DCI);
-}
-
-
-DlDciLteControlMessage::~DlDciLteControlMessage (void)
+namespace ns3
 {
 
-}
+    NS_LOG_COMPONENT_DEFINE("LteControlMessage");
 
-void
-DlDciLteControlMessage::SetDci (DlDciListElement_s dci)
-{
-  m_dci = dci;
+    LteControlMessage::LteControlMessage(void) {
+    }
 
-}
+    LteControlMessage::~LteControlMessage(void) {
+    }
 
+    void
+    LteControlMessage::SetMessageType(LteControlMessage::MessageType type) {
+        m_type = type;
+    }
 
-DlDciListElement_s
-DlDciLteControlMessage::GetDci (void)
-{
-  return m_dci;
-}
+    LteControlMessage::MessageType
+    LteControlMessage::GetMessageType(void) {
+        return m_type;
+    }
 
 
-// ----------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------
 
+    DlDciLteControlMessage::DlDciLteControlMessage(void) {
+        SetMessageType(LteControlMessage::DL_DCI);
+    }
 
-UlDciLteControlMessage::UlDciLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::UL_DCI);
-}
+    DlDciLteControlMessage::~DlDciLteControlMessage(void) {
 
+    }
 
-UlDciLteControlMessage::~UlDciLteControlMessage (void)
-{
+    void
+    DlDciLteControlMessage::SetDci(DlDciListElement_s dci) {
+        m_dci = dci;
 
-}
+    }
 
-void
-UlDciLteControlMessage::SetDci (UlDciListElement_s dci)
-{
-  m_dci = dci;
+    DlDciListElement_s
+    DlDciLteControlMessage::GetDci(void) {
+        return m_dci;
+    }
 
-}
 
+    // ----------------------------------------------------------------------------------------------------------
 
-UlDciListElement_s
-UlDciLteControlMessage::GetDci (void)
-{
-  return m_dci;
-}
+    UlDciLteControlMessage::UlDciLteControlMessage(void) {
+        SetMessageType(LteControlMessage::UL_DCI);
+    }
 
+    UlDciLteControlMessage::~UlDciLteControlMessage(void) {
 
-// ----------------------------------------------------------------------------------------------------------
+    }
 
+    void
+    UlDciLteControlMessage::SetDci(UlDciListElement_s dci) {
+        m_dci = dci;
 
-DlCqiLteControlMessage::DlCqiLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::DL_CQI);
-}
+    }
 
+    UlDciListElement_s
+    UlDciLteControlMessage::GetDci(void) {
+        return m_dci;
+    }
 
-DlCqiLteControlMessage::~DlCqiLteControlMessage (void)
-{
 
-}
+    // ----------------------------------------------------------------------------------------------------------
 
-void
-DlCqiLteControlMessage::SetDlCqi (CqiListElement_s dlcqi)
-{
-  m_dlCqi = dlcqi;
+    DlCqiLteControlMessage::DlCqiLteControlMessage(void) {
+        SetMessageType(LteControlMessage::DL_CQI);
+    }
 
-}
+    DlCqiLteControlMessage::~DlCqiLteControlMessage(void) {
 
+    }
 
-CqiListElement_s
-DlCqiLteControlMessage::GetDlCqi (void)
-{
-  return m_dlCqi;
-}
+    void
+    DlCqiLteControlMessage::SetDlCqi(CqiListElement_s dlcqi) {
+        m_dlCqi = dlcqi;
 
+    }
 
+    CqiListElement_s
+    DlCqiLteControlMessage::GetDlCqi(void) {
+        return m_dlCqi;
+    }
 
-// ----------------------------------------------------------------------------------------------------------
 
 
-BsrLteControlMessage::BsrLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::BSR);
-}
+    // ----------------------------------------------------------------------------------------------------------
 
+    BsrLteControlMessage::BsrLteControlMessage(void) {
+        SetMessageType(LteControlMessage::BSR);
+    }
 
-BsrLteControlMessage::~BsrLteControlMessage (void)
-{
+    BsrLteControlMessage::~BsrLteControlMessage(void) {
 
-}
+    }
 
-void
-BsrLteControlMessage::SetBsr (MacCeListElement_s bsr)
-{
-  m_bsr = bsr;
+    void
+    BsrLteControlMessage::SetBsr(MacCeListElement_s bsr) {
+        m_bsr = bsr;
 
-}
+    }
 
+    MacCeListElement_s
+    BsrLteControlMessage::GetBsr(void) {
+        return m_bsr;
+    }
 
-MacCeListElement_s
-BsrLteControlMessage::GetBsr (void)
-{
-  return m_bsr;
-}
 
 
+    // ----------------------------------------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------------------------------------
+    RachPreambleLteControlMessage::RachPreambleLteControlMessage(void) {
+        SetMessageType(LteControlMessage::RACH_PREAMBLE);
+    }
 
+    void
+    RachPreambleLteControlMessage::SetRapId(uint32_t rapId) {
+        m_rapId = rapId;
+    }
 
-RachPreambleLteControlMessage::RachPreambleLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::RACH_PREAMBLE);
-}
+    uint32_t
+    RachPreambleLteControlMessage::GetRapId() const {
+        return m_rapId;
+    }
 
-void
-RachPreambleLteControlMessage::SetRapId (uint32_t rapId)
-{
-  m_rapId = rapId;
-}
 
-uint32_t 
-RachPreambleLteControlMessage::GetRapId () const
-{
-  return m_rapId;
-}
+    // ----------------------------------------------------------------------------------------------------------
 
+    RarLteControlMessage::RarLteControlMessage(void) {
+        SetMessageType(LteControlMessage::RAR);
+    }
 
-// ----------------------------------------------------------------------------------------------------------
+    void
+    RarLteControlMessage::SetRaRnti(uint16_t raRnti) {
+        m_raRnti = raRnti;
+    }
 
+    uint16_t
+    RarLteControlMessage::GetRaRnti() const {
+        return m_raRnti;
+    }
 
-RarLteControlMessage::RarLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::RAR);
-}
+    void
+    RarLteControlMessage::AddRar(Rar rar) {
+        m_rarList.push_back(rar);
+    }
 
+    std::list<RarLteControlMessage::Rar>::const_iterator
+    RarLteControlMessage::RarListBegin() const {
+        return m_rarList.begin();
+    }
 
-void
-RarLteControlMessage::SetRaRnti (uint16_t raRnti)
-{
-  m_raRnti = raRnti;
-}
+    std::list<RarLteControlMessage::Rar>::const_iterator
+    RarLteControlMessage::RarListEnd() const {
+        return m_rarList.end();
+    }
 
-uint16_t 
-RarLteControlMessage::GetRaRnti () const
-{
-  return m_raRnti;
-}
 
+    // ----------------------------------------------------------------------------------------------------------
 
-void
-RarLteControlMessage::AddRar (Rar rar)
-{
-  m_rarList.push_back (rar);
-}
+    MibLteControlMessage::MibLteControlMessage(void) {
+        SetMessageType(LteControlMessage::MIB);
+    }
 
-std::list<RarLteControlMessage::Rar>::const_iterator 
-RarLteControlMessage::RarListBegin () const
-{
-  return m_rarList.begin ();
-}
+    void
+    MibLteControlMessage::SetMib(LteRrcSap::MasterInformationBlock mib) {
+        m_mib = mib;
+    }
 
-std::list<RarLteControlMessage::Rar>::const_iterator 
-RarLteControlMessage::RarListEnd () const
-{
-  return m_rarList.end ();
-}
+    LteRrcSap::MasterInformationBlock
+    MibLteControlMessage::GetMib() const {
+        return m_mib;
+    }
 
 
-// ----------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------
 
+    Sib1LteControlMessage::Sib1LteControlMessage(void) {
+        SetMessageType(LteControlMessage::SIB1);
+    }
 
+    void
+    Sib1LteControlMessage::SetSib1(LteRrcSap::SystemInformationBlockType1 sib1) {
+        m_sib1 = sib1;
+    }
 
-MibLteControlMessage::MibLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::MIB);
-}
+    LteRrcSap::SystemInformationBlockType1
+    Sib1LteControlMessage::GetSib1() const {
+        return m_sib1;
+    }
 
 
-void
-MibLteControlMessage::SetMib (LteRrcSap::MasterInformationBlock  mib)
-{
-  m_mib = mib;
-}
+    // ---------------------------------------------------------------------------
 
-LteRrcSap::MasterInformationBlock 
-MibLteControlMessage::GetMib () const
-{
-  return m_mib;
-}
+    DlHarqFeedbackLteControlMessage::DlHarqFeedbackLteControlMessage(void) {
+        SetMessageType(LteControlMessage::DL_HARQ);
+    }
 
+    DlHarqFeedbackLteControlMessage::~DlHarqFeedbackLteControlMessage(void) {
 
-// ----------------------------------------------------------------------------------------------------------
+    }
 
+    void
+    DlHarqFeedbackLteControlMessage::SetDlHarqFeedback(DlInfoListElement_s m) {
+        m_dlInfoListElement = m;
+    }
 
-
-Sib1LteControlMessage::Sib1LteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::SIB1);
-}
-
-
-void
-Sib1LteControlMessage::SetSib1 (LteRrcSap::SystemInformationBlockType1 sib1)
-{
-  m_sib1 = sib1;
-}
-
-LteRrcSap::SystemInformationBlockType1
-Sib1LteControlMessage::GetSib1 () const
-{
-  return m_sib1;
-}
-
-
-// ---------------------------------------------------------------------------
-
-
-
-DlHarqFeedbackLteControlMessage::DlHarqFeedbackLteControlMessage (void)
-{
-  SetMessageType (LteControlMessage::DL_HARQ);
-}
-
-
-DlHarqFeedbackLteControlMessage::~DlHarqFeedbackLteControlMessage (void)
-{
-
-}
-
-void
-DlHarqFeedbackLteControlMessage::SetDlHarqFeedback (DlInfoListElement_s m)
-{
-  m_dlInfoListElement = m;
-}
-
-
-DlInfoListElement_s
-DlHarqFeedbackLteControlMessage::GetDlHarqFeedback (void)
-{
-  return m_dlInfoListElement;
-}
+    DlInfoListElement_s
+    DlHarqFeedbackLteControlMessage::GetDlHarqFeedback(void) {
+        return m_dlInfoListElement;
+    }
 
 
 } // namespace ns3

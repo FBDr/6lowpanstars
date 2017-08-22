@@ -26,86 +26,82 @@
 NS_LOG_COMPONENT_DEFINE("RequesterApp");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-class RequesterApp : public App
-{
-public:
-  static TypeId
-  GetTypeId()
-  {
-    static TypeId tid = TypeId("RequesterApp")
-      .SetParent<App>()
-      .AddConstructor<RequesterApp>()
-      .AddAttribute("Name", "Name of data to request",
-                    StringValue("/data/name"),
-                    MakeNameAccessor(&RequesterApp::m_name), MakeNameChecker())
-      .AddAttribute("Delegation", "Delegation name to attach to Interest",
-                    StringValue("/"),
-                    MakeNameAccessor(&RequesterApp::getDelegation, &RequesterApp::setDelegation), MakeNameChecker())
-      ;
+        class RequesterApp : public App {
+        public:
 
-    return tid;
-  }
+            static TypeId
+            GetTypeId() {
+                static TypeId tid = TypeId("RequesterApp")
+                        .SetParent<App>()
+                        .AddConstructor<RequesterApp>()
+                        .AddAttribute("Name", "Name of data to request",
+                        StringValue("/data/name"),
+                        MakeNameAccessor(&RequesterApp::m_name), MakeNameChecker())
+                        .AddAttribute("Delegation", "Delegation name to attach to Interest",
+                        StringValue("/"),
+                        MakeNameAccessor(&RequesterApp::getDelegation, &RequesterApp::setDelegation), MakeNameChecker())
+                        ;
 
-protected:
-  virtual void
-  StartApplication() override
-  {
-    App::StartApplication();
+                return tid;
+            }
 
-    Simulator::Schedule(Seconds(1.0), &RequesterApp::sendInterest, this);
-  }
+        protected:
 
-  virtual void
-  StopApplication() override
-  {
-    // do cleanup
-    App::StopApplication();
-    m_face->close();
-  }
+            virtual void
+            StartApplication() override {
+                App::StartApplication();
 
-private:
-  void
-  setDelegation(const Name& delegation)
-  {
-    m_delegation = delegation;
+                Simulator::Schedule(Seconds(1.0), &RequesterApp::sendInterest, this);
+            }
 
-    m_link = ::ndn::Link(Name(m_name).append("/LINK"));
-    m_link.addDelegation(1, m_delegation);
-    ndn::StackHelper::getKeyChain().sign(m_link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
+            virtual void
+            StopApplication() override {
+                // do cleanup
+                App::StopApplication();
+                m_face->close();
+            }
 
-    NS_LOG_DEBUG("Created Link Object "<< m_link);
-  }
+        private:
 
-  Name
-  getDelegation() const
-  {
-    return m_delegation;
-  }
+            void
+            setDelegation(const Name& delegation) {
+                m_delegation = delegation;
 
-  void
-  sendInterest()
-  {
-    auto interest = make_shared<Interest>(m_name);
-    interest->setInterestLifetime(time::seconds(1));
-    if (m_delegation.size() > 0) {
-      interest->setLink(m_link.wireEncode());
-    }
+                m_link = ::ndn::Link(Name(m_name).append("/LINK"));
+                m_link.addDelegation(1, m_delegation);
+                ndn::StackHelper::getKeyChain().sign(m_link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
 
-    NS_LOG_DEBUG("Sending an Interest for "<< *interest);
+                NS_LOG_DEBUG("Created Link Object " << m_link);
+            }
 
-    m_transmittedInterests(interest, this, m_face);
-    m_appLink->onReceiveInterest(*interest);
-  }
+            Name
+            getDelegation() const {
+                return m_delegation;
+            }
 
-private:
-  Name m_name;
-  Name m_delegation;
-  ::ndn::Link m_link;
-};
+            void
+            sendInterest() {
+                auto interest = make_shared<Interest>(m_name);
+                interest->setInterestLifetime(time::seconds(1));
+                if (m_delegation.size() > 0) {
+                    interest->setLink(m_link.wireEncode());
+                }
 
-NS_OBJECT_ENSURE_REGISTERED(RequesterApp);
+                NS_LOG_DEBUG("Sending an Interest for " << *interest);
 
-} // namespace ndn
+                m_transmittedInterests(interest, this, m_face);
+                m_appLink->onReceiveInterest(*interest);
+            }
+
+        private:
+            Name m_name;
+            Name m_delegation;
+            ::ndn::Link m_link;
+        };
+
+        NS_OBJECT_ENSURE_REGISTERED(RequesterApp);
+
+    } // namespace ndn
 } // namespace ns3

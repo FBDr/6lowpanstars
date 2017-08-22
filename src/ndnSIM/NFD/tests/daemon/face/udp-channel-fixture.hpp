@@ -32,42 +32,41 @@
 #include "channel-fixture.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class UdpChannelFixture : public ChannelFixture<UdpChannel, udp::Endpoint>
-{
-protected:
-  virtual unique_ptr<UdpChannel>
-  makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0) final
-  {
-    if (port == 0)
-      port = getNextPort();
+        class UdpChannelFixture : public ChannelFixture<UdpChannel, udp::Endpoint> {
+        protected:
 
-    return make_unique<UdpChannel>(udp::Endpoint(addr, port), time::seconds(2));
-  }
+            virtual unique_ptr<UdpChannel>
+            makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0) final {
+                if (port == 0)
+                    port = getNextPort();
 
-  virtual void
-  connect(UdpChannel& channel) final
-  {
-    g_io.post([&] {
-      channel.connect(listenerEp, ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-        [this] (const shared_ptr<Face>& newFace) {
-          BOOST_REQUIRE(newFace != nullptr);
-          connectFaceClosedSignal(*newFace, [this] { limitedIo.afterOp(); });
-          clientFaces.push_back(newFace);
-          face::Transport::Packet pkt(ndn::encoding::makeStringBlock(300, "hello"));
-          newFace->getTransport()->send(std::move(pkt));
-          limitedIo.afterOp();
-        },
-        ChannelFixture::unexpectedFailure);
-    });
-  }
+                return make_unique<UdpChannel>(udp::Endpoint(addr, port), time::seconds(2));
+            }
 
-protected:
-  std::vector<shared_ptr<Face>> clientFaces;
-};
+            virtual void
+            connect(UdpChannel& channel) final {
+                g_io.post([&] {
+                    channel.connect(listenerEp, ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                            [this] (const shared_ptr<Face>& newFace) {
+                                BOOST_REQUIRE(newFace != nullptr);
+                                connectFaceClosedSignal(*newFace, [this] {
+                                    limitedIo.afterOp(); });
+                                clientFaces.push_back(newFace);
+                                face::Transport::Packet pkt(ndn::encoding::makeStringBlock(300, "hello"));
+                                newFace->getTransport()->send(std::move(pkt));
+                                limitedIo.afterOp();
+                            },
+                    ChannelFixture::unexpectedFailure);
+                });
+            }
 
-} // namespace tests
+        protected:
+            std::vector<shared_ptr<Face>> clientFaces;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_UDP_CHANNEL_FIXTURE_HPP

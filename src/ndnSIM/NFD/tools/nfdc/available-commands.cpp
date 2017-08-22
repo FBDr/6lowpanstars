@@ -30,39 +30,36 @@
 #include "legacy-nfdc.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-void
-registerCommands(CommandParser& parser)
-{
-  registerHelpCommand(parser);
-  registerStatusCommands(parser);
-  registerLegacyStatusCommand(parser);
+            void
+            registerCommands(CommandParser& parser) {
+                registerHelpCommand(parser);
+                registerStatusCommands(parser);
+                registerLegacyStatusCommand(parser);
 
-  struct LegacyNfdcCommandDefinition
-  {
-    std::string subcommand;
-    std::string title;
-  };
-  const std::vector<LegacyNfdcCommandDefinition> legacyNfdcSubcommands{
-    {"register", "register a prefix"},
-    {"unregister", "unregister a prefix"},
-    {"create", "create a face"},
-    {"destroy", "destroy a face"},
-    {"set-strategy", "set strategy choice on namespace"},
-    {"unset-strategy", "unset strategy choice on namespace"},
-    {"add-nexthop", "add FIB nexthop"},
-    {"remove-nexthop", "remove FIB nexthop"}
-  };
-  for (const LegacyNfdcCommandDefinition& lncd : legacyNfdcSubcommands) {
-    CommandDefinition def(lncd.subcommand, "");
-    def.setTitle(lncd.title);
-    def.addArg("args", ArgValueType::ANY, Required::NO, Positional::YES);
-    parser.addCommand(def, &legacyNfdcMain);
-  }
-}
+                struct LegacyNfdcCommandDefinition {
+                    std::string subcommand;
+                    std::string title;
+                };
+                const std::vector<LegacyNfdcCommandDefinition> legacyNfdcSubcommands{
+                    {"register", "register a prefix"},
+                    {"unregister", "unregister a prefix"},
+                    {"create", "create a face"},
+                    {"destroy", "destroy a face"},
+                    {"set-strategy", "set strategy choice on namespace"},
+                    {"unset-strategy", "unset strategy choice on namespace"},
+                    {"add-nexthop", "add FIB nexthop"},
+                    {"remove-nexthop", "remove FIB nexthop"}};
+                for (const LegacyNfdcCommandDefinition& lncd : legacyNfdcSubcommands) {
+                    CommandDefinition def(lncd.subcommand, "");
+                    def.setTitle(lncd.title);
+                    def.addArg("args", ArgValueType::ANY, Required::NO, Positional::YES);
+                    parser.addCommand(def, &legacyNfdcMain);
+                }
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

@@ -28,173 +28,162 @@
 #include "certificate-cache-ttl.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-const shared_ptr<CertificateCache> ValidatorRegex::DEFAULT_CERTIFICATE_CACHE;
+        const shared_ptr<CertificateCache> ValidatorRegex::DEFAULT_CERTIFICATE_CACHE;
 
-ValidatorRegex::ValidatorRegex(Face* face,
-                               shared_ptr<CertificateCache> certificateCache,
-                               const int stepLimit)
-  : Validator(face)
-  , m_stepLimit(stepLimit)
-  , m_certificateCache(certificateCache)
-{
-  if (!static_cast<bool>(m_certificateCache) && face != nullptr)
-    m_certificateCache = make_shared<CertificateCacheTtl>(ref(face->getIoService()));
-}
+        ValidatorRegex::ValidatorRegex(Face* face,
+                shared_ptr<CertificateCache> certificateCache,
+                const int stepLimit)
+        : Validator(face)
+        , m_stepLimit(stepLimit)
+        , m_certificateCache(certificateCache) {
+            if (!static_cast<bool> (m_certificateCache) && face != nullptr)
+                m_certificateCache = make_shared<CertificateCacheTtl>(ref(face->getIoService()));
+        }
 
-ValidatorRegex::ValidatorRegex(Face& face,
-                               shared_ptr<CertificateCache> certificateCache,
-                               const int stepLimit)
-  : Validator(face)
-  , m_stepLimit(stepLimit)
-  , m_certificateCache(certificateCache)
-{
-  if (certificateCache == nullptr)
-    m_certificateCache = make_shared<CertificateCacheTtl>(ref(face.getIoService()));
-}
+        ValidatorRegex::ValidatorRegex(Face& face,
+                shared_ptr<CertificateCache> certificateCache,
+                const int stepLimit)
+        : Validator(face)
+        , m_stepLimit(stepLimit)
+        , m_certificateCache(certificateCache) {
+            if (certificateCache == nullptr)
+                m_certificateCache = make_shared<CertificateCacheTtl>(ref(face.getIoService()));
+        }
 
-void
-ValidatorRegex::addDataVerificationRule(shared_ptr<SecRuleRelative> rule)
-{
-  rule->isPositive() ? m_verifyPolicies.push_back(rule) : m_mustFailVerify.push_back(rule);
-}
+        void
+        ValidatorRegex::addDataVerificationRule(shared_ptr<SecRuleRelative> rule) {
+            rule->isPositive() ? m_verifyPolicies.push_back(rule) : m_mustFailVerify.push_back(rule);
+        }
 
-void
-ValidatorRegex::addTrustAnchor(shared_ptr<v1::IdentityCertificate> certificate)
-{
-  m_trustAnchors[certificate->getName().getPrefix(-1)] = certificate;
-}
+        void
+        ValidatorRegex::addTrustAnchor(shared_ptr<v1::IdentityCertificate> certificate) {
+            m_trustAnchors[certificate->getName().getPrefix(-1)] = certificate;
+        }
 
-void
-ValidatorRegex::onCertificateValidated(const shared_ptr<const Data>& signCertificate,
-                                       const shared_ptr<const Data>& data,
-                                       const OnDataValidated& onValidated,
-                                       const OnDataValidationFailed& onValidationFailed)
-{
-  shared_ptr<v1::IdentityCertificate> certificate =
-    make_shared<v1::IdentityCertificate>(*signCertificate);
+        void
+        ValidatorRegex::onCertificateValidated(const shared_ptr<const Data>& signCertificate,
+                const shared_ptr<const Data>& data,
+                const OnDataValidated& onValidated,
+                const OnDataValidationFailed& onValidationFailed) {
+            shared_ptr<v1::IdentityCertificate> certificate =
+                    make_shared<v1::IdentityCertificate>(*signCertificate);
 
-  if (!certificate->isTooLate() && !certificate->isTooEarly()) {
-    if (m_certificateCache != nullptr)
-      m_certificateCache->insertCertificate(certificate);
+            if (!certificate->isTooLate() && !certificate->isTooEarly()) {
+                if (m_certificateCache != nullptr)
+                    m_certificateCache->insertCertificate(certificate);
 
-    if (verifySignature(*data, certificate->getPublicKeyInfo()))
-      return onValidated(data);
-    else
-      return onValidationFailed(data,
-                                "Cannot verify signature: " +
-                                data->getName().toUri());
-  }
-  else {
-    return onValidationFailed(data,
-                              "Signing certificate " +
-                              signCertificate->getName().toUri() +
-                              " is no longer valid.");
-  }
-}
+                if (verifySignature(*data, certificate->getPublicKeyInfo()))
+                    return onValidated(data);
+                else
+                    return onValidationFailed(data,
+                        "Cannot verify signature: " +
+                        data->getName().toUri());
+            } else {
+                return onValidationFailed(data,
+                        "Signing certificate " +
+                        signCertificate->getName().toUri() +
+                        " is no longer valid.");
+            }
+        }
 
-void
-ValidatorRegex::onCertificateValidationFailed(const shared_ptr<const Data>& signCertificate,
-                                              const std::string& failureInfo,
-                                              const shared_ptr<const Data>& data,
-                                              const OnDataValidationFailed& onValidationFailed)
-{
-  onValidationFailed(data, failureInfo);
-}
+        void
+        ValidatorRegex::onCertificateValidationFailed(const shared_ptr<const Data>& signCertificate,
+                const std::string& failureInfo,
+                const shared_ptr<const Data>& data,
+                const OnDataValidationFailed& onValidationFailed) {
+            onValidationFailed(data, failureInfo);
+        }
 
-void
-ValidatorRegex::checkPolicy(const Data& data,
-                            int nSteps,
-                            const OnDataValidated& onValidated,
-                            const OnDataValidationFailed& onValidationFailed,
-                            std::vector<shared_ptr<ValidationRequest> >& nextSteps)
-{
-  if (m_stepLimit == nSteps)
-    return onValidationFailed(data.shared_from_this(),
-                              "Maximum steps of validation reached: " +
-                              data.getName().toUri());
+        void
+        ValidatorRegex::checkPolicy(const Data& data,
+                int nSteps,
+                const OnDataValidated& onValidated,
+                const OnDataValidationFailed& onValidationFailed,
+                std::vector<shared_ptr<ValidationRequest> >& nextSteps) {
+            if (m_stepLimit == nSteps)
+                return onValidationFailed(data.shared_from_this(),
+                    "Maximum steps of validation reached: " +
+                    data.getName().toUri());
 
-  for (RuleList::iterator it = m_mustFailVerify.begin();
-       it != m_mustFailVerify.end();
-       it++)
-    if ((*it)->satisfy(data))
-      return onValidationFailed(data.shared_from_this(),
-                                "Comply with mustFail policy: " +
+            for (RuleList::iterator it = m_mustFailVerify.begin();
+                    it != m_mustFailVerify.end();
+                    it++)
+                if ((*it)->satisfy(data))
+                    return onValidationFailed(data.shared_from_this(),
+                        "Comply with mustFail policy: " +
+                        data.getName().toUri());
+
+            for (RuleList::iterator it = m_verifyPolicies.begin();
+                    it != m_verifyPolicies.end();
+                    it++) {
+                if ((*it)->satisfy(data)) {
+                    try {
+                        if (!data.getSignature().hasKeyLocator())
+                            return onValidationFailed(data.shared_from_this(),
+                                "Key Locator is missing in Data packet: " +
                                 data.getName().toUri());
 
-  for (RuleList::iterator it = m_verifyPolicies.begin();
-       it != m_verifyPolicies.end();
-       it++) {
-    if ((*it)->satisfy(data)) {
-      try {
-        if (!data.getSignature().hasKeyLocator())
-          return onValidationFailed(data.shared_from_this(),
-                                    "Key Locator is missing in Data packet: " +
+                        const KeyLocator& keyLocator = data.getSignature().getKeyLocator();
+                        if (keyLocator.getType() != KeyLocator::KeyLocator_Name)
+                            return onValidationFailed(data.shared_from_this(),
+                                "Key Locator is not a name: " +
+                                data.getName().toUri());
+
+
+                        const Name& keyLocatorName = keyLocator.getName();
+                        shared_ptr<const v1::Certificate> trustedCert;
+                        if (m_trustAnchors.end() == m_trustAnchors.find(keyLocatorName) &&
+                                m_certificateCache != nullptr)
+                            trustedCert = m_certificateCache->getCertificate(keyLocatorName);
+                        else
+                            trustedCert = m_trustAnchors[keyLocatorName];
+
+                        if (trustedCert != nullptr) {
+                            if (verifySignature(data, data.getSignature(), trustedCert->getPublicKeyInfo()))
+                                return onValidated(data.shared_from_this());
+                            else
+                                return onValidationFailed(data.shared_from_this(),
+                                    "Cannot verify signature: " +
                                     data.getName().toUri());
+                        } else {
+                            // KeyLocator is not a trust anchor
 
-        const KeyLocator& keyLocator = data.getSignature().getKeyLocator();
-        if (keyLocator.getType() != KeyLocator::KeyLocator_Name)
-          return onValidationFailed(data.shared_from_this(),
-                                    "Key Locator is not a name: " +
-                                    data.getName().toUri());
+                            OnDataValidated onKeyValidated =
+                                    bind(&ValidatorRegex::onCertificateValidated, this, _1,
+                                    data.shared_from_this(), onValidated, onValidationFailed);
 
+                            OnDataValidationFailed onKeyValidationFailed =
+                                    bind(&ValidatorRegex::onCertificateValidationFailed, this, _1, _2,
+                                    data.shared_from_this(), onValidationFailed);
 
-        const Name& keyLocatorName = keyLocator.getName();
-        shared_ptr<const v1::Certificate> trustedCert;
-        if (m_trustAnchors.end() == m_trustAnchors.find(keyLocatorName) &&
-            m_certificateCache != nullptr)
-          trustedCert = m_certificateCache->getCertificate(keyLocatorName);
-        else
-          trustedCert = m_trustAnchors[keyLocatorName];
+                            Interest interest(keyLocatorName);
+                            shared_ptr<ValidationRequest> nextStep =
+                                    make_shared<ValidationRequest>(interest,
+                                    onKeyValidated,
+                                    onKeyValidationFailed,
+                                    3,
+                                    nSteps + 1);
 
-        if (trustedCert != nullptr) {
-          if (verifySignature(data, data.getSignature(), trustedCert->getPublicKeyInfo()))
-            return onValidated(data.shared_from_this());
-          else
+                            nextSteps.push_back(nextStep);
+
+                            return;
+                        }
+                    } catch (const KeyLocator::Error& e) {
+                        return onValidationFailed(data.shared_from_this(),
+                                "Key Locator is not a name: " +
+                                data.getName().toUri());
+                    } catch (const tlv::Error& e) {
+                        return onValidationFailed(data.shared_from_this(),
+                                "Cannot decode signature");
+                    }
+                }
+            }
+
             return onValidationFailed(data.shared_from_this(),
-                                      "Cannot verify signature: " +
-                                      data.getName().toUri());
+                    "No policy found for data: " + data.getName().toUri());
         }
-        else {
-          // KeyLocator is not a trust anchor
 
-          OnDataValidated onKeyValidated =
-            bind(&ValidatorRegex::onCertificateValidated, this, _1,
-                 data.shared_from_this(), onValidated, onValidationFailed);
-
-          OnDataValidationFailed onKeyValidationFailed =
-            bind(&ValidatorRegex::onCertificateValidationFailed, this, _1, _2,
-                 data.shared_from_this(), onValidationFailed);
-
-          Interest interest(keyLocatorName);
-          shared_ptr<ValidationRequest> nextStep =
-            make_shared<ValidationRequest>(interest,
-                                           onKeyValidated,
-                                           onKeyValidationFailed,
-                                           3,
-                                           nSteps + 1);
-
-          nextSteps.push_back(nextStep);
-
-          return;
-        }
-      }
-      catch (const KeyLocator::Error& e) {
-        return onValidationFailed(data.shared_from_this(),
-                                  "Key Locator is not a name: " +
-                                  data.getName().toUri());
-      }
-      catch (const tlv::Error& e) {
-        return onValidationFailed(data.shared_from_this(),
-                                  "Cannot decode signature");
-      }
-    }
-  }
-
-  return onValidationFailed(data.shared_from_this(),
-                            "No policy found for data: " + data.getName().toUri());
-}
-
-} // namespace security
+    } // namespace security
 } // namespace ndn

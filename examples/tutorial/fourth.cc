@@ -25,40 +25,38 @@ using namespace ns3;
 
 class MyObject : public Object
 {
-public:
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void)
-  {
-    static TypeId tid = TypeId ("MyObject")
-      .SetParent<Object> ()
-      .SetGroupName ("Tutorial")
-      .AddConstructor<MyObject> ()
-      .AddTraceSource ("MyInteger",
-                       "An integer value to trace.",
-                       MakeTraceSourceAccessor (&MyObject::m_myInt),
-                       "ns3::TracedValue::Int32Callback")
-    ;
-    return tid;
-  }
+    public :
+    /**
+     * Register this type.
+     * \return The TypeId.
+     */
+    static TypeId GetTypeId(void)
+    {
+        static TypeId tid = TypeId("MyObject")
+        .SetParent<Object> ()
+        .SetGroupName("Tutorial")
+        .AddConstructor<MyObject> ()
+        .AddTraceSource("MyInteger",
+        "An integer value to trace.",
+        MakeTraceSourceAccessor(&MyObject::m_myInt),
+        "ns3::TracedValue::Int32Callback")
+        ;
+        return tid;
+    }
 
-  MyObject () {}
-  TracedValue<int32_t> m_myInt;
-};
+    MyObject()
+    {}
+    TracedValue<int32_t> m_myInt;};
 
 void
-IntTrace (int32_t oldValue, int32_t newValue)
-{
-  std::cout << "Traced " << oldValue << " to " << newValue << std::endl;
+IntTrace(int32_t oldValue, int32_t newValue) {
+    std::cout << "Traced " << oldValue << " to " << newValue << std::endl;
 }
 
 int
-main (int argc, char *argv[])
-{
-  Ptr<MyObject> myObject = CreateObject<MyObject> ();
-  myObject->TraceConnectWithoutContext ("MyInteger", MakeCallback (&IntTrace));
+main(int argc, char *argv[]) {
+    Ptr<MyObject> myObject = CreateObject<MyObject> ();
+    myObject->TraceConnectWithoutContext("MyInteger", MakeCallback(&IntTrace));
 
-  myObject->m_myInt = 1234;
+    myObject->m_myInt = 1234;
 }

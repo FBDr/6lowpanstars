@@ -25,21 +25,20 @@
 #include "../encoding/block.hpp"
 
 namespace ndn {
-namespace mgmt {
+    namespace mgmt {
 
-/** \brief base class for a struct that contains ControlCommand parameters
- */
-class ControlParameters
-{
-public:
-  virtual void
-  wireDecode(const Block& wire) = 0;
+        /** \brief base class for a struct that contains ControlCommand parameters
+         */
+        class ControlParameters {
+        public:
+            virtual void
+            wireDecode(const Block& wire) = 0;
 
-  virtual Block
-  wireEncode() const = 0;
-};
+            virtual Block
+            wireEncode() const = 0;
+        };
 
-} // namespace mgmt
+    } // namespace mgmt
 } // namespace ndn
 
 #endif // NDN_MGMT_CONTROL_PARAMETERS_HPP

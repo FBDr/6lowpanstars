@@ -27,209 +27,198 @@
 
 namespace ndn {
 
-/**
- * @brief Base class of key parameters.
- *
- * Its subclasses are used to store parameters for key generation.
- */
-class KeyParams
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+    /**
+     * @brief Base class of key parameters.
+     *
+     * Its subclasses are used to store parameters for key generation.
+     */
+    class KeyParams {
+    public:
 
-  virtual
-  ~KeyParams()
-  {
-  }
+        class Error : public std::runtime_error {
+        public:
 
-  KeyType
-  getKeyType() const
-  {
-    return m_keyType;
-  }
+            explicit
+            Error(const std::string& what)
+            : std::runtime_error(what) {
+            }
+        };
 
-protected:
-  explicit
-  KeyParams(KeyType keyType)
-    : m_keyType(keyType)
-  {
-  }
+        virtual
+        ~KeyParams() {
+        }
 
-private:
-  KeyType m_keyType;
-};
+        KeyType
+        getKeyType() const {
+            return m_keyType;
+        }
+
+    protected:
+
+        explicit
+        KeyParams(KeyType keyType)
+        : m_keyType(keyType) {
+        }
+
+    private:
+        KeyType m_keyType;
+    };
 
 
-/// @brief RsaKeyParamInfo is used to initialize a SimplePublicKeyParams template for RSA key.
-class RsaKeyParamsInfo
-{
-public:
-  static KeyType
-  getType()
-  {
-    return KeyType::RSA;
-  }
+    /// @brief RsaKeyParamInfo is used to initialize a SimplePublicKeyParams template for RSA key.
 
-  /// @brief check if size is qualified, otherwise return the default key size.
-  static uint32_t
-  checkKeySize(uint32_t size);
+    class RsaKeyParamsInfo {
+    public:
 
-  static uint32_t
-  getDefaultSize();
-};
+        static KeyType
+        getType() {
+            return KeyType::RSA;
+        }
 
-/// @brief EcdsaKeyParamInfo is used to initialize a SimplePublicKeyParams template for ECDSA key.
-class EcdsaKeyParamsInfo
-{
-public:
-  static KeyType
-  getType()
-  {
-    return KeyType::EC;
-  }
+        /// @brief check if size is qualified, otherwise return the default key size.
+        static uint32_t
+        checkKeySize(uint32_t size);
 
-  /// @brief check if size is qualified, otherwise return the default key size.
-  static uint32_t
-  checkKeySize(uint32_t size);
+        static uint32_t
+        getDefaultSize();
+    };
 
-  static uint32_t
-  getDefaultSize();
-};
+    /// @brief EcdsaKeyParamInfo is used to initialize a SimplePublicKeyParams template for ECDSA key.
 
+    class EcdsaKeyParamsInfo {
+    public:
 
-/// @brief SimplePublicKeyParams is a template for public keys with only one parameter: size.
-template<typename KeyParamsInfo>
-class SimplePublicKeyParams : public KeyParams
-{
-public:
-  explicit
-  SimplePublicKeyParams(uint32_t size = KeyParamsInfo::getDefaultSize())
-    : KeyParams(KeyParamsInfo::getType())
-  {
-    setKeySize(size);
-  }
+        static KeyType
+        getType() {
+            return KeyType::EC;
+        }
 
-  explicit
-  SimplePublicKeyParams(const SimplePublicKeyParams& params)
-    : KeyParams(params)
-    , m_size(params.m_size)
-  {
-  }
+        /// @brief check if size is qualified, otherwise return the default key size.
+        static uint32_t
+        checkKeySize(uint32_t size);
 
-  explicit
-  SimplePublicKeyParams(const KeyParams& params)
-    : KeyParams(params.getKeyType())
-  {
-    BOOST_THROW_EXCEPTION(KeyParams::Error("Incorrect key parameters (incompatible key type)"));
-  }
-
-  uint32_t
-  getKeySize() const
-  {
-    return m_size;
-  }
-
-private:
-  void
-  setKeySize(uint32_t size)
-  {
-    m_size = KeyParamsInfo::checkKeySize(size);
-  }
-
-  uint32_t
-  getDefaultKeySize() const
-  {
-    return KeyParamsInfo::getDefaultSize();
-  }
-
-private:
-  uint32_t m_size;
-};
-
-/// @brief RsaKeyParams carries parameters for RSA key.
-typedef SimplePublicKeyParams<RsaKeyParamsInfo> RsaKeyParams;
-
-/// @brief EcdsaKeyParams carries parameters for ECDSA key.
-typedef SimplePublicKeyParams<EcdsaKeyParamsInfo> EcdsaKeyParams;
+        static uint32_t
+        getDefaultSize();
+    };
 
 
-/// @brief AesKeyParamsInfo is used to initialize a SimpleSymmetricKeyParams template for AES key.
-class AesKeyParamsInfo
-{
-public:
-  static KeyType
-  getType()
-  {
-    return KeyType::AES;
-  }
+    /// @brief SimplePublicKeyParams is a template for public keys with only one parameter: size.
 
-  /// @brief check if size is qualified, otherwise return the default key size.
-  static uint32_t
-  checkKeySize(uint32_t size);
+    template<typename KeyParamsInfo>
+    class SimplePublicKeyParams : public KeyParams {
+    public:
 
-  static uint32_t
-  getDefaultSize();
-};
+        explicit
+        SimplePublicKeyParams(uint32_t size = KeyParamsInfo::getDefaultSize())
+        : KeyParams(KeyParamsInfo::getType()) {
+            setKeySize(size);
+        }
+
+        explicit
+        SimplePublicKeyParams(const SimplePublicKeyParams& params)
+        : KeyParams(params)
+        , m_size(params.m_size) {
+        }
+
+        explicit
+        SimplePublicKeyParams(const KeyParams& params)
+        : KeyParams(params.getKeyType()) {
+            BOOST_THROW_EXCEPTION(KeyParams::Error("Incorrect key parameters (incompatible key type)"));
+        }
+
+        uint32_t
+        getKeySize() const {
+            return m_size;
+        }
+
+    private:
+
+        void
+        setKeySize(uint32_t size) {
+            m_size = KeyParamsInfo::checkKeySize(size);
+        }
+
+        uint32_t
+        getDefaultKeySize() const {
+            return KeyParamsInfo::getDefaultSize();
+        }
+
+    private:
+        uint32_t m_size;
+    };
+
+    /// @brief RsaKeyParams carries parameters for RSA key.
+    typedef SimplePublicKeyParams<RsaKeyParamsInfo> RsaKeyParams;
+
+    /// @brief EcdsaKeyParams carries parameters for ECDSA key.
+    typedef SimplePublicKeyParams<EcdsaKeyParamsInfo> EcdsaKeyParams;
 
 
-/// @brief SimpleSymmetricKeyParams is a template for symmetric keys with only one parameter: size.
-template<typename KeyParamsInfo>
-class SimpleSymmetricKeyParams : public KeyParams
-{
-public:
-  explicit
-  SimpleSymmetricKeyParams(uint32_t size = KeyParamsInfo::getDefaultSize())
-    : KeyParams(KeyParamsInfo::getType())
-  {
-    setKeySize(size);
-  }
+    /// @brief AesKeyParamsInfo is used to initialize a SimpleSymmetricKeyParams template for AES key.
 
-  explicit
-  SimpleSymmetricKeyParams(const SimpleSymmetricKeyParams& params)
-    : KeyParams(params)
-    , m_size(params.m_size)
-  {
-  }
+    class AesKeyParamsInfo {
+    public:
 
-  explicit
-  SimpleSymmetricKeyParams(const KeyParams& params)
-  {
-    BOOST_THROW_EXCEPTION(KeyParams::Error("Incorrect key parameters (incompatible key type)"));
-  }
+        static KeyType
+        getType() {
+            return KeyType::AES;
+        }
 
-  uint32_t
-  getKeySize() const
-  {
-    return m_size;
-  }
+        /// @brief check if size is qualified, otherwise return the default key size.
+        static uint32_t
+        checkKeySize(uint32_t size);
 
-private:
-  void
-  setKeySize(uint32_t size)
-  {
-    m_size = KeyParamsInfo::checkKeySize(size);
-  }
+        static uint32_t
+        getDefaultSize();
+    };
 
-  uint32_t
-  getDefaultKeySize() const
-  {
-    return KeyParamsInfo::getDefaultSize();
-  }
 
-private:
-  uint32_t m_size;
+    /// @brief SimpleSymmetricKeyParams is a template for symmetric keys with only one parameter: size.
 
-};
+    template<typename KeyParamsInfo>
+    class SimpleSymmetricKeyParams : public KeyParams {
+    public:
 
-typedef SimpleSymmetricKeyParams<AesKeyParamsInfo> AesKeyParams;
+        explicit
+        SimpleSymmetricKeyParams(uint32_t size = KeyParamsInfo::getDefaultSize())
+        : KeyParams(KeyParamsInfo::getType()) {
+            setKeySize(size);
+        }
+
+        explicit
+        SimpleSymmetricKeyParams(const SimpleSymmetricKeyParams& params)
+        : KeyParams(params)
+        , m_size(params.m_size) {
+        }
+
+        explicit
+        SimpleSymmetricKeyParams(const KeyParams& params) {
+            BOOST_THROW_EXCEPTION(KeyParams::Error("Incorrect key parameters (incompatible key type)"));
+        }
+
+        uint32_t
+        getKeySize() const {
+            return m_size;
+        }
+
+    private:
+
+        void
+        setKeySize(uint32_t size) {
+            m_size = KeyParamsInfo::checkKeySize(size);
+        }
+
+        uint32_t
+        getDefaultKeySize() const {
+            return KeyParamsInfo::getDefaultSize();
+        }
+
+    private:
+        uint32_t m_size;
+
+    };
+
+    typedef SimpleSymmetricKeyParams<AesKeyParamsInfo> AesKeyParams;
 
 } // namespace ndn
 

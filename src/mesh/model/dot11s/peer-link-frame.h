@@ -26,147 +26,143 @@
 #include "ie-dot11s-configuration.h"
 #include "ie-dot11s-peering-protocol.h"
 #include "ie-dot11s-id.h"
-namespace ns3
-{
-namespace dot11s
-{
-/**
- * \ingroup dot11s
- *
- * \brief 802.11s Peer link open management frame
- * 
- * Peer link opent frame includes the following:
- * - Capability
- * - Supported rates
- * - Mesh ID of mesh
- * - Configuration
- */
-class PeerLinkOpenStart : public Header
-{
-public:
-  PeerLinkOpenStart ();
-  ///\brief fields:
-  struct PlinkOpenStartFields
-  {
-    IePeeringProtocol protocol; //Peering protocol version - 3 octets
-    uint16_t capability;        //open and confirm
-    SupportedRates rates;       //open and confirm
-    IeMeshId meshId;            //open and close
-    IeConfiguration config;     //open and confirm
-  };
-  void SetPlinkOpenStart (PlinkOpenStartFields);
-  PlinkOpenStartFields GetFields () const;
+namespace ns3 {
+    namespace dot11s {
 
-  // Inherited from header:
-  static  TypeId   GetTypeId ();
-  virtual TypeId   GetInstanceTypeId () const;
-  virtual void     Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void     Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        /**
+         * \ingroup dot11s
+         *
+         * \brief 802.11s Peer link open management frame
+         * 
+         * Peer link opent frame includes the following:
+         * - Capability
+         * - Supported rates
+         * - Mesh ID of mesh
+         * - Configuration
+         */
+        class PeerLinkOpenStart : public Header {
+        public:
+            PeerLinkOpenStart();
+            ///\brief fields:
 
-private:
-  uint16_t m_capability;
-  SupportedRates m_rates;
-  IeMeshId m_meshId;
-  IeConfiguration m_config;
+            struct PlinkOpenStartFields {
+                IePeeringProtocol protocol; //Peering protocol version - 3 octets
+                uint16_t capability; //open and confirm
+                SupportedRates rates; //open and confirm
+                IeMeshId meshId; //open and close
+                IeConfiguration config; //open and confirm
+            };
+            void SetPlinkOpenStart(PlinkOpenStartFields);
+            PlinkOpenStartFields GetFields() const;
 
-  friend bool operator== (const PeerLinkOpenStart & a, const PeerLinkOpenStart & b);
+            // Inherited from header:
+            static TypeId GetTypeId();
+            virtual TypeId GetInstanceTypeId() const;
+            virtual void Print(std::ostream &os) const;
+            virtual uint32_t GetSerializedSize() const;
+            virtual void Serialize(Buffer::Iterator start) const;
+            virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  PeerLinkOpenStart& operator= (const PeerLinkOpenStart &);
-  PeerLinkOpenStart (const PeerLinkOpenStart &);
+        private:
+            uint16_t m_capability;
+            SupportedRates m_rates;
+            IeMeshId m_meshId;
+            IeConfiguration m_config;
 
-};
+            friend bool operator==(const PeerLinkOpenStart & a, const PeerLinkOpenStart & b);
 
-bool operator== (const PeerLinkOpenStart & a, const PeerLinkOpenStart & b);
+            PeerLinkOpenStart& operator=(const PeerLinkOpenStart &);
+            PeerLinkOpenStart(const PeerLinkOpenStart &);
 
-/**
- * \ingroup dot11s
- *
- * \brief 802.11s Peer link close management frame
- * 
- * Peer link close frame includes the following:
- * - Mesh ID of mesh
- */
-class PeerLinkCloseStart : public Header
-{
-public:
-  PeerLinkCloseStart ();
-  ///\brief fields:
-  struct PlinkCloseStartFields
-  {
-    IePeeringProtocol protocol; //Peering protocol version - 3 octets
-    IeMeshId meshId;            //open and close
-  };
-  void SetPlinkCloseStart (PlinkCloseStartFields);
-  PlinkCloseStartFields GetFields () const;
+        };
 
-  // Inherited from header:
-  static  TypeId   GetTypeId ();
-  virtual TypeId   GetInstanceTypeId () const;
-  virtual void     Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void     Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        bool operator==(const PeerLinkOpenStart & a, const PeerLinkOpenStart & b);
 
-private:
-  IeMeshId m_meshId;
+        /**
+         * \ingroup dot11s
+         *
+         * \brief 802.11s Peer link close management frame
+         * 
+         * Peer link close frame includes the following:
+         * - Mesh ID of mesh
+         */
+        class PeerLinkCloseStart : public Header {
+        public:
+            PeerLinkCloseStart();
+            ///\brief fields:
 
-  friend bool operator== (const PeerLinkCloseStart & a, const PeerLinkCloseStart & b);
+            struct PlinkCloseStartFields {
+                IePeeringProtocol protocol; //Peering protocol version - 3 octets
+                IeMeshId meshId; //open and close
+            };
+            void SetPlinkCloseStart(PlinkCloseStartFields);
+            PlinkCloseStartFields GetFields() const;
 
-  PeerLinkCloseStart& operator= (const PeerLinkCloseStart &);
-  PeerLinkCloseStart (const PeerLinkCloseStart &);
+            // Inherited from header:
+            static TypeId GetTypeId();
+            virtual TypeId GetInstanceTypeId() const;
+            virtual void Print(std::ostream &os) const;
+            virtual uint32_t GetSerializedSize() const;
+            virtual void Serialize(Buffer::Iterator start) const;
+            virtual uint32_t Deserialize(Buffer::Iterator start);
 
-};
-bool operator== (const PeerLinkCloseStart & a, const PeerLinkCloseStart & b);
+        private:
+            IeMeshId m_meshId;
 
-/**
- * \ingroup dot11s
- *
- * \brief 802.11s Peer link confirm management frame
- * 
- * Peer link confirm frame includes the following:
- * - Association ID field
- * - Supported rates
- * - Configuration
- */
-class PeerLinkConfirmStart : public Header
-{
-public:
-  PeerLinkConfirmStart ();
-  ///\brief fields:
-  struct PlinkConfirmStartFields
-  {
-    IePeeringProtocol protocol; //Peering protocol version - 3 octets
-    uint16_t capability;        //open and confirm
-    uint16_t aid;               //confirm only
-    SupportedRates rates;       //open and confirm
-    IeConfiguration config;     //open and confirm
-  };
-  void SetPlinkConfirmStart (PlinkConfirmStartFields);
-  PlinkConfirmStartFields GetFields () const;
+            friend bool operator==(const PeerLinkCloseStart & a, const PeerLinkCloseStart & b);
 
-  // Inherited from header:
-  static  TypeId   GetTypeId ();
-  virtual TypeId   GetInstanceTypeId () const;
-  virtual void     Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void     Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+            PeerLinkCloseStart& operator=(const PeerLinkCloseStart &);
+            PeerLinkCloseStart(const PeerLinkCloseStart &);
 
-private:
-  uint16_t m_capability;
-  uint16_t m_aid;
-  SupportedRates m_rates;
-  IeConfiguration m_config;
+        };
+        bool operator==(const PeerLinkCloseStart & a, const PeerLinkCloseStart & b);
 
-  friend bool operator== (const PeerLinkConfirmStart & a, const PeerLinkConfirmStart & b);
+        /**
+         * \ingroup dot11s
+         *
+         * \brief 802.11s Peer link confirm management frame
+         * 
+         * Peer link confirm frame includes the following:
+         * - Association ID field
+         * - Supported rates
+         * - Configuration
+         */
+        class PeerLinkConfirmStart : public Header {
+        public:
+            PeerLinkConfirmStart();
+            ///\brief fields:
 
-  PeerLinkConfirmStart& operator= (const PeerLinkConfirmStart &);
-  PeerLinkConfirmStart (const PeerLinkConfirmStart &);
+            struct PlinkConfirmStartFields {
+                IePeeringProtocol protocol; //Peering protocol version - 3 octets
+                uint16_t capability; //open and confirm
+                uint16_t aid; //confirm only
+                SupportedRates rates; //open and confirm
+                IeConfiguration config; //open and confirm
+            };
+            void SetPlinkConfirmStart(PlinkConfirmStartFields);
+            PlinkConfirmStartFields GetFields() const;
 
-};
-bool operator== (const PeerLinkConfirmStart & a, const PeerLinkConfirmStart & b);
-} // namespace dot11s
+            // Inherited from header:
+            static TypeId GetTypeId();
+            virtual TypeId GetInstanceTypeId() const;
+            virtual void Print(std::ostream &os) const;
+            virtual uint32_t GetSerializedSize() const;
+            virtual void Serialize(Buffer::Iterator start) const;
+            virtual uint32_t Deserialize(Buffer::Iterator start);
+
+        private:
+            uint16_t m_capability;
+            uint16_t m_aid;
+            SupportedRates m_rates;
+            IeConfiguration m_config;
+
+            friend bool operator==(const PeerLinkConfirmStart & a, const PeerLinkConfirmStart & b);
+
+            PeerLinkConfirmStart& operator=(const PeerLinkConfirmStart &);
+            PeerLinkConfirmStart(const PeerLinkConfirmStart &);
+
+        };
+        bool operator==(const PeerLinkConfirmStart & a, const PeerLinkConfirmStart & b);
+    } // namespace dot11s
 } // namespace ns3
 #endif

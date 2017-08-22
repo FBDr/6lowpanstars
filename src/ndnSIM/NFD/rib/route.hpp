@@ -30,78 +30,72 @@
 #include <ndn-cxx/encoding/nfd-constants.hpp>
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-/** \brief represents a route for a name prefix
- */
-class Route
-{
-public:
-  Route()
-    : faceId(0)
-    , origin(0)
-    , flags(0)
-    , cost(0)
-    , expires(time::steady_clock::TimePoint::min())
-    , m_expirationEvent()
-  {
-  }
+        /** \brief represents a route for a name prefix
+         */
+        class Route {
+        public:
 
-  bool
-  operator==(const Route& other) const;
+            Route()
+            : faceId(0)
+            , origin(0)
+            , flags(0)
+            , cost(0)
+            , expires(time::steady_clock::TimePoint::min())
+            , m_expirationEvent() {
+            }
 
-public:
-  void
-  setExpirationEvent(const scheduler::EventId eid)
-  {
-    m_expirationEvent = eid;
-  }
+            bool
+            operator==(const Route& other) const;
 
-  const scheduler::EventId&
-  getExpirationEvent() const
-  {
-    return m_expirationEvent;
-  }
+        public:
 
-  bool
-  isChildInherit() const
-  {
-    return flags & ndn::nfd::ROUTE_FLAG_CHILD_INHERIT;
-  }
+            void
+            setExpirationEvent(const scheduler::EventId eid) {
+                m_expirationEvent = eid;
+            }
 
-  bool
-  isCapture() const
-  {
-    return flags & ndn::nfd::ROUTE_FLAG_CAPTURE;
-  }
+            const scheduler::EventId&
+            getExpirationEvent() const {
+                return m_expirationEvent;
+            }
 
-public:
-  uint64_t faceId;
-  uint64_t origin;
-  uint64_t flags;
-  uint64_t cost;
-  time::steady_clock::TimePoint expires;
+            bool
+            isChildInherit() const {
+                return flags & ndn::nfd::ROUTE_FLAG_CHILD_INHERIT;
+            }
 
-private:
-  scheduler::EventId m_expirationEvent;
-};
+            bool
+            isCapture() const {
+                return flags & ndn::nfd::ROUTE_FLAG_CAPTURE;
+            }
 
-inline bool
-compareFaceIdAndOrigin(const Route& lhs, const Route& rhs)
-{
-  return (lhs.faceId == rhs.faceId && lhs.origin == rhs.origin);
-}
+        public:
+            uint64_t faceId;
+            uint64_t origin;
+            uint64_t flags;
+            uint64_t cost;
+            time::steady_clock::TimePoint expires;
 
-inline bool
-compareFaceId(const Route& route, const uint64_t faceId)
-{
-  return (route.faceId == faceId);
-}
+        private:
+            scheduler::EventId m_expirationEvent;
+        };
 
-std::ostream&
-operator<<(std::ostream& os, const Route& route);
+        inline bool
+        compareFaceIdAndOrigin(const Route& lhs, const Route& rhs) {
+            return (lhs.faceId == rhs.faceId && lhs.origin == rhs.origin);
+        }
 
-} // namespace rib
+        inline bool
+        compareFaceId(const Route& route, const uint64_t faceId) {
+            return (route.faceId == faceId);
+        }
+
+        std::ostream&
+        operator<<(std::ostream& os, const Route& route);
+
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_ROUTE_HPP

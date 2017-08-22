@@ -23,7 +23,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     CoapServerHelper::CoapServerHelper(uint16_t port) {
         m_factory.SetTypeId(CoapServer::GetTypeId());
@@ -33,7 +34,7 @@ namespace ns3 {
     void
     CoapServerHelper::SetAttribute(
             std::string name,
-            const AttributeValue &value) {
+            const AttributeValue & value) {
         m_factory.Set(name, value);
     }
 
@@ -64,7 +65,7 @@ namespace ns3 {
     }
 
     Ptr<Application>
-    CoapServerHelper::InstallPriv(Ptr<Node> node) const {
+            CoapServerHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapServer> ();
         node->AddApplication(app);
 
@@ -79,7 +80,7 @@ namespace ns3 {
     void
     CoapClientHelper::SetAttribute(
             std::string name,
-            const AttributeValue &value) {
+            const AttributeValue & value) {
         m_factory.Set(name, value);
     }
 
@@ -125,7 +126,7 @@ namespace ns3 {
     }
 
     Ptr<Application>
-    CoapClientHelper::InstallPriv(Ptr<Node> node) const {
+            CoapClientHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapClient> ();
         node->AddApplication(app);
 

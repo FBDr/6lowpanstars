@@ -47,134 +47,129 @@
 #endif // HAVE_PRIVILEGE_DROP_AND_ELEVATE
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-/** \brief base test fixture
- *
- *  Every test case should be based on this fixture,
- *  to have per test case io_service initialization.
- */
-class BaseFixture
-{
-protected:
-  BaseFixture();
+        /** \brief base test fixture
+         *
+         *  Every test case should be based on this fixture,
+         *  to have per test case io_service initialization.
+         */
+        class BaseFixture {
+        protected:
+            BaseFixture();
 
-  ~BaseFixture();
+            ~BaseFixture();
 
-protected:
-  /** \brief reference to global io_service
-   */
-  boost::asio::io_service& g_io;
-};
+        protected:
+            /** \brief reference to global io_service
+             */
+            boost::asio::io_service& g_io;
+        };
 
-/** \brief a base test fixture that overrides steady clock and system clock
- */
-class UnitTestTimeFixture : public virtual BaseFixture
-{
-protected:
-  UnitTestTimeFixture();
+        /** \brief a base test fixture that overrides steady clock and system clock
+         */
+        class UnitTestTimeFixture : public virtual BaseFixture {
+        protected:
+            UnitTestTimeFixture();
 
-  ~UnitTestTimeFixture();
+            ~UnitTestTimeFixture();
 
-  /** \brief advance steady and system clocks
-   *
-   *  Clocks are advanced in increments of \p tick for \p nTicks ticks.
-   *  After each tick, global io_service is polled to process pending I/O events.
-   *
-   *  Exceptions thrown during I/O events are propagated to the caller.
-   *  Clock advancing would stop in case of an exception.
-   */
-  void
-  advanceClocks(const time::nanoseconds& tick, size_t nTicks = 1);
+            /** \brief advance steady and system clocks
+             *
+             *  Clocks are advanced in increments of \p tick for \p nTicks ticks.
+             *  After each tick, global io_service is polled to process pending I/O events.
+             *
+             *  Exceptions thrown during I/O events are propagated to the caller.
+             *  Clock advancing would stop in case of an exception.
+             */
+            void
+            advanceClocks(const time::nanoseconds& tick, size_t nTicks = 1);
 
-  /** \brief advance steady and system clocks
-   *
-   *  Clocks are advanced in increments of \p tick for \p total time.
-   *  The last increment might be shorter than \p tick.
-   *  After each tick, global io_service is polled to process pending I/O events.
-   *
-   *  Exceptions thrown during I/O events are propagated to the caller.
-   *  Clock advancing would stop in case of an exception.
-   */
-  void
-  advanceClocks(const time::nanoseconds& tick, const time::nanoseconds& total);
+            /** \brief advance steady and system clocks
+             *
+             *  Clocks are advanced in increments of \p tick for \p total time.
+             *  The last increment might be shorter than \p tick.
+             *  After each tick, global io_service is polled to process pending I/O events.
+             *
+             *  Exceptions thrown during I/O events are propagated to the caller.
+             *  Clock advancing would stop in case of an exception.
+             */
+            void
+            advanceClocks(const time::nanoseconds& tick, const time::nanoseconds& total);
 
-protected:
-  shared_ptr<time::UnitTestSteadyClock> steadyClock;
-  shared_ptr<time::UnitTestSystemClock> systemClock;
+        protected:
+            shared_ptr<time::UnitTestSteadyClock> steadyClock;
+            shared_ptr<time::UnitTestSystemClock> systemClock;
 
-  friend class LimitedIo;
-};
+            friend class LimitedIo;
+        };
 
-/** \brief create an Interest
- *  \param name Interest name
- *  \param nonce if non-zero, set Nonce to this value
- *               (useful for creating Nack with same Nonce)
- */
-shared_ptr<Interest>
-makeInterest(const Name& name, uint32_t nonce = 0);
+        /** \brief create an Interest
+         *  \param name Interest name
+         *  \param nonce if non-zero, set Nonce to this value
+         *               (useful for creating Nack with same Nonce)
+         */
+        shared_ptr<Interest>
+        makeInterest(const Name& name, uint32_t nonce = 0);
 
-/** \brief create a Data with fake signature
- *  \note Data may be modified afterwards without losing the fake signature.
- *        If a real signature is desired, sign again with KeyChain.
- */
-shared_ptr<Data>
-makeData(const Name& name);
+        /** \brief create a Data with fake signature
+         *  \note Data may be modified afterwards without losing the fake signature.
+         *        If a real signature is desired, sign again with KeyChain.
+         */
+        shared_ptr<Data>
+        makeData(const Name& name);
 
-/** \brief add a fake signature to Data
- */
-Data&
-signData(Data& data);
+        /** \brief add a fake signature to Data
+         */
+        Data&
+        signData(Data& data);
 
-/** \brief add a fake signature to Data
- */
-inline shared_ptr<Data>
-signData(shared_ptr<Data> data)
-{
-  signData(*data);
-  return data;
-}
+        /** \brief add a fake signature to Data
+         */
+        inline shared_ptr<Data>
+        signData(shared_ptr<Data> data) {
+            signData(*data);
+            return data;
+        }
 
-/** \brief create a Link object with fake signature
- *  \note Link may be modified afterwards without losing the fake signature.
- *        If a real signature is desired, sign again with KeyChain.
- */
-shared_ptr<Link>
-makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations);
+        /** \brief create a Link object with fake signature
+         *  \note Link may be modified afterwards without losing the fake signature.
+         *        If a real signature is desired, sign again with KeyChain.
+         */
+        shared_ptr<Link>
+        makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations);
 
-/** \brief create a Nack
- *  \param name Interest name
- *  \param nonce Interest nonce
- *  \param reason Nack reason
- */
-lp::Nack
-makeNack(const Name& name, uint32_t nonce, lp::NackReason reason);
+        /** \brief create a Nack
+         *  \param name Interest name
+         *  \param nonce Interest nonce
+         *  \param reason Nack reason
+         */
+        lp::Nack
+        makeNack(const Name& name, uint32_t nonce, lp::NackReason reason);
 
-/** \brief replace a name component
- *  \param[inout] name name
- *  \param index name component index
- *  \param a arguments to name::Component constructor
- */
-template<typename...A>
-void
-setNameComponent(Name& name, ssize_t index, const A& ...a)
-{
-  Name name2 = name.getPrefix(index);
-  name2.append(name::Component(a...));
-  name2.append(name.getSubName(name2.size()));
-  name = name2;
-}
+        /** \brief replace a name component
+         *  \param[inout] name name
+         *  \param index name component index
+         *  \param a arguments to name::Component constructor
+         */
+        template<typename...A>
+        void
+        setNameComponent(Name& name, ssize_t index, const A& ...a) {
+            Name name2 = name.getPrefix(index);
+            name2.append(name::Component(a...));
+            name2.append(name.getSubName(name2.size()));
+            name = name2;
+        }
 
-template<typename Packet, typename...A>
-void
-setNameComponent(Packet& packet, ssize_t index, const A& ...a)
-{
-  Name name = packet.getName();
-  setNameComponent(name, index, a...);
-  packet.setName(name);
-}
+        template<typename Packet, typename...A>
+        void
+        setNameComponent(Packet& packet, ssize_t index, const A& ...a) {
+            Name name = packet.getName();
+            setNameComponent(name, index, a...);
+            packet.setName(name);
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_TEST_COMMON_HPP

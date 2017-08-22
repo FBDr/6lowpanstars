@@ -29,248 +29,228 @@
 #include <boost/asio/io_service.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-class DummyClientFace::Transport : public ndn::Transport
-{
-public:
-  void
-  receive(Block block) const
-  {
-    block.encode();
-    if (m_receiveCallback) {
-      m_receiveCallback(block);
-    }
-  }
+        class DummyClientFace::Transport : public ndn::Transport {
+        public:
 
-  virtual void
-  close() override
-  {
-  }
+            void
+            receive(Block block) const {
+                block.encode();
+                if (m_receiveCallback) {
+                    m_receiveCallback(block);
+                }
+            }
 
-  virtual void
-  pause() override
-  {
-  }
+            virtual void
+            close() override {
+            }
 
-  virtual void
-  resume() override
-  {
-  }
+            virtual void
+            pause() override {
+            }
 
-  virtual void
-  send(const Block& wire) override
-  {
-    onSendBlock(wire);
-  }
+            virtual void
+            resume() override {
+            }
 
-  virtual void
-  send(const Block& header, const Block& payload) override
-  {
-    EncodingBuffer encoder(header.size() + payload.size(), header.size() + payload.size());
-    encoder.appendByteArray(header.wire(), header.size());
-    encoder.appendByteArray(payload.wire(), payload.size());
+            virtual void
+            send(const Block& wire) override {
+                onSendBlock(wire);
+            }
 
-    this->send(encoder.block());
-  }
+            virtual void
+            send(const Block& header, const Block& payload) override {
+                EncodingBuffer encoder(header.size() + payload.size(), header.size() + payload.size());
+                encoder.appendByteArray(header.wire(), header.size());
+                encoder.appendByteArray(payload.wire(), payload.size());
 
-  boost::asio::io_service&
-  getIoService()
-  {
-    return *m_ioService;
-  }
+                this->send(encoder.block());
+            }
 
-public:
-  Signal<Transport, Block> onSendBlock;
-};
+            boost::asio::io_service&
+            getIoService() {
+                return *m_ioService;
+            }
 
-DummyClientFace::DummyClientFace(const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
-  : Face(make_shared<DummyClientFace::Transport>())
-  , m_internalKeyChain(new KeyChain)
-  , m_keyChain(*m_internalKeyChain)
-{
-  this->construct(options);
-}
+        public:
+            Signal<Transport, Block> onSendBlock;
+        };
 
-DummyClientFace::DummyClientFace(KeyChain& keyChain,
-                                 const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
-  : Face(make_shared<DummyClientFace::Transport>(), keyChain)
-  , m_keyChain(keyChain)
-{
-  this->construct(options);
-}
-
-DummyClientFace::DummyClientFace(boost::asio::io_service& ioService,
-                                 const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
-  : Face(make_shared<DummyClientFace::Transport>(), ioService)
-  , m_internalKeyChain(new KeyChain)
-  , m_keyChain(*m_internalKeyChain)
-{
-  this->construct(options);
-}
-
-DummyClientFace::DummyClientFace(boost::asio::io_service& ioService, KeyChain& keyChain,
-                                 const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
-  : Face(make_shared<DummyClientFace::Transport>(), ioService, keyChain)
-  , m_keyChain(keyChain)
-{
-  this->construct(options);
-}
-
-void
-DummyClientFace::construct(const Options& options)
-{
-  static_pointer_cast<Transport>(getTransport())->onSendBlock.connect([this] (const Block& blockFromDaemon) {
-    Block packet(blockFromDaemon);
-    packet.encode();
-    lp::Packet lpPacket(packet);
-
-    Buffer::const_iterator begin, end;
-    std::tie(begin, end) = lpPacket.get<lp::FragmentField>();
-    Block block(&*begin, std::distance(begin, end));
-
-    if (block.type() == tlv::Interest) {
-      shared_ptr<Interest> interest = make_shared<Interest>(block);
-      if (lpPacket.has<lp::NackField>()) {
-        shared_ptr<lp::Nack> nack = make_shared<lp::Nack>(std::move(*interest));
-        nack->setHeader(lpPacket.get<lp::NackField>());
-        if (lpPacket.has<lp::NextHopFaceIdField>()) {
-          nack->setTag(make_shared<lp::NextHopFaceIdTag>(lpPacket.get<lp::NextHopFaceIdField>()));
+        DummyClientFace::DummyClientFace(const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
+        : Face(make_shared<DummyClientFace::Transport>())
+        , m_internalKeyChain(new KeyChain)
+        , m_keyChain(*m_internalKeyChain) {
+            this->construct(options);
         }
-        if (lpPacket.has<lp::CongestionMarkField>()) {
-          nack->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
+
+        DummyClientFace::DummyClientFace(KeyChain& keyChain,
+                const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
+        : Face(make_shared<DummyClientFace::Transport>(), keyChain)
+        , m_keyChain(keyChain) {
+            this->construct(options);
         }
-        onSendNack(*nack);
-      }
-      else {
-        if (lpPacket.has<lp::NextHopFaceIdField>()) {
-          interest->setTag(make_shared<lp::NextHopFaceIdTag>(lpPacket.get<lp::NextHopFaceIdField>()));
+
+        DummyClientFace::DummyClientFace(boost::asio::io_service& ioService,
+                const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
+        : Face(make_shared<DummyClientFace::Transport>(), ioService)
+        , m_internalKeyChain(new KeyChain)
+        , m_keyChain(*m_internalKeyChain) {
+            this->construct(options);
         }
-        if (lpPacket.has<lp::CongestionMarkField>()) {
-          interest->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
+
+        DummyClientFace::DummyClientFace(boost::asio::io_service& ioService, KeyChain& keyChain,
+                const Options& options/* = DummyClientFace::DEFAULT_OPTIONS*/)
+        : Face(make_shared<DummyClientFace::Transport>(), ioService, keyChain)
+        , m_keyChain(keyChain) {
+            this->construct(options);
         }
-        onSendInterest(*interest);
-      }
-    }
-    else if (block.type() == tlv::Data) {
-      shared_ptr<Data> data = make_shared<Data>(block);
 
-      if (lpPacket.has<lp::CachePolicyField>()) {
-        data->setTag(make_shared<lp::CachePolicyTag>(lpPacket.get<lp::CachePolicyField>()));
-      }
-      if (lpPacket.has<lp::CongestionMarkField>()) {
-        data->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
-      }
+        void
+        DummyClientFace::construct(const Options& options) {
+            static_pointer_cast<Transport>(getTransport())->onSendBlock.connect([this] (const Block & blockFromDaemon) {
+                Block packet(blockFromDaemon);
+                packet.encode();
+                lp::Packet lpPacket(packet);
 
-      onSendData(*data);
-    }
-  });
+                Buffer::const_iterator begin, end;
+                std::tie(begin, end) = lpPacket.get<lp::FragmentField>();
+                Block block(&*begin, std::distance(begin, end));
 
-  if (options.enablePacketLogging)
-    this->enablePacketLogging();
+                if (block.type() == tlv::Interest) {
+                    shared_ptr<Interest> interest = make_shared<Interest>(block);
+                    if (lpPacket.has<lp::NackField>()) {
+                        shared_ptr<lp::Nack> nack = make_shared<lp::Nack>(std::move(*interest));
+                                nack->setHeader(lpPacket.get<lp::NackField>());
+                        if (lpPacket.has<lp::NextHopFaceIdField>()) {
+                            nack->setTag(make_shared<lp::NextHopFaceIdTag>(lpPacket.get<lp::NextHopFaceIdField>()));
+                        }
+                        if (lpPacket.has<lp::CongestionMarkField>()) {
+                            nack->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
+                        }
+                        onSendNack(*nack);
+                    } else {
+                        if (lpPacket.has<lp::NextHopFaceIdField>()) {
+                            interest->setTag(make_shared<lp::NextHopFaceIdTag>(lpPacket.get<lp::NextHopFaceIdField>()));
+                        }
+                        if (lpPacket.has<lp::CongestionMarkField>()) {
+                            interest->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
+                        }
+                        onSendInterest(*interest);
+                    }
+                } else if (block.type() == tlv::Data) {
+                    shared_ptr<Data> data = make_shared<Data>(block);
 
-  if (options.enableRegistrationReply)
-    this->enableRegistrationReply();
+                    if (lpPacket.has<lp::CachePolicyField>()) {
+                        data->setTag(make_shared<lp::CachePolicyTag>(lpPacket.get<lp::CachePolicyField>()));
+                    }
+                    if (lpPacket.has<lp::CongestionMarkField>()) {
+                        data->setTag(make_shared<lp::CongestionMarkTag>(lpPacket.get<lp::CongestionMarkField>()));
+                    }
 
-  m_processEventsOverride = options.processEventsOverride;
-}
+                    onSendData(*data);
+                }
+            });
 
-void
-DummyClientFace::enablePacketLogging()
-{
-  onSendInterest.connect([this] (const Interest& interest) {
-    this->sentInterests.push_back(interest);
-  });
-  onSendData.connect([this] (const Data& data) {
-    this->sentData.push_back(data);
-  });
-  onSendNack.connect([this] (const lp::Nack& nack) {
-    this->sentNacks.push_back(nack);
-  });
-}
+            if (options.enablePacketLogging)
+                this->enablePacketLogging();
 
-void
-DummyClientFace::enableRegistrationReply()
-{
-  onSendInterest.connect([this] (const Interest& interest) {
-    static const Name localhostRegistration("/localhost/nfd/rib");
-    if (!localhostRegistration.isPrefixOf(interest.getName()))
-      return;
+            if (options.enableRegistrationReply)
+                this->enableRegistrationReply();
 
-    nfd::ControlParameters params(interest.getName().get(-5).blockFromValue());
-    params.setFaceId(1);
-    params.setOrigin(0);
-    if (interest.getName().get(3) == name::Component("register")) {
-      params.setCost(0);
-    }
+            m_processEventsOverride = options.processEventsOverride;
+        }
 
-    nfd::ControlResponse resp;
-    resp.setCode(200);
-    resp.setBody(params.wireEncode());
+        void
+        DummyClientFace::enablePacketLogging() {
+            onSendInterest.connect([this] (const Interest & interest) {
+                this->sentInterests.push_back(interest);
+            });
+            onSendData.connect([this] (const Data & data) {
+                this->sentData.push_back(data);
+            });
+            onSendNack.connect([this] (const lp::Nack & nack) {
+                this->sentNacks.push_back(nack);
+            });
+        }
 
-    shared_ptr<Data> data = make_shared<Data>(interest.getName());
-    data->setContent(resp.wireEncode());
+        void
+        DummyClientFace::enableRegistrationReply() {
+            onSendInterest.connect([this] (const Interest & interest) {
+                static const Name localhostRegistration("/localhost/nfd/rib");
+                if (!localhostRegistration.isPrefixOf(interest.getName()))
+                    return;
 
-    m_keyChain.sign(*data, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
+                    nfd::ControlParameters params(interest.getName().get(-5).blockFromValue());
+                        params.setFaceId(1);
+                        params.setOrigin(0);
+                    if (interest.getName().get(3) == name::Component("register")) {
+                        params.setCost(0);
+                    }
 
-    this->getIoService().post([this, data] { this->receive(*data); });
-  });
-}
+                nfd::ControlResponse resp;
+                resp.setCode(200);
+                resp.setBody(params.wireEncode());
 
-template<typename Packet, typename Field, typename Tag>
-static void
-addFieldFromTag(lp::Packet& lpPacket, const Packet& packet)
-{
-  shared_ptr<Tag> tag = static_cast<const TagHost&>(packet).getTag<Tag>();
-  if (tag != nullptr) {
-    lpPacket.add<Field>(*tag);
-  }
-}
+                shared_ptr<Data> data = make_shared<Data>(interest.getName());
+                data->setContent(resp.wireEncode());
 
-template<typename Packet>
-void
-DummyClientFace::receive(const Packet& packet)
-{
-  lp::Packet lpPacket(packet.wireEncode());
+                m_keyChain.sign(*data, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
 
-  addFieldFromTag<Packet, lp::IncomingFaceIdField, lp::IncomingFaceIdTag>(lpPacket, packet);
-  addFieldFromTag<Packet, lp::NextHopFaceIdField, lp::NextHopFaceIdTag>(lpPacket, packet);
-  addFieldFromTag<Packet, lp::CongestionMarkField, lp::CongestionMarkTag>(lpPacket, packet);
+                this->getIoService().post([this, data] {
+                    this->receive(*data); });
+            });
+        }
 
-  static_pointer_cast<Transport>(getTransport())->receive(lpPacket.wireEncode());
-}
+        template<typename Packet, typename Field, typename Tag>
+        static void
+        addFieldFromTag(lp::Packet& lpPacket, const Packet& packet) {
+            shared_ptr<Tag> tag = static_cast<const TagHost&> (packet).getTag<Tag>();
+            if (tag != nullptr) {
+                lpPacket.add<Field>(*tag);
+            }
+        }
 
-template void
-DummyClientFace::receive<Interest>(const Interest& packet);
+        template<typename Packet>
+        void
+        DummyClientFace::receive(const Packet& packet) {
+            lp::Packet lpPacket(packet.wireEncode());
 
-template void
-DummyClientFace::receive<Data>(const Data& packet);
+            addFieldFromTag<Packet, lp::IncomingFaceIdField, lp::IncomingFaceIdTag>(lpPacket, packet);
+            addFieldFromTag<Packet, lp::NextHopFaceIdField, lp::NextHopFaceIdTag>(lpPacket, packet);
+            addFieldFromTag<Packet, lp::CongestionMarkField, lp::CongestionMarkTag>(lpPacket, packet);
 
-template<>
-void
-DummyClientFace::receive<lp::Nack>(const lp::Nack& nack)
-{
-  lp::Packet lpPacket;
-  lpPacket.add<lp::NackField>(nack.getHeader());
-  Block interest = nack.getInterest().wireEncode();
-  lpPacket.add<lp::FragmentField>(make_pair(interest.begin(), interest.end()));
+            static_pointer_cast<Transport>(getTransport())->receive(lpPacket.wireEncode());
+        }
 
-  addFieldFromTag<lp::Nack, lp::IncomingFaceIdField, lp::IncomingFaceIdTag>(lpPacket, nack);
-  addFieldFromTag<lp::Nack, lp::CongestionMarkField, lp::CongestionMarkTag>(lpPacket, nack);
+        template void
+        DummyClientFace::receive<Interest>(const Interest& packet);
 
-  static_pointer_cast<Transport>(getTransport())->receive(lpPacket.wireEncode());
-}
+        template void
+        DummyClientFace::receive<Data>(const Data& packet);
 
-void
-DummyClientFace::doProcessEvents(const time::milliseconds& timeout, bool keepThread)
-{
-  if (m_processEventsOverride != nullptr) {
-    m_processEventsOverride(timeout);
-  }
-  else {
-    this->Face::doProcessEvents(timeout, keepThread);
-  }
-}
+        template<>
+        void
+        DummyClientFace::receive<lp::Nack>(const lp::Nack& nack) {
+            lp::Packet lpPacket;
+            lpPacket.add<lp::NackField>(nack.getHeader());
+            Block interest = nack.getInterest().wireEncode();
+            lpPacket.add<lp::FragmentField>(make_pair(interest.begin(), interest.end()));
 
-} // namespace util
+            addFieldFromTag<lp::Nack, lp::IncomingFaceIdField, lp::IncomingFaceIdTag>(lpPacket, nack);
+            addFieldFromTag<lp::Nack, lp::CongestionMarkField, lp::CongestionMarkTag>(lpPacket, nack);
+
+            static_pointer_cast<Transport>(getTransport())->receive(lpPacket.wireEncode());
+        }
+
+        void
+        DummyClientFace::doProcessEvents(const time::milliseconds& timeout, bool keepThread) {
+            if (m_processEventsOverride != nullptr) {
+                m_processEventsOverride(timeout);
+            } else {
+                this->Face::doProcessEvents(timeout, keepThread);
+            }
+        }
+
+    } // namespace util
 } // namespace ndn

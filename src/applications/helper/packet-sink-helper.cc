@@ -23,53 +23,47 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/names.h"
 
-namespace ns3 {
-
-PacketSinkHelper::PacketSinkHelper (std::string protocol, Address address)
+namespace ns3
 {
-  m_factory.SetTypeId ("ns3::PacketSink");
-  m_factory.Set ("Protocol", StringValue (protocol));
-  m_factory.Set ("Local", AddressValue (address));
-}
 
-void 
-PacketSinkHelper::SetAttribute (std::string name, const AttributeValue &value)
-{
-  m_factory.Set (name, value);
-}
-
-ApplicationContainer
-PacketSinkHelper::Install (Ptr<Node> node) const
-{
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-PacketSinkHelper::Install (std::string nodeName) const
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-PacketSinkHelper::Install (NodeContainer c) const
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      apps.Add (InstallPriv (*i));
+    PacketSinkHelper::PacketSinkHelper(std::string protocol, Address address) {
+        m_factory.SetTypeId("ns3::PacketSink");
+        m_factory.Set("Protocol", StringValue(protocol));
+        m_factory.Set("Local", AddressValue(address));
     }
 
-  return apps;
-}
+    void
+    PacketSinkHelper::SetAttribute(std::string name, const AttributeValue & value) {
+        m_factory.Set(name, value);
+    }
 
-Ptr<Application>
-PacketSinkHelper::InstallPriv (Ptr<Node> node) const
-{
-  Ptr<Application> app = m_factory.Create<Application> ();
-  node->AddApplication (app);
+    ApplicationContainer
+    PacketSinkHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
 
-  return app;
-}
+    ApplicationContainer
+    PacketSinkHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    PacketSinkHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    Ptr<Application>
+            PacketSinkHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<Application> ();
+        node->AddApplication(app);
+
+        return app;
+    }
 
 } // namespace ns3

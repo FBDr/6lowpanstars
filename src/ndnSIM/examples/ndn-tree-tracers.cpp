@@ -25,99 +25,97 @@
 
 namespace ns3 {
 
-/**
- * This scenario simulates a tree topology (using topology reader module)
- *
- *    /------\      /------\      /------\      /------\
- *    |leaf-1|      |leaf-2|      |leaf-3|      |leaf-4|
- *    \------/      \------/      \------/      \------/
- *         ^          ^                ^           ^
- *         |          |                |           |
- *          \        /                  \         /
- *           \      /                    \       /    10Mbps / 1ms
- *            \    /                      \     /
- *             |  |                        |   |
- *             v  v                        v   v
- *          /-------\                    /-------\
- *          | rtr-1 |                    | rtr-2 |
- *          \-------/                    \-------/
- *                ^                        ^
- *                |                        |
- *                 \                      /  10 Mpbs / 1ms
- *                  +--------+  +--------+
- *                           |  |
- *                           v  v
- *                        /--------\
- *                        |  root  |
- *                        \--------/
- *
- *
- * To run scenario and see what is happening, use the following command:
- *
- *     ./waf --run=ndn-tree-tracers
- */
+    /**
+     * This scenario simulates a tree topology (using topology reader module)
+     *
+     *    /------\      /------\      /------\      /------\
+     *    |leaf-1|      |leaf-2|      |leaf-3|      |leaf-4|
+     *    \------/      \------/      \------/      \------/
+     *         ^          ^                ^           ^
+     *         |          |                |           |
+     *          \        /                  \         /
+     *           \      /                    \       /    10Mbps / 1ms
+     *            \    /                      \     /
+     *             |  |                        |   |
+     *             v  v                        v   v
+     *          /-------\                    /-------\
+     *          | rtr-1 |                    | rtr-2 |
+     *          \-------/                    \-------/
+     *                ^                        ^
+     *                |                        |
+     *                 \                      /  10 Mpbs / 1ms
+     *                  +--------+  +--------+
+     *                           |  |
+     *                           v  v
+     *                        /--------\
+     *                        |  root  |
+     *                        \--------/
+     *
+     *
+     * To run scenario and see what is happening, use the following command:
+     *
+     *     ./waf --run=ndn-tree-tracers
+     */
 
-int
-main(int argc, char* argv[])
-{
-  CommandLine cmd;
-  cmd.Parse(argc, argv);
+    int
+    main(int argc, char* argv[]) {
+        CommandLine cmd;
+        cmd.Parse(argc, argv);
 
-  AnnotatedTopologyReader topologyReader("", 1);
-  topologyReader.SetFileName("src/ndnSIM/examples/topologies/topo-tree.txt");
-  topologyReader.Read();
+        AnnotatedTopologyReader topologyReader("", 1);
+        topologyReader.SetFileName("src/ndnSIM/examples/topologies/topo-tree.txt");
+        topologyReader.Read();
 
-  // Install NDN stack on all nodes
-  ndn::StackHelper ndnHelper;
-  ndnHelper.InstallAll();
+        // Install NDN stack on all nodes
+        ndn::StackHelper ndnHelper;
+        ndnHelper.InstallAll();
 
-  // Choosing forwarding strategy
-  ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/best-route");
+        // Choosing forwarding strategy
+        ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/best-route");
 
-  // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-  ndnGlobalRoutingHelper.InstallAll();
+        // Installing global routing interface on all nodes
+        ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+        ndnGlobalRoutingHelper.InstallAll();
 
-  // Getting containers for the consumer/producer
-  Ptr<Node> consumers[4] = {Names::Find<Node>("leaf-1"), Names::Find<Node>("leaf-2"),
-                            Names::Find<Node>("leaf-3"), Names::Find<Node>("leaf-4")};
-  Ptr<Node> producer = Names::Find<Node>("root");
+        // Getting containers for the consumer/producer
+        Ptr<Node> consumers[4] = {Names::Find<Node>("leaf-1"), Names::Find<Node>("leaf-2"),
+            Names::Find<Node>("leaf-3"), Names::Find<Node>("leaf-4")};
+        Ptr<Node> producer = Names::Find<Node>("root");
 
-  for (int i = 0; i < 4; i++) {
-    ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-    consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
+        for (int i = 0; i < 4; i++) {
+            ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+            consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
 
-    // Each consumer will express unique interests /root/<leaf-name>/<seq-no>
-    consumerHelper.SetPrefix("/root/" + Names::FindName(consumers[i]));
-    consumerHelper.Install(consumers[i]);
-  }
+            // Each consumer will express unique interests /root/<leaf-name>/<seq-no>
+            consumerHelper.SetPrefix("/root/" + Names::FindName(consumers[i]));
+            consumerHelper.Install(consumers[i]);
+        }
 
-  ndn::AppHelper producerHelper("ns3::ndn::Producer");
-  producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+        ndn::AppHelper producerHelper("ns3::ndn::Producer");
+        producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
 
-  // Register /root prefix with global routing controller and
-  // install producer that will satisfy Interests in /root namespace
-  ndnGlobalRoutingHelper.AddOrigins("/root", producer);
-  producerHelper.SetPrefix("/root");
-  producerHelper.Install(producer);
+        // Register /root prefix with global routing controller and
+        // install producer that will satisfy Interests in /root namespace
+        ndnGlobalRoutingHelper.AddOrigins("/root", producer);
+        producerHelper.SetPrefix("/root");
+        producerHelper.Install(producer);
 
-  // Calculate and install FIBs
-  ndn::GlobalRoutingHelper::CalculateRoutes();
+        // Calculate and install FIBs
+        ndn::GlobalRoutingHelper::CalculateRoutes();
 
-  Simulator::Stop(Seconds(20.0));
+        Simulator::Stop(Seconds(20.0));
 
-  ndn::L3RateTracer::InstallAll("rate-trace.txt", Seconds(0.5));
+        ndn::L3RateTracer::InstallAll("rate-trace.txt", Seconds(0.5));
 
-  Simulator::Run();
-  Simulator::Destroy();
+        Simulator::Run();
+        Simulator::Destroy();
 
-  return 0;
-}
+        return 0;
+    }
 
 } // namespace ns3
 
 int
-main(int argc, char* argv[])
-{
-  return ns3::main(argc, argv);
+main(int argc, char* argv[]) {
+    return ns3::main(argc, argv);
 }

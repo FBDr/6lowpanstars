@@ -22,7 +22,8 @@
 #include "ns3/brite-module.h"
 //#include "ns3/log.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     void
     shuffle_array(std::vector<int>& arrayf) {
@@ -40,30 +41,31 @@ namespace ns3 {
 
 
 
-namespace ns3 {
-//
-//    class PcapWriter {
-//    public:
-//
-//        PcapWriter(const std::string& file) {
-//            PcapHelper helper;
-//            m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
-//        }
-//
-//        void
-//        TracePacket(Ptr<const Packet> packet) {
-//            static PppHeader pppHeader;
-//            pppHeader.SetProtocol(0x0077);
-//
-//            m_pcap->Write(Simulator::Now(), pppHeader, packet);
-//        }
-//
-//    private:
-//        Ptr<PcapFileWrapper> m_pcap;
-//    };
+namespace ns3{
+    //
+    //    class PcapWriter {
+    //    public:
+    //
+    //        PcapWriter(const std::string& file) {
+    //            PcapHelper helper;
+    //            m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
+    //        }
+    //
+    //        void
+    //        TracePacket(Ptr<const Packet> packet) {
+    //            static PppHeader pppHeader;
+    //            pppHeader.SetProtocol(0x0077);
+    //
+    //            m_pcap->Write(Simulator::Now(), pppHeader, packet);
+    //        }
+    //
+    //    private:
+    //        Ptr<PcapFileWrapper> m_pcap;
+    //    };
 
     int
-    main(int argc, char* argv[]) {
+    main(int argc, char* argv[])
+    {
         // setting default parameters for PointToPoint links and channels
         Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
         Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("5ms"));
@@ -82,8 +84,8 @@ namespace ns3 {
         int nrc_mix = 50;
         int nrc_num = 0;
         bool sillyseq = false;
-        int stoptime= 10;
-        int time_ran =1;
+        int stoptime = 10;
+        int time_ran = 1;
         std::string preamble_prefix = "/NL/TNO/NRCTestbed/VROrientation";
         std::string cur_prefix;
 
@@ -114,7 +116,7 @@ namespace ns3 {
         std::cout << "Range: " << range_input << std::endl;
         std::cout << "Stoptime: " << stoptime << std::endl;
         std::cout << "RNG feed: " << time_ran << std::endl << std::endl;
-        
+
 
         //Seeding RNG
         //time_t time_ran;
@@ -204,7 +206,7 @@ namespace ns3 {
         // Producer
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         producerHelper.SetAttribute("PayloadSize", StringValue(std::to_string(pktsize)));
-        ProConArray.erase(ProConArray.begin(), ProConArray.begin()+numCon);
+        ProConArray.erase(ProConArray.begin(), ProConArray.begin() + numCon);
 
         //Availability
         avalangle = (int) (360 * (float) aval / 100);
@@ -259,7 +261,6 @@ namespace ns3 {
 
         return 0;
     }
-
 } // namespace ns3
 
 int

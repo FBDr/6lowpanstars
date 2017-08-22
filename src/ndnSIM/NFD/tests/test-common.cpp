@@ -27,106 +27,94 @@
 #include <ndn-cxx/security/signature-sha256-with-rsa.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BaseFixture::BaseFixture()
-  : g_io(getGlobalIoService())
-{
-}
+        BaseFixture::BaseFixture()
+        : g_io(getGlobalIoService()) {
+        }
 
-BaseFixture::~BaseFixture()
-{
-  resetGlobalIoService();
-}
+        BaseFixture::~BaseFixture() {
+            resetGlobalIoService();
+        }
 
-UnitTestTimeFixture::UnitTestTimeFixture()
-  : steadyClock(make_shared<time::UnitTestSteadyClock>())
-  , systemClock(make_shared<time::UnitTestSystemClock>())
-{
-  time::setCustomClocks(steadyClock, systemClock);
-}
+        UnitTestTimeFixture::UnitTestTimeFixture()
+        : steadyClock(make_shared<time::UnitTestSteadyClock>())
+        , systemClock(make_shared<time::UnitTestSystemClock>()) {
+            time::setCustomClocks(steadyClock, systemClock);
+        }
 
-UnitTestTimeFixture::~UnitTestTimeFixture()
-{
-  time::setCustomClocks(nullptr, nullptr);
-}
+        UnitTestTimeFixture::~UnitTestTimeFixture() {
+            time::setCustomClocks(nullptr, nullptr);
+        }
 
-void
-UnitTestTimeFixture::advanceClocks(const time::nanoseconds& tick, size_t nTicks)
-{
-  this->advanceClocks(tick, tick * nTicks);
-}
+        void
+        UnitTestTimeFixture::advanceClocks(const time::nanoseconds& tick, size_t nTicks) {
+            this->advanceClocks(tick, tick * nTicks);
+        }
 
-void
-UnitTestTimeFixture::advanceClocks(const time::nanoseconds& tick, const time::nanoseconds& total)
-{
-  BOOST_ASSERT(tick > time::nanoseconds::zero());
-  BOOST_ASSERT(total >= time::nanoseconds::zero());
+        void
+        UnitTestTimeFixture::advanceClocks(const time::nanoseconds& tick, const time::nanoseconds& total) {
+            BOOST_ASSERT(tick > time::nanoseconds::zero());
+            BOOST_ASSERT(total >= time::nanoseconds::zero());
 
-  time::nanoseconds remaining = total;
-  while (remaining > time::nanoseconds::zero()) {
-    if (remaining >= tick) {
-      steadyClock->advance(tick);
-      systemClock->advance(tick);
-      remaining -= tick;
-    }
-    else {
-      steadyClock->advance(remaining);
-      systemClock->advance(remaining);
-      remaining = time::nanoseconds::zero();
-    }
+            time::nanoseconds remaining = total;
+            while (remaining > time::nanoseconds::zero()) {
+                if (remaining >= tick) {
+                    steadyClock->advance(tick);
+                    systemClock->advance(tick);
+                    remaining -= tick;
+                } else {
+                    steadyClock->advance(remaining);
+                    systemClock->advance(remaining);
+                    remaining = time::nanoseconds::zero();
+                }
 
-    if (g_io.stopped())
-      g_io.reset();
-    g_io.poll();
-  }
-}
+                if (g_io.stopped())
+                    g_io.reset();
+                g_io.poll();
+            }
+        }
 
-shared_ptr<Interest>
-makeInterest(const Name& name, uint32_t nonce)
-{
-  auto interest = make_shared<Interest>(name);
-  if (nonce != 0) {
-    interest->setNonce(nonce);
-  }
-  return interest;
-}
+        shared_ptr<Interest>
+        makeInterest(const Name& name, uint32_t nonce) {
+            auto interest = make_shared<Interest>(name);
+            if (nonce != 0) {
+                interest->setNonce(nonce);
+            }
+            return interest;
+        }
 
-shared_ptr<Data>
-makeData(const Name& name)
-{
-  auto data = make_shared<Data>(name);
-  return signData(data);
-}
+        shared_ptr<Data>
+        makeData(const Name& name) {
+            auto data = make_shared<Data>(name);
+            return signData(data);
+        }
 
-Data&
-signData(Data& data)
-{
-  ndn::SignatureSha256WithRsa fakeSignature;
-  fakeSignature.setValue(ndn::encoding::makeEmptyBlock(tlv::SignatureValue));
-  data.setSignature(fakeSignature);
-  data.wireEncode();
+        Data&
+        signData(Data& data) {
+            ndn::SignatureSha256WithRsa fakeSignature;
+            fakeSignature.setValue(ndn::encoding::makeEmptyBlock(tlv::SignatureValue));
+            data.setSignature(fakeSignature);
+            data.wireEncode();
 
-  return data;
-}
+            return data;
+        }
 
-shared_ptr<Link>
-makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations)
-{
-  auto link = make_shared<Link>(name, delegations);
-  signData(link);
-  return link;
-}
+        shared_ptr<Link>
+        makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations) {
+            auto link = make_shared<Link>(name, delegations);
+            signData(link);
+            return link;
+        }
 
-lp::Nack
-makeNack(const Name& name, uint32_t nonce, lp::NackReason reason)
-{
-  Interest interest(name);
-  interest.setNonce(nonce);
-  lp::Nack nack(std::move(interest));
-  nack.setReason(reason);
-  return nack;
-}
+        lp::Nack
+        makeNack(const Name& name, uint32_t nonce, lp::NackReason reason) {
+            Interest interest(name);
+            interest.setNonce(nonce);
+            lp::Nack nack(std::move(interest));
+            nack.setReason(reason);
+            return nack;
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

@@ -50,146 +50,138 @@ using namespace ns3;
 
 class DsdvHeaderTestCase : public TestCase
 {
-public:
-  DsdvHeaderTestCase ();
-  ~DsdvHeaderTestCase ();
-  virtual void
-  DoRun (void);
-};
-DsdvHeaderTestCase::DsdvHeaderTestCase ()
-  : TestCase ("Verifying the DSDV header")
-{
+    public :
+    DsdvHeaderTestCase();
+    ~DsdvHeaderTestCase();
+    virtual void
+    DoRun(void);};
+
+DsdvHeaderTestCase::DsdvHeaderTestCase()
+: TestCase("Verifying the DSDV header") {
 }
-DsdvHeaderTestCase::~DsdvHeaderTestCase ()
-{
+
+DsdvHeaderTestCase::~DsdvHeaderTestCase() {
 }
+
 void
-DsdvHeaderTestCase::DoRun ()
-{
-  Ptr<Packet> packet = Create<Packet> ();
+DsdvHeaderTestCase::DoRun() {
+    Ptr<Packet> packet = Create<Packet> ();
 
-  {
-    dsdv::DsdvHeader hdr1;
-    hdr1.SetDst (Ipv4Address ("10.1.1.2"));
-    hdr1.SetDstSeqno (2);
-    hdr1.SetHopCount (2);
-    packet->AddHeader (hdr1);
-    dsdv::DsdvHeader hdr2;
-    hdr2.SetDst (Ipv4Address ("10.1.1.3"));
-    hdr2.SetDstSeqno (4);
-    hdr2.SetHopCount (1);
-    packet->AddHeader (hdr2);
-    NS_TEST_ASSERT_MSG_EQ (packet->GetSize (), 24, "001");
-  }
+    {
+        dsdv::DsdvHeader hdr1;
+        hdr1.SetDst(Ipv4Address("10.1.1.2"));
+        hdr1.SetDstSeqno(2);
+        hdr1.SetHopCount(2);
+        packet->AddHeader(hdr1);
+        dsdv::DsdvHeader hdr2;
+        hdr2.SetDst(Ipv4Address("10.1.1.3"));
+        hdr2.SetDstSeqno(4);
+        hdr2.SetHopCount(1);
+        packet->AddHeader(hdr2);
+        NS_TEST_ASSERT_MSG_EQ(packet->GetSize(), 24, "001");
+    }
 
-  {
-    dsdv::DsdvHeader hdr2;
-    packet->RemoveHeader (hdr2);
-    NS_TEST_ASSERT_MSG_EQ (hdr2.GetSerializedSize (),12,"002");
-    NS_TEST_ASSERT_MSG_EQ (hdr2.GetDst (),Ipv4Address ("10.1.1.3"),"003");
-    NS_TEST_ASSERT_MSG_EQ (hdr2.GetDstSeqno (),4,"004");
-    NS_TEST_ASSERT_MSG_EQ (hdr2.GetHopCount (),1,"005");
-    dsdv::DsdvHeader hdr1;
-    packet->RemoveHeader (hdr1);
-    NS_TEST_ASSERT_MSG_EQ (hdr1.GetSerializedSize (),12,"006");
-    NS_TEST_ASSERT_MSG_EQ (hdr1.GetDst (),Ipv4Address ("10.1.1.2"),"008");
-    NS_TEST_ASSERT_MSG_EQ (hdr1.GetDstSeqno (),2,"009");
-    NS_TEST_ASSERT_MSG_EQ (hdr1.GetHopCount (),2,"010");
-  }
+    {
+        dsdv::DsdvHeader hdr2;
+        packet->RemoveHeader(hdr2);
+        NS_TEST_ASSERT_MSG_EQ(hdr2.GetSerializedSize(), 12, "002");
+        NS_TEST_ASSERT_MSG_EQ(hdr2.GetDst(), Ipv4Address("10.1.1.3"), "003");
+        NS_TEST_ASSERT_MSG_EQ(hdr2.GetDstSeqno(), 4, "004");
+        NS_TEST_ASSERT_MSG_EQ(hdr2.GetHopCount(), 1, "005");
+        dsdv::DsdvHeader hdr1;
+        packet->RemoveHeader(hdr1);
+        NS_TEST_ASSERT_MSG_EQ(hdr1.GetSerializedSize(), 12, "006");
+        NS_TEST_ASSERT_MSG_EQ(hdr1.GetDst(), Ipv4Address("10.1.1.2"), "008");
+        NS_TEST_ASSERT_MSG_EQ(hdr1.GetDstSeqno(), 2, "009");
+        NS_TEST_ASSERT_MSG_EQ(hdr1.GetHopCount(), 2, "010");
+    }
 }
 
 class DsdvTableTestCase : public TestCase
 {
-public:
-  DsdvTableTestCase ();
-  ~DsdvTableTestCase ();
-  virtual void
-  DoRun (void);
-};
+    public :
+    DsdvTableTestCase();
+    ~DsdvTableTestCase();
+    virtual void
+    DoRun(void);};
 
-DsdvTableTestCase::DsdvTableTestCase ()
-  : TestCase ("Dsdv Routing Table test case")
-{
+DsdvTableTestCase::DsdvTableTestCase()
+: TestCase("Dsdv Routing Table test case") {
 }
-DsdvTableTestCase::~DsdvTableTestCase ()
-{
+
+DsdvTableTestCase::~DsdvTableTestCase() {
 }
+
 void
-DsdvTableTestCase::DoRun ()
-{
-  dsdv::RoutingTable rtable;
-  Ptr<NetDevice> dev;
-  {
-    dsdv::RoutingTableEntry rEntry1 (
-      /*device=*/ dev, /*dst=*/
-      Ipv4Address ("10.1.1.4"), /*seqno=*/ 2,
-      /*iface=*/ Ipv4InterfaceAddress (Ipv4Address ("10.1.1.1"), Ipv4Mask ("255.255.255.0")),
-      /*hops=*/ 2, /*next hop=*/
-      Ipv4Address ("10.1.1.2"),
-      /*lifetime=*/ Seconds (10));
-    NS_TEST_EXPECT_MSG_EQ (rtable.AddRoute (rEntry1),true,"add route");
-    dsdv::RoutingTableEntry rEntry2 (
-      /*device=*/ dev, /*dst=*/
-      Ipv4Address ("10.1.1.2"), /*seqno=*/ 4,
-      /*iface=*/ Ipv4InterfaceAddress (Ipv4Address ("10.1.1.1"), Ipv4Mask ("255.255.255.0")),
-      /*hops=*/ 1, /*next hop=*/
-      Ipv4Address ("10.1.1.2"),
-      /*lifetime=*/ Seconds (10));
-    NS_TEST_EXPECT_MSG_EQ (rtable.AddRoute (rEntry2),true,"add route");
-    dsdv::RoutingTableEntry rEntry3 (
-      /*device=*/ dev, /*dst=*/
-      Ipv4Address ("10.1.1.3"), /*seqno=*/ 4,
-      /*iface=*/ Ipv4InterfaceAddress (Ipv4Address ("10.1.1.1"), Ipv4Mask ("255.255.255.0")),
-      /*hops=*/ 1, /*next hop=*/
-      Ipv4Address ("10.1.1.3"),
-      /*lifetime=*/ Seconds (10));
-    NS_TEST_EXPECT_MSG_EQ (rtable.AddRoute (rEntry3),true,"add route");
-    dsdv::RoutingTableEntry rEntry4 (
-      /*device=*/ dev, /*dst=*/
-      Ipv4Address ("10.1.1.255"), /*seqno=*/ 0,
-      /*iface=*/ Ipv4InterfaceAddress (Ipv4Address ("10.1.1.1"), Ipv4Mask ("255.255.255.0")),
-      /*hops=*/ 0, /*next hop=*/
-      Ipv4Address ("10.1.1.255"),
-      /*lifetime=*/ Seconds (10));
-    NS_TEST_EXPECT_MSG_EQ (rtable.AddRoute (rEntry4),true,"add route");
-  }
-  {
-    dsdv::RoutingTableEntry rEntry;
-    if (rtable.LookupRoute (Ipv4Address ("10.1.1.4"), rEntry))
-      {
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetDestination (),Ipv4Address ("10.1.1.4"),"100");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetSeqNo (),2,"101");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetHop (),2,"102");
-      }
-    if (rtable.LookupRoute (Ipv4Address ("10.1.1.2"), rEntry))
-      {
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetDestination (),Ipv4Address ("10.1.1.2"),"103");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetSeqNo (),4,"104");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetHop (),1,"105");
-      }
-    if (rtable.LookupRoute (Ipv4Address ("10.1.1.3"), rEntry))
-      {
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetDestination (),Ipv4Address ("10.1.1.3"),"106");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetSeqNo (),4,"107");
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetHop (),1,"108");
-      }
-    if (rtable.LookupRoute (Ipv4Address ("10.1.1.255"), rEntry))
-      {
-        NS_TEST_ASSERT_MSG_EQ (rEntry.GetDestination (),Ipv4Address ("10.1.1.255"),"109");
-      }
-    NS_TEST_ASSERT_MSG_EQ (rEntry.GetInterface ().GetLocal (),Ipv4Address ("10.1.1.1"),"110");
-    NS_TEST_ASSERT_MSG_EQ (rEntry.GetInterface ().GetBroadcast (),Ipv4Address ("10.1.1.255"),"111");
-    NS_TEST_ASSERT_MSG_EQ (rtable.RoutingTableSize (),4,"Rtable size incorrect");
-  }
-  Simulator::Destroy ();
+DsdvTableTestCase::DoRun() {
+    dsdv::RoutingTable rtable;
+    Ptr<NetDevice> dev;
+    {
+        dsdv::RoutingTableEntry rEntry1(
+                /*device=*/ dev, /*dst=*/
+                Ipv4Address("10.1.1.4"), /*seqno=*/ 2,
+                /*iface=*/ Ipv4InterfaceAddress(Ipv4Address("10.1.1.1"), Ipv4Mask("255.255.255.0")),
+                /*hops=*/ 2, /*next hop=*/
+                Ipv4Address("10.1.1.2"),
+                /*lifetime=*/ Seconds(10));
+        NS_TEST_EXPECT_MSG_EQ(rtable.AddRoute(rEntry1), true, "add route");
+        dsdv::RoutingTableEntry rEntry2(
+                /*device=*/ dev, /*dst=*/
+                Ipv4Address("10.1.1.2"), /*seqno=*/ 4,
+                /*iface=*/ Ipv4InterfaceAddress(Ipv4Address("10.1.1.1"), Ipv4Mask("255.255.255.0")),
+                /*hops=*/ 1, /*next hop=*/
+                Ipv4Address("10.1.1.2"),
+                /*lifetime=*/ Seconds(10));
+        NS_TEST_EXPECT_MSG_EQ(rtable.AddRoute(rEntry2), true, "add route");
+        dsdv::RoutingTableEntry rEntry3(
+                /*device=*/ dev, /*dst=*/
+                Ipv4Address("10.1.1.3"), /*seqno=*/ 4,
+                /*iface=*/ Ipv4InterfaceAddress(Ipv4Address("10.1.1.1"), Ipv4Mask("255.255.255.0")),
+                /*hops=*/ 1, /*next hop=*/
+                Ipv4Address("10.1.1.3"),
+                /*lifetime=*/ Seconds(10));
+        NS_TEST_EXPECT_MSG_EQ(rtable.AddRoute(rEntry3), true, "add route");
+        dsdv::RoutingTableEntry rEntry4(
+                /*device=*/ dev, /*dst=*/
+                Ipv4Address("10.1.1.255"), /*seqno=*/ 0,
+                /*iface=*/ Ipv4InterfaceAddress(Ipv4Address("10.1.1.1"), Ipv4Mask("255.255.255.0")),
+                /*hops=*/ 0, /*next hop=*/
+                Ipv4Address("10.1.1.255"),
+                /*lifetime=*/ Seconds(10));
+        NS_TEST_EXPECT_MSG_EQ(rtable.AddRoute(rEntry4), true, "add route");
+    }
+    {
+        dsdv::RoutingTableEntry rEntry;
+        if (rtable.LookupRoute(Ipv4Address("10.1.1.4"), rEntry)) {
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetDestination(), Ipv4Address("10.1.1.4"), "100");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetSeqNo(), 2, "101");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetHop(), 2, "102");
+        }
+        if (rtable.LookupRoute(Ipv4Address("10.1.1.2"), rEntry)) {
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetDestination(), Ipv4Address("10.1.1.2"), "103");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetSeqNo(), 4, "104");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetHop(), 1, "105");
+        }
+        if (rtable.LookupRoute(Ipv4Address("10.1.1.3"), rEntry)) {
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetDestination(), Ipv4Address("10.1.1.3"), "106");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetSeqNo(), 4, "107");
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetHop(), 1, "108");
+        }
+        if (rtable.LookupRoute(Ipv4Address("10.1.1.255"), rEntry)) {
+            NS_TEST_ASSERT_MSG_EQ(rEntry.GetDestination(), Ipv4Address("10.1.1.255"), "109");
+        }
+        NS_TEST_ASSERT_MSG_EQ(rEntry.GetInterface().GetLocal(), Ipv4Address("10.1.1.1"), "110");
+        NS_TEST_ASSERT_MSG_EQ(rEntry.GetInterface().GetBroadcast(), Ipv4Address("10.1.1.255"), "111");
+        NS_TEST_ASSERT_MSG_EQ(rtable.RoutingTableSize(), 4, "Rtable size incorrect");
+    }
+    Simulator::Destroy();
 }
 
 class DsdvTestSuite : public TestSuite
 {
-public:
-  DsdvTestSuite () : TestSuite ("routing-dsdv", UNIT)
-  {
-    AddTestCase (new DsdvHeaderTestCase (), TestCase::QUICK);
-    AddTestCase (new DsdvTableTestCase (), TestCase::QUICK);
-  }
-} g_dsdvTestSuite;
+    public :
+    DsdvTestSuite() : TestSuite("routing-dsdv", UNIT)
+    {
+        AddTestCase(new DsdvHeaderTestCase(), TestCase::QUICK);
+        AddTestCase(new DsdvTableTestCase(), TestCase::QUICK);
+    }} g_dsdvTestSuite;

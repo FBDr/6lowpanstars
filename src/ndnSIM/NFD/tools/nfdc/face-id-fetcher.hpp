@@ -33,81 +33,80 @@
 #include <ndn-cxx/security/validator-null.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-using ndn::util::FaceUri;
+            using ndn::util::FaceUri;
 
-class FaceIdFetcher
-{
-public:
-  typedef std::function<void(uint32_t)> SuccessCallback;
-  typedef std::function<void(const std::string&)> FailureCallback;
+            class FaceIdFetcher {
+            public:
+                typedef std::function<void(uint32_t) > SuccessCallback;
+                typedef std::function<void(const std::string&) > FailureCallback;
 
-  /** \brief obtain FaceId from input
-   *  \param face Reference to the Face that should be used to fetch data
-   *  \param controller Reference to the controller that should be used to sign the Interest
-   *  \param input User input, either FaceId or FaceUri
-   *  \param allowCreate Whether creating face is allowed
-   *  \param onSucceed Callback to be fired when faceId is obtained
-   *  \param onFail Callback to be fired when an error occurs
-   */
-  static void
-  start(ndn::Face& face,
-        ndn::nfd::Controller& controller,
-        const std::string& input,
-        bool allowCreate,
-        const SuccessCallback& onSucceed,
-        const FailureCallback& onFail);
+                /** \brief obtain FaceId from input
+                 *  \param face Reference to the Face that should be used to fetch data
+                 *  \param controller Reference to the controller that should be used to sign the Interest
+                 *  \param input User input, either FaceId or FaceUri
+                 *  \param allowCreate Whether creating face is allowed
+                 *  \param onSucceed Callback to be fired when faceId is obtained
+                 *  \param onFail Callback to be fired when an error occurs
+                 */
+                static void
+                start(ndn::Face& face,
+                        ndn::nfd::Controller& controller,
+                        const std::string& input,
+                        bool allowCreate,
+                        const SuccessCallback& onSucceed,
+                        const FailureCallback& onFail);
 
-private:
-  FaceIdFetcher(ndn::Face& face,
-                ndn::nfd::Controller& controller,
-                bool allowCreate,
-                const SuccessCallback& onSucceed,
-                const FailureCallback& onFail);
+            private:
+                FaceIdFetcher(ndn::Face& face,
+                        ndn::nfd::Controller& controller,
+                        bool allowCreate,
+                        const SuccessCallback& onSucceed,
+                        const FailureCallback& onFail);
 
-  void
-  onQuerySuccess(const ndn::ConstBufferPtr& data,
-                 const FaceUri& canonicalUri);
+                void
+                onQuerySuccess(const ndn::ConstBufferPtr& data,
+                        const FaceUri& canonicalUri);
 
-  void
-  onQueryFailure(uint32_t errorCode,
-                 const FaceUri& canonicalUri);
+                void
+                onQueryFailure(uint32_t errorCode,
+                        const FaceUri& canonicalUri);
 
-  void
-  onCanonizeSuccess(const FaceUri& canonicalUri);
+                void
+                onCanonizeSuccess(const FaceUri& canonicalUri);
 
-  void
-  onCanonizeFailure(const std::string& reason);
+                void
+                onCanonizeFailure(const std::string& reason);
 
-  void
-  startGetFaceId(const FaceUri& faceUri);
+                void
+                startGetFaceId(const FaceUri& faceUri);
 
-  void
-  startFaceCreate(const FaceUri& canonicalUri);
+                void
+                startFaceCreate(const FaceUri& canonicalUri);
 
-  void
-  onFaceCreateError(const ndn::nfd::ControlResponse& response,
-                    const std::string& message);
+                void
+                onFaceCreateError(const ndn::nfd::ControlResponse& response,
+                        const std::string& message);
 
-  void
-  succeed(uint32_t faceId);
+                void
+                succeed(uint32_t faceId);
 
-  void
-  fail(const std::string& reason);
+                void
+                fail(const std::string& reason);
 
-private:
-  ndn::Face& m_face;
-  ndn::nfd::Controller& m_controller;
-  bool m_allowCreate;
-  SuccessCallback m_onSucceed;
-  FailureCallback m_onFail;
-  ndn::ValidatorNull m_validator;
-};
+            private:
+                ndn::Face& m_face;
+                ndn::nfd::Controller& m_controller;
+                bool m_allowCreate;
+                SuccessCallback m_onSucceed;
+                FailureCallback m_onFail;
+                ndn::ValidatorNull m_validator;
+            };
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_FACE_ID_FETCHER_HPP

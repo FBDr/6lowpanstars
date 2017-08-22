@@ -55,140 +55,133 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-unique_ptr<Policy>
-makeDefaultPolicy();
+        unique_ptr<Policy>
+        makeDefaultPolicy();
 
-/** \brief represents the ContentStore
- */
-class Cs : noncopyable
-{
-public:
-  explicit
-  Cs(size_t nMaxPackets = 10, unique_ptr<Policy> policy = makeDefaultPolicy());
+        /** \brief represents the ContentStore
+         */
+        class Cs : noncopyable {
+        public:
+            explicit
+            Cs(size_t nMaxPackets = 10, unique_ptr<Policy> policy = makeDefaultPolicy());
 
-  /** \brief inserts a Data packet
-   */
-  void
-  insert(const Data& data, bool isUnsolicited = false);
+            /** \brief inserts a Data packet
+             */
+            void
+            insert(const Data& data, bool isUnsolicited = false);
 
-  typedef std::function<void(const Interest&, const Data& data)> HitCallback;
-  typedef std::function<void(const Interest&)> MissCallback;
+            typedef std::function<void(const Interest&, const Data& data) > HitCallback;
+            typedef std::function<void(const Interest&) > MissCallback;
 
-  /** \brief finds the best matching Data packet
-   *  \param interest the Interest for lookup
-   *  \param hitCallback a callback if a match is found; must not be empty
-   *  \param missCallback a callback if there's no match; must not be empty
-   *  \note A lookup invokes either callback exactly once.
-   *        The callback may be invoked either before or after find() returns
-   */
-  void
-  find(const Interest& interest,
-       const HitCallback& hitCallback,
-       const MissCallback& missCallback) const;
+            /** \brief finds the best matching Data packet
+             *  \param interest the Interest for lookup
+             *  \param hitCallback a callback if a match is found; must not be empty
+             *  \param missCallback a callback if there's no match; must not be empty
+             *  \note A lookup invokes either callback exactly once.
+             *        The callback may be invoked either before or after find() returns
+             */
+            void
+            find(const Interest& interest,
+                    const HitCallback& hitCallback,
+                    const MissCallback& missCallback) const;
 
-  void
-  erase(const Name& exactName)
-  {
-    BOOST_ASSERT_MSG(false, "not implemented");
-  }
+            void
+            erase(const Name& exactName) {
+                BOOST_ASSERT_MSG(false, "not implemented");
+            }
 
-  /** \brief changes capacity (in number of packets)
-   */
-  void
-  setLimit(size_t nMaxPackets);
+            /** \brief changes capacity (in number of packets)
+             */
+            void
+            setLimit(size_t nMaxPackets);
 
-  /** \return capacity (in number of packets)
-   */
-  size_t
-  getLimit() const;
+            /** \return capacity (in number of packets)
+             */
+            size_t
+            getLimit() const;
 
-  /** \brief changes cs replacement policy
-   *  \pre size() == 0
-   */
-  void
-  setPolicy(unique_ptr<Policy> policy);
+            /** \brief changes cs replacement policy
+             *  \pre size() == 0
+             */
+            void
+            setPolicy(unique_ptr<Policy> policy);
 
-  /** \return cs replacement policy
-   */
-  Policy*
-  getPolicy() const
-  {
-    return m_policy.get();
-  }
+            /** \return cs replacement policy
+             */
+            Policy*
+            getPolicy() const {
+                return m_policy.get();
+            }
 
-  /** \return number of stored packets
-   */
-  size_t
-  size() const
-  {
-    return m_table.size();
-  }
+            /** \return number of stored packets
+             */
+            size_t
+            size() const {
+                return m_table.size();
+            }
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  void
-  dump();
+            void
+            dump();
 
-public: // enumeration
-  struct EntryFromEntryImpl
-  {
-    typedef const Entry& result_type;
+        public: // enumeration
 
-    const Entry&
-    operator()(const EntryImpl& entry) const
-    {
-      return entry;
-    }
-  };
+            struct EntryFromEntryImpl {
+                typedef const Entry& result_type;
 
-  /** \brief ContentStore iterator (public API)
-   */
-  typedef boost::transform_iterator<EntryFromEntryImpl, iterator, const Entry&> const_iterator;
+                const Entry&
+                operator()(const EntryImpl& entry) const {
+                    return entry;
+                }
+            };
 
-  const_iterator
-  begin() const
-  {
-    return boost::make_transform_iterator(m_table.begin(), EntryFromEntryImpl());
-  }
+            /** \brief ContentStore iterator (public API)
+             */
+            typedef boost::transform_iterator<EntryFromEntryImpl, iterator, const Entry&> const_iterator;
 
-  const_iterator
-  end() const
-  {
-    return boost::make_transform_iterator(m_table.end(), EntryFromEntryImpl());
-  }
+            const_iterator
+            begin() const {
+                return boost::make_transform_iterator(m_table.begin(), EntryFromEntryImpl());
+            }
 
-private: // find
-  /** \brief find leftmost match in [first,last)
-   *  \return the leftmost match, or last if not found
-   */
-  iterator
-  findLeftmost(const Interest& interest, iterator left, iterator right) const;
+            const_iterator
+            end() const {
+                return boost::make_transform_iterator(m_table.end(), EntryFromEntryImpl());
+            }
 
-  /** \brief find rightmost match in [first,last)
-   *  \return the rightmost match, or last if not found
-   */
-  iterator
-  findRightmost(const Interest& interest, iterator first, iterator last) const;
+        private: // find
+            /** \brief find leftmost match in [first,last)
+             *  \return the leftmost match, or last if not found
+             */
+            iterator
+            findLeftmost(const Interest& interest, iterator left, iterator right) const;
 
-  /** \brief find rightmost match among entries with exact Names in [first,last)
-   *  \return the rightmost match, or last if not found
-   */
-  iterator
-  findRightmostAmongExact(const Interest& interest, iterator first, iterator last) const;
+            /** \brief find rightmost match in [first,last)
+             *  \return the rightmost match, or last if not found
+             */
+            iterator
+            findRightmost(const Interest& interest, iterator first, iterator last) const;
 
-  void
-  setPolicyImpl(unique_ptr<Policy> policy);
+            /** \brief find rightmost match among entries with exact Names in [first,last)
+             *  \return the rightmost match, or last if not found
+             */
+            iterator
+            findRightmostAmongExact(const Interest& interest, iterator first, iterator last) const;
 
-private:
-  Table m_table;
-  unique_ptr<Policy> m_policy;
-  ndn::util::signal::ScopedConnection m_beforeEvictConnection;
-};
+            void
+            setPolicyImpl(unique_ptr<Policy> policy);
 
-} // namespace cs
+        private:
+            Table m_table;
+            unique_ptr<Policy> m_policy;
+            ndn::util::signal::ScopedConnection m_beforeEvictConnection;
+        };
 
-using cs::Cs;
+    } // namespace cs
+
+    using cs::Cs;
 
 } // namespace nfd
 

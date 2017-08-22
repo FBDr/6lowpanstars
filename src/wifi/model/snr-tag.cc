@@ -26,75 +26,66 @@
 #include "ns3/tag.h"
 #include "ns3/double.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SnrTag);
-
-TypeId
-SnrTag::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SnrTag")
-    .SetParent<Tag> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<SnrTag> ()
-    .AddAttribute ("Snr", "The snr of the last packet received",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SnrTag::Get),
-                   MakeDoubleChecker<double> ())
-  ;
-  return tid;
-}
 
-TypeId
-SnrTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(SnrTag);
 
-SnrTag::SnrTag ()
-  : m_snr (0)
-{
-}
+    TypeId
+    SnrTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SnrTag")
+                .SetParent<Tag> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<SnrTag> ()
+                .AddAttribute("Snr", "The snr of the last packet received",
+                DoubleValue(0.0),
+                MakeDoubleAccessor(&SnrTag::Get),
+                MakeDoubleChecker<double> ())
+                ;
+        return tid;
+    }
 
-SnrTag::SnrTag (double snr)
-  : m_snr (snr)
-{
-}
+    TypeId
+    SnrTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-uint32_t
-SnrTag::GetSerializedSize (void) const
-{
-  return sizeof (double);
-}
+    SnrTag::SnrTag()
+            : m_snr(0) {
+    }
 
-void
-SnrTag::Serialize (TagBuffer i) const
-{
-  i.WriteDouble (m_snr);
-}
+    SnrTag::SnrTag(double snr)
+            : m_snr(snr) {
+    }
 
-void
-SnrTag::Deserialize (TagBuffer i)
-{
-  m_snr = i.ReadDouble ();
-}
+    uint32_t
+    SnrTag::GetSerializedSize(void) const {
+        return sizeof (double);
+    }
 
-void
-SnrTag::Print (std::ostream &os) const
-{
-  os << "Snr=" << m_snr;
-}
+    void
+    SnrTag::Serialize(TagBuffer i) const {
+        i.WriteDouble(m_snr);
+    }
 
-void
-SnrTag::Set (double snr)
-{
-  m_snr = snr;
-}
+    void
+    SnrTag::Deserialize(TagBuffer i) {
+        m_snr = i.ReadDouble();
+    }
 
-double
-SnrTag::Get (void) const
-{
-  return m_snr;
-}
+    void
+    SnrTag::Print(std::ostream & os) const {
+        os << "Snr=" << m_snr;
+    }
+
+    void
+    SnrTag::Set(double snr) {
+        m_snr = snr;
+    }
+
+    double
+    SnrTag::Get(void) const {
+        return m_snr;
+    }
 
 }

@@ -26,52 +26,50 @@
 #include "cryptopp.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-void
-CertificateExtension::encode(CryptoPP::BufferedTransformation& out) const
-{
-  using namespace CryptoPP;
+            void
+            CertificateExtension::encode(CryptoPP::BufferedTransformation& out) const {
+                using namespace CryptoPP;
 
-  // Extension ::= SEQUENCE {
-  //        extnID      OBJECT IDENTIFIER,
-  //        critical    BOOLEAN DEFAULT FALSE,
-  //        extnValue   OCTET STRING  }
+                // Extension ::= SEQUENCE {
+                //        extnID      OBJECT IDENTIFIER,
+                //        critical    BOOLEAN DEFAULT FALSE,
+                //        extnValue   OCTET STRING  }
 
-  DERSequenceEncoder extension(out);
-  {
-    m_extensionId.encode(extension);
-    DEREncodeUnsigned(extension, m_isCritical, BOOLEAN);
-    DEREncodeOctetString(extension, m_extensionValue.buf(), m_extensionValue.size());
-  }
-  extension.MessageEnd();
-}
+                DERSequenceEncoder extension(out);
+                {
+                    m_extensionId.encode(extension);
+                    DEREncodeUnsigned(extension, m_isCritical, BOOLEAN);
+                    DEREncodeOctetString(extension, m_extensionValue.buf(), m_extensionValue.size());
+                }
+                extension.MessageEnd();
+            }
 
-void
-CertificateExtension::decode(CryptoPP::BufferedTransformation& in)
-{
-  using namespace CryptoPP;
+            void
+            CertificateExtension::decode(CryptoPP::BufferedTransformation& in) {
+                using namespace CryptoPP;
 
-  // Extension ::= SEQUENCE {
-  //        extnID      OBJECT IDENTIFIER,
-  //        critical    BOOLEAN DEFAULT FALSE,
-  //        extnValue   OCTET STRING  }
+                // Extension ::= SEQUENCE {
+                //        extnID      OBJECT IDENTIFIER,
+                //        critical    BOOLEAN DEFAULT FALSE,
+                //        extnValue   OCTET STRING  }
 
-  BERSequenceDecoder extension(in);
-  {
-    m_extensionId.decode(extension);
-    BERDecodeUnsigned(extension, m_isCritical, BOOLEAN);
+                BERSequenceDecoder extension(in);
+                {
+                    m_extensionId.decode(extension);
+                    BERDecodeUnsigned(extension, m_isCritical, BOOLEAN);
 
-    // the extra copy operation can be optimized, but not trivial,
-    // since the length is not known in advance
-    SecByteBlock tmpBlock;
-    BERDecodeOctetString(extension, tmpBlock);
-    m_extensionValue.assign(tmpBlock.begin(), tmpBlock.end());
-  }
-  extension.MessageEnd();
-}
+                    // the extra copy operation can be optimized, but not trivial,
+                    // since the length is not known in advance
+                    SecByteBlock tmpBlock;
+                    BERDecodeOctetString(extension, tmpBlock);
+                    m_extensionValue.assign(tmpBlock.begin(), tmpBlock.end());
+                }
+                extension.MessageEnd();
+            }
 
-} // namespace v1
-} // namespace security
+        } // namespace v1
+    } // namespace security
 } // namespace ndn

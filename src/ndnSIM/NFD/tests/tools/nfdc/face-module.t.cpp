@@ -28,14 +28,14 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestFaceModule, ModuleFixture<FaceModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestFaceModule, ModuleFixture<FaceModule>)
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <faces>
     <face>
       <faceId>134</faceId>
@@ -92,60 +92,59 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </faces>
 )XML");
 
-const std::string STATUS_TEXT =
-  "Faces:\n"
-  "  faceid=134 remote=udp4://233.252.0.4:6363 local=udp4://192.0.2.1:6363"
-    " counters={in={22562i 22031d 63n 2522915B} out={30121i 20940d 1218n 1353592B}}"
-    " non-local permanent multi-access flags={}\n"
-  "  faceid=745 remote=fd://75 local=unix:///var/run/nfd.sock"
-    " counters={in={18998i 26701d 147n 4672308B} out={34779i 17028d 1176n 8957187B}}"
-    " local on-demand point-to-point flags={local-fields}\n";
+                const std::string STATUS_TEXT =
+                        "Faces:\n"
+                        "  faceid=134 remote=udp4://233.252.0.4:6363 local=udp4://192.0.2.1:6363"
+                        " counters={in={22562i 22031d 63n 2522915B} out={30121i 20940d 1218n 1353592B}}"
+                        " non-local permanent multi-access flags={}\n"
+                        "  faceid=745 remote=fd://75 local=unix:///var/run/nfd.sock"
+                        " counters={in={18998i 26701d 147n 4672308B} out={34779i 17028d 1176n 8957187B}}"
+                        " local on-demand point-to-point flags={local-fields}\n";
 
-BOOST_AUTO_TEST_CASE(Status)
-{
-  this->fetchStatus();
-  FaceStatus payload1;
-  payload1.setFaceId(134)
-          .setRemoteUri("udp4://233.252.0.4:6363")
-          .setLocalUri("udp4://192.0.2.1:6363")
-          .setFaceScope(ndn::nfd::FACE_SCOPE_NON_LOCAL)
-          .setFacePersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT)
-          .setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS)
-          .setNInInterests(22562)
-          .setNInDatas(22031)
-          .setNInNacks(63)
-          .setNOutInterests(30121)
-          .setNOutDatas(20940)
-          .setNOutNacks(1218)
-          .setNInBytes(2522915)
-          .setNOutBytes(1353592);
-  FaceStatus payload2;
-  payload2.setFaceId(745)
-          .setRemoteUri("fd://75")
-          .setLocalUri("unix:///var/run/nfd.sock")
-          .setFaceScope(ndn::nfd::FACE_SCOPE_LOCAL)
-          .setFacePersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND)
-          .setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT)
-          .setFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED, true)
-          .setNInInterests(18998)
-          .setNInDatas(26701)
-          .setNInNacks(147)
-          .setNOutInterests(34779)
-          .setNOutDatas(17028)
-          .setNOutNacks(1176)
-          .setNInBytes(4672308)
-          .setNOutBytes(8957187);
-  this->sendDataset("/localhost/nfd/faces/list", payload1, payload2);
-  this->prepareStatusOutput();
+                BOOST_AUTO_TEST_CASE(Status) {
+                    this->fetchStatus();
+                    FaceStatus payload1;
+                    payload1.setFaceId(134)
+                            .setRemoteUri("udp4://233.252.0.4:6363")
+                            .setLocalUri("udp4://192.0.2.1:6363")
+                            .setFaceScope(ndn::nfd::FACE_SCOPE_NON_LOCAL)
+                            .setFacePersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT)
+                            .setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS)
+                            .setNInInterests(22562)
+                            .setNInDatas(22031)
+                            .setNInNacks(63)
+                            .setNOutInterests(30121)
+                            .setNOutDatas(20940)
+                            .setNOutNacks(1218)
+                            .setNInBytes(2522915)
+                            .setNOutBytes(1353592);
+                    FaceStatus payload2;
+                    payload2.setFaceId(745)
+                            .setRemoteUri("fd://75")
+                            .setLocalUri("unix:///var/run/nfd.sock")
+                            .setFaceScope(ndn::nfd::FACE_SCOPE_LOCAL)
+                            .setFacePersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND)
+                            .setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT)
+                            .setFlagBit(ndn::nfd::BIT_LOCAL_FIELDS_ENABLED, true)
+                            .setNInInterests(18998)
+                            .setNInDatas(26701)
+                            .setNInNacks(147)
+                            .setNOutInterests(34779)
+                            .setNOutDatas(17028)
+                            .setNOutNacks(1176)
+                            .setNInBytes(4672308)
+                            .setNOutBytes(8957187);
+                    this->sendDataset("/localhost/nfd/faces/list", payload1, payload2);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestFaceModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestFaceModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

@@ -25,50 +25,49 @@
 
 namespace ns3 {
 
-/**
- * \brief Helper class to allow easy installation of 802.11s stack.
- */
-class Dot11sStack : public MeshStack
-{
-public:
-  
-  static TypeId GetTypeId ();
+    /**
+     * \brief Helper class to allow easy installation of 802.11s stack.
+     */
+    class Dot11sStack : public MeshStack {
+    public:
 
-  /**
-   * Create a Dot11sStack() installer helper.
-   */
-  Dot11sStack ();
+        static TypeId GetTypeId();
 
-  /**
-   * Destroy a Dot11sStack() installer helper.
-   */
-  ~Dot11sStack ();
+        /**
+         * Create a Dot11sStack() installer helper.
+         */
+        Dot11sStack();
 
-  /**
-   * Break any reference cycles in the installer helper.  Required for ns-3
-   * Object support.
-   */
-  void DoDispose ();
+        /**
+         * Destroy a Dot11sStack() installer helper.
+         */
+        ~Dot11sStack();
 
-  /**
-   * \brief Install an 802.11s stack.
-   * \param mp The Ptr<MeshPointDevice> to use when setting up the PMP.
-   */
-  bool InstallStack (Ptr<MeshPointDevice> mp);
- 
-  /**
-   * \brief Iterate through the referenced devices and protocols and print
-   * their statistics
-   */
-  void Report (const Ptr<MeshPointDevice> mp, std::ostream&);
+        /**
+         * Break any reference cycles in the installer helper.  Required for ns-3
+         * Object support.
+         */
+        void DoDispose();
 
-  /**
-   * \brief Reset the statistics on the referenced devices and protocols.
-   */
-  void ResetStats (const Ptr<MeshPointDevice> mp);
-private:
-  Mac48Address m_root;
-};
+        /**
+         * \brief Install an 802.11s stack.
+         * \param mp The Ptr<MeshPointDevice> to use when setting up the PMP.
+         */
+        bool InstallStack(Ptr<MeshPointDevice> mp);
+
+        /**
+         * \brief Iterate through the referenced devices and protocols and print
+         * their statistics
+         */
+        void Report(const Ptr<MeshPointDevice> mp, std::ostream&);
+
+        /**
+         * \brief Reset the statistics on the referenced devices and protocols.
+         */
+        void ResetStats(const Ptr<MeshPointDevice> mp);
+    private:
+        Mac48Address m_root;
+    };
 
 } // namespace ns3
 

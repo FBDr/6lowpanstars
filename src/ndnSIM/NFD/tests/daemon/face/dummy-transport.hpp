@@ -31,82 +31,76 @@
 #include "face/transport.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-/** \brief dummy Transport used in unit tests
- */
-class DummyTransport : public Transport
-{
-public:
-  DummyTransport(const std::string& localUri = "dummy://",
-                 const std::string& remoteUri = "dummy://",
-                 ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_NON_LOCAL,
-                 ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-                 ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT,
-                 ssize_t mtu = MTU_UNLIMITED)
-    : isClosed(false)
-  {
-    this->setLocalUri(FaceUri(localUri));
-    this->setRemoteUri(FaceUri(remoteUri));
-    this->setScope(scope);
-    this->setPersistency(persistency);
-    this->setLinkType(linkType);
-    this->setMtu(mtu);
-  }
+            /** \brief dummy Transport used in unit tests
+             */
+            class DummyTransport : public Transport {
+            public:
 
-  void
-  setMtu(ssize_t mtu)
-  {
-    this->Transport::setMtu(mtu);
-  }
+                DummyTransport(const std::string& localUri = "dummy://",
+                        const std::string& remoteUri = "dummy://",
+                        ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_NON_LOCAL,
+                        ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                        ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT,
+                        ssize_t mtu = MTU_UNLIMITED)
+                : isClosed(false) {
+                    this->setLocalUri(FaceUri(localUri));
+                    this->setRemoteUri(FaceUri(remoteUri));
+                    this->setScope(scope);
+                    this->setPersistency(persistency);
+                    this->setLinkType(linkType);
+                    this->setMtu(mtu);
+                }
 
-  void
-  setState(FaceState state)
-  {
-    this->Transport::setState(state);
-  }
+                void
+                setMtu(ssize_t mtu) {
+                    this->Transport::setMtu(mtu);
+                }
 
-  void
-  receivePacket(Packet&& packet)
-  {
-    this->receive(std::move(packet));
-  }
+                void
+                setState(FaceState state) {
+                    this->Transport::setState(state);
+                }
 
-  void
-  receivePacket(Block block)
-  {
-    this->receive(Packet(std::move(block)));
-  }
+                void
+                receivePacket(Packet&& packet) {
+                    this->receive(std::move(packet));
+                }
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) override
-  {
-    // accept everything
-  }
+                void
+                receivePacket(Block block) {
+                    this->receive(Packet(std::move(block)));
+                }
 
-private:
-  virtual void
-  doClose() override
-  {
-    isClosed = true;
-    this->setState(TransportState::CLOSED);
-  }
+            protected:
 
-  virtual void
-  doSend(Packet&& packet) override
-  {
-    sentPackets.push_back(std::move(packet));
-  }
+                virtual void
+                beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) override {
+                    // accept everything
+                }
 
-public:
-  bool isClosed;
-  std::vector<Packet> sentPackets;
-};
+            private:
 
-} // namespace tests
-} // namespace face
+                virtual void
+                doClose() override {
+                    isClosed = true;
+                    this->setState(TransportState::CLOSED);
+                }
+
+                virtual void
+                doSend(Packet&& packet) override {
+                    sentPackets.push_back(std::move(packet));
+                }
+
+            public:
+                bool isClosed;
+                std::vector<Packet> sentPackets;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_DUMMY_TRANSPORT_HPP

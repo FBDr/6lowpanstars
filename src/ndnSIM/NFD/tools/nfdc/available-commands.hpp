@@ -29,14 +29,14 @@
 #include "command-parser.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-void
-registerCommands(CommandParser& parser);
+            void
+            registerCommands(CommandParser& parser);
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_AVAILABLE_COMMANDS_HPP

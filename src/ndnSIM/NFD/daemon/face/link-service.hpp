@@ -31,226 +31,217 @@
 #include "face-log.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-class Face;
+        class Face;
 
-/** \brief counters provided by LinkService
- *  \note The type name 'LinkServiceCounters' is implementation detail.
- *        Use 'LinkService::Counters' in public API.
- */
-class LinkServiceCounters
-{
-public:
-  /** \brief count of incoming Interests
-   */
-  PacketCounter nInInterests;
+        /** \brief counters provided by LinkService
+         *  \note The type name 'LinkServiceCounters' is implementation detail.
+         *        Use 'LinkService::Counters' in public API.
+         */
+        class LinkServiceCounters {
+        public:
+            /** \brief count of incoming Interests
+             */
+            PacketCounter nInInterests;
 
-  /** \brief count of outgoing Interests
-   */
-  PacketCounter nOutInterests;
+            /** \brief count of outgoing Interests
+             */
+            PacketCounter nOutInterests;
 
-  /** \brief count of incoming Data
-   */
-  PacketCounter nInData;
+            /** \brief count of incoming Data
+             */
+            PacketCounter nInData;
 
-  /** \brief count of outgoing Data
-   */
-  PacketCounter nOutData;
+            /** \brief count of outgoing Data
+             */
+            PacketCounter nOutData;
 
-  /** \brief count of incoming Nacks
-   */
-  PacketCounter nInNacks;
+            /** \brief count of incoming Nacks
+             */
+            PacketCounter nInNacks;
 
-  /** \brief count of outgoing Nacks
-   */
-  PacketCounter nOutNacks;
-};
+            /** \brief count of outgoing Nacks
+             */
+            PacketCounter nOutNacks;
+        };
 
-/** \brief the upper part of a Face
- *  \sa Face
- */
-class LinkService : protected virtual LinkServiceCounters, noncopyable
-{
-public:
-  /** \brief counters provided by LinkService
-   */
-  typedef LinkServiceCounters Counters;
+        /** \brief the upper part of a Face
+         *  \sa Face
+         */
+        class LinkService : protected virtual LinkServiceCounters, noncopyable {
+        public:
+            /** \brief counters provided by LinkService
+             */
+            typedef LinkServiceCounters Counters;
 
-public:
-  LinkService();
+        public:
+            LinkService();
 
-  virtual
-  ~LinkService();
+            virtual
+            ~LinkService();
 
-  /** \brief set Face and Transport for LinkService
-   *  \pre setFaceAndTransport has not been called
-   */
-  void
-  setFaceAndTransport(Face& face, Transport& transport);
+            /** \brief set Face and Transport for LinkService
+             *  \pre setFaceAndTransport has not been called
+             */
+            void
+            setFaceAndTransport(Face& face, Transport& transport);
 
-  /** \return Face to which this LinkService is attached
-   */
-  const Face*
-  getFace() const;
+            /** \return Face to which this LinkService is attached
+             */
+            const Face*
+            getFace() const;
 
-  /** \return Transport to which this LinkService is attached
-   */
-  const Transport*
-  getTransport() const;
+            /** \return Transport to which this LinkService is attached
+             */
+            const Transport*
+            getTransport() const;
 
-  /** \return Transport to which this LinkService is attached
-   */
-  Transport*
-  getTransport();
+            /** \return Transport to which this LinkService is attached
+             */
+            Transport*
+            getTransport();
 
-  virtual const Counters&
-  getCounters() const;
+            virtual const Counters&
+            getCounters() const;
 
-public: // upper interface to be used by forwarding
-  /** \brief send Interest
-   *  \pre setTransport has been called
-   */
-  void
-  sendInterest(const Interest& interest);
+        public: // upper interface to be used by forwarding
+            /** \brief send Interest
+             *  \pre setTransport has been called
+             */
+            void
+            sendInterest(const Interest& interest);
 
-  /** \brief send Data
-   *  \pre setTransport has been called
-   */
-  void
-  sendData(const Data& data);
+            /** \brief send Data
+             *  \pre setTransport has been called
+             */
+            void
+            sendData(const Data& data);
 
-  /** \brief send Nack
-   *  \pre setTransport has been called
-   */
-  void
-  sendNack(const ndn::lp::Nack& nack);
+            /** \brief send Nack
+             *  \pre setTransport has been called
+             */
+            void
+            sendNack(const ndn::lp::Nack& nack);
 
-  /** \brief signals on Interest received
-   */
-  signal::Signal<LinkService, Interest> afterReceiveInterest;
+            /** \brief signals on Interest received
+             */
+            signal::Signal<LinkService, Interest> afterReceiveInterest;
 
-  /** \brief signals on Data received
-   */
-  signal::Signal<LinkService, Data> afterReceiveData;
+            /** \brief signals on Data received
+             */
+            signal::Signal<LinkService, Data> afterReceiveData;
 
-  /** \brief signals on Nack received
-   */
-  signal::Signal<LinkService, lp::Nack> afterReceiveNack;
+            /** \brief signals on Nack received
+             */
+            signal::Signal<LinkService, lp::Nack> afterReceiveNack;
 
-  /** \brief signals on Interest sent
-   */
-  signal::Signal<LinkService, Interest> afterSendInterest;
+            /** \brief signals on Interest sent
+             */
+            signal::Signal<LinkService, Interest> afterSendInterest;
 
-  /** \brief signals on Data sent
-   */
-  signal::Signal<LinkService, Data> afterSendData;
+            /** \brief signals on Data sent
+             */
+            signal::Signal<LinkService, Data> afterSendData;
 
-  /** \brief signals on Nack sent
-   */
-  signal::Signal<LinkService, lp::Nack> afterSendNack;
+            /** \brief signals on Nack sent
+             */
+            signal::Signal<LinkService, lp::Nack> afterSendNack;
 
-public: // lower interface to be invoked by Transport
-  /** \brief performs LinkService specific operations to receive a lower-layer packet
-   */
-  void
-  receivePacket(Transport::Packet&& packet);
+        public: // lower interface to be invoked by Transport
+            /** \brief performs LinkService specific operations to receive a lower-layer packet
+             */
+            void
+            receivePacket(Transport::Packet&& packet);
 
-protected: // upper interface to be invoked in subclass (receive path termination)
-  /** \brief delivers received Interest to forwarding
-   */
-  void
-  receiveInterest(const Interest& interest);
+        protected: // upper interface to be invoked in subclass (receive path termination)
+            /** \brief delivers received Interest to forwarding
+             */
+            void
+            receiveInterest(const Interest& interest);
 
-  /** \brief delivers received Data to forwarding
-   */
-  void
-  receiveData(const Data& data);
+            /** \brief delivers received Data to forwarding
+             */
+            void
+            receiveData(const Data& data);
 
-  /** \brief delivers received Nack to forwarding
-   */
-  void
-  receiveNack(const lp::Nack& nack);
+            /** \brief delivers received Nack to forwarding
+             */
+            void
+            receiveNack(const lp::Nack& nack);
 
-protected: // lower interface to be invoked in subclass (send path termination)
-  /** \brief sends a lower-layer packet via Transport
-   */
-  void
-  sendPacket(Transport::Packet&& packet);
+        protected: // lower interface to be invoked in subclass (send path termination)
+            /** \brief sends a lower-layer packet via Transport
+             */
+            void
+            sendPacket(Transport::Packet&& packet);
 
-private: // upper interface to be overridden in subclass (send path entrypoint)
-  /** \brief performs LinkService specific operations to send an Interest
-   */
-  virtual void
-  doSendInterest(const Interest& interest) = 0;
+        private: // upper interface to be overridden in subclass (send path entrypoint)
+            /** \brief performs LinkService specific operations to send an Interest
+             */
+            virtual void
+            doSendInterest(const Interest& interest) = 0;
 
-  /** \brief performs LinkService specific operations to send a Data
-   */
-  virtual void
-  doSendData(const Data& data) = 0;
+            /** \brief performs LinkService specific operations to send a Data
+             */
+            virtual void
+            doSendData(const Data& data) = 0;
 
-  /** \brief performs LinkService specific operations to send a Nack
-   */
-  virtual void
-  doSendNack(const lp::Nack& nack) = 0;
+            /** \brief performs LinkService specific operations to send a Nack
+             */
+            virtual void
+            doSendNack(const lp::Nack& nack) = 0;
 
-private: // lower interface to be overridden in subclass
-  virtual void
-  doReceivePacket(Transport::Packet&& packet) = 0;
+        private: // lower interface to be overridden in subclass
+            virtual void
+            doReceivePacket(Transport::Packet&& packet) = 0;
 
-private:
-  Face* m_face;
-  Transport* m_transport;
-};
+        private:
+            Face* m_face;
+            Transport* m_transport;
+        };
 
-inline const Face*
-LinkService::getFace() const
-{
-  return m_face;
-}
+        inline const Face*
+        LinkService::getFace() const {
+            return m_face;
+        }
 
-inline const Transport*
-LinkService::getTransport() const
-{
-  return m_transport;
-}
+        inline const Transport*
+        LinkService::getTransport() const {
+            return m_transport;
+        }
 
-inline Transport*
-LinkService::getTransport()
-{
-  return m_transport;
-}
+        inline Transport*
+        LinkService::getTransport() {
+            return m_transport;
+        }
 
-inline const LinkService::Counters&
-LinkService::getCounters() const
-{
-  return *this;
-}
+        inline const LinkService::Counters&
+        LinkService::getCounters() const {
+            return *this;
+        }
 
-inline void
-LinkService::receivePacket(Transport::Packet&& packet)
-{
-  doReceivePacket(std::move(packet));
-}
+        inline void
+        LinkService::receivePacket(Transport::Packet&& packet) {
+            doReceivePacket(std::move(packet));
+        }
 
-inline void
-LinkService::sendPacket(Transport::Packet&& packet)
-{
-  m_transport->send(std::move(packet));
-}
+        inline void
+        LinkService::sendPacket(Transport::Packet&& packet) {
+            m_transport->send(std::move(packet));
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const FaceLogHelper<LinkService>& flh);
+        std::ostream&
+        operator<<(std::ostream& os, const FaceLogHelper<LinkService>& flh);
 
-template<typename T>
-typename std::enable_if<std::is_base_of<LinkService, T>::value &&
-                        !std::is_same<LinkService, T>::value, std::ostream&>::type
-operator<<(std::ostream& os, const FaceLogHelper<T>& flh)
-{
-  return os << FaceLogHelper<LinkService>(flh.obj);
-}
+        template<typename T>
+        typename std::enable_if<std::is_base_of<LinkService, T>::value &&
+        !std::is_same<LinkService, T>::value, std::ostream&>::type
+        operator<<(std::ostream& os, const FaceLogHelper<T>& flh) {
+            return os << FaceLogHelper<LinkService>(flh.obj);
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_LINK_SERVICE_HPP

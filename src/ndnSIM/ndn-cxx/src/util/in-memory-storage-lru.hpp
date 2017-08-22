@@ -31,71 +31,70 @@
 #include <boost/multi_index/identity.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** @brief Provides in-memory storage employing LRU replacement policy, of which the least
- *  recently used entry will be evict first.
- */
-class InMemoryStorageLru : public InMemoryStorage
-{
-public:
-  explicit
-  InMemoryStorageLru(size_t limit = 10);
+        /** @brief Provides in-memory storage employing LRU replacement policy, of which the least
+         *  recently used entry will be evict first.
+         */
+        class InMemoryStorageLru : public InMemoryStorage {
+        public:
+            explicit
+            InMemoryStorageLru(size_t limit = 10);
 
-  InMemoryStorageLru(boost::asio::io_service& ioService, size_t limit = 10);
+            InMemoryStorageLru(boost::asio::io_service& ioService, size_t limit = 10);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
-  /** @brief Removes one Data packet from in-memory storage based on LRU, i.e. evict the least
-   *  recently accessed Data packet
-   *  @return{ whether the Data was removed }
-   */
-  virtual bool
-  evictItem() override;
+            /** @brief Removes one Data packet from in-memory storage based on LRU, i.e. evict the least
+             *  recently accessed Data packet
+             *  @return{ whether the Data was removed }
+             */
+            virtual bool
+            evictItem() override;
 
-  /** @brief Update the entry when the entry is returned by the find() function,
-   *  update the last used time according to LRU
-   */
-  virtual void
-  afterAccess(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry when the entry is returned by the find() function,
+             *  update the last used time according to LRU
+             */
+            virtual void
+            afterAccess(InMemoryStorageEntry* entry) override;
 
-  /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
-   */
-  virtual void
-  afterInsert(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
+             */
+            virtual void
+            afterInsert(InMemoryStorageEntry* entry) override;
 
-  /** @brief Update the entry or other data structures before a entry is successfully erased,
-   *  erase it from the cleanupIndex
-   */
-  virtual void
-  beforeErase(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry or other data structures before a entry is successfully erased,
+             *  erase it from the cleanupIndex
+             */
+            virtual void
+            beforeErase(InMemoryStorageEntry* entry) override;
 
-private:
-  //multi_index_container to implement LRU
-  class byUsedTime;
-  class byEntity;
+        private:
+            //multi_index_container to implement LRU
+            class byUsedTime;
+            class byEntity;
 
-  typedef boost::multi_index_container<
-    InMemoryStorageEntry*,
-    boost::multi_index::indexed_by<
+            typedef boost::multi_index_container<
+            InMemoryStorageEntry*,
+            boost::multi_index::indexed_by<
 
-      // by Entry itself
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<byEntity>,
-        boost::multi_index::identity<InMemoryStorageEntry*>
-      >,
+            // by Entry itself
+            boost::multi_index::hashed_unique<
+            boost::multi_index::tag<byEntity>,
+            boost::multi_index::identity<InMemoryStorageEntry*>
+            >,
 
-      // by last used time (LRU)
-      boost::multi_index::sequenced<
-        boost::multi_index::tag<byUsedTime>
-      >
+            // by last used time (LRU)
+            boost::multi_index::sequenced<
+            boost::multi_index::tag<byUsedTime>
+            >
 
-    >
-  > CleanupIndex;
+            >
+            > CleanupIndex;
 
-  CleanupIndex m_cleanupIndex;
-};
+            CleanupIndex m_cleanupIndex;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_IN_MEMORY_STORAGE_LRU_HPP

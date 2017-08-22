@@ -1106,377 +1106,369 @@
 
 namespace ns3 {
 
-/**
- * \ingroup testing
- * \brief Compare two double precision floating point numbers and
- * declare them equal if they are within some epsilon of each other.
- *
- * Approximate comparison of floating point numbers near equality is
- * trickier than one may expect and is well-discussed in the
- * literature.  Basic strategies revolve around a suggestion by Knuth
- * to compare the floating point numbers as binary integers, supplying
- * a maximum difference between them .  This max difference is
- * specified in Units in the Last Place (ulps) or a floating point
- * epsilon.
- *
- * This routine is based on the GNU Scientific Library function
- * gsl_fcmp.
- * 
- * \param [in] a The first of double precision floating point
- *               numbers to compare
- * \param [in] b The second of double precision floating point
- *               numbers to compare
- * \param [in] epsilon The tolerance to use in the comparison.
- * \returns Returns \c true if the doubles are equal to a precision
- *          defined by epsilon
- */
-bool TestDoubleIsEqual (const double a, const double b, 
-                        const double epsilon = std::numeric_limits<double>::epsilon ());
+    /**
+     * \ingroup testing
+     * \brief Compare two double precision floating point numbers and
+     * declare them equal if they are within some epsilon of each other.
+     *
+     * Approximate comparison of floating point numbers near equality is
+     * trickier than one may expect and is well-discussed in the
+     * literature.  Basic strategies revolve around a suggestion by Knuth
+     * to compare the floating point numbers as binary integers, supplying
+     * a maximum difference between them .  This max difference is
+     * specified in Units in the Last Place (ulps) or a floating point
+     * epsilon.
+     *
+     * This routine is based on the GNU Scientific Library function
+     * gsl_fcmp.
+     * 
+     * \param [in] a The first of double precision floating point
+     *               numbers to compare
+     * \param [in] b The second of double precision floating point
+     *               numbers to compare
+     * \param [in] epsilon The tolerance to use in the comparison.
+     * \returns Returns \c true if the doubles are equal to a precision
+     *          defined by epsilon
+     */
+    bool TestDoubleIsEqual(const double a, const double b,
+            const double epsilon = std::numeric_limits<double>::epsilon());
 
-class TestRunnerImpl;
+    class TestRunnerImpl;
 
-/**
- * \ingroup testing
- *
- * \brief encapsulates test code
- *
- * To allow a new test to be run within the ns-3 test framework, users
- * need to create subclasses of this base class, override the DoRun
- * method, and use the NS_TEST_* macros within DoRun.
- */
-class TestCase : private NonCopyable
-{
-public:
-  /** \brief How long the test takes to execute. */
-  enum TestDuration {
-    QUICK         = 1,  //!< Fast test.
-    EXTENSIVE     = 2,  //!< Medium length test.
-    TAKES_FOREVER = 3   //!< Very long running test.
-  };
+    /**
+     * \ingroup testing
+     *
+     * \brief encapsulates test code
+     *
+     * To allow a new test to be run within the ns-3 test framework, users
+     * need to create subclasses of this base class, override the DoRun
+     * method, and use the NS_TEST_* macros within DoRun.
+     */
+    class TestCase : private NonCopyable {
+    public:
 
-  /**
-   *  Destructor
-   */
-  virtual ~TestCase ();
+        /** \brief How long the test takes to execute. */
+        enum TestDuration {
+            QUICK = 1, //!< Fast test.
+            EXTENSIVE = 2, //!< Medium length test.
+            TAKES_FOREVER = 3 //!< Very long running test.
+        };
 
-  /**
-   * \return The name of this test
-   */
-  std::string GetName (void) const;  
+        /**
+         *  Destructor
+         */
+        virtual ~TestCase();
 
-protected:
-  /**
-   * \brief Constructor.
-   *
-   * \param [in] name The name of the new TestCase created
-   */
-  TestCase (std::string name);
+        /**
+         * \return The name of this test
+         */
+        std::string GetName(void) const;
 
-  /**
-   * \brief Add an individual child TestCase to this test suite.
-   *
-   * \param [in] testCase Pointer to the TestCase object to be added.
-   * \param [in] duration Amount of time this test takes to execute.
-   */
-  void AddTestCase (TestCase *testCase, enum TestDuration duration);
+    protected:
+        /**
+         * \brief Constructor.
+         *
+         * \param [in] name The name of the new TestCase created
+         */
+        TestCase(std::string name);
 
-  /**
-   * \brief Set the data directory where reference trace files can be
-   * found.
-   *
-   * \param [in] directory The directory where the test data is
-   * located
-   *
-   * In general, this method is invoked as SetDataDir
-   * (NS_TEST_SOURCEDIR); However, if a module contains a test
-   * directory with subdirectories (e.g. src/mesh/test), and the test
-   * data (e.g. pcap traces) is located in one of these
-   * subdirectories, then the variable NS_TEST_SOURCEDIR may not work
-   * and the user may want to explicitly pass in a directory string.
-   *
-   * Note that NS_TEST_SOURCEDIR is set in src/wscript for each module
-   */
-  void SetDataDir (std::string directory);
+        /**
+         * \brief Add an individual child TestCase to this test suite.
+         *
+         * \param [in] testCase Pointer to the TestCase object to be added.
+         * \param [in] duration Amount of time this test takes to execute.
+         */
+        void AddTestCase(TestCase *testCase, enum TestDuration duration);
 
-  /**
-   * \brief Check if any tests failed.
-   *
-   * \return \c true if any of the tests have failed, \c false otherwise.
-   */
-  bool IsStatusFailure (void) const;
-  /**
-   * \brief Check if all tests passed.
-   *
-   * \return \c true if the tests have succeeded, \c false otherwise.
-   */
-  bool IsStatusSuccess (void) const;
+        /**
+         * \brief Set the data directory where reference trace files can be
+         * found.
+         *
+         * \param [in] directory The directory where the test data is
+         * located
+         *
+         * In general, this method is invoked as SetDataDir
+         * (NS_TEST_SOURCEDIR); However, if a module contains a test
+         * directory with subdirectories (e.g. src/mesh/test), and the test
+         * data (e.g. pcap traces) is located in one of these
+         * subdirectories, then the variable NS_TEST_SOURCEDIR may not work
+         * and the user may want to explicitly pass in a directory string.
+         *
+         * Note that NS_TEST_SOURCEDIR is set in src/wscript for each module
+         */
+        void SetDataDir(std::string directory);
 
-  /**
-   * \brief Get the parent of this TestCsse.
-   *
-   * \return A pointer to the parent of this test.
-   */
-  TestCase * GetParent () const;
+        /**
+         * \brief Check if any tests failed.
+         *
+         * \return \c true if any of the tests have failed, \c false otherwise.
+         */
+        bool IsStatusFailure(void) const;
+        /**
+         * \brief Check if all tests passed.
+         *
+         * \return \c true if the tests have succeeded, \c false otherwise.
+         */
+        bool IsStatusSuccess(void) const;
 
-  /**
-   * \name Internal Interface
-   * These methods are the interface used by test macros and should not
-   * be used directly by normal test code.
-   * @{
-   */
-  /**
-   * \brief Log the failure of this TestCase.
-   *
-   * \param [in] cond The test condition.
-   * \param [in] actual Actual value of the test.
-   * \param [in] limit Expected value of the test.
-   * \param [in] message Message indicating the type of failure.
-   * \param [in] file The file where the test failed.
-   * \param [in] line The line number in \p file where the test failed.
-   */
-  void ReportTestFailure (std::string cond, std::string actual, 
-                      std::string limit, std::string message, 
-                      std::string file, int32_t line);
-  /**
-   * \brief Check if this run should assert on failure.
-   *
-   * \return \c true if we should assert on failure.
-   */
-  bool MustAssertOnFailure (void) const;
-  /**
-   * \brief Check if this run should continue on failure.
-   *
-   * \return \c true if we should continue on failure.
-   */
-  bool MustContinueOnFailure (void) const;
-  /**
-   * \brief Construct the full path to a file in the data directory.
-   *
-   * The data directory is configured by SetDataDirectory().
-   *
-   * \param [in] filename The bare (no path) file name
-   * \return The full path to \p filename in the data directory
-   */
-  std::string CreateDataDirFilename (std::string filename);
-  /**
-   * \brief Construct the full path to a file in a temporary directory.
-   *
-   *  If the TestRunner is invoked with "--update-data", this will be
-   *  the data directory instead.
-   *
-   * \param [in] filename The bare (no path) file name
-   * \return The full path to \p filename in the temporary directory.
-   */
-  std::string CreateTempDirFilename (std::string filename);
-  /**@}*/
-  
-private:
-  friend class TestRunnerImpl;
+        /**
+         * \brief Get the parent of this TestCsse.
+         *
+         * \return A pointer to the parent of this test.
+         */
+        TestCase * GetParent() const;
 
-  /**
-   * \brief Implementation to do any local setup required for this
-   * TestCase.
-   *
-   * Subclasses should override this method to perform any costly
-   * per-test setup before DoRun is invoked.
-   */
-  virtual void DoSetup (void);
+        /**
+         * \name Internal Interface
+         * These methods are the interface used by test macros and should not
+         * be used directly by normal test code.
+         * @{
+         */
+        /**
+         * \brief Log the failure of this TestCase.
+         *
+         * \param [in] cond The test condition.
+         * \param [in] actual Actual value of the test.
+         * \param [in] limit Expected value of the test.
+         * \param [in] message Message indicating the type of failure.
+         * \param [in] file The file where the test failed.
+         * \param [in] line The line number in \p file where the test failed.
+         */
+        void ReportTestFailure(std::string cond, std::string actual,
+                std::string limit, std::string message,
+                std::string file, int32_t line);
+        /**
+         * \brief Check if this run should assert on failure.
+         *
+         * \return \c true if we should assert on failure.
+         */
+        bool MustAssertOnFailure(void) const;
+        /**
+         * \brief Check if this run should continue on failure.
+         *
+         * \return \c true if we should continue on failure.
+         */
+        bool MustContinueOnFailure(void) const;
+        /**
+         * \brief Construct the full path to a file in the data directory.
+         *
+         * The data directory is configured by SetDataDirectory().
+         *
+         * \param [in] filename The bare (no path) file name
+         * \return The full path to \p filename in the data directory
+         */
+        std::string CreateDataDirFilename(std::string filename);
+        /**
+         * \brief Construct the full path to a file in a temporary directory.
+         *
+         *  If the TestRunner is invoked with "--update-data", this will be
+         *  the data directory instead.
+         *
+         * \param [in] filename The bare (no path) file name
+         * \return The full path to \p filename in the temporary directory.
+         */
+        std::string CreateTempDirFilename(std::string filename);
+        /**@}*/
 
-  /**
-   * \brief Implementation to actually run this TestCase.
-   *
-   * Subclasses should override this method to conduct their tests.
-   */
-  virtual void DoRun (void) = 0;
+    private:
+        friend class TestRunnerImpl;
 
-  /**
-   * \brief Implementation to do any local setup required for this
-   * TestCase.
-   *
-   * Subclasses should override this method to perform any costly
-   * per-test teardown
-   */
-  virtual void DoTeardown (void);
+        /**
+         * \brief Implementation to do any local setup required for this
+         * TestCase.
+         *
+         * Subclasses should override this method to perform any costly
+         * per-test setup before DoRun is invoked.
+         */
+        virtual void DoSetup(void);
 
-  // methods called by TestRunnerImpl
-  /**
-   * \brief Actually run this TestCase
-   *
-   * \param [in] runner The test runner implementation.
-   */
-  void Run (TestRunnerImpl *runner);
-  /**
-   * \copydoc IsStatusFailure()
-   */
-  bool IsFailed (void) const;
+        /**
+         * \brief Implementation to actually run this TestCase.
+         *
+         * Subclasses should override this method to conduct their tests.
+         */
+        virtual void DoRun(void) = 0;
 
-  /**
-   * \ingroup testingimpl
-   * \brief Container for results from a TestCase.
-   */
-  struct Result;
+        /**
+         * \brief Implementation to do any local setup required for this
+         * TestCase.
+         *
+         * Subclasses should override this method to perform any costly
+         * per-test teardown
+         */
+        virtual void DoTeardown(void);
 
-  TestCase *m_parent;                   //!< Pointer to my parent TestCase
-  std::vector<TestCase *> m_children;   //!< Vector of my children
-  std::string m_dataDir;                //!< My data directory
-  TestRunnerImpl *m_runner;             //!< Pointer to the TestRunner
-  struct Result *m_result;              //!< Results data
-  std::string m_name;                   //!< TestCase name
-  enum TestDuration m_duration;         //!< TestCase duration
-};
+        // methods called by TestRunnerImpl
+        /**
+         * \brief Actually run this TestCase
+         *
+         * \param [in] runner The test runner implementation.
+         */
+        void Run(TestRunnerImpl *runner);
+        /**
+         * \copydoc IsStatusFailure()
+         */
+        bool IsFailed(void) const;
 
-/**
- * \ingroup testing
- *
- * \brief A suite of tests to run.
- */
-class TestSuite : public TestCase
-{
-public:
-  /**
-   * \enum Type
-   * \brief Type of test.
-   */
-  enum Type {
-    ALL = 0,    //!<
-    BVT = 1,    //!< This test suite implements a Build Verification Test
-    UNIT,       //!< This test suite implements a Unit Test
-    SYSTEM,     //!< This test suite implements a System Test
-    EXAMPLE,    //!< This test suite implements an Example Test
-    PERFORMANCE //!< This test suite implements a Performance Test
-  };
+        /**
+         * \ingroup testingimpl
+         * \brief Container for results from a TestCase.
+         */
+        struct Result;
 
-  /**
-   * \brief Constuct a new test suite.
-   *
-   * \param [in] name The name of the test suite.
-   * \param [in] type The TestType of the test suite (defaults to UNIT test).
-   */
-  TestSuite (std::string name, Type type = UNIT);
+        TestCase *m_parent; //!< Pointer to my parent TestCase
+        std::vector<TestCase *> m_children; //!< Vector of my children
+        std::string m_dataDir; //!< My data directory
+        TestRunnerImpl *m_runner; //!< Pointer to the TestRunner
+        struct Result *m_result; //!< Results data
+        std::string m_name; //!< TestCase name
+        enum TestDuration m_duration; //!< TestCase duration
+    };
 
-  /**
-   * \brief get the kind of test this test suite implements
-   *
-   * \returns The Type of the suite.
-   */
-  TestSuite::Type GetTestType (void);
+    /**
+     * \ingroup testing
+     *
+     * \brief A suite of tests to run.
+     */
+    class TestSuite : public TestCase {
+    public:
 
-private:
-  // Inherited
-  virtual void DoRun (void);
+        /**
+         * \enum Type
+         * \brief Type of test.
+         */
+        enum Type {
+            ALL = 0, //!<
+            BVT = 1, //!< This test suite implements a Build Verification Test
+            UNIT, //!< This test suite implements a Unit Test
+            SYSTEM, //!< This test suite implements a System Test
+            EXAMPLE, //!< This test suite implements an Example Test
+            PERFORMANCE //!< This test suite implements a Performance Test
+        };
 
-  TestSuite::Type m_type;               //!< Type of this TestSuite
-};
+        /**
+         * \brief Constuct a new test suite.
+         *
+         * \param [in] name The name of the test suite.
+         * \param [in] type The TestType of the test suite (defaults to UNIT test).
+         */
+        TestSuite(std::string name, Type type = UNIT);
 
-/**
- * \ingroup testingimpl
- *
- * \brief A runner to execute tests.
- */
-class TestRunner
-{
-public:
-  /**
-   * Run the requested suite of tests,
-   * according to the given command line arguments.
-   *
-   * \param [in] argc The number of elements in \pname{argv}
-   * \param [in] argv The vector of command line arguments
-   * \returns Success status
-   */
-  static int Run (int argc, char *argv[]);
-};
+        /**
+         * \brief get the kind of test this test suite implements
+         *
+         * \returns The Type of the suite.
+         */
+        TestSuite::Type GetTestType(void);
 
-/**
- * \ingroup testing
- *
- * \brief A simple way to store test vectors (for stimulus or from responses)
- */
-template <typename T>
-class TestVectors : private NonCopyable
-{
-public:
-  /**
-   * Constructor
-   */
-  TestVectors ();
-  /**
-   * Virtual desctructor
-   */
-  virtual ~TestVectors ();
+    private:
+        // Inherited
+        virtual void DoRun(void);
 
-  /**
-   * \brief Set the expected length of this vector.
-   *
-   * \param [in] reserve The number of entries to reserve
-   */
-  void Reserve (uint32_t reserve);
+        TestSuite::Type m_type; //!< Type of this TestSuite
+    };
 
-  /**
-   * \param [in] vector The test vector to add
-   * 
-   * \returns The new test vector index
-   */
-  uint32_t Add (T vector);
+    /**
+     * \ingroup testingimpl
+     *
+     * \brief A runner to execute tests.
+     */
+    class TestRunner {
+    public:
+        /**
+         * Run the requested suite of tests,
+         * according to the given command line arguments.
+         *
+         * \param [in] argc The number of elements in \pname{argv}
+         * \param [in] argv The vector of command line arguments
+         * \returns Success status
+         */
+        static int Run(int argc, char *argv[]);
+    };
 
-  /**
-   * \brief Get the total number of test vectors.
-   * \return The number of test vectors
-   */
-  uint32_t GetN (void) const;
-  /**
-   * \brief Get the i'th test vector
-   * \param [in] i The requested vector index
-   * \return The requested vector
-   */
-  T Get (uint32_t i) const;
+    /**
+     * \ingroup testing
+     *
+     * \brief A simple way to store test vectors (for stimulus or from responses)
+     */
+    template <typename T>
+    class TestVectors : private NonCopyable {
+    public:
+        /**
+         * Constructor
+         */
+        TestVectors();
+        /**
+         * Virtual desctructor
+         */
+        virtual ~TestVectors();
 
-private:
-  typedef std::vector<T> TestVector;    //!< Container type
-  TestVector m_vectors;                 //!< The list of test vectors
-};
+        /**
+         * \brief Set the expected length of this vector.
+         *
+         * \param [in] reserve The number of entries to reserve
+         */
+        void Reserve(uint32_t reserve);
 
-template <typename T>
-TestVectors<T>::TestVectors ()
-  : m_vectors ()
-{
-}
+        /**
+         * \param [in] vector The test vector to add
+         * 
+         * \returns The new test vector index
+         */
+        uint32_t Add(T vector);
 
-template <typename T>
-void
-TestVectors<T>::Reserve (uint32_t reserve)
-{
-  m_vectors.reserve (reserve);
-}
+        /**
+         * \brief Get the total number of test vectors.
+         * \return The number of test vectors
+         */
+        uint32_t GetN(void) const;
+        /**
+         * \brief Get the i'th test vector
+         * \param [in] i The requested vector index
+         * \return The requested vector
+         */
+        T Get(uint32_t i) const;
 
-template <typename T>
-TestVectors<T>::~TestVectors ()
-{
-}
+    private:
+        typedef std::vector<T> TestVector; //!< Container type
+        TestVector m_vectors; //!< The list of test vectors
+    };
 
-template <typename T>
-uint32_t
-TestVectors<T>::Add (T vector)
-{
-  uint32_t index = m_vectors.size ();
-  m_vectors.push_back (vector);
-  return index;
-}
+    template <typename T>
+    TestVectors<T>::TestVectors()
+    : m_vectors() {
+    }
 
-template <typename T>
-uint32_t 
-TestVectors<T>::GetN (void) const
-{
-  return m_vectors.size ();
-}
+    template <typename T>
+    void
+    TestVectors<T>::Reserve(uint32_t reserve) {
+        m_vectors.reserve(reserve);
+    }
 
-template <typename T>
-T
-TestVectors<T>::Get (uint32_t i) const
-{
-  NS_ABORT_MSG_UNLESS (m_vectors.size () > i, "TestVectors::Get(): Bad index");
-  return m_vectors[i];
-}
+    template <typename T>
+    TestVectors<T>::~TestVectors() {
+    }
+
+    template <typename T>
+    uint32_t
+    TestVectors<T>::Add(T vector) {
+        uint32_t index = m_vectors.size();
+        m_vectors.push_back(vector);
+        return index;
+    }
+
+    template <typename T>
+    uint32_t
+    TestVectors<T>::GetN(void) const {
+        return m_vectors.size();
+    }
+
+    template <typename T>
+    T
+    TestVectors<T>::Get(uint32_t i) const {
+        NS_ABORT_MSG_UNLESS(m_vectors.size() > i, "TestVectors::Get(): Bad index");
+        return m_vectors[i];
+    }
 
 } // namespace ns3 
 

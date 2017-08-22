@@ -30,29 +30,28 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-/** \brief check a transport has all its static properties set after initialization
- *
- *  This check shall be inserted to the StaticProperties test case for each transport,
- *  in addition to checking the values of properties.
- *  When a new static property is defined, this test case shall be updated.
- *  Thus, if a transport forgets to set a static property, this check would fail.
- */
-inline void
-checkStaticPropertiesInitialized(const Transport& transport)
-{
-  BOOST_CHECK(!transport.getLocalUri().getScheme().empty());
-  BOOST_CHECK(!transport.getRemoteUri().getScheme().empty());
-  BOOST_CHECK_NE(transport.getScope(), ndn::nfd::FACE_SCOPE_NONE);
-  BOOST_CHECK_NE(transport.getPersistency(), ndn::nfd::FACE_PERSISTENCY_NONE);
-  BOOST_CHECK_NE(transport.getLinkType(), ndn::nfd::LINK_TYPE_NONE);
-  BOOST_CHECK_NE(transport.getMtu(), MTU_INVALID);
-}
+            /** \brief check a transport has all its static properties set after initialization
+             *
+             *  This check shall be inserted to the StaticProperties test case for each transport,
+             *  in addition to checking the values of properties.
+             *  When a new static property is defined, this test case shall be updated.
+             *  Thus, if a transport forgets to set a static property, this check would fail.
+             */
+            inline void
+            checkStaticPropertiesInitialized(const Transport& transport) {
+                BOOST_CHECK(!transport.getLocalUri().getScheme().empty());
+                BOOST_CHECK(!transport.getRemoteUri().getScheme().empty());
+                BOOST_CHECK_NE(transport.getScope(), ndn::nfd::FACE_SCOPE_NONE);
+                BOOST_CHECK_NE(transport.getPersistency(), ndn::nfd::FACE_PERSISTENCY_NONE);
+                BOOST_CHECK_NE(transport.getLinkType(), ndn::nfd::LINK_TYPE_NONE);
+                BOOST_CHECK_NE(transport.getMtu(), MTU_INVALID);
+            }
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_TRANSPORT_TEST_COMMON_HPP

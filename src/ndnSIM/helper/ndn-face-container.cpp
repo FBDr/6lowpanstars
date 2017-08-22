@@ -22,71 +22,61 @@
 #include <algorithm>
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-FaceContainer::FaceContainer() = default;
+        FaceContainer::FaceContainer() = default;
 
-FaceContainer::FaceContainer(const FaceContainer& other)
-{
-  AddAll(other);
-}
+        FaceContainer::FaceContainer(const FaceContainer& other) {
+            AddAll(other);
+        }
 
-FaceContainer&
-FaceContainer::operator= (const FaceContainer &other)
-{
-  m_faces.clear();
-  AddAll(other);
+        FaceContainer&
+                FaceContainer::operator=(const FaceContainer &other) {
+            m_faces.clear();
+            AddAll(other);
 
-  return *this;
-}
+            return *this;
+        }
 
-void
-FaceContainer::AddAll(Ptr<FaceContainer> other)
-{
-  AddAll(*other);
-}
+        void
+        FaceContainer::AddAll(Ptr<FaceContainer> other) {
+            AddAll(*other);
+        }
 
-void
-FaceContainer::AddAll(const FaceContainer& other)
-{
-  if (this == &other) { // adding self to self, need to make a copy
-    auto copyOfFaces = other.m_faces;
-    m_faces.insert(m_faces.end(), copyOfFaces.begin(), copyOfFaces.end());
-  }
-  else {
-    m_faces.insert(m_faces.end(), other.m_faces.begin(), other.m_faces.end());
-  }
-}
+        void
+        FaceContainer::AddAll(const FaceContainer& other) {
+            if (this == &other) { // adding self to self, need to make a copy
+                auto copyOfFaces = other.m_faces;
+                m_faces.insert(m_faces.end(), copyOfFaces.begin(), copyOfFaces.end());
+            } else {
+                m_faces.insert(m_faces.end(), other.m_faces.begin(), other.m_faces.end());
+            }
+        }
 
-FaceContainer::Iterator
-FaceContainer::Begin(void) const
-{
-  return m_faces.begin();
-}
+        FaceContainer::Iterator
+        FaceContainer::Begin(void) const {
+            return m_faces.begin();
+        }
 
-FaceContainer::Iterator
-FaceContainer::End(void) const
-{
-  return m_faces.end();
-}
+        FaceContainer::Iterator
+        FaceContainer::End(void) const {
+            return m_faces.end();
+        }
 
-uint32_t
-FaceContainer::GetN(void) const
-{
-  return m_faces.size();
-}
+        uint32_t
+        FaceContainer::GetN(void) const {
+            return m_faces.size();
+        }
 
-void
-FaceContainer::Add(shared_ptr<Face> face)
-{
-  m_faces.push_back(face);
-}
+        void
+        FaceContainer::Add(shared_ptr<Face> face) {
+            m_faces.push_back(face);
+        }
 
-shared_ptr<Face>
-FaceContainer::Get(size_t i) const
-{
-  return m_faces.at(i);
-}
+        shared_ptr<Face>
+        FaceContainer::Get(size_t i) const {
+            return m_faces.at(i);
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

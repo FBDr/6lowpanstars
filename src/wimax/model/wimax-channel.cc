@@ -23,44 +23,39 @@
 #include "wimax-channel.h"
 #include "wimax-phy.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("WimaxChannel");
-
-NS_OBJECT_ENSURE_REGISTERED (WimaxChannel);
-
-TypeId WimaxChannel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::WimaxChannel")
-    .SetParent<Channel> ()
-    .SetGroupName("Wimax");
-  return tid;
-}
 
-WimaxChannel::WimaxChannel (void)
-{
-}
+    NS_LOG_COMPONENT_DEFINE("WimaxChannel");
 
-WimaxChannel::~WimaxChannel (void)
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(WimaxChannel);
 
-void
-WimaxChannel::Attach (Ptr<WimaxPhy> phy)
-{
-  DoAttach (phy);
-}
+    TypeId WimaxChannel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::WimaxChannel")
+                .SetParent<Channel> ()
+                .SetGroupName("Wimax");
+        return tid;
+    }
 
-uint32_t
-WimaxChannel::GetNDevices (void) const
-{
-  return DoGetNDevices ();
-}
+    WimaxChannel::WimaxChannel(void) {
+    }
 
-Ptr<NetDevice>
-WimaxChannel::GetDevice (uint32_t index) const
-{
-  return DoGetDevice (index);
-}
+    WimaxChannel::~WimaxChannel(void) {
+    }
+
+    void
+    WimaxChannel::Attach(Ptr<WimaxPhy> phy) {
+        DoAttach(phy);
+    }
+
+    uint32_t
+    WimaxChannel::GetNDevices(void) const {
+        return DoGetNDevices();
+    }
+
+    Ptr<NetDevice>
+            WimaxChannel::GetDevice(uint32_t index) const {
+        return DoGetDevice(index);
+    }
 
 } // namespace ns3

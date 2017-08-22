@@ -20,59 +20,56 @@
 #include "attribute-iterator.h"
 #include <gtk/gtk.h>
 
-namespace ns3
-{
+namespace ns3 {
 
-enum
-{
-  COL_NODE = 0, COL_LAST
-};
+    enum {
+        COL_NODE = 0, COL_LAST
+    };
 
-struct ModelNode
-{
-  enum
-  {
-    // store object + attribute name
-    NODE_ATTRIBUTE,
-    // store object + attribute name
-    NODE_POINTER,
-    // store object + attribute name
-    NODE_VECTOR,
-    // store index + value (object)
-    NODE_VECTOR_ITEM,
-    // store object
-    NODE_OBJECT
-  } type;
-  std::string name;
-  Ptr<Object> object;
-  uint32_t index;
-};
-/**
- * \ingroup configstore
- *
- */
-class ModelCreator : public AttributeIterator
-{
-public:
-  ModelCreator ();
+    struct ModelNode {
 
-  void Build (GtkTreeStore *treestore);
-private:
-  virtual void DoVisitAttribute (Ptr<Object> object, std::string name);
-  virtual void DoStartVisitObject (Ptr<Object> object);
-  virtual void DoEndVisitObject (void);
-  virtual void DoStartVisitPointerAttribute (Ptr<Object> object, std::string name, Ptr<Object> value);
-  virtual void DoEndVisitPointerAttribute (void);
-  virtual void DoStartVisitArrayAttribute (Ptr<Object> object, std::string name,
-                                           const ObjectPtrContainerValue &vector);
-  virtual void DoEndVisitArrayAttribute (void);
-  virtual void DoStartVisitArrayItem (const ObjectPtrContainerValue &vector,
-                                      uint32_t index, Ptr<Object> item);
-  virtual void DoEndVisitArrayItem (void);
-  void Add (ModelNode *node);
-  void Remove (void);
+        enum {
+            // store object + attribute name
+            NODE_ATTRIBUTE,
+            // store object + attribute name
+            NODE_POINTER,
+            // store object + attribute name
+            NODE_VECTOR,
+            // store index + value (object)
+            NODE_VECTOR_ITEM,
+            // store object
+            NODE_OBJECT
+        } type;
+        std::string name;
+        Ptr<Object> object;
+        uint32_t index;
+    };
 
-  GtkTreeStore *m_treestore;
-  std::vector<GtkTreeIter *> m_iters;
-};
+    /**
+     * \ingroup configstore
+     *
+     */
+    class ModelCreator : public AttributeIterator {
+    public:
+        ModelCreator();
+
+        void Build(GtkTreeStore *treestore);
+    private:
+        virtual void DoVisitAttribute(Ptr<Object> object, std::string name);
+        virtual void DoStartVisitObject(Ptr<Object> object);
+        virtual void DoEndVisitObject(void);
+        virtual void DoStartVisitPointerAttribute(Ptr<Object> object, std::string name, Ptr<Object> value);
+        virtual void DoEndVisitPointerAttribute(void);
+        virtual void DoStartVisitArrayAttribute(Ptr<Object> object, std::string name,
+                const ObjectPtrContainerValue &vector);
+        virtual void DoEndVisitArrayAttribute(void);
+        virtual void DoStartVisitArrayItem(const ObjectPtrContainerValue &vector,
+                uint32_t index, Ptr<Object> item);
+        virtual void DoEndVisitArrayItem(void);
+        void Add(ModelNode *node);
+        void Remove(void);
+
+        GtkTreeStore *m_treestore;
+        std::vector<GtkTreeIter *> m_iters;
+    };
 }

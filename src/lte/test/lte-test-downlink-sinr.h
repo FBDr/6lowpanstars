@@ -32,40 +32,35 @@ using namespace ns3;
 /**
  * Test 1.1 SINR calculation in downlink
  */
-class LteDownlinkSinrTestSuite : public TestSuite
-{
+class LteDownlinkSinrTestSuite : public TestSuite {
 public:
-  LteDownlinkSinrTestSuite ();
+    LteDownlinkSinrTestSuite();
 };
 
-
-class LteDownlinkDataSinrTestCase : public TestCase
-{
+class LteDownlinkDataSinrTestCase : public TestCase {
 public:
-  LteDownlinkDataSinrTestCase (Ptr<SpectrumValue> sv, Ptr<SpectrumValue> sinr, std::string name);
-  virtual ~LteDownlinkDataSinrTestCase ();
+    LteDownlinkDataSinrTestCase(Ptr<SpectrumValue> sv, Ptr<SpectrumValue> sinr, std::string name);
+    virtual ~LteDownlinkDataSinrTestCase();
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 
-  Ptr<SpectrumValue> m_sv;
-  Ptr<const SpectrumModel> m_sm;
-  Ptr<SpectrumValue> m_expectedSinr;
+    Ptr<SpectrumValue> m_sv;
+    Ptr<const SpectrumModel> m_sm;
+    Ptr<SpectrumValue> m_expectedSinr;
 };
 
+class LteDownlinkCtrlSinrTestCase : public TestCase {
+public:
+    LteDownlinkCtrlSinrTestCase(Ptr<SpectrumValue> sv, Ptr<SpectrumValue> sinr, std::string name);
+    virtual ~LteDownlinkCtrlSinrTestCase();
 
-class LteDownlinkCtrlSinrTestCase : public TestCase
-{
-  public:
-    LteDownlinkCtrlSinrTestCase (Ptr<SpectrumValue> sv, Ptr<SpectrumValue> sinr, std::string name);
-    virtual ~LteDownlinkCtrlSinrTestCase ();
-  
 private:
-  virtual void DoRun (void);
-  
-  Ptr<SpectrumValue> m_sv;
-  Ptr<const SpectrumModel> m_sm;
-  Ptr<SpectrumValue> m_expectedSinr;
+    virtual void DoRun(void);
+
+    Ptr<SpectrumValue> m_sv;
+    Ptr<const SpectrumModel> m_sm;
+    Ptr<SpectrumValue> m_expectedSinr;
 };
 
 #endif /* LTE_TEST_DOWNLINK_SINR_H */

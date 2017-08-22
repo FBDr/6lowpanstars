@@ -26,182 +26,181 @@
 #include "certificate-container.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibImpl;
-class Identity;
-class KeyContainer;
+        class PibImpl;
+        class Identity;
+        class KeyContainer;
 
-/**
- * @brief represents a key
- *
- * Key is at the second level in PIB's Identity-Key-Certificate hierarchy.
- * An Key has a Name (identity + keyId), and contains one or more certificates,
- * one of which is set as the default certificate of this key.  A certificate
- * can be directly accessed from a Key object.
- *
- * @throw PibImpl::Error when underlying implementation has non-semantic error.
- */
-class Key
-{
-public:
-  friend class Identity;
-  friend class KeyContainer;
-  friend class KeyChain;
+        /**
+         * @brief represents a key
+         *
+         * Key is at the second level in PIB's Identity-Key-Certificate hierarchy.
+         * An Key has a Name (identity + keyId), and contains one or more certificates,
+         * one of which is set as the default certificate of this key.  A certificate
+         * can be directly accessed from a Key object.
+         *
+         * @throw PibImpl::Error when underlying implementation has non-semantic error.
+         */
+        class Key {
+        public:
+            friend class Identity;
+            friend class KeyContainer;
+            friend class KeyChain;
 
-public:
-  /**
-   * @brief Default Constructor
-   *
-   * Key created using this default constructor is just a place holder.
-   * It must obtain an actual instance from Identity::getKey(...).  A typical
-   * usage would be for exception handling:
-   *
-   *   Key key;
-   *   try {
-   *     key = Identity.getKey(...);
-   *   }
-   *   catch (Pib::Error&) {
-   *     ...
-   *   }
-   *
-   * A Key instance created using the constructor is invalid. Calling a
-   * member method on an invalid Key instance may cause an std::domain_error.
-   */
-  Key();
+        public:
+            /**
+             * @brief Default Constructor
+             *
+             * Key created using this default constructor is just a place holder.
+             * It must obtain an actual instance from Identity::getKey(...).  A typical
+             * usage would be for exception handling:
+             *
+             *   Key key;
+             *   try {
+             *     key = Identity.getKey(...);
+             *   }
+             *   catch (Pib::Error&) {
+             *     ...
+             *   }
+             *
+             * A Key instance created using the constructor is invalid. Calling a
+             * member method on an invalid Key instance may cause an std::domain_error.
+             */
+            Key();
 
-  /// @brief Get the name of the key.
-  const Name&
-  getName() const;
+            /// @brief Get the name of the key.
+            const Name&
+            getName() const;
 
-  /// @brief Get the name of the belonging identity.
-  const Name&
-  getIdentity() const;
+            /// @brief Get the name of the belonging identity.
+            const Name&
+            getIdentity() const;
 
-  /// @brief Get the key id of the key.
-  const name::Component&
-  getKeyId() const;
+            /// @brief Get the key id of the key.
+            const name::Component&
+            getKeyId() const;
 
-  /// @brief Get public key
-  const v1::PublicKey&
-  getPublicKey() const;
+            /// @brief Get public key
+            const v1::PublicKey&
+            getPublicKey() const;
 
-  /**
-   * @brief Get a certificate.
-   *
-   * @return the certificate
-   * @throws Pib::Error if the certificate does not exist.
-   */
-  v1::IdentityCertificate
-  getCertificate(const Name& certName) const;
+            /**
+             * @brief Get a certificate.
+             *
+             * @return the certificate
+             * @throws Pib::Error if the certificate does not exist.
+             */
+            v1::IdentityCertificate
+            getCertificate(const Name& certName) const;
 
-  /// @brief Get all the certificates for this key.
-  const CertificateContainer&
-  getCertificates() const;
+            /// @brief Get all the certificates for this key.
+            const CertificateContainer&
+            getCertificates() const;
 
-  /**
-   * @brief Get the default certificate for this Key.
-   *
-   * @throws Pib::Error if the default certificate does not exist.
-   */
-  const v1::IdentityCertificate&
-  getDefaultCertificate() const;
+            /**
+             * @brief Get the default certificate for this Key.
+             *
+             * @throws Pib::Error if the default certificate does not exist.
+             */
+            const v1::IdentityCertificate&
+            getDefaultCertificate() const;
 
-  /// @brief Check if the Key instance is valid
-  operator bool() const;
+            /// @brief Check if the Key instance is valid
+            operator bool() const;
 
-  /// @brief Check if the Key instance is invalid
-  bool
-  operator!() const;
+            /// @brief Check if the Key instance is invalid
+            bool
+            operator!() const;
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE: // write operations should be private
 
-  /**
-   * @brief Add a certificate.
-   *
-   * @param certificate The certificate to add.
-   */
-  void
-  addCertificate(const v1::IdentityCertificate& certificate);
+            /**
+             * @brief Add a certificate.
+             *
+             * @param certificate The certificate to add.
+             */
+            void
+            addCertificate(const v1::IdentityCertificate& certificate);
 
-  /**
-   * @brief Remove a certificate.
-   *
-   * @param certName The name of the certificate to delete.
-   */
-  void
-  removeCertificate(const Name& certName);
+            /**
+             * @brief Remove a certificate.
+             *
+             * @param certName The name of the certificate to delete.
+             */
+            void
+            removeCertificate(const Name& certName);
 
-  /**
-   * @brief Set the default certificate.
-   *
-   * @param certName The name of the default certificate of the key.
-   * @return the default certificate
-   * @throws Pib::Error if the certificate does not exist.
-   */
-  const v1::IdentityCertificate&
-  setDefaultCertificate(const Name& certName);
+            /**
+             * @brief Set the default certificate.
+             *
+             * @param certName The name of the default certificate of the key.
+             * @return the default certificate
+             * @throws Pib::Error if the certificate does not exist.
+             */
+            const v1::IdentityCertificate&
+            setDefaultCertificate(const Name& certName);
 
-  /**
-   * @brief Set the default certificate.
-   *
-   * If the certificate does not exist, add it and set it as the default certificate of the key.
-   * If the certificate exists, simply set it as the default certificate of the key.
-   *
-   * @param certificate The certificate to add.
-   * @return the default certificate
-   */
-  const v1::IdentityCertificate&
-  setDefaultCertificate(const v1::IdentityCertificate& certificate);
+            /**
+             * @brief Set the default certificate.
+             *
+             * If the certificate does not exist, add it and set it as the default certificate of the key.
+             * If the certificate exists, simply set it as the default certificate of the key.
+             *
+             * @param certificate The certificate to add.
+             * @return the default certificate
+             */
+            const v1::IdentityCertificate&
+            setDefaultCertificate(const v1::IdentityCertificate& certificate);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  /**
-   * @brief Create a Key with @p identityName and @p keyId.
-   *
-   * If the key/identity does not exist in the backend, create it in backend.
-   *
-   * @param identityName The name of the Identity.
-   * @param keyId The key id of the key.
-   * @param publicKey The public key to add.
-   * @param impl The actual backend implementation.
-   */
-  Key(const Name& identityName, const name::Component& keyId,
-      const v1::PublicKey& publicKey, shared_ptr<PibImpl> impl);
+            /**
+             * @brief Create a Key with @p identityName and @p keyId.
+             *
+             * If the key/identity does not exist in the backend, create it in backend.
+             *
+             * @param identityName The name of the Identity.
+             * @param keyId The key id of the key.
+             * @param publicKey The public key to add.
+             * @param impl The actual backend implementation.
+             */
+            Key(const Name& identityName, const name::Component& keyId,
+                    const v1::PublicKey& publicKey, shared_ptr<PibImpl> impl);
 
-  /**
-   * @brief Create an KeyEntry with @p identityName and @p keyId.
-   *
-   * @param identityName The name of the Identity.
-   * @param keyId The key id of the key.
-   * @param impl The actual backend implementation.
-   * @throws Pib::Error if the key does not exist.
-   */
-  Key(const Name& identityName, const name::Component& keyId, shared_ptr<PibImpl> impl);
+            /**
+             * @brief Create an KeyEntry with @p identityName and @p keyId.
+             *
+             * @param identityName The name of the Identity.
+             * @param keyId The key id of the key.
+             * @param impl The actual backend implementation.
+             * @throws Pib::Error if the key does not exist.
+             */
+            Key(const Name& identityName, const name::Component& keyId, shared_ptr<PibImpl> impl);
 
-  /**
-   * @brief Check the validity of this instance
-   *
-   * @throws std::domain_error if the instance is invalid
-   */
-  void
-  validityCheck() const;
+            /**
+             * @brief Check the validity of this instance
+             *
+             * @throws std::domain_error if the instance is invalid
+             */
+            void
+            validityCheck() const;
 
-private:
-  Name m_id;
-  name::Component m_keyId;
-  Name m_keyName;
-  v1::PublicKey m_key;
+        private:
+            Name m_id;
+            name::Component m_keyId;
+            Name m_keyName;
+            v1::PublicKey m_key;
 
-  mutable bool m_hasDefaultCertificate;
-  mutable v1::IdentityCertificate m_defaultCertificate;
+            mutable bool m_hasDefaultCertificate;
+            mutable v1::IdentityCertificate m_defaultCertificate;
 
-  mutable bool m_needRefreshCerts;
-  mutable CertificateContainer m_certificates;
+            mutable bool m_needRefreshCerts;
+            mutable CertificateContainer m_certificates;
 
-  shared_ptr<PibImpl> m_impl;
-};
+            shared_ptr<PibImpl> m_impl;
+        };
 
-} // namespace security
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_PIB_HPP

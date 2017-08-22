@@ -25,139 +25,139 @@
 #include "../../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-const boost::filesystem::path TEST_TRACE = boost::filesystem::path(TEST_CONFIG_PATH) / "trace.txt";
+        const boost::filesystem::path TEST_TRACE = boost::filesystem::path(TEST_CONFIG_PATH) / "trace.txt";
 
-class AppDelayTracerFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  AppDelayTracerFixture()
-  {
-    boost::filesystem::create_directories(TEST_CONFIG_PATH);
+        class AppDelayTracerFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-    // setting default parameters for PointToPoint links and channels
-    Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
-    Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-    Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+            AppDelayTracerFixture() {
+                boost::filesystem::create_directories(TEST_CONFIG_PATH);
 
-    createTopology({
-        {"1", "2"},
-        {"2", "3"}
-      });
+                // setting default parameters for PointToPoint links and channels
+                Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
+                Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+                Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
 
-    addRoutes({
-        {"1", "2", "/prefix", 1},
-        {"2", "3", "/prefix", 1}
-      });
+                createTopology({
+                    {"1", "2"},
+                    {"2", "3"}
+                });
 
-    addApps({
-        {"1", "ns3::ndn::ConsumerCbr",
-            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "0.9s"}, // send just one packet
-        // Second consumer will capture effect of the bug #2764
-        {"2", "ns3::ndn::ConsumerCbr",
-            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "2s", "100s"},
-        {"3", "ns3::ndn::Producer",
-            {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
-            "0s", "100s"}
-      });
-  }
+                addRoutes({
+                    {"1", "2", "/prefix", 1},
+                    {"2", "3", "/prefix", 1}
+                });
 
-  ~AppDelayTracerFixture()
-  {
-    boost::filesystem::remove(TEST_TRACE);
-    AppDelayTracer::Destroy(); // additional cleanup
-  }
-};
+                addApps({
+                    {"1", "ns3::ndn::ConsumerCbr",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"Frequency", "1"}},
+                        "0s", "0.9s"}, // send just one packet
+                    // Second consumer will capture effect of the bug #2764
+                    {"2", "ns3::ndn::ConsumerCbr",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"Frequency", "1"}},
+                        "2s", "100s"},
+                    {"3", "ns3::ndn::Producer",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"PayloadSize", "1024"}},
+                        "0s", "100s"}
+                });
+            }
 
-BOOST_FIXTURE_TEST_SUITE(UtilsTracersNdnAppDelayTracer, AppDelayTracerFixture)
+            ~AppDelayTracerFixture() {
+                boost::filesystem::remove(TEST_TRACE);
+                AppDelayTracer::Destroy(); // additional cleanup
+            }
+        };
 
-BOOST_AUTO_TEST_CASE(InstallAll)
-{
-  AppDelayTracer::InstallAll(TEST_TRACE.string());
+        BOOST_FIXTURE_TEST_SUITE(UtilsTracersNdnAppDelayTracer, AppDelayTracerFixture)
 
-  Simulator::Stop(Seconds(4));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(InstallAll) {
+            AppDelayTracer::InstallAll(TEST_TRACE.string());
 
-  AppDelayTracer::Destroy(); // to force log to be written
+            Simulator::Stop(Seconds(4));
+            Simulator::Run();
 
-  std::ifstream t(TEST_TRACE.string().c_str());
-  std::stringstream buffer;
-  buffer << t.rdbuf();
+            AppDelayTracer::Destroy(); // to force log to be written
 
-  BOOST_CHECK_EQUAL(buffer.str(),
-    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
-    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n"
-    "2	2	0	0	LastDelay	0	0	1	0\n"
-    "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
-}
+            std::ifstream t(TEST_TRACE.string().c_str());
+            std::stringstream buffer;
+            buffer << t.rdbuf();
 
-BOOST_AUTO_TEST_CASE(InstallNodeContainer)
-{
-  NodeContainer nodes;
-  nodes.Add(getNode("1"));
+            BOOST_CHECK_EQUAL(buffer.str(),
+                    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
+                    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
+                    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n"
+                    "2	2	0	0	LastDelay	0	0	1	0\n"
+                    "2	2	0	0	FullDelay	0	0	1	0\n"
+                    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+                    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
+        }
 
-  AppDelayTracer::Install(nodes, TEST_TRACE.string());
+        BOOST_AUTO_TEST_CASE(InstallNodeContainer) {
+            NodeContainer nodes;
+            nodes.Add(getNode("1"));
 
-  Simulator::Stop(Seconds(4));
-  Simulator::Run();
+            AppDelayTracer::Install(nodes, TEST_TRACE.string());
 
-  AppDelayTracer::Destroy(); // to force log to be written
+            Simulator::Stop(Seconds(4));
+            Simulator::Run();
 
-  std::ifstream t(TEST_TRACE.string().c_str());
-  std::stringstream buffer;
-  buffer << t.rdbuf();
+            AppDelayTracer::Destroy(); // to force log to be written
 
-  BOOST_CHECK_EQUAL(buffer.str(),
-    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
-    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n");
-}
+            std::ifstream t(TEST_TRACE.string().c_str());
+            std::stringstream buffer;
+            buffer << t.rdbuf();
 
-BOOST_AUTO_TEST_CASE(InstallNode)
-{
-  AppDelayTracer::Install(getNode("2"), TEST_TRACE.string());
+            BOOST_CHECK_EQUAL(buffer.str(),
+                    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
+                    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
+                    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n");
+        }
 
-  Simulator::Stop(Seconds(4));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(InstallNode) {
+            AppDelayTracer::Install(getNode("2"), TEST_TRACE.string());
 
-  AppDelayTracer::Destroy(); // to force log to be written
+            Simulator::Stop(Seconds(4));
+            Simulator::Run();
 
-  std::ifstream t(TEST_TRACE.string().c_str());
-  std::stringstream buffer;
-  buffer << t.rdbuf();
+            AppDelayTracer::Destroy(); // to force log to be written
 
-  BOOST_CHECK_EQUAL(buffer.str(),
-    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "2	2	0	0	LastDelay	0	0	1	0\n"
-    "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
-}
+            std::ifstream t(TEST_TRACE.string().c_str());
+            std::stringstream buffer;
+            buffer << t.rdbuf();
 
-BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
-{
-  auto output = make_shared<boost::test_tools::output_test_stream>();
-  Ptr<AppDelayTracer> tracer = AppDelayTracer::Install(getNode("2"), output);
+            BOOST_CHECK_EQUAL(buffer.str(),
+                    "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
+                    "2	2	0	0	LastDelay	0	0	1	0\n"
+                    "2	2	0	0	FullDelay	0	0	1	0\n"
+                    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+                    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
+        }
 
-  Simulator::Stop(Seconds(4));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(InstallNodeDumpStream) {
+            auto output = make_shared<boost::test_tools::output_test_stream>();
+            Ptr<AppDelayTracer> tracer = AppDelayTracer::Install(getNode("2"), output);
 
-  tracer = nullptr; // destroy tracer
+            Simulator::Stop(Seconds(4));
+            Simulator::Run();
 
-  BOOST_CHECK(output->is_equal(
-    "2	2	0	0	LastDelay	0	0	1	0\n"
-    "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n"));
-}
+            tracer = nullptr; // destroy tracer
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_CHECK(output->is_equal(
+                    "2	2	0	0	LastDelay	0	0	1	0\n"
+                    "2	2	0	0	FullDelay	0	0	1	0\n"
+                    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+                    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n"));
+        }
 
-} // namespace ndn
+        BOOST_AUTO_TEST_SUITE_END()
+
+    } // namespace ndn
 } // namespace ns3

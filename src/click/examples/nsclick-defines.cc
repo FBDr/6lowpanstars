@@ -24,43 +24,42 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("NsclickRouting");
+NS_LOG_COMPONENT_DEFINE("NsclickRouting");
 
 int
-main (int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
 #ifdef NS3_CLICK
 
-//
-// Explicitly create the nodes required by the topology (shown above).
-//
-  NS_LOG_INFO ("Create a node.");
-  NodeContainer n;
-  n.Create (1);
+    //
+    // Explicitly create the nodes required by the topology (shown above).
+    //
+    NS_LOG_INFO("Create a node.");
+    NodeContainer n;
+    n.Create(1);
 
-//
-// Install Click on the nodes
-//
-  std::map<std::string, std::string> defines;
-// Strings, especially with blanks in it, have to be enclosed in quotation
-// marks, like in click configuration files.
-  defines["OUTPUT"] = "\"Hello World!\"";
-  
-  ClickInternetStackHelper clickinternet;
-  clickinternet.SetClickFile (n, "src/click/examples/nsclick-defines.click");
-  clickinternet.SetRoutingTableElement (n, "rt");
-  clickinternet.SetDefines(n, defines);
-  clickinternet.Install (n);
+    //
+    // Install Click on the nodes
+    //
+    std::map<std::string, std::string> defines;
+    // Strings, especially with blanks in it, have to be enclosed in quotation
+    // marks, like in click configuration files.
+    defines["OUTPUT"] = "\"Hello World!\"";
 
-//
-// Now, do the actual simulation.
-//
-  NS_LOG_INFO ("Run Simulation.");
-  Simulator::Stop (Seconds (20.0));
-  Simulator::Run ();
-  Simulator::Destroy ();
-  NS_LOG_INFO ("Done.");
+    ClickInternetStackHelper clickinternet;
+    clickinternet.SetClickFile(n, "src/click/examples/nsclick-defines.click");
+    clickinternet.SetRoutingTableElement(n, "rt");
+    clickinternet.SetDefines(n, defines);
+    clickinternet.Install(n);
+
+    //
+    // Now, do the actual simulation.
+    //
+    NS_LOG_INFO("Run Simulation.");
+    Simulator::Stop(Seconds(20.0));
+    Simulator::Run();
+    Simulator::Destroy();
+    NS_LOG_INFO("Done.");
 #else
-  NS_FATAL_ERROR ("Can't use ns-3-click without NSCLICK compiled in");
+    NS_FATAL_ERROR("Can't use ns-3-click without NSCLICK compiled in");
 #endif
 }

@@ -22,85 +22,75 @@
 #include "energy-harvester.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("EnergyHarvester");
-    
-NS_OBJECT_ENSURE_REGISTERED (EnergyHarvester);
-
-TypeId
-EnergyHarvester::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::EnergyHarvester")
-    .SetParent<Object> ()
-    .SetGroupName ("Energy")
-  ;
-  return tid;
-}
 
-EnergyHarvester::EnergyHarvester ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("EnergyHarvester");
 
-EnergyHarvester::~EnergyHarvester ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(EnergyHarvester);
 
-void
-EnergyHarvester::SetNode (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (node != 0);
-  m_node = node;
-}
+    TypeId
+    EnergyHarvester::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::EnergyHarvester")
+                .SetParent<Object> ()
+                .SetGroupName("Energy")
+                ;
+        return tid;
+    }
 
-Ptr<Node>
-EnergyHarvester::GetNode (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_node;
-}
+    EnergyHarvester::EnergyHarvester() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-EnergyHarvester::SetEnergySource (Ptr<EnergySource> source)
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (source != 0);
-  m_energySource = source;
-}
+    EnergyHarvester::~EnergyHarvester() {
+        NS_LOG_FUNCTION(this);
+    }
 
-Ptr<EnergySource>
-EnergyHarvester::GetEnergySource (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_energySource;
-}
+    void
+    EnergyHarvester::SetNode(Ptr<Node> node) {
+        NS_LOG_FUNCTION(this);
+        NS_ASSERT(node != 0);
+        m_node = node;
+    }
 
+    Ptr<Node>
+            EnergyHarvester::GetNode(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_node;
+    }
 
-double
-EnergyHarvester::GetPower (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return DoGetPower ();
-}
+    void
+    EnergyHarvester::SetEnergySource(Ptr<EnergySource> source) {
+        NS_LOG_FUNCTION(this);
+        NS_ASSERT(source != 0);
+        m_energySource = source;
+    }
 
-/*
- * Private function starts here.
- */
+    Ptr<EnergySource>
+            EnergyHarvester::GetEnergySource(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_energySource;
+    }
 
-void
-EnergyHarvester::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-}
+    double
+    EnergyHarvester::GetPower(void) const {
+        NS_LOG_FUNCTION(this);
+        return DoGetPower();
+    }
 
-double
-EnergyHarvester::DoGetPower (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return 0.0;
-}
+    /*
+     * Private function starts here.
+     */
+
+    void
+    EnergyHarvester::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+    }
+
+    double
+    EnergyHarvester::DoGetPower(void) const {
+        NS_LOG_FUNCTION(this);
+        return 0.0;
+    }
 
 }

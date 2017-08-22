@@ -27,238 +27,237 @@
 
 namespace ndn {
 
-class KeyParams;
+    class KeyParams;
 
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief Abstraction of private key in crypto transformation
- */
-class PrivateKey : noncopyable
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            /**
+             * @brief Abstraction of private key in crypto transformation
+             */
+            class PrivateKey : noncopyable {
+            public:
 
-  friend class SignerFilter;
+                class Error : public std::runtime_error {
+                public:
 
-  /**
-   * @brief Callback for application to handle password input
-   *
-   * Password should be stored in @p buf and should not be longer than @p size.  It is
-   * recommended to ask the user to verify the passphrase if @p shouldConfirm is true, e.g., by
-   * prompting for the password twice.
-   */
-  typedef function<int(char* buf, size_t bufSize, bool shouldConfirm)> PasswordCallback;
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-public:
-  /**
-   * @brief Create a private key instance
-   *
-   * One must call loadXXXX(...) to load private key.
-   */
-  PrivateKey();
+                friend class SignerFilter;
 
-  ~PrivateKey();
+                /**
+                 * @brief Callback for application to handle password input
+                 *
+                 * Password should be stored in @p buf and should not be longer than @p size.  It is
+                 * recommended to ask the user to verify the passphrase if @p shouldConfirm is true, e.g., by
+                 * prompting for the password twice.
+                 */
+                typedef function<int(char* buf, size_t bufSize, bool shouldConfirm) > PasswordCallback;
 
-  /**
-   * @brief Load the private key in PKCS#1 format from a buffer @p buf
-   */
-  void
-  loadPkcs1(const uint8_t* buf, size_t size);
+            public:
+                /**
+                 * @brief Create a private key instance
+                 *
+                 * One must call loadXXXX(...) to load private key.
+                 */
+                PrivateKey();
 
-  /**
-   * @brief Load the private key in PKCS#1 format from a stream @p is
-   */
-  void
-  loadPkcs1(std::istream& is);
+                ~PrivateKey();
 
-  /**
-   * @brief Load the private key in base64-encoded PKCS#1 format from a buffer @p buf
-   */
-  void
-  loadPkcs1Base64(const uint8_t* buf, size_t size);
+                /**
+                 * @brief Load the private key in PKCS#1 format from a buffer @p buf
+                 */
+                void
+                loadPkcs1(const uint8_t* buf, size_t size);
 
-  /**
-   * @brief Load the private key in base64-encoded PKCS#1 format from a stream @p is
-   */
-  void
-  loadPkcs1Base64(std::istream& is);
+                /**
+                 * @brief Load the private key in PKCS#1 format from a stream @p is
+                 */
+                void
+                loadPkcs1(std::istream& is);
 
-  /**
-   * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with passphrase @p pw
-   *
-   * @pre strlen(pw) == pwLen
-   */
-  void
-  loadPkcs8(const uint8_t* buf, size_t size, const char* pw, size_t pwLen);
+                /**
+                 * @brief Load the private key in base64-encoded PKCS#1 format from a buffer @p buf
+                 */
+                void
+                loadPkcs1Base64(const uint8_t* buf, size_t size);
 
-  /**
-   * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with
-   *        passphrase obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  loadPkcs8(const uint8_t* buf, size_t size, PasswordCallback pwCallback = nullptr);
+                /**
+                 * @brief Load the private key in base64-encoded PKCS#1 format from a stream @p is
+                 */
+                void
+                loadPkcs1Base64(std::istream& is);
 
-  /**
-   * @brief Load the private key in encrypted PKCS#8 format from a stream @p is with passphrase @p pw
-   *
-   * @pre strlen(pw) == pwLen
-   */
-  void
-  loadPkcs8(std::istream& is, const char* pw, size_t pwLen);
+                /**
+                 * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with passphrase @p pw
+                 *
+                 * @pre strlen(pw) == pwLen
+                 */
+                void
+                loadPkcs8(const uint8_t* buf, size_t size, const char* pw, size_t pwLen);
 
-  /**
-   * @brief Load the private key in encrypted PKCS#8 format from a stream @p is with passphrase
-   *        obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  loadPkcs8(std::istream& is, PasswordCallback pwCallback = nullptr);
+                /**
+                 * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with
+                 *        passphrase obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                loadPkcs8(const uint8_t* buf, size_t size, PasswordCallback pwCallback = nullptr);
 
-  /**
-   * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a buffer @p buf
-   *        with passphrase @p pw
-   *
-   * @pre strlen(pw) == pwLen
-   */
-  void
-  loadPkcs8Base64(const uint8_t* buf, size_t size, const char* pw, size_t pwLen);
+                /**
+                 * @brief Load the private key in encrypted PKCS#8 format from a stream @p is with passphrase @p pw
+                 *
+                 * @pre strlen(pw) == pwLen
+                 */
+                void
+                loadPkcs8(std::istream& is, const char* pw, size_t pwLen);
 
-  /**
-   * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with
-   *        passphrase obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  loadPkcs8Base64(const uint8_t* buf, size_t size, PasswordCallback pwCallback = nullptr);
+                /**
+                 * @brief Load the private key in encrypted PKCS#8 format from a stream @p is with passphrase
+                 *        obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                loadPkcs8(std::istream& is, PasswordCallback pwCallback = nullptr);
 
-  /**
-   * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a stream @p is
-   *        with passphrase @p pw
-   *
-   * @pre strlen(pw) == pwLen
-   */
-  void
-  loadPkcs8Base64(std::istream& is, const char* pw, size_t pwLen);
+                /**
+                 * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a buffer @p buf
+                 *        with passphrase @p pw
+                 *
+                 * @pre strlen(pw) == pwLen
+                 */
+                void
+                loadPkcs8Base64(const uint8_t* buf, size_t size, const char* pw, size_t pwLen);
 
-  /**
-   * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a stream @p is
-   *        with passphrase obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  loadPkcs8Base64(std::istream& is, PasswordCallback pwCallback = nullptr);
+                /**
+                 * @brief Load the private key in encrypted PKCS#8 format from a buffer @p buf with
+                 *        passphrase obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                loadPkcs8Base64(const uint8_t* buf, size_t size, PasswordCallback pwCallback = nullptr);
 
-  /**
-   * @brief Save the private key in PKCS#1 format into a stream @p os
-   */
-  void
-  savePkcs1(std::ostream& os) const;
+                /**
+                 * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a stream @p is
+                 *        with passphrase @p pw
+                 *
+                 * @pre strlen(pw) == pwLen
+                 */
+                void
+                loadPkcs8Base64(std::istream& is, const char* pw, size_t pwLen);
 
-  /**
-   * @brief Save the private key in base64-encoded PKCS#1 format into a stream @p os
-   */
-  void
-  savePkcs1Base64(std::ostream& os) const;
+                /**
+                 * @brief Load the private key in base64-encoded encrypted PKCS#8 format from a stream @p is
+                 *        with passphrase obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                loadPkcs8Base64(std::istream& is, PasswordCallback pwCallback = nullptr);
 
-  /**
-   * @brief Save the private key in encrypted PKCS#8 format into a stream @p os
-   */
-  void
-  savePkcs8(std::ostream& os, const char* pw, size_t pwLen) const;
+                /**
+                 * @brief Save the private key in PKCS#1 format into a stream @p os
+                 */
+                void
+                savePkcs1(std::ostream& os) const;
 
-  /**
-   * @brief Save the private key in encrypted PKCS#8 format into a stream @p os with passphrase
-   *        obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  savePkcs8(std::ostream& os, PasswordCallback pwCallback = nullptr) const;
+                /**
+                 * @brief Save the private key in base64-encoded PKCS#1 format into a stream @p os
+                 */
+                void
+                savePkcs1Base64(std::ostream& os) const;
 
-  /**
-   * @brief Save the private key in base64-encoded encrypted PKCS#8 format into a stream @p os
-   */
-  void
-  savePkcs8Base64(std::ostream& os, const char* pw, size_t pwLen) const;
+                /**
+                 * @brief Save the private key in encrypted PKCS#8 format into a stream @p os
+                 */
+                void
+                savePkcs8(std::ostream& os, const char* pw, size_t pwLen) const;
 
-  /**
-   * @brief Save the private key in base64-encoded encrypted PKCS#8 format into a stream @p os
-   *        with passphrase obtained from @p pwCallback
-   *
-   * The default password callback is provided by OpenSSL
-   */
-  void
-  savePkcs8Base64(std::ostream& os, PasswordCallback pwCallback = nullptr) const;
+                /**
+                 * @brief Save the private key in encrypted PKCS#8 format into a stream @p os with passphrase
+                 *        obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                savePkcs8(std::ostream& os, PasswordCallback pwCallback = nullptr) const;
 
-  /**
-   * @return Public key bits in PKCS#8 format
-   */
-  ConstBufferPtr
-  derivePublicKey() const;
+                /**
+                 * @brief Save the private key in base64-encoded encrypted PKCS#8 format into a stream @p os
+                 */
+                void
+                savePkcs8Base64(std::ostream& os, const char* pw, size_t pwLen) const;
 
-  /**
-   * @return Plain text of @p cipherText decrypted using the private key.
-   *
-   * Only RSA encryption is supported for now.
-   */
-  ConstBufferPtr
-  decrypt(const uint8_t* cipherText, size_t cipherLen) const;
+                /**
+                 * @brief Save the private key in base64-encoded encrypted PKCS#8 format into a stream @p os
+                 *        with passphrase obtained from @p pwCallback
+                 *
+                 * The default password callback is provided by OpenSSL
+                 */
+                void
+                savePkcs8Base64(std::ostream& os, PasswordCallback pwCallback = nullptr) const;
 
-private:
-  /**
-   * @return A pointer to an EVP_PKEY instance.
-   *
-   * One need to explicitly cast the return value to EVP_PKEY*.
-   */
-  void*
-  getEvpPkey() const;
+                /**
+                 * @return Public key bits in PKCS#8 format
+                 */
+                ConstBufferPtr
+                derivePublicKey() const;
 
-private:
-  ConstBufferPtr
-  toPkcs1() const;
+                /**
+                 * @return Plain text of @p cipherText decrypted using the private key.
+                 *
+                 * Only RSA encryption is supported for now.
+                 */
+                ConstBufferPtr
+                decrypt(const uint8_t* cipherText, size_t cipherLen) const;
 
-  ConstBufferPtr
-  toPkcs8(const char* pw, size_t pwLen) const;
+            private:
+                /**
+                 * @return A pointer to an EVP_PKEY instance.
+                 *
+                 * One need to explicitly cast the return value to EVP_PKEY*.
+                 */
+                void*
+                getEvpPkey() const;
 
-  ConstBufferPtr
-  toPkcs8(PasswordCallback pwCallback = nullptr) const;
+            private:
+                ConstBufferPtr
+                toPkcs1() const;
 
-  ConstBufferPtr
-  rsaDecrypt(const uint8_t* cipherText, size_t cipherLen) const;
+                ConstBufferPtr
+                toPkcs8(const char* pw, size_t pwLen) const;
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+                ConstBufferPtr
+                toPkcs8(PasswordCallback pwCallback = nullptr) const;
 
-/**
- * @brief generate a private key according to @p keyParams.
- *
- * @note the public key can be derived from the private key
- *
- * @throw std::argument_error if the key type is not supported
- * @throw std::runtime_error when failing to generate the key
- */
-unique_ptr<PrivateKey>
-generatePrivateKey(const KeyParams& keyParams);
+                ConstBufferPtr
+                rsaDecrypt(const uint8_t* cipherText, size_t cipherLen) const;
 
-} // namespace transform
-} // namespace security
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
+
+            /**
+             * @brief generate a private key according to @p keyParams.
+             *
+             * @note the public key can be derived from the private key
+             *
+             * @throw std::argument_error if the key type is not supported
+             * @throw std::runtime_error when failing to generate the key
+             */
+            unique_ptr<PrivateKey>
+            generatePrivateKey(const KeyParams& keyParams);
+
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_PRIVATE_KEY_HPP

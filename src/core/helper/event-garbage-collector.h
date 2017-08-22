@@ -26,64 +26,62 @@
 
 namespace ns3 {
 
-/**
- * \ingroup events
- *
- * \brief An object that tracks scheduled events and automatically
- * cancels them when it is destroyed.  It is useful in situations
- * where multiple instances of the same type of event can
- * simultaneously be scheduled, and when the events should be limited
- * to the lifetime of a container object.
- */
-class EventGarbageCollector
-{
-public:
-
-  EventGarbageCollector ();
-
-  /**
-   * \brief Tracks a new event
-   */
-  void Track (EventId event);
-
-  ~EventGarbageCollector ();
-
-private:
- 
-  /**
-   * \brief comparison operator for std::multiset
-   */
-  struct EventIdLessThanTs
-  {
     /**
-     * \brief comparison operator for std::multiset
+     * \ingroup events
+     *
+     * \brief An object that tracks scheduled events and automatically
+     * cancels them when it is destroyed.  It is useful in situations
+     * where multiple instances of the same type of event can
+     * simultaneously be scheduled, and when the events should be limited
+     * to the lifetime of a container object.
      */
-    bool operator () (const EventId &a, const EventId &b) const
-    {
-      return (a.GetTs () < b.GetTs ());
-    }
-  };
+    class EventGarbageCollector {
+    public:
 
-  /** Event list container */
-  typedef std::multiset<EventId, EventIdLessThanTs> EventList;
+        EventGarbageCollector();
 
-  EventList::size_type m_nextCleanupSize;      //!< batch size for cleanup
-  EventList m_events;                          //!< the tracked event list 
+        /**
+         * \brief Tracks a new event
+         */
+        void Track(EventId event);
 
-  /**
-   * \brief called when a new event was added and the cleanup limit was
-   * exceeded in consequence.
-   */
-  void Cleanup ();
-  /**
-   * \brief grow the cleanup limit
-   */
-  void Grow ();
-  /**
-   * \brief shrink the cleanup limit
-   */
-  void Shrink ();
-};
+        ~EventGarbageCollector();
+
+    private:
+
+        /**
+         * \brief comparison operator for std::multiset
+         */
+        struct EventIdLessThanTs {
+
+            /**
+             * \brief comparison operator for std::multiset
+             */
+            bool operator()(const EventId &a, const EventId &b) const {
+                return (a.GetTs() < b.GetTs());
+            }
+        };
+
+        /** Event list container */
+        typedef std::multiset<EventId, EventIdLessThanTs> EventList;
+
+        EventList::size_type m_nextCleanupSize; //!< batch size for cleanup
+        EventList m_events; //!< the tracked event list 
+
+        /**
+         * \brief called when a new event was added and the cleanup limit was
+         * exceeded in consequence.
+         */
+        void Cleanup();
+        /**
+         * \brief grow the cleanup limit
+         */
+        void Grow();
+        /**
+         * \brief shrink the cleanup limit
+         */
+        void Shrink();
+    };
 
 } // namespace ns3
 

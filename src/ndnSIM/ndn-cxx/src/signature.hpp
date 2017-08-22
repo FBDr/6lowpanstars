@@ -27,163 +27,152 @@
 
 namespace ndn {
 
-/**
- * A Signature is storage for the signature-related information (info and value) in a Data packet.
- */
-class Signature
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+    /**
+     * A Signature is storage for the signature-related information (info and value) in a Data packet.
+     */
+    class Signature {
+    public:
 
-  /// @deprecated use tlv::SignatureTypeValue instead.
-  enum {
-    Sha256 = tlv::DigestSha256,
-    Sha256WithRsa = tlv::SignatureSha256WithRsa,
-    Sha256WithEcdsa = tlv::SignatureSha256WithEcdsa
-  };
+        class Error : public tlv::Error {
+        public:
 
-  Signature() = default;
+            explicit
+            Error(const std::string& what)
+            : tlv::Error(what) {
+            }
+        };
 
-  explicit
-  Signature(const Block& info, const Block& value = Block());
+        /// @deprecated use tlv::SignatureTypeValue instead.
 
-  explicit
-  Signature(const SignatureInfo& info, const Block& value = Block());
+        enum {
+            Sha256 = tlv::DigestSha256,
+            Sha256WithRsa = tlv::SignatureSha256WithRsa,
+            Sha256WithEcdsa = tlv::SignatureSha256WithEcdsa
+        };
 
-  operator bool() const
-  {
-    return m_info.getSignatureType() != -1;
-  }
+        Signature() = default;
 
-  /**
-   * @brief Get SignatureInfo in the wire format
-   */
-  const Block&
-  getInfo() const
-  {
-    return m_info.wireEncode(); // will do nothing if wire already exists
-  }
+        explicit
+        Signature(const Block& info, const Block& value = Block());
 
-  /**
-   * @brief Get SignatureInfo
-   */
-  const SignatureInfo&
-  getSignatureInfo() const
-  {
-    return m_info;
-  }
+        explicit
+        Signature(const SignatureInfo& info, const Block& value = Block());
 
-  /**
-   * @brief Set SignatureInfo from a block
-   *
-   * @throws tlv::Error if supplied block is not formatted correctly
-   */
-  void
-  setInfo(const Block& info);
+        operator bool() const {
+            return m_info.getSignatureType() != -1;
+        }
 
-  /**
-   * @brief Set SignatureInfo
-   */
-  void
-  setInfo(const SignatureInfo& info)
-  {
-    m_info = info;
-  }
+        /**
+         * @brief Get SignatureInfo in the wire format
+         */
+        const Block&
+        getInfo() const {
+            return m_info.wireEncode(); // will do nothing if wire already exists
+        }
 
-  /**
-   * @brief Get SignatureValue in the wire format
-   */
-  const Block&
-  getValue() const
-  {
-    m_value.encode(); // will do nothing if wire already exists
-    return m_value;
-  }
+        /**
+         * @brief Get SignatureInfo
+         */
+        const SignatureInfo&
+        getSignatureInfo() const {
+            return m_info;
+        }
 
-  /**
-   * @brief Get SignatureValue from a block
-   *
-   * @throws tlv::Error if supplied block has type different from SignatureValue
-   */
-  void
-  setValue(const Block& value);
+        /**
+         * @brief Set SignatureInfo from a block
+         *
+         * @throws tlv::Error if supplied block is not formatted correctly
+         */
+        void
+        setInfo(const Block& info);
 
-  /**
-   * @brief Get signature type
-   */
-  uint32_t
-  getType() const
-  {
-    return m_info.getSignatureType();
-  }
+        /**
+         * @brief Set SignatureInfo
+         */
+        void
+        setInfo(const SignatureInfo& info) {
+            m_info = info;
+        }
 
-  /**
-   * @brief Check if SignatureInfo block has a KeyLocator
-   */
-  bool
-  hasKeyLocator() const
-  {
-    return m_info.hasKeyLocator();
-  }
+        /**
+         * @brief Get SignatureValue in the wire format
+         */
+        const Block&
+        getValue() const {
+            m_value.encode(); // will do nothing if wire already exists
+            return m_value;
+        }
 
-  /**
-   * @brief Get KeyLocator
-   *
-   * @throws Signature::Error if KeyLocator does not exist
-   */
-  const KeyLocator&
-  getKeyLocator() const
-  {
-    return m_info.getKeyLocator();
-  }
+        /**
+         * @brief Get SignatureValue from a block
+         *
+         * @throws tlv::Error if supplied block has type different from SignatureValue
+         */
+        void
+        setValue(const Block& value);
 
-  /**
-   * @brief Set KeyLocator
-   */
-  void
-  setKeyLocator(const KeyLocator& keyLocator)
-  {
-    m_info.setKeyLocator(keyLocator);
-  }
+        /**
+         * @brief Get signature type
+         */
+        uint32_t
+        getType() const {
+            return m_info.getSignatureType();
+        }
 
-  /**
-   * @brief Unset KeyLocator
-   *
-   * Note that specific signature types may provide advisory (non-virtual) override
-   * to prevent unsetting KeyLocator if it is required by the specification.
-   */
-  void
-  unsetKeyLocator()
-  {
-    m_info.unsetKeyLocator();
-  }
+        /**
+         * @brief Check if SignatureInfo block has a KeyLocator
+         */
+        bool
+        hasKeyLocator() const {
+            return m_info.hasKeyLocator();
+        }
 
-public: // EqualityComparable concept
-  bool
-  operator==(const Signature& other) const
-  {
-    return getInfo() == other.getInfo() &&
-      getValue() == other.getValue();
-  }
+        /**
+         * @brief Get KeyLocator
+         *
+         * @throws Signature::Error if KeyLocator does not exist
+         */
+        const KeyLocator&
+        getKeyLocator() const {
+            return m_info.getKeyLocator();
+        }
 
-  bool
-  operator!=(const Signature& other) const
-  {
-    return !(*this == other);
-  }
+        /**
+         * @brief Set KeyLocator
+         */
+        void
+        setKeyLocator(const KeyLocator& keyLocator) {
+            m_info.setKeyLocator(keyLocator);
+        }
 
-protected:
-  SignatureInfo m_info;
-  mutable Block m_value;
-};
+        /**
+         * @brief Unset KeyLocator
+         *
+         * Note that specific signature types may provide advisory (non-virtual) override
+         * to prevent unsetting KeyLocator if it is required by the specification.
+         */
+        void
+        unsetKeyLocator() {
+            m_info.unsetKeyLocator();
+        }
+
+    public: // EqualityComparable concept
+
+        bool
+        operator==(const Signature& other) const {
+            return getInfo() == other.getInfo() &&
+                    getValue() == other.getValue();
+        }
+
+        bool
+        operator!=(const Signature& other) const {
+            return !(*this == other);
+        }
+
+    protected:
+        SignatureInfo m_info;
+        mutable Block m_value;
+    };
 
 } // namespace ndn
 

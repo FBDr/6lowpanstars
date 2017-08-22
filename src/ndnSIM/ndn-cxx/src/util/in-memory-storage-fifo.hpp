@@ -29,65 +29,64 @@
 #include <boost/multi_index/hashed_index.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** @brief Provides in-memory storage employing FIFO replacement policy, which is first in first
- *  out.
- */
-class InMemoryStorageFifo : public InMemoryStorage
-{
-public:
-  explicit
-  InMemoryStorageFifo(size_t limit = 10);
+        /** @brief Provides in-memory storage employing FIFO replacement policy, which is first in first
+         *  out.
+         */
+        class InMemoryStorageFifo : public InMemoryStorage {
+        public:
+            explicit
+            InMemoryStorageFifo(size_t limit = 10);
 
-  explicit
-  InMemoryStorageFifo(boost::asio::io_service& ioService, size_t limit = 10);
+            explicit
+            InMemoryStorageFifo(boost::asio::io_service& ioService, size_t limit = 10);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
-  /** @brief Removes one Data packet from in-memory storage based on FIFO
-   *  @return{ whether the Data was removed }
-   */
-  virtual bool
-  evictItem() override;
+            /** @brief Removes one Data packet from in-memory storage based on FIFO
+             *  @return{ whether the Data was removed }
+             */
+            virtual bool
+            evictItem() override;
 
-  /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
-   */
-  virtual void
-  afterInsert(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
+             */
+            virtual void
+            afterInsert(InMemoryStorageEntry* entry) override;
 
-  /** @brief Update the entry or other data structures before a entry is successfully erased,
-   *  erase it from the cleanupIndex
-   */
-  virtual void
-  beforeErase(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry or other data structures before a entry is successfully erased,
+             *  erase it from the cleanupIndex
+             */
+            virtual void
+            beforeErase(InMemoryStorageEntry* entry) override;
 
-private:
-  //multi_index_container to implement FIFO
-  class byArrival;
-  class byEntity;
+        private:
+            //multi_index_container to implement FIFO
+            class byArrival;
+            class byEntity;
 
-  typedef boost::multi_index_container<
-    InMemoryStorageEntry*,
-    boost::multi_index::indexed_by<
+            typedef boost::multi_index_container<
+            InMemoryStorageEntry*,
+            boost::multi_index::indexed_by<
 
-      // by Entry itself
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<byEntity>,
-        boost::multi_index::identity<InMemoryStorageEntry*>
-      >,
+            // by Entry itself
+            boost::multi_index::hashed_unique<
+            boost::multi_index::tag<byEntity>,
+            boost::multi_index::identity<InMemoryStorageEntry*>
+            >,
 
-      // by arrival (FIFO)
-      boost::multi_index::sequenced<
-        boost::multi_index::tag<byArrival>
-      >
+            // by arrival (FIFO)
+            boost::multi_index::sequenced<
+            boost::multi_index::tag<byArrival>
+            >
 
-    >
-  > CleanupIndex;
+            >
+            > CleanupIndex;
 
-  CleanupIndex m_cleanupIndex;
-};
+            CleanupIndex m_cleanupIndex;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_IN_MEMORY_STORAGE_FIFO_HPP

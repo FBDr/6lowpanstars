@@ -29,68 +29,64 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-/** \class FibUpdate
- *  \brief represents a FIB update
- */
-class FibUpdate
-{
-public:
-  FibUpdate()
-    : faceId(0)
-    , cost(0)
-  {
-  }
+        /** \class FibUpdate
+         *  \brief represents a FIB update
+         */
+        class FibUpdate {
+        public:
 
-  bool
-  operator==(const FibUpdate& other) const
-  {
-    return (this->name == other.name &&
-            this->faceId == other.faceId &&
-            this->cost == other.cost &&
-            this->action == other.action);
-  }
+            FibUpdate()
+            : faceId(0)
+            , cost(0) {
+            }
 
-  static FibUpdate
-  createAddUpdate(const Name& name, const uint64_t faceId, const uint64_t cost);
+            bool
+            operator==(const FibUpdate& other) const {
+                return (this->name == other.name &&
+                        this->faceId == other.faceId &&
+                        this->cost == other.cost &&
+                        this->action == other.action);
+            }
 
-  static FibUpdate
-  createRemoveUpdate(const Name& name, const uint64_t faceId);
+            static FibUpdate
+            createAddUpdate(const Name& name, const uint64_t faceId, const uint64_t cost);
 
-  enum Action {
-    ADD_NEXTHOP    = 0,
-    REMOVE_NEXTHOP = 1
-  };
+            static FibUpdate
+            createRemoveUpdate(const Name& name, const uint64_t faceId);
 
-public:
-  Name name;
-  uint64_t faceId;
-  uint64_t cost;
-  Action action;
-};
+            enum Action {
+                ADD_NEXTHOP = 0,
+                REMOVE_NEXTHOP = 1
+            };
 
-inline std::ostream&
-operator<<(std::ostream& os, const FibUpdate& update)
-{
-  os << "FibUpdate("
-     << " Name: " << update.name << ", "
-     << "faceId: " << update.faceId << ", ";
+        public:
+            Name name;
+            uint64_t faceId;
+            uint64_t cost;
+            Action action;
+        };
 
-  if (update.action == FibUpdate::ADD_NEXTHOP) {
-    os << "cost: " << update.cost << ", "
-       << "action: ADD_NEXTHOP";
-  }
-  else {
-    os << "action: REMOVE_NEXTHOP";
-  }
+        inline std::ostream&
+        operator<<(std::ostream& os, const FibUpdate& update) {
+            os << "FibUpdate("
+                    << " Name: " << update.name << ", "
+                    << "faceId: " << update.faceId << ", ";
 
-  os << ")";
+            if (update.action == FibUpdate::ADD_NEXTHOP) {
+                os << "cost: " << update.cost << ", "
+                        << "action: ADD_NEXTHOP";
+            } else {
+                os << "action: REMOVE_NEXTHOP";
+            }
 
-  return os;
-}
+            os << ")";
 
-} // namespace rib
+            return os;
+        }
+
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_FIB_UPDATE_HPP

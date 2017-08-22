@@ -29,107 +29,106 @@ namespace ns3 {
 
 
 
-class FfMacCschedSapUser;
-class FfMacSchedSapUser;
-class FfMacCschedSapProvider;
-class FfMacSchedSapProvider;
-class LteFfrSapProvider;
-class LteFfrSapUser;
+    class FfMacCschedSapUser;
+    class FfMacSchedSapUser;
+    class FfMacCschedSapProvider;
+    class FfMacSchedSapProvider;
+    class LteFfrSapProvider;
+    class LteFfrSapUser;
 
-/**
- * \ingroup lte
- * \defgroup ff-api FF MAC Schedulers
- */
-     
-/**
- * \ingroup ff-api
- *
- * This abstract base class identifies the interface by means of which
- * the helper object can plug on the MAC a scheduler implementation based on the
- * FF MAC Sched API.
- *
- *
- */
-class FfMacScheduler : public Object
-{
-public:
-  /**
-  * The type of UL CQI to be filtered (ALL means accept all the CQI,
-  * where a new CQI of any type overwrite the old one, even of another type)
-  *
-  */
-  enum UlCqiFilter_t
-  {
-    SRS_UL_CQI,
-    PUSCH_UL_CQI,
-    ALL_UL_CQI
-  };
-  /**
-  * constructor
-  *
-  */
-  FfMacScheduler ();
-  /**
-   * destructor
-   *
-   */
-  virtual ~FfMacScheduler ();
+    /**
+     * \ingroup lte
+     * \defgroup ff-api FF MAC Schedulers
+     */
 
-  // inherited from Object
-  virtual void DoDispose (void);
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup ff-api
+     *
+     * This abstract base class identifies the interface by means of which
+     * the helper object can plug on the MAC a scheduler implementation based on the
+     * FF MAC Sched API.
+     *
+     *
+     */
+    class FfMacScheduler : public Object {
+    public:
 
-  /**
-   * set the user part of the FfMacCschedSap that this Scheduler will
-   * interact with. Normally this part of the SAP is exported by the MAC.
-   *
-   * \param s
-   */
-  virtual void SetFfMacCschedSapUser (FfMacCschedSapUser* s) = 0;
+        /**
+         * The type of UL CQI to be filtered (ALL means accept all the CQI,
+         * where a new CQI of any type overwrite the old one, even of another type)
+         *
+         */
+        enum UlCqiFilter_t {
+            SRS_UL_CQI,
+            PUSCH_UL_CQI,
+            ALL_UL_CQI
+        };
+        /**
+         * constructor
+         *
+         */
+        FfMacScheduler();
+        /**
+         * destructor
+         *
+         */
+        virtual ~FfMacScheduler();
 
-  /**
-   *
-   * set the user part of the FfMacSchedSap that this Scheduler will
-   * interact with. Normally this part of the SAP is exported by the MAC.
-   *
-   * \param s
-   */
-  virtual void SetFfMacSchedSapUser (FfMacSchedSapUser* s) = 0;
+        // inherited from Object
+        virtual void DoDispose(void);
+        static TypeId GetTypeId(void);
 
-  /**
-   *
-   * \return the Provider part of the FfMacCschedSap provided by the Scheduler
-   */
-  virtual FfMacCschedSapProvider* GetFfMacCschedSapProvider () = 0;
+        /**
+         * set the user part of the FfMacCschedSap that this Scheduler will
+         * interact with. Normally this part of the SAP is exported by the MAC.
+         *
+         * \param s
+         */
+        virtual void SetFfMacCschedSapUser(FfMacCschedSapUser* s) = 0;
 
-  /**
-   *
-   * \return the Provider part of the FfMacSchedSap provided by the Scheduler
-   */
-  virtual FfMacSchedSapProvider* GetFfMacSchedSapProvider () = 0;
+        /**
+         *
+         * set the user part of the FfMacSchedSap that this Scheduler will
+         * interact with. Normally this part of the SAP is exported by the MAC.
+         *
+         * \param s
+         */
+        virtual void SetFfMacSchedSapUser(FfMacSchedSapUser* s) = 0;
 
-  //FFR SAPs
-  /**
-   *
-   * Set the Provider part of the LteFfrSap that this Scheduler will
-   * interact with
-   *
-   * \param s
-   */
-  virtual void SetLteFfrSapProvider (LteFfrSapProvider* s) = 0;
+        /**
+         *
+         * \return the Provider part of the FfMacCschedSap provided by the Scheduler
+         */
+        virtual FfMacCschedSapProvider* GetFfMacCschedSapProvider() = 0;
 
-  /**
-   *
-   * \return the User part of the LteFfrSap provided by the FfrAlgorithm
-   */
-  virtual LteFfrSapUser* GetLteFfrSapUser () = 0;
-  
-protected:
-    
-  UlCqiFilter_t m_ulCqiFilter;
+        /**
+         *
+         * \return the Provider part of the FfMacSchedSap provided by the Scheduler
+         */
+        virtual FfMacSchedSapProvider* GetFfMacSchedSapProvider() = 0;
 
-};
+        //FFR SAPs
+        /**
+         *
+         * Set the Provider part of the LteFfrSap that this Scheduler will
+         * interact with
+         *
+         * \param s
+         */
+        virtual void SetLteFfrSapProvider(LteFfrSapProvider* s) = 0;
 
-}  // namespace ns3
+        /**
+         *
+         * \return the User part of the LteFfrSap provided by the FfrAlgorithm
+         */
+        virtual LteFfrSapUser* GetLteFfrSapUser() = 0;
+
+    protected:
+
+        UlCqiFilter_t m_ulCqiFilter;
+
+    };
+
+} // namespace ns3
 
 #endif /* FF_MAC_SCHEDULER_H */

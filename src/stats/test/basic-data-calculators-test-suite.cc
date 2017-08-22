@@ -33,68 +33,63 @@ const double TOLERANCE = 1e-14;
 
 class OneIntegerTestCase : public TestCase
 {
-public:
-  OneIntegerTestCase ();
-  virtual ~OneIntegerTestCase ();
+    public :
+    OneIntegerTestCase();
+    virtual ~OneIntegerTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-OneIntegerTestCase::OneIntegerTestCase ()
-  : TestCase ("Basic Statistical Functions using One Integer")
-
-{
+OneIntegerTestCase::OneIntegerTestCase()
+: TestCase("Basic Statistical Functions using One Integer")
+ {
 }
 
-OneIntegerTestCase::~OneIntegerTestCase ()
-{
+OneIntegerTestCase::~OneIntegerTestCase() {
 }
 
 void
-OneIntegerTestCase::DoRun (void)
-{
-  MinMaxAvgTotalCalculator<int> calculator;
+OneIntegerTestCase::DoRun(void) {
+    MinMaxAvgTotalCalculator<int> calculator;
 
-  long count = 1;
+    long count = 1;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  int multiple = 5;
-  int value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    int multiple = 5;
+    int value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = 0;
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = 0;
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getCount(),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSum(),      sum,      TOLERANCE, "Sum value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMin(),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMax(),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMean(),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getStddev(),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSqrSum(),   sqrSum,   TOLERANCE, "SqrSum value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getCount(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSum(), sum, TOLERANCE, "Sum value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMin(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMax(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getStddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSqrSum(), sqrSum, TOLERANCE, "SqrSum value wrong");
 }
 
 
@@ -104,68 +99,63 @@ OneIntegerTestCase::DoRun (void)
 
 class FiveIntegersTestCase : public TestCase
 {
-public:
-  FiveIntegersTestCase ();
-  virtual ~FiveIntegersTestCase ();
+    public :
+    FiveIntegersTestCase();
+    virtual ~FiveIntegersTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-FiveIntegersTestCase::FiveIntegersTestCase ()
-  : TestCase ("Basic Statistical Functions using Five Integers")
-
-{
+FiveIntegersTestCase::FiveIntegersTestCase()
+: TestCase("Basic Statistical Functions using Five Integers")
+ {
 }
 
-FiveIntegersTestCase::~FiveIntegersTestCase ()
-{
+FiveIntegersTestCase::~FiveIntegersTestCase() {
 }
 
 void
-FiveIntegersTestCase::DoRun (void)
-{
-  MinMaxAvgTotalCalculator<int> calculator;
+FiveIntegersTestCase::DoRun(void) {
+    MinMaxAvgTotalCalculator<int> calculator;
 
-  long count = 5;
+    long count = 5;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  int multiple = 5;
-  int value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    int multiple = 5;
+    int value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = (count * sqrSum - sum * sum) / (count * (count - 1));
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = (count * sqrSum - sum * sum) / (count * (count - 1));
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getCount(),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSum(),      sum,      TOLERANCE, "Sum value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMin(),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMax(),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMean(),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getStddev(),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSqrSum(),   sqrSum,   TOLERANCE, "SqrSum value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getCount(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSum(), sum, TOLERANCE, "Sum value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMin(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMax(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getStddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSqrSum(), sqrSum, TOLERANCE, "SqrSum value wrong");
 }
 
 
@@ -175,83 +165,76 @@ FiveIntegersTestCase::DoRun (void)
 
 class FiveDoublesTestCase : public TestCase
 {
-public:
-  FiveDoublesTestCase ();
-  virtual ~FiveDoublesTestCase ();
+    public :
+    FiveDoublesTestCase();
+    virtual ~FiveDoublesTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-FiveDoublesTestCase::FiveDoublesTestCase ()
-  : TestCase ("Basic Statistical Functions using Five Double Values")
-
-{
+FiveDoublesTestCase::FiveDoublesTestCase()
+: TestCase("Basic Statistical Functions using Five Double Values")
+ {
 }
 
-FiveDoublesTestCase::~FiveDoublesTestCase ()
-{
+FiveDoublesTestCase::~FiveDoublesTestCase() {
 }
 
 void
-FiveDoublesTestCase::DoRun (void)
-{
-  MinMaxAvgTotalCalculator<double> calculator;
+FiveDoublesTestCase::DoRun(void) {
+    MinMaxAvgTotalCalculator<double> calculator;
 
-  long count = 5;
+    long count = 5;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  double multiple = 3.14;
-  double value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    double multiple = 3.14;
+    double value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = (count * sqrSum - sum * sum) / (count * (count - 1));
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = (count * sqrSum - sum * sum) / (count * (count - 1));
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getCount(),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSum(),      sum,      TOLERANCE, "Sum value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMin(),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMax(),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getMean(),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getStddev(),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.getSqrSum(),   sqrSum,   TOLERANCE, "SqrSum value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getCount(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSum(), sum, TOLERANCE, "Sum value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMin(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMax(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getMean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getStddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getVariance(), variance, TOLERANCE, "Variance value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.getSqrSum(), sqrSum, TOLERANCE, "SqrSum value wrong");
 }
 
 
 class BasicDataCalculatorsTestSuite : public TestSuite
 {
-public:
-  BasicDataCalculatorsTestSuite ();
-};
+    public :
+    BasicDataCalculatorsTestSuite();};
 
-BasicDataCalculatorsTestSuite::BasicDataCalculatorsTestSuite ()
-  : TestSuite ("basic-data-calculators", UNIT)
-{
-  AddTestCase (new OneIntegerTestCase, TestCase::QUICK);
-  AddTestCase (new FiveIntegersTestCase, TestCase::QUICK);
-  AddTestCase (new FiveDoublesTestCase, TestCase::QUICK);
+BasicDataCalculatorsTestSuite::BasicDataCalculatorsTestSuite()
+: TestSuite("basic-data-calculators", UNIT) {
+    AddTestCase(new OneIntegerTestCase, TestCase::QUICK);
+    AddTestCase(new FiveIntegersTestCase, TestCase::QUICK);
+    AddTestCase(new FiveDoublesTestCase, TestCase::QUICK);
 }
 
 static BasicDataCalculatorsTestSuite basicDataCalculatorsTestSuite;

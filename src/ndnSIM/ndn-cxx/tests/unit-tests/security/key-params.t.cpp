@@ -25,69 +25,65 @@
 
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecurityKeyParams)
+        BOOST_AUTO_TEST_SUITE(SecurityKeyParams)
 
-BOOST_AUTO_TEST_CASE(RsaParameter)
-{
-  RsaKeyParams params;
-  BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::RSA);
-  BOOST_CHECK_EQUAL(params.getKeySize(), 2048);
+        BOOST_AUTO_TEST_CASE(RsaParameter) {
+            RsaKeyParams params;
+            BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::RSA);
+            BOOST_CHECK_EQUAL(params.getKeySize(), 2048);
 
-  RsaKeyParams params2(1024);
-  BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::RSA);
-  BOOST_CHECK_EQUAL(params2.getKeySize(), 1024);
+            RsaKeyParams params2(1024);
+            BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::RSA);
+            BOOST_CHECK_EQUAL(params2.getKeySize(), 1024);
 
-  RsaKeyParams params3(3);
-  BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::RSA);
-  BOOST_CHECK_EQUAL(params3.getKeySize(), 2048);
-}
+            RsaKeyParams params3(3);
+            BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::RSA);
+            BOOST_CHECK_EQUAL(params3.getKeySize(), 2048);
+        }
 
-BOOST_AUTO_TEST_CASE(EcdsaParameter)
-{
-  EcdsaKeyParams params;
-  BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::EC);
-  BOOST_CHECK_EQUAL(params.getKeySize(), 256);
+        BOOST_AUTO_TEST_CASE(EcdsaParameter) {
+            EcdsaKeyParams params;
+            BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::EC);
+            BOOST_CHECK_EQUAL(params.getKeySize(), 256);
 
-  EcdsaKeyParams params2(384);
-  BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::EC);
-  BOOST_CHECK_EQUAL(params2.getKeySize(), 384);
+            EcdsaKeyParams params2(384);
+            BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::EC);
+            BOOST_CHECK_EQUAL(params2.getKeySize(), 384);
 
-  EcdsaKeyParams params3(3);
-  BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::EC);
-  BOOST_CHECK_EQUAL(params3.getKeySize(), 256);
-}
+            EcdsaKeyParams params3(3);
+            BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::EC);
+            BOOST_CHECK_EQUAL(params3.getKeySize(), 256);
+        }
 
-BOOST_AUTO_TEST_CASE(AesParameter)
-{
-  AesKeyParams params;
-  BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::AES);
-  BOOST_CHECK_EQUAL(params.getKeySize(), 64);
+        BOOST_AUTO_TEST_CASE(AesParameter) {
+            AesKeyParams params;
+            BOOST_CHECK_EQUAL(params.getKeyType(), KeyType::AES);
+            BOOST_CHECK_EQUAL(params.getKeySize(), 64);
 
-  AesKeyParams params2(128);
-  BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::AES);
-  BOOST_CHECK_EQUAL(params2.getKeySize(), 128);
+            AesKeyParams params2(128);
+            BOOST_CHECK_EQUAL(params2.getKeyType(), KeyType::AES);
+            BOOST_CHECK_EQUAL(params2.getKeySize(), 128);
 
-  AesKeyParams params3(256);
-  BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::AES);
-  BOOST_CHECK_EQUAL(params3.getKeySize(), 256);
+            AesKeyParams params3(256);
+            BOOST_CHECK_EQUAL(params3.getKeyType(), KeyType::AES);
+            BOOST_CHECK_EQUAL(params3.getKeySize(), 256);
 
-  AesKeyParams params4(4);
-  BOOST_CHECK_EQUAL(params4.getKeyType(), KeyType::AES);
-  BOOST_CHECK_EQUAL(params4.getKeySize(), 64);
-}
+            AesKeyParams params4(4);
+            BOOST_CHECK_EQUAL(params4.getKeyType(), KeyType::AES);
+            BOOST_CHECK_EQUAL(params4.getKeySize(), 64);
+        }
 
-BOOST_AUTO_TEST_CASE(Error)
-{
-  EcdsaKeyParams params;
-  BOOST_REQUIRE_THROW((RsaKeyParams(params)), KeyParams::Error);
+        BOOST_AUTO_TEST_CASE(Error) {
+            EcdsaKeyParams params;
+            BOOST_REQUIRE_THROW((RsaKeyParams(params)), KeyParams::Error);
 
-  AesKeyParams params2;
-  BOOST_REQUIRE_THROW((RsaKeyParams(params2)), KeyParams::Error);
-}
+            AesKeyParams params2;
+            BOOST_REQUIRE_THROW((RsaKeyParams(params2)), KeyParams::Error);
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

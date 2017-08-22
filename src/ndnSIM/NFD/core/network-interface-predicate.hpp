@@ -30,42 +30,41 @@
 
 namespace nfd {
 
-class NetworkInterfaceInfo;
+    class NetworkInterfaceInfo;
 
-/**
- * \brief Represents a predicate to accept or reject a NetworkInterfaceInfo.
- *
- * The predicate consists of a whitelist and a blacklist. Whitelist and blacklist can contain,
- * in no particular order, interface names (e.g., ifname eth0), mac addresses
- * (e.g., ether 85:3b:4d:d3:5f:c2), subnets (e.g., subnet 192.0.2.0/24) or a wildcard (*) that matches
- * all interfaces. A NetworkInterfaceInfo is accepted if it matches any entry in the whitelist and none
- * of the entries in the blacklist.
- */
+    /**
+     * \brief Represents a predicate to accept or reject a NetworkInterfaceInfo.
+     *
+     * The predicate consists of a whitelist and a blacklist. Whitelist and blacklist can contain,
+     * in no particular order, interface names (e.g., ifname eth0), mac addresses
+     * (e.g., ether 85:3b:4d:d3:5f:c2), subnets (e.g., subnet 192.0.2.0/24) or a wildcard (*) that matches
+     * all interfaces. A NetworkInterfaceInfo is accepted if it matches any entry in the whitelist and none
+     * of the entries in the blacklist.
+     */
 
-class NetworkInterfacePredicate
-{
-public:
-  NetworkInterfacePredicate();
+    class NetworkInterfacePredicate {
+    public:
+        NetworkInterfacePredicate();
 
-  /**
-   * \brief Set the whitelist to "*" and clear the blacklist
-   */
-  void
-  clear();
+        /**
+         * \brief Set the whitelist to "*" and clear the blacklist
+         */
+        void
+        clear();
 
-  void
-  parseWhitelist(const boost::property_tree::ptree& list);
+        void
+        parseWhitelist(const boost::property_tree::ptree& list);
 
-  void
-  parseBlacklist(const boost::property_tree::ptree& list);
+        void
+        parseBlacklist(const boost::property_tree::ptree& list);
 
-  bool
-  operator()(const NetworkInterfaceInfo& nic) const;
+        bool
+        operator()(const NetworkInterfaceInfo& nic) const;
 
-private:
-  std::set<std::string> m_whitelist;
-  std::set<std::string> m_blacklist;
-};
+    private:
+        std::set<std::string> m_whitelist;
+        std::set<std::string> m_blacklist;
+    };
 
 } // namespace nfd
 

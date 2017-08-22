@@ -31,91 +31,89 @@
 #include <boost/multi_index/identity.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** @brief Provides an in-memory storage with Least Frequently Used (LFU) replacement policy.
- *  @note The frequency right now is usage count.
- *  @sa https://en.wikipedia.org/w/index.php?title=Least_frequently_used&oldid=604542656
- */
-class InMemoryStorageLfu : public InMemoryStorage
-{
-public:
-  explicit
-  InMemoryStorageLfu(size_t limit = 10);
+        /** @brief Provides an in-memory storage with Least Frequently Used (LFU) replacement policy.
+         *  @note The frequency right now is usage count.
+         *  @sa https://en.wikipedia.org/w/index.php?title=Least_frequently_used&oldid=604542656
+         */
+        class InMemoryStorageLfu : public InMemoryStorage {
+        public:
+            explicit
+            InMemoryStorageLfu(size_t limit = 10);
 
-  explicit
-  InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit = 10);
+            explicit
+            InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit = 10);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
-  /** @brief Removes one Data packet from in-memory storage based on LFU, i.e. evict the least
-   *  frequently accessed Data packet
-   *  @return{ whether the Data was removed }
-   */
-  virtual bool
-  evictItem() override;
+            /** @brief Removes one Data packet from in-memory storage based on LFU, i.e. evict the least
+             *  frequently accessed Data packet
+             *  @return{ whether the Data was removed }
+             */
+            virtual bool
+            evictItem() override;
 
-  /** @brief Update the entry when the entry is returned by the find() function,
-   *  increment the frequency according to LFU
-   */
-  virtual void
-  afterAccess(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry when the entry is returned by the find() function,
+             *  increment the frequency according to LFU
+             */
+            virtual void
+            afterAccess(InMemoryStorageEntry* entry) override;
 
-  /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
-   */
-  virtual void
-  afterInsert(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry after a entry is successfully inserted, add it to the cleanupIndex
+             */
+            virtual void
+            afterInsert(InMemoryStorageEntry* entry) override;
 
-  /** @brief Update the entry or other data structures before a entry is successfully erased,
-   *  erase it from the cleanupIndex
-   */
-  virtual void
-  beforeErase(InMemoryStorageEntry* entry) override;
+            /** @brief Update the entry or other data structures before a entry is successfully erased,
+             *  erase it from the cleanupIndex
+             */
+            virtual void
+            beforeErase(InMemoryStorageEntry* entry) override;
 
-private:
-  // binds frequency and entry together
-  struct CleanupEntry
-  {
-    InMemoryStorageEntry* entry;
-    uint64_t frequency; // could potentially be overflowed
-  };
+        private:
+            // binds frequency and entry together
 
-  /** @brief Function to increment frequency of the entry in the CleanupEntry
-   */
-  static inline void
-  incrementFrequency(CleanupEntry& cleanupEntry)
-  {
-    ++cleanupEntry.frequency;
-  }
+            struct CleanupEntry {
+                InMemoryStorageEntry* entry;
+                uint64_t frequency; // could potentially be overflowed
+            };
 
-private:
-  //multi_index_container to implement LFU
-  class byFrequency;
-  class byEntity;
+            /** @brief Function to increment frequency of the entry in the CleanupEntry
+             */
+            static inline void
+            incrementFrequency(CleanupEntry& cleanupEntry) {
+                ++cleanupEntry.frequency;
+            }
 
-  typedef boost::multi_index_container<
-    CleanupEntry,
-    boost::multi_index::indexed_by<
+        private:
+            //multi_index_container to implement LFU
+            class byFrequency;
+            class byEntity;
 
-      // by Entry itself
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<byEntity>,
-        boost::multi_index::member<CleanupEntry, InMemoryStorageEntry*, &CleanupEntry::entry>
-      >,
+            typedef boost::multi_index_container<
+            CleanupEntry,
+            boost::multi_index::indexed_by<
 
-      // by frequency (LFU)
-      boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<byFrequency>,
-        boost::multi_index::member<CleanupEntry, uint64_t, &CleanupEntry::frequency>,
-        std::less<uint64_t>
-      >
+            // by Entry itself
+            boost::multi_index::hashed_unique<
+            boost::multi_index::tag<byEntity>,
+            boost::multi_index::member<CleanupEntry, InMemoryStorageEntry*, &CleanupEntry::entry>
+            >,
 
-    >
-  > CleanupIndex;
+            // by frequency (LFU)
+            boost::multi_index::ordered_non_unique<
+            boost::multi_index::tag<byFrequency>,
+            boost::multi_index::member<CleanupEntry, uint64_t, &CleanupEntry::frequency>,
+            std::less<uint64_t>
+            >
 
-  CleanupIndex m_cleanupIndex;
-};
+            >
+            > CleanupIndex;
 
-} // namespace util
+            CleanupIndex m_cleanupIndex;
+        };
+
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_IN_MEMORY_STORAGE_LFU_HPP

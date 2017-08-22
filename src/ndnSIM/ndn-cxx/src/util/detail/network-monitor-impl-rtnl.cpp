@@ -34,57 +34,55 @@
 #include <cstring>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-NetworkMonitor::Impl::Impl(NetworkMonitor& nm, boost::asio::io_service& io)
-  : m_nm(nm)
-  , m_socket(io)
-{
-  int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-  if (fd < 0)
-    BOOST_THROW_EXCEPTION(Error(std::string("Cannot create netlink socket (") +
-                                std::strerror(errno) + ")"));
+        NetworkMonitor::Impl::Impl(NetworkMonitor& nm, boost::asio::io_service& io)
+        : m_nm(nm)
+        , m_socket(io) {
+            int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+            if (fd < 0)
+                BOOST_THROW_EXCEPTION(Error(std::string("Cannot create netlink socket (") +
+                    std::strerror(errno) + ")"));
 
-  sockaddr_nl addr{};
-  addr.nl_family = AF_NETLINK;
-  addr.nl_groups = RTMGRP_LINK |
-                   RTMGRP_IPV4_IFADDR | RTMGRP_IPV4_ROUTE |
-                   RTMGRP_IPV6_IFADDR | RTMGRP_IPV6_ROUTE;
+            sockaddr_nl addr{};
+            addr.nl_family = AF_NETLINK;
+            addr.nl_groups = RTMGRP_LINK |
+                    RTMGRP_IPV4_IFADDR | RTMGRP_IPV4_ROUTE |
+                    RTMGRP_IPV6_IFADDR | RTMGRP_IPV6_ROUTE;
 
-  if (::bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
-    BOOST_THROW_EXCEPTION(Error(std::string("Cannot bind on netlink socket (") +
-                                std::strerror(errno) + ")"));
-  }
+            if (::bind(fd, reinterpret_cast<sockaddr*> (&addr), sizeof (addr)) == -1) {
+                BOOST_THROW_EXCEPTION(Error(std::string("Cannot bind on netlink socket (") +
+                        std::strerror(errno) + ")"));
+            }
 
-  m_socket.assign(fd);
+            m_socket.assign(fd);
 
-  m_socket.async_read_some(boost::asio::buffer(m_buffer, NETLINK_BUFFER_SIZE),
-                           bind(&Impl::onReceiveRtNetlink, this, _1, _2));
-}
+            m_socket.async_read_some(boost::asio::buffer(m_buffer, NETLINK_BUFFER_SIZE),
+                    bind(&Impl::onReceiveRtNetlink, this, _1, _2));
+        }
 
-void
-NetworkMonitor::Impl::onReceiveRtNetlink(const boost::system::error_code& error, size_t nBytesReceived)
-{
-  if (error) {
-    return;
-  }
+        void
+        NetworkMonitor::Impl::onReceiveRtNetlink(const boost::system::error_code& error, size_t nBytesReceived) {
+            if (error) {
+                return;
+            }
 
-  const nlmsghdr* nlh = reinterpret_cast<const nlmsghdr*>(m_buffer);
-  while ((NLMSG_OK(nlh, nBytesReceived)) && (nlh->nlmsg_type != NLMSG_DONE)) {
-    if (nlh->nlmsg_type == RTM_NEWADDR || nlh->nlmsg_type == RTM_DELADDR ||
-        nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK ||
-        nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
-      m_nm.onNetworkStateChanged();
-      break;
-    }
-    nlh = NLMSG_NEXT(nlh, nBytesReceived);
-  }
+            const nlmsghdr* nlh = reinterpret_cast<const nlmsghdr*> (m_buffer);
+            while ((NLMSG_OK(nlh, nBytesReceived)) && (nlh->nlmsg_type != NLMSG_DONE)) {
+                if (nlh->nlmsg_type == RTM_NEWADDR || nlh->nlmsg_type == RTM_DELADDR ||
+                        nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK ||
+                        nlh->nlmsg_type == RTM_NEWROUTE || nlh->nlmsg_type == RTM_DELROUTE) {
+                    m_nm.onNetworkStateChanged();
+                    break;
+                }
+                nlh = NLMSG_NEXT(nlh, nBytesReceived);
+            }
 
-  m_socket.async_read_some(boost::asio::buffer(m_buffer, NETLINK_BUFFER_SIZE),
-                           bind(&Impl::onReceiveRtNetlink, this, _1, _2));
-}
+            m_socket.async_read_some(boost::asio::buffer(m_buffer, NETLINK_BUFFER_SIZE),
+                    bind(&Impl::onReceiveRtNetlink, this, _1, _2));
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_CXX_HAVE_RTNETLINK

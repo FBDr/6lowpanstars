@@ -26,25 +26,22 @@
 #include "nfd-manager-common-fixture.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-NfdManagerCommonFixture::NfdManagerCommonFixture()
-  : m_authenticator(CommandAuthenticator::create())
-{
-}
+        NfdManagerCommonFixture::NfdManagerCommonFixture()
+        : m_authenticator(CommandAuthenticator::create()) {
+        }
 
-void
-NfdManagerCommonFixture::setTopPrefix()
-{
-  this->ManagerCommonFixture::setTopPrefix("/localhost/nfd");
-}
+        void
+        NfdManagerCommonFixture::setTopPrefix() {
+            this->ManagerCommonFixture::setTopPrefix("/localhost/nfd");
+        }
 
-void
-NfdManagerCommonFixture::setPrivilege(const std::string& privilege)
-{
-  this->saveIdentityCertificate(m_identityName, "ManagerCommonFixture.ndncert");
+        void
+        NfdManagerCommonFixture::setPrivilege(const std::string& privilege) {
+            this->saveIdentityCertificate(m_identityName, "ManagerCommonFixture.ndncert");
 
-  const std::string& config = R"CONFIG(
+            const std::string& config = R"CONFIG(
     authorizations
     {
       authorize
@@ -58,10 +55,10 @@ NfdManagerCommonFixture::setPrivilege(const std::string& privilege)
     }
   )CONFIG";
 
-  ConfigFile cf;
-  m_authenticator->setConfigFile(cf);
-  cf.parse(config, false, "ManagerCommonFixture.authenticator.conf");
-}
+            ConfigFile cf;
+            m_authenticator->setConfigFile(cf);
+            cf.parse(config, false, "ManagerCommonFixture.authenticator.conf");
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

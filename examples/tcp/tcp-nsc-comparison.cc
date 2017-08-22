@@ -37,7 +37,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("TcpNscComparison");
+NS_LOG_COMPONENT_DEFINE("TcpNscComparison");
 
 std::string m_stack = "nsc-linux";
 std::string sock_factory;
@@ -50,162 +50,148 @@ bool enableTimestamps = false;
 bool enableWindowScale = false;
 
 int
-main (int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
 
-  //ensure the ns3 TCP default values match what nsc is using
-  Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (1448));
-  Config::SetDefault ("ns3::TcpSocket::DelAckCount", UintegerValue (1));
+    //ensure the ns3 TCP default values match what nsc is using
+    Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(1448));
+    Config::SetDefault("ns3::TcpSocket::DelAckCount", UintegerValue(1));
 
-  CommandLine cmd;
-  cmd.AddValue ("stack", "choose network stack", m_stack);
-  cmd.AddValue ("seed", "randomize seed", m_seed);
-  cmd.AddValue ("nNodes", "the number of source and sink nodes", m_nNodes);
-  cmd.AddValue ("stopTime", "duration", stopTime);
-  cmd.AddValue ("enablePcap", "pcap", enablePcap);
-  cmd.AddValue ("enableTimestamps", "use TCP Timestamps option", enableTimestamps);
-  cmd.AddValue ("enableWindowScale", "use TCP Window Scale option", enableWindowScale);
-  cmd.Parse (argc, argv);
+    CommandLine cmd;
+    cmd.AddValue("stack", "choose network stack", m_stack);
+    cmd.AddValue("seed", "randomize seed", m_seed);
+    cmd.AddValue("nNodes", "the number of source and sink nodes", m_nNodes);
+    cmd.AddValue("stopTime", "duration", stopTime);
+    cmd.AddValue("enablePcap", "pcap", enablePcap);
+    cmd.AddValue("enableTimestamps", "use TCP Timestamps option", enableTimestamps);
+    cmd.AddValue("enableWindowScale", "use TCP Window Scale option", enableWindowScale);
+    cmd.Parse(argc, argv);
 
-  SeedManager::SetSeed (m_seed);
+    SeedManager::SetSeed(m_seed);
 
-  if (m_stack != "nsc-linux" && m_stack != "ns3")
-    {
-      NS_FATAL_ERROR ("Error, stack named " << m_stack << " is not supported");
+    if (m_stack != "nsc-linux" && m_stack != "ns3") {
+        NS_FATAL_ERROR("Error, stack named " << m_stack << " is not supported");
     }
 
-  NodeContainer lefts, routers, rights, nodes;
-  lefts.Create (m_nNodes);
-  routers.Create (2);
-  rights.Create (m_nNodes);
-  nodes = NodeContainer (lefts, routers, rights);
+    NodeContainer lefts, routers, rights, nodes;
+    lefts.Create(m_nNodes);
+    routers.Create(2);
+    rights.Create(m_nNodes);
+    nodes = NodeContainer(lefts, routers, rights);
 
-  InternetStackHelper internetStack;
+    InternetStackHelper internetStack;
 
-  GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
-  if (m_stack == "ns3")
-    {
-      sock_factory = "ns3::TcpSocketFactory";
-      if (enableTimestamps == false)
-        {
-          Config::SetDefault ("ns3::TcpSocketBase::WindowScaling", BooleanValue (false));
+    GlobalValue::Bind("ChecksumEnabled", BooleanValue(true));
+    if (m_stack == "ns3") {
+        sock_factory = "ns3::TcpSocketFactory";
+        if (enableTimestamps == false) {
+            Config::SetDefault("ns3::TcpSocketBase::WindowScaling", BooleanValue(false));
         }
-      if (enableWindowScale == false)
-        {
-          Config::SetDefault ("ns3::TcpSocketBase::Timestamp", BooleanValue (false));
+        if (enableWindowScale == false) {
+            Config::SetDefault("ns3::TcpSocketBase::Timestamp", BooleanValue(false));
         }
-      internetStack.Install (nodes);
-    }
-  else if (m_stack == "nsc-linux")
-    {
-      internetStack.Install (routers);
-      sock_factory = "ns3::TcpSocketFactory";
-      internetStack.SetTcp ("ns3::NscTcpL4Protocol",
-                            "Library", StringValue ("liblinux2.6.26.so"));
-      internetStack.Install (lefts);
-      internetStack.Install (rights);
+        internetStack.Install(nodes);
+    } else if (m_stack == "nsc-linux") {
+        internetStack.Install(routers);
+        sock_factory = "ns3::TcpSocketFactory";
+        internetStack.SetTcp("ns3::NscTcpL4Protocol",
+                "Library", StringValue("liblinux2.6.26.so"));
+        internetStack.Install(lefts);
+        internetStack.Install(rights);
 
-      // at the time this program was written, these were not implemented 
-      // in ns3 tcp, so disable for comparison
-      Config::Set ("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_sack", StringValue ("0"));
-      if (enableTimestamps == false)
-        {
-          Config::Set ("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_timestamps", StringValue ("0"));
+        // at the time this program was written, these were not implemented 
+        // in ns3 tcp, so disable for comparison
+        Config::Set("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_sack", StringValue("0"));
+        if (enableTimestamps == false) {
+            Config::Set("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_timestamps", StringValue("0"));
         }
-      if (enableWindowScale == false)
-        {
-          Config::Set ("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_window_scaling", StringValue ("0"));
+        if (enableWindowScale == false) {
+            Config::Set("/NodeList/*/$ns3::Ns3NscStack<linux2.6.26>/net.ipv4.tcp_window_scaling", StringValue("0"));
         }
     }
 
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("1ns"));
+    PointToPointHelper pointToPoint;
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("1ns"));
 
-  Ipv4AddressHelper address;
-  Ipv4InterfaceContainer interfaces;
+    Ipv4AddressHelper address;
+    Ipv4InterfaceContainer interfaces;
 
-  NetDeviceContainer dev0, dev1, dev2;
-  for (uint32_t i = 0; i < m_nNodes; i++)
-    {
-      std::ostringstream oss;
-      oss << "10.0." << i << ".0";
-      address.SetBase (oss.str ().c_str (), "255.255.255.0");
-      dev0 = pointToPoint.Install (NodeContainer (lefts.Get (i), routers.Get (0)));
-      address.Assign (dev0);
+    NetDeviceContainer dev0, dev1, dev2;
+    for (uint32_t i = 0; i < m_nNodes; i++) {
+        std::ostringstream oss;
+        oss << "10.0." << i << ".0";
+        address.SetBase(oss.str().c_str(), "255.255.255.0");
+        dev0 = pointToPoint.Install(NodeContainer(lefts.Get(i), routers.Get(0)));
+        address.Assign(dev0);
     }
 
-  // bottle neck link
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("2Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("100ms"));
-  dev1 = pointToPoint.Install (NodeContainer (routers.Get (0), routers.Get (1)));
+    // bottle neck link
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("2Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("100ms"));
+    dev1 = pointToPoint.Install(NodeContainer(routers.Get(0), routers.Get(1)));
 
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("1ns"));
-  // for right links
-  for (uint32_t i = 0; i < m_nNodes; i++)
-    {
-      std::ostringstream oss;
-      oss << "10.2." << i << ".0";
-      address.SetBase (oss.str ().c_str (), "255.255.255.0");
-      dev2 = pointToPoint.Install (NodeContainer (routers.Get (1), rights.Get (i)));
-      address.Assign (dev2);
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("1ns"));
+    // for right links
+    for (uint32_t i = 0; i < m_nNodes; i++) {
+        std::ostringstream oss;
+        oss << "10.2." << i << ".0";
+        address.SetBase(oss.str().c_str(), "255.255.255.0");
+        dev2 = pointToPoint.Install(NodeContainer(routers.Get(1), rights.Get(i)));
+        address.Assign(dev2);
     }
 
-  // bottle neck link
-  Ptr<RateErrorModel> em1 =
-    CreateObjectWithAttributes<RateErrorModel> (
-      "ErrorRate", DoubleValue (0.05),
-      "ErrorUnit", EnumValue (RateErrorModel::ERROR_UNIT_PACKET)
-      );
-  dev1.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (em1));
+    // bottle neck link
+    Ptr<RateErrorModel> em1 =
+            CreateObjectWithAttributes<RateErrorModel> (
+            "ErrorRate", DoubleValue(0.05),
+            "ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET)
+            );
+    dev1.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
 
-  address.SetBase ("10.1.0.0", "255.255.255.0");
-  address.Assign (dev1);
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+    address.SetBase("10.1.0.0", "255.255.255.0");
+    address.Assign(dev1);
+    Ipv4GlobalRoutingHelper::PopulateRoutingTables();
 
-  ApplicationContainer apps;
+    ApplicationContainer apps;
 
-  OnOffHelper onoff = OnOffHelper (sock_factory,
-                                   InetSocketAddress (Ipv4Address ("10.2.0.2"), 2000));
-  onoff.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
-  onoff.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+    OnOffHelper onoff = OnOffHelper(sock_factory,
+            InetSocketAddress(Ipv4Address("10.2.0.2"), 2000));
+    onoff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
+    onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
 
-  // Flow 1 - n
-  for (uint32_t i = 0; i < m_nNodes; i++)
-    {
-      std::ostringstream oss;
-      oss << "10.2." << i << ".2";
-      onoff.SetAttribute ("Remote", AddressValue (InetSocketAddress (Ipv4Address (oss.str ().c_str ()), 2000)));
-      onoff.SetAttribute ("PacketSize", StringValue ("1024"));
-      onoff.SetAttribute ("DataRate", StringValue ("1Mbps"));
-      onoff.SetAttribute ("StartTime", TimeValue (Seconds (startTime)));
-      apps = onoff.Install (lefts.Get (i));
+    // Flow 1 - n
+    for (uint32_t i = 0; i < m_nNodes; i++) {
+        std::ostringstream oss;
+        oss << "10.2." << i << ".2";
+        onoff.SetAttribute("Remote", AddressValue(InetSocketAddress(Ipv4Address(oss.str().c_str()), 2000)));
+        onoff.SetAttribute("PacketSize", StringValue("1024"));
+        onoff.SetAttribute("DataRate", StringValue("1Mbps"));
+        onoff.SetAttribute("StartTime", TimeValue(Seconds(startTime)));
+        apps = onoff.Install(lefts.Get(i));
     }
 
-  PacketSinkHelper sink = PacketSinkHelper (sock_factory,
-                                            InetSocketAddress (Ipv4Address::GetAny (), 2000));
-  apps = sink.Install (rights);
-  apps.Start (Seconds (3.9999));
+    PacketSinkHelper sink = PacketSinkHelper(sock_factory,
+            InetSocketAddress(Ipv4Address::GetAny(), 2000));
+    apps = sink.Install(rights);
+    apps.Start(Seconds(3.9999));
 
-  if (enablePcap)
-    {
-      pointToPoint.EnablePcapAll ("nsc.pcap");
+    if (enablePcap) {
+        pointToPoint.EnablePcapAll("nsc.pcap");
     }
 
-  Simulator::Stop (Seconds (stopTime));
-  Simulator::Run ();
+    Simulator::Stop(Seconds(stopTime));
+    Simulator::Run();
 
-  Ptr<PacketSink> pktsink;
-  std::cout << "Total ";
-  for (uint32_t i = 0; i < m_nNodes; i++)
-    {
-      pktsink = apps.Get (i)->GetObject<PacketSink> ();
-      std::cout << "Rx(" << i << ") = " << pktsink->GetTotalRx () <<
-      " bytes (" << pktsink->GetTotalRx () * 8 / (stopTime - startTime) << " bps), ";
+    Ptr<PacketSink> pktsink;
+    std::cout << "Total ";
+    for (uint32_t i = 0; i < m_nNodes; i++) {
+        pktsink = apps.Get(i)->GetObject<PacketSink> ();
+        std::cout << "Rx(" << i << ") = " << pktsink->GetTotalRx() <<
+                " bytes (" << pktsink->GetTotalRx() * 8 / (stopTime - startTime) << " bps), ";
     }
-  std::cout << std::endl;
+    std::cout << std::endl;
 
-  Simulator::Destroy ();
-  return 0;
+    Simulator::Destroy();
+    return 0;
 }

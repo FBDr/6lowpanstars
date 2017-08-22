@@ -32,70 +32,69 @@
 #include "fw/strategy.hpp"
 
 namespace nfd {
-namespace fw {
-namespace asf {
+    namespace fw {
+        namespace asf {
 
-/** \brief Adaptive SRTT-based Forwarding Strategy
- *
- *  \see Vince Lehman, Ashlesh Gawande, Rodrigo Aldecoa, Dmitri Krioukov, Beichuan Zhang, Lixia Zhang, and Lan Wang,
- *       "An Experimental Investigation of Hyperbolic Routing with a Smart Forwarding Plane in NDN,"
- *       NDN Technical Report NDN-0042, 2016. http://named-data.net/techreports.html
- */
-class AsfStrategy : public Strategy
-{
-public:
-  explicit
-  AsfStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+            /** \brief Adaptive SRTT-based Forwarding Strategy
+             *
+             *  \see Vince Lehman, Ashlesh Gawande, Rodrigo Aldecoa, Dmitri Krioukov, Beichuan Zhang, Lixia Zhang, and Lan Wang,
+             *       "An Experimental Investigation of Hyperbolic Routing with a Smart Forwarding Plane in NDN,"
+             *       NDN Technical Report NDN-0042, 2016. http://named-data.net/techreports.html
+             */
+            class AsfStrategy : public Strategy {
+            public:
+                explicit
+                AsfStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-public: // triggers
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            public: // triggers
+                virtual void
+                afterReceiveInterest(const Face& inFace, const Interest& interest,
+                        const shared_ptr<pit::Entry>& pitEntry) override;
 
-  virtual void
-  beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                virtual void
+                beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
                         const Face& inFace, const Data& data) override;
 
-  virtual void
-  afterReceiveNack(const Face& inFace, const lp::Nack& nack,
-                   const shared_ptr<pit::Entry>& pitEntry) override;
+                virtual void
+                afterReceiveNack(const Face& inFace, const lp::Nack& nack,
+                        const shared_ptr<pit::Entry>& pitEntry) override;
 
-private:
-  void
-  forwardInterest(const Interest& interest,
-                  const fib::Entry& fibEntry,
-                  const shared_ptr<pit::Entry>& pitEntry,
-                  Face& outFace,
-                  bool wantNewNonce = false);
+            private:
+                void
+                forwardInterest(const Interest& interest,
+                        const fib::Entry& fibEntry,
+                        const shared_ptr<pit::Entry>& pitEntry,
+                        Face& outFace,
+                        bool wantNewNonce = false);
 
-  Face*
-  getBestFaceForForwarding(const fib::Entry& fibEntry, const Interest& interest, const Face& inFace);
+                Face*
+                getBestFaceForForwarding(const fib::Entry& fibEntry, const Interest& interest, const Face& inFace);
 
-  void
-  onTimeout(const Name& interestName, face::FaceId faceId);
+                void
+                onTimeout(const Name& interestName, face::FaceId faceId);
 
-  void
-  sendNoRouteNack(const Face& inFace, const Interest& interest, const shared_ptr<pit::Entry>& pitEntry);
+                void
+                sendNoRouteNack(const Face& inFace, const Interest& interest, const shared_ptr<pit::Entry>& pitEntry);
 
-public:
-  static const Name STRATEGY_NAME;
+            public:
+                static const Name STRATEGY_NAME;
 
-private:
-  AsfMeasurements m_measurements;
-  ProbingModule m_probing;
+            private:
+                AsfMeasurements m_measurements;
+                ProbingModule m_probing;
 
-private:
-  RetxSuppressionExponential m_retxSuppression;
+            private:
+                RetxSuppressionExponential m_retxSuppression;
 
-  static const time::milliseconds RETX_SUPPRESSION_INITIAL;
-  static const time::milliseconds RETX_SUPPRESSION_MAX;
-};
+                static const time::milliseconds RETX_SUPPRESSION_INITIAL;
+                static const time::milliseconds RETX_SUPPRESSION_MAX;
+            };
 
-} // namespace asf
+        } // namespace asf
 
-using asf::AsfStrategy;
+        using asf::AsfStrategy;
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_ASF_STRATEGY_HPP

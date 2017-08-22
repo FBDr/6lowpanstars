@@ -28,40 +28,38 @@
 
 namespace ns3 {
 
-/**
- * This class implements the ITU-R 1238 propagation loss model.
- * 
- */
-class ItuR1238PropagationLossModel : public PropagationLossModel
-{
+    /**
+     * This class implements the ITU-R 1238 propagation loss model.
+     * 
+     */
+    class ItuR1238PropagationLossModel : public PropagationLossModel {
+    public:
 
-public:
+        // inherited from Object
+        static TypeId GetTypeId(void);
 
-  // inherited from Object
-  static TypeId GetTypeId (void);
+        /** 
+         * 
+         * 
+         * \param a the first mobility model
+         * \param b the second mobility model
+         * 
+         * \return the loss in dBm for the propagation between
+         * the two given mobility models
+         */
+        double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  /** 
-   * 
-   * 
-   * \param a the first mobility model
-   * \param b the second mobility model
-   * 
-   * \return the loss in dBm for the propagation between
-   * the two given mobility models
-   */
-  double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+    private:
 
-private:
+        // inherited from PropagationLossModel
+        virtual double DoCalcRxPower(double txPowerDbm,
+                Ptr<MobilityModel> a,
+                Ptr<MobilityModel> b) const;
+        virtual int64_t DoAssignStreams(int64_t stream);
 
-  // inherited from PropagationLossModel
-  virtual double DoCalcRxPower (double txPowerDbm,
-                                Ptr<MobilityModel> a,
-                                Ptr<MobilityModel> b) const;
-  virtual int64_t DoAssignStreams (int64_t stream);
-  
-  double m_frequency; ///< frequency in MHz
+        double m_frequency; ///< frequency in MHz
 
-};
+    };
 
 } // namespace ns3
 

@@ -25,212 +25,199 @@
 
 namespace ndn {
 
-BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Selectors>));
-BOOST_CONCEPT_ASSERT((WireEncodable<Selectors>));
-BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<Selectors>));
-BOOST_CONCEPT_ASSERT((WireDecodable<Selectors>));
-static_assert(std::is_base_of<tlv::Error, Selectors::Error>::value,
-              "Selectors::Error must inherit from tlv::Error");
+    BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Selectors>));
+    BOOST_CONCEPT_ASSERT((WireEncodable<Selectors>));
+    BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<Selectors>));
+    BOOST_CONCEPT_ASSERT((WireDecodable<Selectors>));
+    static_assert(std::is_base_of<tlv::Error, Selectors::Error>::value,
+            "Selectors::Error must inherit from tlv::Error");
 
-Selectors::Selectors()
-  : m_minSuffixComponents(-1)
-  , m_maxSuffixComponents(-1)
-  , m_childSelector(-1)
-  , m_mustBeFresh(false)
-{
-}
+    Selectors::Selectors()
+    : m_minSuffixComponents(-1)
+    , m_maxSuffixComponents(-1)
+    , m_childSelector(-1)
+    , m_mustBeFresh(false) {
+    }
 
-Selectors::Selectors(const Block& wire)
-{
-  wireDecode(wire);
-}
+    Selectors::Selectors(const Block& wire) {
+        wireDecode(wire);
+    }
 
-bool
-Selectors::empty() const
-{
-  return m_minSuffixComponents < 0 &&
-         m_maxSuffixComponents < 0 &&
-         m_publisherPublicKeyLocator.empty() &&
-         m_exclude.empty() &&
-         m_childSelector < 0 &&
-         !m_mustBeFresh;
-}
+    bool
+    Selectors::empty() const {
+        return m_minSuffixComponents < 0 &&
+                m_maxSuffixComponents < 0 &&
+                m_publisherPublicKeyLocator.empty() &&
+                m_exclude.empty() &&
+                m_childSelector < 0 &&
+                !m_mustBeFresh;
+    }
 
-template<encoding::Tag TAG>
-size_t
-Selectors::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t totalLength = 0;
+    template<encoding::Tag TAG>
+    size_t
+    Selectors::wireEncode(EncodingImpl<TAG>& encoder) const {
+        size_t totalLength = 0;
 
-  // Selectors ::= SELECTORS-TYPE TLV-LENGTH
-  //                 MinSuffixComponents?
-  //                 MaxSuffixComponents?
-  //                 PublisherPublicKeyLocator?
-  //                 Exclude?
-  //                 ChildSelector?
-  //                 MustBeFresh?
+        // Selectors ::= SELECTORS-TYPE TLV-LENGTH
+        //                 MinSuffixComponents?
+        //                 MaxSuffixComponents?
+        //                 PublisherPublicKeyLocator?
+        //                 Exclude?
+        //                 ChildSelector?
+        //                 MustBeFresh?
 
-  // (reverse encoding)
+        // (reverse encoding)
 
-  // MustBeFresh
-  if (getMustBeFresh()) {
-    totalLength += prependEmptyBlock(encoder, tlv::MustBeFresh);
-  }
+        // MustBeFresh
+        if (getMustBeFresh()) {
+            totalLength += prependEmptyBlock(encoder, tlv::MustBeFresh);
+        }
 
-  // ChildSelector
-  if (getChildSelector() >= 0) {
-    totalLength += prependNonNegativeIntegerBlock(encoder, tlv::ChildSelector, getChildSelector());
-  }
+        // ChildSelector
+        if (getChildSelector() >= 0) {
+            totalLength += prependNonNegativeIntegerBlock(encoder, tlv::ChildSelector, getChildSelector());
+        }
 
-  // Exclude
-  if (!getExclude().empty()) {
-    totalLength += getExclude().wireEncode(encoder);
-  }
+        // Exclude
+        if (!getExclude().empty()) {
+            totalLength += getExclude().wireEncode(encoder);
+        }
 
-  // PublisherPublicKeyLocator
-  if (!getPublisherPublicKeyLocator().empty()) {
-    totalLength += getPublisherPublicKeyLocator().wireEncode(encoder);
-  }
+        // PublisherPublicKeyLocator
+        if (!getPublisherPublicKeyLocator().empty()) {
+            totalLength += getPublisherPublicKeyLocator().wireEncode(encoder);
+        }
 
-  // MaxSuffixComponents
-  if (getMaxSuffixComponents() >= 0) {
-    totalLength += prependNonNegativeIntegerBlock(encoder, tlv::MaxSuffixComponents,
-                                                  getMaxSuffixComponents());
-  }
+        // MaxSuffixComponents
+        if (getMaxSuffixComponents() >= 0) {
+            totalLength += prependNonNegativeIntegerBlock(encoder, tlv::MaxSuffixComponents,
+                    getMaxSuffixComponents());
+        }
 
-  // MinSuffixComponents
-  if (getMinSuffixComponents() >= 0) {
-    totalLength += prependNonNegativeIntegerBlock(encoder, tlv::MinSuffixComponents,
-                                                  getMinSuffixComponents());
-  }
+        // MinSuffixComponents
+        if (getMinSuffixComponents() >= 0) {
+            totalLength += prependNonNegativeIntegerBlock(encoder, tlv::MinSuffixComponents,
+                    getMinSuffixComponents());
+        }
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::Selectors);
-  return totalLength;
-}
+        totalLength += encoder.prependVarNumber(totalLength);
+        totalLength += encoder.prependVarNumber(tlv::Selectors);
+        return totalLength;
+    }
 
-template size_t
-Selectors::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+    template size_t
+    Selectors::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
 
-template size_t
-Selectors::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+    template size_t
+    Selectors::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
 
-const Block&
-Selectors::wireEncode() const
-{
-  if (m_wire.hasWire())
-    return m_wire;
+    const Block&
+    Selectors::wireEncode() const {
+        if (m_wire.hasWire())
+            return m_wire;
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+        EncodingEstimator estimator;
+        size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+        EncodingBuffer buffer(estimatedSize, 0);
+        wireEncode(buffer);
 
-  m_wire = buffer.block();
-  return m_wire;
-}
+        m_wire = buffer.block();
+        return m_wire;
+    }
 
-void
-Selectors::wireDecode(const Block& wire)
-{
-  if (wire.type() != tlv::Selectors)
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV type when decoding Selectors"));
+    void
+    Selectors::wireDecode(const Block& wire) {
+        if (wire.type() != tlv::Selectors)
+            BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV type when decoding Selectors"));
 
-  *this = Selectors();
+        *this = Selectors();
 
-  m_wire = wire;
-  m_wire.parse();
+        m_wire = wire;
+        m_wire.parse();
 
-  // MinSuffixComponents
-  Block::element_const_iterator val = m_wire.find(tlv::MinSuffixComponents);
-  if (val != m_wire.elements_end()) {
-    m_minSuffixComponents = readNonNegativeInteger(*val);
-  }
+        // MinSuffixComponents
+        Block::element_const_iterator val = m_wire.find(tlv::MinSuffixComponents);
+        if (val != m_wire.elements_end()) {
+            m_minSuffixComponents = readNonNegativeInteger(*val);
+        }
 
-  // MaxSuffixComponents
-  val = m_wire.find(tlv::MaxSuffixComponents);
-  if (val != m_wire.elements_end()) {
-    m_maxSuffixComponents = readNonNegativeInteger(*val);
-  }
+        // MaxSuffixComponents
+        val = m_wire.find(tlv::MaxSuffixComponents);
+        if (val != m_wire.elements_end()) {
+            m_maxSuffixComponents = readNonNegativeInteger(*val);
+        }
 
-  // PublisherPublicKeyLocator
-  val = m_wire.find(tlv::KeyLocator);
-  if (val != m_wire.elements_end()) {
-    m_publisherPublicKeyLocator.wireDecode(*val);
-  }
+        // PublisherPublicKeyLocator
+        val = m_wire.find(tlv::KeyLocator);
+        if (val != m_wire.elements_end()) {
+            m_publisherPublicKeyLocator.wireDecode(*val);
+        }
 
-  // Exclude
-  val = m_wire.find(tlv::Exclude);
-  if (val != m_wire.elements_end()) {
-    m_exclude.wireDecode(*val);
-  }
+        // Exclude
+        val = m_wire.find(tlv::Exclude);
+        if (val != m_wire.elements_end()) {
+            m_exclude.wireDecode(*val);
+        }
 
-  // ChildSelector
-  val = m_wire.find(tlv::ChildSelector);
-  if (val != m_wire.elements_end()) {
-    m_childSelector = readNonNegativeInteger(*val);
-  }
+        // ChildSelector
+        val = m_wire.find(tlv::ChildSelector);
+        if (val != m_wire.elements_end()) {
+            m_childSelector = readNonNegativeInteger(*val);
+        }
 
-  // MustBeFresh
-  val = m_wire.find(tlv::MustBeFresh);
-  if (val != m_wire.elements_end()) {
-    m_mustBeFresh = true;
-  }
-}
+        // MustBeFresh
+        val = m_wire.find(tlv::MustBeFresh);
+        if (val != m_wire.elements_end()) {
+            m_mustBeFresh = true;
+        }
+    }
 
-Selectors&
-Selectors::setMinSuffixComponents(int minSuffixComponents)
-{
-  m_minSuffixComponents = minSuffixComponents;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setMinSuffixComponents(int minSuffixComponents) {
+        m_minSuffixComponents = minSuffixComponents;
+        m_wire.reset();
+        return *this;
+    }
 
-Selectors&
-Selectors::setMaxSuffixComponents(int maxSuffixComponents)
-{
-  m_maxSuffixComponents = maxSuffixComponents;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setMaxSuffixComponents(int maxSuffixComponents) {
+        m_maxSuffixComponents = maxSuffixComponents;
+        m_wire.reset();
+        return *this;
+    }
 
-Selectors&
-Selectors::setPublisherPublicKeyLocator(const KeyLocator& keyLocator)
-{
-  m_publisherPublicKeyLocator = keyLocator;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setPublisherPublicKeyLocator(const KeyLocator& keyLocator) {
+        m_publisherPublicKeyLocator = keyLocator;
+        m_wire.reset();
+        return *this;
+    }
 
-Selectors&
-Selectors::setExclude(const Exclude& exclude)
-{
-  m_exclude = exclude;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setExclude(const Exclude& exclude) {
+        m_exclude = exclude;
+        m_wire.reset();
+        return *this;
+    }
 
-Selectors&
-Selectors::setChildSelector(int childSelector)
-{
-  m_childSelector = childSelector;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setChildSelector(int childSelector) {
+        m_childSelector = childSelector;
+        m_wire.reset();
+        return *this;
+    }
 
-Selectors&
-Selectors::setMustBeFresh(bool mustBeFresh)
-{
-  m_mustBeFresh = mustBeFresh;
-  m_wire.reset();
-  return *this;
-}
+    Selectors&
+    Selectors::setMustBeFresh(bool mustBeFresh) {
+        m_mustBeFresh = mustBeFresh;
+        m_wire.reset();
+        return *this;
+    }
 
-bool
-Selectors::operator==(const Selectors& other) const
-{
-  return wireEncode() == other.wireEncode();
-}
+    bool
+    Selectors::operator==(const Selectors& other) const {
+        return wireEncode() == other.wireEncode();
+    }
 
 } // namespace ndn

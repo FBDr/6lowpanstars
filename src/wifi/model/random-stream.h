@@ -27,87 +27,82 @@
 
 namespace ns3 {
 
-/**
- * A simple wrapper around RngStream to make testing
- * of the code easier.
- */
-class RandomStream
-{
-public:
-  virtual ~RandomStream ();
-  /**
-   * Get integer between min and max (including min and max).
-   *
-   * \param min lower bound (inclusive)
-   * \param max upper bound (inclusive)
-   *
-   * \return a random number between min and max (including min and max)
-   */
-  virtual uint32_t GetNext (uint32_t min, uint32_t max) = 0;
+    /**
+     * A simple wrapper around RngStream to make testing
+     * of the code easier.
+     */
+    class RandomStream {
+    public:
+        virtual ~RandomStream();
+        /**
+         * Get integer between min and max (including min and max).
+         *
+         * \param min lower bound (inclusive)
+         * \param max upper bound (inclusive)
+         *
+         * \return a random number between min and max (including min and max)
+         */
+        virtual uint32_t GetNext(uint32_t min, uint32_t max) = 0;
 
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream first stream index to use
-   *
-   * \return the number of stream indices assigned by this model
-   */
-  virtual int64_t AssignStreams (int64_t stream) = 0;
-};
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         *
+         * \return the number of stream indices assigned by this model
+         */
+        virtual int64_t AssignStreams(int64_t stream) = 0;
+    };
 
+    class RealRandomStream : public RandomStream {
+    public:
+        RealRandomStream();
+        virtual uint32_t GetNext(uint32_t min, uint32_t max);
 
-class RealRandomStream : public RandomStream
-{
-public:
-  RealRandomStream ();
-  virtual uint32_t GetNext (uint32_t min, uint32_t max);
-
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream first stream index to use
-   *
-   * \return the number of stream indices assigned by this model
-   */
-  virtual int64_t AssignStreams (int64_t stream);
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         *
+         * \return the number of stream indices assigned by this model
+         */
+        virtual int64_t AssignStreams(int64_t stream);
 
 
-private:
-  /// Provides uniform random variables.
-  Ptr<UniformRandomVariable> m_stream;
-};
+    private:
+        /// Provides uniform random variables.
+        Ptr<UniformRandomVariable> m_stream;
+    };
+
+    class TestRandomStream : public RandomStream {
+    public:
+        /**
+         * Add the given value to the list.
+         *
+         * \param v
+         */
+        void AddNext(uint32_t v);
+        virtual uint32_t GetNext(uint32_t min, uint32_t max);
+
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         *
+         * \return the number of stream indices assigned by this model
+         */
+        virtual int64_t AssignStreams(int64_t stream);
 
 
-class TestRandomStream : public RandomStream
-{
-public:
-  /**
-   * Add the given value to the list.
-   *
-   * \param v
-   */
-  void AddNext (uint32_t v);
-  virtual uint32_t GetNext (uint32_t min, uint32_t max);
-
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream first stream index to use
-   *
-   * \return the number of stream indices assigned by this model
-   */
-  virtual int64_t AssignStreams (int64_t stream);
-
-
-private:
-  std::list<uint32_t> m_nexts;
-};
+    private:
+        std::list<uint32_t> m_nexts;
+    };
 
 } //namespace ns3
 

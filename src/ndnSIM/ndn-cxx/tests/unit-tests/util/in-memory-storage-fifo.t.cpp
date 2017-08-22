@@ -26,60 +26,58 @@
 #include "../make-interest-data.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-using namespace ndn::tests;
+            using namespace ndn::tests;
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_AUTO_TEST_SUITE(TestInMemoryStorage)
-BOOST_AUTO_TEST_SUITE(Fifo)
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_AUTO_TEST_SUITE(TestInMemoryStorage)
+            BOOST_AUTO_TEST_SUITE(Fifo)
 
-BOOST_AUTO_TEST_CASE(ArrivalQueue)
-{
-  InMemoryStorageFifo ims;
+            BOOST_AUTO_TEST_CASE(ArrivalQueue) {
+                InMemoryStorageFifo ims;
 
-  ims.insert(*makeData("/1"));
-  ims.insert(*makeData("/2"));
-  ims.insert(*makeData("/3"));
+                ims.insert(*makeData("/1"));
+                ims.insert(*makeData("/2"));
+                ims.insert(*makeData("/3"));
 
-  ims.evictItem();
-  BOOST_CHECK_EQUAL(ims.size(), 2);
+                ims.evictItem();
+                BOOST_CHECK_EQUAL(ims.size(), 2);
 
-  shared_ptr<Interest> interest = makeInterest("/1");
-  shared_ptr<const Data> found = ims.find(*interest);
-  BOOST_CHECK(found == nullptr);
-}
+                shared_ptr<Interest> interest = makeInterest("/1");
+                shared_ptr<const Data> found = ims.find(*interest);
+                BOOST_CHECK(found == nullptr);
+            }
 
-BOOST_AUTO_TEST_CASE(ArrivalQueue2)
-{
-  InMemoryStorageFifo ims;
+            BOOST_AUTO_TEST_CASE(ArrivalQueue2) {
+                InMemoryStorageFifo ims;
 
-  ims.insert(*makeData("/1"));
-  ims.insert(*makeData("/2"));
-  ims.insert(*makeData("/3"));
+                ims.insert(*makeData("/1"));
+                ims.insert(*makeData("/2"));
+                ims.insert(*makeData("/3"));
 
-  ims.evictItem();
-  BOOST_CHECK_EQUAL(ims.size(), 2);
+                ims.evictItem();
+                BOOST_CHECK_EQUAL(ims.size(), 2);
 
-  shared_ptr<Interest> interest1 = makeInterest("/1");
-  shared_ptr<const Data> found1 = ims.find(*interest1);
-  BOOST_CHECK(found1 == nullptr);
+                shared_ptr<Interest> interest1 = makeInterest("/1");
+                shared_ptr<const Data> found1 = ims.find(*interest1);
+                BOOST_CHECK(found1 == nullptr);
 
-  ims.insert(*makeData("/4"));
+                ims.insert(*makeData("/4"));
 
-  ims.evictItem();
-  BOOST_CHECK_EQUAL(ims.size(), 2);
+                ims.evictItem();
+                BOOST_CHECK_EQUAL(ims.size(), 2);
 
-  shared_ptr<Interest> interest2 = makeInterest("/2");
-  shared_ptr<const Data> found2 = ims.find(*interest2);
-  BOOST_CHECK(found2 == nullptr);
-}
+                shared_ptr<Interest> interest2 = makeInterest("/2");
+                shared_ptr<const Data> found2 = ims.find(*interest2);
+                BOOST_CHECK(found2 == nullptr);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // Fifo
-BOOST_AUTO_TEST_SUITE_END() // TestInMemoryStorage
-BOOST_AUTO_TEST_SUITE_END() // Util
+            BOOST_AUTO_TEST_SUITE_END() // Fifo
+            BOOST_AUTO_TEST_SUITE_END() // TestInMemoryStorage
+            BOOST_AUTO_TEST_SUITE_END() // Util
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

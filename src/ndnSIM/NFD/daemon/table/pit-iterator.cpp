@@ -30,40 +30,37 @@
 #include <type_traits>
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-BOOST_CONCEPT_ASSERT((boost::ForwardIterator<Iterator>));
-static_assert(std::is_default_constructible<Iterator>::value,
-              "Iterator must be default-constructible");
+        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<Iterator>));
+        static_assert(std::is_default_constructible<Iterator>::value,
+                "Iterator must be default-constructible");
 
-Iterator::Iterator(const NameTree::const_iterator& ntIt, size_t iPitEntry)
-  : m_ntIt(ntIt)
-  , m_iPitEntry(iPitEntry)
-{
-}
+        Iterator::Iterator(const NameTree::const_iterator& ntIt, size_t iPitEntry)
+        : m_ntIt(ntIt)
+        , m_iPitEntry(iPitEntry) {
+        }
 
-Iterator&
-Iterator::operator++()
-{
-  BOOST_ASSERT(m_ntIt != NameTree::const_iterator());
-  BOOST_ASSERT(m_iPitEntry < m_ntIt->getPitEntries().size());
+        Iterator&
+        Iterator::operator++() {
+            BOOST_ASSERT(m_ntIt != NameTree::const_iterator());
+            BOOST_ASSERT(m_iPitEntry < m_ntIt->getPitEntries().size());
 
-  if (++m_iPitEntry >= m_ntIt->getPitEntries().size()) {
-    ++m_ntIt;
-    m_iPitEntry = 0;
-    BOOST_ASSERT(m_ntIt == NameTree::const_iterator() || m_ntIt->hasPitEntries());
-  }
+            if (++m_iPitEntry >= m_ntIt->getPitEntries().size()) {
+                ++m_ntIt;
+                m_iPitEntry = 0;
+                BOOST_ASSERT(m_ntIt == NameTree::const_iterator() || m_ntIt->hasPitEntries());
+            }
 
-  return *this;
-}
+            return *this;
+        }
 
-Iterator
-Iterator::operator++(int)
-{
-  Iterator copy = *this;
-  this->operator++();
-  return copy;
-}
+        Iterator
+        Iterator::operator++(int) {
+            Iterator copy = *this;
+            this->operator++();
+            return copy;
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd

@@ -27,150 +27,138 @@
 #include "util.hpp"
 
 int
-ndnsec_cert_revoke(int argc, char** argv)
-{
-  using namespace ndn;
-  using namespace ndn::security;
-  namespace po = boost::program_options;
+ndnsec_cert_revoke(int argc, char** argv) {
+    using namespace ndn;
+    using namespace ndn::security;
+    namespace po = boost::program_options;
 
-  KeyChain keyChain;
+    KeyChain keyChain;
 
-  std::string requestFile("-");
-  Name signId = keyChain.getDefaultIdentity();
-  bool hasSignId = false;
-  Name certPrefix = KeyChain::DEFAULT_PREFIX;
+    std::string requestFile("-");
+    Name signId = keyChain.getDefaultIdentity();
+    bool hasSignId = false;
+    Name certPrefix = KeyChain::DEFAULT_PREFIX;
 
-  po::options_description description("General Usage\n  ndnsec cert-revoke [-h] request\n"
-                                      "General options");
-  description.add_options()
-    ("help,h", "produce help message")
-    ("sign-id,s",     po::value<Name>(&signId),
-                      "signing identity (default: use the same as in the revoked certificate)")
-    ("cert-prefix,p", po::value<Name>(&certPrefix),
-                      "cert prefix, which is the part of certificate name before "
-                      "KEY component (default: use the same as in the revoked certificate)")
-    ("request,r",     po::value<std::string>(&requestFile)->default_value("-"),
-                      "request file name, - for stdin")
-    ;
+    po::options_description description("General Usage\n  ndnsec cert-revoke [-h] request\n"
+            "General options");
+    description.add_options()
+            ("help,h", "produce help message")
+            ("sign-id,s", po::value<Name>(&signId),
+            "signing identity (default: use the same as in the revoked certificate)")
+            ("cert-prefix,p", po::value<Name>(&certPrefix),
+            "cert prefix, which is the part of certificate name before "
+            "KEY component (default: use the same as in the revoked certificate)")
+            ("request,r", po::value<std::string>(&requestFile)->default_value("-"),
+            "request file name, - for stdin")
+            ;
 
-  po::positional_options_description p;
-  p.add("request", 1);
+    po::positional_options_description p;
+    p.add("request", 1);
 
-  po::variables_map vm;
-  try {
-    po::store(po::command_line_parser(argc, argv).options(description).positional(p).run(),
-              vm);
-    po::notify(vm);
-  }
-  catch (const std::exception& e) {
-    std::cerr << "ERROR: " << e.what() << std::endl;
-    return 1;
-  }
-
-  if (vm.count("help") != 0) {
-    std::cerr << description << std::endl;
-    return 0;
-  }
-
-  hasSignId = (vm.count("sign-id") != 0);
-
-  if (vm.count("request") == 0) {
-    std::cerr << "request file must be specified" << std::endl;
-    return 1;
-  }
-
-  shared_ptr<v1::IdentityCertificate> revokedCertificate = getIdentityCertificate(requestFile);
-
-  if (!static_cast<bool>(revokedCertificate)) {
-    std::cerr << "ERROR: input error" << std::endl;
-    return 1;
-  }
-
-  Block wire;
-
-  try {
-    Name keyName;
-
-    if (hasSignId) {
-      keyName = keyChain.getDefaultKeyNameForIdentity(signId);
+    po::variables_map vm;
+    try {
+        po::store(po::command_line_parser(argc, argv).options(description).positional(p).run(),
+                vm);
+        po::notify(vm);
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        return 1;
     }
-    else {
-      const Signature& signature = revokedCertificate->getSignature();
-      if (!signature.hasKeyLocator() ||
-          signature.getKeyLocator().getType() != KeyLocator::KeyLocator_Name)
-        {
-          std::cerr << "ERROR: Invalid certificate to revoke" << std::endl;
-          return 1;
+
+    if (vm.count("help") != 0) {
+        std::cerr << description << std::endl;
+        return 0;
+    }
+
+    hasSignId = (vm.count("sign-id") != 0);
+
+    if (vm.count("request") == 0) {
+        std::cerr << "request file must be specified" << std::endl;
+        return 1;
+    }
+
+    shared_ptr<v1::IdentityCertificate> revokedCertificate = getIdentityCertificate(requestFile);
+
+    if (!static_cast<bool> (revokedCertificate)) {
+        std::cerr << "ERROR: input error" << std::endl;
+        return 1;
+    }
+
+    Block wire;
+
+    try {
+        Name keyName;
+
+        if (hasSignId) {
+            keyName = keyChain.getDefaultKeyNameForIdentity(signId);
+        } else {
+            const Signature& signature = revokedCertificate->getSignature();
+            if (!signature.hasKeyLocator() ||
+                    signature.getKeyLocator().getType() != KeyLocator::KeyLocator_Name) {
+                std::cerr << "ERROR: Invalid certificate to revoke" << std::endl;
+                return 1;
+            }
+
+            keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(
+                    signature.getKeyLocator().getName());
         }
 
-      keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(
-                  signature.getKeyLocator().getName());
-    }
+        Name certName;
+        if (certPrefix == KeyChain::DEFAULT_PREFIX) {
+            certName = revokedCertificate->getName().getPrefix(-1);
+        } else {
+            Name revokedKeyName = revokedCertificate->getPublicKeyName();
 
-    Name certName;
-    if (certPrefix == KeyChain::DEFAULT_PREFIX) {
-      certName = revokedCertificate->getName().getPrefix(-1);
-    }
-    else {
-      Name revokedKeyName = revokedCertificate->getPublicKeyName();
+            if (certPrefix.isPrefixOf(revokedKeyName) && certPrefix != revokedKeyName) {
+                certName.append(certPrefix)
+                        .append("KEY")
+                        .append(revokedKeyName.getSubName(certPrefix.size()))
+                        .append("ID-CERT");
+            } else {
+                std::cerr << "ERROR: certificate prefix does not match the revoked certificate"
+                        << std::endl;
+                return 1;
+            }
+        }
+        certName
+                .appendVersion()
+                .append("REVOKED");
 
-      if (certPrefix.isPrefixOf(revokedKeyName) && certPrefix != revokedKeyName) {
-        certName.append(certPrefix)
-          .append("KEY")
-          .append(revokedKeyName.getSubName(certPrefix.size()))
-          .append("ID-CERT");
-      }
-      else {
-        std::cerr << "ERROR: certificate prefix does not match the revoked certificate"
-                  << std::endl;
-        return 1;
-      }
-    }
-    certName
-      .appendVersion()
-      .append("REVOKED");
+        Data revocationCert;
+        revocationCert.setName(certName);
 
-    Data revocationCert;
-    revocationCert.setName(certName);
-
-    if (keyChain.doesPublicKeyExist(keyName)) {
-      Name signingCertificateName = keyChain.getDefaultCertificateNameForKey(keyName);
-      keyChain.sign(revocationCert,
+        if (keyChain.doesPublicKeyExist(keyName)) {
+            Name signingCertificateName = keyChain.getDefaultCertificateNameForKey(keyName);
+            keyChain.sign(revocationCert,
                     SigningInfo(SigningInfo::SIGNER_TYPE_CERT, signingCertificateName));
-    }
-    else {
-      std::cerr << "ERROR: Cannot find the signing key!" << std::endl;
-      return 1;
+        } else {
+            std::cerr << "ERROR: Cannot find the signing key!" << std::endl;
+            return 1;
+        }
+
+        wire = revocationCert.wireEncode();
+    } catch (const Signature::Error& e) {
+        std::cerr << "ERROR: No valid signature!" << std::endl;
+        return 1;
+    } catch (const KeyLocator::Error& e) {
+        std::cerr << "ERROR: No valid KeyLocator!" << std::endl;
+        return 1;
+    } catch (const v1::IdentityCertificate::Error& e) {
+        std::cerr << "ERROR: Cannot determine the signing key!" << std::endl;
+        return 1;
+    } catch (const SecPublicInfo::Error& e) {
+        std::cerr << "ERROR: Incomplete or corrupted PIB (" << e.what() << ")" << std::endl;
+        return 1;
     }
 
-    wire = revocationCert.wireEncode();
-  }
-  catch (const Signature::Error& e) {
-    std::cerr << "ERROR: No valid signature!" << std::endl;
-    return 1;
-  }
-  catch (const KeyLocator::Error& e) {
-    std::cerr << "ERROR: No valid KeyLocator!" << std::endl;
-    return 1;
-  }
-  catch (const v1::IdentityCertificate::Error& e) {
-    std::cerr << "ERROR: Cannot determine the signing key!" << std::endl;
-    return 1;
-  }
-  catch (const SecPublicInfo::Error& e) {
-    std::cerr << "ERROR: Incomplete or corrupted PIB (" << e.what() << ")" << std::endl;
-    return 1;
-  }
-
-  try {
-    transform::bufferSource(wire.wire(), wire.size()) >> transform::base64Encode(true) >> transform::streamSink(std::cout);
+    try {
+        transform::bufferSource(wire.wire(), wire.size()) >> transform::base64Encode(true) >> transform::streamSink(std::cout);
+    } catch (const transform::Error& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        return 1;
     }
-  catch (const transform::Error& e) {
-    std::cerr << "ERROR: " << e.what() << std::endl;
-    return 1;
-  }
 
-  return 0;
+    return 0;
 }
 
 #endif // NDN_TOOLS_NDNSEC_CERT_REVOKE_HPP

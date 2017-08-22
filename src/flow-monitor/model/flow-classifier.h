@@ -26,57 +26,57 @@
 
 namespace ns3 {
 
-/**
- * \ingroup flow-monitor
- * \brief Abstract identifier of a packet flow
- */
-typedef uint32_t FlowId;
+    /**
+     * \ingroup flow-monitor
+     * \brief Abstract identifier of a packet flow
+     */
+    typedef uint32_t FlowId;
 
-/**
- * \ingroup flow-monitor
- * \brief Abstract identifier of a packet within a flow
- */
-typedef uint32_t FlowPacketId;
+    /**
+     * \ingroup flow-monitor
+     * \brief Abstract identifier of a packet within a flow
+     */
+    typedef uint32_t FlowPacketId;
 
 
-/// \ingroup flow-monitor
-/// Provides a method to translate raw packet data into abstract
-/// `flow identifier` and `packet identifier` parameters.  These
-/// identifiers are unsigned 32-bit integers that uniquely identify a
-/// flow and a packet within that flow, respectively, for the whole
-/// simulation, regardless of the point in which the packet was
-/// captured.  These abstract identifiers are used in the
-/// communication between FlowProbe and FlowMonitor, and all collected
-/// statistics reference only those abstract identifiers in order to
-/// keep the core architecture generic and not tied down to any
-/// particular flow capture method or classification system.
-class FlowClassifier : public SimpleRefCount<FlowClassifier>
-{
-private:
-  FlowId m_lastNewFlowId; //!< Last known Flow ID
+    /// \ingroup flow-monitor
+    /// Provides a method to translate raw packet data into abstract
+    /// `flow identifier` and `packet identifier` parameters.  These
+    /// identifiers are unsigned 32-bit integers that uniquely identify a
+    /// flow and a packet within that flow, respectively, for the whole
+    /// simulation, regardless of the point in which the packet was
+    /// captured.  These abstract identifiers are used in the
+    /// communication between FlowProbe and FlowMonitor, and all collected
+    /// statistics reference only those abstract identifiers in order to
+    /// keep the core architecture generic and not tied down to any
+    /// particular flow capture method or classification system.
 
-  /// Defined and not implemented to avoid misuse
-  FlowClassifier (FlowClassifier const &);
-  /// Defined and not implemented to avoid misuse
-  /// \returns
-  FlowClassifier& operator= (FlowClassifier const &);
+    class FlowClassifier : public SimpleRefCount<FlowClassifier> {
+    private:
+        FlowId m_lastNewFlowId; //!< Last known Flow ID
 
-public:
+        /// Defined and not implemented to avoid misuse
+        FlowClassifier(FlowClassifier const &);
+        /// Defined and not implemented to avoid misuse
+        /// \returns
+        FlowClassifier& operator=(FlowClassifier const &);
 
-  FlowClassifier ();
-  virtual ~FlowClassifier ();
+    public:
 
-  /// Serializes the results to an std::ostream in XML format
-  /// \param os the output stream
-  /// \param indent number of spaces to use as base indentation level
-  virtual void SerializeToXmlStream (std::ostream &os, int indent) const = 0;
+        FlowClassifier();
+        virtual ~FlowClassifier();
 
-protected:
-  /// Returns a new, unique Flow Identifier
-  /// \returns a new FlowId
-  FlowId GetNewFlowId ();
+        /// Serializes the results to an std::ostream in XML format
+        /// \param os the output stream
+        /// \param indent number of spaces to use as base indentation level
+        virtual void SerializeToXmlStream(std::ostream &os, int indent) const = 0;
 
-};
+    protected:
+        /// Returns a new, unique Flow Identifier
+        /// \returns a new FlowId
+        FlowId GetNewFlowId();
+
+    };
 
 
 } // namespace ns3

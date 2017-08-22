@@ -30,76 +30,76 @@
 
 namespace nfd {
 
-namespace unix_stream {
-typedef boost::asio::local::stream_protocol::endpoint Endpoint;
-} // namespace unix_stream
+    namespace unix_stream {
+        typedef boost::asio::local::stream_protocol::endpoint Endpoint;
+    } // namespace unix_stream
 
-/**
- * \brief Class implementing a local channel to create faces
- *
- * Channel can create faces as a response to incoming IPC connections
- * (UnixStreamChannel::listen needs to be called for that to work).
- */
-class UnixStreamChannel : public Channel
-{
-public:
-  /**
-   * \brief UnixStreamChannel-related error
-   */
-  struct Error : public std::runtime_error
-  {
-    Error(const std::string& what) : std::runtime_error(what) {}
-  };
+    /**
+     * \brief Class implementing a local channel to create faces
+     *
+     * Channel can create faces as a response to incoming IPC connections
+     * (UnixStreamChannel::listen needs to be called for that to work).
+     */
+    class UnixStreamChannel : public Channel {
+    public:
 
-  /**
-   * \brief Create UnixStream channel for the specified endpoint
-   *
-   * To enable creation of faces upon incoming connections, one
-   * needs to explicitly call UnixStreamChannel::listen method.
-   */
-  explicit
-  UnixStreamChannel(const unix_stream::Endpoint& endpoint);
+        /**
+         * \brief UnixStreamChannel-related error
+         */
+        struct Error : public std::runtime_error {
 
-  ~UnixStreamChannel() override;
+            Error(const std::string& what) : std::runtime_error(what) {
+            }
+        };
 
-  /**
-   * \brief Enable listening on the local endpoint, accept connections,
-   *        and create faces when a connection is made
-   * \param onFaceCreated  Callback to notify successful creation of the face
-   * \param onAcceptFailed Callback to notify when channel fails (accept call
-   *                       returns an error)
-   * \param backlog        The maximum length of the queue of pending incoming
-   *                       connections
-   */
-  void
-  listen(const FaceCreatedCallback& onFaceCreated,
-         const FaceCreationFailedCallback& onAcceptFailed,
-         int backlog = boost::asio::local::stream_protocol::acceptor::max_connections);
+        /**
+         * \brief Create UnixStream channel for the specified endpoint
+         *
+         * To enable creation of faces upon incoming connections, one
+         * needs to explicitly call UnixStreamChannel::listen method.
+         */
+        explicit
+        UnixStreamChannel(const unix_stream::Endpoint& endpoint);
 
-  bool
-  isListening() const;
+        ~UnixStreamChannel() override;
 
-private:
-  void
-  accept(const FaceCreatedCallback& onFaceCreated,
-         const FaceCreationFailedCallback& onAcceptFailed);
+        /**
+         * \brief Enable listening on the local endpoint, accept connections,
+         *        and create faces when a connection is made
+         * \param onFaceCreated  Callback to notify successful creation of the face
+         * \param onAcceptFailed Callback to notify when channel fails (accept call
+         *                       returns an error)
+         * \param backlog        The maximum length of the queue of pending incoming
+         *                       connections
+         */
+        void
+        listen(const FaceCreatedCallback& onFaceCreated,
+                const FaceCreationFailedCallback& onAcceptFailed,
+                int backlog = boost::asio::local::stream_protocol::acceptor::max_connections);
 
-  void
-  handleAccept(const boost::system::error_code& error,
-               const FaceCreatedCallback& onFaceCreated,
-               const FaceCreationFailedCallback& onAcceptFailed);
+        bool
+        isListening() const;
 
-private:
-  unix_stream::Endpoint m_endpoint;
-  boost::asio::local::stream_protocol::acceptor m_acceptor;
-  boost::asio::local::stream_protocol::socket m_socket;
-};
+    private:
+        void
+        accept(const FaceCreatedCallback& onFaceCreated,
+                const FaceCreationFailedCallback& onAcceptFailed);
 
-inline bool
-UnixStreamChannel::isListening() const
-{
-  return m_acceptor.is_open();
-}
+        void
+        handleAccept(const boost::system::error_code& error,
+                const FaceCreatedCallback& onFaceCreated,
+                const FaceCreationFailedCallback& onAcceptFailed);
+
+    private:
+        unix_stream::Endpoint m_endpoint;
+        boost::asio::local::stream_protocol::acceptor m_acceptor;
+        boost::asio::local::stream_protocol::socket m_socket;
+    };
+
+    inline bool
+    UnixStreamChannel::isListening() const {
+        return m_acceptor.is_open();
+    }
 
 } // namespace nfd
 

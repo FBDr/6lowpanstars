@@ -23,23 +23,21 @@
 
 #include "ns3/ipv6-raw-socket-factory.h"
 
-namespace ns3
-{
+namespace ns3 {
 
-/**
- * \ingroup socket
- *
- * \class Ipv6RawSocketFactoryImpl
- * \brief Implementation of IPv6 raw socket factory.
- */
-class Ipv6RawSocketFactoryImpl : public Ipv6RawSocketFactory
-{
-public:
-  /**
-   * \brief Create a raw IPv6 socket.
-   */
-  virtual Ptr<Socket> CreateSocket ();
-};
+    /**
+     * \ingroup socket
+     *
+     * \class Ipv6RawSocketFactoryImpl
+     * \brief Implementation of IPv6 raw socket factory.
+     */
+    class Ipv6RawSocketFactoryImpl : public Ipv6RawSocketFactory {
+    public:
+        /**
+         * \brief Create a raw IPv6 socket.
+         */
+        virtual Ptr<Socket> CreateSocket();
+    };
 
 } /* namespace ns3 */
 

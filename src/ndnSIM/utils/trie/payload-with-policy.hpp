@@ -23,83 +23,81 @@
 /// @cond include_hidden
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-template<typename PayloadTraits, typename IndexTraits>
-class payload_with_index {
-public:
-  typedef PayloadTraits::pointer_type iterator;
+            template<typename PayloadTraits, typename IndexTraits>
+            class payload_with_index {
+            public:
+                typedef PayloadTraits::pointer_type iterator;
 
-  typedef typename IndexTraits::
-    template index<PayloadTraits,
-                   typename IndexTraits::template container_hook<parent_trie>::type>::type
-      index_container;
+                typedef typename IndexTraits::
+                template index<PayloadTraits,
+                typename IndexTraits::template container_hook<parent_trie>::type>::type
+                index_container;
 
-  inline payload_with_index()
-    : index_(*this)
-  {
-  }
+                inline payload_with_index()
+                : index_(*this) {
+                }
 
-  inline std::pair<iterator, bool>
-  insert(typename iterator payload)
-  {
-    bool ok = policy_.insert(s_iterator_to(item.first));
-    if (!ok) {
-      item.first->erase(); // cannot insert
-      return std::make_pair(end(), false);
-    }
+                inline std::pair<iterator, bool>
+                insert(typename iterator payload) {
+                    bool ok = policy_.insert(s_iterator_to(item.first));
+                    if (!ok) {
+                        item.first->erase(); // cannot insert
+                        return std::make_pair(end(), false);
+                    }
 
-    return item;
-  }
+                    return item;
+                }
 
-  // inline void
-  // erase (const FullKey &key)
-  // {
-  //   iterator foundItem, lastItem;
-  //   bool reachLast;
-  //   std::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+                // inline void
+                // erase (const FullKey &key)
+                // {
+                //   iterator foundItem, lastItem;
+                //   bool reachLast;
+                //   std::tie (foundItem, reachLast, lastItem) = trie_.find (key);
 
-  //   if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
-  //     return; // nothing to invalidate
+                //   if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
+                //     return; // nothing to invalidate
 
-  //   erase (lastItem);
-  // }
+                //   erase (lastItem);
+                // }
 
-  // inline void
-  // erase (iterator node)
-  // {
-  //   if (node == end ()) return;
+                // inline void
+                // erase (iterator node)
+                // {
+                //   if (node == end ()) return;
 
-  //   policy_.erase (s_iterator_to (node));
-  //   node->erase (); // will do cleanup here
-  // }
+                //   policy_.erase (s_iterator_to (node));
+                //   node->erase (); // will do cleanup here
+                // }
 
-  // inline void
-  // clear ()
-  // {
-  //   policy_.clear ();
-  //   trie_.clear ();
-  // }
+                // inline void
+                // clear ()
+                // {
+                //   policy_.clear ();
+                //   trie_.clear ();
+                // }
 
-  // template<typename Modifier>
-  // bool
-  // modify (iterator position, Modifier mod)
-  // {
-  //   if (position == end ()) return false;
-  //   if (position->payload () == PayloadTraits::empty_payload) return false;
+                // template<typename Modifier>
+                // bool
+                // modify (iterator position, Modifier mod)
+                // {
+                //   if (position == end ()) return false;
+                //   if (position->payload () == PayloadTraits::empty_payload) return false;
 
-  //   mod (*position->payload ());
-  //   policy_.update (position);
-  //   return true;
-  // }
+                //   mod (*position->payload ());
+                //   policy_.update (position);
+                //   return true;
+                // }
 
-private:
-  mutable index_container policy_;
-};
+            private:
+                mutable index_container policy_;
+            };
 
-} // ndnSIM
-} // ndn
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

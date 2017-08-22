@@ -23,31 +23,29 @@
 #define NDN_TESTS_UNIT_TESTS_UTIL_HOME_ENVIRONMENT_FIXTURE_HPP
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-class TestHomeEnvironmentFixture
-{
-public:
-  TestHomeEnvironmentFixture()
-  {
-    if (std::getenv("TEST_HOME"))
-      m_HOME = std::getenv("TEST_HOME");
-  }
+        class TestHomeEnvironmentFixture {
+        public:
 
-  virtual
-  ~TestHomeEnvironmentFixture()
-  {
-    if (!m_HOME.empty())
-      setenv("TEST_HOME", m_HOME.c_str(), 1);
-    else
-      unsetenv("TEST_HOME");
-  }
+            TestHomeEnvironmentFixture() {
+                if (std::getenv("TEST_HOME"))
+                    m_HOME = std::getenv("TEST_HOME");
+            }
 
-protected:
-  std::string m_HOME;
-};
+            virtual
+            ~TestHomeEnvironmentFixture() {
+                if (!m_HOME.empty())
+                    setenv("TEST_HOME", m_HOME.c_str(), 1);
+                else
+                    unsetenv("TEST_HOME");
+            }
 
-} // namespace tests
+        protected:
+            std::string m_HOME;
+        };
+
+    } // namespace tests
 } // namespace ndn
 
 #endif // NDN_TESTS_UNIT_TESTS_UTIL_HOME_ENVIRONMENT_FIXTURE_HPP

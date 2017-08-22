@@ -47,14 +47,12 @@ typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
 typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
 typedef client::connection_ptr connection_ptr;
 
-
-
 class perftest {
 public:
     typedef perftest type;
-    typedef std::chrono::duration<int,std::micro> dur_type;
+    typedef std::chrono::duration<int, std::micro> dur_type;
 
-    perftest () {
+    perftest() {
         m_endpoint.set_access_channels(websocketpp::log::alevel::all);
         m_endpoint.set_error_channels(websocketpp::log::elevel::all);
 
@@ -62,12 +60,12 @@ public:
         m_endpoint.init_asio();
 
         // Register our handlers
-        m_endpoint.set_socket_init_handler(bind(&type::on_socket_init,this,::_1));
+        m_endpoint.set_socket_init_handler(bind(&type::on_socket_init, this, ::_1));
         //m_endpoint.set_tls_init_handler(bind(&type::on_tls_init,this,::_1));
-        m_endpoint.set_message_handler(bind(&type::on_message,this,::_1,::_2));
-        m_endpoint.set_open_handler(bind(&type::on_open,this,::_1));
-        m_endpoint.set_close_handler(bind(&type::on_close,this,::_1));
-        m_endpoint.set_fail_handler(bind(&type::on_fail,this,::_1));
+        m_endpoint.set_message_handler(bind(&type::on_message, this, ::_1, ::_2));
+        m_endpoint.set_open_handler(bind(&type::on_open, this, ::_1));
+        m_endpoint.set_close_handler(bind(&type::on_close, this, ::_1));
+        m_endpoint.set_fail_handler(bind(&type::on_fail, this, ::_1));
     }
 
     void start(std::string uri) {
@@ -75,7 +73,7 @@ public:
         client::connection_ptr con = m_endpoint.get_connection(uri, ec);
 
         if (ec) {
-            m_endpoint.get_alog().write(websocketpp::log::alevel::app,ec.message());
+            m_endpoint.get_alog().write(websocketpp::log::alevel::app, ec.message());
             return;
         }
 
@@ -98,9 +96,9 @@ public:
 
         try {
             ctx->set_options(boost::asio::ssl::context::default_workarounds |
-                             boost::asio::ssl::context::no_sslv2 |
-                             boost::asio::ssl::context::no_sslv3 |
-                             boost::asio::ssl::context::single_dh_use);
+                    boost::asio::ssl::context::no_sslv2 |
+                    boost::asio::ssl::context::no_sslv3 |
+                    boost::asio::ssl::context::single_dh_use);
         } catch (std::exception& e) {
             std::cout << e.what() << std::endl;
         }
@@ -109,7 +107,7 @@ public:
 
     void on_fail(websocketpp::connection_hdl hdl) {
         client::connection_ptr con = m_endpoint.get_con_from_hdl(hdl);
-        
+
         std::cout << "Fail handler" << std::endl;
         std::cout << con->get_state() << std::endl;
         std::cout << con->get_local_close_code() << std::endl;
@@ -123,18 +121,20 @@ public:
         m_open = std::chrono::high_resolution_clock::now();
         m_endpoint.send(hdl, "", websocketpp::frame::opcode::text);
     }
+
     void on_message(websocketpp::connection_hdl hdl, message_ptr) {
         m_message = std::chrono::high_resolution_clock::now();
-        m_endpoint.close(hdl,websocketpp::close::status::going_away,"");
+        m_endpoint.close(hdl, websocketpp::close::status::going_away, "");
     }
+
     void on_close(websocketpp::connection_hdl) {
         m_close = std::chrono::high_resolution_clock::now();
 
-        std::cout << "Socket Init: " << std::chrono::duration_cast<dur_type>(m_socket_init-m_start).count() << std::endl;
-        std::cout << "TLS Init: " << std::chrono::duration_cast<dur_type>(m_tls_init-m_start).count() << std::endl;
-        std::cout << "Open: " << std::chrono::duration_cast<dur_type>(m_open-m_start).count() << std::endl;
-        std::cout << "Message: " << std::chrono::duration_cast<dur_type>(m_message-m_start).count() << std::endl;
-        std::cout << "Close: " << std::chrono::duration_cast<dur_type>(m_close-m_start).count() << std::endl;
+        std::cout << "Socket Init: " << std::chrono::duration_cast<dur_type>(m_socket_init - m_start).count() << std::endl;
+        std::cout << "TLS Init: " << std::chrono::duration_cast<dur_type>(m_tls_init - m_start).count() << std::endl;
+        std::cout << "Open: " << std::chrono::duration_cast<dur_type>(m_open - m_start).count() << std::endl;
+        std::cout << "Message: " << std::chrono::duration_cast<dur_type>(m_message - m_start).count() << std::endl;
+        std::cout << "Close: " << std::chrono::duration_cast<dur_type>(m_close - m_start).count() << std::endl;
     }
 private:
     client m_endpoint;

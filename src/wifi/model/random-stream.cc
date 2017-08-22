@@ -22,50 +22,43 @@
 #include "ns3/assert.h"
 #include <cmath>
 
-namespace ns3 {
-
-RandomStream::~RandomStream ()
+namespace ns3
 {
-}
 
+    RandomStream::~RandomStream() {
+    }
 
-RealRandomStream::RealRandomStream ()
-{
-  m_stream = CreateObject<UniformRandomVariable> ();
-}
+    RealRandomStream::RealRandomStream() {
+        m_stream = CreateObject<UniformRandomVariable> ();
+    }
 
-uint32_t
-RealRandomStream::GetNext (uint32_t min, uint32_t max)
-{
-  return m_stream->GetInteger (min, max);
-}
+    uint32_t
+    RealRandomStream::GetNext(uint32_t min, uint32_t max) {
+        return m_stream->GetInteger(min, max);
+    }
 
-int64_t
-RealRandomStream::AssignStreams (int64_t stream)
-{
-  m_stream->SetStream (stream);
-  return 1;
-}
+    int64_t
+    RealRandomStream::AssignStreams(int64_t stream) {
+        m_stream->SetStream(stream);
+        return 1;
+    }
 
-void
-TestRandomStream::AddNext (uint32_t v)
-{
-  m_nexts.push_back (v);
-}
+    void
+    TestRandomStream::AddNext(uint32_t v) {
+        m_nexts.push_back(v);
+    }
 
-uint32_t
-TestRandomStream::GetNext (uint32_t min, uint32_t max)
-{
-  NS_ASSERT (!m_nexts.empty ());
-  uint32_t next = m_nexts.front ();
-  m_nexts.pop_front ();
-  return next;
-}
+    uint32_t
+    TestRandomStream::GetNext(uint32_t min, uint32_t max) {
+        NS_ASSERT(!m_nexts.empty());
+        uint32_t next = m_nexts.front();
+        m_nexts.pop_front();
+        return next;
+    }
 
-int64_t
-TestRandomStream::AssignStreams (int64_t stream)
-{
-  return 0;
-}
+    int64_t
+    TestRandomStream::AssignStreams(int64_t stream) {
+        return 0;
+    }
 
 } //namespace ns3

@@ -23,12 +23,12 @@
 #include <ns3/ndnSIM/NFD/daemon/table/fib.hpp>
 
 namespace nfd {
-namespace fib {
+    namespace fib {
 
-std::shared_ptr<Face>
-getFaceFromFibNextHop(const NextHop& nextHop);
+        std::shared_ptr<Face>
+        getFaceFromFibNextHop(const NextHop& nextHop);
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd
 
 #endif // NDNSIM_BINDINGS_MODULE_HELPERS_HPP

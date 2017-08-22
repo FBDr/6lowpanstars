@@ -42,131 +42,126 @@
 
 namespace ns3
 {
-namespace olsr
-{
+    namespace olsr
+            {
 
-Bug780Test::Bug780Test() : 
-  TestCase ("Test OLSR bug 780"),
-  m_time (Seconds (200.0)), m_seq (0), m_recvCount (0)
-{
-}
-
-Bug780Test::~Bug780Test()
-{
-}
-
-void
-Bug780Test::DoRun ()
-{
-  RngSeedManager::SetSeed (12345);
-  RngSeedManager::SetRun (12345);
-  CreateNodes ();
-
-  Simulator::Stop (m_time);
-  Simulator::Run ();
-
-  NS_TEST_EXPECT_MSG_EQ (m_recvCount, 192, "192 out of 200 ping received.");
-
-  Simulator::Destroy ();
-}
-
-void
-Bug780Test::CreateNodes (void)
-{
-  NodeContainer c;
-  c.Create (3);
-
-  // install TCP/IP & OLSR
-  OlsrHelper olsr;
-  InternetStackHelper internet;
-  internet.SetRoutingHelper (olsr);
-  internet.Install (c);
-  int64_t streamsUsed = olsr.AssignStreams (c, 0);
-  NS_TEST_EXPECT_MSG_EQ (streamsUsed, 3, "Should have assigned 3 streams");
-
-  // create channel & devices
-  SimpleNetDeviceHelper simpleNetHelper;
-  simpleNetHelper.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  simpleNetHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
-  NetDeviceContainer nd = simpleNetHelper.Install (c);
-
-  Ipv4AddressHelper addressAdhoc;
-  addressAdhoc.SetBase ("10.1.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer adhocInterfaces;
-  adhocInterfaces = addressAdhoc.Assign (nd);
-
-  // Blacklist some devices (equivalent to Wireless out of range)
-  Ptr<SimpleNetDevice> nd0 = DynamicCast<SimpleNetDevice> (nd.Get (0));
-  Ptr<SimpleNetDevice> nd2 = DynamicCast<SimpleNetDevice> (nd.Get (2));
-  Ptr<SimpleChannel> ch = DynamicCast<SimpleChannel> (nd.Get (0)->GetChannel ());
-
-  Simulator::Schedule (Seconds (100.0), &SimpleChannel::BlackList, ch, nd0, nd2);
-  Simulator::Schedule (Seconds (100.0), &SimpleChannel::BlackList, ch, nd2, nd0);
-
-  // 3. Setup ping
-  m_socket = Socket::CreateSocket (c.Get (0), TypeId::LookupByName ("ns3::Ipv4RawSocketFactory"));
-  m_socket->SetAttribute ("Protocol", UintegerValue (1)); // icmp
-  m_socket->SetRecvCallback (MakeCallback (&Bug780Test::Receive, this));
-  InetSocketAddress src = InetSocketAddress (Ipv4Address::GetAny (), 0);
-  m_socket->Bind (src);
-  InetSocketAddress dst = InetSocketAddress (adhocInterfaces.GetAddress (2), 0);
-  m_socket->Connect (dst);
-
-  SendPing ();
-}
-
-void
-Bug780Test::SendPing ()
-{
-  if (Simulator::Now () >= m_time)
-    {
-      return;
-    }
-
-  Ptr<Packet> p = Create<Packet> ();
-  Icmpv4Echo echo;
-  echo.SetSequenceNumber (m_seq);
-  m_seq++;
-  echo.SetIdentifier (0);
-
-  Ptr<Packet> dataPacket = Create<Packet> (56);
-  echo.SetData (dataPacket);
-  p->AddHeader (echo);
-  Icmpv4Header header;
-  header.SetType (Icmpv4Header::ECHO);
-  header.SetCode (0);
-  if (Node::ChecksumEnabled ())
-    {
-      header.EnableChecksum ();
-    }
-  p->AddHeader (header);
-  m_socket->Send (p, 0);
-  Simulator::Schedule (Seconds (1), &Bug780Test::SendPing, this);
-}
-
-void
-Bug780Test::Receive (Ptr<Socket> socket)
-{
-  while (m_socket->GetRxAvailable () > 0)
-    {
-      Address from;
-      Ptr<Packet> p = m_socket->RecvFrom (0xffffffff, 0, from);
-
-      NS_ASSERT (InetSocketAddress::IsMatchingType (from));
-      InetSocketAddress realFrom = InetSocketAddress::ConvertFrom (from);
-      NS_ASSERT (realFrom.GetPort () == 1); // protocol should be icmp.
-      Ipv4Header ipv4;
-      p->RemoveHeader (ipv4);
-      NS_ASSERT (ipv4.GetProtocol () == 1); // protocol should be icmp.
-      Icmpv4Header icmp;
-      p->RemoveHeader (icmp);
-      if (icmp.GetType () == Icmpv4Header::ECHO_REPLY)
+        Bug780Test::Bug780Test() :
+        TestCase("Test OLSR bug 780"),
+        m_time(Seconds(200.0)), m_seq(0), m_recvCount(0)
         {
-          m_recvCount ++;
         }
-    }
-}
 
+        Bug780Test::~Bug780Test()
+        {
+        }
+
+        void
+        Bug780Test::DoRun()
+        {
+            RngSeedManager::SetSeed(12345);
+            RngSeedManager::SetRun(12345);
+            CreateNodes();
+
+            Simulator::Stop(m_time);
+            Simulator::Run();
+
+            NS_TEST_EXPECT_MSG_EQ(m_recvCount, 192, "192 out of 200 ping received.");
+
+            Simulator::Destroy();
+        }
+
+        void
+        Bug780Test::CreateNodes(void)
+        {
+            NodeContainer c;
+            c.Create(3);
+
+            // install TCP/IP & OLSR
+            OlsrHelper olsr;
+            InternetStackHelper internet;
+            internet.SetRoutingHelper(olsr);
+            internet.Install(c);
+            int64_t streamsUsed = olsr.AssignStreams(c, 0);
+            NS_TEST_EXPECT_MSG_EQ(streamsUsed, 3, "Should have assigned 3 streams");
+
+            // create channel & devices
+            SimpleNetDeviceHelper simpleNetHelper;
+            simpleNetHelper.SetDeviceAttribute("DataRate", StringValue("10Mbps"));
+            simpleNetHelper.SetChannelAttribute("Delay", StringValue("2ms"));
+            NetDeviceContainer nd = simpleNetHelper.Install(c);
+
+            Ipv4AddressHelper addressAdhoc;
+            addressAdhoc.SetBase("10.1.1.0", "255.255.255.0");
+            Ipv4InterfaceContainer adhocInterfaces;
+            adhocInterfaces = addressAdhoc.Assign(nd);
+
+            // Blacklist some devices (equivalent to Wireless out of range)
+            Ptr<SimpleNetDevice> nd0 = DynamicCast<SimpleNetDevice> (nd.Get(0));
+            Ptr<SimpleNetDevice> nd2 = DynamicCast<SimpleNetDevice> (nd.Get(2));
+            Ptr<SimpleChannel> ch = DynamicCast<SimpleChannel> (nd.Get(0)->GetChannel());
+
+            Simulator::Schedule(Seconds(100.0), &SimpleChannel::BlackList, ch, nd0, nd2);
+            Simulator::Schedule(Seconds(100.0), &SimpleChannel::BlackList, ch, nd2, nd0);
+
+            // 3. Setup ping
+            m_socket = Socket::CreateSocket(c.Get(0), TypeId::LookupByName("ns3::Ipv4RawSocketFactory"));
+            m_socket->SetAttribute("Protocol", UintegerValue(1)); // icmp
+            m_socket->SetRecvCallback(MakeCallback(&Bug780Test::Receive, this));
+            InetSocketAddress src = InetSocketAddress(Ipv4Address::GetAny(), 0);
+            m_socket->Bind(src);
+            InetSocketAddress dst = InetSocketAddress(adhocInterfaces.GetAddress(2), 0);
+            m_socket->Connect(dst);
+
+            SendPing();
+        }
+
+        void
+        Bug780Test::SendPing()
+        {
+            if (Simulator::Now() >= m_time) {
+                return;
+            }
+
+            Ptr<Packet> p = Create<Packet> ();
+            Icmpv4Echo echo;
+            echo.SetSequenceNumber(m_seq);
+            m_seq++;
+            echo.SetIdentifier(0);
+
+            Ptr<Packet> dataPacket = Create<Packet> (56);
+            echo.SetData(dataPacket);
+            p->AddHeader(echo);
+            Icmpv4Header header;
+            header.SetType(Icmpv4Header::ECHO);
+            header.SetCode(0);
+            if (Node::ChecksumEnabled()) {
+                header.EnableChecksum();
+            }
+            p->AddHeader(header);
+            m_socket->Send(p, 0);
+            Simulator::Schedule(Seconds(1), &Bug780Test::SendPing, this);
+        }
+
+        void
+        Bug780Test::Receive(Ptr<Socket> socket)
+        {
+            while (m_socket->GetRxAvailable() > 0) {
+                Address from;
+                Ptr<Packet> p = m_socket->RecvFrom(0xffffffff, 0, from);
+
+                NS_ASSERT(InetSocketAddress::IsMatchingType(from));
+                InetSocketAddress realFrom = InetSocketAddress::ConvertFrom(from);
+                NS_ASSERT(realFrom.GetPort() == 1); // protocol should be icmp.
+                Ipv4Header ipv4;
+                p->RemoveHeader(ipv4);
+                NS_ASSERT(ipv4.GetProtocol() == 1); // protocol should be icmp.
+                Icmpv4Header icmp;
+                p->RemoveHeader(icmp);
+                if (icmp.GetType() == Icmpv4Header::ECHO_REPLY) {
+                    m_recvCount++;
+                }
+            }
+        }
 } // namespace olsr
 } // namespace ns3
 

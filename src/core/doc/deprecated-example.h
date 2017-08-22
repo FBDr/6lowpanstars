@@ -30,9 +30,9 @@
  * \deprecated This method will go away in future versions of ns-3.
  * See instead TheNewWay()
  */
-void SomethingUseful (void); 
+void SomethingUseful(void);
 /*
  * Do something more useful.
  */
-void TheNewWay (void);
+void TheNewWay(void);
 // [doxygen snippet]

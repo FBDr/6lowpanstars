@@ -25,36 +25,36 @@
 
 namespace ns3 {
 
+    /**
+     * \brief This class implements a tag that carries the status of a RLC SDU
+     * for the fragmentation process
+     * Status of RLC SDU
+     */
+    class LteRlcSduStatusTag : public Tag {
+    public:
+        LteRlcSduStatusTag();
 
-/**
- * \brief This class implements a tag that carries the status of a RLC SDU
- * for the fragmentation process
- * Status of RLC SDU
- */
-class LteRlcSduStatusTag : public Tag
-{
-public:
-  LteRlcSduStatusTag ();
+        void SetStatus(uint8_t status);
+        uint8_t GetStatus(void) const;
 
-  void SetStatus (uint8_t status);
-  uint8_t GetStatus (void) const;
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual void Print(std::ostream &os) const;
 
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual void Print (std::ostream &os) const;
+        typedef enum {
+            FULL_SDU = 1,
+            FIRST_SEGMENT = 2,
+            MIDDLE_SEGMENT = 3,
+            LAST_SEGMENT = 4,
+            ANY_SEGMENT = 5
+        } SduStatus_t;
 
-  typedef enum { FULL_SDU       = 1,
-                 FIRST_SEGMENT  = 2,
-                 MIDDLE_SEGMENT = 3,
-                 LAST_SEGMENT   = 4,
-                 ANY_SEGMENT    = 5 } SduStatus_t;
-
-private:
-  uint8_t m_sduStatus;
-};
+    private:
+        uint8_t m_sduStatus;
+    };
 
 
 }; // namespace ns3

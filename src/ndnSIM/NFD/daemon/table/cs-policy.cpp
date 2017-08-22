@@ -30,63 +30,55 @@
 NFD_LOG_INIT("CsPolicy");
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-Policy::Registry&
-Policy::getRegistry()
-{
-  static Registry registry;
-  return registry;
-}
+        Policy::Registry&
+        Policy::getRegistry() {
+            static Registry registry;
+            return registry;
+        }
 
-unique_ptr<Policy>
-Policy::create(const std::string& key)
-{
-  Registry& registry = getRegistry();
-  auto i = registry.find(key);
-  return i == registry.end() ? nullptr : i->second();
-}
+        unique_ptr<Policy>
+        Policy::create(const std::string& key) {
+            Registry& registry = getRegistry();
+            auto i = registry.find(key);
+            return i == registry.end() ? nullptr : i->second();
+        }
 
-Policy::Policy(const std::string& policyName)
-  : m_policyName(policyName)
-{
-}
+        Policy::Policy(const std::string& policyName)
+        : m_policyName(policyName) {
+        }
 
-void
-Policy::setLimit(size_t nMaxEntries)
-{
-  NFD_LOG_INFO("setLimit " << nMaxEntries);
-  m_limit = nMaxEntries;
-  this->evictEntries();
-}
+        void
+        Policy::setLimit(size_t nMaxEntries) {
+            NFD_LOG_INFO("setLimit " << nMaxEntries);
+            m_limit = nMaxEntries;
+            this->evictEntries();
+        }
 
-void
-Policy::afterInsert(iterator i)
-{
-  BOOST_ASSERT(m_cs != nullptr);
-  this->doAfterInsert(i);
-}
+        void
+        Policy::afterInsert(iterator i) {
+            BOOST_ASSERT(m_cs != nullptr);
+            this->doAfterInsert(i);
+        }
 
-void
-Policy::afterRefresh(iterator i)
-{
-  BOOST_ASSERT(m_cs != nullptr);
-  this->doAfterRefresh(i);
-}
+        void
+        Policy::afterRefresh(iterator i) {
+            BOOST_ASSERT(m_cs != nullptr);
+            this->doAfterRefresh(i);
+        }
 
-void
-Policy::beforeErase(iterator i)
-{
-  BOOST_ASSERT(m_cs != nullptr);
-  this->doBeforeErase(i);
-}
+        void
+        Policy::beforeErase(iterator i) {
+            BOOST_ASSERT(m_cs != nullptr);
+            this->doBeforeErase(i);
+        }
 
-void
-Policy::beforeUse(iterator i)
-{
-  BOOST_ASSERT(m_cs != nullptr);
-  this->doBeforeUse(i);
-}
+        void
+        Policy::beforeUse(iterator i) {
+            BOOST_ASSERT(m_cs != nullptr);
+            this->doBeforeUse(i);
+        }
 
-} // namespace cs
+    } // namespace cs
 } // namespace nfd

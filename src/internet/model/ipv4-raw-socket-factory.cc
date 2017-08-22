@@ -21,19 +21,19 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Ipv4RawSocketFactory");
-
-NS_OBJECT_ENSURE_REGISTERED (Ipv4RawSocketFactory);
-
-TypeId Ipv4RawSocketFactory::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Ipv4RawSocketFactory")
-    .SetParent<SocketFactory> ()
-    .SetGroupName ("Internet")
-  ;
-  return tid;
-}
+
+    NS_LOG_COMPONENT_DEFINE("Ipv4RawSocketFactory");
+
+    NS_OBJECT_ENSURE_REGISTERED(Ipv4RawSocketFactory);
+
+    TypeId Ipv4RawSocketFactory::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Ipv4RawSocketFactory")
+                .SetParent<SocketFactory> ()
+                .SetGroupName("Internet")
+                ;
+        return tid;
+    }
 
 } // namespace ns3

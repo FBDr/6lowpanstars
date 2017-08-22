@@ -30,38 +30,37 @@
 #include <boost/mpl/vector.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestTcpChannel, TcpChannelFixture)
+        BOOST_AUTO_TEST_SUITE(Face)
+        BOOST_FIXTURE_TEST_SUITE(TestTcpChannel, TcpChannelFixture)
 
-using AddressFamilies = boost::mpl::vector<boost::asio::ip::address_v4,
-                                           boost::asio::ip::address_v6>;
+        using AddressFamilies = boost::mpl::vector<boost::asio::ip::address_v4,
+        boost::asio::ip::address_v6>;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ConnectTimeout, A, AddressFamilies)
-{
-  auto address = getTestIp<A>(LoopbackAddress::Yes);
-  SKIP_IF_IP_UNAVAILABLE(address);
-  // do not listen
+        BOOST_AUTO_TEST_CASE_TEMPLATE(ConnectTimeout, A, AddressFamilies) {
+            auto address = getTestIp<A>(LoopbackAddress::Yes);
+            SKIP_IF_IP_UNAVAILABLE(address);
+            // do not listen
 
-  auto channel = this->makeChannel(A());
-  channel->connect(tcp::Endpoint(address, 7040), false,
-    [this] (const shared_ptr<nfd::Face>&) {
-      BOOST_FAIL("Connect succeeded when it should have failed");
-      this->limitedIo.afterOp();
-    },
-    [this] (uint32_t, const std::string& reason) {
-      BOOST_CHECK_EQUAL(reason.empty(), false);
-      this->limitedIo.afterOp();
-    },
-    time::seconds(1));
+            auto channel = this->makeChannel(A());
+            channel->connect(tcp::Endpoint(address, 7040), false,
+                    [this] (const shared_ptr<nfd::Face>&) {
+                        BOOST_FAIL("Connect succeeded when it should have failed");
+                        this->limitedIo.afterOp();
+                    },
+            [this] (uint32_t, const std::string & reason) {
+                BOOST_CHECK_EQUAL(reason.empty(), false);
+                this->limitedIo.afterOp();
+            },
+            time::seconds(1));
 
-  BOOST_CHECK_EQUAL(this->limitedIo.run(1, time::seconds(2)), LimitedIo::EXCEED_OPS);
-  BOOST_CHECK_EQUAL(channel->size(), 0);
-}
+            BOOST_CHECK_EQUAL(this->limitedIo.run(1, time::seconds(2)), LimitedIo::EXCEED_OPS);
+            BOOST_CHECK_EQUAL(channel->size(), 0);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestTcpChannel
-BOOST_AUTO_TEST_SUITE_END() // Face
+        BOOST_AUTO_TEST_SUITE_END() // TestTcpChannel
+        BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

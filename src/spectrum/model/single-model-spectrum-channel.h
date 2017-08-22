@@ -28,89 +28,85 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup spectrum
+     *
+     * @brief SpectrumChannel implementation which handles a single spectrum model
+     *
+     * All SpectrumPhy layers attached to this SpectrumChannel
+     */
+    class SingleModelSpectrumChannel : public SpectrumChannel {
+    public:
+        SingleModelSpectrumChannel();
+
+        static TypeId GetTypeId(void);
 
 
-/**
- * \ingroup spectrum
- *
- * @brief SpectrumChannel implementation which handles a single spectrum model
- *
- * All SpectrumPhy layers attached to this SpectrumChannel
- */
-class SingleModelSpectrumChannel : public SpectrumChannel
-{
-
-public:
-  SingleModelSpectrumChannel ();
-
-  static TypeId GetTypeId (void);
+        // inherited from SpectrumChannel
+        virtual void AddPropagationLossModel(Ptr<PropagationLossModel> loss);
+        virtual void AddSpectrumPropagationLossModel(Ptr<SpectrumPropagationLossModel> loss);
+        virtual void SetPropagationDelayModel(Ptr<PropagationDelayModel> delay);
+        virtual void AddRx(Ptr<SpectrumPhy> phy);
+        virtual void StartTx(Ptr<SpectrumSignalParameters> params);
 
 
-  // inherited from SpectrumChannel
-  virtual void AddPropagationLossModel (Ptr<PropagationLossModel> loss);
-  virtual void AddSpectrumPropagationLossModel (Ptr<SpectrumPropagationLossModel> loss);
-  virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
-  virtual void AddRx (Ptr<SpectrumPhy> phy);
-  virtual void StartTx (Ptr<SpectrumSignalParameters> params);
+        // inherited from Channel
+        virtual uint32_t GetNDevices(void) const;
+        virtual Ptr<NetDevice> GetDevice(uint32_t i) const;
 
 
-  // inherited from Channel
-  virtual uint32_t GetNDevices (void) const;
-  virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
+        typedef std::vector<Ptr<SpectrumPhy> > PhyList;
+
+        virtual Ptr<SpectrumPropagationLossModel> GetSpectrumPropagationLossModel(void);
+
+    private:
+        virtual void DoDispose();
+
+        /**
+         * used internally to reschedule transmission after the propagation delay
+         *
+         * @param params
+         * @param receiver
+         */
+        void StartRx(Ptr<SpectrumSignalParameters> params, Ptr<SpectrumPhy> receiver);
+
+        /**
+         * list of SpectrumPhy instances attached to
+         * the channel
+         */
+        PhyList m_phyList;
+
+        /**
+         * SpectrumModel that this channel instance
+         * is supporting
+         */
+        Ptr<const SpectrumModel> m_spectrumModel;
 
 
-  typedef std::vector<Ptr<SpectrumPhy> > PhyList;
-
-  virtual Ptr<SpectrumPropagationLossModel> GetSpectrumPropagationLossModel (void);
-
-private:
-  virtual void DoDispose ();
-
-  /**
-   * used internally to reschedule transmission after the propagation delay
-   *
-   * @param params
-   * @param receiver
-   */
-  void StartRx (Ptr<SpectrumSignalParameters> params, Ptr<SpectrumPhy> receiver);
-
-  /**
-   * list of SpectrumPhy instances attached to
-   * the channel
-   */
-  PhyList m_phyList;
-
-  /**
-   * SpectrumModel that this channel instance
-   * is supporting
-   */
-  Ptr<const SpectrumModel> m_spectrumModel;
+        /**
+         * propagation delay model to be used with this channel
+         *
+         */
+        Ptr<PropagationDelayModel> m_propagationDelay;
 
 
-  /**
-   * propagation delay model to be used with this channel
-   *
-   */
-  Ptr<PropagationDelayModel> m_propagationDelay;
+        /**
+         * single-frequency propagation loss model to be used with this channel
+         *
+         */
+        Ptr<PropagationLossModel> m_propagationLoss;
+
+        /**
+         * frequency-dependent propagation loss model to be used with this channel
+         *
+         */
+        Ptr<SpectrumPropagationLossModel> m_spectrumPropagationLoss;
 
 
-  /**
-    * single-frequency propagation loss model to be used with this channel
-    *
-    */
-  Ptr<PropagationLossModel> m_propagationLoss;
+        double m_maxLossDb;
 
-  /**
-   * frequency-dependent propagation loss model to be used with this channel
-   *
-   */
-  Ptr<SpectrumPropagationLossModel> m_spectrumPropagationLoss;
-
-
-  double m_maxLossDb;
-
-  TracedCallback<Ptr<SpectrumPhy>, Ptr<SpectrumPhy>, double > m_pathLossTrace;
-};
+        TracedCallback<Ptr<SpectrumPhy>, Ptr<SpectrumPhy>, double > m_pathLossTrace;
+    };
 
 
 

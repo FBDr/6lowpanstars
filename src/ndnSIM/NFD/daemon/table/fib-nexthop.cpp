@@ -26,13 +26,12 @@
 #include "fib-nexthop.hpp"
 
 namespace nfd {
-namespace fib {
+    namespace fib {
 
-NextHop::NextHop(Face& face)
-  : m_face(&face)
-  , m_cost(0)
-{
-}
+        NextHop::NextHop(Face& face)
+        : m_face(&face)
+        , m_cost(0) {
+        }
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd

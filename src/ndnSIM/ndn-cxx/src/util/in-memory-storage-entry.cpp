@@ -22,38 +22,33 @@
 #include "in-memory-storage-entry.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-InMemoryStorageEntry::InMemoryStorageEntry()
-  : m_isFresh(true)
-{
-}
+        InMemoryStorageEntry::InMemoryStorageEntry()
+        : m_isFresh(true) {
+        }
 
-void
-InMemoryStorageEntry::release()
-{
-  m_dataPacket.reset();
-  m_markStaleEventId.reset();
-}
+        void
+        InMemoryStorageEntry::release() {
+            m_dataPacket.reset();
+            m_markStaleEventId.reset();
+        }
 
-void
-InMemoryStorageEntry::setData(const Data& data)
-{
-  m_dataPacket = data.shared_from_this();
-  m_isFresh = true;
-}
+        void
+        InMemoryStorageEntry::setData(const Data& data) {
+            m_dataPacket = data.shared_from_this();
+            m_isFresh = true;
+        }
 
-void
-InMemoryStorageEntry::setMarkStaleEventId(unique_ptr<scheduler::ScopedEventId>&& markStaleEventId)
-{
-  m_markStaleEventId = std::move(markStaleEventId);
-}
+        void
+        InMemoryStorageEntry::setMarkStaleEventId(unique_ptr<scheduler::ScopedEventId>&& markStaleEventId) {
+            m_markStaleEventId = std::move(markStaleEventId);
+        }
 
-void
-InMemoryStorageEntry::markStale()
-{
-  m_isFresh = false;
-}
+        void
+        InMemoryStorageEntry::markStale() {
+            m_isFresh = false;
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

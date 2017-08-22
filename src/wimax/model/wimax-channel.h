@@ -28,50 +28,49 @@
 
 namespace ns3 {
 
-class WimaxPhy;
-class Packet;
-class Position;
-class PacketBurst;
+    class WimaxPhy;
+    class Packet;
+    class Position;
+    class PacketBurst;
 
-/**
- * \ingroup wimax
- */
-class WimaxChannel : public Channel
-{
-public:
-  static TypeId GetTypeId (void);
-  WimaxChannel (void);
-  virtual ~WimaxChannel (void);
-  /**
-   * \brief attach the channel to a physical layer of a device
-   * \param phy the physical layer to which the channel will be attached
-   */
-  void Attach (Ptr<WimaxPhy> phy);
-  /**
-   * \return the number of attached devices
-   */
-  uint32_t GetNDevices (void) const;
-  /**
-   * \return the ith attached device
-   */
-  Ptr<NetDevice> GetDevice (uint32_t i) const;
+    /**
+     * \ingroup wimax
+     */
+    class WimaxChannel : public Channel {
+    public:
+        static TypeId GetTypeId(void);
+        WimaxChannel(void);
+        virtual ~WimaxChannel(void);
+        /**
+         * \brief attach the channel to a physical layer of a device
+         * \param phy the physical layer to which the channel will be attached
+         */
+        void Attach(Ptr<WimaxPhy> phy);
+        /**
+         * \return the number of attached devices
+         */
+        uint32_t GetNDevices(void) const;
+        /**
+         * \return the ith attached device
+         */
+        Ptr<NetDevice> GetDevice(uint32_t i) const;
 
- /**
-  * Assign a fixed random variable stream number to the random variables
-  * used by this model.  Return the number of streams (possibly zero) that
-  * have been assigned.
-  *
-  * \param stream first stream index to use
-  * \return the number of stream indices assigned by this model
-  */
-  virtual int64_t AssignStreams (int64_t stream) = 0;
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         * \return the number of stream indices assigned by this model
+         */
+        virtual int64_t AssignStreams(int64_t stream) = 0;
 
-private:
-  virtual void DoAttach (Ptr<WimaxPhy> phy) = 0;
+    private:
+        virtual void DoAttach(Ptr<WimaxPhy> phy) = 0;
 
-  virtual uint32_t DoGetNDevices (void) const = 0;
-  virtual Ptr<NetDevice> DoGetDevice (uint32_t i) const = 0;
-};
+        virtual uint32_t DoGetNDevices(void) const = 0;
+        virtual Ptr<NetDevice> DoGetDevice(uint32_t i) const = 0;
+    };
 
 } // namespace ns3
 

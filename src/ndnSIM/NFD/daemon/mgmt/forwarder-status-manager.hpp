@@ -31,32 +31,31 @@
 
 namespace nfd {
 
-class Forwarder;
+    class Forwarder;
 
-/**
- * @brief implement the Forwarder Status of NFD Management Protocol.
- * @sa http://redmine.named-data.net/projects/nfd/wiki/ForwarderStatus
- */
-class ForwarderStatusManager : noncopyable
-{
-public:
-  ForwarderStatusManager(Forwarder& forwarder, Dispatcher& dispatcher);
+    /**
+     * @brief implement the Forwarder Status of NFD Management Protocol.
+     * @sa http://redmine.named-data.net/projects/nfd/wiki/ForwarderStatus
+     */
+    class ForwarderStatusManager : noncopyable {
+    public:
+        ForwarderStatusManager(Forwarder& forwarder, Dispatcher& dispatcher);
 
-private:
-  ndn::nfd::ForwarderStatus
-  collectGeneralStatus();
+    private:
+        ndn::nfd::ForwarderStatus
+        collectGeneralStatus();
 
-  /** \brief provide general status dataset
-   */
-  void
-  listGeneralStatus(const Name& topPrefix, const Interest& interest,
-                    ndn::mgmt::StatusDatasetContext& context);
+        /** \brief provide general status dataset
+         */
+        void
+        listGeneralStatus(const Name& topPrefix, const Interest& interest,
+                ndn::mgmt::StatusDatasetContext& context);
 
-private:
-  Forwarder&  m_forwarder;
-  Dispatcher& m_dispatcher;
-  time::system_clock::TimePoint m_startTimestamp;
-};
+    private:
+        Forwarder& m_forwarder;
+        Dispatcher& m_dispatcher;
+        time::system_clock::TimePoint m_startTimestamp;
+    };
 
 } // namespace nfd
 

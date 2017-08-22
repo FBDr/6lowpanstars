@@ -31,48 +31,45 @@
 #include <fstream>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class GlobalConfigurationFixture
-{
-public:
-  GlobalConfigurationFixture()
-  {
-    const std::string filename = "unit-tests.conf";
-    if (boost::filesystem::exists(filename))
-      {
-        ConfigFile config;
-        LoggerFactory::getInstance().setConfigFile(config);
+        class GlobalConfigurationFixture {
+        public:
 
-        config.parse(filename, false);
-      }
+            GlobalConfigurationFixture() {
+                const std::string filename = "unit-tests.conf";
+                if (boost::filesystem::exists(filename)) {
+                    ConfigFile config;
+                    LoggerFactory::getInstance().setConfigFile(config);
 
-    if (std::getenv("HOME"))
-      m_home = std::getenv("HOME");
+                    config.parse(filename, false);
+                }
 
-    boost::filesystem::path dir(UNIT_TEST_CONFIG_PATH "test-home");
-    setenv("HOME", dir.generic_string().c_str(), 1);
-    boost::filesystem::create_directories(dir);
-    std::ofstream clientConf((dir / ".ndn" / "client.conf").generic_string().c_str());
-    clientConf << "pib=pib-sqlite3\n"
-               << "tpm=tpm-file" << std::endl;
-  }
+                if (std::getenv("HOME"))
+                    m_home = std::getenv("HOME");
 
-  ~GlobalConfigurationFixture()
-  {
-    if (!m_home.empty()) {
-      setenv("HOME", m_home.c_str(), 1);
-    }
-  }
+                boost::filesystem::path dir(UNIT_TEST_CONFIG_PATH "test-home");
+                setenv("HOME", dir.generic_string().c_str(), 1);
+                boost::filesystem::create_directories(dir);
+                std::ofstream clientConf((dir / ".ndn" / "client.conf").generic_string().c_str());
+                clientConf << "pib=pib-sqlite3\n"
+                        << "tpm=tpm-file" << std::endl;
+            }
 
-private:
-  std::string m_home;
-};
+            ~GlobalConfigurationFixture() {
+                if (!m_home.empty()) {
+                    setenv("HOME", m_home.c_str(), 1);
+                }
+            }
 
-BOOST_GLOBAL_FIXTURE(GlobalConfigurationFixture)
+        private:
+            std::string m_home;
+        };
+
+        BOOST_GLOBAL_FIXTURE(GlobalConfigurationFixture)
 #if BOOST_VERSION >= 105900
-;
+        ;
 #endif // BOOST_VERSION >= 105900
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

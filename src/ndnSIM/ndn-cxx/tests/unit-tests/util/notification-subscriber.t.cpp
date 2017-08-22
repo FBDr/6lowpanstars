@@ -34,286 +34,269 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-using namespace ndn::tests;
+            using namespace ndn::tests;
 
-class NotificationSubscriberFixture : public IdentityManagementTimeFixture
-{
-public:
-  NotificationSubscriberFixture()
-    : streamPrefix("ndn:/NotificationSubscriberTest")
-    , subscriberFace(io, m_keyChain)
-    , subscriber(subscriberFace, streamPrefix, time::seconds(1))
-    , nextSendNotificationNo(0)
-  {
-  }
+            class NotificationSubscriberFixture : public IdentityManagementTimeFixture {
+            public:
 
-  /** \brief deliver one notification to subscriber
-   */
-  void
-  deliverNotification(const std::string& msg)
-  {
-    SimpleNotification notification(msg);
+                NotificationSubscriberFixture()
+                : streamPrefix("ndn:/NotificationSubscriberTest")
+                , subscriberFace(io, m_keyChain)
+                , subscriber(subscriberFace, streamPrefix, time::seconds(1))
+                , nextSendNotificationNo(0) {
+                }
 
-    Name dataName = streamPrefix;
-    dataName.appendSequenceNumber(nextSendNotificationNo);
-    Data data(dataName);
-    data.setContent(notification.wireEncode());
-    data.setFreshnessPeriod(time::seconds(1));
-    m_keyChain.sign(data);
+                /** \brief deliver one notification to subscriber
+                 */
+                void
+                deliverNotification(const std::string& msg) {
+                    SimpleNotification notification(msg);
 
-    lastDeliveredSeqNo = nextSendNotificationNo;
-    lastNotification.setMessage("");
-    ++nextSendNotificationNo;
-    subscriberFace.receive(data);
-  }
+                    Name dataName = streamPrefix;
+                    dataName.appendSequenceNumber(nextSendNotificationNo);
+                    Data data(dataName);
+                    data.setContent(notification.wireEncode());
+                    data.setFreshnessPeriod(time::seconds(1));
+                    m_keyChain.sign(data);
 
-  /** \brief deliver a Nack to subscriber
-   */
-  void
-  deliverNack(const Interest& interest, const lp::NackReason& reason)
-  {
-    lp::Nack nack = makeNack(interest, reason);
-    subscriberFace.receive(nack);
-  }
+                    lastDeliveredSeqNo = nextSendNotificationNo;
+                    lastNotification.setMessage("");
+                    ++nextSendNotificationNo;
+                    subscriberFace.receive(data);
+                }
 
-  void
-  afterNotification(const SimpleNotification& notification)
-  {
-    lastNotification = notification;
-  }
+                /** \brief deliver a Nack to subscriber
+                 */
+                void
+                deliverNack(const Interest& interest, const lp::NackReason& reason) {
+                    lp::Nack nack = makeNack(interest, reason);
+                    subscriberFace.receive(nack);
+                }
 
-  void
-  afterNack(const lp::Nack& nack)
-  {
-    lastNack = nack;
-  }
+                void
+                afterNotification(const SimpleNotification& notification) {
+                    lastNotification = notification;
+                }
 
-  void
-  afterTimeout()
-  {
-    hasTimeout = true;
-  }
+                void
+                afterNack(const lp::Nack& nack) {
+                    lastNack = nack;
+                }
 
-  void
-  afterDecodeError(const Data& data)
-  {
-    lastDecodeErrorData = data;
-  }
+                void
+                afterTimeout() {
+                    hasTimeout = true;
+                }
 
-  void
-  connectHandlers()
-  {
-    notificationConn = subscriber.onNotification.connect(
-      bind(&NotificationSubscriberFixture::afterNotification, this, _1));
-    nackConn = subscriber.onNack.connect(
-      bind(&NotificationSubscriberFixture::afterNack, this, _1));
-    subscriber.onTimeout.connect(
-      bind(&NotificationSubscriberFixture::afterTimeout, this));
-    subscriber.onDecodeError.connect(
-      bind(&NotificationSubscriberFixture::afterDecodeError, this, _1));
-  }
+                void
+                afterDecodeError(const Data& data) {
+                    lastDecodeErrorData = data;
+                }
 
-  void
-  disconnectHandlers()
-  {
-    notificationConn.disconnect();
-    nackConn.disconnect();
-  }
+                void
+                connectHandlers() {
+                    notificationConn = subscriber.onNotification.connect(
+                            bind(&NotificationSubscriberFixture::afterNotification, this, _1));
+                    nackConn = subscriber.onNack.connect(
+                            bind(&NotificationSubscriberFixture::afterNack, this, _1));
+                    subscriber.onTimeout.connect(
+                            bind(&NotificationSubscriberFixture::afterTimeout, this));
+                    subscriber.onDecodeError.connect(
+                            bind(&NotificationSubscriberFixture::afterDecodeError, this, _1));
+                }
 
-  /** \return true if subscriberFace has an initial request (first sent Interest)
-   */
-  bool
-  hasInitialRequest() const
-  {
-    if (subscriberFace.sentInterests.empty())
-      return false;
+                void
+                disconnectHandlers() {
+                    notificationConn.disconnect();
+                    nackConn.disconnect();
+                }
 
-    const Interest& interest = subscriberFace.sentInterests[0];
-    return interest.getName() == streamPrefix &&
-           interest.getChildSelector() == 1 &&
-           interest.getMustBeFresh() &&
-           interest.getInterestLifetime() == subscriber.getInterestLifetime();
-  }
+                /** \return true if subscriberFace has an initial request (first sent Interest)
+                 */
+                bool
+                hasInitialRequest() const {
+                    if (subscriberFace.sentInterests.empty())
+                        return false;
 
-  /** \return sequence number of the continuation request sent from subscriberFace
-   *          or 0 if there's no such request as sole sent Interest
-   */
-  uint64_t
-  getRequestSeqNo() const
-  {
-    if (subscriberFace.sentInterests.size() != 1)
-      return 0;
+                    const Interest& interest = subscriberFace.sentInterests[0];
+                    return interest.getName() == streamPrefix &&
+                            interest.getChildSelector() == 1 &&
+                            interest.getMustBeFresh() &&
+                            interest.getInterestLifetime() == subscriber.getInterestLifetime();
+                }
 
-    const Interest& interest = subscriberFace.sentInterests[0];
-    const Name& name = interest.getName();
-    if (streamPrefix.isPrefixOf(name) &&
-        name.size() == streamPrefix.size() + 1 &&
-        interest.getInterestLifetime() == subscriber.getInterestLifetime())
-      return name[-1].toSequenceNumber();
-    else
-      return 0;
-  }
+                /** \return sequence number of the continuation request sent from subscriberFace
+                 *          or 0 if there's no such request as sole sent Interest
+                 */
+                uint64_t
+                getRequestSeqNo() const {
+                    if (subscriberFace.sentInterests.size() != 1)
+                        return 0;
 
-protected:
-  Name streamPrefix;
-  DummyClientFace subscriberFace;
-  util::NotificationSubscriber<SimpleNotification> subscriber;
-  util::signal::Connection notificationConn;
-  util::signal::Connection nackConn;
-  uint64_t nextSendNotificationNo;
-  uint64_t lastDeliveredSeqNo;
-  SimpleNotification lastNotification;
-  lp::Nack lastNack;
-  bool hasTimeout;
-  Data lastDecodeErrorData;
-};
+                    const Interest& interest = subscriberFace.sentInterests[0];
+                    const Name& name = interest.getName();
+                    if (streamPrefix.isPrefixOf(name) &&
+                            name.size() == streamPrefix.size() + 1 &&
+                            interest.getInterestLifetime() == subscriber.getInterestLifetime())
+                        return name[-1].toSequenceNumber();
+                    else
+                        return 0;
+                }
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_FIXTURE_TEST_SUITE(TestNotificationSubscriber, NotificationSubscriberFixture)
+            protected:
+                Name streamPrefix;
+                DummyClientFace subscriberFace;
+                util::NotificationSubscriber<SimpleNotification> subscriber;
+                util::signal::Connection notificationConn;
+                util::signal::Connection nackConn;
+                uint64_t nextSendNotificationNo;
+                uint64_t lastDeliveredSeqNo;
+                SimpleNotification lastNotification;
+                lp::Nack lastNack;
+                bool hasTimeout;
+                Data lastDecodeErrorData;
+            };
 
-BOOST_AUTO_TEST_CASE(StartStop)
-{
-  BOOST_REQUIRE_EQUAL(subscriber.isRunning(), false);
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_FIXTURE_TEST_SUITE(TestNotificationSubscriber, NotificationSubscriberFixture)
 
-  // has no effect because onNotification has no handler
-  subscriber.start();
-  BOOST_REQUIRE_EQUAL(subscriber.isRunning(), false);
+            BOOST_AUTO_TEST_CASE(StartStop) {
+                BOOST_REQUIRE_EQUAL(subscriber.isRunning(), false);
 
-  this->connectHandlers();
-  subscriber.start();
-  BOOST_REQUIRE_EQUAL(subscriber.isRunning(), true);
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK(this->hasInitialRequest());
+                // has no effect because onNotification has no handler
+                subscriber.start();
+                BOOST_REQUIRE_EQUAL(subscriber.isRunning(), false);
 
-  subscriberFace.sentInterests.clear();
-  this->disconnectHandlers();
-  this->deliverNotification("n1");
-  BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 0);
-}
+                this->connectHandlers();
+                subscriber.start();
+                BOOST_REQUIRE_EQUAL(subscriber.isRunning(), true);
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK(this->hasInitialRequest());
 
-BOOST_AUTO_TEST_CASE(Notifications)
-{
-  this->connectHandlers();
-  subscriber.start();
-  advanceClocks(time::milliseconds(1));
+                subscriberFace.sentInterests.clear();
+                this->disconnectHandlers();
+                this->deliverNotification("n1");
+                BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 0);
+            }
 
-  // respond to initial request
-  subscriberFace.sentInterests.clear();
-  this->deliverNotification("n1");
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n1");
-  BOOST_CHECK_EQUAL(this->getRequestSeqNo(), lastDeliveredSeqNo + 1);
+            BOOST_AUTO_TEST_CASE(Notifications) {
+                this->connectHandlers();
+                subscriber.start();
+                advanceClocks(time::milliseconds(1));
 
-  // respond to continuation request
-  subscriberFace.sentInterests.clear();
-  this->deliverNotification("n2");
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n2");
-  BOOST_CHECK_EQUAL(this->getRequestSeqNo(), lastDeliveredSeqNo + 1);
-}
+                // respond to initial request
+                subscriberFace.sentInterests.clear();
+                this->deliverNotification("n1");
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n1");
+                BOOST_CHECK_EQUAL(this->getRequestSeqNo(), lastDeliveredSeqNo + 1);
 
-BOOST_AUTO_TEST_CASE(Nack)
-{
-  this->connectHandlers();
-  subscriber.start();
-  advanceClocks(time::milliseconds(1));
+                // respond to continuation request
+                subscriberFace.sentInterests.clear();
+                this->deliverNotification("n2");
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n2");
+                BOOST_CHECK_EQUAL(this->getRequestSeqNo(), lastDeliveredSeqNo + 1);
+            }
 
-  // send the first Nack to initial request
-  BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
-  Interest interest = subscriberFace.sentInterests[0];
-  subscriberFace.sentInterests.clear();
-  this->deliverNack(interest, lp::NackReason::CONGESTION);
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(lastNack.getReason(), lp::NackReason::CONGESTION);
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
-  advanceClocks(time::milliseconds(300));
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
+            BOOST_AUTO_TEST_CASE(Nack) {
+                this->connectHandlers();
+                subscriber.start();
+                advanceClocks(time::milliseconds(1));
 
-  // send the second Nack to initial request
-  BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
-  interest = subscriberFace.sentInterests[0];
-  subscriberFace.sentInterests.clear();
-  this->deliverNack(interest, lp::NackReason::CONGESTION);
-  advanceClocks(time::milliseconds(301));
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
-  advanceClocks(time::milliseconds(200));
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
+                // send the first Nack to initial request
+                BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
+                Interest interest = subscriberFace.sentInterests[0];
+                subscriberFace.sentInterests.clear();
+                this->deliverNack(interest, lp::NackReason::CONGESTION);
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(lastNack.getReason(), lp::NackReason::CONGESTION);
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
+                advanceClocks(time::milliseconds(300));
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
 
-  // send a notification to initial request
-  subscriberFace.sentInterests.clear();
-  this->deliverNotification("n1");
-  advanceClocks(time::milliseconds(1));
+                // send the second Nack to initial request
+                BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
+                interest = subscriberFace.sentInterests[0];
+                subscriberFace.sentInterests.clear();
+                this->deliverNack(interest, lp::NackReason::CONGESTION);
+                advanceClocks(time::milliseconds(301));
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
+                advanceClocks(time::milliseconds(200));
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
 
-  // send a Nack to subsequent request
-  BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
-  interest = subscriberFace.sentInterests[0];
-  subscriberFace.sentInterests.clear();
-  this->deliverNack(interest, lp::NackReason::CONGESTION);
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(lastNack.getReason(), lp::NackReason::CONGESTION);
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
-  advanceClocks(time::milliseconds(300));
-  BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
-}
+                // send a notification to initial request
+                subscriberFace.sentInterests.clear();
+                this->deliverNotification("n1");
+                advanceClocks(time::milliseconds(1));
 
-BOOST_AUTO_TEST_CASE(Timeout)
-{
-  this->connectHandlers();
-  subscriber.start();
-  advanceClocks(time::milliseconds(1));
+                // send a Nack to subsequent request
+                BOOST_REQUIRE_EQUAL(subscriberFace.sentInterests.size(), 1);
+                interest = subscriberFace.sentInterests[0];
+                subscriberFace.sentInterests.clear();
+                this->deliverNack(interest, lp::NackReason::CONGESTION);
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(lastNack.getReason(), lp::NackReason::CONGESTION);
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), false);
+                advanceClocks(time::milliseconds(300));
+                BOOST_REQUIRE_EQUAL(this->hasInitialRequest(), true);
+            }
 
-  subscriberFace.sentInterests.clear();
-  lastNotification.setMessage("");
-  advanceClocks(subscriber.getInterestLifetime(), 2);
-  BOOST_CHECK(lastNotification.getMessage().empty());
-  BOOST_CHECK_EQUAL(hasTimeout, true);
-  BOOST_CHECK(this->hasInitialRequest());
+            BOOST_AUTO_TEST_CASE(Timeout) {
+                this->connectHandlers();
+                subscriber.start();
+                advanceClocks(time::milliseconds(1));
 
-  subscriberFace.sentInterests.clear();
-  this->deliverNotification("n1");
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n1");
-}
+                subscriberFace.sentInterests.clear();
+                lastNotification.setMessage("");
+                advanceClocks(subscriber.getInterestLifetime(), 2);
+                BOOST_CHECK(lastNotification.getMessage().empty());
+                BOOST_CHECK_EQUAL(hasTimeout, true);
+                BOOST_CHECK(this->hasInitialRequest());
 
-BOOST_AUTO_TEST_CASE(SequenceError)
-{
-  this->connectHandlers();
-  subscriber.start();
-  advanceClocks(time::milliseconds(1));
+                subscriberFace.sentInterests.clear();
+                this->deliverNotification("n1");
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(lastNotification.getMessage(), "n1");
+            }
 
-  Name wrongName = streamPrefix;
-  wrongName.append("%07%07");
-  Data wrongData(wrongName);
-  m_keyChain.sign(wrongData);
-  subscriberFace.receive(wrongData);
-  subscriberFace.sentInterests.clear();
-  lastNotification.setMessage("");
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK(lastNotification.getMessage().empty());
-  BOOST_CHECK_EQUAL(lastDecodeErrorData.getName(), wrongName);
-  BOOST_CHECK(this->hasInitialRequest());
-}
+            BOOST_AUTO_TEST_CASE(SequenceError) {
+                this->connectHandlers();
+                subscriber.start();
+                advanceClocks(time::milliseconds(1));
 
-BOOST_AUTO_TEST_CASE(PayloadError)
-{
-  this->connectHandlers();
-  subscriber.start();
-  advanceClocks(time::milliseconds(1));
+                Name wrongName = streamPrefix;
+                wrongName.append("%07%07");
+                Data wrongData(wrongName);
+                m_keyChain.sign(wrongData);
+                subscriberFace.receive(wrongData);
+                subscriberFace.sentInterests.clear();
+                lastNotification.setMessage("");
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK(lastNotification.getMessage().empty());
+                BOOST_CHECK_EQUAL(lastDecodeErrorData.getName(), wrongName);
+                BOOST_CHECK(this->hasInitialRequest());
+            }
 
-  subscriberFace.sentInterests.clear();
-  lastNotification.setMessage("");
-  this->deliverNotification("\x07n4");
-  advanceClocks(time::milliseconds(1));
-  BOOST_CHECK(lastNotification.getMessage().empty());
-  BOOST_CHECK(this->hasInitialRequest());
-}
+            BOOST_AUTO_TEST_CASE(PayloadError) {
+                this->connectHandlers();
+                subscriber.start();
+                advanceClocks(time::milliseconds(1));
 
-BOOST_AUTO_TEST_SUITE_END() // TestNotificationSubscriber
-BOOST_AUTO_TEST_SUITE_END() // Util
+                subscriberFace.sentInterests.clear();
+                lastNotification.setMessage("");
+                this->deliverNotification("\x07n4");
+                advanceClocks(time::milliseconds(1));
+                BOOST_CHECK(lastNotification.getMessage().empty());
+                BOOST_CHECK(this->hasInitialRequest());
+            }
 
-} // namespace tests
-} // namespace util
+            BOOST_AUTO_TEST_SUITE_END() // TestNotificationSubscriber
+            BOOST_AUTO_TEST_SUITE_END() // Util
+
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

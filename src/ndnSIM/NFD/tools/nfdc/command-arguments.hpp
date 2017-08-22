@@ -30,27 +30,26 @@
 #include <boost/any.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-/** \brief contains named command arguments
- */
-class CommandArguments : public std::map<std::string, boost::any>
-{
-public:
-  /** \return the argument value, or a default value if the argument is omitted on command line
-   */
-  template<typename T>
-  T
-  get(const std::string& key, const T& defaultValue = T()) const
-  {
-    auto i = find(key);
-    return i == end() ? defaultValue : boost::any_cast<T>(i->second);
-  }
-};
+            /** \brief contains named command arguments
+             */
+            class CommandArguments : public std::map<std::string, boost::any> {
+            public:
 
-} // namespace nfdc
-} // namespace tools
+                /** \return the argument value, or a default value if the argument is omitted on command line
+                 */
+                template<typename T>
+                T
+                get(const std::string& key, const T& defaultValue = T()) const {
+                    auto i = find(key);
+                    return i == end() ? defaultValue : boost::any_cast<T>(i->second);
+                }
+            };
+
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_COMMAND_ARGUMENTS_HPP

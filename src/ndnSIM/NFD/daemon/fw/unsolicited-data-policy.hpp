@@ -29,96 +29,93 @@
 #include "face/face.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief a decision made by UnsolicitedDataPolicy
- */
-enum class UnsolicitedDataDecision {
-  DROP, ///< the Data should be dropped
-  CACHE ///< the Data should be cached in the ContentStore
-};
+        /** \brief a decision made by UnsolicitedDataPolicy
+         */
+        enum class UnsolicitedDataDecision {
+            DROP, ///< the Data should be dropped
+            CACHE ///< the Data should be cached in the ContentStore
+        };
 
-std::ostream&
-operator<<(std::ostream& os, UnsolicitedDataDecision d);
+        std::ostream&
+        operator<<(std::ostream& os, UnsolicitedDataDecision d);
 
-/** \brief determines how to process an unsolicited Data
- *
- *  An incoming Data is unsolicited if it does not match any PIT entry.
- *  This class assists forwarding pipelines to decide whether to drop an unsolicited Data
- *  or admit it into the ContentStore.
- */
-class UnsolicitedDataPolicy : noncopyable
-{
-public:
-  virtual ~UnsolicitedDataPolicy() = default;
+        /** \brief determines how to process an unsolicited Data
+         *
+         *  An incoming Data is unsolicited if it does not match any PIT entry.
+         *  This class assists forwarding pipelines to decide whether to drop an unsolicited Data
+         *  or admit it into the ContentStore.
+         */
+        class UnsolicitedDataPolicy : noncopyable {
+        public:
+            virtual ~UnsolicitedDataPolicy() = default;
 
-  virtual UnsolicitedDataDecision
-  decide(const Face& inFace, const Data& data) const = 0;
+            virtual UnsolicitedDataDecision
+            decide(const Face& inFace, const Data& data) const = 0;
 
-public: // registry
-  template<typename P>
-  static void
-  registerPolicy(const std::string& key)
-  {
-    Registry& registry = getRegistry();
-    BOOST_ASSERT(registry.count(key) == 0);
-    registry[key] = [] { return make_unique<P>(); };
-  }
+        public: // registry
 
-  /** \return an UnsolicitedDataPolicy identified by \p key, or nullptr if \p key is unknown
-   */
-  static unique_ptr<UnsolicitedDataPolicy>
-  create(const std::string& key);
+            template<typename P>
+            static void
+            registerPolicy(const std::string& key) {
+                Registry& registry = getRegistry();
+                BOOST_ASSERT(registry.count(key) == 0);
+                registry[key] = [] {
+                    return make_unique<P>();
+                };
+            }
 
-private:
-  typedef std::function<unique_ptr<UnsolicitedDataPolicy>()> CreateFunc;
-  typedef std::map<std::string, CreateFunc> Registry; // indexed by key
+            /** \return an UnsolicitedDataPolicy identified by \p key, or nullptr if \p key is unknown
+             */
+            static unique_ptr<UnsolicitedDataPolicy>
+            create(const std::string& key);
 
-  static Registry&
-  getRegistry();
-};
+        private:
+            typedef std::function<unique_ptr<UnsolicitedDataPolicy>() > CreateFunc;
+            typedef std::map<std::string, CreateFunc> Registry; // indexed by key
 
-/** \brief drops all unsolicited Data
- */
-class DropAllUnsolicitedDataPolicy : public UnsolicitedDataPolicy
-{
-public:
-  virtual UnsolicitedDataDecision
-  decide(const Face& inFace, const Data& data) const final;
-};
+            static Registry&
+            getRegistry();
+        };
 
-/** \brief admits unsolicited Data from local faces
- */
-class AdmitLocalUnsolicitedDataPolicy : public UnsolicitedDataPolicy
-{
-public:
-  virtual UnsolicitedDataDecision
-  decide(const Face& inFace, const Data& data) const final;
-};
+        /** \brief drops all unsolicited Data
+         */
+        class DropAllUnsolicitedDataPolicy : public UnsolicitedDataPolicy {
+        public:
+            virtual UnsolicitedDataDecision
+            decide(const Face& inFace, const Data& data) const final;
+        };
 
-/** \brief admits unsolicited Data from non-local faces
- */
-class AdmitNetworkUnsolicitedDataPolicy : public UnsolicitedDataPolicy
-{
-public:
-  virtual UnsolicitedDataDecision
-  decide(const Face& inFace, const Data& data) const final;
-};
+        /** \brief admits unsolicited Data from local faces
+         */
+        class AdmitLocalUnsolicitedDataPolicy : public UnsolicitedDataPolicy {
+        public:
+            virtual UnsolicitedDataDecision
+            decide(const Face& inFace, const Data& data) const final;
+        };
 
-/** \brief admits all unsolicited Data
- */
-class AdmitAllUnsolicitedDataPolicy : public UnsolicitedDataPolicy
-{
-public:
-  virtual UnsolicitedDataDecision
-  decide(const Face& inFace, const Data& data) const final;
-};
+        /** \brief admits unsolicited Data from non-local faces
+         */
+        class AdmitNetworkUnsolicitedDataPolicy : public UnsolicitedDataPolicy {
+        public:
+            virtual UnsolicitedDataDecision
+            decide(const Face& inFace, const Data& data) const final;
+        };
 
-/** \brief the default UnsolicitedDataPolicy
- */
-typedef DropAllUnsolicitedDataPolicy DefaultUnsolicitedDataPolicy;
+        /** \brief admits all unsolicited Data
+         */
+        class AdmitAllUnsolicitedDataPolicy : public UnsolicitedDataPolicy {
+        public:
+            virtual UnsolicitedDataDecision
+            decide(const Face& inFace, const Data& data) const final;
+        };
 
-} // namespace fw
+        /** \brief the default UnsolicitedDataPolicy
+         */
+        typedef DropAllUnsolicitedDataPolicy DefaultUnsolicitedDataPolicy;
+
+    } // namespace fw
 } // namespace nfd
 
 /** \brief registers an unsolicited data policy

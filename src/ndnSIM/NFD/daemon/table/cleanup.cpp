@@ -27,35 +27,35 @@
 
 namespace nfd {
 
-void
-cleanupOnFaceRemoval(NameTree& nt, Fib& fib, Pit& pit, const Face& face)
-{
-  std::multimap<size_t, const name_tree::Entry*> maybeEmptyNtes;
+    void
+    cleanupOnFaceRemoval(NameTree& nt, Fib& fib, Pit& pit, const Face& face) {
+        std::multimap<size_t, const name_tree::Entry*> maybeEmptyNtes;
 
-  // visit FIB and PIT entries in one pass of NameTree enumeration
-  for (const name_tree::Entry& nte : nt) {
-    fib::Entry* fibEntry = nte.getFibEntry();
-    if (fibEntry != nullptr) {
-      fib.removeNextHop(*fibEntry, face);
+        // visit FIB and PIT entries in one pass of NameTree enumeration
+        for (const name_tree::Entry& nte : nt) {
+            fib::Entry* fibEntry = nte.getFibEntry();
+            if (fibEntry != nullptr) {
+                fib.removeNextHop(*fibEntry, face);
+            }
+
+            for (const auto& pitEntry : nte.getPitEntries()) {
+                pit.deleteInOutRecords(pitEntry.get(), face);
+            }
+
+            if (!nte.hasTableEntries()) {
+                maybeEmptyNtes.emplace(nte.getName().size(), &nte);
+            }
+        }
+
+        // try to erase longer names first, so that children are erased before parent is checked
+        for (auto i = maybeEmptyNtes.rbegin(); i != maybeEmptyNtes.rend(); ++i) {
+            nt.eraseIfEmpty(const_cast<name_tree::Entry*> (i->second), false);
+        }
+
+        BOOST_ASSERT(nt.size() == 0 ||
+                std::none_of(nt.begin(), nt.end(),
+                [] (const name_tree::Entry & nte) {
+                    return nte.isEmpty(); }));
     }
-
-    for (const auto& pitEntry : nte.getPitEntries()) {
-      pit.deleteInOutRecords(pitEntry.get(), face);
-    }
-
-    if (!nte.hasTableEntries()) {
-      maybeEmptyNtes.emplace(nte.getName().size(), &nte);
-    }
-  }
-
-  // try to erase longer names first, so that children are erased before parent is checked
-  for (auto i = maybeEmptyNtes.rbegin(); i != maybeEmptyNtes.rend(); ++i) {
-    nt.eraseIfEmpty(const_cast<name_tree::Entry*>(i->second), false);
-  }
-
-  BOOST_ASSERT(nt.size() == 0 ||
-               std::none_of(nt.begin(), nt.end(),
-                            [] (const name_tree::Entry& nte) { return nte.isEmpty(); }));
-}
 
 } // namespace nfd

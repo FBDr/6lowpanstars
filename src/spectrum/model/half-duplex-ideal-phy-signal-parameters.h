@@ -26,36 +26,34 @@
 
 namespace ns3 {
 
-class Packet;
+    class Packet;
 
-/**
- * \ingroup spectrum
- *
- * Signal parameters for HalfDuplexIdealPhy
- */
-struct HalfDuplexIdealPhySignalParameters : public SpectrumSignalParameters
-{
+    /**
+     * \ingroup spectrum
+     *
+     * Signal parameters for HalfDuplexIdealPhy
+     */
+    struct HalfDuplexIdealPhySignalParameters : public SpectrumSignalParameters {
+        // inherited from SpectrumSignalParameters
+        virtual Ptr<SpectrumSignalParameters> Copy();
 
-  // inherited from SpectrumSignalParameters
-  virtual Ptr<SpectrumSignalParameters> Copy ();
+        /**
+         * default constructor
+         */
+        HalfDuplexIdealPhySignalParameters();
 
-  /**
-   * default constructor
-   */
-  HalfDuplexIdealPhySignalParameters ();
+        /**
+         * copy constructor
+         */
+        HalfDuplexIdealPhySignalParameters(const HalfDuplexIdealPhySignalParameters& p);
 
-  /**
-   * copy constructor
-   */
-  HalfDuplexIdealPhySignalParameters (const HalfDuplexIdealPhySignalParameters& p);
+        /**
+         * The data packet being transmitted with this signal
+         */
+        Ptr<Packet> data;
+    };
 
-  /**
-   * The data packet being transmitted with this signal
-   */
-  Ptr<Packet> data;
-};
-
-}  // namespace ns3
+} // namespace ns3
 
 
 #endif /* HALF_DUPLEX_IDEAL_PHY_SPECTRUM_PARAMETERS_H */

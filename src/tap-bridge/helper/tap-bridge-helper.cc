@@ -23,73 +23,65 @@
 #include "ns3/names.h"
 #include "tap-bridge-helper.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("TapBridgeHelper");
-
-TapBridgeHelper::TapBridgeHelper ()
+namespace ns3
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  m_deviceFactory.SetTypeId ("ns3::TapBridge");
-}
 
-TapBridgeHelper::TapBridgeHelper (Ipv4Address gateway)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_deviceFactory.SetTypeId ("ns3::TapBridge");
-  SetAttribute ("Gateway", Ipv4AddressValue (gateway));
-  SetAttribute ("Mode", EnumValue (TapBridge::CONFIGURE_LOCAL));
-}
+    NS_LOG_COMPONENT_DEFINE("TapBridgeHelper");
 
-void 
-TapBridgeHelper::SetAttribute (std::string n1, const AttributeValue &v1)
-{
-  NS_LOG_FUNCTION (n1 << &v1);
-  m_deviceFactory.Set (n1, v1);
-}
+    TapBridgeHelper::TapBridgeHelper() {
+        NS_LOG_FUNCTION_NOARGS();
+        m_deviceFactory.SetTypeId("ns3::TapBridge");
+    }
 
+    TapBridgeHelper::TapBridgeHelper(Ipv4Address gateway) {
+        NS_LOG_FUNCTION_NOARGS();
+        m_deviceFactory.SetTypeId("ns3::TapBridge");
+        SetAttribute("Gateway", Ipv4AddressValue(gateway));
+        SetAttribute("Mode", EnumValue(TapBridge::CONFIGURE_LOCAL));
+    }
 
-Ptr<NetDevice>
-TapBridgeHelper::Install (Ptr<Node> node, Ptr<NetDevice> nd, const AttributeValue &v1)
-{
-  NS_LOG_FUNCTION (node << nd << &v1);
-  m_deviceFactory.Set ("DeviceName", v1);
-  return Install (node, nd);
-}
+    void
+    TapBridgeHelper::SetAttribute(std::string n1, const AttributeValue & v1) {
+        NS_LOG_FUNCTION(n1 << &v1);
+        m_deviceFactory.Set(n1, v1);
+    }
 
-Ptr<NetDevice>
-TapBridgeHelper::Install (Ptr<Node> node, Ptr<NetDevice> nd)
-{
-  NS_LOG_FUNCTION (node << nd);
-  NS_LOG_LOGIC ("Install TapBridge on node " << node->GetId () << " bridging net device " << nd);
+    Ptr<NetDevice>
+            TapBridgeHelper::Install(Ptr<Node> node, Ptr<NetDevice> nd, const AttributeValue & v1) {
+        NS_LOG_FUNCTION(node << nd << &v1);
+        m_deviceFactory.Set("DeviceName", v1);
+        return Install(node, nd);
+    }
 
-  Ptr<TapBridge> bridge = m_deviceFactory.Create<TapBridge> ();
-  node->AddDevice (bridge);
-  bridge->SetBridgedNetDevice (nd);
+    Ptr<NetDevice>
+            TapBridgeHelper::Install(Ptr<Node> node, Ptr<NetDevice> nd) {
+        NS_LOG_FUNCTION(node << nd);
+        NS_LOG_LOGIC("Install TapBridge on node " << node->GetId() << " bridging net device " << nd);
 
-  return bridge;
-}
+        Ptr<TapBridge> bridge = m_deviceFactory.Create<TapBridge> ();
+        node->AddDevice(bridge);
+        bridge->SetBridgedNetDevice(nd);
 
-Ptr<NetDevice>
-TapBridgeHelper::Install (std::string nodeName, Ptr<NetDevice> nd)
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return Install (node, nd);
-}
+        return bridge;
+    }
 
-Ptr<NetDevice>
-TapBridgeHelper::Install (Ptr<Node> node, std::string ndName)
-{
-  Ptr<NetDevice> nd = Names::Find<NetDevice> (ndName);
-  return Install (node, nd);
-}
+    Ptr<NetDevice>
+            TapBridgeHelper::Install(std::string nodeName, Ptr<NetDevice> nd) {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return Install(node, nd);
+    }
 
-Ptr<NetDevice>
-TapBridgeHelper::Install (std::string nodeName, std::string ndName)
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  Ptr<NetDevice> nd = Names::Find<NetDevice> (ndName);
-  return Install (node, nd);
-}
+    Ptr<NetDevice>
+            TapBridgeHelper::Install(Ptr<Node> node, std::string ndName) {
+        Ptr<NetDevice> nd = Names::Find<NetDevice> (ndName);
+        return Install(node, nd);
+    }
+
+    Ptr<NetDevice>
+            TapBridgeHelper::Install(std::string nodeName, std::string ndName) {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        Ptr<NetDevice> nd = Names::Find<NetDevice> (ndName);
+        return Install(node, nd);
+    }
 
 } // namespace ns3

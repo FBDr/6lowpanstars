@@ -27,53 +27,48 @@
 
 namespace nfd {
 
-RttEstimator::RttEstimator(uint16_t maxMultiplier, Duration minRto, double gain)
-  : m_maxMultiplier(maxMultiplier)
-  , m_minRto(minRto.count())
-  , m_rtt(RttEstimator::getInitialRtt().count())
-  , m_gain(gain)
-  , m_variance(0)
-  , m_multiplier(1)
-  , m_nSamples(0)
-{
-}
+    RttEstimator::RttEstimator(uint16_t maxMultiplier, Duration minRto, double gain)
+    : m_maxMultiplier(maxMultiplier)
+    , m_minRto(minRto.count())
+    , m_rtt(RttEstimator::getInitialRtt().count())
+    , m_gain(gain)
+    , m_variance(0)
+    , m_multiplier(1)
+    , m_nSamples(0) {
+    }
 
-void
-RttEstimator::addMeasurement(Duration measure)
-{
-  double m = static_cast<double>(measure.count());
-  if (m_nSamples > 0) {
-    double err = m - m_rtt;
-    double gErr = err * m_gain;
-    m_rtt += gErr;
-    double difference = std::abs(err) - m_variance;
-    m_variance += difference * m_gain;
-  } else {
-    m_rtt = m;
-    m_variance = m;
-  }
-  ++m_nSamples;
-  m_multiplier = 1;
-}
+    void
+    RttEstimator::addMeasurement(Duration measure) {
+        double m = static_cast<double> (measure.count());
+        if (m_nSamples > 0) {
+            double err = m - m_rtt;
+            double gErr = err * m_gain;
+            m_rtt += gErr;
+            double difference = std::abs(err) - m_variance;
+            m_variance += difference * m_gain;
+        } else {
+            m_rtt = m;
+            m_variance = m;
+        }
+        ++m_nSamples;
+        m_multiplier = 1;
+    }
 
-void
-RttEstimator::incrementMultiplier()
-{
-  m_multiplier = std::min(static_cast<uint16_t>(m_multiplier + 1), m_maxMultiplier);
-}
+    void
+    RttEstimator::incrementMultiplier() {
+        m_multiplier = std::min(static_cast<uint16_t> (m_multiplier + 1), m_maxMultiplier);
+    }
 
-void
-RttEstimator::doubleMultiplier()
-{
-  m_multiplier = std::min(static_cast<uint16_t>(m_multiplier * 2), m_maxMultiplier);
-}
+    void
+    RttEstimator::doubleMultiplier() {
+        m_multiplier = std::min(static_cast<uint16_t> (m_multiplier * 2), m_maxMultiplier);
+    }
 
-RttEstimator::Duration
-RttEstimator::computeRto() const
-{
-  double rto = std::max(m_minRto, m_rtt + 4 * m_variance);
-  rto *= m_multiplier;
-  return Duration(static_cast<Duration::rep>(rto));
-}
+    RttEstimator::Duration
+    RttEstimator::computeRto() const {
+        double rto = std::max(m_minRto, m_rtt + 4 * m_variance);
+        rto *= m_multiplier;
+        return Duration(static_cast<Duration::rep> (rto));
+    }
 
 } // namespace nfd

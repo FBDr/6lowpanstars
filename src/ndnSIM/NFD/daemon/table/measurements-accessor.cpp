@@ -26,36 +26,33 @@
 #include "measurements-accessor.hpp"
 
 namespace nfd {
-namespace measurements {
+    namespace measurements {
 
-using fw::Strategy;
+        using fw::Strategy;
 
-MeasurementsAccessor::MeasurementsAccessor(Measurements& measurements,
-                                           const StrategyChoice& strategyChoice,
-                                           const Strategy& strategy)
-  : m_measurements(measurements)
-  , m_strategyChoice(strategyChoice)
-  , m_strategy(&strategy)
-{
-}
+        MeasurementsAccessor::MeasurementsAccessor(Measurements& measurements,
+                const StrategyChoice& strategyChoice,
+                const Strategy& strategy)
+        : m_measurements(measurements)
+        , m_strategyChoice(strategyChoice)
+        , m_strategy(&strategy) {
+        }
 
-MeasurementsAccessor::~MeasurementsAccessor()
-{
-}
+        MeasurementsAccessor::~MeasurementsAccessor() {
+        }
 
-Entry*
-MeasurementsAccessor::filter(Entry* entry) const
-{
-  if (entry == nullptr) {
-    return entry;
-  }
+        Entry*
+        MeasurementsAccessor::filter(Entry* entry) const {
+            if (entry == nullptr) {
+                return entry;
+            }
 
-  Strategy& effectiveStrategy = m_strategyChoice.findEffectiveStrategy(*entry);
-  if (&effectiveStrategy == m_strategy) {
-    return entry;
-  }
-  return nullptr;
-}
+            Strategy& effectiveStrategy = m_strategyChoice.findEffectiveStrategy(*entry);
+            if (&effectiveStrategy == m_strategy) {
+                return entry;
+            }
+            return nullptr;
+        }
 
-} // namespace measurements
+    } // namespace measurements
 } // namespace nfd

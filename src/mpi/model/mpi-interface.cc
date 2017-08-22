@@ -28,102 +28,87 @@
 #include "null-message-mpi-interface.h"
 #include "granted-time-window-mpi-interface.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("MpiInterface");
-
-ParallelCommunicationInterface* MpiInterface::g_parallelCommunicationInterface = 0;
-
-void
-MpiInterface::Destroy ()
+namespace ns3
 {
-  NS_ASSERT (g_parallelCommunicationInterface);
-  g_parallelCommunicationInterface->Destroy ();
-}
 
-uint32_t
-MpiInterface::GetSystemId ()
-{
-  if ( g_parallelCommunicationInterface )
-    return g_parallelCommunicationInterface->GetSystemId ();
-  else
-    return 0;
-}
+    NS_LOG_COMPONENT_DEFINE("MpiInterface");
 
-uint32_t
-MpiInterface::GetSize ()
-{
-  if ( g_parallelCommunicationInterface )
-    return g_parallelCommunicationInterface->GetSize ();
-  else
-    return 1;
-}
+    ParallelCommunicationInterface * MpiInterface::g_parallelCommunicationInterface = 0;
 
-bool
-MpiInterface::IsEnabled ()
-{
-  if (g_parallelCommunicationInterface)
-    {
-      return g_parallelCommunicationInterface->IsEnabled ();
+    void
+    MpiInterface::Destroy() {
+        NS_ASSERT(g_parallelCommunicationInterface);
+        g_parallelCommunicationInterface->Destroy();
     }
-  else
-    {
-      return false;
+
+    uint32_t
+    MpiInterface::GetSystemId() {
+        if (g_parallelCommunicationInterface)
+            return g_parallelCommunicationInterface->GetSystemId();
+        else
+            return 0;
     }
-}
 
-void
-MpiInterface::Enable (int* pargc, char*** pargv)
-{
-  StringValue simulationTypeValue;
-  bool useDefault = true;
+    uint32_t
+    MpiInterface::GetSize() {
+        if (g_parallelCommunicationInterface)
+            return g_parallelCommunicationInterface->GetSize();
+        else
+            return 1;
+    }
 
-  if (GlobalValue::GetValueByNameFailSafe ("SimulatorImplementationType", simulationTypeValue))
-    {
-      std::string simulationType = simulationTypeValue.Get ();
-
-      // Set communication interface based on the simulation type being used.
-      // Defaults to synchronous.
-      if (simulationType.compare ("ns3::NullMessageSimulatorImpl") == 0)
-        {
-          g_parallelCommunicationInterface = new NullMessageMpiInterface ();
-          useDefault = false;
-        }
-      else if (simulationType.compare ("ns3::DistributedSimulatorImpl") == 0)
-        {
-          g_parallelCommunicationInterface = new GrantedTimeWindowMpiInterface ();
-          useDefault = false;
+    bool
+    MpiInterface::IsEnabled() {
+        if (g_parallelCommunicationInterface) {
+            return g_parallelCommunicationInterface->IsEnabled();
+        } else {
+            return false;
         }
     }
 
-  // User did not specify a valid parallel simulator; use the default.
-  if (useDefault)
-    {
-      g_parallelCommunicationInterface = new GrantedTimeWindowMpiInterface ();
-      GlobalValue::Bind ("SimulatorImplementationType",
-                         StringValue ("ns3::DistributedSimulatorImpl"));
-      NS_LOG_WARN ("SimulatorImplementationType was set to non-parallel simulator; setting type to ns3::DistributedSimulatorImp");
+    void
+    MpiInterface::Enable(int* pargc, char*** pargv) {
+        StringValue simulationTypeValue;
+        bool useDefault = true;
+
+        if (GlobalValue::GetValueByNameFailSafe("SimulatorImplementationType", simulationTypeValue)) {
+            std::string simulationType = simulationTypeValue.Get();
+
+            // Set communication interface based on the simulation type being used.
+            // Defaults to synchronous.
+            if (simulationType.compare("ns3::NullMessageSimulatorImpl") == 0) {
+                g_parallelCommunicationInterface = new NullMessageMpiInterface();
+                useDefault = false;
+            } else if (simulationType.compare("ns3::DistributedSimulatorImpl") == 0) {
+                g_parallelCommunicationInterface = new GrantedTimeWindowMpiInterface();
+                useDefault = false;
+            }
+        }
+
+        // User did not specify a valid parallel simulator; use the default.
+        if (useDefault) {
+            g_parallelCommunicationInterface = new GrantedTimeWindowMpiInterface();
+            GlobalValue::Bind("SimulatorImplementationType",
+                    StringValue("ns3::DistributedSimulatorImpl"));
+            NS_LOG_WARN("SimulatorImplementationType was set to non-parallel simulator; setting type to ns3::DistributedSimulatorImp");
+        }
+
+        g_parallelCommunicationInterface->Enable(pargc, pargv);
     }
 
-  g_parallelCommunicationInterface->Enable (pargc, pargv);
-}
+    void
+    MpiInterface::SendPacket(Ptr<Packet> p, const Time& rxTime, uint32_t node, uint32_t dev) {
+        NS_ASSERT(g_parallelCommunicationInterface);
+        g_parallelCommunicationInterface->SendPacket(p, rxTime, node, dev);
+    }
 
-void
-MpiInterface::SendPacket (Ptr<Packet> p, const Time& rxTime, uint32_t node, uint32_t dev)
-{
-  NS_ASSERT (g_parallelCommunicationInterface);
-  g_parallelCommunicationInterface->SendPacket (p, rxTime, node, dev);
-}
-
-
-void
-MpiInterface::Disable ()
-{
-  NS_ASSERT (g_parallelCommunicationInterface);
-  g_parallelCommunicationInterface->Disable ();
-  delete g_parallelCommunicationInterface;
-  g_parallelCommunicationInterface = 0;
-}
+    void
+    MpiInterface::Disable() {
+        NS_ASSERT(g_parallelCommunicationInterface);
+        g_parallelCommunicationInterface->Disable();
+        delete g_parallelCommunicationInterface;
+        g_parallelCommunicationInterface = 0;
+    }
 
 
 } // namespace ns3

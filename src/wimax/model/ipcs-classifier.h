@@ -29,26 +29,25 @@
 #include "ns3/packet.h"
 
 namespace ns3 {
-class SsServiceFlowManager;
+    class SsServiceFlowManager;
 
-/**
- * \ingroup wimax
- */
-class IpcsClassifier : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  IpcsClassifier (void);
-  ~IpcsClassifier (void);
-  /**
-   * \brief classify a packet in a service flow
-   * \param packet the packet to classify
-   * \param sfm the service flow manager to be used to classify packets
-   * \param dir The direction on wich the packet should be sent (UP or DOWN)
-   * \return The service flow that should be used to send this packet
-   */
-  ServiceFlow * Classify (Ptr<const Packet> packet, Ptr<ServiceFlowManager> sfm, ServiceFlow::Direction dir);
-};
+    /**
+     * \ingroup wimax
+     */
+    class IpcsClassifier : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        IpcsClassifier(void);
+        ~IpcsClassifier(void);
+        /**
+         * \brief classify a packet in a service flow
+         * \param packet the packet to classify
+         * \param sfm the service flow manager to be used to classify packets
+         * \param dir The direction on wich the packet should be sent (UP or DOWN)
+         * \return The service flow that should be used to send this packet
+         */
+        ServiceFlow * Classify(Ptr<const Packet> packet, Ptr<ServiceFlowManager> sfm, ServiceFlow::Direction dir);
+    };
 } // namespace ns3
 
 #endif /* IPCS_CLASSIFIER_H */

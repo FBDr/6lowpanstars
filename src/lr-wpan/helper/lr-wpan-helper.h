@@ -29,177 +29,176 @@
 
 namespace ns3 {
 
-class SpectrumChannel;
-class MobilityModel;
+    class SpectrumChannel;
+    class MobilityModel;
 
-/**
- * \ingroup lr-wpan
- *
- * \brief helps to manage and create IEEE 802.15.4 NetDevice objects
- *
- * This class can help to create IEEE 802.15.4 NetDevice objects
- * and to configure their attributes during creation.  It also contains
- * additional helper functions used by client code.
- *
- * Only one channel is created, and all devices attached to it.  If
- * multiple channels are needed, multiple helper objects must be used,
- * or else the channel object must be replaced.
- */
-
-class LrWpanHelper : public PcapHelperForDevice,
-                     public AsciiTraceHelperForDevice
-{
-public:
-  /**
-   * \brief Create a LrWpan helper in an empty state.  By default, a
-   * SingleModelSpectrumChannel is created, with a 
-   * LogDistancePropagationLossModel and a ConstantSpeedPropagationDelayModel.
-   *
-   * To change the channel type, loss model, or delay model, the Get/Set
-   * Channel methods may be used.
-   */
-  LrWpanHelper (void);
-
-  /**
-   * \brief Create a LrWpan helper in an empty state with either a
-   * SingleModelSpectrumChannel or a MultiModelSpectrumChannel.
-   * \param useMultiModelSpectrumChannel use a MultiModelSpectrumChannel if true, a SingleModelSpectrumChannel otherwise
-   *
-   * A LogDistancePropagationLossModel and a 
-   * ConstantSpeedPropagationDelayModel are added to the channel.
-   */
-  LrWpanHelper (bool useMultiModelSpectrumChannel);
-
-  virtual ~LrWpanHelper (void);
-
-  /**
-   * \brief Get the channel associated to this helper
-   * \returns the channel
-   */
-  Ptr<SpectrumChannel> GetChannel (void);
-
-  /**
-   * \brief Set the channel associated to this helper
-   * \param channel the channel
-   */
-  void SetChannel (Ptr<SpectrumChannel> channel);
-
-  /**
-   * \brief Set the channel associated to this helper
-   * \param channelName the channel name
-   */
-  void SetChannel (std::string channelName);
-
-  /**
-   * \brief Add mobility model to a physical device
-   * \param phy the physical device
-   * \param m the mobility model
-   */
-  void AddMobility (Ptr<LrWpanPhy> phy, Ptr<MobilityModel> m);
-
-  /**
-   * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
-   * \param c a set of nodes
-   * \returns A container holding the added net devices.
-   */
-  NetDeviceContainer Install (NodeContainer c, bool useContiki);
     /**
-   * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
-   * \param c a set of nodes
-   * \returns A container holding the added net devices.
-   */
-  NetDeviceContainer Install (NodeContainer c);
-      /**
-   * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
-   * \param c a set of nodes
-   * \returns A container holding the added net devices.
-   */
-  NetDeviceContainer InstallIoT(NodeContainer c, int &node_periph, int &node_head, bool &usecontiki, int &gtw_num);
+     * \ingroup lr-wpan
+     *
+     * \brief helps to manage and create IEEE 802.15.4 NetDevice objects
+     *
+     * This class can help to create IEEE 802.15.4 NetDevice objects
+     * and to configure their attributes during creation.  It also contains
+     * additional helper functions used by client code.
+     *
+     * Only one channel is created, and all devices attached to it.  If
+     * multiple channels are needed, multiple helper objects must be used,
+     * or else the channel object must be replaced.
+     */
 
-  /**
-   * \brief Associate the nodes to the same PAN
-   *
-   * \param c a set of nodes
-   * \param panId the PAN Id
-   */
-  void AssociateToPan (NetDeviceContainer c, uint16_t panId);
+    class LrWpanHelper : public PcapHelperForDevice,
+    public AsciiTraceHelperForDevice {
+    public:
+        /**
+         * \brief Create a LrWpan helper in an empty state.  By default, a
+         * SingleModelSpectrumChannel is created, with a 
+         * LogDistancePropagationLossModel and a ConstantSpeedPropagationDelayModel.
+         *
+         * To change the channel type, loss model, or delay model, the Get/Set
+         * Channel methods may be used.
+         */
+        LrWpanHelper(void);
 
-  /**
-   * Helper to enable all LrWpan log components with one statement
-   */
-  void EnableLogComponents (void);
+        /**
+         * \brief Create a LrWpan helper in an empty state with either a
+         * SingleModelSpectrumChannel or a MultiModelSpectrumChannel.
+         * \param useMultiModelSpectrumChannel use a MultiModelSpectrumChannel if true, a SingleModelSpectrumChannel otherwise
+         *
+         * A LogDistancePropagationLossModel and a 
+         * ConstantSpeedPropagationDelayModel are added to the channel.
+         */
+        LrWpanHelper(bool useMultiModelSpectrumChannel);
 
-  /**
-   * \brief Transform the LrWpanPhyEnumeration enumeration into a printable string.
-   * \param e the LrWpanPhyEnumeration
-   * \return a string
-   */
-  static std::string LrWpanPhyEnumerationPrinter (LrWpanPhyEnumeration e);
+        virtual ~LrWpanHelper(void);
 
-  /**
-   * \brief Transform the LrWpanMacState enumeration into a printable string.
-   * \param e the LrWpanMacState
-   * \return a string
-   */
-  static std::string LrWpanMacStatePrinter (LrWpanMacState e);
+        /**
+         * \brief Get the channel associated to this helper
+         * \returns the channel
+         */
+        Ptr<SpectrumChannel> GetChannel(void);
 
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model. Return the number of streams that have been
-   * assigned. The Install() method should have previously been
-   * called by the user.
-   *
-   * \param c NetDeviceContainer of the set of net devices for which the
-   *          CsmaNetDevice should be modified to use a fixed stream
-   * \param stream first stream index to use
-   * \return the number of stream indices assigned by this helper
-   */
-  int64_t AssignStreams (NetDeviceContainer c, int64_t stream);
+        /**
+         * \brief Set the channel associated to this helper
+         * \param channel the channel
+         */
+        void SetChannel(Ptr<SpectrumChannel> channel);
 
-private:
-  // Disable implicit constructors
-  /**
-   * \brief Copy constructor - defined and not implemented.
-   */
-  LrWpanHelper (LrWpanHelper const &);
-  /**
-   * \brief Copy constructor - defined and not implemented.
-   * \returns
-   */
-  LrWpanHelper& operator= (LrWpanHelper const &);
-  /**
-   * \brief Enable pcap output on the indicated net device.
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param prefix Filename prefix to use for pcap files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param promiscuous If true capture all possible packets available at the device.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
+        /**
+         * \brief Set the channel associated to this helper
+         * \param channelName the channel name
+         */
+        void SetChannel(std::string channelName);
 
-  /**
-   * \brief Enable ascii trace output on the indicated net device.
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param stream The output stream object to use when logging ascii traces.
-   * \param prefix Filename prefix to use for ascii trace files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnableAsciiInternal (Ptr<OutputStreamWrapper> stream,
-                                    std::string prefix,
-                                    Ptr<NetDevice> nd,
-                                    bool explicitFilename);
+        /**
+         * \brief Add mobility model to a physical device
+         * \param phy the physical device
+         * \param m the mobility model
+         */
+        void AddMobility(Ptr<LrWpanPhy> phy, Ptr<MobilityModel> m);
 
-private:
-  Ptr<SpectrumChannel> m_channel; //!< channel to be used for the devices
+        /**
+         * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
+         * \param c a set of nodes
+         * \returns A container holding the added net devices.
+         */
+        NetDeviceContainer Install(NodeContainer c, bool useContiki);
+        /**
+         * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
+         * \param c a set of nodes
+         * \returns A container holding the added net devices.
+         */
+        NetDeviceContainer Install(NodeContainer c);
+        /**
+         * \brief Install a LrWpanNetDevice and the associated structures (e.g., channel) in the nodes.
+         * \param c a set of nodes
+         * \returns A container holding the added net devices.
+         */
+        NetDeviceContainer InstallIoT(NodeContainer c, int &node_periph, int &node_head, bool &usecontiki, int &gtw_num);
 
-};
+        /**
+         * \brief Associate the nodes to the same PAN
+         *
+         * \param c a set of nodes
+         * \param panId the PAN Id
+         */
+        void AssociateToPan(NetDeviceContainer c, uint16_t panId);
+
+        /**
+         * Helper to enable all LrWpan log components with one statement
+         */
+        void EnableLogComponents(void);
+
+        /**
+         * \brief Transform the LrWpanPhyEnumeration enumeration into a printable string.
+         * \param e the LrWpanPhyEnumeration
+         * \return a string
+         */
+        static std::string LrWpanPhyEnumerationPrinter(LrWpanPhyEnumeration e);
+
+        /**
+         * \brief Transform the LrWpanMacState enumeration into a printable string.
+         * \param e the LrWpanMacState
+         * \return a string
+         */
+        static std::string LrWpanMacStatePrinter(LrWpanMacState e);
+
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model. Return the number of streams that have been
+         * assigned. The Install() method should have previously been
+         * called by the user.
+         *
+         * \param c NetDeviceContainer of the set of net devices for which the
+         *          CsmaNetDevice should be modified to use a fixed stream
+         * \param stream first stream index to use
+         * \return the number of stream indices assigned by this helper
+         */
+        int64_t AssignStreams(NetDeviceContainer c, int64_t stream);
+
+    private:
+        // Disable implicit constructors
+        /**
+         * \brief Copy constructor - defined and not implemented.
+         */
+        LrWpanHelper(LrWpanHelper const &);
+        /**
+         * \brief Copy constructor - defined and not implemented.
+         * \returns
+         */
+        LrWpanHelper& operator=(LrWpanHelper const &);
+        /**
+         * \brief Enable pcap output on the indicated net device.
+         *
+         * NetDevice-specific implementation mechanism for hooking the trace and
+         * writing to the trace file.
+         *
+         * \param prefix Filename prefix to use for pcap files.
+         * \param nd Net device for which you want to enable tracing.
+         * \param promiscuous If true capture all possible packets available at the device.
+         * \param explicitFilename Treat the prefix as an explicit filename if true
+         */
+        virtual void EnablePcapInternal(std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
+
+        /**
+         * \brief Enable ascii trace output on the indicated net device.
+         *
+         * NetDevice-specific implementation mechanism for hooking the trace and
+         * writing to the trace file.
+         *
+         * \param stream The output stream object to use when logging ascii traces.
+         * \param prefix Filename prefix to use for ascii trace files.
+         * \param nd Net device for which you want to enable tracing.
+         * \param explicitFilename Treat the prefix as an explicit filename if true
+         */
+        virtual void EnableAsciiInternal(Ptr<OutputStreamWrapper> stream,
+                std::string prefix,
+                Ptr<NetDevice> nd,
+                bool explicitFilename);
+
+    private:
+        Ptr<SpectrumChannel> m_channel; //!< channel to be used for the devices
+
+    };
 
 }
 

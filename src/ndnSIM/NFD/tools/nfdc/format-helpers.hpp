@@ -29,106 +29,100 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-namespace xml {
+            namespace xml {
 
-void
-printHeader(std::ostream& os);
+                void
+                printHeader(std::ostream& os);
 
-void
-printFooter(std::ostream& os);
+                void
+                printFooter(std::ostream& os);
 
-struct Text
-{
-  const std::string& s;
-};
+                struct Text {
+                    const std::string& s;
+                };
 
-/** \brief print XML text with special character represented as predefined entities
- */
-std::ostream&
-operator<<(std::ostream& os, const Text& text);
+                /** \brief print XML text with special character represented as predefined entities
+                 */
+                std::ostream&
+                operator<<(std::ostream& os, const Text& text);
 
-std::string
-formatSeconds(time::seconds d);
+                std::string
+                formatSeconds(time::seconds d);
 
-template<typename DURATION>
-std::string
-formatDuration(DURATION d)
-{
-  return formatSeconds(time::duration_cast<time::seconds>(d));
-}
+                template<typename DURATION>
+                std::string
+                formatDuration(DURATION d) {
+                    return formatSeconds(time::duration_cast<time::seconds>(d));
+                }
 
-std::string
-formatTimestamp(time::system_clock::TimePoint t);
+                std::string
+                formatTimestamp(time::system_clock::TimePoint t);
 
-} // namespace xml
+            } // namespace xml
 
-namespace text {
+            namespace text {
 
-/** \brief print a number of whitespaces
- */
-struct Spaces
-{
-  int nSpaces; ///< number of spaces; print nothing if negative
-};
+                /** \brief print a number of whitespaces
+                 */
+                struct Spaces {
+                    int nSpaces; ///< number of spaces; print nothing if negative
+                };
 
-std::ostream&
-operator<<(std::ostream& os, const Spaces& spaces);
+                std::ostream&
+                operator<<(std::ostream& os, const Spaces& spaces);
 
-/** \brief print different string on first and subsequent usage
- *
- *  \code
- *  Separator sep(",");
- *  for (int i = 1; i <= 3; ++i) {
- *    os << sep << i;
- *  }
- *  // prints: 1,2,3
- *  \endcode
- */
-class Separator
-{
-public:
-  Separator(const std::string& first, const std::string& subsequent);
+                /** \brief print different string on first and subsequent usage
+                 *
+                 *  \code
+                 *  Separator sep(",");
+                 *  for (int i = 1; i <= 3; ++i) {
+                 *    os << sep << i;
+                 *  }
+                 *  // prints: 1,2,3
+                 *  \endcode
+                 */
+                class Separator {
+                public:
+                    Separator(const std::string& first, const std::string& subsequent);
 
-  explicit
-  Separator(const std::string& subsequent);
+                    explicit
+                    Separator(const std::string& subsequent);
 
-  int
-  getCount() const
-  {
-    return m_count;
-  }
+                    int
+                    getCount() const {
+                        return m_count;
+                    }
 
-private:
-  std::string m_first;
-  std::string m_subsequent;
-  int m_count;
+                private:
+                    std::string m_first;
+                    std::string m_subsequent;
+                    int m_count;
 
-  friend std::ostream& operator<<(std::ostream& os, Separator& sep);
-};
+                    friend std::ostream& operator<<(std::ostream& os, Separator& sep);
+                };
 
-std::ostream&
-operator<<(std::ostream& os, Separator& sep);
+                std::ostream&
+                operator<<(std::ostream& os, Separator& sep);
 
-std::string
-formatSeconds(time::seconds d, bool isLong = false);
+                std::string
+                formatSeconds(time::seconds d, bool isLong = false);
 
-template<typename DURATION>
-std::string
-formatDuration(DURATION d, bool isLong = false)
-{
-  return formatSeconds(time::duration_cast<time::seconds>(d), isLong);
-}
+                template<typename DURATION>
+                std::string
+                formatDuration(DURATION d, bool isLong = false) {
+                    return formatSeconds(time::duration_cast<time::seconds>(d), isLong);
+                }
 
-std::string
-formatTimestamp(time::system_clock::TimePoint t);
+                std::string
+                formatTimestamp(time::system_clock::TimePoint t);
 
-} // namespace text
+            } // namespace text
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_FORMAT_HELPERS_HPP

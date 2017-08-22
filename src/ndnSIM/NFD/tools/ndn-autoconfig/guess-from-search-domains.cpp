@@ -26,28 +26,25 @@
 #include "guess-from-search-domains.hpp"
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-GuessFromSearchDomains::GuessFromSearchDomains(Face& face, KeyChain& keyChain,
-                                               const NextStageCallback& nextStageOnFailure)
-  : BaseDns(face, keyChain, nextStageOnFailure)
-{
-}
+            GuessFromSearchDomains::GuessFromSearchDomains(Face& face, KeyChain& keyChain,
+                    const NextStageCallback& nextStageOnFailure)
+            : BaseDns(face, keyChain, nextStageOnFailure) {
+            }
 
-void
-GuessFromSearchDomains::start()
-{
-  try {
-    std::string hubUri = BaseDns::querySrvRrSearch();
-    this->connectToHub(hubUri);
-  }
-  catch (const BaseDns::Error& e) {
-    m_nextStageOnFailure(std::string("Failed to find NDN router using default suffix DNS query (") +
-                         e.what() + ")");
-  }
-}
+            void
+            GuessFromSearchDomains::start() {
+                try {
+                    std::string hubUri = BaseDns::querySrvRrSearch();
+                    this->connectToHub(hubUri);
+                } catch (const BaseDns::Error& e) {
+                    m_nextStageOnFailure(std::string("Failed to find NDN router using default suffix DNS query (") +
+                            e.what() + ")");
+                }
+            }
 
-} // namespace autoconfig
-} // namespace tools
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn

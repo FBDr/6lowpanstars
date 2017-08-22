@@ -36,193 +36,190 @@
 namespace ns3 {
 
 
-class SpectrumChannel;
-class Channel;
-class SpectrumErrorModel;
-class Queue;
+    class SpectrumChannel;
+    class Channel;
+    class SpectrumErrorModel;
+    class Queue;
+
+    /**
+     * \ingroup spectrum
+     *
+     * This devices implements the following features:
+     *  - layer 3 protocol multiplexing
+     *  - MAC addressing
+     *  - Aloha MAC:
+     *    + packets transmitted as soon as possible
+     *    + a new packet is queued if previous one is still being transmitted
+     *    + no acknowledgements, hence no retransmissions
+     *  - can support any PHY layer compatible with the API defined in generic-phy.h
+     *
+     */
+    class AlohaNoackNetDevice : public NetDevice {
+    public:
+
+        enum State {
+            IDLE, TX, RX
+        };
+
+        static TypeId GetTypeId(void);
+
+        AlohaNoackNetDevice();
+        virtual ~AlohaNoackNetDevice();
+
+
+        /**
+         * set the queue which is going to be used by this device
+         *
+         * @param queue
+         */
+        virtual void SetQueue(Ptr<Queue> queue);
+
+
+        /**
+         * Notify the MAC that the PHY has finished a previously started transmission
+         *
+         */
+        void NotifyTransmissionEnd(Ptr<const Packet>);
+
+        /**
+         * Notify the MAC that the PHY has started a reception
+         *
+         */
+        void NotifyReceptionStart();
+
+
+        /**
+         * Notify the MAC that the PHY finished a reception with an error
+         *
+         */
+        void NotifyReceptionEndError();
+
+        /**
+         * Notify the MAC that the PHY finished a reception successfully
+         *
+         * @param p the received packet
+         */
+        void NotifyReceptionEndOk(Ptr<Packet> p);
+
+
+        /**
+         * This class doesn't talk directly with the underlying channel (a
+         * dedicated PHY class is expected to do it), however the NetDevice
+         * specification features a GetChannel() method. This method here
+         * is therefore provide to allow AlohaNoackNetDevice::GetChannel() to have
+         * something meaningful to return.
+         *
+         * @param c the underlying channel
+         */
+        void SetChannel(Ptr<Channel> c);
+
+
+        /**
+         * set the callback used to instruct the lower layer to start a TX
+         *
+         * @param c
+         */
+        void SetGenericPhyTxStartCallback(GenericPhyTxStartCallback c);
 
 
 
-/**
- * \ingroup spectrum
- *
- * This devices implements the following features:
- *  - layer 3 protocol multiplexing
- *  - MAC addressing
- *  - Aloha MAC:
- *    + packets transmitted as soon as possible
- *    + a new packet is queued if previous one is still being transmitted
- *    + no acknowledgements, hence no retransmissions
- *  - can support any PHY layer compatible with the API defined in generic-phy.h
- *
- */
-class AlohaNoackNetDevice : public NetDevice
-{
-public:
-  enum State
-  {
-    IDLE, TX, RX
-  };
+        /**
+         * Set the Phy object which is attached to this device.
+         * This object is needed so that we can set/get attributes and
+         * connect to trace sources of the PHY from the net device.
+         *
+         * @param phy the Phy object attached to the device.  Note that the
+         * API between the PHY and the above (this NetDevice which also
+         * implements the MAC) is implemented entirely by
+         * callbacks, so we do not require that the PHY inherits by any
+         * specific class.
+         */
+        void SetPhy(Ptr<Object> phy);
 
-  static TypeId GetTypeId (void);
-
-  AlohaNoackNetDevice ();
-  virtual ~AlohaNoackNetDevice ();
-
-
-  /**
-   * set the queue which is going to be used by this device
-   *
-   * @param queue
-   */
-  virtual void SetQueue (Ptr<Queue> queue);
-
-
-  /**
-   * Notify the MAC that the PHY has finished a previously started transmission
-   *
-   */
-  void NotifyTransmissionEnd (Ptr<const Packet>);
-
-  /**
-   * Notify the MAC that the PHY has started a reception
-   *
-   */
-  void NotifyReceptionStart ();
-
-
-  /**
-   * Notify the MAC that the PHY finished a reception with an error
-   *
-   */
-  void NotifyReceptionEndError ();
-
-  /**
-   * Notify the MAC that the PHY finished a reception successfully
-   *
-   * @param p the received packet
-   */
-  void NotifyReceptionEndOk (Ptr<Packet> p);
-
-
-  /**
-   * This class doesn't talk directly with the underlying channel (a
-   * dedicated PHY class is expected to do it), however the NetDevice
-   * specification features a GetChannel() method. This method here
-   * is therefore provide to allow AlohaNoackNetDevice::GetChannel() to have
-   * something meaningful to return.
-   *
-   * @param c the underlying channel
-   */
-  void SetChannel (Ptr<Channel> c);
-
-
-  /**
-   * set the callback used to instruct the lower layer to start a TX
-   *
-   * @param c
-   */
-  void SetGenericPhyTxStartCallback (GenericPhyTxStartCallback c);
+        /**
+         * @return a reference to the PHY object embedded in this NetDevice.
+         */
+        Ptr<Object> GetPhy() const;
 
 
 
-  /**
-   * Set the Phy object which is attached to this device.
-   * This object is needed so that we can set/get attributes and
-   * connect to trace sources of the PHY from the net device.
-   *
-   * @param phy the Phy object attached to the device.  Note that the
-   * API between the PHY and the above (this NetDevice which also
-   * implements the MAC) is implemented entirely by
-   * callbacks, so we do not require that the PHY inherits by any
-   * specific class.
-   */
-  void SetPhy (Ptr<Object> phy);
-
-  /**
-   * @return a reference to the PHY object embedded in this NetDevice.
-   */
-  Ptr<Object> GetPhy () const;
-
-
-
-  // inherited from NetDevice
-  virtual void SetIfIndex (const uint32_t index);
-  virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<Channel> GetChannel (void) const;
-  virtual bool SetMtu (const uint16_t mtu);
-  virtual uint16_t GetMtu (void) const;
-  virtual void SetAddress (Address address);
-  virtual Address GetAddress (void) const;
-  virtual bool IsLinkUp (void) const;
-  virtual void AddLinkChangeCallback (Callback<void> callback);
-  virtual bool IsBroadcast (void) const;
-  virtual Address GetBroadcast (void) const;
-  virtual bool IsMulticast (void) const;
-  virtual bool IsPointToPoint (void) const;
-  virtual bool IsBridge (void) const;
-  virtual bool Send (Ptr<Packet> packet, const Address& dest,
-                     uint16_t protocolNumber);
-  virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest,
-                         uint16_t protocolNumber);
-  virtual Ptr<Node> GetNode (void) const;
-  virtual void SetNode (Ptr<Node> node);
-  virtual bool NeedsArp (void) const;
-  virtual void SetReceiveCallback (NetDevice::ReceiveCallback cb);
-  virtual Address GetMulticast (Ipv4Address addr) const;
-  virtual Address GetMulticast (Ipv6Address addr) const;
-  virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
-  virtual bool SupportsSendFrom (void) const;
+        // inherited from NetDevice
+        virtual void SetIfIndex(const uint32_t index);
+        virtual uint32_t GetIfIndex(void) const;
+        virtual Ptr<Channel> GetChannel(void) const;
+        virtual bool SetMtu(const uint16_t mtu);
+        virtual uint16_t GetMtu(void) const;
+        virtual void SetAddress(Address address);
+        virtual Address GetAddress(void) const;
+        virtual bool IsLinkUp(void) const;
+        virtual void AddLinkChangeCallback(Callback<void> callback);
+        virtual bool IsBroadcast(void) const;
+        virtual Address GetBroadcast(void) const;
+        virtual bool IsMulticast(void) const;
+        virtual bool IsPointToPoint(void) const;
+        virtual bool IsBridge(void) const;
+        virtual bool Send(Ptr<Packet> packet, const Address& dest,
+                uint16_t protocolNumber);
+        virtual bool SendFrom(Ptr<Packet> packet, const Address& source, const Address& dest,
+                uint16_t protocolNumber);
+        virtual Ptr<Node> GetNode(void) const;
+        virtual void SetNode(Ptr<Node> node);
+        virtual bool NeedsArp(void) const;
+        virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
+        virtual Address GetMulticast(Ipv4Address addr) const;
+        virtual Address GetMulticast(Ipv6Address addr) const;
+        virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
+        virtual bool SupportsSendFrom(void) const;
 
 
 
 
 
-private:
-  void NotifyGuardIntervalEnd ();
-  virtual void DoDispose (void);
+    private:
+        void NotifyGuardIntervalEnd();
+        virtual void DoDispose(void);
 
-  /**
-   * start the transmission of a packet by contacting the PHY layer
-   *
-   */
-  void StartTransmission ();
-
-
-  Ptr<Queue> m_queue;
-
-  TracedCallback<Ptr<const Packet> > m_macTxTrace;
-  TracedCallback<Ptr<const Packet> > m_macTxDropTrace;
-  TracedCallback<Ptr<const Packet> > m_macPromiscRxTrace;
-  TracedCallback<Ptr<const Packet> > m_macRxTrace;
-
-  Ptr<Node>    m_node;
-  Ptr<Channel> m_channel;
-
-  Mac48Address m_address;
-
-  NetDevice::ReceiveCallback m_rxCallback;
-  NetDevice::PromiscReceiveCallback m_promiscRxCallback;
-
-  GenericPhyTxStartCallback m_phyMacTxStartCallback;
-
-  /**
-   * List of callbacks to fire if the link changes state (up or down).
-   */
-  TracedCallback<> m_linkChangeCallbacks;
+        /**
+         * start the transmission of a packet by contacting the PHY layer
+         *
+         */
+        void StartTransmission();
 
 
-  uint32_t m_ifIndex;
-  mutable uint32_t m_mtu;
-  bool m_linkUp;
+        Ptr<Queue> m_queue;
+
+        TracedCallback<Ptr<const Packet> > m_macTxTrace;
+        TracedCallback<Ptr<const Packet> > m_macTxDropTrace;
+        TracedCallback<Ptr<const Packet> > m_macPromiscRxTrace;
+        TracedCallback<Ptr<const Packet> > m_macRxTrace;
+
+        Ptr<Node> m_node;
+        Ptr<Channel> m_channel;
+
+        Mac48Address m_address;
+
+        NetDevice::ReceiveCallback m_rxCallback;
+        NetDevice::PromiscReceiveCallback m_promiscRxCallback;
+
+        GenericPhyTxStartCallback m_phyMacTxStartCallback;
+
+        /**
+         * List of callbacks to fire if the link changes state (up or down).
+         */
+        TracedCallback<> m_linkChangeCallbacks;
 
 
-  State m_state;
+        uint32_t m_ifIndex;
+        mutable uint32_t m_mtu;
+        bool m_linkUp;
 
-  Ptr<Packet> m_currentPkt;
 
-  Ptr<Object> m_phy;
-};
+        State m_state;
+
+        Ptr<Packet> m_currentPkt;
+
+        Ptr<Object> m_phy;
+    };
 
 
 } // namespace ns3

@@ -21,86 +21,80 @@ using namespace ns3;
 
 class Ipv6AddressTestCase1 : public TestCase
 {
-public:
-  Ipv6AddressTestCase1 ();
-  virtual ~Ipv6AddressTestCase1 ();
+    public :
+    Ipv6AddressTestCase1();
+    virtual ~Ipv6AddressTestCase1();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-Ipv6AddressTestCase1::Ipv6AddressTestCase1 ()
-  : TestCase ("serialization code")
-{
+Ipv6AddressTestCase1::Ipv6AddressTestCase1()
+: TestCase("serialization code") {
 }
 
-Ipv6AddressTestCase1::~Ipv6AddressTestCase1 ()
-{
+Ipv6AddressTestCase1::~Ipv6AddressTestCase1() {
 }
 
 void
-Ipv6AddressTestCase1::DoRun (void)
-{
-  Ipv6Address ip = Ipv6Address ("2001:db8::1");
-  uint8_t ipBytes[16];
-  ip.Serialize (ipBytes);
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[0], 0x20, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[1], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[2], 0x0d, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[3], 0xb8, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[15], 1, "Failed string conversion");
+Ipv6AddressTestCase1::DoRun(void) {
+    Ipv6Address ip = Ipv6Address("2001:db8::1");
+    uint8_t ipBytes[16];
+    ip.Serialize(ipBytes);
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[0], 0x20, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[1], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[2], 0x0d, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[3], 0xb8, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[15], 1, "Failed string conversion");
 
-  ip = Ipv6Address ("2001:db8:1::1");
-  ip.Serialize (ipBytes);
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[0], 0x20, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[1], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[2], 0x0d, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[3], 0xb8, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[5], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[15], 1, "Failed string conversion");
+    ip = Ipv6Address("2001:db8:1::1");
+    ip.Serialize(ipBytes);
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[0], 0x20, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[1], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[2], 0x0d, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[3], 0xb8, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[5], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[15], 1, "Failed string conversion");
 
-  // Zero padding
-  ip = Ipv6Address ("2001:0db8:0001::1");
-  ip.Serialize (ipBytes);
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[0], 0x20, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[1], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[2], 0x0d, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[3], 0xb8, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[5], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[15], 1, "Failed string conversion");
+    // Zero padding
+    ip = Ipv6Address("2001:0db8:0001::1");
+    ip.Serialize(ipBytes);
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[0], 0x20, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[1], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[2], 0x0d, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[3], 0xb8, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[5], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[15], 1, "Failed string conversion");
 
-  ip = Ipv6Address ("2001:db8:0:1::1");
-  ip.Serialize (ipBytes);
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[0], 0x20, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[1], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[2], 0x0d, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[3], 0xb8, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[7], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[15], 1, "Failed string conversion");
+    ip = Ipv6Address("2001:db8:0:1::1");
+    ip.Serialize(ipBytes);
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[0], 0x20, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[1], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[2], 0x0d, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[3], 0xb8, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[7], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[15], 1, "Failed string conversion");
 
-  ip = Ipv6Address ("2001:db8:0:1:0:0:0:1");
-  ip.Serialize (ipBytes);
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[0], 0x20, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[1], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[2], 0x0d, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[3], 0xb8, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[7], 0x01, "Failed string conversion");
-  NS_TEST_ASSERT_MSG_EQ (ipBytes[15], 1, "Failed string conversion");
+    ip = Ipv6Address("2001:db8:0:1:0:0:0:1");
+    ip.Serialize(ipBytes);
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[0], 0x20, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[1], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[2], 0x0d, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[3], 0xb8, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[7], 0x01, "Failed string conversion");
+    NS_TEST_ASSERT_MSG_EQ(ipBytes[15], 1, "Failed string conversion");
 
-  // Please add more tests below
+    // Please add more tests below
 
 }
 
 class Ipv6AddressTestSuite : public TestSuite
 {
-public:
-  Ipv6AddressTestSuite ();
-};
+    public :
+    Ipv6AddressTestSuite();};
 
-Ipv6AddressTestSuite::Ipv6AddressTestSuite ()
-  : TestSuite ("ipv6-address", UNIT)
-{
-  AddTestCase (new Ipv6AddressTestCase1, TestCase::QUICK);
+Ipv6AddressTestSuite::Ipv6AddressTestSuite()
+: TestSuite("ipv6-address", UNIT) {
+    AddTestCase(new Ipv6AddressTestCase1, TestCase::QUICK);
 }
 
 static Ipv6AddressTestSuite ipv6AddressTestSuite;

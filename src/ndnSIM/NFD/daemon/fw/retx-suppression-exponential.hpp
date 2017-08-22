@@ -29,50 +29,49 @@
 #include "retx-suppression.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief a retransmission suppression decision algorithm that
- *         suppresses retransmissions using exponential backoff
- *
- *  The i-th retransmission will be suppressed if the last transmission (out-record)
- *  occurred within MIN(initialInterval * multiplier^(i-1), maxInterval)
- */
-class RetxSuppressionExponential : public RetxSuppression
-{
-public:
-  /** \brief time granularity
-   */
-  typedef time::microseconds Duration;
+        /** \brief a retransmission suppression decision algorithm that
+         *         suppresses retransmissions using exponential backoff
+         *
+         *  The i-th retransmission will be suppressed if the last transmission (out-record)
+         *  occurred within MIN(initialInterval * multiplier^(i-1), maxInterval)
+         */
+        class RetxSuppressionExponential : public RetxSuppression {
+        public:
+            /** \brief time granularity
+             */
+            typedef time::microseconds Duration;
 
-  explicit
-  RetxSuppressionExponential(const Duration& initialInterval = DEFAULT_INITIAL_INTERVAL,
-                             float multiplier = DEFAULT_MULTIPLIER,
-                             const Duration& maxInterval = DEFAULT_MAX_INTERVAL);
+            explicit
+            RetxSuppressionExponential(const Duration& initialInterval = DEFAULT_INITIAL_INTERVAL,
+                    float multiplier = DEFAULT_MULTIPLIER,
+                    const Duration& maxInterval = DEFAULT_MAX_INTERVAL);
 
-  /** \brief determines whether Interest is a retransmission,
-   *         and if so, whether it shall be forwarded or suppressed
-   */
-  virtual Result
-  decide(const Face& inFace, const Interest& interest,
-         pit::Entry& pitEntry) const override;
+            /** \brief determines whether Interest is a retransmission,
+             *         and if so, whether it shall be forwarded or suppressed
+             */
+            virtual Result
+            decide(const Face& inFace, const Interest& interest,
+                    pit::Entry& pitEntry) const override;
 
-public:
-  /** \brief StrategyInfo on pit::Entry
-   */
-  class PitInfo;
+        public:
+            /** \brief StrategyInfo on pit::Entry
+             */
+            class PitInfo;
 
-public:
-  static const Duration DEFAULT_INITIAL_INTERVAL;
-  static const float DEFAULT_MULTIPLIER;
-  static const Duration DEFAULT_MAX_INTERVAL;
+        public:
+            static const Duration DEFAULT_INITIAL_INTERVAL;
+            static const float DEFAULT_MULTIPLIER;
+            static const Duration DEFAULT_MAX_INTERVAL;
 
-private:
-  const Duration m_initialInterval;
-  const float m_multiplier;
-  const Duration m_maxInterval;
-};
+        private:
+            const Duration m_initialInterval;
+            const float m_multiplier;
+            const Duration m_maxInterval;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_RETX_SUPPRESSION_EXPONENTIAL_HPP

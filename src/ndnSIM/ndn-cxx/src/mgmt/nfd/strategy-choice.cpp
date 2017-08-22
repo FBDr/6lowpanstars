@@ -25,107 +25,97 @@
 #include "util/concepts.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-//BOOST_CONCEPT_ASSERT((boost::EqualityComparable<StrategyChoice>));
-BOOST_CONCEPT_ASSERT((WireEncodable<StrategyChoice>));
-BOOST_CONCEPT_ASSERT((WireDecodable<StrategyChoice>));
-static_assert(std::is_base_of<tlv::Error, StrategyChoice::Error>::value,
-              "StrategyChoice::Error must inherit from tlv::Error");
+        //BOOST_CONCEPT_ASSERT((boost::EqualityComparable<StrategyChoice>));
+        BOOST_CONCEPT_ASSERT((WireEncodable<StrategyChoice>));
+        BOOST_CONCEPT_ASSERT((WireDecodable<StrategyChoice>));
+        static_assert(std::is_base_of<tlv::Error, StrategyChoice::Error>::value,
+                "StrategyChoice::Error must inherit from tlv::Error");
 
-StrategyChoice::StrategyChoice()
-{
-}
+        StrategyChoice::StrategyChoice() {
+        }
 
-StrategyChoice::StrategyChoice(const Block& payload)
-{
-  this->wireDecode(payload);
-}
+        StrategyChoice::StrategyChoice(const Block& payload) {
+            this->wireDecode(payload);
+        }
 
-template<encoding::Tag TAG>
-size_t
-StrategyChoice::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t totalLength = 0;
+        template<encoding::Tag TAG>
+        size_t
+        StrategyChoice::wireEncode(EncodingImpl<TAG>& encoder) const {
+            size_t totalLength = 0;
 
-  totalLength += prependNestedBlock(encoder, tlv::nfd::Strategy, m_strategy);
-  totalLength += m_name.wireEncode(encoder);
+            totalLength += prependNestedBlock(encoder, tlv::nfd::Strategy, m_strategy);
+            totalLength += m_name.wireEncode(encoder);
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::nfd::StrategyChoice);
-  return totalLength;
-}
+            totalLength += encoder.prependVarNumber(totalLength);
+            totalLength += encoder.prependVarNumber(tlv::nfd::StrategyChoice);
+            return totalLength;
+        }
 
-template size_t
-StrategyChoice::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>&) const;
+        template size_t
+        StrategyChoice::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>&) const;
 
-template size_t
-StrategyChoice::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>&) const;
+        template size_t
+        StrategyChoice::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>&) const;
 
-const Block&
-StrategyChoice::wireEncode() const
-{
-  if (m_wire.hasWire())
-    return m_wire;
+        const Block&
+        StrategyChoice::wireEncode() const {
+            if (m_wire.hasWire())
+                return m_wire;
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  m_wire = buffer.block();
-  return m_wire;
-}
+            m_wire = buffer.block();
+            return m_wire;
+        }
 
-void
-StrategyChoice::wireDecode(const Block& block)
-{
-  if (block.type() != tlv::nfd::StrategyChoice) {
-    BOOST_THROW_EXCEPTION(Error("expecting StrategyChoice block"));
-  }
-  m_wire = block;
-  m_wire.parse();
-  Block::element_const_iterator val = m_wire.elements_begin();
+        void
+        StrategyChoice::wireDecode(const Block& block) {
+            if (block.type() != tlv::nfd::StrategyChoice) {
+                BOOST_THROW_EXCEPTION(Error("expecting StrategyChoice block"));
+            }
+            m_wire = block;
+            m_wire.parse();
+            Block::element_const_iterator val = m_wire.elements_begin();
 
-  if (val != m_wire.elements_end() && val->type() == tlv::Name) {
-    m_name.wireDecode(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required Name field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::Name) {
+                m_name.wireDecode(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required Name field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::Strategy) {
-    val->parse();
-    if (val->elements().empty()) {
-      BOOST_THROW_EXCEPTION(Error("expecting Strategy/Name"));
-    }
-    else {
-      m_strategy.wireDecode(*val->elements_begin());
-    }
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required Strategy field"));
-  }
-}
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::Strategy) {
+                val->parse();
+                if (val->elements().empty()) {
+                    BOOST_THROW_EXCEPTION(Error("expecting Strategy/Name"));
+                } else {
+                    m_strategy.wireDecode(*val->elements_begin());
+                }
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required Strategy field"));
+            }
+        }
 
-StrategyChoice&
-StrategyChoice::setName(const Name& name)
-{
-  m_wire.reset();
-  m_name = name;
-  return *this;
-}
+        StrategyChoice&
+        StrategyChoice::setName(const Name& name) {
+            m_wire.reset();
+            m_name = name;
+            return *this;
+        }
 
-StrategyChoice&
-StrategyChoice::setStrategy(const Name& strategy)
-{
-  m_wire.reset();
-  m_strategy = strategy;
-  return *this;
-}
+        StrategyChoice&
+        StrategyChoice::setStrategy(const Name& strategy) {
+            m_wire.reset();
+            m_strategy = strategy;
+            return *this;
+        }
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace ndn

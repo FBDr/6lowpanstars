@@ -26,40 +26,39 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mpi
- *
- * \brief Class to aggregate to a NetDevice if it supports MPI capability
- *
- * MpiInterface::ReceiveMessages () needs to send packets to a NetDevice
- * Receive() method.  Since each NetDevice's Receive() method is specific
- * to the derived class, and since we do not know whether such a NetDevice
- * is MPI-capable, we aggregate one of these objects to each MPI-capable
- * device.  In addition, we must hook up a NetDevice::Receive() method
- * to the callback.  So the two steps to enable MPI capability are to
- * aggregate this object to a NetDevice, and to set the callback.
- */
-class MpiReceiver : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual ~MpiReceiver ();
+    /**
+     * \ingroup mpi
+     *
+     * \brief Class to aggregate to a NetDevice if it supports MPI capability
+     *
+     * MpiInterface::ReceiveMessages () needs to send packets to a NetDevice
+     * Receive() method.  Since each NetDevice's Receive() method is specific
+     * to the derived class, and since we do not know whether such a NetDevice
+     * is MPI-capable, we aggregate one of these objects to each MPI-capable
+     * device.  In addition, we must hook up a NetDevice::Receive() method
+     * to the callback.  So the two steps to enable MPI capability are to
+     * aggregate this object to a NetDevice, and to set the callback.
+     */
+    class MpiReceiver : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        virtual ~MpiReceiver();
 
-  /**
-   * \brief Direct an incoming packet to the device Receive() method
-   * \param p Packet to receive
-   */
-  void Receive (Ptr<Packet> p);
-  /**
-   * \brief Set the receive callback to get packets to net devices
-   * \param callback the callback itself
-   */
-  void SetReceiveCallback (Callback<void, Ptr<Packet> > callback);
-private:
-  virtual void DoDispose (void);
+        /**
+         * \brief Direct an incoming packet to the device Receive() method
+         * \param p Packet to receive
+         */
+        void Receive(Ptr<Packet> p);
+        /**
+         * \brief Set the receive callback to get packets to net devices
+         * \param callback the callback itself
+         */
+        void SetReceiveCallback(Callback<void, Ptr<Packet> > callback);
+    private:
+        virtual void DoDispose(void);
 
-  Callback<void, Ptr<Packet> > m_rxCallback;
-};
+        Callback<void, Ptr<Packet> > m_rxCallback;
+    };
 
 } // namespace ns3
 

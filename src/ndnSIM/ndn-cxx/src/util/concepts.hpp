@@ -28,73 +28,69 @@
 
 namespace ndn {
 
-/** \brief a concept check for TLV abstraction with .wireEncode method
- */
-template<class X>
-class WireEncodable
-{
-public:
-  BOOST_CONCEPT_USAGE(WireEncodable)
-  {
-    Block block = j.wireEncode();
-    block.size(); // avoid 'unused variable block'
-  }
+    /** \brief a concept check for TLV abstraction with .wireEncode method
+     */
+    template<class X>
+    class WireEncodable {
+    public:
 
-private:
-  X j;
-};
+        BOOST_CONCEPT_USAGE(WireEncodable) {
+            Block block = j.wireEncode();
+            block.size(); // avoid 'unused variable block'
+        }
 
-/** \brief a concept check for TLV abstraction with .wireEncode method
- */
-template<class X>
-class WireEncodableWithEncodingBuffer
-{
-public:
-  BOOST_CONCEPT_USAGE(WireEncodableWithEncodingBuffer)
-  {
-    EncodingEstimator estimator;
-    size_t estimatedSize = j.wireEncode(estimator);
+    private:
+        X j;
+    };
 
-    EncodingBuffer encoder(estimatedSize, 0);
-    j.wireEncode(encoder);
-  }
+    /** \brief a concept check for TLV abstraction with .wireEncode method
+     */
+    template<class X>
+    class WireEncodableWithEncodingBuffer {
+    public:
 
-private:
-  X j;
-};
+        BOOST_CONCEPT_USAGE(WireEncodableWithEncodingBuffer) {
+            EncodingEstimator estimator;
+            size_t estimatedSize = j.wireEncode(estimator);
 
-/** \brief a concept check for TLV abstraction with .wireDecode method
- *         and constructible from Block
- */
-template<class X>
-class WireDecodable
-{
-public:
-  BOOST_CONCEPT_USAGE(WireDecodable)
-  {
-    Block block;
-    X j(block);
-    j.wireDecode(block);
-  }
-};
+            EncodingBuffer encoder(estimatedSize, 0);
+            j.wireEncode(encoder);
+        }
 
-/** \brief a concept check for CryptoPP hash algorithm
- */
-template<class X>
-class Hashable
-{
-public:
-  BOOST_CONCEPT_USAGE(Hashable)
-  {
-    X hash;
-    uint8_t* buf = 0;
-    size_t size = hash.DigestSize();
+    private:
+        X j;
+    };
 
-    hash.Update(buf, size);
-    hash.Final(buf);
-    hash.Restart();
-  }
-};
+    /** \brief a concept check for TLV abstraction with .wireDecode method
+     *         and constructible from Block
+     */
+    template<class X>
+    class WireDecodable {
+    public:
+
+        BOOST_CONCEPT_USAGE(WireDecodable) {
+            Block block;
+            X j(block);
+            j.wireDecode(block);
+        }
+    };
+
+    /** \brief a concept check for CryptoPP hash algorithm
+     */
+    template<class X>
+    class Hashable {
+    public:
+
+        BOOST_CONCEPT_USAGE(Hashable) {
+            X hash;
+            uint8_t* buf = 0;
+            size_t size = hash.DigestSize();
+
+            hash.Update(buf, size);
+            hash.Final(buf);
+            hash.Restart();
+        }
+    };
 
 } // namespace ndn
 

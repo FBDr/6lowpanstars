@@ -60,11 +60,12 @@
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/ndnSIM-module.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("VirtualNetDeviceExample");
 
-    class Tunnel {
+    class Tunnel{
         Ptr<Socket> m_n3Socket;
         Ptr<Socket> m_n0Socket;
         Ptr<Socket> m_n1Socket;
@@ -77,21 +78,24 @@ namespace ns3 {
         Ptr<VirtualNetDevice> m_n3Tap;
 
         bool
-        N0VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber) {
+        N0VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
+        {
             NS_LOG_DEBUG("Send to " << m_n3Address << ": " << *packet);
             m_n0Socket->SendTo(packet, 0, InetSocketAddress(m_n3Address, 667));
             return true;
         }
 
         bool
-        N1VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber) {
+        N1VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
+        {
             NS_LOG_DEBUG("Send to " << m_n3Address << ": " << *packet);
             m_n1Socket->SendTo(packet, 0, InetSocketAddress(m_n3Address, 667));
             return true;
         }
 
         bool
-        N3VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber) {
+        N3VirtualSend(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
+        {
             if (m_rng->GetValue() < 0.25) {
                 NS_LOG_DEBUG("Send to " << m_n0Address << ": " << *packet);
                 m_n3Socket->SendTo(packet, 0, InetSocketAddress(m_n0Address, 667));
@@ -102,7 +106,8 @@ namespace ns3 {
             return true;
         }
 
-        void N3SocketRecv(Ptr<Socket> socket) {
+        void N3SocketRecv(Ptr<Socket> socket)
+        {
 
             Ptr<Packet> packet = socket->Recv(65535, 0);
             NS_LOG_DEBUG("N3SocketRecv: " << *packet);
@@ -111,7 +116,8 @@ namespace ns3 {
             m_n3Tap->Receive(packet, 0x0800, m_n3Tap->GetAddress(), m_n3Tap->GetAddress(), NetDevice::PACKET_HOST);
         }
 
-        void N0SocketRecv(Ptr<Socket> socket) {
+        void N0SocketRecv(Ptr<Socket> socket)
+        {
             Ptr<Packet> packet = socket->Recv(65535, 0);
             NS_LOG_DEBUG("N0SocketRecv: " << *packet);
             SocketAddressTag socketAddressTag;
@@ -119,7 +125,8 @@ namespace ns3 {
             m_n0Tap->Receive(packet, 0x0800, m_n0Tap->GetAddress(), m_n0Tap->GetAddress(), NetDevice::PACKET_HOST);
         }
 
-        void N1SocketRecv(Ptr<Socket> socket) {
+        void N1SocketRecv(Ptr<Socket> socket)
+        {
             Ptr<Packet> packet = socket->Recv(65535, 0);
             NS_LOG_DEBUG("N1SocketRecv: " << *packet);
             SocketAddressTag socketAddressTag;
@@ -127,11 +134,12 @@ namespace ns3 {
             m_n1Tap->Receive(packet, 0x0800, m_n1Tap->GetAddress(), m_n1Tap->GetAddress(), NetDevice::PACKET_HOST);
         }
 
-    public:
+public:
 
         Tunnel(Ptr<Node> n3, Ptr<Node> n0, Ptr<Node> n1,
-                Ipv4Address n3Addr, Ipv4Address n0Addr, Ipv4Address n1Addr)
-        : m_n3Address(n3Addr), m_n0Address(n0Addr), m_n1Address(n1Addr) {
+        Ipv4Address n3Addr, Ipv4Address n0Addr, Ipv4Address n1Addr)
+        : m_n3Address(n3Addr), m_n0Address(n0Addr), m_n1Address(n1Addr)
+        {
             m_rng = CreateObject<UniformRandomVariable> ();
             m_n3Socket = Socket::CreateSocket(n3, TypeId::LookupByName("ns3::UdpSocketFactory"));
             m_n3Socket->Bind(InetSocketAddress(Ipv4Address::GetAny(), 667));
@@ -177,8 +185,7 @@ namespace ns3 {
 
         }
 
-
-    };
+};
 
     int
     main(int argc, char *argv[]) {

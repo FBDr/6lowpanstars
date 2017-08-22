@@ -25,42 +25,44 @@ struct INetStack;
 
 namespace ns3 {
 
-/**
- * \ingroup nsctcp
- *
- * This object represents the underlying nsc stack,
- * which is aggregated to a Node object, and which provides access to the
- * sysctls of the nsc stack through attributes.
- */
-class Ns3NscStack : public Object
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  /**
-   * \brief Set the underlying stack
-   * \param stack the stack
-   */
-  void SetStack (INetStack *stack) { m_stack = stack; }
+    /**
+     * \ingroup nsctcp
+     *
+     * This object represents the underlying nsc stack,
+     * which is aggregated to a Node object, and which provides access to the
+     * sysctls of the nsc stack through attributes.
+     */
+    class Ns3NscStack : public Object {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-private:
-  friend class NscStackStringAccessor;
-  /**
-   * \brief Set an attribute
-   * \param name the attribute name
-   * \param value the attribute value
-   */
-  void Set (std::string name, std::string value);
-  /**
-   * \brief Get an attribute
-   * \param name the attribute name
-   * \returns the attribute value
-   */
-  std::string Get (std::string name) const;
-  INetStack *m_stack; //!< the underlying stack
-};
+        /**
+         * \brief Set the underlying stack
+         * \param stack the stack
+         */
+        void SetStack(INetStack *stack) {
+            m_stack = stack;
+        }
+
+    private:
+        friend class NscStackStringAccessor;
+        /**
+         * \brief Set an attribute
+         * \param name the attribute name
+         * \param value the attribute value
+         */
+        void Set(std::string name, std::string value);
+        /**
+         * \brief Get an attribute
+         * \param name the attribute name
+         * \returns the attribute value
+         */
+        std::string Get(std::string name) const;
+        INetStack *m_stack; //!< the underlying stack
+    };
 } // namespace ns3

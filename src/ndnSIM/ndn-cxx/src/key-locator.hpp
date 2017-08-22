@@ -27,140 +27,137 @@
 
 namespace ndn {
 
-class KeyLocator
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+    class KeyLocator {
+    public:
 
-  enum Type {
-    /** \brief indicates KeyLocator is empty (internal use only)
-     */
-    KeyLocator_None = 65535,
-    /** \brief indicates KeyLocator contains a Name
-     */
-    KeyLocator_Name = 0,
-    /** \brief indicates KeyLocator contains a KeyDigest
-     */
-    KeyLocator_KeyDigest = 1,
-    /** \brief indicates KeyLocator contains an unknown element
-     */
-    KeyLocator_Unknown = 255
-  };
+        class Error : public tlv::Error {
+        public:
 
-public: // constructors
-  /** \brief construct an empty KeyLocator
-   */
-  KeyLocator();
+            explicit
+            Error(const std::string& what)
+            : tlv::Error(what) {
+            }
+        };
 
-  /** \brief construct from wire encoding
-   */
-  explicit
-  KeyLocator(const Block& wire);
+        enum Type {
+            /** \brief indicates KeyLocator is empty (internal use only)
+             */
+            KeyLocator_None = 65535,
+            /** \brief indicates KeyLocator contains a Name
+             */
+            KeyLocator_Name = 0,
+            /** \brief indicates KeyLocator contains a KeyDigest
+             */
+            KeyLocator_KeyDigest = 1,
+            /** \brief indicates KeyLocator contains an unknown element
+             */
+            KeyLocator_Unknown = 255
+        };
 
-  /** \brief construct from Name
-   *  \note implicit conversion is permitted
-   */
-  KeyLocator(const Name& name);
+    public: // constructors
+        /** \brief construct an empty KeyLocator
+         */
+        KeyLocator();
 
-public: // encode and decode
-  /** \brief prepend wire encoding
-   *  \param encoder EncodingBuffer or Estimator
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+        /** \brief construct from wire encoding
+         */
+        explicit
+        KeyLocator(const Block& wire);
 
-  /** \return wire encoding
-   */
-  const Block&
-  wireEncode() const;
+        /** \brief construct from Name
+         *  \note implicit conversion is permitted
+         */
+        KeyLocator(const Name& name);
 
-  /** \brief decode from wire encoding
-   *  \throw Error outer TLV type is not KeyLocator
-   *  \note No error is thrown for unrecognized inner TLV, but type becomes KeyLocator_Unknown.
-   */
-  void
-  wireDecode(const Block& wire);
+    public: // encode and decode
+        /** \brief prepend wire encoding
+         *  \param encoder EncodingBuffer or Estimator
+         */
+        template<encoding::Tag TAG>
+        size_t
+        wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // attributes
-  bool
-  empty() const
-  {
-    return m_type == KeyLocator_None;
-  }
+        /** \return wire encoding
+         */
+        const Block&
+        wireEncode() const;
 
-  Type
-  getType() const
-  {
-    return m_type;
-  }
+        /** \brief decode from wire encoding
+         *  \throw Error outer TLV type is not KeyLocator
+         *  \note No error is thrown for unrecognized inner TLV, but type becomes KeyLocator_Unknown.
+         */
+        void
+        wireDecode(const Block& wire);
 
-  /** \brief clear KeyLocator
-   *  \details type becomes KeyLocator_None
-   *  \return self
-   */
-  KeyLocator&
-  clear();
+    public: // attributes
 
-  /** \brief get Name element
-   *  \throw Error if type is not KeyLocator_Name
-   */
-  const Name&
-  getName() const;
+        bool
+        empty() const {
+            return m_type == KeyLocator_None;
+        }
 
-  /** \brief set Name element
-   *  \details type becomes KeyLocator_Name
-   *  \return self
-   */
-  KeyLocator&
-  setName(const Name& name);
+        Type
+        getType() const {
+            return m_type;
+        }
 
-  /** \brief get KeyDigest element
-   *  \throw Error if type is not KeyLocator_KeyDigest
-   */
-  const Block&
-  getKeyDigest() const;
+        /** \brief clear KeyLocator
+         *  \details type becomes KeyLocator_None
+         *  \return self
+         */
+        KeyLocator&
+        clear();
 
-  /** \brief set KeyDigest element
-   *  \details type becomes KeyLocator_KeyDigest
-   *  \throw Error if Block type is not KeyDigest
-   *  \return self
-   */
-  KeyLocator&
-  setKeyDigest(const Block& keyDigest);
+        /** \brief get Name element
+         *  \throw Error if type is not KeyLocator_Name
+         */
+        const Name&
+        getName() const;
 
-  /** \brief set KeyDigest value
-   *  \details type becomes KeyLocator_KeyDigest
-   *  \return self
-   */
-  KeyLocator&
-  setKeyDigest(const ConstBufferPtr& keyDigest);
+        /** \brief set Name element
+         *  \details type becomes KeyLocator_Name
+         *  \return self
+         */
+        KeyLocator&
+        setName(const Name& name);
 
-public: // EqualityComparable concept
-  bool
-  operator==(const KeyLocator& other) const;
+        /** \brief get KeyDigest element
+         *  \throw Error if type is not KeyLocator_KeyDigest
+         */
+        const Block&
+        getKeyDigest() const;
 
-  bool
-  operator!=(const KeyLocator& other) const
-  {
-    return !this->operator==(other);
-  }
+        /** \brief set KeyDigest element
+         *  \details type becomes KeyLocator_KeyDigest
+         *  \throw Error if Block type is not KeyDigest
+         *  \return self
+         */
+        KeyLocator&
+        setKeyDigest(const Block& keyDigest);
 
-private:
-  Type m_type;
-  Name m_name;
-  Block m_keyDigest;
+        /** \brief set KeyDigest value
+         *  \details type becomes KeyLocator_KeyDigest
+         *  \return self
+         */
+        KeyLocator&
+        setKeyDigest(const ConstBufferPtr& keyDigest);
 
-  mutable Block m_wire;
-};
+    public: // EqualityComparable concept
+        bool
+        operator==(const KeyLocator& other) const;
+
+        bool
+        operator!=(const KeyLocator& other) const {
+            return !this->operator==(other);
+        }
+
+    private:
+        Type m_type;
+        Name m_name;
+        Block m_keyDigest;
+
+        mutable Block m_wire;
+    };
 
 } // namespace ndn
 

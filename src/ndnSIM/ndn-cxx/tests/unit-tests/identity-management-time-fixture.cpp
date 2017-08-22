@@ -22,15 +22,13 @@
 #include "identity-management-time-fixture.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-IdentityManagementTimeFixture::IdentityManagementTimeFixture()
-{
-}
+        IdentityManagementTimeFixture::IdentityManagementTimeFixture() {
+        }
 
-IdentityManagementTimeFixture::~IdentityManagementTimeFixture()
-{
-}
+        IdentityManagementTimeFixture::~IdentityManagementTimeFixture() {
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

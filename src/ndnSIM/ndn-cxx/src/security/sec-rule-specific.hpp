@@ -30,45 +30,43 @@
 
 namespace ndn {
 
-class SecRuleSpecific : public SecRule
-{
+    class SecRuleSpecific : public SecRule {
+    public:
+        SecRuleSpecific(shared_ptr<Regex> dataRegex,
+                shared_ptr<Regex> signerRegex);
 
-public:
-  SecRuleSpecific(shared_ptr<Regex> dataRegex,
-                  shared_ptr<Regex> signerRegex);
+        explicit
+        SecRuleSpecific(shared_ptr<Regex> dataRegex);
 
-  explicit
-  SecRuleSpecific(shared_ptr<Regex> dataRegex);
+        explicit
+        SecRuleSpecific(const SecRuleSpecific& rule);
 
-  explicit
-  SecRuleSpecific(const SecRuleSpecific& rule);
+        virtual
+        ~SecRuleSpecific() {
+        };
 
-  virtual
-  ~SecRuleSpecific() {};
+        bool
+        matchDataName(const Data& data);
 
-  bool
-  matchDataName(const Data& data);
+        bool
+        matchSignerName(const Data& data);
 
-  bool
-  matchSignerName(const Data& data);
+        bool
+        satisfy(const Data& data);
 
-  bool
-  satisfy(const Data& data);
+        bool
+        satisfy(const Name& dataName, const Name& signerName);
 
-  bool
-  satisfy(const Name& dataName, const Name& signerName);
+        bool
+        isExempted() const {
+            return m_isExempted;
+        }
 
-  bool
-  isExempted() const
-  {
-    return m_isExempted;
-  }
-
-private:
-  shared_ptr<Regex> m_dataRegex;
-  shared_ptr<Regex> m_signerRegex;
-  bool m_isExempted;
-};
+    private:
+        shared_ptr<Regex> m_dataRegex;
+        shared_ptr<Regex> m_signerRegex;
+        bool m_isExempted;
+    };
 
 } // namespace ndn
 

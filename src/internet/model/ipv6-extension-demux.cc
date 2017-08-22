@@ -28,67 +28,56 @@
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED (Ipv6ExtensionDemux);
+    NS_OBJECT_ENSURE_REGISTERED(Ipv6ExtensionDemux);
 
-TypeId Ipv6ExtensionDemux::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::Ipv6ExtensionDemux")
-    .SetParent<Object> ()
-    .SetGroupName ("Internet")
-    .AddAttribute ("Extensions", "The set of IPv6 extensions registered with this demux.",
-                   ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&Ipv6ExtensionDemux::m_extensions),
-                   MakeObjectVectorChecker<Ipv6Extension> ())
-  ;
-  return tid;
-}
-
-Ipv6ExtensionDemux::Ipv6ExtensionDemux ()
-{
-}
-
-Ipv6ExtensionDemux::~Ipv6ExtensionDemux ()
-{
-}
-
-void Ipv6ExtensionDemux::DoDispose ()
-{
-  for (Ipv6ExtensionList_t::iterator it = m_extensions.begin (); it != m_extensions.end (); it++)
-    {
-      (*it)->Dispose ();
-      *it = 0;
+    TypeId Ipv6ExtensionDemux::GetTypeId() {
+        static TypeId tid = TypeId("ns3::Ipv6ExtensionDemux")
+                .SetParent<Object> ()
+                .SetGroupName("Internet")
+                .AddAttribute("Extensions", "The set of IPv6 extensions registered with this demux.",
+                ObjectVectorValue(),
+                MakeObjectVectorAccessor(&Ipv6ExtensionDemux::m_extensions),
+                MakeObjectVectorChecker<Ipv6Extension> ())
+                ;
+        return tid;
     }
-  m_extensions.clear ();
-  m_node = 0;
-  Object::DoDispose ();
-}
 
-void Ipv6ExtensionDemux::SetNode (Ptr<Node> node)
-{
-  m_node = node;
-}
+    Ipv6ExtensionDemux::Ipv6ExtensionDemux() {
+    }
 
-void Ipv6ExtensionDemux::Insert (Ptr<Ipv6Extension> extension)
-{
-  m_extensions.push_back (extension);
-}
+    Ipv6ExtensionDemux::~Ipv6ExtensionDemux() {
+    }
 
-Ptr<Ipv6Extension> Ipv6ExtensionDemux::GetExtension (uint8_t extensionNumber)
-{
-  for (Ipv6ExtensionList_t::iterator i = m_extensions.begin (); i != m_extensions.end (); ++i)
-    {
-      if ((*i)->GetExtensionNumber () == extensionNumber)
-        {
-          return *i;
+    void Ipv6ExtensionDemux::DoDispose() {
+        for (Ipv6ExtensionList_t::iterator it = m_extensions.begin(); it != m_extensions.end(); it++) {
+            (*it)->Dispose();
+            *it = 0;
         }
+        m_extensions.clear();
+        m_node = 0;
+        Object::DoDispose();
     }
-  return 0;
-}
 
-void Ipv6ExtensionDemux::Remove (Ptr<Ipv6Extension> extension)
-{
-  m_extensions.remove (extension);
-}
+    void Ipv6ExtensionDemux::SetNode(Ptr<Node> node) {
+        m_node = node;
+    }
+
+    void Ipv6ExtensionDemux::Insert(Ptr<Ipv6Extension> extension) {
+        m_extensions.push_back(extension);
+    }
+
+    Ptr<Ipv6Extension> Ipv6ExtensionDemux::GetExtension(uint8_t extensionNumber) {
+        for (Ipv6ExtensionList_t::iterator i = m_extensions.begin(); i != m_extensions.end(); ++i) {
+            if ((*i)->GetExtensionNumber() == extensionNumber) {
+                return *i;
+            }
+        }
+        return 0;
+    }
+
+    void Ipv6ExtensionDemux::Remove(Ptr<Ipv6Extension> extension) {
+        m_extensions.remove(extension);
+    }
 
 } /* namespace ns3 */
 

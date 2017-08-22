@@ -26,84 +26,84 @@
 #include "ns3/traced-value.h"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * @ingroup ndn-apps
- * \brief Ndn application for sending out Interest packets (window-based)
- *
- * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the
- *simulator.
- * Behavior may be unpredictable if used incorrectly.
- */
-class ConsumerWindow : public Consumer {
-public:
-  static TypeId
-  GetTypeId();
+        /**
+         * @ingroup ndn-apps
+         * \brief Ndn application for sending out Interest packets (window-based)
+         *
+         * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the
+         *simulator.
+         * Behavior may be unpredictable if used incorrectly.
+         */
+        class ConsumerWindow : public Consumer {
+        public:
+            static TypeId
+            GetTypeId();
 
-  /**
-   * \brief Default constructor
-   */
-  ConsumerWindow();
+            /**
+             * \brief Default constructor
+             */
+            ConsumerWindow();
 
-  // From App
-  virtual void
-  OnData(shared_ptr<const Data> contentObject);
+            // From App
+            virtual void
+            OnData(shared_ptr<const Data> contentObject);
 
-  virtual void
-  OnTimeout(uint32_t sequenceNumber);
+            virtual void
+            OnTimeout(uint32_t sequenceNumber);
 
-  virtual void
-  WillSendOutInterest(uint32_t sequenceNumber);
+            virtual void
+            WillSendOutInterest(uint32_t sequenceNumber);
 
-public:
-  typedef void (*WindowTraceCallback)(uint32_t);
+        public:
+            typedef void (*WindowTraceCallback)(uint32_t);
 
-protected:
-  /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
-   * protocol
-   */
-  virtual void
-  ScheduleNextPacket();
+        protected:
+            /**
+             * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
+             * protocol
+             */
+            virtual void
+            ScheduleNextPacket();
 
-private:
-  virtual void
-  SetWindow(uint32_t window);
+        private:
+            virtual void
+            SetWindow(uint32_t window);
 
-  uint32_t
-  GetWindow() const;
+            uint32_t
+            GetWindow() const;
 
-  virtual void
-  SetPayloadSize(uint32_t payload);
+            virtual void
+            SetPayloadSize(uint32_t payload);
 
-  uint32_t
-  GetPayloadSize() const;
+            uint32_t
+            GetPayloadSize() const;
 
-  double
-  GetMaxSize() const;
+            double
+            GetMaxSize() const;
 
-  void
-  SetMaxSize(double size);
+            void
+            SetMaxSize(double size);
 
-  uint32_t
-  GetSeqMax() const;
+            uint32_t
+            GetSeqMax() const;
 
-  void
-  SetSeqMax(uint32_t seqMax);
+            void
+            SetSeqMax(uint32_t seqMax);
 
-private:
-  uint32_t m_payloadSize; // expected payload size
-  double m_maxSize;       // max size to request
+        private:
+            uint32_t m_payloadSize; // expected payload size
+            double m_maxSize; // max size to request
 
-  uint32_t m_initialWindow;
-  bool m_setInitialWindowOnTimeout;
+            uint32_t m_initialWindow;
+            bool m_setInitialWindowOnTimeout;
 
-  TracedValue<uint32_t> m_window;
-  TracedValue<uint32_t> m_inFlight;
-};
+            TracedValue<uint32_t> m_window;
+            TracedValue<uint32_t> m_inFlight;
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif

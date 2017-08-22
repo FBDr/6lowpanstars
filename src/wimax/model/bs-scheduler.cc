@@ -35,90 +35,79 @@
 #include "service-flow-record.h"
 #include "service-flow-manager.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("BSScheduler");
-  
-NS_OBJECT_ENSURE_REGISTERED (BSScheduler);
-
-TypeId
-BSScheduler::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::BSScheduler")
-    .SetParent<Object> ()
-    .SetGroupName("Wimax")
-    // No AddConstructor because this is an abstract class.
-    ;
-  return tid;
-}
-
-BSScheduler::BSScheduler ()
-  : m_downlinkBursts (new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ())
-{
-  // m_downlinkBursts is filled by AddDownlinkBurst and emptied by
-  // wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
-}
-
-BSScheduler::BSScheduler (Ptr<BaseStationNetDevice> bs)
-  : m_downlinkBursts (new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ())
+namespace ns3
 {
 
-}
+    NS_LOG_COMPONENT_DEFINE("BSScheduler");
 
-BSScheduler::~BSScheduler (void)
-{
-  std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > *downlinkBursts = m_downlinkBursts;
-  std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > pair;
-  while (downlinkBursts->size ())
-    {
-      pair = downlinkBursts->front ();
-      pair.second = 0;
-      delete pair.first;
+    NS_OBJECT_ENSURE_REGISTERED(BSScheduler);
+
+    TypeId
+    BSScheduler::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::BSScheduler")
+                .SetParent<Object> ()
+                .SetGroupName("Wimax")
+                // No AddConstructor because this is an abstract class.
+                ;
+        return tid;
     }
-  SetBs (0);
-  delete m_downlinkBursts;
-  m_downlinkBursts = 0;
-}
 
-void
-BSScheduler::SetBs (Ptr<BaseStationNetDevice> bs)
-{
-  m_bs = bs;
-}
-
-Ptr<BaseStationNetDevice> BSScheduler::GetBs (void)
-{
-  return m_bs;
-}
-
-bool
-BSScheduler::CheckForFragmentation (Ptr<WimaxConnection> connection,
-                                    int availableSymbols,
-                                    WimaxPhy::ModulationType modulationType)
-{
-  NS_LOG_INFO ("BS Scheduler, CheckForFragmentation");
-  if (connection->GetType () != Cid::TRANSPORT)
-    {
-      NS_LOG_INFO ("\t No Transport connction, Fragmentation IS NOT possible");
-      return false;
+    BSScheduler::BSScheduler()
+            : m_downlinkBursts(new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ()) {
+        // m_downlinkBursts is filled by AddDownlinkBurst and emptied by
+        // wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
     }
-  uint32_t availableByte = GetBs ()->GetPhy ()->
-    GetNrBytes (availableSymbols, modulationType);
 
-  uint32_t headerSize = connection->GetQueue ()->GetFirstPacketHdrSize (
-      MacHeaderType::HEADER_TYPE_GENERIC);
-  NS_LOG_INFO ("\t availableByte = " << availableByte <<
-               " headerSize = " << headerSize);
+    BSScheduler::BSScheduler(Ptr<BaseStationNetDevice> bs)
+            : m_downlinkBursts(new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ()) {
 
-  if (availableByte > headerSize)
-    {
-      NS_LOG_INFO ("\t Fragmentation IS possible");
-      return true;
     }
-  else
-    {
-      NS_LOG_INFO ("\t Fragmentation IS NOT possible");
-      return false;
+
+    BSScheduler::~BSScheduler(void) {
+        std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > *downlinkBursts = m_downlinkBursts;
+        std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > pair;
+        while (downlinkBursts->size()) {
+            pair = downlinkBursts->front();
+            pair.second = 0;
+            delete pair.first;
+        }
+        SetBs(0);
+        delete m_downlinkBursts;
+        m_downlinkBursts = 0;
     }
-}
+
+    void
+    BSScheduler::SetBs(Ptr<BaseStationNetDevice> bs) {
+        m_bs = bs;
+    }
+
+    Ptr<BaseStationNetDevice> BSScheduler::GetBs(void) {
+        return m_bs;
+    }
+
+    bool
+    BSScheduler::CheckForFragmentation(Ptr<WimaxConnection> connection,
+            int availableSymbols,
+            WimaxPhy::ModulationType modulationType) {
+        NS_LOG_INFO("BS Scheduler, CheckForFragmentation");
+        if (connection->GetType() != Cid::TRANSPORT) {
+            NS_LOG_INFO("\t No Transport connction, Fragmentation IS NOT possible");
+            return false;
+        }
+        uint32_t availableByte = GetBs()->GetPhy()->
+                GetNrBytes(availableSymbols, modulationType);
+
+        uint32_t headerSize = connection->GetQueue()->GetFirstPacketHdrSize(
+                MacHeaderType::HEADER_TYPE_GENERIC);
+        NS_LOG_INFO("\t availableByte = " << availableByte <<
+                " headerSize = " << headerSize);
+
+        if (availableByte > headerSize) {
+            NS_LOG_INFO("\t Fragmentation IS possible");
+            return true;
+        } else {
+            NS_LOG_INFO("\t Fragmentation IS NOT possible");
+            return false;
+        }
+    }
 } // namespace ns3

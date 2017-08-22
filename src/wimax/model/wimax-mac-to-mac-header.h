@@ -26,29 +26,28 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- * \brief this class implements the mac to mac header needed to dump a wimax pcap file
- * The header format was reverse-engineered by looking  at existing live pcap traces which
- * could be opened with wireshark  i.e., we have no idea where this is coming from.
- */
-class WimaxMacToMacHeader : public Header
-{
-public:
-  WimaxMacToMacHeader ();
-  ~WimaxMacToMacHeader ();
-  WimaxMacToMacHeader (uint32_t len);
+    /**
+     * \ingroup wimax
+     * \brief this class implements the mac to mac header needed to dump a wimax pcap file
+     * The header format was reverse-engineered by looking  at existing live pcap traces which
+     * could be opened with wireshark  i.e., we have no idea where this is coming from.
+     */
+    class WimaxMacToMacHeader : public Header {
+    public:
+        WimaxMacToMacHeader();
+        ~WimaxMacToMacHeader();
+        WimaxMacToMacHeader(uint32_t len);
 
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  uint32_t GetSerializedSize (void) const;
-  void Serialize (Buffer::Iterator start) const;
-  uint32_t Deserialize (Buffer::Iterator start);
-  uint8_t GetSizeOfLen (void) const;
-  virtual void Print (std::ostream &os) const;
-private:
-  uint32_t m_len;
-};
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
+        uint32_t GetSerializedSize(void) const;
+        void Serialize(Buffer::Iterator start) const;
+        uint32_t Deserialize(Buffer::Iterator start);
+        uint8_t GetSizeOfLen(void) const;
+        virtual void Print(std::ostream &os) const;
+    private:
+        uint32_t m_len;
+    };
 };
 #endif
 

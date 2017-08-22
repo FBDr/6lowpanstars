@@ -40,65 +40,58 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("TestSync");
+NS_LOG_COMPONENT_DEFINE("TestSync");
 
 /** Check that the event functions run in the intended order. */
 bool gFirstRun = false;
 
 /** An event method called many times from the background thread. */
-void 
-inserted_function (void)
-{
-  NS_ASSERT (gFirstRun);
-  NS_LOG_UNCOND ("inserted_function() called at " << 
-                 Simulator::Now ().GetSeconds () << " s");
+void
+inserted_function(void) {
+    NS_ASSERT(gFirstRun);
+    NS_LOG_UNCOND("inserted_function() called at " <<
+            Simulator::Now().GetSeconds() << " s");
 }
 
 /** An event method called many times from the main thread. */
-void 
-background_function (void)
-{
-  NS_ASSERT (gFirstRun);
-  NS_LOG_UNCOND ("background_function() called at " << 
-                 Simulator::Now ().GetSeconds () << " s");
+void
+background_function(void) {
+    NS_ASSERT(gFirstRun);
+    NS_LOG_UNCOND("background_function() called at " <<
+            Simulator::Now().GetSeconds() << " s");
 }
 
 /** An event method called once from the main thread. */
-void 
-first_function (void)
-{
-  NS_LOG_UNCOND ("first_function() called at " << 
-                 Simulator::Now ().GetSeconds () << " s");
-  gFirstRun = true;
+void
+first_function(void) {
+    NS_LOG_UNCOND("first_function() called at " <<
+            Simulator::Now().GetSeconds() << " s");
+    gFirstRun = true;
 }
 
 /** Example class with a method for the background task. */
 class FakeNetDevice
 {
-public:
-  /** Constructor. */
-  FakeNetDevice ();
-  /** The thread entry point. */
-  void Doit3 (void);
-};
+    public :
+    /** Constructor. */
+    FakeNetDevice();
+    /** The thread entry point. */
+    void Doit3(void);};
 
-FakeNetDevice::FakeNetDevice ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
+FakeNetDevice::FakeNetDevice() {
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-FakeNetDevice::Doit3 (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  sleep (1);
-  for (uint32_t i = 0; i < 10000; ++i)
-    {
-      //
-      // Exercise the realtime relative now path
-      //
-      Simulator::ScheduleWithContext(0xffffffff, Seconds(0.0), MakeEvent (&inserted_function));
-      usleep (1000);
+FakeNetDevice::Doit3(void) {
+    NS_LOG_FUNCTION_NOARGS();
+    sleep(1);
+    for (uint32_t i = 0; i < 10000; ++i) {
+        //
+        // Exercise the realtime relative now path
+        //
+        Simulator::ScheduleWithContext(0xffffffff, Seconds(0.0), MakeEvent(&inserted_function));
+        usleep(1000);
     }
 }
 
@@ -111,43 +104,39 @@ FakeNetDevice::Doit3 (void)
  * thread with an instance of FakeNetDevice, which schedules many instances of
  * \c inserted_function.
  */
-void 
-test (void)
-{
-  GlobalValue::Bind ("SimulatorImplementationType", 
-                     StringValue ("ns3::RealtimeSimulatorImpl"));
+void
+test(void) {
+    GlobalValue::Bind("SimulatorImplementationType",
+            StringValue("ns3::RealtimeSimulatorImpl"));
 
-  FakeNetDevice fnd;
+    FakeNetDevice fnd;
 
-  // 
-  // Make sure ScheduleNow works when the system isn't running
-  //
-  Simulator::ScheduleWithContext(0xffffffff, Seconds(0.0), MakeEvent (&first_function));
+    // 
+    // Make sure ScheduleNow works when the system isn't running
+    //
+    Simulator::ScheduleWithContext(0xffffffff, Seconds(0.0), MakeEvent(&first_function));
 
-  // 
-  // drive the progression of m_currentTs at a ten millisecond rate from the main thread
-  //
-  for (double d = 0.; d < 14.999; d += 0.01)
-    {
-      Simulator::Schedule (Seconds (d), &background_function);
+    // 
+    // drive the progression of m_currentTs at a ten millisecond rate from the main thread
+    //
+    for (double d = 0.; d < 14.999; d += 0.01) {
+        Simulator::Schedule(Seconds(d), &background_function);
     }
 
-  Ptr<SystemThread> st3 = Create<SystemThread> (
-      MakeCallback (&FakeNetDevice::Doit3, &fnd));
-  st3->Start ();
+    Ptr<SystemThread> st3 = Create<SystemThread> (
+            MakeCallback(&FakeNetDevice::Doit3, &fnd));
+    st3->Start();
 
-  Simulator::Stop (Seconds (15.0));
-  Simulator::Run ();
-  st3->Join ();
-  Simulator::Destroy ();
+    Simulator::Stop(Seconds(15.0));
+    Simulator::Run();
+    st3->Join();
+    Simulator::Destroy();
 }
 
 int
-main (int argc, char *argv[])
-{
-  while (true)
-    {
-      test ();
+main(int argc, char *argv[]) {
+    while (true) {
+        test();
     }
 }
 

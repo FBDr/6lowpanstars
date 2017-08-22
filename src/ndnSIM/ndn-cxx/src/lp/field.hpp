@@ -30,55 +30,51 @@
 #include <boost/type_traits.hpp>
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-/**
- * \brief indicates where a field may occur
- */
-namespace field_location_tags {
+        /**
+         * \brief indicates where a field may occur
+         */
+        namespace field_location_tags {
 
-class Base
-{
-};
+            class Base {
+            };
 
-/**
- * \brief a header field
- */
-class Header : public Base
-{
-};
+            /**
+             * \brief a header field
+             */
+            class Header : public Base {
+            };
 
-/**
- * \brief the Fragment field
- */
-class Fragment : public Base
-{
-};
+            /**
+             * \brief the Fragment field
+             */
+            class Fragment : public Base {
+            };
 
-} // namespace field_location_tags
+        } // namespace field_location_tags
 
-/**
- * \brief concept check for fields
- */
-template<class X>
-struct Field
-{
-  BOOST_CONCEPT_ASSERT((boost::is_base_of<field_location_tags::Base, typename X::FieldLocation>));
-  BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<typename X::ValueType>));
-  BOOST_CONCEPT_ASSERT((boost::CopyConstructible<typename X::ValueType>));
-  BOOST_CONCEPT_ASSERT((boost::is_same<typename X::TlvType::value_type, uint64_t>));
-  BOOST_CONCEPT_ASSERT((boost::is_same<typename X::IsRepeatable::value_type, bool>));
-  BOOST_CONCEPT_USAGE(Field)
-  {
-    Block wire;
-    X j;
-    typename X::ValueType decoded = j.decode(wire);
-    EncodingBuffer enc;
-    j.encode(enc, decoded);
-  }
-};
+        /**
+         * \brief concept check for fields
+         */
+        template<class X>
+        struct Field {
+            BOOST_CONCEPT_ASSERT((boost::is_base_of<field_location_tags::Base, typename X::FieldLocation>));
+            BOOST_CONCEPT_ASSERT((boost::DefaultConstructible<typename X::ValueType>));
+            BOOST_CONCEPT_ASSERT((boost::CopyConstructible<typename X::ValueType>));
+            BOOST_CONCEPT_ASSERT((boost::is_same<typename X::TlvType::value_type, uint64_t>));
+            BOOST_CONCEPT_ASSERT((boost::is_same<typename X::IsRepeatable::value_type, bool>));
 
-} // namespace lp
+            BOOST_CONCEPT_USAGE(Field) {
+                Block wire;
+                X j;
+                typename X::ValueType decoded = j.decode(wire);
+                EncodingBuffer enc;
+                j.encode(enc, decoded);
+            }
+        };
+
+    } // namespace lp
 } // namespace ndn
 
 #endif // NDN_CXX_LP_FIELD_HPP

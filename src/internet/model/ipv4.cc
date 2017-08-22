@@ -24,48 +24,46 @@
 #include "ipv4.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Ipv4");
-
-NS_OBJECT_ENSURE_REGISTERED (Ipv4);
-
-TypeId 
-Ipv4::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Ipv4")
-    .SetParent<Object> ()
-    .SetGroupName ("Internet")
-    .AddAttribute ("IpForward", "Globally enable or disable IP forwarding for all current and future Ipv4 devices.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&Ipv4::SetIpForward,
-                                        &Ipv4::GetIpForward),
-                   MakeBooleanChecker ())
-    .AddAttribute ("WeakEsModel", 
-                   "RFC1122 term for whether host accepts datagram with a dest. address on another interface",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&Ipv4::SetWeakEsModel,
-                                        &Ipv4::GetWeakEsModel),
-                   MakeBooleanChecker ())
+
+    NS_LOG_COMPONENT_DEFINE("Ipv4");
+
+    NS_OBJECT_ENSURE_REGISTERED(Ipv4);
+
+    TypeId
+    Ipv4::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Ipv4")
+                .SetParent<Object> ()
+                .SetGroupName("Internet")
+                .AddAttribute("IpForward", "Globally enable or disable IP forwarding for all current and future Ipv4 devices.",
+                BooleanValue(true),
+                MakeBooleanAccessor(&Ipv4::SetIpForward,
+                &Ipv4::GetIpForward),
+                MakeBooleanChecker())
+                .AddAttribute("WeakEsModel",
+                "RFC1122 term for whether host accepts datagram with a dest. address on another interface",
+                BooleanValue(true),
+                MakeBooleanAccessor(&Ipv4::SetWeakEsModel,
+                &Ipv4::GetWeakEsModel),
+                MakeBooleanChecker())
 #if 0
-    .AddAttribute ("MtuDiscover", "If enabled, every outgoing ip packet will have the DF flag set.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&UdpSocket::SetMtuDiscover,
-                                        &UdpSocket::GetMtuDiscover),
-                   MakeBooleanChecker ())
+                .AddAttribute("MtuDiscover", "If enabled, every outgoing ip packet will have the DF flag set.",
+                BooleanValue(false),
+                MakeBooleanAccessor(&UdpSocket::SetMtuDiscover,
+                &UdpSocket::GetMtuDiscover),
+                MakeBooleanChecker())
 #endif
-  ;
-  return tid;
-}
+                ;
+        return tid;
+    }
 
-Ipv4::Ipv4 ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    Ipv4::Ipv4() {
+        NS_LOG_FUNCTION(this);
+    }
 
-Ipv4::~Ipv4 ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    Ipv4::~Ipv4() {
+        NS_LOG_FUNCTION(this);
+    }
 
 } // namespace ns3

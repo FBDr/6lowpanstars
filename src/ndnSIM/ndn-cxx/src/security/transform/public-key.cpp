@@ -35,172 +35,158 @@
   } while (false)
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class PublicKey::Impl
-{
-public:
-  Impl()
-    : key(nullptr)
-  {
-  }
+            class PublicKey::Impl {
+            public:
 
-  ~Impl()
-  {
-    EVP_PKEY_free(key);
-  }
+                Impl()
+                : key(nullptr) {
+                }
 
-public:
-  EVP_PKEY* key;
-};
+                ~Impl() {
+                    EVP_PKEY_free(key);
+                }
 
-PublicKey::PublicKey()
-  : m_impl(new Impl)
-{
-}
+            public:
+                EVP_PKEY* key;
+            };
 
-PublicKey::~PublicKey() = default;
+            PublicKey::PublicKey()
+            : m_impl(new Impl) {
+            }
 
-KeyType
-PublicKey::getKeyType() const
-{
-  ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
+            PublicKey::~PublicKey() = default;
+
+            KeyType
+            PublicKey::getKeyType() const {
+                ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  switch (EVP_PKEY_type(m_impl->key->type)) {
+                switch (EVP_PKEY_type(m_impl->key->type)) {
 #else
-  switch (EVP_PKEY_base_id(m_impl->key)) {
+                switch (EVP_PKEY_base_id(m_impl->key)) {
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
-  case EVP_PKEY_RSA:
-    return KeyType::RSA;
-  case EVP_PKEY_EC:
-    return KeyType::EC;
-  default:
-    BOOST_THROW_EXCEPTION(Error("Public key type is not recognized"));
-  }
-}
+                    case EVP_PKEY_RSA:
+                        return KeyType::RSA;
+                    case EVP_PKEY_EC:
+                        return KeyType::EC;
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("Public key type is not recognized"));
+                }
+            }
 
-void
-PublicKey::loadPkcs8(const uint8_t* buf, size_t size)
-{
-  m_impl->key = d2i_PUBKEY(nullptr, &buf, size);
+            void
+            PublicKey::loadPkcs8(const uint8_t* buf, size_t size) {
+                m_impl->key = d2i_PUBKEY(nullptr, &buf, size);
 
-  ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
-}
+                ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
+            }
 
-void
-PublicKey::loadPkcs8(std::istream& is)
-{
-  OBufferStream os;
-  {
-    using namespace transform;
-    streamSource(is) >> streamSink(os);
-  }
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size());
-}
+            void
+            PublicKey::loadPkcs8(std::istream& is) {
+                OBufferStream os;
+                {
+                    using namespace transform;
+                    streamSource(is) >> streamSink(os);
+                }
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size());
+            }
 
-void
-PublicKey::loadPkcs8Base64(const uint8_t* buf, size_t size)
-{
-  OBufferStream os;
-  {
-    using namespace transform;
-    bufferSource(buf, size) >> base64Decode() >> streamSink(os);
-  }
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size());
-}
+            void
+            PublicKey::loadPkcs8Base64(const uint8_t* buf, size_t size) {
+                OBufferStream os;
+                {
+                    using namespace transform;
+                    bufferSource(buf, size) >> base64Decode() >> streamSink(os);
+                }
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size());
+            }
 
-void
-PublicKey::loadPkcs8Base64(std::istream& is)
-{
-  OBufferStream os;
-  {
-    using namespace transform;
-    streamSource(is) >> base64Decode() >> streamSink(os);
-  }
-  this->loadPkcs8(os.buf()->buf(), os.buf()->size());
-}
+            void
+            PublicKey::loadPkcs8Base64(std::istream& is) {
+                OBufferStream os;
+                {
+                    using namespace transform;
+                    streamSource(is) >> base64Decode() >> streamSink(os);
+                }
+                this->loadPkcs8(os.buf()->buf(), os.buf()->size());
+            }
 
-void
-PublicKey::savePkcs8(std::ostream& os) const
-{
-  using namespace transform;
-  bufferSource(*this->toPkcs8()) >> streamSink(os);
-}
+            void
+            PublicKey::savePkcs8(std::ostream& os) const {
+                using namespace transform;
+                bufferSource(*this->toPkcs8()) >> streamSink(os);
+            }
 
-void
-PublicKey::savePkcs8Base64(std::ostream& os) const
-{
-  using namespace transform;
-  bufferSource(*this->toPkcs8()) >> base64Encode() >> streamSink(os);
-}
+            void
+            PublicKey::savePkcs8Base64(std::ostream& os) const {
+                using namespace transform;
+                bufferSource(*this->toPkcs8()) >> base64Encode() >> streamSink(os);
+            }
 
-ConstBufferPtr
-PublicKey::encrypt(const uint8_t* plainText, size_t plainLen) const
-{
-  ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
+            ConstBufferPtr
+            PublicKey::encrypt(const uint8_t* plainText, size_t plainLen) const {
+                ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  switch (EVP_PKEY_type(m_impl->key->type)) {
+                switch (EVP_PKEY_type(m_impl->key->type)) {
 #else
-  switch (EVP_PKEY_base_id(m_impl->key)) {
+                switch (EVP_PKEY_base_id(m_impl->key)) {
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
-  case EVP_PKEY_RSA:
-    return rsaEncrypt(plainText, plainLen);
-  default:
-    BOOST_THROW_EXCEPTION(Error("Encryption is not supported for this key type"));
-  }
-}
+                    case EVP_PKEY_RSA:
+                        return rsaEncrypt(plainText, plainLen);
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("Encryption is not supported for this key type"));
+                }
+            }
 
-void*
-PublicKey::getEvpPkey() const
-{
-  return m_impl->key;
-}
+            void*
+            PublicKey::getEvpPkey() const {
+                return m_impl->key;
+            }
 
-ConstBufferPtr
-PublicKey::toPkcs8() const
-{
-  ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
+            ConstBufferPtr
+            PublicKey::toPkcs8() const {
+                ENSURE_PUBLIC_KEY_LOADED(m_impl->key);
 
-  uint8_t* pkcs8 = nullptr;
-  int len = i2d_PUBKEY(m_impl->key, &pkcs8);
+                uint8_t* pkcs8 = nullptr;
+                int len = i2d_PUBKEY(m_impl->key, &pkcs8);
 
-  if (pkcs8 == nullptr)
-    BOOST_THROW_EXCEPTION(Error("Failed to convert to pkcs8 format"));
+                if (pkcs8 == nullptr)
+                    BOOST_THROW_EXCEPTION(Error("Failed to convert to pkcs8 format"));
 
-  auto buffer = make_shared<Buffer>(pkcs8, len);
-  OPENSSL_free(pkcs8);
+                auto buffer = make_shared<Buffer>(pkcs8, len);
+                OPENSSL_free(pkcs8);
 
-  return buffer;
-}
+                return buffer;
+            }
 
-ConstBufferPtr
-PublicKey::rsaEncrypt(const uint8_t* plainText, size_t plainLen) const
-{
-  detail::EvpPkeyCtx ctx(m_impl->key);
+            ConstBufferPtr
+            PublicKey::rsaEncrypt(const uint8_t* plainText, size_t plainLen) const {
+                detail::EvpPkeyCtx ctx(m_impl->key);
 
-  if (EVP_PKEY_encrypt_init(ctx.get()) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to initialize encryption context"));
+                if (EVP_PKEY_encrypt_init(ctx.get()) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to initialize encryption context"));
 
-  if (EVP_PKEY_CTX_set_rsa_padding(ctx.get(), RSA_PKCS1_OAEP_PADDING) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to set padding"));
+                if (EVP_PKEY_CTX_set_rsa_padding(ctx.get(), RSA_PKCS1_OAEP_PADDING) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to set padding"));
 
-  size_t outlen = 0;
-  // Determine buffer length
-  if (EVP_PKEY_encrypt(ctx.get(), nullptr, &outlen, plainText, plainLen) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to estimate output length"));
+                size_t outlen = 0;
+                // Determine buffer length
+                if (EVP_PKEY_encrypt(ctx.get(), nullptr, &outlen, plainText, plainLen) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to estimate output length"));
 
-  auto out = make_shared<Buffer>(outlen);
+                auto out = make_shared<Buffer>(outlen);
 
-  if (EVP_PKEY_encrypt(ctx.get(), out->buf(), &outlen, plainText, plainLen) <= 0)
-    BOOST_THROW_EXCEPTION(Error("Failed to decrypt cipher text"));
+                if (EVP_PKEY_encrypt(ctx.get(), out->buf(), &outlen, plainText, plainLen) <= 0)
+                    BOOST_THROW_EXCEPTION(Error("Failed to decrypt cipher text"));
 
-  out->resize(outlen);
-  return out;
-}
+                out->resize(outlen);
+                return out;
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

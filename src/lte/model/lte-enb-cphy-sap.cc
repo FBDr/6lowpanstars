@@ -20,14 +20,13 @@
 
 #include "ns3/lte-enb-cphy-sap.h"
 
-namespace ns3 {
-
-LteEnbCphySapProvider::~LteEnbCphySapProvider ()
+namespace ns3
 {
-}
 
-LteEnbCphySapUser::~LteEnbCphySapUser ()
-{
-}
+    LteEnbCphySapProvider::~LteEnbCphySapProvider() {
+    }
+
+    LteEnbCphySapUser::~LteEnbCphySapUser() {
+    }
 
 } // namespace ns3

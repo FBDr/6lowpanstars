@@ -30,62 +30,60 @@
 
 namespace ns3 {
 
-class Building;
+    class Building;
 
+    /**
+     * \ingroup buildings
+     * \brief Allocate buildings on a rectangular 2d grid.
+     *
+     * This class allows to create a set of buildings positioned on a
+     * rectangular 2D grid. Under the hood, this class uses two instances
+     * of GridPositionAllocator. 
+     */
+    class GridBuildingAllocator : public Object {
+    public:
+        GridBuildingAllocator();
+        virtual ~GridBuildingAllocator();
 
-/**
- * \ingroup buildings
- * \brief Allocate buildings on a rectangular 2d grid.
- *
- * This class allows to create a set of buildings positioned on a
- * rectangular 2D grid. Under the hood, this class uses two instances
- * of GridPositionAllocator. 
- */
-class GridBuildingAllocator : public Object
-{
-public:
-  GridBuildingAllocator ();
-  virtual ~GridBuildingAllocator ();
+        // inherited from Object
+        static TypeId GetTypeId(void);
 
-  // inherited from Object
-  static TypeId GetTypeId (void);
+        /** 
+         * Set an attribute to be used for each new building to be created
+         * 
+         * \param n attribute name
+         * \param v attribute value
+         */
+        void SetBuildingAttribute(std::string n, const AttributeValue &v);
 
-  /** 
-   * Set an attribute to be used for each new building to be created
-   * 
-   * \param n attribute name
-   * \param v attribute value
-   */
-  void SetBuildingAttribute (std::string n, const AttributeValue &v);
+        /** 
+         * Create a set of buildings allocated on a grid
+         * 
+         * \param n the number of buildings to create
+         * 
+         * \return the BuildingContainer that contains the newly created buildings
+         */
+        BuildingContainer Create(uint32_t n) const;
 
-  /** 
-   * Create a set of buildings allocated on a grid
-   * 
-   * \param n the number of buildings to create
-   * 
-   * \return the BuildingContainer that contains the newly created buildings
-   */
-  BuildingContainer Create (uint32_t n) const;
+    private:
 
-private:
+        void PushAttributes() const;
+        mutable uint32_t m_current;
+        enum GridPositionAllocator::LayoutType m_layoutType;
+        double m_xMin;
+        double m_yMin;
+        uint32_t m_n;
+        double m_lengthX;
+        double m_lengthY;
+        double m_deltaX;
+        double m_deltaY;
+        double m_height;
 
-  void PushAttributes () const;
-  mutable uint32_t m_current;
-  enum GridPositionAllocator::LayoutType m_layoutType;
-  double m_xMin;
-  double m_yMin;
-  uint32_t m_n;
-  double m_lengthX;
-  double m_lengthY;
-  double m_deltaX;
-  double m_deltaY;
-  double m_height;
+        mutable ObjectFactory m_buildingFactory;
+        Ptr<GridPositionAllocator> m_lowerLeftPositionAllocator;
+        Ptr<GridPositionAllocator> m_upperRightPositionAllocator;
 
-  mutable ObjectFactory m_buildingFactory;
-  Ptr<GridPositionAllocator> m_lowerLeftPositionAllocator;
-  Ptr<GridPositionAllocator> m_upperRightPositionAllocator;
-  
-};
+    };
 
 } // namespace ns3
 

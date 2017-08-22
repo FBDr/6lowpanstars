@@ -28,32 +28,31 @@
 
 namespace ns3 {
 
-/**
- * \brief create HT-enabled MAC layers for a ns3::WifiNetDevice.
- *
- * This class can create MACs of type ns3::ApWifiMac, ns3::StaWifiMac,
- * and, ns3::AdhocWifiMac, with QosSupported and HTSupported attributes set to True.
- */
-class HtWifiMacHelper : public QosWifiMacHelper
-{
-public:
-  /**
-   * Create a QosWifiMacHelper that is used to make life easier when working
-   * with Wifi devices using a QOS MAC layer.
-   */
-  HtWifiMacHelper ();
+    /**
+     * \brief create HT-enabled MAC layers for a ns3::WifiNetDevice.
+     *
+     * This class can create MACs of type ns3::ApWifiMac, ns3::StaWifiMac,
+     * and, ns3::AdhocWifiMac, with QosSupported and HTSupported attributes set to True.
+     */
+    class HtWifiMacHelper : public QosWifiMacHelper {
+    public:
+        /**
+         * Create a QosWifiMacHelper that is used to make life easier when working
+         * with Wifi devices using a QOS MAC layer.
+         */
+        HtWifiMacHelper();
 
-  /**
-   * Destroy a HtWifiMacHelper
-   */
-  virtual ~HtWifiMacHelper ();
+        /**
+         * Destroy a HtWifiMacHelper
+         */
+        virtual ~HtWifiMacHelper();
 
-  /**
-   * Create a mac helper in a default working state.
-   */
-  static HtWifiMacHelper Default (void);
+        /**
+         * Create a mac helper in a default working state.
+         */
+        static HtWifiMacHelper Default(void);
 
-};
+    };
 
 } //namespace ns3
 

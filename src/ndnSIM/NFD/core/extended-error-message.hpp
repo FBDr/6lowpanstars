@@ -31,26 +31,25 @@
 
 namespace nfd {
 
-template<typename E>
-std::string
-getExtendedErrorMessage(const E& exception)
-{
-  std::ostringstream errorMessage;
-  errorMessage << exception.what();
+    template<typename E>
+    std::string
+    getExtendedErrorMessage(const E& exception) {
+        std::ostringstream errorMessage;
+        errorMessage << exception.what();
 
-  const char* const* file = boost::get_error_info<boost::throw_file>(exception);
-  const int* line = boost::get_error_info<boost::throw_line>(exception);
-  const char* const* func = boost::get_error_info<boost::throw_function>(exception);
-  if (file && line) {
-    errorMessage << " [from " << *file << ":" << *line;
-    if (func) {
-      errorMessage << " in " << *func;
+        const char* const* file = boost::get_error_info<boost::throw_file>(exception);
+        const int* line = boost::get_error_info<boost::throw_line>(exception);
+        const char* const* func = boost::get_error_info<boost::throw_function>(exception);
+        if (file && line) {
+            errorMessage << " [from " << *file << ":" << *line;
+            if (func) {
+                errorMessage << " in " << *func;
+            }
+            errorMessage << "]";
+        }
+
+        return errorMessage.str();
     }
-    errorMessage << "]";
-  }
-
-  return errorMessage.str();
-}
 
 } // namespace nfd
 

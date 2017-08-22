@@ -26,19 +26,17 @@
 #include "pit-in-record.hpp"
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-InRecord::InRecord(Face& face)
-  : FaceRecord(face)
-{
-}
+        InRecord::InRecord(Face& face)
+        : FaceRecord(face) {
+        }
 
-void
-InRecord::update(const Interest& interest)
-{
-  this->FaceRecord::update(interest);
-  m_interest = const_cast<Interest&>(interest).shared_from_this();
-}
+        void
+        InRecord::update(const Interest& interest) {
+            this->FaceRecord::update(interest);
+            m_interest = const_cast<Interest&> (interest).shared_from_this();
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd

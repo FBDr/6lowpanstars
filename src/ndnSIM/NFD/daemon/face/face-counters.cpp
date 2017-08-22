@@ -26,24 +26,23 @@
 #include "face-counters.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-FaceCounters::FaceCounters(const LinkService::Counters& linkServiceCounters,
-                           const Transport::Counters& transportCounters)
-  : nInInterests(linkServiceCounters.nInInterests)
-  , nOutInterests(linkServiceCounters.nOutInterests)
-  , nInData(linkServiceCounters.nInData)
-  , nOutData(linkServiceCounters.nOutData)
-  , nInNacks(linkServiceCounters.nInNacks)
-  , nOutNacks(linkServiceCounters.nOutNacks)
-  , nInPackets(transportCounters.nInPackets)
-  , nOutPackets(transportCounters.nOutPackets)
-  , nInBytes(transportCounters.nInBytes)
-  , nOutBytes(transportCounters.nOutBytes)
-  , m_linkServiceCounters(linkServiceCounters)
-  , m_transportCounters(transportCounters)
-{
-}
+        FaceCounters::FaceCounters(const LinkService::Counters& linkServiceCounters,
+                const Transport::Counters& transportCounters)
+        : nInInterests(linkServiceCounters.nInInterests)
+        , nOutInterests(linkServiceCounters.nOutInterests)
+        , nInData(linkServiceCounters.nInData)
+        , nOutData(linkServiceCounters.nOutData)
+        , nInNacks(linkServiceCounters.nInNacks)
+        , nOutNacks(linkServiceCounters.nOutNacks)
+        , nInPackets(transportCounters.nInPackets)
+        , nOutPackets(transportCounters.nOutPackets)
+        , nInBytes(transportCounters.nInBytes)
+        , nOutBytes(transportCounters.nOutBytes)
+        , m_linkServiceCounters(linkServiceCounters)
+        , m_transportCounters(transportCounters) {
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

@@ -25,126 +25,111 @@
  * ns3::Synchronizer implementation.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Synchronizer");
-
-NS_OBJECT_ENSURE_REGISTERED (Synchronizer);
-
-TypeId 
-Synchronizer::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Synchronizer")
-    .SetParent<Object> ()
-    .SetGroupName ("Core")
-  ;
-  return tid;
-}
 
-Synchronizer::Synchronizer ()
-  : m_realtimeOriginNano (0),
-    m_simOriginNano (0)
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("Synchronizer");
 
-Synchronizer::~Synchronizer ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(Synchronizer);
 
-bool
-Synchronizer::Realtime (void)
-{
-  NS_LOG_FUNCTION (this);
-  return DoRealtime ();
-}
-
-uint64_t
-Synchronizer::GetCurrentRealtime (void)
-{
-  NS_LOG_FUNCTION (this);
-  return NanosecondToTimeStep (DoGetCurrentRealtime ());
-}
-
-void
-Synchronizer::SetOrigin (uint64_t ts)
-{
-  NS_LOG_FUNCTION (this << ts);
-  m_simOriginNano = TimeStepToNanosecond (ts);
-  DoSetOrigin (m_simOriginNano);
-}
-
-uint64_t
-Synchronizer::GetOrigin (void)
-{
-  NS_LOG_FUNCTION (this);
-  return NanosecondToTimeStep (m_simOriginNano);
-}
-
-int64_t
-Synchronizer::GetDrift (uint64_t ts)
-{
-  NS_LOG_FUNCTION (this << ts);
-  int64_t tDrift = DoGetDrift (TimeStepToNanosecond (ts));
-
-  if (tDrift < 0) 
-    {
-      return -NanosecondToTimeStep (-tDrift);
-    } else {
-      return NanosecondToTimeStep (tDrift);
+    TypeId
+    Synchronizer::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Synchronizer")
+                .SetParent<Object> ()
+                .SetGroupName("Core")
+                ;
+        return tid;
     }
-}
 
-bool
-Synchronizer::Synchronize (uint64_t tsCurrent, uint64_t tsDelay)
-{
-  NS_LOG_FUNCTION (this << tsCurrent << tsDelay);
-  return DoSynchronize (TimeStepToNanosecond (tsCurrent), 
-                        TimeStepToNanosecond (tsDelay));
-}
+    Synchronizer::Synchronizer()
+            : m_realtimeOriginNano(0),
+            m_simOriginNano(0) {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-Synchronizer::Signal (void)
-{
-  NS_LOG_FUNCTION (this);
-  DoSignal ();
-}
+    Synchronizer::~Synchronizer() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-Synchronizer::SetCondition (bool cond)
-{
-  NS_LOG_FUNCTION (this << cond);
-  DoSetCondition (cond);
-}
+    bool
+    Synchronizer::Realtime(void) {
+        NS_LOG_FUNCTION(this);
+        return DoRealtime();
+    }
 
-void
-Synchronizer::EventStart (void)
-{
-  NS_LOG_FUNCTION (this);
-  DoEventStart ();
-}
+    uint64_t
+    Synchronizer::GetCurrentRealtime(void) {
+        NS_LOG_FUNCTION(this);
+        return NanosecondToTimeStep(DoGetCurrentRealtime());
+    }
 
-uint64_t
-Synchronizer::EventEnd (void)
-{
-  NS_LOG_FUNCTION (this);
-  return NanosecondToTimeStep (DoEventEnd ());
-}
+    void
+    Synchronizer::SetOrigin(uint64_t ts) {
+        NS_LOG_FUNCTION(this << ts);
+        m_simOriginNano = TimeStepToNanosecond(ts);
+        DoSetOrigin(m_simOriginNano);
+    }
 
-uint64_t
-Synchronizer::TimeStepToNanosecond (uint64_t ts)
-{
-  NS_LOG_FUNCTION (this << ts);
-  return TimeStep (ts).GetNanoSeconds ();
-}
+    uint64_t
+    Synchronizer::GetOrigin(void) {
+        NS_LOG_FUNCTION(this);
+        return NanosecondToTimeStep(m_simOriginNano);
+    }
 
-uint64_t
-Synchronizer::NanosecondToTimeStep (uint64_t ns)
-{
-  NS_LOG_FUNCTION (this << ns);
-  return NanoSeconds (ns).GetTimeStep ();
-}
+    int64_t
+    Synchronizer::GetDrift(uint64_t ts) {
+        NS_LOG_FUNCTION(this << ts);
+        int64_t tDrift = DoGetDrift(TimeStepToNanosecond(ts));
+
+        if (tDrift < 0) {
+            return -NanosecondToTimeStep(-tDrift);
+        } else {
+            return NanosecondToTimeStep(tDrift);
+        }
+    }
+
+    bool
+    Synchronizer::Synchronize(uint64_t tsCurrent, uint64_t tsDelay) {
+        NS_LOG_FUNCTION(this << tsCurrent << tsDelay);
+        return DoSynchronize(TimeStepToNanosecond(tsCurrent),
+                TimeStepToNanosecond(tsDelay));
+    }
+
+    void
+    Synchronizer::Signal(void) {
+        NS_LOG_FUNCTION(this);
+        DoSignal();
+    }
+
+    void
+    Synchronizer::SetCondition(bool cond) {
+        NS_LOG_FUNCTION(this << cond);
+        DoSetCondition(cond);
+    }
+
+    void
+    Synchronizer::EventStart(void) {
+        NS_LOG_FUNCTION(this);
+        DoEventStart();
+    }
+
+    uint64_t
+    Synchronizer::EventEnd(void) {
+        NS_LOG_FUNCTION(this);
+        return NanosecondToTimeStep(DoEventEnd());
+    }
+
+    uint64_t
+    Synchronizer::TimeStepToNanosecond(uint64_t ts) {
+        NS_LOG_FUNCTION(this << ts);
+        return TimeStep(ts).GetNanoSeconds();
+    }
+
+    uint64_t
+    Synchronizer::NanosecondToTimeStep(uint64_t ns) {
+        NS_LOG_FUNCTION(this << ns);
+        return NanoSeconds(ns).GetTimeStep();
+    }
 
 } // namespace ns3
 

@@ -27,14 +27,14 @@
 #include "../common.hpp"
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-/**
- * \brief represents a sequence number
- */
-typedef uint64_t Sequence;
+        /**
+         * \brief represents a sequence number
+         */
+        typedef uint64_t Sequence;
 
-} // namespace lp
+    } // namespace lp
 } // namespace ndn
 
 #endif // NDN_CXX_LP_SEQUENCE_HPP

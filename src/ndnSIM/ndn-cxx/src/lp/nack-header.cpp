@@ -24,117 +24,108 @@
 #include "nack-header.hpp"
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-std::ostream&
-operator<<(std::ostream& os, NackReason reason)
-{
-  switch (reason) {
-  case NackReason::CONGESTION:
-    os << "Congestion";
-    break;
-  case NackReason::DUPLICATE:
-    os << "Duplicate";
-    break;
-  case NackReason::NO_ROUTE:
-    os << "NoRoute";
-    break;
-  default:
-    os << "None";
-    break;
-  }
-  return os;
-}
+        std::ostream&
+        operator<<(std::ostream& os, NackReason reason) {
+            switch (reason) {
+                case NackReason::CONGESTION:
+                    os << "Congestion";
+                    break;
+                case NackReason::DUPLICATE:
+                    os << "Duplicate";
+                    break;
+                case NackReason::NO_ROUTE:
+                    os << "NoRoute";
+                    break;
+                default:
+                    os << "None";
+                    break;
+            }
+            return os;
+        }
 
-NackHeader::NackHeader()
-  : m_reason(NackReason::NONE)
-{
-}
+        NackHeader::NackHeader()
+        : m_reason(NackReason::NONE) {
+        }
 
-NackHeader::NackHeader(const Block& block)
-{
-  wireDecode(block);
-}
+        NackHeader::NackHeader(const Block& block) {
+            wireDecode(block);
+        }
 
-template<encoding::Tag TAG>
-size_t
-NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t length = 0;
-  length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason,
-                                           static_cast<uint32_t>(m_reason));
-  length += encoder.prependVarNumber(length);
-  length += encoder.prependVarNumber(tlv::Nack);
-  return length;
-}
+        template<encoding::Tag TAG>
+        size_t
+        NackHeader::wireEncode(EncodingImpl<TAG>& encoder) const {
+            size_t length = 0;
+            length += prependNonNegativeIntegerBlock(encoder, tlv::NackReason,
+                    static_cast<uint32_t> (m_reason));
+            length += encoder.prependVarNumber(length);
+            length += encoder.prependVarNumber(tlv::Nack);
+            return length;
+        }
 
-template size_t
-NackHeader::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+        template size_t
+        NackHeader::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
 
-template size_t
-NackHeader::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+        template size_t
+        NackHeader::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
 
-const Block&
-NackHeader::wireEncode() const
-{
-  if (m_wire.hasWire()) {
-    return m_wire;
-  }
+        const Block&
+        NackHeader::wireEncode() const {
+            if (m_wire.hasWire()) {
+                return m_wire;
+            }
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  m_wire = buffer.block();
+            m_wire = buffer.block();
 
-  return m_wire;
-}
+            return m_wire;
+        }
 
-void
-NackHeader::wireDecode(const Block& wire)
-{
-  if (wire.type() != tlv::Nack) {
-    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting Nack block"));
-  }
+        void
+        NackHeader::wireDecode(const Block& wire) {
+            if (wire.type() != tlv::Nack) {
+                BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting Nack block"));
+            }
 
-  m_wire = wire;
-  m_wire.parse();
-  m_reason = NackReason::NONE;
+            m_wire = wire;
+            m_wire.parse();
+            m_reason = NackReason::NONE;
 
-  if (m_wire.elements_size() > 0) {
-    Block::element_const_iterator it = m_wire.elements_begin();
+            if (m_wire.elements_size() > 0) {
+                Block::element_const_iterator it = m_wire.elements_begin();
 
-    if (it->type() == tlv::NackReason) {
-      m_reason = static_cast<NackReason>(readNonNegativeInteger(*it));
-    }
-    else {
-      BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
-    }
-  }
-}
+                if (it->type() == tlv::NackReason) {
+                    m_reason = static_cast<NackReason> (readNonNegativeInteger(*it));
+                } else {
+                    BOOST_THROW_EXCEPTION(ndn::tlv::Error("expecting NackReason block"));
+                }
+            }
+        }
 
-NackReason
-NackHeader::getReason() const
-{
-  switch (m_reason) {
-  case NackReason::CONGESTION:
-  case NackReason::DUPLICATE:
-  case NackReason::NO_ROUTE:
-    return m_reason;
-  default:
-    return NackReason::NONE;
-  }
-}
+        NackReason
+        NackHeader::getReason() const {
+            switch (m_reason) {
+                case NackReason::CONGESTION:
+                case NackReason::DUPLICATE:
+                case NackReason::NO_ROUTE:
+                    return m_reason;
+                default:
+                    return NackReason::NONE;
+            }
+        }
 
-NackHeader&
-NackHeader::setReason(NackReason reason)
-{
-  m_reason = reason;
-  m_wire.reset();
-  return *this;
-}
+        NackHeader&
+        NackHeader::setReason(NackReason reason) {
+            m_reason = reason;
+            m_wire.reset();
+            return *this;
+        }
 
-} // namespace lp
+    } // namespace lp
 } // namespace ndn

@@ -30,26 +30,25 @@
 #include <boost/thread.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TestGlobalIo, BaseFixture)
+        BOOST_FIXTURE_TEST_SUITE(TestGlobalIo, BaseFixture)
 
-BOOST_AUTO_TEST_CASE(ThreadLocalGlobalIoService)
-{
-  boost::asio::io_service* s1 = &getGlobalIoService();
-  boost::asio::io_service* s2 = nullptr;
-  boost::thread t([&s2] {
-      s2 = &getGlobalIoService();
-    });
+        BOOST_AUTO_TEST_CASE(ThreadLocalGlobalIoService) {
+            boost::asio::io_service* s1 = &getGlobalIoService();
+            boost::asio::io_service* s2 = nullptr;
+            boost::thread t([&s2] {
+                s2 = &getGlobalIoService();
+            });
 
-  t.join();
+            t.join();
 
-  BOOST_CHECK(s1 != nullptr);
-  BOOST_CHECK(s2 != nullptr);
-  BOOST_CHECK(s1 != s2);
-}
+            BOOST_CHECK(s1 != nullptr);
+            BOOST_CHECK(s2 != nullptr);
+            BOOST_CHECK(s1 != s2);
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

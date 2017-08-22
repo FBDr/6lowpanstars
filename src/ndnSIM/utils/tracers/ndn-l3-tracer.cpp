@@ -29,48 +29,46 @@
 #include "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-L3Tracer::L3Tracer(Ptr<Node> node)
-  : m_nodePtr(node)
-{
-  m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
+        L3Tracer::L3Tracer(Ptr<Node> node)
+        : m_nodePtr(node) {
+            m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
 
-  Connect();
+            Connect();
 
-  std::string name = Names::FindName(node);
-  if (!name.empty()) {
-    m_node = name;
-  }
-}
+            std::string name = Names::FindName(node);
+            if (!name.empty()) {
+                m_node = name;
+            }
+        }
 
-L3Tracer::L3Tracer(const std::string& node)
-  : m_node(node)
-{
-  Connect();
-}
+        L3Tracer::L3Tracer(const std::string& node)
+        : m_node(node) {
+            Connect();
+        }
 
-L3Tracer::~L3Tracer(){};
+        L3Tracer::~L3Tracer() {
+        };
 
-void
-L3Tracer::Connect()
-{
-  Ptr<L3Protocol> l3 = m_nodePtr->GetObject<L3Protocol>();
+        void
+        L3Tracer::Connect() {
+            Ptr<L3Protocol> l3 = m_nodePtr->GetObject<L3Protocol>();
 
-  l3->TraceConnectWithoutContext("OutInterests", MakeCallback(&L3Tracer::OutInterests, this));
-  l3->TraceConnectWithoutContext("InInterests", MakeCallback(&L3Tracer::InInterests, this));
-  l3->TraceConnectWithoutContext("OutData", MakeCallback(&L3Tracer::OutData, this));
-  l3->TraceConnectWithoutContext("InData", MakeCallback(&L3Tracer::InData, this));
-  l3->TraceConnectWithoutContext("OutNack", MakeCallback(&L3Tracer::OutNack, this));
-  l3->TraceConnectWithoutContext("InNack", MakeCallback(&L3Tracer::InNack, this));
+            l3->TraceConnectWithoutContext("OutInterests", MakeCallback(&L3Tracer::OutInterests, this));
+            l3->TraceConnectWithoutContext("InInterests", MakeCallback(&L3Tracer::InInterests, this));
+            l3->TraceConnectWithoutContext("OutData", MakeCallback(&L3Tracer::OutData, this));
+            l3->TraceConnectWithoutContext("InData", MakeCallback(&L3Tracer::InData, this));
+            l3->TraceConnectWithoutContext("OutNack", MakeCallback(&L3Tracer::OutNack, this));
+            l3->TraceConnectWithoutContext("InNack", MakeCallback(&L3Tracer::InNack, this));
 
-  // satisfied/timed out PIs
-  l3->TraceConnectWithoutContext("SatisfiedInterests",
-                                 MakeCallback(&L3Tracer::SatisfiedInterests, this));
+            // satisfied/timed out PIs
+            l3->TraceConnectWithoutContext("SatisfiedInterests",
+                    MakeCallback(&L3Tracer::SatisfiedInterests, this));
 
-  l3->TraceConnectWithoutContext("TimedOutInterests",
-                                 MakeCallback(&L3Tracer::TimedOutInterests, this));
-}
+            l3->TraceConnectWithoutContext("TimedOutInterests",
+                    MakeCallback(&L3Tracer::TimedOutInterests, this));
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

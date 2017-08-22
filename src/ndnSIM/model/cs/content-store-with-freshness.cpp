@@ -34,66 +34,67 @@
   } x_##type##templ##RegistrationVariable
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-using namespace ndnSIM;
+        using namespace ndnSIM;
 
-namespace cs {
+        namespace cs {
 
-// explicit instantiation and registering
-/**
- * @brief ContentStore with freshness and LRU cache replacement policy
- **/
-template class ContentStoreWithFreshness<lru_policy_traits>;
+            // explicit instantiation and registering
+            /**
+             * @brief ContentStore with freshness and LRU cache replacement policy
+             **/
+            template class ContentStoreWithFreshness<lru_policy_traits>;
 
-/**
- * @brief ContentStore with freshness and random cache replacement policy
- **/
-template class ContentStoreWithFreshness<random_policy_traits>;
+            /**
+             * @brief ContentStore with freshness and random cache replacement policy
+             **/
+            template class ContentStoreWithFreshness<random_policy_traits>;
 
-/**
- * @brief ContentStore with freshness and FIFO cache replacement policy
- **/
-template class ContentStoreWithFreshness<fifo_policy_traits>;
+            /**
+             * @brief ContentStore with freshness and FIFO cache replacement policy
+             **/
+            template class ContentStoreWithFreshness<fifo_policy_traits>;
 
-/**
- * @brief ContentStore with freshness and Least Frequently Used (LFU) cache replacement policy
- **/
-template class ContentStoreWithFreshness<lfu_policy_traits>;
+            /**
+             * @brief ContentStore with freshness and Least Frequently Used (LFU) cache replacement policy
+             **/
+            template class ContentStoreWithFreshness<lfu_policy_traits>;
 
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lru_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, random_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, fifo_policy_traits);
+            NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lru_policy_traits);
+            NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, random_policy_traits);
+            NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, fifo_policy_traits);
 
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lfu_policy_traits);
+            NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lfu_policy_traits);
 
 #ifdef DOXYGEN
-// /**
-//  * \brief Content Store with freshness implementing LRU cache replacement policy
-//  */
-class Freshness::Lru : public ContentStoreWithFreshness<lru_policy_traits> {
-};
+            // /**
+            //  * \brief Content Store with freshness implementing LRU cache replacement policy
+            //  */
 
-/**
- * \brief Content Store with freshness implementing FIFO cache replacement policy
- */
-class Freshness::Fifo : public ContentStoreWithFreshness<fifo_policy_traits> {
-};
+            class Freshness::Lru : public ContentStoreWithFreshness<lru_policy_traits> {
+            };
 
-/**
- * \brief Content Store with freshness implementing Random cache replacement policy
- */
-class Freshness::Random : public ContentStoreWithFreshness<random_policy_traits> {
-};
+            /**
+             * \brief Content Store with freshness implementing FIFO cache replacement policy
+             */
+            class Freshness::Fifo : public ContentStoreWithFreshness<fifo_policy_traits> {
+            };
 
-/**
- * \brief Content Store with freshness implementing Least Frequently Used cache replacement policy
- */
-class Freshness::Lfu : public ContentStoreWithFreshness<lfu_policy_traits> {
-};
+            /**
+             * \brief Content Store with freshness implementing Random cache replacement policy
+             */
+            class Freshness::Random : public ContentStoreWithFreshness<random_policy_traits> {
+            };
+
+            /**
+             * \brief Content Store with freshness implementing Least Frequently Used cache replacement policy
+             */
+            class Freshness::Lfu : public ContentStoreWithFreshness<lfu_policy_traits> {
+            };
 
 #endif
 
-} // namespace cs
-} // namespace ndn
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3

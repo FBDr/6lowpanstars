@@ -22,140 +22,127 @@
 #include "block-helpers.hpp"
 
 namespace ndn {
-namespace encoding {
+    namespace encoding {
 
-template<Tag TAG>
-size_t
-prependNonNegativeIntegerBlock(EncodingImpl<TAG>& encoder, uint32_t type, uint64_t value)
-{
-  size_t valueLength = encoder.prependNonNegativeInteger(value);
-  size_t totalLength = valueLength;
-  totalLength += encoder.prependVarNumber(valueLength);
-  totalLength += encoder.prependVarNumber(type);
+        template<Tag TAG>
+        size_t
+        prependNonNegativeIntegerBlock(EncodingImpl<TAG>& encoder, uint32_t type, uint64_t value) {
+            size_t valueLength = encoder.prependNonNegativeInteger(value);
+            size_t totalLength = valueLength;
+            totalLength += encoder.prependVarNumber(valueLength);
+            totalLength += encoder.prependVarNumber(type);
 
-  return totalLength;
-}
+            return totalLength;
+        }
 
-template size_t
-prependNonNegativeIntegerBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder,
-                                             uint32_t type, uint64_t value);
+        template size_t
+        prependNonNegativeIntegerBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder,
+                uint32_t type, uint64_t value);
 
-template size_t
-prependNonNegativeIntegerBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder,
-                                           uint32_t type, uint64_t value);
+        template size_t
+        prependNonNegativeIntegerBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder,
+                uint32_t type, uint64_t value);
 
+        Block
+        makeNonNegativeIntegerBlock(uint32_t type, uint64_t value) {
+            EncodingEstimator estimator;
+            size_t totalLength = prependNonNegativeIntegerBlock(estimator, type, value);
 
-Block
-makeNonNegativeIntegerBlock(uint32_t type, uint64_t value)
-{
-  EncodingEstimator estimator;
-  size_t totalLength = prependNonNegativeIntegerBlock(estimator, type, value);
+            EncodingBuffer encoder(totalLength, 0);
+            prependNonNegativeIntegerBlock(encoder, type, value);
 
-  EncodingBuffer encoder(totalLength, 0);
-  prependNonNegativeIntegerBlock(encoder, type, value);
+            return encoder.block();
+        }
 
-  return encoder.block();
-}
+        uint64_t
+        readNonNegativeInteger(const Block& block) {
+            Buffer::const_iterator begin = block.value_begin();
+            return tlv::readNonNegativeInteger(block.value_size(), begin, block.value_end());
+        }
 
-uint64_t
-readNonNegativeInteger(const Block& block)
-{
-  Buffer::const_iterator begin = block.value_begin();
-  return tlv::readNonNegativeInteger(block.value_size(), begin, block.value_end());
-}
+        ////////
 
-////////
+        template<Tag TAG>
+        size_t
+        prependEmptyBlock(EncodingImpl<TAG>& encoder, uint32_t type) {
+            size_t totalLength = encoder.prependVarNumber(0);
+            totalLength += encoder.prependVarNumber(type);
 
-template<Tag TAG>
-size_t
-prependEmptyBlock(EncodingImpl<TAG>& encoder, uint32_t type)
-{
-  size_t totalLength = encoder.prependVarNumber(0);
-  totalLength += encoder.prependVarNumber(type);
+            return totalLength;
+        }
 
-  return totalLength;
-}
+        template size_t
+        prependEmptyBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder, uint32_t type);
 
-template size_t
-prependEmptyBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder, uint32_t type);
+        template size_t
+        prependEmptyBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder, uint32_t type);
 
-template size_t
-prependEmptyBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder, uint32_t type);
+        Block
+        makeEmptyBlock(uint32_t type) {
+            EncodingEstimator estimator;
+            size_t totalLength = prependEmptyBlock(estimator, type);
 
+            EncodingBuffer encoder(totalLength, 0);
+            prependEmptyBlock(encoder, type);
 
-Block
-makeEmptyBlock(uint32_t type)
-{
-  EncodingEstimator estimator;
-  size_t totalLength = prependEmptyBlock(estimator, type);
+            return encoder.block();
+        }
 
-  EncodingBuffer encoder(totalLength, 0);
-  prependEmptyBlock(encoder, type);
+        ////////
 
-  return encoder.block();
-}
+        template<Tag TAG>
+        size_t
+        prependStringBlock(EncodingImpl<TAG>& encoder, uint32_t type, const std::string& value) {
+            size_t valueLength = encoder.prependByteArray(reinterpret_cast<const uint8_t*> (value.data()),
+                    value.size());
+            size_t totalLength = valueLength;
+            totalLength += encoder.prependVarNumber(valueLength);
+            totalLength += encoder.prependVarNumber(type);
 
-////////
+            return totalLength;
+        }
 
-template<Tag TAG>
-size_t
-prependStringBlock(EncodingImpl<TAG>& encoder, uint32_t type, const std::string& value)
-{
-  size_t valueLength = encoder.prependByteArray(reinterpret_cast<const uint8_t*>(value.data()),
-                                                value.size());
-  size_t totalLength = valueLength;
-  totalLength += encoder.prependVarNumber(valueLength);
-  totalLength += encoder.prependVarNumber(type);
+        template size_t
+        prependStringBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder,
+                uint32_t type, const std::string& value);
 
-  return totalLength;
-}
+        template size_t
+        prependStringBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder,
+                uint32_t type, const std::string& value);
 
-template size_t
-prependStringBlock<EstimatorTag>(EncodingImpl<EstimatorTag>& encoder,
-                                 uint32_t type, const std::string& value);
+        Block
+        makeStringBlock(uint32_t type, const std::string& value) {
+            EncodingEstimator estimator;
+            size_t totalLength = prependStringBlock(estimator, type, value);
 
-template size_t
-prependStringBlock<EncoderTag>(EncodingImpl<EncoderTag>& encoder,
-                               uint32_t type, const std::string& value);
+            EncodingBuffer encoder(totalLength, 0);
+            prependStringBlock(encoder, type, value);
 
+            return encoder.block();
+        }
 
-Block
-makeStringBlock(uint32_t type, const std::string& value)
-{
-  EncodingEstimator estimator;
-  size_t totalLength = prependStringBlock(estimator, type, value);
+        std::string
+        readString(const Block& block) {
+            return std::string(reinterpret_cast<const char*> (block.value()), block.value_size());
+        }
 
-  EncodingBuffer encoder(totalLength, 0);
-  prependStringBlock(encoder, type, value);
+        ////////
 
-  return encoder.block();
-}
+        Block
+        makeBinaryBlock(uint32_t type, const uint8_t* value, size_t length) {
+            EncodingEstimator estimator;
+            size_t totalLength = estimator.prependByteArrayBlock(type, value, length);
 
-std::string
-readString(const Block& block)
-{
-  return std::string(reinterpret_cast<const char*>(block.value()), block.value_size());
-}
+            EncodingBuffer encoder(totalLength, 0);
+            encoder.prependByteArrayBlock(type, value, length);
 
-////////
+            return encoder.block();
+        }
 
-Block
-makeBinaryBlock(uint32_t type, const uint8_t* value, size_t length)
-{
-  EncodingEstimator estimator;
-  size_t totalLength = estimator.prependByteArrayBlock(type, value, length);
+        Block
+        makeBinaryBlock(uint32_t type, const char* value, size_t length) {
+            return makeBinaryBlock(type, reinterpret_cast<const uint8_t*> (value), length);
+        }
 
-  EncodingBuffer encoder(totalLength, 0);
-  encoder.prependByteArrayBlock(type, value, length);
-
-  return encoder.block();
-}
-
-Block
-makeBinaryBlock(uint32_t type, const char* value, size_t length)
-{
-  return makeBinaryBlock(type, reinterpret_cast<const uint8_t*>(value), length);
-}
-
-} // namespace encoding
+    } // namespace encoding
 } // namespace ndn

@@ -28,48 +28,47 @@
 
 namespace ns3 {
 
-class Tag;
+    class Tag;
 
-/**
- * Tag to calculate the per-PDU delay from eNb PDCP to UE PDCP
- */
+    /**
+     * Tag to calculate the per-PDU delay from eNb PDCP to UE PDCP
+     */
 
-class PdcpTag : public Tag
-{
-public:
-  static TypeId  GetTypeId (void);
-  virtual TypeId  GetInstanceTypeId (void) const;
+    class PdcpTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create an empty PDCP tag
-   */
-  PdcpTag ();
-  /**
-   * Create an PDCP tag with the given senderTimestamp
-   */
-  PdcpTag (Time senderTimestamp);
+        /**
+         * Create an empty PDCP tag
+         */
+        PdcpTag();
+        /**
+         * Create an PDCP tag with the given senderTimestamp
+         */
+        PdcpTag(Time senderTimestamp);
 
-  virtual void  Serialize (TagBuffer i) const;
-  virtual void  Deserialize (TagBuffer i);
-  virtual uint32_t  GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Print(std::ostream &os) const;
 
-  /**
-   * Get the instant when the PDCP delivers the PDU to the MAC SAP provider
-   * @return the sender timestamp
-   */
-  Time  GetSenderTimestamp (void) const;
+        /**
+         * Get the instant when the PDCP delivers the PDU to the MAC SAP provider
+         * @return the sender timestamp
+         */
+        Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set the sender timestamp
-   * @param senderTimestamp time stamp of the instant when the PDCP delivers the PDU to the MAC SAP provider
-   */
-  void  SetSenderTimestamp (Time senderTimestamp);
+        /**
+         * Set the sender timestamp
+         * @param senderTimestamp time stamp of the instant when the PDCP delivers the PDU to the MAC SAP provider
+         */
+        void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
+    private:
+        Time m_senderTimestamp;
 
-};
+    };
 
 } //namespace ns3
 

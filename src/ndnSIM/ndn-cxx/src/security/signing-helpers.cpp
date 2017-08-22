@@ -22,31 +22,27 @@
 #include "signing-helpers.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-SigningInfo
-signingByIdentity(const Name& identity)
-{
-  return SigningInfo(SigningInfo::SIGNER_TYPE_ID, identity);
-}
+        SigningInfo
+        signingByIdentity(const Name& identity) {
+            return SigningInfo(SigningInfo::SIGNER_TYPE_ID, identity);
+        }
 
-SigningInfo
-signingByKey(const Name& keyName)
-{
-  return SigningInfo(SigningInfo::SIGNER_TYPE_KEY, keyName);
-}
+        SigningInfo
+        signingByKey(const Name& keyName) {
+            return SigningInfo(SigningInfo::SIGNER_TYPE_KEY, keyName);
+        }
 
-SigningInfo
-signingByCertificate(const Name& certName)
-{
-  return SigningInfo(SigningInfo::SIGNER_TYPE_CERT, certName);
-}
+        SigningInfo
+        signingByCertificate(const Name& certName) {
+            return SigningInfo(SigningInfo::SIGNER_TYPE_CERT, certName);
+        }
 
-SigningInfo
-signingWithSha256()
-{
-  return SigningInfo(SigningInfo::SIGNER_TYPE_SHA256);
-}
+        SigningInfo
+        signingWithSha256() {
+            return SigningInfo(SigningInfo::SIGNER_TYPE_SHA256);
+        }
 
-} // namespace security
+    } // namespace security
 } // namespace ndn

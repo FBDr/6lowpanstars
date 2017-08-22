@@ -30,57 +30,52 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup spectrum
+     *
+     */
+    class SpectrumErrorModel : public Object {
+    public:
 
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId();
+        virtual ~SpectrumErrorModel();
+        virtual void StartRx(Ptr<const Packet> p) = 0;
+        virtual void EvaluateChunk(const SpectrumValue& sinr, Time duration) = 0;
+        virtual bool IsRxCorrect() = 0;
+    };
 
-/**
- * \ingroup spectrum
- *
- */
-class SpectrumErrorModel :  public Object
-{
-public:
+    /**
+     * \ingroup spectrum
+     *
+     * This class implements the error model described in this paper:
+     * N. Baldo and M. Miozzo, "Spectrum-aware Channel and PHY layer modeling
+     * for ns3", in Proceedings of International Workshop on Network
+     * Simulation Tools (NSTOOLS 2009), 19 October 2009, Pisa (Italy).
+     */
+    class ShannonSpectrumErrorModel : public SpectrumErrorModel {
+    protected:
+        virtual void DoDispose();
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId ();
-  virtual ~SpectrumErrorModel ();
-  virtual void StartRx (Ptr<const Packet> p) = 0;
-  virtual void EvaluateChunk (const SpectrumValue& sinr, Time duration) = 0;
-  virtual bool IsRxCorrect () = 0;
-};
+    public:
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
+        // inherited from SpectrumErrorModel
+        void StartRx(Ptr<const Packet> p);
+        void EvaluateChunk(const SpectrumValue& sinr, Time duration);
+        bool IsRxCorrect();
 
+    private:
+        uint32_t m_bytes;
+        uint32_t m_deliverableBytes;
 
-/**
- * \ingroup spectrum
- *
- * This class implements the error model described in this paper:
- * N. Baldo and M. Miozzo, "Spectrum-aware Channel and PHY layer modeling
- * for ns3", in Proceedings of International Workshop on Network
- * Simulation Tools (NSTOOLS 2009), 19 October 2009, Pisa (Italy).
- */
-class ShannonSpectrumErrorModel : public SpectrumErrorModel
-{
-protected:
-  virtual void DoDispose ();
-
-public:
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  // inherited from SpectrumErrorModel
-  void StartRx (Ptr<const Packet> p);
-  void EvaluateChunk (const SpectrumValue& sinr, Time duration);
-  bool IsRxCorrect ();
-
-private:
-  uint32_t m_bytes;
-  uint32_t m_deliverableBytes;
-
-};
+    };
 
 
 } // namespace ns3

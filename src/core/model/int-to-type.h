@@ -27,26 +27,26 @@
 
 namespace ns3 {
 
-/**
- * Convert an integer into a type.
- *
- * This trivial template is extremely useful, as explained in
- * "Modern C++ Design", p 29, section 2.4, 
- * "Mapping Integral Constants to Types".
- *
- * For an example, see timer-impl.h
- *
- * \tparam v \explicit The integral constant value distinguishing this type
- *           from other values.
- */
-template <int v>
-struct IntToType
-{
-  /** Enumeration holding the type-specific value. */
-  enum v_e {
-    value = v  /**< The integer value distinguishing this type. */
-  };
-};
+    /**
+     * Convert an integer into a type.
+     *
+     * This trivial template is extremely useful, as explained in
+     * "Modern C++ Design", p 29, section 2.4, 
+     * "Mapping Integral Constants to Types".
+     *
+     * For an example, see timer-impl.h
+     *
+     * \tparam v \explicit The integral constant value distinguishing this type
+     *           from other values.
+     */
+    template <int v>
+    struct IntToType {
+
+        /** Enumeration holding the type-specific value. */
+        enum v_e {
+            value = v /**< The integer value distinguishing this type. */
+        };
+    };
 
 } // namespace ns3
 

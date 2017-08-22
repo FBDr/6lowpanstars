@@ -26,14 +26,13 @@
 #include "measurements-entry.hpp"
 
 namespace nfd {
-namespace measurements {
+    namespace measurements {
 
-Entry::Entry(const Name& name)
-  : m_name(name)
-  , m_expiry(time::steady_clock::TimePoint::min())
-  , m_nameTreeEntry(nullptr)
-{
-}
+        Entry::Entry(const Name& name)
+        : m_name(name)
+        , m_expiry(time::steady_clock::TimePoint::min())
+        , m_nameTreeEntry(nullptr) {
+        }
 
-} // namespace measurements
+    } // namespace measurements
 } // namespace nfd

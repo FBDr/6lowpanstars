@@ -30,188 +30,187 @@
 
 namespace ns3 {
 
-class NetDevice;
-class Packet;
-class Node;
-class ArpCache;
+    class NetDevice;
+    class Packet;
+    class Node;
+    class ArpCache;
 
-/**
- * \brief The IPv4 representation of a network interface
- *
- * This class roughly corresponds to the struct in_device
- * of Linux; the main purpose is to provide address-family
- * specific information (addresses) about an interface.
- *
- * By default, Ipv4 interface are created in the "down" state
- * no IP addresses.  Before becoming usable, the user must
- * add an address of some type and invoke Setup on them.
- */
-class Ipv4Interface  : public Object
-{
-public:
-  /**
-   * \brief Get the type ID
-   * \return type ID
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief The IPv4 representation of a network interface
+     *
+     * This class roughly corresponds to the struct in_device
+     * of Linux; the main purpose is to provide address-family
+     * specific information (addresses) about an interface.
+     *
+     * By default, Ipv4 interface are created in the "down" state
+     * no IP addresses.  Before becoming usable, the user must
+     * add an address of some type and invoke Setup on them.
+     */
+    class Ipv4Interface : public Object {
+    public:
+        /**
+         * \brief Get the type ID
+         * \return type ID
+         */
+        static TypeId GetTypeId(void);
 
-  Ipv4Interface ();
-  virtual ~Ipv4Interface();
+        Ipv4Interface();
+        virtual ~Ipv4Interface();
 
-  /**
-   * \brief Set node associated with interface.
-   * \param node node
-   */
-  void SetNode (Ptr<Node> node); 
-  /**
-   * \brief Set the NetDevice.
-   * \param device NetDevice
-   */
-  void SetDevice (Ptr<NetDevice> device);
-  /**
-   * \brief Set ARP cache used by this interface
-   * \param arpCache the ARP cache
-   */
-  void SetArpCache (Ptr<ArpCache> arpCache);
+        /**
+         * \brief Set node associated with interface.
+         * \param node node
+         */
+        void SetNode(Ptr<Node> node);
+        /**
+         * \brief Set the NetDevice.
+         * \param device NetDevice
+         */
+        void SetDevice(Ptr<NetDevice> device);
+        /**
+         * \brief Set ARP cache used by this interface
+         * \param arpCache the ARP cache
+         */
+        void SetArpCache(Ptr<ArpCache> arpCache);
 
-  /**
-   * \returns the underlying NetDevice. This method cannot return zero.
-   */
-  Ptr<NetDevice> GetDevice (void) const;
+        /**
+         * \returns the underlying NetDevice. This method cannot return zero.
+         */
+        Ptr<NetDevice> GetDevice(void) const;
 
-  /**
-   * \return ARP cache used by this interface
-   */
-  Ptr<ArpCache> GetArpCache () const;
+        /**
+         * \return ARP cache used by this interface
+         */
+        Ptr<ArpCache> GetArpCache() const;
 
-  /**
-   * \param metric configured routing metric (cost) of this interface
-   *
-   * Note:  This is synonymous to the Metric value that ifconfig prints
-   * out.  It is used by ns-3 global routing, but other routing daemons
-   * choose to ignore it. 
-   */
-  void SetMetric (uint16_t metric);
+        /**
+         * \param metric configured routing metric (cost) of this interface
+         *
+         * Note:  This is synonymous to the Metric value that ifconfig prints
+         * out.  It is used by ns-3 global routing, but other routing daemons
+         * choose to ignore it. 
+         */
+        void SetMetric(uint16_t metric);
 
-  /**
-   * \returns configured routing metric (cost) of this interface
-   *
-   * Note:  This is synonymous to the Metric value that ifconfig prints
-   * out.  It is used by ns-3 global routing, but other routing daemons 
-   * may choose to ignore it. 
-   */
-  uint16_t GetMetric (void) const;
+        /**
+         * \returns configured routing metric (cost) of this interface
+         *
+         * Note:  This is synonymous to the Metric value that ifconfig prints
+         * out.  It is used by ns-3 global routing, but other routing daemons 
+         * may choose to ignore it. 
+         */
+        uint16_t GetMetric(void) const;
 
-  /**
-   * These are IP interface states and may be distinct from 
-   * NetDevice states, such as found in real implementations
-   * (where the device may be down but IP interface state is still up).
-   */
-  /**
-   * \returns true if this interface is enabled, false otherwise.
-   */
-  bool IsUp (void) const;
+        /**
+         * These are IP interface states and may be distinct from 
+         * NetDevice states, such as found in real implementations
+         * (where the device may be down but IP interface state is still up).
+         */
+        /**
+         * \returns true if this interface is enabled, false otherwise.
+         */
+        bool IsUp(void) const;
 
-  /**
-   * \returns true if this interface is disabled, false otherwise.
-   */
-  bool IsDown (void) const;
+        /**
+         * \returns true if this interface is disabled, false otherwise.
+         */
+        bool IsDown(void) const;
 
-  /**
-   * Enable this interface
-   */
-  void SetUp (void);
+        /**
+         * Enable this interface
+         */
+        void SetUp(void);
 
-  /**
-   * Disable this interface
-   */
-  void SetDown (void);
+        /**
+         * Disable this interface
+         */
+        void SetDown(void);
 
-  /**
-   * \returns true if this interface is enabled for IP forwarding of input datagrams
-   */
-  bool IsForwarding (void) const;
+        /**
+         * \returns true if this interface is enabled for IP forwarding of input datagrams
+         */
+        bool IsForwarding(void) const;
 
-  /**
-   * \param val Whether to enable or disable IP forwarding for input datagrams
-   */
-  void SetForwarding (bool val);
+        /**
+         * \param val Whether to enable or disable IP forwarding for input datagrams
+         */
+        void SetForwarding(bool val);
 
-  /**
-   * \param p packet to send
-   * \param dest next hop address of packet.
-   *
-   * This method will eventually call the private
-   * SendTo method which must be implemented by subclasses.
-   */ 
-  void Send (Ptr<Packet> p, Ipv4Address dest);
+        /**
+         * \param p packet to send
+         * \param dest next hop address of packet.
+         *
+         * This method will eventually call the private
+         * SendTo method which must be implemented by subclasses.
+         */
+        void Send(Ptr<Packet> p, Ipv4Address dest);
 
-  /**
-   * \param address The Ipv4InterfaceAddress to add to the interface
-   * \returns true if succeeded
-   */
-  bool AddAddress (Ipv4InterfaceAddress address);
+        /**
+         * \param address The Ipv4InterfaceAddress to add to the interface
+         * \returns true if succeeded
+         */
+        bool AddAddress(Ipv4InterfaceAddress address);
 
-  /**
-   * \param index Index of Ipv4InterfaceAddress to return
-   * \returns The Ipv4InterfaceAddress address whose index is i
-   */
-  Ipv4InterfaceAddress GetAddress (uint32_t index) const;
+        /**
+         * \param index Index of Ipv4InterfaceAddress to return
+         * \returns The Ipv4InterfaceAddress address whose index is i
+         */
+        Ipv4InterfaceAddress GetAddress(uint32_t index) const;
 
-  /**
-   * \returns the number of Ipv4InterfaceAddresss stored on this interface
-   */
-  uint32_t GetNAddresses (void) const;
+        /**
+         * \returns the number of Ipv4InterfaceAddresss stored on this interface
+         */
+        uint32_t GetNAddresses(void) const;
 
-  /**
-   * \param index Index of Ipv4InterfaceAddress to remove
-   * \returns The Ipv4InterfaceAddress address whose index is index 
-   */
-  Ipv4InterfaceAddress RemoveAddress (uint32_t index);
+        /**
+         * \param index Index of Ipv4InterfaceAddress to remove
+         * \returns The Ipv4InterfaceAddress address whose index is index 
+         */
+        Ipv4InterfaceAddress RemoveAddress(uint32_t index);
 
-  /**
-   * \brief Remove the given Ipv4 address from the interface.
-   * \param address The Ipv4 address to remove
-   * \returns The removed Ipv4 interface address 
-   * \returns The null interface address if the interface did not contain the 
-   * address or if loopback address was passed as argument
-   */
-  Ipv4InterfaceAddress RemoveAddress (Ipv4Address address);
+        /**
+         * \brief Remove the given Ipv4 address from the interface.
+         * \param address The Ipv4 address to remove
+         * \returns The removed Ipv4 interface address 
+         * \returns The null interface address if the interface did not contain the 
+         * address or if loopback address was passed as argument
+         */
+        Ipv4InterfaceAddress RemoveAddress(Ipv4Address address);
 
-protected:
-  virtual void DoDispose (void);
-private:
-  /**
-   * \brief Initialize interface.
-   */
-  void DoSetup (void);
-
-
-  /**
-   * \brief Container for the Ipv4InterfaceAddresses.
-   */
-  typedef std::list<Ipv4InterfaceAddress> Ipv4InterfaceAddressList;
-
-  /**
-   * \brief Container Iterator for the Ipv4InterfaceAddresses.
-   */
-  typedef std::list<Ipv4InterfaceAddress>::const_iterator Ipv4InterfaceAddressListCI;
-
-  /**
-   * \brief Const Container Iterator for the Ipv4InterfaceAddresses.
-   */
-  typedef std::list<Ipv4InterfaceAddress>::iterator Ipv4InterfaceAddressListI;
+    protected:
+        virtual void DoDispose(void);
+    private:
+        /**
+         * \brief Initialize interface.
+         */
+        void DoSetup(void);
 
 
+        /**
+         * \brief Container for the Ipv4InterfaceAddresses.
+         */
+        typedef std::list<Ipv4InterfaceAddress> Ipv4InterfaceAddressList;
 
-  bool m_ifup; //!< The state of this interface
-  bool m_forwarding;  //!< Forwarding state.
-  uint16_t m_metric;  //!< Interface metric
-  Ipv4InterfaceAddressList m_ifaddrs; //!< Address list
-  Ptr<Node> m_node; //!< The associated node
-  Ptr<NetDevice> m_device; //!< The associated NetDevice
-  Ptr<ArpCache> m_cache; //!< ARP cache
-};
+        /**
+         * \brief Container Iterator for the Ipv4InterfaceAddresses.
+         */
+        typedef std::list<Ipv4InterfaceAddress>::const_iterator Ipv4InterfaceAddressListCI;
+
+        /**
+         * \brief Const Container Iterator for the Ipv4InterfaceAddresses.
+         */
+        typedef std::list<Ipv4InterfaceAddress>::iterator Ipv4InterfaceAddressListI;
+
+
+
+        bool m_ifup; //!< The state of this interface
+        bool m_forwarding; //!< Forwarding state.
+        uint16_t m_metric; //!< Interface metric
+        Ipv4InterfaceAddressList m_ifaddrs; //!< Address list
+        Ptr<Node> m_node; //!< The associated node
+        Ptr<NetDevice> m_device; //!< The associated NetDevice
+        Ptr<ArpCache> m_cache; //!< ARP cache
+    };
 
 } // namespace ns3
 

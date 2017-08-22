@@ -33,99 +33,93 @@
 #include "../security-common.hpp"
 
 namespace CryptoPP {
-class BufferedTransformation;
+    class BufferedTransformation;
 } // namespace CryptoPP
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-class PublicKey
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            class PublicKey {
+            public:
 
-  /**
-   * The default constructor.
-   */
-  PublicKey();
+                class Error : public std::runtime_error {
+                public:
 
-  /**
-   * @brief Create a new PublicKey from @p keyDerBuf in DER buffer
-   *
-   * @param keyDerBuf The pointer to the first byte of buffer containing DER of public key
-   * @param keyDerSize Size of the buffer
-   *
-   * @throws PublicKey::Error If DER in buffer cannot be decoded
-   */
-  PublicKey(const uint8_t* keyDerBuf, size_t keyDerSize);
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-  const Buffer&
-  get() const
-  {
-    return m_key;
-  }
+                /**
+                 * The default constructor.
+                 */
+                PublicKey();
 
-  void
-  set(const uint8_t* keyDerBuf, size_t keyDerSize)
-  {
-    Buffer buf(keyDerBuf, keyDerSize);
-    m_key.swap(buf);
-  }
+                /**
+                 * @brief Create a new PublicKey from @p keyDerBuf in DER buffer
+                 *
+                 * @param keyDerBuf The pointer to the first byte of buffer containing DER of public key
+                 * @param keyDerSize Size of the buffer
+                 *
+                 * @throws PublicKey::Error If DER in buffer cannot be decoded
+                 */
+                PublicKey(const uint8_t* keyDerBuf, size_t keyDerSize);
 
-  KeyType
-  getKeyType() const
-  {
-    return m_type;
-  }
+                const Buffer&
+                get() const {
+                    return m_key;
+                }
 
-  /**
-   * @return a KeyDigest block that matches this public key
-   */
-  const Block&
-  computeDigest() const;
+                void
+                set(const uint8_t* keyDerBuf, size_t keyDerSize) {
+                    Buffer buf(keyDerBuf, keyDerSize);
+                    m_key.swap(buf);
+                }
 
-  void
-  encode(CryptoPP::BufferedTransformation& out) const;
+                KeyType
+                getKeyType() const {
+                    return m_type;
+                }
 
-  void
-  decode(CryptoPP::BufferedTransformation& in);
+                /**
+                 * @return a KeyDigest block that matches this public key
+                 */
+                const Block&
+                computeDigest() const;
 
-  bool
-  operator==(const PublicKey& key) const
-  {
-    return m_key == key.m_key;
-  }
+                void
+                encode(CryptoPP::BufferedTransformation& out) const;
 
-  bool
-  operator!=(const PublicKey& key) const
-  {
-    return m_key != key.m_key;
-  }
+                void
+                decode(CryptoPP::BufferedTransformation& in);
 
-private:
-  KeyType m_type;
-  Buffer m_key;
-  mutable Block m_digest;
-};
+                bool
+                operator==(const PublicKey& key) const {
+                    return m_key == key.m_key;
+                }
 
-std::ostream&
-operator<<(std::ostream& os, const PublicKey& key);
+                bool
+                operator!=(const PublicKey& key) const {
+                    return m_key != key.m_key;
+                }
 
-} // namespace v1
-} // namespace security
+            private:
+                KeyType m_type;
+                Buffer m_key;
+                mutable Block m_digest;
+            };
+
+            std::ostream&
+            operator<<(std::ostream& os, const PublicKey& key);
+
+        } // namespace v1
+    } // namespace security
 
 #ifdef NDN_CXX_KEEP_SECURITY_V1_ALIASES
-/// @deprecated When needed, use explicit namespace
-using security::v1::PublicKey;
+    /// @deprecated When needed, use explicit namespace
+    using security::v1::PublicKey;
 #endif // NDN_CXX_KEEP_SECURITY_V1_ALIASES
 
 } // namespace ndn

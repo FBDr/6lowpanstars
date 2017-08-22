@@ -21,30 +21,27 @@
 #include "ipv4-nix-vector-helper.h"
 #include "ns3/ipv4-nix-vector-routing.h"
 
-namespace ns3 {
-
-Ipv4NixVectorHelper::Ipv4NixVectorHelper ()
+namespace ns3
 {
-  m_agentFactory.SetTypeId ("ns3::Ipv4NixVectorRouting");
-}
 
-Ipv4NixVectorHelper::Ipv4NixVectorHelper (const Ipv4NixVectorHelper &o)
-  : m_agentFactory (o.m_agentFactory)
-{
-}
+    Ipv4NixVectorHelper::Ipv4NixVectorHelper() {
+        m_agentFactory.SetTypeId("ns3::Ipv4NixVectorRouting");
+    }
 
-Ipv4NixVectorHelper* 
-Ipv4NixVectorHelper::Copy (void) const 
-{
-  return new Ipv4NixVectorHelper (*this); 
-}
+    Ipv4NixVectorHelper::Ipv4NixVectorHelper(const Ipv4NixVectorHelper & o)
+            : m_agentFactory(o.m_agentFactory) {
+    }
 
-Ptr<Ipv4RoutingProtocol> 
-Ipv4NixVectorHelper::Create (Ptr<Node> node) const
-{
-  Ptr<Ipv4NixVectorRouting> agent = m_agentFactory.Create<Ipv4NixVectorRouting> ();
-  agent->SetNode (node);
-  node->AggregateObject (agent);
-  return agent;
-}
+    Ipv4NixVectorHelper *
+            Ipv4NixVectorHelper::Copy(void) const {
+        return new Ipv4NixVectorHelper(*this);
+    }
+
+    Ptr<Ipv4RoutingProtocol>
+            Ipv4NixVectorHelper::Create(Ptr<Node> node) const {
+        Ptr<Ipv4NixVectorRouting> agent = m_agentFactory.Create<Ipv4NixVectorRouting> ();
+        agent->SetNode(node);
+        node->AggregateObject(agent);
+        return agent;
+    }
 } // namespace ns3

@@ -29,36 +29,35 @@
 #include "network-interface-fixture.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestEthernetTransport, NetworkInterfaceFixture)
+            BOOST_AUTO_TEST_SUITE(Face)
+            BOOST_FIXTURE_TEST_SUITE(TestEthernetTransport, NetworkInterfaceFixture)
 
-BOOST_AUTO_TEST_CASE(StaticProperties)
-{
-  SKIP_IF_NETWORK_INTERFACE_COUNT_LT(1);
+            BOOST_AUTO_TEST_CASE(StaticProperties) {
+                SKIP_IF_NETWORK_INTERFACE_COUNT_LT(1);
 
-  auto netif = m_interfaces.front();
-  EthernetTransport transport(netif, ethernet::getDefaultMulticastAddress());
-  checkStaticPropertiesInitialized(transport);
+                auto netif = m_interfaces.front();
+                EthernetTransport transport(netif, ethernet::getDefaultMulticastAddress());
+                checkStaticPropertiesInitialized(transport);
 
-  BOOST_CHECK_EQUAL(transport.getLocalUri(), FaceUri::fromDev(netif.name));
-  BOOST_CHECK_EQUAL(transport.getRemoteUri(), FaceUri(ethernet::getDefaultMulticastAddress()));
-  BOOST_CHECK_EQUAL(transport.getScope(), ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  BOOST_CHECK_EQUAL(transport.getPersistency(), ndn::nfd::FACE_PERSISTENCY_PERMANENT);
-  BOOST_CHECK_EQUAL(transport.getLinkType(), ndn::nfd::LINK_TYPE_MULTI_ACCESS);
-}
+                BOOST_CHECK_EQUAL(transport.getLocalUri(), FaceUri::fromDev(netif.name));
+                BOOST_CHECK_EQUAL(transport.getRemoteUri(), FaceUri(ethernet::getDefaultMulticastAddress()));
+                BOOST_CHECK_EQUAL(transport.getScope(), ndn::nfd::FACE_SCOPE_NON_LOCAL);
+                BOOST_CHECK_EQUAL(transport.getPersistency(), ndn::nfd::FACE_PERSISTENCY_PERMANENT);
+                BOOST_CHECK_EQUAL(transport.getLinkType(), ndn::nfd::LINK_TYPE_MULTI_ACCESS);
+            }
 
-// TODO add the equivalent of these test cases from ethernet.t.cpp as of commit:65caf200924b28748037750449e28bcb548dbc9c
-// SendPacket
-// ProcessIncomingPacket
+            // TODO add the equivalent of these test cases from ethernet.t.cpp as of commit:65caf200924b28748037750449e28bcb548dbc9c
+            // SendPacket
+            // ProcessIncomingPacket
 
-BOOST_AUTO_TEST_SUITE_END() // TestEthernetTransport
-BOOST_AUTO_TEST_SUITE_END() // Face
+            BOOST_AUTO_TEST_SUITE_END() // TestEthernetTransport
+            BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

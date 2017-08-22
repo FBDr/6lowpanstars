@@ -29,57 +29,52 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestWebSocketFactory, BaseFixture)
+        BOOST_AUTO_TEST_SUITE(Face)
+        BOOST_FIXTURE_TEST_SUITE(TestWebSocketFactory, BaseFixture)
 
-using nfd::Face;
+        using nfd::Face;
 
-BOOST_AUTO_TEST_CASE(GetChannels)
-{
-  WebSocketFactory factory;
-  BOOST_REQUIRE_EQUAL(factory.getChannels().empty(), true);
+        BOOST_AUTO_TEST_CASE(GetChannels) {
+            WebSocketFactory factory;
+            BOOST_REQUIRE_EQUAL(factory.getChannels().empty(), true);
 
-  std::vector<shared_ptr<const Channel>> expectedChannels;
-  expectedChannels.push_back(factory.createChannel("127.0.0.1", "20070"));
-  expectedChannels.push_back(factory.createChannel("127.0.0.1", "20071"));
-  expectedChannels.push_back(factory.createChannel("::1", "20071"));
+            std::vector<shared_ptr<const Channel>> expectedChannels;
+            expectedChannels.push_back(factory.createChannel("127.0.0.1", "20070"));
+            expectedChannels.push_back(factory.createChannel("127.0.0.1", "20071"));
+            expectedChannels.push_back(factory.createChannel("::1", "20071"));
 
-  for (const auto& i : factory.getChannels()) {
-    auto pos = std::find(expectedChannels.begin(), expectedChannels.end(), i);
-    BOOST_REQUIRE(pos != expectedChannels.end());
-    expectedChannels.erase(pos);
-  }
+            for (const auto& i : factory.getChannels()) {
+                auto pos = std::find(expectedChannels.begin(), expectedChannels.end(), i);
+                BOOST_REQUIRE(pos != expectedChannels.end());
+                expectedChannels.erase(pos);
+            }
 
-  BOOST_CHECK_EQUAL(expectedChannels.size(), 0);
-}
+            BOOST_CHECK_EQUAL(expectedChannels.size(), 0);
+        }
 
-BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate)
-{
-  WebSocketFactory factory;
+        BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate) {
+            WebSocketFactory factory;
 
-  createFace(factory,
-             FaceUri("ws://127.0.0.1:20070"),
-             ndn::nfd::FACE_PERSISTENCY_PERMANENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("ws://127.0.0.1:20070"),
+                    ndn::nfd::FACE_PERSISTENCY_PERMANENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("ws://127.0.0.1:20070"),
-             ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("ws://127.0.0.1:20070"),
+                    ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("ws://127.0.0.1:20070"),
-             ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
-}
+            createFace(factory,
+                    FaceUri("ws://127.0.0.1:20070"),
+                    ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestWebSocketFactory
-BOOST_AUTO_TEST_SUITE_END() // Face
+        BOOST_AUTO_TEST_SUITE_END() // TestWebSocketFactory
+        BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

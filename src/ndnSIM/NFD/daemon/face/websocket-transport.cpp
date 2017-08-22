@@ -26,162 +26,149 @@
 #include "websocket-transport.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-NFD_LOG_INIT("WebSocketTransport");
+        NFD_LOG_INIT("WebSocketTransport");
 
-static bool
-isLoopback(const boost::asio::ip::address& addr)
-{
-  if (addr.is_loopback()) {
-    return true;
-  }
-  // Workaround for loopback IPv4-mapped IPv6 addresses
-  // see https://svn.boost.org/trac/boost/ticket/9084
-  else if (addr.is_v6()) {
-    auto addr6 = addr.to_v6();
-    if (addr6.is_v4_mapped()) {
-      return addr6.to_v4().is_loopback();
-    }
-  }
+        static bool
+        isLoopback(const boost::asio::ip::address& addr) {
+            if (addr.is_loopback()) {
+                return true;
+            }                // Workaround for loopback IPv4-mapped IPv6 addresses
+                // see https://svn.boost.org/trac/boost/ticket/9084
+            else if (addr.is_v6()) {
+                auto addr6 = addr.to_v6();
+                if (addr6.is_v4_mapped()) {
+                    return addr6.to_v4().is_loopback();
+                }
+            }
 
-  return false;
-}
+            return false;
+        }
 
-WebSocketTransport::WebSocketTransport(websocketpp::connection_hdl hdl,
-                                       websocket::Server& server,
-                                       time::milliseconds pingInterval)
-  : m_handle(hdl)
-  , m_server(server)
-  , m_pingInterval(pingInterval)
-{
-  const auto& sock = m_server.get_con_from_hdl(hdl)->get_socket();
-  this->setLocalUri(FaceUri(sock.local_endpoint(), "ws"));
-  this->setRemoteUri(FaceUri(sock.remote_endpoint(), "wsclient"));
+        WebSocketTransport::WebSocketTransport(websocketpp::connection_hdl hdl,
+                websocket::Server& server,
+                time::milliseconds pingInterval)
+        : m_handle(hdl)
+        , m_server(server)
+        , m_pingInterval(pingInterval) {
+            const auto& sock = m_server.get_con_from_hdl(hdl)->get_socket();
+            this->setLocalUri(FaceUri(sock.local_endpoint(), "ws"));
+            this->setRemoteUri(FaceUri(sock.remote_endpoint(), "wsclient"));
 
-  if (isLoopback(sock.local_endpoint().address()) &&
-      isLoopback(sock.remote_endpoint().address())) {
-    this->setScope(ndn::nfd::FACE_SCOPE_LOCAL);
-  }
-  else {
-    this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  }
+            if (isLoopback(sock.local_endpoint().address()) &&
+                    isLoopback(sock.remote_endpoint().address())) {
+                this->setScope(ndn::nfd::FACE_SCOPE_LOCAL);
+            } else {
+                this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
+            }
 
-  this->setPersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  this->setMtu(MTU_UNLIMITED);
+            this->setPersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+            this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+            this->setMtu(MTU_UNLIMITED);
 
-  this->schedulePing();
+            this->schedulePing();
 
-  NFD_LOG_FACE_INFO("Creating transport");
-}
+            NFD_LOG_FACE_INFO("Creating transport");
+        }
 
-void
-WebSocketTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency)
-{
-  if (newPersistency != ndn::nfd::FACE_PERSISTENCY_ON_DEMAND) {
-    BOOST_THROW_EXCEPTION(
-      std::invalid_argument("WebSocketTransport supports only FACE_PERSISTENCY_ON_DEMAND"));
-  }
-}
+        void
+        WebSocketTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) {
+            if (newPersistency != ndn::nfd::FACE_PERSISTENCY_ON_DEMAND) {
+                BOOST_THROW_EXCEPTION(
+                        std::invalid_argument("WebSocketTransport supports only FACE_PERSISTENCY_ON_DEMAND"));
+            }
+        }
 
-void
-WebSocketTransport::doSend(Transport::Packet&& packet)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        WebSocketTransport::doSend(Transport::Packet&& packet) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  websocketpp::lib::error_code error;
-  m_server.send(m_handle, packet.packet.wire(), packet.packet.size(),
-                websocketpp::frame::opcode::binary, error);
-  if (error)
-    return processErrorCode(error);
+            websocketpp::lib::error_code error;
+            m_server.send(m_handle, packet.packet.wire(), packet.packet.size(),
+                    websocketpp::frame::opcode::binary, error);
+            if (error)
+                return processErrorCode(error);
 
-  NFD_LOG_FACE_TRACE("Successfully sent: " << packet.packet.size() << " bytes");
-}
+            NFD_LOG_FACE_TRACE("Successfully sent: " << packet.packet.size() << " bytes");
+        }
 
-void
-WebSocketTransport::receiveMessage(const std::string& msg)
-{
-  NFD_LOG_FACE_TRACE("Received: " << msg.size() << " bytes");
+        void
+        WebSocketTransport::receiveMessage(const std::string& msg) {
+            NFD_LOG_FACE_TRACE("Received: " << msg.size() << " bytes");
 
-  bool isOk = false;
-  Block element;
-  std::tie(isOk, element) = Block::fromBuffer(reinterpret_cast<const uint8_t*>(msg.c_str()), msg.size());
-  if (!isOk) {
-    NFD_LOG_FACE_WARN("Failed to parse message payload");
-    return;
-  }
+            bool isOk = false;
+            Block element;
+            std::tie(isOk, element) = Block::fromBuffer(reinterpret_cast<const uint8_t*> (msg.c_str()), msg.size());
+            if (!isOk) {
+                NFD_LOG_FACE_WARN("Failed to parse message payload");
+                return;
+            }
 
-  this->receive(Transport::Packet(std::move(element)));
-}
+            this->receive(Transport::Packet(std::move(element)));
+        }
 
-void
-WebSocketTransport::schedulePing()
-{
-  m_pingEventId = scheduler::schedule(m_pingInterval, bind(&WebSocketTransport::sendPing, this));
-}
+        void
+        WebSocketTransport::schedulePing() {
+            m_pingEventId = scheduler::schedule(m_pingInterval, bind(&WebSocketTransport::sendPing, this));
+        }
 
-void
-WebSocketTransport::sendPing()
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        WebSocketTransport::sendPing() {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nOutPings;
+            ++this->nOutPings;
 
-  websocketpp::lib::error_code error;
-  m_server.ping(m_handle, "NFD-WebSocket", error);
-  if (error)
-    return processErrorCode(error);
+            websocketpp::lib::error_code error;
+            m_server.ping(m_handle, "NFD-WebSocket", error);
+            if (error)
+                return processErrorCode(error);
 
-  this->schedulePing();
-}
+            this->schedulePing();
+        }
 
-void
-WebSocketTransport::handlePong()
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        WebSocketTransport::handlePong() {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nInPongs;
-}
+            ++this->nInPongs;
+        }
 
-void
-WebSocketTransport::handlePongTimeout()
-{
-  NFD_LOG_FACE_WARN(__func__);
-  this->setState(TransportState::FAILED);
-  doClose();
-}
+        void
+        WebSocketTransport::handlePongTimeout() {
+            NFD_LOG_FACE_WARN(__func__);
+            this->setState(TransportState::FAILED);
+            doClose();
+        }
 
-void
-WebSocketTransport::processErrorCode(const websocketpp::lib::error_code& error)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        WebSocketTransport::processErrorCode(const websocketpp::lib::error_code& error) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  if (getState() == TransportState::CLOSING ||
-      getState() == TransportState::FAILED ||
-      getState() == TransportState::CLOSED)
-    // transport is shutting down, ignore any errors
-    return;
+            if (getState() == TransportState::CLOSING ||
+                    getState() == TransportState::FAILED ||
+                    getState() == TransportState::CLOSED)
+                // transport is shutting down, ignore any errors
+                return;
 
-  NFD_LOG_FACE_WARN("Send or ping operation failed: " << error.message());
+            NFD_LOG_FACE_WARN("Send or ping operation failed: " << error.message());
 
-  this->setState(TransportState::FAILED);
-  doClose();
-}
+            this->setState(TransportState::FAILED);
+            doClose();
+        }
 
-void
-WebSocketTransport::doClose()
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        WebSocketTransport::doClose() {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  m_pingEventId.cancel();
+            m_pingEventId.cancel();
 
-  // use the non-throwing variant and ignore errors, if any
-  websocketpp::lib::error_code error;
-  m_server.close(m_handle, websocketpp::close::status::normal, "closed by NFD", error);
+            // use the non-throwing variant and ignore errors, if any
+            websocketpp::lib::error_code error;
+            m_server.close(m_handle, websocketpp::close::status::normal, "closed by NFD", error);
 
-  this->setState(TransportState::CLOSED);
-}
+            this->setState(TransportState::CLOSED);
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

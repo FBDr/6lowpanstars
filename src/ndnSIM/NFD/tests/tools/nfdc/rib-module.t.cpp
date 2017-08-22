@@ -28,14 +28,14 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestRibModule, ModuleFixture<RibModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestRibModule, ModuleFixture<RibModule>)
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <rib>
     <ribEntry>
       <prefix>/</prefix>
@@ -90,52 +90,51 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </rib>
 )XML");
 
-const std::string STATUS_TEXT =
-  "RIB:\n"
-  "  / route={faceid=262 (origin=255 cost=9 RibCapture), faceid=272 (origin=255 cost=50), "
-    "faceid=274 (origin=255 cost=78 ChildInherit RibCapture), "
-    "faceid=276 (origin=255 cost=79 expires=47s ChildInherit)}\n"
-  "  /localhost/nfd route={faceid=258 (origin=0 cost=0 ChildInherit)}\n";
+                const std::string STATUS_TEXT =
+                        "RIB:\n"
+                        "  / route={faceid=262 (origin=255 cost=9 RibCapture), faceid=272 (origin=255 cost=50), "
+                        "faceid=274 (origin=255 cost=78 ChildInherit RibCapture), "
+                        "faceid=276 (origin=255 cost=79 expires=47s ChildInherit)}\n"
+                        "  /localhost/nfd route={faceid=258 (origin=0 cost=0 ChildInherit)}\n";
 
-BOOST_AUTO_TEST_CASE(Status)
-{
-  this->fetchStatus();
-  RibEntry payload1;
-  payload1.setName("/")
-          .addRoute(Route().setFaceId(262)
-                           .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
-                           .setCost(9)
-                           .setFlags(ndn::nfd::ROUTE_FLAG_CAPTURE))
-          .addRoute(Route().setFaceId(272)
-                           .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
-                           .setCost(50)
-                           .setFlags(ndn::nfd::ROUTE_FLAGS_NONE))
-          .addRoute(Route().setFaceId(274)
-                           .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
-                           .setCost(78)
-                           .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT | ndn::nfd::ROUTE_FLAG_CAPTURE))
-          .addRoute(Route().setFaceId(276)
-                           .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
-                           .setCost(79)
-                           .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT)
-                           .setExpirationPeriod(time::milliseconds(47292)));
-  RibEntry payload2;
-  payload2.setName("/localhost/nfd")
-          .addRoute(Route().setFaceId(258)
-                           .setOrigin(ndn::nfd::ROUTE_ORIGIN_APP)
-                           .setCost(0)
-                           .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT));
-  this->sendDataset("/localhost/nfd/rib/list", payload1, payload2);
-  this->prepareStatusOutput();
+                BOOST_AUTO_TEST_CASE(Status) {
+                    this->fetchStatus();
+                    RibEntry payload1;
+                    payload1.setName("/")
+                            .addRoute(Route().setFaceId(262)
+                            .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
+                            .setCost(9)
+                            .setFlags(ndn::nfd::ROUTE_FLAG_CAPTURE))
+                            .addRoute(Route().setFaceId(272)
+                            .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
+                            .setCost(50)
+                            .setFlags(ndn::nfd::ROUTE_FLAGS_NONE))
+                            .addRoute(Route().setFaceId(274)
+                            .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
+                            .setCost(78)
+                            .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT | ndn::nfd::ROUTE_FLAG_CAPTURE))
+                            .addRoute(Route().setFaceId(276)
+                            .setOrigin(ndn::nfd::ROUTE_ORIGIN_STATIC)
+                            .setCost(79)
+                            .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT)
+                            .setExpirationPeriod(time::milliseconds(47292)));
+                    RibEntry payload2;
+                    payload2.setName("/localhost/nfd")
+                            .addRoute(Route().setFaceId(258)
+                            .setOrigin(ndn::nfd::ROUTE_ORIGIN_APP)
+                            .setCost(0)
+                            .setFlags(ndn::nfd::ROUTE_FLAG_CHILD_INHERIT));
+                    this->sendDataset("/localhost/nfd/rib/list", payload1, payload2);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRibModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestRibModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

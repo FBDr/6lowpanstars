@@ -33,88 +33,85 @@
 
 namespace ns3 {
 
-class SpectrumValue;
+    class SpectrumValue;
 
-typedef Callback< void, const SpectrumValue& > LteChunkProcessorCallback;
+    typedef Callback< void, const SpectrumValue& > LteChunkProcessorCallback;
 
-/** 
- * This abstract class is used to process the time-vs-frequency
- * SINR/interference/power chunk of a received LTE signal
- * which was calculated by the LteInterference object.
- */
-class LteChunkProcessor : public SimpleRefCount<LteChunkProcessor>
-{
-public:
-  LteChunkProcessor ();
-  virtual ~LteChunkProcessor ();
+    /** 
+     * This abstract class is used to process the time-vs-frequency
+     * SINR/interference/power chunk of a received LTE signal
+     * which was calculated by the LteInterference object.
+     */
+    class LteChunkProcessor : public SimpleRefCount<LteChunkProcessor> {
+    public:
+        LteChunkProcessor();
+        virtual ~LteChunkProcessor();
 
-  /**
-    * \brief Add callback to list
-    *
-    * This function adds callback c to list. Each callback pass
-    * calculated value to its object and is called in
-    * LteChunkProcessor::End().
-    */
-  virtual void AddCallback (LteChunkProcessorCallback c);
+        /**
+         * \brief Add callback to list
+         *
+         * This function adds callback c to list. Each callback pass
+         * calculated value to its object and is called in
+         * LteChunkProcessor::End().
+         */
+        virtual void AddCallback(LteChunkProcessorCallback c);
 
-  /**
-    * \brief Clear internal variables
-    *
-    * This function clears internal variables in the beginning of
-    * calculation
-    */
-  virtual void Start ();
+        /**
+         * \brief Clear internal variables
+         *
+         * This function clears internal variables in the beginning of
+         * calculation
+         */
+        virtual void Start();
 
-  /**
-    * \brief Collect SpectrumValue and duration of signal
-    *
-    * Passed values are collected in m_sumValues and m_totDuration variables.
-    */
-  virtual void EvaluateChunk (const SpectrumValue& sinr, Time duration);
+        /**
+         * \brief Collect SpectrumValue and duration of signal
+         *
+         * Passed values are collected in m_sumValues and m_totDuration variables.
+         */
+        virtual void EvaluateChunk(const SpectrumValue& sinr, Time duration);
 
-  /**
-    * \brief Finish calculation and inform interested objects about calculated value
-    *
-    * During this function all callbacks from list are executed
-    * to inform interested object about calculated value. This
-    * function is called at the end of calculation.
-    */
-  virtual void End ();
+        /**
+         * \brief Finish calculation and inform interested objects about calculated value
+         *
+         * During this function all callbacks from list are executed
+         * to inform interested object about calculated value. This
+         * function is called at the end of calculation.
+         */
+        virtual void End();
 
-private:
-  Ptr<SpectrumValue> m_sumValues;
-  Time m_totDuration;
+    private:
+        Ptr<SpectrumValue> m_sumValues;
+        Time m_totDuration;
 
-  std::vector<LteChunkProcessorCallback> m_lteChunkProcessorCallbacks;
-};
+        std::vector<LteChunkProcessorCallback> m_lteChunkProcessorCallbacks;
+    };
 
+    /**
+     * A sink to be plugged to the callback of LteChunkProcessor allowing
+     * to save and later retrieve the latest reported value 
+     * 
+     */
+    class LteSpectrumValueCatcher {
+    public:
 
-/**
- * A sink to be plugged to the callback of LteChunkProcessor allowing
- * to save and later retrieve the latest reported value 
- * 
- */
-class LteSpectrumValueCatcher
-{
-public:
+        /** 
+         * function to be plugged to LteChunkProcessor::AddCallback ()
+         * 
+         * \param value 
+         */
+        void ReportValue(const SpectrumValue& value);
 
-  /** 
-   * function to be plugged to LteChunkProcessor::AddCallback ()
-   * 
-   * \param value 
-   */
-  void ReportValue (const SpectrumValue& value);
+        /** 
+         * 
+         * 
+         * \return the latest value reported by the LteChunkProcessor
+         */
+        Ptr<SpectrumValue> GetValue();
 
-  /** 
-   * 
-   * 
-   * \return the latest value reported by the LteChunkProcessor
-   */
-  Ptr<SpectrumValue> GetValue ();
-  
-private:
-  Ptr<SpectrumValue> m_value;
-};
+    private:
+        Ptr<SpectrumValue> m_value;
+    };
 
 } // namespace ns3
 

@@ -31,49 +31,48 @@
 
 namespace ns3 {
 
-/**
- * \ingroup access
- * \brief A template singleton
- *
- * This template class can be used to implement the singleton pattern.
- * The underlying object will be destroyed automatically when the process
- * exits.
- *
- * For a singleton whose lifetime is bounded by the simulation run,
- * not the process, see SimulationSingleton.
- *
- * To force your `class ExampleS` to be a singleton, inherit from Singleton:
- * \code
- *   class ExampleS : public Singleton<ExampleS> { ... };
- * \endcode
- *
- * Then, to reach the singleton instance, just do
- * \code
- *   ExampleS::Get ()->...;
- * \endcode
- *
- * \note
- * If you call Get() again after the object has
- * been destroyed, the object will be re-created which will result in a
- * memory leak as reported by most memory leak checkers. It is up to the
- * user to ensure that Get() is never called from a static variable
- * finalizer.
- */
-template <typename T>
-class Singleton : private NonCopyable
-{
-public:
-  /**
-   * Get a pointer to the singleton instance.
-   *
-   * The instance will be automatically deleted when
-   * the process exits.
-   *
-   * \return A pointer to the singleton instance.
-   */
-  static T *Get (void);
+    /**
+     * \ingroup access
+     * \brief A template singleton
+     *
+     * This template class can be used to implement the singleton pattern.
+     * The underlying object will be destroyed automatically when the process
+     * exits.
+     *
+     * For a singleton whose lifetime is bounded by the simulation run,
+     * not the process, see SimulationSingleton.
+     *
+     * To force your `class ExampleS` to be a singleton, inherit from Singleton:
+     * \code
+     *   class ExampleS : public Singleton<ExampleS> { ... };
+     * \endcode
+     *
+     * Then, to reach the singleton instance, just do
+     * \code
+     *   ExampleS::Get ()->...;
+     * \endcode
+     *
+     * \note
+     * If you call Get() again after the object has
+     * been destroyed, the object will be re-created which will result in a
+     * memory leak as reported by most memory leak checkers. It is up to the
+     * user to ensure that Get() is never called from a static variable
+     * finalizer.
+     */
+    template <typename T>
+    class Singleton : private NonCopyable {
+    public:
+        /**
+         * Get a pointer to the singleton instance.
+         *
+         * The instance will be automatically deleted when
+         * the process exits.
+         *
+         * \return A pointer to the singleton instance.
+         */
+        static T *Get(void);
 
-};
+    };
 
 } // namespace ns3
 
@@ -84,13 +83,12 @@ public:
 
 namespace ns3 {
 
-template <typename T>
-T *
-Singleton<T>::Get (void)
-{
-  static T object;
-  return &object;
-}
+    template <typename T>
+    T *
+    Singleton<T>::Get(void) {
+        static T object;
+        return &object;
+    }
 
 
 } // namespace ns3

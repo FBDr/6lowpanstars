@@ -23,61 +23,51 @@
 
 namespace ndn {
 
-static const uint32_t RSA_KEY_SIZES[] = {2048, 1024};
-static const uint32_t ECDSA_KEY_SIZES[] = {256, 384};
-static const uint32_t AES_KEY_SIZES[] = {64, 128, 256};
+    static const uint32_t RSA_KEY_SIZES[] = {2048, 1024};
+    static const uint32_t ECDSA_KEY_SIZES[] = {256, 384};
+    static const uint32_t AES_KEY_SIZES[] = {64, 128, 256};
 
-uint32_t
-RsaKeyParamsInfo::checkKeySize(uint32_t size)
-{
-  for (size_t i = 0; i < (sizeof(RSA_KEY_SIZES) / sizeof(uint32_t)); i++)
-    {
-      if (RSA_KEY_SIZES[i] == size)
-        return size;
+    uint32_t
+    RsaKeyParamsInfo::checkKeySize(uint32_t size) {
+        for (size_t i = 0; i < (sizeof (RSA_KEY_SIZES) / sizeof (uint32_t)); i++) {
+            if (RSA_KEY_SIZES[i] == size)
+                return size;
+        }
+        return getDefaultSize();
     }
-  return getDefaultSize();
-}
 
-uint32_t
-RsaKeyParamsInfo::getDefaultSize()
-{
-  return RSA_KEY_SIZES[0];
-}
-
-uint32_t
-EcdsaKeyParamsInfo::checkKeySize(uint32_t size)
-{
-
-  for (size_t i = 0; i < (sizeof(ECDSA_KEY_SIZES) / sizeof(uint32_t)); i++)
-    {
-      if (ECDSA_KEY_SIZES[i] == size)
-        return size;
+    uint32_t
+    RsaKeyParamsInfo::getDefaultSize() {
+        return RSA_KEY_SIZES[0];
     }
-  return getDefaultSize();
-}
 
-uint32_t
-EcdsaKeyParamsInfo::getDefaultSize()
-{
-  return ECDSA_KEY_SIZES[0];
-}
+    uint32_t
+    EcdsaKeyParamsInfo::checkKeySize(uint32_t size) {
 
-
-uint32_t
-AesKeyParamsInfo::checkKeySize(uint32_t size)
-{
-  for (size_t i = 0; i < (sizeof(AES_KEY_SIZES) / sizeof(uint32_t)); i++)
-    {
-      if (AES_KEY_SIZES[i] == size)
-        return size;
+        for (size_t i = 0; i < (sizeof (ECDSA_KEY_SIZES) / sizeof (uint32_t)); i++) {
+            if (ECDSA_KEY_SIZES[i] == size)
+                return size;
+        }
+        return getDefaultSize();
     }
-  return getDefaultSize();
-}
 
-uint32_t
-AesKeyParamsInfo::getDefaultSize()
-{
-  return AES_KEY_SIZES[0];
-}
+    uint32_t
+    EcdsaKeyParamsInfo::getDefaultSize() {
+        return ECDSA_KEY_SIZES[0];
+    }
+
+    uint32_t
+    AesKeyParamsInfo::checkKeySize(uint32_t size) {
+        for (size_t i = 0; i < (sizeof (AES_KEY_SIZES) / sizeof (uint32_t)); i++) {
+            if (AES_KEY_SIZES[i] == size)
+                return size;
+        }
+        return getDefaultSize();
+    }
+
+    uint32_t
+    AesKeyParamsInfo::getDefaultSize() {
+        return AES_KEY_SIZES[0];
+    }
 
 } // namespace ndn

@@ -24,116 +24,107 @@
 #include "cache-policy.hpp"
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-std::ostream&
-operator<<(std::ostream& os, CachePolicyType policy)
-{
-  switch (policy) {
-  case CachePolicyType::NO_CACHE:
-    os << "NoCache";
-    break;
-  default:
-    os << "None";
-    break;
-  }
+        std::ostream&
+        operator<<(std::ostream& os, CachePolicyType policy) {
+            switch (policy) {
+                case CachePolicyType::NO_CACHE:
+                    os << "NoCache";
+                    break;
+                default:
+                    os << "None";
+                    break;
+            }
 
-  return os;
-}
+            return os;
+        }
 
-CachePolicy::CachePolicy()
-  : m_policy(CachePolicyType::NONE)
-{
-}
+        CachePolicy::CachePolicy()
+        : m_policy(CachePolicyType::NONE) {
+        }
 
-CachePolicy::CachePolicy(const Block& block)
-{
-  wireDecode(block);
-}
+        CachePolicy::CachePolicy(const Block& block) {
+            wireDecode(block);
+        }
 
-template<encoding::Tag TAG>
-size_t
-CachePolicy::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  if (m_policy == CachePolicyType::NONE) {
-    BOOST_THROW_EXCEPTION(Error("CachePolicyType must be set"));
-  }
-  size_t length = 0;
-  length += prependNonNegativeIntegerBlock(encoder, tlv::CachePolicyType,
-                                           static_cast<uint32_t>(m_policy));
-  length += encoder.prependVarNumber(length);
-  length += encoder.prependVarNumber(tlv::CachePolicy);
-  return length;
-}
+        template<encoding::Tag TAG>
+        size_t
+        CachePolicy::wireEncode(EncodingImpl<TAG>& encoder) const {
+            if (m_policy == CachePolicyType::NONE) {
+                BOOST_THROW_EXCEPTION(Error("CachePolicyType must be set"));
+            }
+            size_t length = 0;
+            length += prependNonNegativeIntegerBlock(encoder, tlv::CachePolicyType,
+                    static_cast<uint32_t> (m_policy));
+            length += encoder.prependVarNumber(length);
+            length += encoder.prependVarNumber(tlv::CachePolicy);
+            return length;
+        }
 
-template size_t
-CachePolicy::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+        template size_t
+        CachePolicy::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
 
-template size_t
-CachePolicy::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+        template size_t
+        CachePolicy::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
 
-const Block&
-CachePolicy::wireEncode() const
-{
-  if (m_policy == CachePolicyType::NONE) {
-    BOOST_THROW_EXCEPTION(Error("CachePolicyType must be set"));
-  }
+        const Block&
+        CachePolicy::wireEncode() const {
+            if (m_policy == CachePolicyType::NONE) {
+                BOOST_THROW_EXCEPTION(Error("CachePolicyType must be set"));
+            }
 
-  if (m_wire.hasWire()) {
-    return m_wire;
-  }
+            if (m_wire.hasWire()) {
+                return m_wire;
+            }
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  m_wire = buffer.block();
+            m_wire = buffer.block();
 
-  return m_wire;
-}
+            return m_wire;
+        }
 
-void
-CachePolicy::wireDecode(const Block& wire)
-{
-  if (wire.type() != tlv::CachePolicy) {
-    BOOST_THROW_EXCEPTION(Error("expecting CachePolicy block"));
-  }
+        void
+        CachePolicy::wireDecode(const Block& wire) {
+            if (wire.type() != tlv::CachePolicy) {
+                BOOST_THROW_EXCEPTION(Error("expecting CachePolicy block"));
+            }
 
-  m_wire = wire;
-  m_wire.parse();
+            m_wire = wire;
+            m_wire.parse();
 
-  Block::element_const_iterator it = m_wire.elements_begin();
-  if (it != m_wire.elements_end() && it->type() == tlv::CachePolicyType) {
-    m_policy = static_cast<CachePolicyType>(readNonNegativeInteger(*it));
-    if (this->getPolicy() == CachePolicyType::NONE) {
-      BOOST_THROW_EXCEPTION(Error("unknown CachePolicyType"));
-    }
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("expecting CachePolicyType block"));
-  }
-}
+            Block::element_const_iterator it = m_wire.elements_begin();
+            if (it != m_wire.elements_end() && it->type() == tlv::CachePolicyType) {
+                m_policy = static_cast<CachePolicyType> (readNonNegativeInteger(*it));
+                if (this->getPolicy() == CachePolicyType::NONE) {
+                    BOOST_THROW_EXCEPTION(Error("unknown CachePolicyType"));
+                }
+            } else {
+                BOOST_THROW_EXCEPTION(Error("expecting CachePolicyType block"));
+            }
+        }
 
-CachePolicyType
-CachePolicy::getPolicy() const
-{
-  switch (m_policy) {
-  case CachePolicyType::NO_CACHE:
-    return m_policy;
-  default:
-    return CachePolicyType::NONE;
-  }
-}
+        CachePolicyType
+        CachePolicy::getPolicy() const {
+            switch (m_policy) {
+                case CachePolicyType::NO_CACHE:
+                    return m_policy;
+                default:
+                    return CachePolicyType::NONE;
+            }
+        }
 
-CachePolicy&
-CachePolicy::setPolicy(CachePolicyType policy)
-{
-  m_policy = policy;
-  m_wire.reset();
-  return *this;
-}
+        CachePolicy&
+        CachePolicy::setPolicy(CachePolicyType policy) {
+            m_policy = policy;
+            m_wire.reset();
+            return *this;
+        }
 
-} // namespace lp
+    } // namespace lp
 } // namespace ndn

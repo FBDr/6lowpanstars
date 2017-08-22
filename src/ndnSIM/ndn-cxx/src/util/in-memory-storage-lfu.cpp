@@ -22,55 +22,49 @@
 #include "in-memory-storage-lfu.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-InMemoryStorageLfu::InMemoryStorageLfu(size_t limit)
-  : InMemoryStorage(limit)
-{
-}
+        InMemoryStorageLfu::InMemoryStorageLfu(size_t limit)
+        : InMemoryStorage(limit) {
+        }
 
-InMemoryStorageLfu::InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit)
-  : InMemoryStorage(ioService, limit)
-{
-}
+        InMemoryStorageLfu::InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit)
+        : InMemoryStorage(ioService, limit) {
+        }
 
-void
-InMemoryStorageLfu::afterInsert(InMemoryStorageEntry* entry)
-{
-  BOOST_ASSERT(m_cleanupIndex.size() <= size());
-  CleanupEntry cleanupEntry;
-  cleanupEntry.entry = entry;
-  cleanupEntry.frequency = 0;
-  m_cleanupIndex.insert(cleanupEntry);
-}
+        void
+        InMemoryStorageLfu::afterInsert(InMemoryStorageEntry* entry) {
+            BOOST_ASSERT(m_cleanupIndex.size() <= size());
+            CleanupEntry cleanupEntry;
+            cleanupEntry.entry = entry;
+            cleanupEntry.frequency = 0;
+            m_cleanupIndex.insert(cleanupEntry);
+        }
 
-bool
-InMemoryStorageLfu::evictItem()
-{
-  if (!m_cleanupIndex.get<byFrequency>().empty()) {
-    CleanupIndex::index<byFrequency>::type::iterator it = m_cleanupIndex.get<byFrequency>().begin();
-    eraseImpl(((*it).entry)->getFullName());
-    m_cleanupIndex.get<byFrequency>().erase(it);
-    return true;
-  }
+        bool
+        InMemoryStorageLfu::evictItem() {
+            if (!m_cleanupIndex.get<byFrequency>().empty()) {
+                CleanupIndex::index<byFrequency>::type::iterator it = m_cleanupIndex.get<byFrequency>().begin();
+                eraseImpl(((*it).entry)->getFullName());
+                m_cleanupIndex.get<byFrequency>().erase(it);
+                return true;
+            }
 
-  return false;
-}
+            return false;
+        }
 
-void
-InMemoryStorageLfu::beforeErase(InMemoryStorageEntry* entry)
-{
-  CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
-  if (it != m_cleanupIndex.get<byEntity>().end())
-    m_cleanupIndex.get<byEntity>().erase(it);
-}
+        void
+        InMemoryStorageLfu::beforeErase(InMemoryStorageEntry* entry) {
+            CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
+            if (it != m_cleanupIndex.get<byEntity>().end())
+                m_cleanupIndex.get<byEntity>().erase(it);
+        }
 
-void
-InMemoryStorageLfu::afterAccess(InMemoryStorageEntry* entry)
-{
-  CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
-  m_cleanupIndex.get<byEntity>().modify(it, &incrementFrequency);
-}
+        void
+        InMemoryStorageLfu::afterAccess(InMemoryStorageEntry* entry) {
+            CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
+            m_cleanupIndex.get<byEntity>().modify(it, &incrementFrequency);
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

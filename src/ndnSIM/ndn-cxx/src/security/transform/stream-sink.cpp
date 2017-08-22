@@ -22,38 +22,34 @@
 #include "stream-sink.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-StreamSink::StreamSink(std::ostream& os)
-  : m_os(os)
-{
-}
+            StreamSink::StreamSink(std::ostream& os)
+            : m_os(os) {
+            }
 
-size_t
-StreamSink::doWrite(const uint8_t* buf, size_t size)
-{
-  m_os.write(reinterpret_cast<const char*>(buf), size);
+            size_t
+            StreamSink::doWrite(const uint8_t* buf, size_t size) {
+                m_os.write(reinterpret_cast<const char*> (buf), size);
 
-  if (m_os.bad())
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Fail to write data into output stream"));
+                if (m_os.bad())
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Fail to write data into output stream"));
 
-  return size;
-}
+                return size;
+            }
 
-void
-StreamSink::doEnd()
-{
-  m_os.flush();
-}
+            void
+            StreamSink::doEnd() {
+                m_os.flush();
+            }
 
-unique_ptr<Sink>
-streamSink(std::ostream& os)
-{
-  return make_unique<StreamSink>(os);
-}
+            unique_ptr<Sink>
+            streamSink(std::ostream& os) {
+                return make_unique<StreamSink>(os);
+            }
 
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

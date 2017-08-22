@@ -25,56 +25,56 @@
 #include "ns3/ndnSIM/model/cs/ndn-content-store.hpp"
 
 namespace ns3 {
-namespace ndn {
-namespace cs {
+    namespace ndn {
+        namespace cs {
 
-/**
- * @ingroup ndn-cs
- * @brief Implementation of ContentStore that completely disables caching
- */
-class Nocache : public ContentStore {
-public:
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId
-  GetTypeId();
+            /**
+             * @ingroup ndn-cs
+             * @brief Implementation of ContentStore that completely disables caching
+             */
+            class Nocache : public ContentStore {
+            public:
+                /**
+                 * \brief Interface ID
+                 *
+                 * \return interface ID
+                 */
+                static TypeId
+                GetTypeId();
 
-  /**
-   * @brief Default constructor
-   */
-  Nocache();
+                /**
+                 * @brief Default constructor
+                 */
+                Nocache();
 
-  /**
-   * @brief Virtual destructor
-   */
-  virtual ~Nocache();
+                /**
+                 * @brief Virtual destructor
+                 */
+                virtual ~Nocache();
 
-  virtual shared_ptr<Data>
-  Lookup(shared_ptr<const Interest> interest);
+                virtual shared_ptr<Data>
+                Lookup(shared_ptr<const Interest> interest);
 
-  virtual bool
-  Add(shared_ptr<const Data> data);
+                virtual bool
+                Add(shared_ptr<const Data> data);
 
-  virtual void
-  Print(std::ostream& os) const;
+                virtual void
+                Print(std::ostream& os) const;
 
-  virtual uint32_t
-  GetSize() const;
+                virtual uint32_t
+                GetSize() const;
 
-  virtual Ptr<cs::Entry>
-  Begin();
+                virtual Ptr<cs::Entry>
+                Begin();
 
-  virtual Ptr<cs::Entry>
-  End();
+                virtual Ptr<cs::Entry>
+                End();
 
-  virtual Ptr<cs::Entry> Next(Ptr<cs::Entry>);
-};
+                virtual Ptr<cs::Entry> Next(Ptr<cs::Entry>);
+            };
 
-} // namespace cs
-} // namespace ndn
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_CONTENT_STORE_NOCACHE_H

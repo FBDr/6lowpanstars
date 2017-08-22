@@ -25,22 +25,20 @@
 #include "../security/v1/cryptopp.hpp"
 
 namespace ndn {
-namespace crypto {
+    namespace crypto {
 
-ConstBufferPtr
-computeSha256Digest(const uint8_t* data, size_t dataLength)
-{
-  try {
-    CryptoPP::SHA256 hash;
-    OBufferStream os;
-    CryptoPP::StringSource(data, dataLength, true,
-      new CryptoPP::HashFilter(hash, new CryptoPP::FileSink(os)));
-    return os.buf();
-  }
-  catch (CryptoPP::Exception& e) {
-    return ConstBufferPtr();
-  }
-}
+        ConstBufferPtr
+        computeSha256Digest(const uint8_t* data, size_t dataLength) {
+            try {
+                CryptoPP::SHA256 hash;
+                OBufferStream os;
+                CryptoPP::StringSource(data, dataLength, true,
+                        new CryptoPP::HashFilter(hash, new CryptoPP::FileSink(os)));
+                return os.buf();
+            } catch (CryptoPP::Exception& e) {
+                return ConstBufferPtr();
+            }
+        }
 
-} // namespace crypto
+    } // namespace crypto
 } // namespace ndn

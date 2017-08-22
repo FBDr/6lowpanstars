@@ -24,17 +24,15 @@
 #include "nack.hpp"
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-Nack::Nack(const Interest& interest)
-  : m_interest(interest)
-{
-}
+        Nack::Nack(const Interest& interest)
+        : m_interest(interest) {
+        }
 
-Nack::Nack(Interest&& interest)
-  : m_interest(interest)
-{
-}
+        Nack::Nack(Interest&& interest)
+        : m_interest(interest) {
+        }
 
-} // namespace lp
+    } // namespace lp
 } // namespace ndn

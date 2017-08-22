@@ -23,126 +23,115 @@
 #include "../../util/concepts.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-using std::string;
+            using std::string;
 
-BOOST_CONCEPT_ASSERT((WireEncodable<IdentityCertificate>));
-BOOST_CONCEPT_ASSERT((WireDecodable<IdentityCertificate>));
-static_assert(std::is_base_of<Certificate::Error, IdentityCertificate::Error>::value,
-              "IdentityCertificate::Error must inherit from Certificate::Error");
+            BOOST_CONCEPT_ASSERT((WireEncodable<IdentityCertificate>));
+            BOOST_CONCEPT_ASSERT((WireDecodable<IdentityCertificate>));
+            static_assert(std::is_base_of<Certificate::Error, IdentityCertificate::Error>::value,
+                    "IdentityCertificate::Error must inherit from Certificate::Error");
 
-IdentityCertificate::IdentityCertificate()
-{
-  this->setFreshnessPeriod(time::hours(1));
-}
+            IdentityCertificate::IdentityCertificate() {
+                this->setFreshnessPeriod(time::hours(1));
+            }
 
-IdentityCertificate::IdentityCertificate(const Data& data)
-  : Certificate(data)
-{
-  setPublicKeyName();
-}
+            IdentityCertificate::IdentityCertificate(const Data& data)
+            : Certificate(data) {
+                setPublicKeyName();
+            }
 
-IdentityCertificate::IdentityCertificate(const Block& block)
-  : Certificate(block)
-{
-  setPublicKeyName();
-}
+            IdentityCertificate::IdentityCertificate(const Block& block)
+            : Certificate(block) {
+                setPublicKeyName();
+            }
 
-void
-IdentityCertificate::wireDecode(const Block& wire)
-{
-  Certificate::wireDecode(wire);
-  setPublicKeyName();
-}
+            void
+            IdentityCertificate::wireDecode(const Block& wire) {
+                Certificate::wireDecode(wire);
+                setPublicKeyName();
+            }
 
-void
-IdentityCertificate::setName(const Name& name)
-{
-  Certificate::setName(name);
-  setPublicKeyName();
-}
+            void
+            IdentityCertificate::setName(const Name& name) {
+                Certificate::setName(name);
+                setPublicKeyName();
+            }
 
-bool
-IdentityCertificate::isCorrectName(const Name& name)
-{
-  string idString("ID-CERT");
-  ssize_t i = name.size() - 1;
-  for (; i >= 0; i--) {
-    if (name.get(i).toUri() == idString)
-      break;
-  }
+            bool
+            IdentityCertificate::isCorrectName(const Name& name) {
+                string idString("ID-CERT");
+                ssize_t i = name.size() - 1;
+                for (; i >= 0; i--) {
+                    if (name.get(i).toUri() == idString)
+                        break;
+                }
 
-  if (i < 0)
-    return false;
+                if (i < 0)
+                    return false;
 
-  string keyString("KEY");
-  size_t keyIndex = 0;
-  for (; keyIndex < name.size(); keyIndex++) {
-    if (name.get(keyIndex).toUri() == keyString)
-      break;
-  }
+                string keyString("KEY");
+                size_t keyIndex = 0;
+                for (; keyIndex < name.size(); keyIndex++) {
+                    if (name.get(keyIndex).toUri() == keyString)
+                        break;
+                }
 
-  if (keyIndex >= name.size())
-    return false;
+                if (keyIndex >= name.size())
+                    return false;
 
-  return true;
-}
+                return true;
+            }
 
-void
-IdentityCertificate::setPublicKeyName()
-{
-  if (!isCorrectName(getName()))
-    BOOST_THROW_EXCEPTION(Error("Wrong Identity Certificate Name"));
+            void
+            IdentityCertificate::setPublicKeyName() {
+                if (!isCorrectName(getName()))
+                    BOOST_THROW_EXCEPTION(Error("Wrong Identity Certificate Name"));
 
-  m_publicKeyName = certificateNameToPublicKeyName(getName());
-}
+                m_publicKeyName = certificateNameToPublicKeyName(getName());
+            }
 
-bool
-IdentityCertificate::isIdentityCertificate(const Certificate& certificate)
-{
-  return dynamic_cast<const IdentityCertificate*>(&certificate);
-}
+            bool
+            IdentityCertificate::isIdentityCertificate(const Certificate& certificate) {
+                return dynamic_cast<const IdentityCertificate*> (&certificate);
+            }
 
-Name
-IdentityCertificate::certificateNameToPublicKeyName(const Name& certificateName)
-{
-  string idString("ID-CERT");
-  bool foundIdString = false;
-  size_t idCertComponentIndex = certificateName.size() - 1;
-  for (; idCertComponentIndex + 1 > 0; --idCertComponentIndex) {
-    if (certificateName.get(idCertComponentIndex).toUri() == idString)
-      {
-        foundIdString = true;
-        break;
-      }
-  }
+            Name
+            IdentityCertificate::certificateNameToPublicKeyName(const Name& certificateName) {
+                string idString("ID-CERT");
+                bool foundIdString = false;
+                size_t idCertComponentIndex = certificateName.size() - 1;
+                for (; idCertComponentIndex + 1 > 0; --idCertComponentIndex) {
+                    if (certificateName.get(idCertComponentIndex).toUri() == idString) {
+                        foundIdString = true;
+                        break;
+                    }
+                }
 
-  if (!foundIdString)
-    BOOST_THROW_EXCEPTION(Error("Incorrect identity certificate name " + certificateName.toUri()));
+                if (!foundIdString)
+                    BOOST_THROW_EXCEPTION(Error("Incorrect identity certificate name " + certificateName.toUri()));
 
-  Name tmpName = certificateName.getSubName(0, idCertComponentIndex);
-  string keyString("KEY");
-  bool foundKeyString = false;
-  size_t keyComponentIndex = 0;
-  for (; keyComponentIndex < tmpName.size(); keyComponentIndex++) {
-    if (tmpName.get(keyComponentIndex).toUri() == keyString)
-      {
-        foundKeyString = true;
-        break;
-      }
-  }
+                Name tmpName = certificateName.getSubName(0, idCertComponentIndex);
+                string keyString("KEY");
+                bool foundKeyString = false;
+                size_t keyComponentIndex = 0;
+                for (; keyComponentIndex < tmpName.size(); keyComponentIndex++) {
+                    if (tmpName.get(keyComponentIndex).toUri() == keyString) {
+                        foundKeyString = true;
+                        break;
+                    }
+                }
 
-  if (!foundKeyString)
-    BOOST_THROW_EXCEPTION(Error("Incorrect identity certificate name " + certificateName.toUri()));
+                if (!foundKeyString)
+                    BOOST_THROW_EXCEPTION(Error("Incorrect identity certificate name " + certificateName.toUri()));
 
-  return tmpName
-           .getSubName(0, keyComponentIndex)
-           .append(tmpName.getSubName(keyComponentIndex + 1,
-                                      tmpName.size() - keyComponentIndex - 1));
-}
+                return tmpName
+                        .getSubName(0, keyComponentIndex)
+                        .append(tmpName.getSubName(keyComponentIndex + 1,
+                        tmpName.size() - keyComponentIndex - 1));
+            }
 
-} // namespace v1
-} // namespace security
+        } // namespace v1
+    } // namespace security
 } // namespace ndn

@@ -29,123 +29,121 @@
 
 namespace ndn {
 
-class SignatureInfo
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+    class SignatureInfo {
+    public:
 
-  SignatureInfo();
+        class Error : public tlv::Error {
+        public:
 
-  explicit
-  SignatureInfo(tlv::SignatureTypeValue type);
+            explicit
+            Error(const std::string& what)
+            : tlv::Error(what) {
+            }
+        };
 
-  SignatureInfo(tlv::SignatureTypeValue type, const KeyLocator& keyLocator);
+        SignatureInfo();
 
-  /**
-   * @brief Generate SignatureInfo from a block
-   *
-   * @throws tlv::Error if supplied block is not formatted correctly
-   */
-  explicit
-  SignatureInfo(const Block& block);
+        explicit
+        SignatureInfo(tlv::SignatureTypeValue type);
 
-  /// @brief Set SignatureType
-  void
-  setSignatureType(tlv::SignatureTypeValue type);
+        SignatureInfo(tlv::SignatureTypeValue type, const KeyLocator& keyLocator);
 
-  /// @brief Get SignatureType
-  int32_t
-  getSignatureType() const
-  {
-    return m_type;
-  }
+        /**
+         * @brief Generate SignatureInfo from a block
+         *
+         * @throws tlv::Error if supplied block is not formatted correctly
+         */
+        explicit
+        SignatureInfo(const Block& block);
 
-  /// @brief Check if KeyLocator is set
-  bool
-  hasKeyLocator() const
-  {
-    return m_hasKeyLocator;
-  }
+        /// @brief Set SignatureType
+        void
+        setSignatureType(tlv::SignatureTypeValue type);
 
-  /// @brief Set KeyLocator
-  void
-  setKeyLocator(const KeyLocator& keyLocator);
+        /// @brief Get SignatureType
 
-  /// @brief Unset KeyLocator
-  void
-  unsetKeyLocator();
+        int32_t
+        getSignatureType() const {
+            return m_type;
+        }
 
-  /**
-   * @brief Get KeyLocator
-   *
-   * @throws SignatureInfo::Error if keyLocator does not exist
-   */
-  const KeyLocator&
-  getKeyLocator() const;
+        /// @brief Check if KeyLocator is set
 
-  /// @brief Set ValidityPeriod
-  void
-  setValidityPeriod(const security::ValidityPeriod& validityPeriod);
+        bool
+        hasKeyLocator() const {
+            return m_hasKeyLocator;
+        }
 
-  /// @brief Unset ValidityPeriod
-  void
-  unsetValidityPeriod();
+        /// @brief Set KeyLocator
+        void
+        setKeyLocator(const KeyLocator& keyLocator);
 
-  /// @brief Get ValidityPeriod
-  security::ValidityPeriod
-  getValidityPeriod() const;
+        /// @brief Unset KeyLocator
+        void
+        unsetKeyLocator();
 
-  /// @brief Append signature type specific tlv block
-  void
-  appendTypeSpecificTlv(const Block& block);
+        /**
+         * @brief Get KeyLocator
+         *
+         * @throws SignatureInfo::Error if keyLocator does not exist
+         */
+        const KeyLocator&
+        getKeyLocator() const;
 
-  /**
-   * @brief Get signature type specific tlv block
-   *
-   * @throws SignatureInfo::Error if the block does not exist
-   */
-  const Block&
-  getTypeSpecificTlv(uint32_t type) const;
+        /// @brief Set ValidityPeriod
+        void
+        setValidityPeriod(const security::ValidityPeriod& validityPeriod);
 
-  /// @brief Encode to a wire format or estimate wire format
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+        /// @brief Unset ValidityPeriod
+        void
+        unsetValidityPeriod();
 
-  /// @brief Encode to a wire format
-  const Block&
-  wireEncode() const;
+        /// @brief Get ValidityPeriod
+        security::ValidityPeriod
+        getValidityPeriod() const;
 
-  /// @brief Decode from a wire format
-  void
-  wireDecode(const Block& wire);
+        /// @brief Append signature type specific tlv block
+        void
+        appendTypeSpecificTlv(const Block& block);
 
-public: // EqualityComparable concept
-  bool
-  operator==(const SignatureInfo& rhs) const;
+        /**
+         * @brief Get signature type specific tlv block
+         *
+         * @throws SignatureInfo::Error if the block does not exist
+         */
+        const Block&
+        getTypeSpecificTlv(uint32_t type) const;
 
-  bool
-  operator!=(const SignatureInfo& rhs) const
-  {
-    return !(*this == rhs);
-  }
+        /// @brief Encode to a wire format or estimate wire format
+        template<encoding::Tag TAG>
+        size_t
+        wireEncode(EncodingImpl<TAG>& encoder) const;
 
-private:
-  int32_t m_type;
-  bool m_hasKeyLocator;
-  KeyLocator m_keyLocator;
-  std::list<Block> m_otherTlvs;
+        /// @brief Encode to a wire format
+        const Block&
+        wireEncode() const;
 
-  mutable Block m_wire;
-};
+        /// @brief Decode from a wire format
+        void
+        wireDecode(const Block& wire);
+
+    public: // EqualityComparable concept
+        bool
+        operator==(const SignatureInfo& rhs) const;
+
+        bool
+        operator!=(const SignatureInfo& rhs) const {
+            return !(*this == rhs);
+        }
+
+    private:
+        int32_t m_type;
+        bool m_hasKeyLocator;
+        KeyLocator m_keyLocator;
+        std::list<Block> m_otherTlvs;
+
+        mutable Block m_wire;
+    };
 
 } // namespace ndn
 

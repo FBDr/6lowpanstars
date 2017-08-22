@@ -24,94 +24,84 @@
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (EpsBearerTag);
-
-TypeId
-EpsBearerTag::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::EpsBearerTag")
-    .SetParent<Tag> ()
-    .SetGroupName("Lte")
-    .AddConstructor<EpsBearerTag> ()
-    .AddAttribute ("rnti", "The rnti that indicates the UE which packet belongs",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&EpsBearerTag::GetRnti),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("bid", "The EPS bearer id within the UE to which the packet belongs",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&EpsBearerTag::GetBid),
-                   MakeUintegerChecker<uint8_t> ())
-  ;
-  return tid;
-}
 
-TypeId
-EpsBearerTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(EpsBearerTag);
 
-EpsBearerTag::EpsBearerTag ()
-  : m_rnti (0),
-    m_bid (0)
-{
-}
-EpsBearerTag::EpsBearerTag (uint16_t rnti, uint8_t bid)
-  : m_rnti (rnti),
-    m_bid (bid)
-{
-}
+    TypeId
+    EpsBearerTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::EpsBearerTag")
+                .SetParent<Tag> ()
+                .SetGroupName("Lte")
+                .AddConstructor<EpsBearerTag> ()
+                .AddAttribute("rnti", "The rnti that indicates the UE which packet belongs",
+                UintegerValue(0),
+                MakeUintegerAccessor(&EpsBearerTag::GetRnti),
+                MakeUintegerChecker<uint16_t> ())
+                .AddAttribute("bid", "The EPS bearer id within the UE to which the packet belongs",
+                UintegerValue(0),
+                MakeUintegerAccessor(&EpsBearerTag::GetBid),
+                MakeUintegerChecker<uint8_t> ())
+                ;
+        return tid;
+    }
 
-void
-EpsBearerTag::SetRnti (uint16_t rnti)
-{
-  m_rnti = rnti;
-}
+    TypeId
+    EpsBearerTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-EpsBearerTag::SetBid (uint8_t bid)
-{
-  m_bid = bid;
-}
+    EpsBearerTag::EpsBearerTag()
+            : m_rnti(0),
+            m_bid(0) {
+    }
 
-uint32_t
-EpsBearerTag::GetSerializedSize (void) const
-{
-  return 3;
-}
+    EpsBearerTag::EpsBearerTag(uint16_t rnti, uint8_t bid)
+            : m_rnti(rnti),
+            m_bid(bid) {
+    }
 
-void
-EpsBearerTag::Serialize (TagBuffer i) const
-{
-  i.WriteU16 (m_rnti);
-  i.WriteU8 (m_bid);
-}
+    void
+    EpsBearerTag::SetRnti(uint16_t rnti) {
+        m_rnti = rnti;
+    }
 
-void
-EpsBearerTag::Deserialize (TagBuffer i)
-{
-  m_rnti = (uint16_t) i.ReadU16 ();
-  m_bid = (uint8_t) i.ReadU8 ();
-}
+    void
+    EpsBearerTag::SetBid(uint8_t bid) {
+        m_bid = bid;
+    }
 
-uint16_t
-EpsBearerTag::GetRnti () const
-{
-  return m_rnti;
-}
+    uint32_t
+    EpsBearerTag::GetSerializedSize(void) const {
+        return 3;
+    }
 
-uint8_t
-EpsBearerTag::GetBid () const
-{
-  return m_bid;
-}
+    void
+    EpsBearerTag::Serialize(TagBuffer i) const {
+        i.WriteU16(m_rnti);
+        i.WriteU8(m_bid);
+    }
 
-void
-EpsBearerTag::Print (std::ostream &os) const
-{
-  os << "rnti=" << m_rnti << ", bid=" << (uint16_t) m_bid;
-}
+    void
+    EpsBearerTag::Deserialize(TagBuffer i) {
+        m_rnti = (uint16_t) i.ReadU16();
+        m_bid = (uint8_t) i.ReadU8();
+    }
+
+    uint16_t
+    EpsBearerTag::GetRnti() const {
+        return m_rnti;
+    }
+
+    uint8_t
+    EpsBearerTag::GetBid() const {
+        return m_bid;
+    }
+
+    void
+    EpsBearerTag::Print(std::ostream & os) const {
+        os << "rnti=" << m_rnti << ", bid=" << (uint16_t) m_bid;
+    }
 
 } // namespace ns3

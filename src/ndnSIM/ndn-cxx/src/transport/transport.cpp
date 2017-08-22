@@ -23,31 +23,27 @@
 
 namespace ndn {
 
-Transport::Error::Error(const boost::system::error_code& code, const std::string& msg)
-  : std::runtime_error(msg + (code.value() ? " (" + code.category().message(code.value()) + ")" : ""))
-{
-}
+    Transport::Error::Error(const boost::system::error_code& code, const std::string& msg)
+    : std::runtime_error(msg + (code.value() ? " (" + code.category().message(code.value()) + ")" : "")) {
+    }
 
-Transport::Error::Error(const std::string& msg)
-  : std::runtime_error(msg)
-{
-}
+    Transport::Error::Error(const std::string& msg)
+    : std::runtime_error(msg) {
+    }
 
-Transport::Transport()
-  : m_ioService(nullptr)
-  , m_isConnected(false)
-  , m_isReceiving(false)
-{
-}
+    Transport::Transport()
+    : m_ioService(nullptr)
+    , m_isConnected(false)
+    , m_isReceiving(false) {
+    }
 
-void
-Transport::connect(boost::asio::io_service& ioService,
-                   const ReceiveCallback& receiveCallback)
-{
-  BOOST_ASSERT(receiveCallback != nullptr);
+    void
+    Transport::connect(boost::asio::io_service& ioService,
+            const ReceiveCallback& receiveCallback) {
+        BOOST_ASSERT(receiveCallback != nullptr);
 
-  m_ioService = &ioService;
-  m_receiveCallback = receiveCallback;
-}
+        m_ioService = &ioService;
+        m_receiveCallback = receiveCallback;
+    }
 
 } // namespace ndn

@@ -28,41 +28,39 @@
 #include "v1/identity-certificate.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief Interface for the cache of validated certificates
- */
-class CertificateCache : noncopyable
-{
-public:
-  virtual
-  ~CertificateCache()
-  {
-  }
+        /**
+         * @brief Interface for the cache of validated certificates
+         */
+        class CertificateCache : noncopyable {
+        public:
 
-  virtual void
-  insertCertificate(shared_ptr<const v1::IdentityCertificate> certificate) = 0;
+            virtual
+            ~CertificateCache() {
+            }
 
-  virtual shared_ptr<const v1::IdentityCertificate>
-  getCertificate(const Name& certificateNameWithoutVersion) = 0;
+            virtual void
+            insertCertificate(shared_ptr<const v1::IdentityCertificate> certificate) = 0;
 
-  virtual void
-  reset() = 0;
+            virtual shared_ptr<const v1::IdentityCertificate>
+            getCertificate(const Name& certificateNameWithoutVersion) = 0;
 
-  virtual size_t
-  getSize() = 0;
+            virtual void
+            reset() = 0;
 
-  bool
-  isEmpty()
-  {
-    return (getSize() == 0);
-  }
-};
+            virtual size_t
+            getSize() = 0;
 
-} // namespace security
+            bool
+            isEmpty() {
+                return (getSize() == 0);
+            }
+        };
 
-using security::CertificateCache;
+    } // namespace security
+
+    using security::CertificateCache;
 
 } // namespace ndn
 

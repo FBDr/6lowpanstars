@@ -18,12 +18,13 @@ struct connection_data {
 
 class print_server {
 public:
+
     print_server() : m_next_sessionid(1) {
         m_server.init_asio();
 
-        m_server.set_open_handler(bind(&print_server::on_open,this,::_1));
-        m_server.set_close_handler(bind(&print_server::on_close,this,::_1));
-        m_server.set_message_handler(bind(&print_server::on_message,this,::_1,::_2));
+        m_server.set_open_handler(bind(&print_server::on_open, this, ::_1));
+        m_server.set_close_handler(bind(&print_server::on_close, this, ::_1));
+        m_server.set_message_handler(bind(&print_server::on_message, this, ::_1, ::_2));
     }
 
     void on_open(connection_hdl hdl) {
@@ -39,7 +40,7 @@ public:
         connection_data& data = get_data_from_hdl(hdl);
 
         std::cout << "Closing connection " << data.name
-                  << " with sessionid " << data.sessionid << std::endl;
+                << " with sessionid " << data.sessionid << std::endl;
 
         m_connections.erase(hdl);
     }
@@ -50,10 +51,10 @@ public:
         if (data.name.empty()) {
             data.name = msg->get_payload();
             std::cout << "Setting name of connection with sessionid "
-                      << data.sessionid << " to " << data.name << std::endl;
+                    << data.sessionid << " to " << data.name << std::endl;
         } else {
             std::cout << "Got a message from connection " << data.name
-                      << " with sessionid " << data.sessionid << std::endl;
+                    << " with sessionid " << data.sessionid << std::endl;
         }
     }
 
@@ -75,7 +76,7 @@ public:
         m_server.run();
     }
 private:
-    typedef std::map<connection_hdl,connection_data,std::owner_less<connection_hdl>> con_list;
+    typedef std::map<connection_hdl, connection_data, std::owner_less<connection_hdl>> con_list;
 
     int m_next_sessionid;
     server m_server;

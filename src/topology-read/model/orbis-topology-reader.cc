@@ -28,83 +28,76 @@
 #include "orbis-topology-reader.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("OrbisTopologyReader");
-
-OrbisTopologyReader::OrbisTopologyReader ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-OrbisTopologyReader::~OrbisTopologyReader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("OrbisTopologyReader");
 
-NodeContainer
-OrbisTopologyReader::Read (void)
-{
-  std::ifstream topgen;
-  topgen.open (GetFileName ().c_str ());
-  std::map<std::string, Ptr<Node> > nodeMap;
-  NodeContainer nodes;
-
-  if ( !topgen.is_open () )
-    {
-      return nodes;
+    OrbisTopologyReader::OrbisTopologyReader() {
+        NS_LOG_FUNCTION(this);
     }
 
-  std::string from;
-  std::string to;
-  std::istringstream lineBuffer;
-  std::string line;
+    OrbisTopologyReader::~OrbisTopologyReader() {
+        NS_LOG_FUNCTION(this);
+    }
 
-  int linksNumber = 0;
-  int nodesNumber = 0;
+    NodeContainer
+    OrbisTopologyReader::Read(void) {
+        std::ifstream topgen;
+        topgen.open(GetFileName().c_str());
+        std::map<std::string, Ptr<Node> > nodeMap;
+        NodeContainer nodes;
 
-  while (!topgen.eof ())
-    {
-      line.clear ();
-      lineBuffer.clear ();
-      from.clear ();
-      to.clear ();
-
-      getline (topgen,line);
-      lineBuffer.str (line);
-      lineBuffer >> from;
-      lineBuffer >> to;
-
-      if ( (!from.empty ()) && (!to.empty ()) )
-        {
-          NS_LOG_INFO ( linksNumber << " From: " << from << " to: " << to );
-          if ( nodeMap[from] == 0 )
-            {
-              Ptr<Node> tmpNode = CreateObject<Node> ();
-              nodeMap[from] = tmpNode;
-              nodes.Add (tmpNode);
-              nodesNumber++;
-            }
-
-          if (nodeMap[to] == 0)
-            {
-              Ptr<Node> tmpNode = CreateObject<Node> ();
-              nodeMap[to] = tmpNode;
-              nodes.Add (tmpNode);
-              nodesNumber++;
-            }
-
-          Link link ( nodeMap[from], from, nodeMap[to], to );
-          AddLink (link);
-
-          linksNumber++;
+        if (!topgen.is_open()) {
+            return nodes;
         }
-    }
-  NS_LOG_INFO ("Orbis topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
-  topgen.close ();
 
-  return nodes;
-}
+        std::string from;
+        std::string to;
+        std::istringstream lineBuffer;
+        std::string line;
+
+        int linksNumber = 0;
+        int nodesNumber = 0;
+
+        while (!topgen.eof()) {
+            line.clear();
+            lineBuffer.clear();
+            from.clear();
+            to.clear();
+
+            getline(topgen, line);
+            lineBuffer.str(line);
+            lineBuffer >> from;
+            lineBuffer >> to;
+
+            if ((!from.empty()) && (!to.empty())) {
+                NS_LOG_INFO(linksNumber << " From: " << from << " to: " << to);
+                if (nodeMap[from] == 0) {
+                    Ptr<Node> tmpNode = CreateObject<Node> ();
+                    nodeMap[from] = tmpNode;
+                    nodes.Add(tmpNode);
+                    nodesNumber++;
+                }
+
+                if (nodeMap[to] == 0) {
+                    Ptr<Node> tmpNode = CreateObject<Node> ();
+                    nodeMap[to] = tmpNode;
+                    nodes.Add(tmpNode);
+                    nodesNumber++;
+                }
+
+                Link link(nodeMap[from], from, nodeMap[to], to);
+                AddLink(link);
+
+                linksNumber++;
+            }
+        }
+        NS_LOG_INFO("Orbis topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
+        topgen.close();
+
+        return nodes;
+    }
 
 } /* namespace ns3 */
 

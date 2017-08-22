@@ -27,52 +27,51 @@
 
 namespace ns3 {
 
-class LteTestUePhy : public LtePhy
-{
-public:
-  /**
-   * @warning the default constructor should not be used
-   */
-  LteTestUePhy ();
+    class LteTestUePhy : public LtePhy {
+    public:
+        /**
+         * @warning the default constructor should not be used
+         */
+        LteTestUePhy();
 
-  /**
-   * \param dlPhy the downlink LteSpectrumPhy instance
-   * \param ulPhy the uplink LteSpectrumPhy instance
-   */
-  LteTestUePhy (Ptr<LteSpectrumPhy> dlPhy, Ptr<LteSpectrumPhy> ulPhy);
+        /**
+         * \param dlPhy the downlink LteSpectrumPhy instance
+         * \param ulPhy the uplink LteSpectrumPhy instance
+         */
+        LteTestUePhy(Ptr<LteSpectrumPhy> dlPhy, Ptr<LteSpectrumPhy> ulPhy);
 
-  virtual ~LteTestUePhy ();
+        virtual ~LteTestUePhy();
 
-  virtual void DoDispose ();
-  static TypeId GetTypeId (void);
+        virtual void DoDispose();
+        static TypeId GetTypeId(void);
 
-  /**
-   * \brief Queue the MAC PDU to be sent
-   * \param p the MAC PDU to sent
-   */
-  virtual void DoSendMacPdu (Ptr<Packet> p);
+        /**
+         * \brief Queue the MAC PDU to be sent
+         * \param p the MAC PDU to sent
+         */
+        virtual void DoSendMacPdu(Ptr<Packet> p);
 
-  /**
-   * \brief Create the PSD for the TX
-   * \return the pointer to the PSD
-   */
-  virtual Ptr<SpectrumValue> CreateTxPowerSpectralDensity ();
+        /**
+         * \brief Create the PSD for the TX
+         * \return the pointer to the PSD
+         */
+        virtual Ptr<SpectrumValue> CreateTxPowerSpectralDensity();
 
-  virtual void GenerateCtrlCqiReport (const SpectrumValue& sinr);
-  
-  virtual void GenerateDataCqiReport (const SpectrumValue& sinr);
+        virtual void GenerateCtrlCqiReport(const SpectrumValue& sinr);
 
-  virtual void ReportInterference (const SpectrumValue& interf);
+        virtual void GenerateDataCqiReport(const SpectrumValue& sinr);
 
-  virtual void ReportRsReceivedPower (const SpectrumValue& power);
+        virtual void ReportInterference(const SpectrumValue& interf);
 
-  virtual void ReceiveLteControlMessage (Ptr<LteControlMessage> msg);
+        virtual void ReportRsReceivedPower(const SpectrumValue& power);
 
-  SpectrumValue GetSinr ();
+        virtual void ReceiveLteControlMessage(Ptr<LteControlMessage> msg);
 
-private:
-  SpectrumValue m_sinr;
-};
+        SpectrumValue GetSinr();
+
+    private:
+        SpectrumValue m_sinr;
+    };
 
 
 } // namespace ns3

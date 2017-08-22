@@ -28,58 +28,55 @@
 #include "core/network-interface.hpp"
 
 namespace nfd {
-namespace tests {
-namespace {
+    namespace tests {
+        namespace {
 
-template<typename E>
-bool
-matchTristate(E e, bool b)
-{
-  return (e == E::DontCare) ||
-         (e == E::Yes && b) ||
-         (e == E::No && !b);
-}
+            template<typename E>
+            bool
+            matchTristate(E e, bool b) {
+                return (e == E::DontCare) ||
+                        (e == E::Yes && b) ||
+                        (e == E::No && !b);
+            }
 
-} // unnamed namespace
+        } // unnamed namespace
 
-template<>
-boost::asio::ip::address_v4
-getTestIp(LoopbackAddress loopback, MulticastInterface mcast)
-{
-  for (const auto& interface : listNetworkInterfaces()) {
-    if (interface.isUp() &&
-        matchTristate(loopback, interface.isLoopback()) &&
-        matchTristate(mcast, interface.isMulticastCapable())) {
-      for (const auto& address : interface.ipv4Addresses) {
-        if (!address.is_unspecified() &&
-            matchTristate(loopback, address.is_loopback())) {
-          return address;
+        template<>
+        boost::asio::ip::address_v4
+        getTestIp(LoopbackAddress loopback, MulticastInterface mcast) {
+            for (const auto& interface : listNetworkInterfaces()) {
+                if (interface.isUp() &&
+                        matchTristate(loopback, interface.isLoopback()) &&
+                        matchTristate(mcast, interface.isMulticastCapable())) {
+                    for (const auto& address : interface.ipv4Addresses) {
+                        if (!address.is_unspecified() &&
+                                matchTristate(loopback, address.is_loopback())) {
+                            return address;
+                        }
+                    }
+                }
+            }
+            return {};
         }
-      }
-    }
-  }
-  return {};
-}
 
-template<>
-boost::asio::ip::address_v6
-getTestIp(LoopbackAddress loopback, MulticastInterface mcast)
-{
-  for (const auto& interface : listNetworkInterfaces()) {
-    if (interface.isUp() &&
-        matchTristate(loopback, interface.isLoopback()) &&
-        matchTristate(mcast, interface.isMulticastCapable())) {
-      for (const auto& address : interface.ipv6Addresses) {
-        if (!address.is_unspecified() &&
-            !address.is_link_local() && // see #1428
-            matchTristate(loopback, address.is_loopback())) {
-          return address;
+        template<>
+        boost::asio::ip::address_v6
+        getTestIp(LoopbackAddress loopback, MulticastInterface mcast) {
+            for (const auto& interface : listNetworkInterfaces()) {
+                if (interface.isUp() &&
+                        matchTristate(loopback, interface.isLoopback()) &&
+                        matchTristate(mcast, interface.isMulticastCapable())) {
+                    for (const auto& address : interface.ipv6Addresses) {
+                        if (!address.is_unspecified() &&
+                                !address.is_link_local() && // see #1428
+                                matchTristate(loopback, address.is_loopback())) {
+                            return address;
+                        }
+                    }
+                }
+            }
+            return {};
         }
-      }
-    }
-  }
-  return {};
-}
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

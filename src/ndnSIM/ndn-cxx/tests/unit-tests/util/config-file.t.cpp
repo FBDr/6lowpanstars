@@ -27,72 +27,60 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(UtilConfigFile, util::TestHomeEnvironmentFixture)
+        BOOST_FIXTURE_TEST_SUITE(UtilConfigFile, util::TestHomeEnvironmentFixture)
 
-BOOST_AUTO_TEST_CASE(TestParse)
-{
-  using namespace boost::filesystem;
-  // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
+        BOOST_AUTO_TEST_CASE(TestParse) {
+            using namespace boost::filesystem;
+            // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
 
-  setenv("TEST_HOME", "tests/unit-tests/util/config-file-home", 1);
+            setenv("TEST_HOME", "tests/unit-tests/util/config-file-home", 1);
 
-  path homePath(absolute(std::getenv("TEST_HOME")));
-  homePath /= ".ndn/client.conf";
+            path homePath(absolute(std::getenv("TEST_HOME")));
+            homePath /= ".ndn/client.conf";
 
-  try
-    {
-      ConfigFile config;
+            try {
+                ConfigFile config;
 
-      BOOST_REQUIRE_EQUAL(config.getPath(), homePath);
+                BOOST_REQUIRE_EQUAL(config.getPath(), homePath);
 
-      const ConfigFile::Parsed& parsed = config.getParsedConfiguration();
-      BOOST_CHECK_EQUAL(parsed.get<std::string>("a"), "/path/to/nowhere");
-      BOOST_CHECK_EQUAL(parsed.get<std::string>("b"), "some-othervalue.01");
-    }
-  catch (const std::runtime_error& error)
-    {
-      BOOST_FAIL("Unexpected exception: " << error.what());
-    }
-}
+                const ConfigFile::Parsed& parsed = config.getParsedConfiguration();
+                BOOST_CHECK_EQUAL(parsed.get<std::string>("a"), "/path/to/nowhere");
+                BOOST_CHECK_EQUAL(parsed.get<std::string>("b"), "some-othervalue.01");
+            } catch (const std::runtime_error& error) {
+                BOOST_FAIL("Unexpected exception: " << error.what());
+            }
+        }
 
-BOOST_AUTO_TEST_CASE(EmptyPathParse)
-{
-  // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
+        BOOST_AUTO_TEST_CASE(EmptyPathParse) {
+            // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
 
-  setenv("TEST_HOME", "tests/unit-tests/util/does/not/exist", 1);
-  try
-    {
-      ConfigFile config;
-    }
-  catch (const std::runtime_error& error)
-    {
-      BOOST_FAIL("Unexpected exception: " << error.what());
-    }
-}
+            setenv("TEST_HOME", "tests/unit-tests/util/does/not/exist", 1);
+            try {
+                ConfigFile config;
+            } catch (const std::runtime_error& error) {
+                BOOST_FAIL("Unexpected exception: " << error.what());
+            }
+        }
 
-BOOST_AUTO_TEST_CASE(MalformedParse)
-{
-  using namespace boost::filesystem;
-  // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
+        BOOST_AUTO_TEST_CASE(MalformedParse) {
+            using namespace boost::filesystem;
+            // std::cerr << "current home = " << std::getenv("TEST_HOME") << std::endl;
 
-  setenv("TEST_HOME", "tests/unit-tests/util/config-file-malformed-home", 1);
+            setenv("TEST_HOME", "tests/unit-tests/util/config-file-malformed-home", 1);
 
-  bool fileWasMalformed = false;
-  try
-    {
-      ConfigFile config;
-    }
-  catch (const ConfigFile::Error& error)
-    {
-      fileWasMalformed = true;
-    }
+            bool fileWasMalformed = false;
+            try {
+                ConfigFile config;
+            } catch (const ConfigFile::Error& error) {
+                fileWasMalformed = true;
+            }
 
-  BOOST_REQUIRE(fileWasMalformed);
-}
+            BOOST_REQUIRE(fileWasMalformed);
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

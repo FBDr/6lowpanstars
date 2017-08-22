@@ -30,32 +30,31 @@
 #include "core/scheduler.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/**
- * \brief A Transport that communicates on a unicast UDP socket
- */
-class UnicastUdpTransport final : public DatagramTransport<boost::asio::ip::udp, Unicast>
-{
-public:
-  UnicastUdpTransport(protocol::socket&& socket,
-                      ndn::nfd::FacePersistency persistency,
-                      time::nanoseconds idleTimeout);
+        /**
+         * \brief A Transport that communicates on a unicast UDP socket
+         */
+        class UnicastUdpTransport final : public DatagramTransport<boost::asio::ip::udp, Unicast> {
+        public:
+            UnicastUdpTransport(protocol::socket&& socket,
+                    ndn::nfd::FacePersistency persistency,
+                    time::nanoseconds idleTimeout);
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
 
-private:
-  void
-  scheduleClosureWhenIdle();
+        private:
+            void
+            scheduleClosureWhenIdle();
 
-private:
-  const time::nanoseconds m_idleTimeout;
-  scheduler::ScopedEventId m_closeIfIdleEvent;
-};
+        private:
+            const time::nanoseconds m_idleTimeout;
+            scheduler::ScopedEventId m_closeIfIdleEvent;
+        };
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_UNICAST_UDP_TRANSPORT_HPP

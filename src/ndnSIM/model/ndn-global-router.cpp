@@ -24,75 +24,65 @@
 #include "ns3/channel.h"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-uint32_t GlobalRouter::m_idCounter = 0;
+        uint32_t GlobalRouter::m_idCounter = 0;
 
-NS_OBJECT_ENSURE_REGISTERED(GlobalRouter);
+        NS_OBJECT_ENSURE_REGISTERED(GlobalRouter);
 
-TypeId
-GlobalRouter::GetTypeId()
-{
-  static TypeId tid = TypeId("ns3::ndn::GlobalRouter").SetGroupName("Ndn").SetParent<Object>();
-  return tid;
-}
+        TypeId
+        GlobalRouter::GetTypeId() {
+            static TypeId tid = TypeId("ns3::ndn::GlobalRouter").SetGroupName("Ndn").SetParent<Object>();
+            return tid;
+        }
 
-GlobalRouter::GlobalRouter()
-{
-  m_id = m_idCounter;
-  m_idCounter++;
-}
+        GlobalRouter::GlobalRouter() {
+            m_id = m_idCounter;
+            m_idCounter++;
+        }
 
-void
-GlobalRouter::NotifyNewAggregate()
-{
-  if (m_ndn == 0) {
-    m_ndn = GetObject<L3Protocol>();
-  }
-  Object::NotifyNewAggregate();
-}
+        void
+        GlobalRouter::NotifyNewAggregate() {
+            if (m_ndn == 0) {
+                m_ndn = GetObject<L3Protocol>();
+            }
+            Object::NotifyNewAggregate();
+        }
 
-uint32_t
-GlobalRouter::GetId() const
-{
-  return m_id;
-}
+        uint32_t
+        GlobalRouter::GetId() const {
+            return m_id;
+        }
 
-Ptr<L3Protocol>
-GlobalRouter::GetL3Protocol() const
-{
-  return m_ndn;
-}
+        Ptr<L3Protocol>
+        GlobalRouter::GetL3Protocol() const {
+            return m_ndn;
+        }
 
-void
-GlobalRouter::AddLocalPrefix(shared_ptr<Name> prefix)
-{
-  m_localPrefixes.push_back(prefix);
-}
+        void
+        GlobalRouter::AddLocalPrefix(shared_ptr<Name> prefix) {
+            m_localPrefixes.push_back(prefix);
+        }
 
-void
-GlobalRouter::AddIncidency(shared_ptr<Face> face, Ptr<GlobalRouter> gr)
-{
-  m_incidencies.push_back(std::make_tuple(this, face, gr));
-}
+        void
+        GlobalRouter::AddIncidency(shared_ptr<Face> face, Ptr<GlobalRouter> gr) {
+            m_incidencies.push_back(std::make_tuple(this, face, gr));
+        }
 
-GlobalRouter::IncidencyList&
-GlobalRouter::GetIncidencies()
-{
-  return m_incidencies;
-}
+        GlobalRouter::IncidencyList&
+        GlobalRouter::GetIncidencies() {
+            return m_incidencies;
+        }
 
-const GlobalRouter::LocalPrefixList&
-GlobalRouter::GetLocalPrefixes() const
-{
-  return m_localPrefixes;
-}
+        const GlobalRouter::LocalPrefixList&
+        GlobalRouter::GetLocalPrefixes() const {
+            return m_localPrefixes;
+        }
 
-void
-GlobalRouter::clear()
-{
-  m_idCounter = 0;
-}
+        void
+        GlobalRouter::clear() {
+            m_idCounter = 0;
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

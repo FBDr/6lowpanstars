@@ -23,20 +23,19 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(SecurityIdentityManagementFixture, IdentityManagementFixture)
+        BOOST_FIXTURE_TEST_SUITE(SecurityIdentityManagementFixture, IdentityManagementFixture)
 
-BOOST_AUTO_TEST_CASE(Tmp)
-{
-  Name identity("/tmp/identity");
-  BOOST_REQUIRE(addIdentity(identity));
-  Name certName = m_keyChain.getDefaultCertificateNameForIdentity(identity);
-  BOOST_REQUIRE_EQUAL(certName.empty(), false);
-  BOOST_REQUIRE_NO_THROW(m_keyChain.getCertificate(certName));
-}
+        BOOST_AUTO_TEST_CASE(Tmp) {
+            Name identity("/tmp/identity");
+            BOOST_REQUIRE(addIdentity(identity));
+            Name certName = m_keyChain.getDefaultCertificateNameForIdentity(identity);
+            BOOST_REQUIRE_EQUAL(certName.empty(), false);
+            BOOST_REQUIRE_NO_THROW(m_keyChain.getCertificate(certName));
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

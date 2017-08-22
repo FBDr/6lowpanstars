@@ -31,81 +31,79 @@
 
 namespace nfd {
 
-class EthernetFactory : public ProtocolFactory
-{
-public:
-  /**
-   * \brief Exception of EthernetFactory
-   */
-  class Error : public ProtocolFactory::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : ProtocolFactory::Error(what)
-    {
+    class EthernetFactory : public ProtocolFactory {
+    public:
+
+        /**
+         * \brief Exception of EthernetFactory
+         */
+        class Error : public ProtocolFactory::Error {
+        public:
+
+            explicit
+            Error(const std::string& what)
+            : ProtocolFactory::Error(what) {
+            }
+        };
+
+        typedef std::map<std::pair<std::string, ethernet::Address>,
+        shared_ptr<Face>> MulticastFaceMap;
+
+        /**
+         * \brief Create an EthernetFace to communicate with the given multicast group
+         *
+         * If this method is called twice with the same interface and group, only
+         * one face will be created. Instead, the second call will just retrieve
+         * the existing face.
+         *
+         * \param interface Local network interface
+         * \param address   Ethernet broadcast/multicast destination address
+         *
+         * \returns always a valid shared pointer to an EthernetFace object,
+         *          an exception will be thrown if the creation fails
+         *
+         * \throws EthernetFactory::Error or EthernetTransport::Error
+         */
+        shared_ptr<Face>
+        createMulticastFace(const NetworkInterfaceInfo& interface,
+                const ethernet::Address& address);
+
+        /**
+         * \brief Get map of configured multicast faces
+         */
+        const MulticastFaceMap&
+        getMulticastFaces() const;
+
+    public: // from ProtocolFactory
+        virtual void
+        createFace(const FaceUri& uri,
+                ndn::nfd::FacePersistency persistency,
+                bool wantLocalFieldsEnabled,
+                const FaceCreatedCallback& onCreated,
+                const FaceCreationFailedCallback& onFailure) override;
+
+        virtual std::vector<shared_ptr<const Channel>>
+        getChannels() const override;
+
+    private:
+        /**
+         * \brief Look up EthernetFace using specified interface and address
+         *
+         * \returns shared pointer to the existing EthernetFace object
+         *          or nullptr when such face does not exist
+         */
+        shared_ptr<Face>
+        findMulticastFace(const std::string& interfaceName,
+                const ethernet::Address& address) const;
+
+    private:
+        MulticastFaceMap m_multicastFaces;
+    };
+
+    inline const EthernetFactory::MulticastFaceMap&
+    EthernetFactory::getMulticastFaces() const {
+        return m_multicastFaces;
     }
-  };
-
-  typedef std::map<std::pair<std::string, ethernet::Address>,
-                   shared_ptr<Face>> MulticastFaceMap;
-
-  /**
-   * \brief Create an EthernetFace to communicate with the given multicast group
-   *
-   * If this method is called twice with the same interface and group, only
-   * one face will be created. Instead, the second call will just retrieve
-   * the existing face.
-   *
-   * \param interface Local network interface
-   * \param address   Ethernet broadcast/multicast destination address
-   *
-   * \returns always a valid shared pointer to an EthernetFace object,
-   *          an exception will be thrown if the creation fails
-   *
-   * \throws EthernetFactory::Error or EthernetTransport::Error
-   */
-  shared_ptr<Face>
-  createMulticastFace(const NetworkInterfaceInfo& interface,
-                      const ethernet::Address& address);
-
-  /**
-   * \brief Get map of configured multicast faces
-   */
-  const MulticastFaceMap&
-  getMulticastFaces() const;
-
-public: // from ProtocolFactory
-  virtual void
-  createFace(const FaceUri& uri,
-             ndn::nfd::FacePersistency persistency,
-             bool wantLocalFieldsEnabled,
-             const FaceCreatedCallback& onCreated,
-             const FaceCreationFailedCallback& onFailure) override;
-
-  virtual std::vector<shared_ptr<const Channel>>
-  getChannels() const override;
-
-private:
-  /**
-   * \brief Look up EthernetFace using specified interface and address
-   *
-   * \returns shared pointer to the existing EthernetFace object
-   *          or nullptr when such face does not exist
-   */
-  shared_ptr<Face>
-  findMulticastFace(const std::string& interfaceName,
-                    const ethernet::Address& address) const;
-
-private:
-  MulticastFaceMap m_multicastFaces;
-};
-
-inline const EthernetFactory::MulticastFaceMap&
-EthernetFactory::getMulticastFaces() const
-{
-  return m_multicastFaces;
-}
 
 } // namespace nfd
 

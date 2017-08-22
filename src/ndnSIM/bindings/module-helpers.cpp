@@ -20,13 +20,12 @@
 #include "module-helpers.hpp"
 
 namespace nfd {
-namespace fib {
+    namespace fib {
 
-std::shared_ptr<Face>
-getFaceFromFibNextHop(const NextHop& nextHop)
-{
-  return nextHop.getFace().shared_from_this();
-}
+        std::shared_ptr<Face>
+        getFaceFromFibNextHop(const NextHop& nextHop) {
+            return nextHop.getFace().shared_from_this();
+        }
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd

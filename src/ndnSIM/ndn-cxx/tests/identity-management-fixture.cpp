@@ -25,61 +25,54 @@
 #include <boost/filesystem.hpp>
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-IdentityManagementFixture::IdentityManagementFixture()
-{
-}
+        IdentityManagementFixture::IdentityManagementFixture() {
+        }
 
-IdentityManagementFixture::~IdentityManagementFixture()
-{
-  for (const auto& identity : m_identities) {
-    m_keyChain.deleteIdentity(identity);
-  }
+        IdentityManagementFixture::~IdentityManagementFixture() {
+            for (const auto& identity : m_identities) {
+                m_keyChain.deleteIdentity(identity);
+            }
 
-  boost::system::error_code ec;
-  for (const auto& certFile : m_certFiles) {
-    boost::filesystem::remove(certFile, ec); // ignore error
-  }
-}
+            boost::system::error_code ec;
+            for (const auto& certFile : m_certFiles) {
+                boost::filesystem::remove(certFile, ec); // ignore error
+            }
+        }
 
-bool
-IdentityManagementFixture::addIdentity(const Name& identity, const KeyParams& params)
-{
-  try {
-    m_keyChain.createIdentity(identity, params);
-    m_identities.push_back(identity);
-    return true;
-  }
-  catch (std::runtime_error&) {
-    return false;
-  }
-}
+        bool
+        IdentityManagementFixture::addIdentity(const Name& identity, const KeyParams& params) {
+            try {
+                m_keyChain.createIdentity(identity, params);
+                m_identities.push_back(identity);
+                return true;
+            } catch (std::runtime_error&) {
+                return false;
+            }
+        }
 
-bool
-IdentityManagementFixture::saveIdentityCertificate(const Name& identity,
-                                                   const std::string& filename, bool wantAdd)
-{
-  shared_ptr<ndn::IdentityCertificate> cert;
-  try {
-    cert = m_keyChain.getCertificate(m_keyChain.getDefaultCertificateNameForIdentity(identity));
-  }
-  catch (const ndn::SecPublicInfo::Error&) {
-    if (wantAdd && this->addIdentity(identity)) {
-      return this->saveIdentityCertificate(identity, filename, false);
-    }
-    return false;
-  }
+        bool
+        IdentityManagementFixture::saveIdentityCertificate(const Name& identity,
+                const std::string& filename, bool wantAdd) {
+            shared_ptr<ndn::IdentityCertificate> cert;
+            try {
+                cert = m_keyChain.getCertificate(m_keyChain.getDefaultCertificateNameForIdentity(identity));
+            } catch (const ndn::SecPublicInfo::Error&) {
+                if (wantAdd && this->addIdentity(identity)) {
+                    return this->saveIdentityCertificate(identity, filename, false);
+                }
+                return false;
+            }
 
-  m_certFiles.push_back(filename);
-  try {
-    ndn::io::save(*cert, filename);
-    return true;
-  }
-  catch (const ndn::io::Error&) {
-    return false;
-  }
-}
+            m_certFiles.push_back(filename);
+            try {
+                ndn::io::save(*cert, filename);
+                return true;
+            } catch (const ndn::io::Error&) {
+                return false;
+            }
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

@@ -34,34 +34,31 @@
 #include "ns3/names.h"
 #include "ns3/ipv4-list-routing.h"
 
-namespace ns3 {
-DsdvHelper::~DsdvHelper ()
+namespace ns3
 {
-}
 
-DsdvHelper::DsdvHelper () : Ipv4RoutingHelper ()
-{
-  m_agentFactory.SetTypeId ("ns3::dsdv::RoutingProtocol");
-}
+    DsdvHelper::~DsdvHelper() {
+    }
 
-DsdvHelper*
-DsdvHelper::Copy (void) const
-{
-  return new DsdvHelper (*this);
-}
+    DsdvHelper::DsdvHelper() : Ipv4RoutingHelper() {
+        m_agentFactory.SetTypeId("ns3::dsdv::RoutingProtocol");
+    }
 
-Ptr<Ipv4RoutingProtocol>
-DsdvHelper::Create (Ptr<Node> node) const
-{
-  Ptr<dsdv::RoutingProtocol> agent = m_agentFactory.Create<dsdv::RoutingProtocol> ();
-  node->AggregateObject (agent);
-  return agent;
-}
+    DsdvHelper *
+            DsdvHelper::Copy(void) const {
+        return new DsdvHelper(*this);
+    }
 
-void
-DsdvHelper::Set (std::string name, const AttributeValue &value)
-{
-  m_agentFactory.Set (name, value);
-}
+    Ptr<Ipv4RoutingProtocol>
+            DsdvHelper::Create(Ptr<Node> node) const {
+        Ptr<dsdv::RoutingProtocol> agent = m_agentFactory.Create<dsdv::RoutingProtocol> ();
+        node->AggregateObject(agent);
+        return agent;
+    }
+
+    void
+    DsdvHelper::Set(std::string name, const AttributeValue & value) {
+        m_agentFactory.Set(name, value);
+    }
 
 }

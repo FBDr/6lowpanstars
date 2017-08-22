@@ -31,45 +31,41 @@
 #include "face/link-service.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-/** \brief a dummy LinkService that logs all received packets, for Transport testing
- *  \warning This LinkService does not allow sending.
- */
-class DummyReceiveLinkService : public LinkService
-{
-private:
-  virtual void
-  doSendInterest(const Interest& interest) override
-  {
-    BOOST_ASSERT(false);
-  }
+            /** \brief a dummy LinkService that logs all received packets, for Transport testing
+             *  \warning This LinkService does not allow sending.
+             */
+            class DummyReceiveLinkService : public LinkService {
+            private:
 
-  virtual void
-  doSendData(const Data& data) override
-  {
-    BOOST_ASSERT(false);
-  }
+                virtual void
+                doSendInterest(const Interest& interest) override {
+                    BOOST_ASSERT(false);
+                }
 
-  virtual void
-  doSendNack(const lp::Nack& nack) override
-  {
-    BOOST_ASSERT(false);
-  }
+                virtual void
+                doSendData(const Data& data) override {
+                    BOOST_ASSERT(false);
+                }
 
-  virtual void
-  doReceivePacket(Transport::Packet&& packet) override
-  {
-    receivedPackets.push_back(packet);
-  }
+                virtual void
+                doSendNack(const lp::Nack& nack) override {
+                    BOOST_ASSERT(false);
+                }
 
-public:
-  std::vector<Transport::Packet> receivedPackets;
-};
+                virtual void
+                doReceivePacket(Transport::Packet&& packet) override {
+                    receivedPackets.push_back(packet);
+                }
 
-} // namespace tests
-} // namespace face
+            public:
+                std::vector<Transport::Packet> receivedPackets;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_DUMMY_RECEIVE_LINK_SERVICE_HPP

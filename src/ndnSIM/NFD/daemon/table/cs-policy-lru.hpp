@@ -33,73 +33,71 @@
 #include <boost/multi_index/hashed_index.hpp>
 
 namespace nfd {
-namespace cs {
-namespace lru {
+    namespace cs {
+        namespace lru {
 
-struct EntryItComparator
-{
-  bool
-  operator()(const iterator& a, const iterator& b) const
-  {
-    return *a < *b;
-  }
-};
+            struct EntryItComparator {
 
-typedef boost::multi_index_container<
-    iterator,
-    boost::multi_index::indexed_by<
-      boost::multi_index::sequenced<>,
-      boost::multi_index::ordered_unique<
-        boost::multi_index::identity<iterator>, EntryItComparator
-      >
-    >
-  > Queue;
+                bool
+                operator()(const iterator& a, const iterator& b) const {
+                    return *a < *b;
+                }
+            };
 
-/** \brief LRU cs replacement policy
- *
- * The least recently used entries get removed first.
- * Everytime when any entry is used or refreshed, Policy should witness the usage
- * of it.
- */
-class LruPolicy : public Policy
-{
-public:
-  LruPolicy();
+            typedef boost::multi_index_container<
+            iterator,
+            boost::multi_index::indexed_by<
+            boost::multi_index::sequenced<>,
+            boost::multi_index::ordered_unique<
+            boost::multi_index::identity<iterator>, EntryItComparator
+            >
+            >
+            > Queue;
 
-public:
-  static const std::string POLICY_NAME;
+            /** \brief LRU cs replacement policy
+             *
+             * The least recently used entries get removed first.
+             * Everytime when any entry is used or refreshed, Policy should witness the usage
+             * of it.
+             */
+            class LruPolicy : public Policy {
+            public:
+                LruPolicy();
 
-private:
-  virtual void
-  doAfterInsert(iterator i) override;
+            public:
+                static const std::string POLICY_NAME;
 
-  virtual void
-  doAfterRefresh(iterator i) override;
+            private:
+                virtual void
+                doAfterInsert(iterator i) override;
 
-  virtual void
-  doBeforeErase(iterator i) override;
+                virtual void
+                doAfterRefresh(iterator i) override;
 
-  virtual void
-  doBeforeUse(iterator i) override;
+                virtual void
+                doBeforeErase(iterator i) override;
 
-  virtual void
-  evictEntries() override;
+                virtual void
+                doBeforeUse(iterator i) override;
 
-private:
-  /** \brief moves an entry to the end of queue
-   */
-  void
-  insertToQueue(iterator i, bool isNewEntry);
+                virtual void
+                evictEntries() override;
 
-private:
-  Queue m_queue;
-};
+            private:
+                /** \brief moves an entry to the end of queue
+                 */
+                void
+                insertToQueue(iterator i, bool isNewEntry);
 
-} // namespace lru
+            private:
+                Queue m_queue;
+            };
 
-using lru::LruPolicy;
+        } // namespace lru
 
-} // namespace cs
+        using lru::LruPolicy;
+
+    } // namespace cs
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_CS_POLICY_LRU_HPP

@@ -30,26 +30,23 @@
 
 namespace ndn {
 
-class RegexBackrefMatcher : public RegexMatcher
-{
-public:
-  RegexBackrefMatcher(const std::string& expr, shared_ptr<RegexBackrefManager> backrefManager);
+    class RegexBackrefMatcher : public RegexMatcher {
+    public:
+        RegexBackrefMatcher(const std::string& expr, shared_ptr<RegexBackrefManager> backrefManager);
 
-  virtual
-  ~RegexBackrefMatcher()
-  {
-  }
+        virtual
+        ~RegexBackrefMatcher() {
+        }
 
-  void
-  lateCompile()
-  {
-    compile();
-  }
+        void
+        lateCompile() {
+            compile();
+        }
 
-protected:
-  virtual void
-  compile();
-};
+    protected:
+        virtual void
+        compile();
+    };
 
 } // namespace ndn
 
@@ -57,31 +54,28 @@ protected:
 
 namespace ndn {
 
-inline
-RegexBackrefMatcher::RegexBackrefMatcher(const std::string& expr,
-                                         shared_ptr<RegexBackrefManager> backrefManager)
-  : RegexMatcher(expr, EXPR_BACKREF, backrefManager)
-{
-  // compile();
-}
+    inline
+    RegexBackrefMatcher::RegexBackrefMatcher(const std::string& expr,
+            shared_ptr<RegexBackrefManager> backrefManager)
+    : RegexMatcher(expr, EXPR_BACKREF, backrefManager) {
+        // compile();
+    }
 
-inline void
-RegexBackrefMatcher::compile()
-{
-  if (m_expr.size() < 2)
-    BOOST_THROW_EXCEPTION(RegexMatcher::Error("Unrecognized format: " + m_expr));
+    inline void
+    RegexBackrefMatcher::compile() {
+        if (m_expr.size() < 2)
+            BOOST_THROW_EXCEPTION(RegexMatcher::Error("Unrecognized format: " + m_expr));
 
-  size_t lastIndex = m_expr.size() - 1;
-  if ('(' == m_expr[0] && ')' == m_expr[lastIndex]) {
-    // m_backRefManager->pushRef(this);
+        size_t lastIndex = m_expr.size() - 1;
+        if ('(' == m_expr[0] && ')' == m_expr[lastIndex]) {
+            // m_backRefManager->pushRef(this);
 
-    shared_ptr<RegexMatcher> matcher(new RegexPatternListMatcher(m_expr.substr(1, lastIndex - 1),
-                                                                 m_backrefManager));
-    m_matchers.push_back(matcher);
-  }
-  else
-    BOOST_THROW_EXCEPTION(RegexMatcher::Error("Unrecognized format: " + m_expr));
-}
+            shared_ptr<RegexMatcher> matcher(new RegexPatternListMatcher(m_expr.substr(1, lastIndex - 1),
+                    m_backrefManager));
+            m_matchers.push_back(matcher);
+        } else
+            BOOST_THROW_EXCEPTION(RegexMatcher::Error("Unrecognized format: " + m_expr));
+    }
 
 
 } // namespace ndn

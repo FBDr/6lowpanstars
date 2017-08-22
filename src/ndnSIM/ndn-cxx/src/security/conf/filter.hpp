@@ -34,205 +34,184 @@
 #include "common.hpp"
 
 namespace ndn {
-namespace security {
-namespace conf {
+    namespace security {
+        namespace conf {
 
-/**
- * @brief Filter is one of the classes used by ValidatorConfig.
- *
- * The ValidatorConfig class consists of a set of rules.
- * The Filter class is a part of a rule and is used to match packet.
- * Matched packets will be checked against the checkers defined in the rule.
- */
+            /**
+             * @brief Filter is one of the classes used by ValidatorConfig.
+             *
+             * The ValidatorConfig class consists of a set of rules.
+             * The Filter class is a part of a rule and is used to match packet.
+             * Matched packets will be checked against the checkers defined in the rule.
+             */
 
-class Filter
-{
-public:
+            class Filter {
+            public:
 
-  virtual
-  ~Filter()
-  {
-  }
+                virtual
+                ~Filter() {
+                }
 
-  bool
-  match(const Data& data)
-  {
-    return matchName(data.getName());
-  }
+                bool
+                match(const Data& data) {
+                    return matchName(data.getName());
+                }
 
-  bool
-  match(const Interest& interest)
-  {
-    if (interest.getName().size() < signed_interest::MIN_LENGTH)
-      return false;
+                bool
+                match(const Interest& interest) {
+                    if (interest.getName().size() < signed_interest::MIN_LENGTH)
+                        return false;
 
-    Name unsignedName = interest.getName().getPrefix(-signed_interest::MIN_LENGTH);
-    return matchName(unsignedName);
-  }
+                    Name unsignedName = interest.getName().getPrefix(-signed_interest::MIN_LENGTH);
+                    return matchName(unsignedName);
+                }
 
-protected:
-  virtual bool
-  matchName(const Name& name) = 0;
-};
+            protected:
+                virtual bool
+                matchName(const Name& name) = 0;
+            };
 
-class RelationNameFilter : public Filter
-{
-public:
-  enum Relation
-    {
-      RELATION_EQUAL,
-      RELATION_IS_PREFIX_OF,
-      RELATION_IS_STRICT_PREFIX_OF
-    };
+            class RelationNameFilter : public Filter {
+            public:
 
-  RelationNameFilter(const Name& name, Relation relation)
-    : m_name(name)
-    , m_relation(relation)
-  {
-  }
+                enum Relation {
+                    RELATION_EQUAL,
+                    RELATION_IS_PREFIX_OF,
+                    RELATION_IS_STRICT_PREFIX_OF
+                };
 
-  virtual
-  ~RelationNameFilter()
-  {
-  }
+                RelationNameFilter(const Name& name, Relation relation)
+                : m_name(name)
+                , m_relation(relation) {
+                }
 
-protected:
-  virtual bool
-  matchName(const Name& name)
-  {
-    switch (m_relation)
-      {
-      case RELATION_EQUAL:
-        return (name == m_name);
-      case RELATION_IS_PREFIX_OF:
-        return m_name.isPrefixOf(name);
-      case RELATION_IS_STRICT_PREFIX_OF:
-        return (m_name.isPrefixOf(name) && m_name.size() < name.size());
-      default:
-        return false;
-      }
-  }
+                virtual
+                ~RelationNameFilter() {
+                }
 
-private:
-  Name m_name;
-  Relation m_relation;
-};
+            protected:
 
-class RegexNameFilter : public Filter
-{
-public:
-  explicit
-  RegexNameFilter(const Regex& regex)
-    : m_regex(regex)
-  {
-  }
+                virtual bool
+                matchName(const Name& name) {
+                    switch (m_relation) {
+                        case RELATION_EQUAL:
+                            return (name == m_name);
+                        case RELATION_IS_PREFIX_OF:
+                            return m_name.isPrefixOf(name);
+                        case RELATION_IS_STRICT_PREFIX_OF:
+                            return (m_name.isPrefixOf(name) && m_name.size() < name.size());
+                        default:
+                            return false;
+                    }
+                }
 
-  virtual
-  ~RegexNameFilter()
-  {
-  }
+            private:
+                Name m_name;
+                Relation m_relation;
+            };
 
-protected:
-  virtual bool
-  matchName(const Name& name)
-  {
-    return m_regex.match(name);
-  }
+            class RegexNameFilter : public Filter {
+            public:
 
-private:
-  Regex m_regex;
-};
+                explicit
+                RegexNameFilter(const Regex& regex)
+                : m_regex(regex) {
+                }
 
-class FilterFactory
-{
-public:
-  static shared_ptr<Filter>
-  create(const ConfigSection& configSection)
-  {
-    ConfigSection::const_iterator propertyIt = configSection.begin();
+                virtual
+                ~RegexNameFilter() {
+                }
 
-    if (propertyIt == configSection.end() || !boost::iequals(propertyIt->first, "type"))
-      BOOST_THROW_EXCEPTION(Error("Expect <filter.type>!"));
+            protected:
 
-    std::string type = propertyIt->second.data();
+                virtual bool
+                matchName(const Name& name) {
+                    return m_regex.match(name);
+                }
 
-    if (boost::iequals(type, "name"))
-      return createNameFilter(configSection);
-    else
-      BOOST_THROW_EXCEPTION(Error("Unsupported filter.type: " + type));
-  }
-private:
-  static shared_ptr<Filter>
-  createNameFilter(const ConfigSection& configSection)
-  {
-    ConfigSection::const_iterator propertyIt = configSection.begin();
-    propertyIt++;
+            private:
+                Regex m_regex;
+            };
 
-    if (propertyIt == configSection.end())
-      BOOST_THROW_EXCEPTION(Error("Expect more properties for filter(name)"));
+            class FilterFactory {
+            public:
 
-    if (boost::iequals(propertyIt->first, "name"))
-      {
-        // Get filter.name
-        Name name;
-        try
-          {
-            name = Name(propertyIt->second.data());
-          }
-        catch (Name::Error& e)
-          {
-            BOOST_THROW_EXCEPTION(Error("Wrong filter.name: " + propertyIt->second.data()));
-          }
+                static shared_ptr<Filter>
+                create(const ConfigSection& configSection) {
+                    ConfigSection::const_iterator propertyIt = configSection.begin();
 
-        propertyIt++;
+                    if (propertyIt == configSection.end() || !boost::iequals(propertyIt->first, "type"))
+                        BOOST_THROW_EXCEPTION(Error("Expect <filter.type>!"));
 
-        // Get filter.relation
-        if (propertyIt == configSection.end() || !boost::iequals(propertyIt->first, "relation"))
-          BOOST_THROW_EXCEPTION(Error("Expect <filter.relation>!"));
+                    std::string type = propertyIt->second.data();
 
-        std::string relationString = propertyIt->second.data();
-        propertyIt++;
+                    if (boost::iequals(type, "name"))
+                        return createNameFilter(configSection);
+                    else
+                        BOOST_THROW_EXCEPTION(Error("Unsupported filter.type: " + type));
+                }
+            private:
 
-        RelationNameFilter::Relation relation;
-        if (boost::iequals(relationString, "equal"))
-          relation = RelationNameFilter::RELATION_EQUAL;
-        else if (boost::iequals(relationString, "is-prefix-of"))
-          relation = RelationNameFilter::RELATION_IS_PREFIX_OF;
-        else if (boost::iequals(relationString, "is-strict-prefix-of"))
-          relation = RelationNameFilter::RELATION_IS_STRICT_PREFIX_OF;
-        else
-          BOOST_THROW_EXCEPTION(Error("Unsupported relation: " + relationString));
+                static shared_ptr<Filter>
+                createNameFilter(const ConfigSection& configSection) {
+                    ConfigSection::const_iterator propertyIt = configSection.begin();
+                    propertyIt++;
+
+                    if (propertyIt == configSection.end())
+                        BOOST_THROW_EXCEPTION(Error("Expect more properties for filter(name)"));
+
+                    if (boost::iequals(propertyIt->first, "name")) {
+                        // Get filter.name
+                        Name name;
+                        try {
+                            name = Name(propertyIt->second.data());
+                        } catch (Name::Error& e) {
+                            BOOST_THROW_EXCEPTION(Error("Wrong filter.name: " + propertyIt->second.data()));
+                        }
+
+                        propertyIt++;
+
+                        // Get filter.relation
+                        if (propertyIt == configSection.end() || !boost::iequals(propertyIt->first, "relation"))
+                            BOOST_THROW_EXCEPTION(Error("Expect <filter.relation>!"));
+
+                        std::string relationString = propertyIt->second.data();
+                        propertyIt++;
+
+                        RelationNameFilter::Relation relation;
+                        if (boost::iequals(relationString, "equal"))
+                            relation = RelationNameFilter::RELATION_EQUAL;
+                        else if (boost::iequals(relationString, "is-prefix-of"))
+                            relation = RelationNameFilter::RELATION_IS_PREFIX_OF;
+                        else if (boost::iequals(relationString, "is-strict-prefix-of"))
+                            relation = RelationNameFilter::RELATION_IS_STRICT_PREFIX_OF;
+                        else
+                            BOOST_THROW_EXCEPTION(Error("Unsupported relation: " + relationString));
 
 
-        if (propertyIt != configSection.end())
-          BOOST_THROW_EXCEPTION(Error("Expect the end of filter!"));
+                        if (propertyIt != configSection.end())
+                            BOOST_THROW_EXCEPTION(Error("Expect the end of filter!"));
 
-        return make_shared<RelationNameFilter>(name, relation);
-      }
-    else if (boost::iequals(propertyIt->first, "regex"))
-      {
-        std::string regexString = propertyIt->second.data();
-        propertyIt++;
+                        return make_shared<RelationNameFilter>(name, relation);
+                    } else if (boost::iequals(propertyIt->first, "regex")) {
+                        std::string regexString = propertyIt->second.data();
+                        propertyIt++;
 
-        if (propertyIt != configSection.end())
-          BOOST_THROW_EXCEPTION(Error("Expect the end of filter!"));
+                        if (propertyIt != configSection.end())
+                            BOOST_THROW_EXCEPTION(Error("Expect the end of filter!"));
 
-        try
-          {
-            return shared_ptr<RegexNameFilter>(new RegexNameFilter(regexString));
-          }
-        catch (Regex::Error& e)
-          {
-            BOOST_THROW_EXCEPTION(Error("Wrong filter.regex: " + regexString));
-          }
-      }
-    else
-      BOOST_THROW_EXCEPTION(Error("Wrong filter(name) properties"));
-  }
-};
+                        try {
+                            return shared_ptr<RegexNameFilter>(new RegexNameFilter(regexString));
+                        } catch (Regex::Error& e) {
+                            BOOST_THROW_EXCEPTION(Error("Wrong filter.regex: " + regexString));
+                        }
+                    } else
+                        BOOST_THROW_EXCEPTION(Error("Wrong filter(name) properties"));
+                }
+            };
 
-} // namespace conf
-} // namespace security
+        } // namespace conf
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_CONF_FILTER_HPP

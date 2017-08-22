@@ -26,36 +26,33 @@
 #include "route.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-bool
-Route::operator==(const Route& other) const
-{
-  return (this->faceId == other.faceId &&
-          this->origin == other.origin &&
-          this->flags == other.flags &&
-          this->cost == other.cost &&
-          this->expires == other.expires);
-}
+        bool
+        Route::operator==(const Route& other) const {
+            return (this->faceId == other.faceId &&
+                    this->origin == other.origin &&
+                    this->flags == other.flags &&
+                    this->cost == other.cost &&
+                    this->expires == other.expires);
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const Route& route)
-{
-  os << "Route("
-     << "faceid: " << route.faceId
-     << ", origin: " << route.origin
-     << ", cost: " << route.cost
-     << ", flags: " << route.flags;
-  if (route.expires != time::steady_clock::TimePoint::max()) {
-    os << ", expires in: " << (route.expires - time::steady_clock::now());
-  }
-  else {
-    os << ", never expires";
-  }
-  os << ")";
+        std::ostream&
+        operator<<(std::ostream& os, const Route& route) {
+            os << "Route("
+                    << "faceid: " << route.faceId
+                    << ", origin: " << route.origin
+                    << ", cost: " << route.cost
+                    << ", flags: " << route.flags;
+            if (route.expires != time::steady_clock::TimePoint::max()) {
+                os << ", expires in: " << (route.expires - time::steady_clock::now());
+            } else {
+                os << ", never expires";
+            }
+            os << ")";
 
-  return os;
-}
+            return os;
+        }
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd

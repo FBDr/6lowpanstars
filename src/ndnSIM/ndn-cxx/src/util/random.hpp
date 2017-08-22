@@ -25,53 +25,53 @@
 #include "../common.hpp"
 
 namespace ndn {
-namespace random {
+    namespace random {
 
-/**
- * @brief Generate a cryptographically secure random integer from the range [0, 2^32)
- *
- * @throw std::runtime_error if generation fails.
- */
-uint32_t
-generateSecureWord32();
+        /**
+         * @brief Generate a cryptographically secure random integer from the range [0, 2^32)
+         *
+         * @throw std::runtime_error if generation fails.
+         */
+        uint32_t
+        generateSecureWord32();
 
-/**
- * @brief Generate a cryptographically secure random integer from the range [0, 2^64)
- *
- * @throw std::runtime_error if generation fails.
- */
-uint64_t
-generateSecureWord64();
+        /**
+         * @brief Generate a cryptographically secure random integer from the range [0, 2^64)
+         *
+         * @throw std::runtime_error if generation fails.
+         */
+        uint64_t
+        generateSecureWord64();
 
-/**
- * @brief Fill @p bytes of @p size with cryptographically secure random bytes
- *
- * @throw std::runtime_error if generation fails.
- */
-void
-generateSecureBytes(uint8_t* bytes, size_t size);
+        /**
+         * @brief Fill @p bytes of @p size with cryptographically secure random bytes
+         *
+         * @throw std::runtime_error if generation fails.
+         */
+        void
+        generateSecureBytes(uint8_t* bytes, size_t size);
 
-/**
- * @brief Generate a non-cryptographically-secure random integer in the range [0, 2^32)
- *
- * This version is faster than generateSecureWord32, but it must not be used when
- * cryptographically secure random integers are needed (e.g., when creating signing or
- * encryption keys)
- */
-uint32_t
-generateWord32();
+        /**
+         * @brief Generate a non-cryptographically-secure random integer in the range [0, 2^32)
+         *
+         * This version is faster than generateSecureWord32, but it must not be used when
+         * cryptographically secure random integers are needed (e.g., when creating signing or
+         * encryption keys)
+         */
+        uint32_t
+        generateWord32();
 
-/**
- * @brief Generate a non-cryptographically-secure random integer in the range [0, 2^64)
- *
- * This version is faster than generateSecureWord64, but it must not be used when
- * cryptographically secure random integers are needed (e.g., when creating signing or
- * encryption keys)
- */
-uint64_t
-generateWord64();
+        /**
+         * @brief Generate a non-cryptographically-secure random integer in the range [0, 2^64)
+         *
+         * This version is faster than generateSecureWord64, but it must not be used when
+         * cryptographically secure random integers are needed (e.g., when creating signing or
+         * encryption keys)
+         */
+        uint64_t
+        generateWord64();
 
-} // namespace random
+    } // namespace random
 } // namespace ndn
 
 #endif // NDN_UTIL_RANDOM_HPP

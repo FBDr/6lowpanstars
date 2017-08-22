@@ -31,100 +31,91 @@
 
 namespace nfd {
 
-NFD_LOG_INIT("FaceTable");
+    NFD_LOG_INIT("FaceTable");
 
-FaceTable::FaceTable()
-  : m_lastFaceId(face::FACEID_RESERVED_MAX)
-{
-}
+    FaceTable::FaceTable()
+    : m_lastFaceId(face::FACEID_RESERVED_MAX) {
+    }
 
-Face*
-FaceTable::get(FaceId id) const
-{
-  auto i = m_faces.find(id);
-  if (i == m_faces.end()) {
-    return nullptr;
-  }
-  return i->second.get();
-}
+    Face*
+    FaceTable::get(FaceId id) const {
+        auto i = m_faces.find(id);
+        if (i == m_faces.end()) {
+            return nullptr;
+        }
+        return i->second.get();
+    }
 
-size_t
-FaceTable::size() const
-{
-  return m_faces.size();
-}
+    size_t
+    FaceTable::size() const {
+        return m_faces.size();
+    }
 
-void
-FaceTable::add(shared_ptr<Face> face)
-{
-  if (face->getId() != face::INVALID_FACEID && m_faces.count(face->getId()) > 0) {
-    NFD_LOG_WARN("Trying to add existing face id=" << face->getId() << " to the face table");
-    return;
-  }
+    void
+    FaceTable::add(shared_ptr<Face> face) {
+        if (face->getId() != face::INVALID_FACEID && m_faces.count(face->getId()) > 0) {
+            NFD_LOG_WARN("Trying to add existing face id=" << face->getId() << " to the face table");
+            return;
+        }
 
-  FaceId faceId = ++m_lastFaceId;
-  BOOST_ASSERT(faceId > face::FACEID_RESERVED_MAX);
-  this->addImpl(face, faceId);
-}
+        FaceId faceId = ++m_lastFaceId;
+        BOOST_ASSERT(faceId > face::FACEID_RESERVED_MAX);
+        this->addImpl(face, faceId);
+    }
 
-void
-FaceTable::addReserved(shared_ptr<Face> face, FaceId faceId)
-{
-  BOOST_ASSERT(face->getId() == face::INVALID_FACEID);
-  BOOST_ASSERT(m_faces.count(face->getId()) == 0);
-  BOOST_ASSERT(faceId <= face::FACEID_RESERVED_MAX);
-  this->addImpl(face, faceId);
-}
+    void
+    FaceTable::addReserved(shared_ptr<Face> face, FaceId faceId) {
+        BOOST_ASSERT(face->getId() == face::INVALID_FACEID);
+        BOOST_ASSERT(m_faces.count(face->getId()) == 0);
+        BOOST_ASSERT(faceId <= face::FACEID_RESERVED_MAX);
+        this->addImpl(face, faceId);
+    }
 
-void
-FaceTable::addImpl(shared_ptr<Face> face, FaceId faceId)
-{
-  face->setId(faceId);
-  m_faces[faceId] = face;
-  NFD_LOG_INFO("Added face id=" << faceId << " remote=" << face->getRemoteUri()
-                                          << " local=" << face->getLocalUri());
+    void
+    FaceTable::addImpl(shared_ptr<Face> face, FaceId faceId) {
+        face->setId(faceId);
+        m_faces[faceId] = face;
+        NFD_LOG_INFO("Added face id=" << faceId << " remote=" << face->getRemoteUri()
+                << " local=" << face->getLocalUri());
 
-  connectFaceClosedSignal(*face, bind(&FaceTable::remove, this, faceId));
+        connectFaceClosedSignal(*face, bind(&FaceTable::remove, this, faceId));
 
-  this->afterAdd(*face);
-}
+        this->afterAdd(*face);
+    }
 
-void
-FaceTable::remove(FaceId faceId)
-{
-  auto i = m_faces.find(faceId);
-  BOOST_ASSERT(i != m_faces.end());
-  shared_ptr<Face> face = i->second;
+    void
+    FaceTable::remove(FaceId faceId) {
+        auto i = m_faces.find(faceId);
+        BOOST_ASSERT(i != m_faces.end());
+        shared_ptr<Face> face = i->second;
 
-  this->beforeRemove(*face);
+        this->beforeRemove(*face);
 
-  m_faces.erase(i);
-  face->setId(face::INVALID_FACEID);
+        m_faces.erase(i);
+        face->setId(face::INVALID_FACEID);
 
-  NFD_LOG_INFO("Removed face id=" << faceId <<
-               " remote=" << face->getRemoteUri() <<
-               " local=" << face->getLocalUri());
+        NFD_LOG_INFO("Removed face id=" << faceId <<
+                " remote=" << face->getRemoteUri() <<
+                " local=" << face->getLocalUri());
 
-  // defer Face deallocation, so that Transport isn't deallocated during afterStateChange signal
-  getGlobalIoService().post([face] {});
-}
+        // defer Face deallocation, so that Transport isn't deallocated during afterStateChange signal
+        getGlobalIoService().post([face] {
+        });
+    }
 
-FaceTable::ForwardRange
-FaceTable::getForwardRange() const
-{
-  return m_faces | boost::adaptors::map_values | boost::adaptors::indirected;
-}
+    FaceTable::ForwardRange
+    FaceTable::getForwardRange() const {
+        return m_faces | boost::adaptors::map_values | boost::adaptors::indirected;
+    }
 
-FaceTable::const_iterator
-FaceTable::begin() const
-{
-  return this->getForwardRange().begin();
-}
+    FaceTable::const_iterator
+    FaceTable::begin() const {
+        return this->getForwardRange().begin();
+    }
 
-FaceTable::const_iterator
-FaceTable::end() const
-{
-  return this->getForwardRange().end();
-}
+    FaceTable::const_iterator
+    FaceTable::end() const {
+        return this->getForwardRange().end();
+    }
 
 } // namespace nfd

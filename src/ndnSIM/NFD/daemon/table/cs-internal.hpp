@@ -33,14 +33,14 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-class EntryImpl;
+        class EntryImpl;
 
-typedef std::set<EntryImpl> Table;
-typedef Table::const_iterator iterator;
+        typedef std::set<EntryImpl> Table;
+        typedef Table::const_iterator iterator;
 
-} // namespace cs
+    } // namespace cs
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_CS_INTERNAL_HPP

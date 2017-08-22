@@ -59,18 +59,20 @@ struct testee_config : public websocketpp::config::asio {
     };
 
     typedef websocketpp::transport::asio::endpoint<transport_config>
-        transport_type;
+    transport_type;
 
     static const websocketpp::log::level elog_level =
-        websocketpp::log::elevel::none;
+            websocketpp::log::elevel::none;
     static const websocketpp::log::level alog_level =
-        websocketpp::log::alevel::none;
-        
+            websocketpp::log::alevel::none;
+
     /// permessage_compress extension
-    struct permessage_deflate_config {};
+
+    struct permessage_deflate_config {
+    };
 
     typedef websocketpp::extensions::permessage_deflate::enabled
-        <permessage_deflate_config> permessage_deflate_type;
+    <permessage_deflate_config> permessage_deflate_type;
 };
 
 typedef websocketpp::server<testee_config> server;
@@ -83,6 +85,7 @@ using websocketpp::lib::bind;
 typedef server::message_ptr message_ptr;
 
 // Define a callback to handle incoming messages
+
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     s->send(hdl, msg->get_payload(), msg->get_opcode());
 }
@@ -114,8 +117,8 @@ int main(int argc, char * argv[]) {
         testee_server.set_reuse_addr(true);
 
         // Register our message handler
-        testee_server.set_message_handler(bind(&on_message,&testee_server,::_1,::_2));
-        testee_server.set_socket_init_handler(bind(&on_socket_init,::_1,::_2));
+        testee_server.set_message_handler(bind(&on_message, &testee_server, ::_1, ::_2));
+        testee_server.set_socket_init_handler(bind(&on_socket_init, ::_1, ::_2));
 
         // Listen on specified port with extended listen backlog
         testee_server.set_listen_backlog(8192);

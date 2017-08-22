@@ -23,135 +23,117 @@
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
 
-namespace ns3 {
-
-UdpEchoServerHelper::UdpEchoServerHelper (uint16_t port)
+namespace ns3
 {
-  m_factory.SetTypeId (UdpEchoServer::GetTypeId ());
-  SetAttribute ("Port", UintegerValue (port));
-}
 
-void 
-UdpEchoServerHelper::SetAttribute (
-  std::string name, 
-  const AttributeValue &value)
-{
-  m_factory.Set (name, value);
-}
-
-ApplicationContainer
-UdpEchoServerHelper::Install (Ptr<Node> node) const
-{
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-UdpEchoServerHelper::Install (std::string nodeName) const
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-UdpEchoServerHelper::Install (NodeContainer c) const
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      apps.Add (InstallPriv (*i));
+    UdpEchoServerHelper::UdpEchoServerHelper(uint16_t port) {
+        m_factory.SetTypeId(UdpEchoServer::GetTypeId());
+        SetAttribute("Port", UintegerValue(port));
     }
 
-  return apps;
-}
-
-Ptr<Application>
-UdpEchoServerHelper::InstallPriv (Ptr<Node> node) const
-{
-  Ptr<Application> app = m_factory.Create<UdpEchoServer> ();
-  node->AddApplication (app);
-
-  return app;
-}
-
-UdpEchoClientHelper::UdpEchoClientHelper (Address address, uint16_t port)
-{
-  m_factory.SetTypeId (UdpEchoClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (address));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-UdpEchoClientHelper::UdpEchoClientHelper (Ipv4Address address, uint16_t port)
-{
-  m_factory.SetTypeId (UdpEchoClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (Address(address)));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-UdpEchoClientHelper::UdpEchoClientHelper (Ipv6Address address, uint16_t port)
-{
-  m_factory.SetTypeId (UdpEchoClient::GetTypeId ());
-  SetAttribute ("RemoteAddress", AddressValue (Address(address)));
-  SetAttribute ("RemotePort", UintegerValue (port));
-}
-
-void 
-UdpEchoClientHelper::SetAttribute (
-  std::string name, 
-  const AttributeValue &value)
-{
-  m_factory.Set (name, value);
-}
-
-void
-UdpEchoClientHelper::SetFill (Ptr<Application> app, std::string fill)
-{
-  app->GetObject<UdpEchoClient>()->SetFill (fill);
-}
-
-void
-UdpEchoClientHelper::SetFill (Ptr<Application> app, uint8_t fill, uint32_t dataLength)
-{
-  app->GetObject<UdpEchoClient>()->SetFill (fill, dataLength);
-}
-
-void
-UdpEchoClientHelper::SetFill (Ptr<Application> app, uint8_t *fill, uint32_t fillLength, uint32_t dataLength)
-{
-  app->GetObject<UdpEchoClient>()->SetFill (fill, fillLength, dataLength);
-}
-
-ApplicationContainer
-UdpEchoClientHelper::Install (Ptr<Node> node) const
-{
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-UdpEchoClientHelper::Install (std::string nodeName) const
-{
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
-}
-
-ApplicationContainer
-UdpEchoClientHelper::Install (NodeContainer c) const
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      apps.Add (InstallPriv (*i));
+    void
+    UdpEchoServerHelper::SetAttribute(
+            std::string name,
+            const AttributeValue & value) {
+        m_factory.Set(name, value);
     }
 
-  return apps;
-}
+    ApplicationContainer
+    UdpEchoServerHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
 
-Ptr<Application>
-UdpEchoClientHelper::InstallPriv (Ptr<Node> node) const
-{
-  Ptr<Application> app = m_factory.Create<UdpEchoClient> ();
-  node->AddApplication (app);
+    ApplicationContainer
+    UdpEchoServerHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
 
-  return app;
-}
+    ApplicationContainer
+    UdpEchoServerHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    Ptr<Application>
+            UdpEchoServerHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<UdpEchoServer> ();
+        node->AddApplication(app);
+
+        return app;
+    }
+
+    UdpEchoClientHelper::UdpEchoClientHelper(Address address, uint16_t port) {
+        m_factory.SetTypeId(UdpEchoClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(address));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    UdpEchoClientHelper::UdpEchoClientHelper(Ipv4Address address, uint16_t port) {
+        m_factory.SetTypeId(UdpEchoClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(Address(address)));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    UdpEchoClientHelper::UdpEchoClientHelper(Ipv6Address address, uint16_t port) {
+        m_factory.SetTypeId(UdpEchoClient::GetTypeId());
+        SetAttribute("RemoteAddress", AddressValue(Address(address)));
+        SetAttribute("RemotePort", UintegerValue(port));
+    }
+
+    void
+    UdpEchoClientHelper::SetAttribute(
+            std::string name,
+            const AttributeValue & value) {
+        m_factory.Set(name, value);
+    }
+
+    void
+    UdpEchoClientHelper::SetFill(Ptr<Application> app, std::string fill) {
+        app->GetObject<UdpEchoClient>()->SetFill(fill);
+    }
+
+    void
+    UdpEchoClientHelper::SetFill(Ptr<Application> app, uint8_t fill, uint32_t dataLength) {
+        app->GetObject<UdpEchoClient>()->SetFill(fill, dataLength);
+    }
+
+    void
+    UdpEchoClientHelper::SetFill(Ptr<Application> app, uint8_t *fill, uint32_t fillLength, uint32_t dataLength) {
+        app->GetObject<UdpEchoClient>()->SetFill(fill, fillLength, dataLength);
+    }
+
+    ApplicationContainer
+    UdpEchoClientHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    UdpEchoClientHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    UdpEchoClientHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    Ptr<Application>
+            UdpEchoClientHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<UdpEchoClient> ();
+        node->AddApplication(app);
+
+        return app;
+    }
 
 } // namespace ns3

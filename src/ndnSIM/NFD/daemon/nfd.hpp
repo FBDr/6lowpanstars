@@ -33,93 +33,92 @@
 #include <ndn-cxx/util/network-monitor.hpp>
 
 namespace ndn {
-class Face;
-namespace mgmt {
-class Dispatcher;
-} // namespace mgmt
+    class Face;
+    namespace mgmt {
+        class Dispatcher;
+    } // namespace mgmt
 } // namespace ndn
 
 namespace nfd {
 
-class Forwarder;
-class CommandAuthenticator;
-class FibManager;
-class FaceManager;
-class StrategyChoiceManager;
-class ForwarderStatusManager;
+    class Forwarder;
+    class CommandAuthenticator;
+    class FibManager;
+    class FaceManager;
+    class StrategyChoiceManager;
+    class ForwarderStatusManager;
 
-namespace face {
-class Face;
-} // namespace face
+    namespace face {
+        class Face;
+    } // namespace face
 
-/**
- * \brief Class representing NFD instance
- * This class can be used to initialize all components of NFD
- */
-class Nfd : noncopyable
-{
-public:
-  /**
-   * \brief Create NFD instance using absolute or relative path to \p configFile
-   */
-  Nfd(const std::string& configFile, ndn::KeyChain& keyChain);
+    /**
+     * \brief Class representing NFD instance
+     * This class can be used to initialize all components of NFD
+     */
+    class Nfd : noncopyable {
+    public:
+        /**
+         * \brief Create NFD instance using absolute or relative path to \p configFile
+         */
+        Nfd(const std::string& configFile, ndn::KeyChain& keyChain);
 
-  /**
-   * \brief Create NFD instance using a parsed ConfigSection \p config
-   * This version of the constructor is more appropriate for integrated environments,
-   * such as NS-3 or android.
-   * \note When using this version of the constructor, error messages will include
-   *      "internal://nfd.conf" when referring to configuration errors.
-   */
-  Nfd(const ConfigSection& config, ndn::KeyChain& keyChain);
+        /**
+         * \brief Create NFD instance using a parsed ConfigSection \p config
+         * This version of the constructor is more appropriate for integrated environments,
+         * such as NS-3 or android.
+         * \note When using this version of the constructor, error messages will include
+         *      "internal://nfd.conf" when referring to configuration errors.
+         */
+        Nfd(const ConfigSection& config, ndn::KeyChain& keyChain);
 
-  /**
-   * \brief Destructor
-   */
-  ~Nfd();
+        /**
+         * \brief Destructor
+         */
+        ~Nfd();
 
-  /**
-   * \brief Perform initialization of NFD instance
-   * After initialization, NFD instance can be started by invoking run on globalIoService
-   */
-  void
-  initialize();
+        /**
+         * \brief Perform initialization of NFD instance
+         * After initialization, NFD instance can be started by invoking run on globalIoService
+         */
+        void
+        initialize();
 
-  /**
-   * \brief Reload configuration file and apply update (if any)
-   */
-  void
-  reloadConfigFile();
+        /**
+         * \brief Reload configuration file and apply update (if any)
+         */
+        void
+        reloadConfigFile();
 
-private:
-  void
-  initializeLogging();
+    private:
+        void
+        initializeLogging();
 
-  void
-  initializeManagement();
+        void
+        initializeManagement();
 
-  void
-  reloadConfigFileFaceSection();
+        void
+        reloadConfigFileFaceSection();
 
-private:
-  std::string m_configFile;
-  ConfigSection m_configSection;
+    private:
+        std::string m_configFile;
+        ConfigSection m_configSection;
 
-  unique_ptr<Forwarder> m_forwarder;
+        unique_ptr<Forwarder> m_forwarder;
 
-  ndn::KeyChain& m_keyChain;
-  shared_ptr<face::Face> m_internalFace;
-  shared_ptr<ndn::Face> m_internalClientFace;
-  unique_ptr<ndn::mgmt::Dispatcher> m_dispatcher;
-  shared_ptr<CommandAuthenticator> m_authenticator;
-  unique_ptr<ForwarderStatusManager> m_forwarderStatusManager;
-  unique_ptr<FaceManager> m_faceManager;
-  unique_ptr<FibManager> m_fibManager;
-  unique_ptr<StrategyChoiceManager> m_strategyChoiceManager;
+        ndn::KeyChain& m_keyChain;
+        shared_ptr<face::Face> m_internalFace;
+        shared_ptr<ndn::Face> m_internalClientFace;
+        unique_ptr<ndn::mgmt::Dispatcher> m_dispatcher;
+        shared_ptr<CommandAuthenticator> m_authenticator;
+        unique_ptr<ForwarderStatusManager> m_forwarderStatusManager;
+        unique_ptr<FaceManager> m_faceManager;
+        unique_ptr<FibManager> m_fibManager;
+        unique_ptr<StrategyChoiceManager> m_strategyChoiceManager;
 
-  unique_ptr<ndn::util::NetworkMonitor> m_networkMonitor;
-  scheduler::ScopedEventId m_reloadConfigEvent;
-};
+        unique_ptr<ndn::util::NetworkMonitor> m_networkMonitor;
+        scheduler::ScopedEventId m_reloadConfigEvent;
+    };
 
 } // namespace nfd
 

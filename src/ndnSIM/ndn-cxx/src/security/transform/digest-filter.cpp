@@ -26,86 +26,79 @@
 #include <boost/lexical_cast.hpp>
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The implementation class which contains the internal state of
- *        the digest calculator which includes openssl specific structures.
- */
-class DigestFilter::Impl
-{
-public:
-  Impl()
-    : m_md(BIO_new(BIO_f_md()))
-    , m_sink(BIO_new(BIO_s_null()))
-  {
-    BIO_push(m_md, m_sink);
-  }
+            /**
+             * @brief The implementation class which contains the internal state of
+             *        the digest calculator which includes openssl specific structures.
+             */
+            class DigestFilter::Impl {
+            public:
 
-  ~Impl()
-  {
-    BIO_free_all(m_md);
-  }
+                Impl()
+                : m_md(BIO_new(BIO_f_md()))
+                , m_sink(BIO_new(BIO_s_null())) {
+                    BIO_push(m_md, m_sink);
+                }
 
-public:
-  BIO* m_md;
-  BIO* m_sink;
-};
+                ~Impl() {
+                    BIO_free_all(m_md);
+                }
 
-DigestFilter::DigestFilter(DigestAlgorithm algo)
-  : m_impl(new Impl)
-{
-  const EVP_MD* md = detail::toDigestEvpMd(algo);
-  if (md == nullptr) {
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Unsupported digest algorithm " +
-                                boost::lexical_cast<std::string>(algo)));
-  }
+            public:
+                BIO* m_md;
+                BIO* m_sink;
+            };
 
-  if (!BIO_set_md(m_impl->m_md, md)) {
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest"+
-                                boost::lexical_cast<std::string>(algo)));
-  }
-}
+            DigestFilter::DigestFilter(DigestAlgorithm algo)
+            : m_impl(new Impl) {
+                const EVP_MD* md = detail::toDigestEvpMd(algo);
+                if (md == nullptr) {
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Unsupported digest algorithm " +
+                            boost::lexical_cast<std::string>(algo)));
+                }
 
-size_t
-DigestFilter::convert(const uint8_t* buf, size_t size)
-{
-  int wLen = BIO_write(m_impl->m_md, buf, size);
+                if (!BIO_set_md(m_impl->m_md, md)) {
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest" +
+                            boost::lexical_cast<std::string>(algo)));
+                }
+            }
 
-  if (wLen <= 0) { // fail to write data
-    if (!BIO_should_retry(m_impl->m_md)) {
-      // we haven't written everything but some error happens, and we cannot retry
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
-    }
-    return 0;
-  }
-  else { // update number of bytes written
-    return wLen;
-  }
-}
+            size_t
+            DigestFilter::convert(const uint8_t* buf, size_t size) {
+                int wLen = BIO_write(m_impl->m_md, buf, size);
 
-void
-DigestFilter::finalize()
-{
-  auto buffer = make_unique<OBuffer>(EVP_MAX_MD_SIZE);
+                if (wLen <= 0) { // fail to write data
+                    if (!BIO_should_retry(m_impl->m_md)) {
+                        // we haven't written everything but some error happens, and we cannot retry
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
+                    }
+                    return 0;
+                } else { // update number of bytes written
+                    return wLen;
+                }
+            }
 
-  int mdLen = BIO_gets(m_impl->m_md, reinterpret_cast<char*>(&(*buffer)[0]), EVP_MAX_MD_SIZE);
-  if (mdLen <= 0)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to compute digest"));
+            void
+            DigestFilter::finalize() {
+                auto buffer = make_unique<OBuffer>(EVP_MAX_MD_SIZE);
 
-  buffer->erase(buffer->begin() + mdLen, buffer->end());
-  setOutputBuffer(std::move(buffer));
+                int mdLen = BIO_gets(m_impl->m_md, reinterpret_cast<char*> (&(*buffer)[0]), EVP_MAX_MD_SIZE);
+                if (mdLen <= 0)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to compute digest"));
 
-  flushAllOutput();
-}
+                buffer->erase(buffer->begin() + mdLen, buffer->end());
+                setOutputBuffer(std::move(buffer));
 
-unique_ptr<Transform>
-digestFilter(DigestAlgorithm algo)
-{
-  return make_unique<DigestFilter>(algo);
-}
+                flushAllOutput();
+            }
 
-} // namespace transform
-} // namespace security
+            unique_ptr<Transform>
+            digestFilter(DigestAlgorithm algo) {
+                return make_unique<DigestFilter>(algo);
+            }
+
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

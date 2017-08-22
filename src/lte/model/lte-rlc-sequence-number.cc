@@ -20,15 +20,14 @@
 
 #include "ns3/lte-rlc-sequence-number.h"
 
-namespace ns3 {
-
-
-std::ostream &
-operator<< (std::ostream& os, const SequenceNumber10 &val)
+namespace ns3
 {
-  os << val.m_value;
-  return os;
-}
+
+    std::ostream &
+            operator << (std::ostream& os, const SequenceNumber10 & val) {
+        os << val.m_value;
+        return os;
+    }
 
 
 } // namespace ns3

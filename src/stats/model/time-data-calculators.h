@@ -28,52 +28,53 @@
 
 namespace ns3 {
 
-//------------------------------------------------------------
-//--------------------------------------------
-/**
- * \ingroup stats
- *
- * Unfortunately, templating the base MinMaxAvgTotalCalculator to
- * operate over Time values isn't straightforward.  The main issues
- * are setting the maximum value, which can be worked around easily
- * as it done here, and dividing to get the average, which is not as
- * easily worked around.
-*/
-class TimeMinMaxAvgTotalCalculator : public DataCalculator {
-public:
-  TimeMinMaxAvgTotalCalculator();
-  virtual ~TimeMinMaxAvgTotalCalculator();
+    //------------------------------------------------------------
+    //--------------------------------------------
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  /**
-   * Updates all variables of TimeMinMaxAvgTotalCalculator
-   * \param i value of type Time to use for updating the calculator
-   */
-  void Update (const Time i);
+    /**
+     * \ingroup stats
+     *
+     * Unfortunately, templating the base MinMaxAvgTotalCalculator to
+     * operate over Time values isn't straightforward.  The main issues
+     * are setting the maximum value, which can be worked around easily
+     * as it done here, and dividing to get the average, which is not as
+     * easily worked around.
+     */
+    class TimeMinMaxAvgTotalCalculator : public DataCalculator {
+    public:
+        TimeMinMaxAvgTotalCalculator();
+        virtual ~TimeMinMaxAvgTotalCalculator();
 
-  /**
-   * Outputs data based on the provided callback
-   * \param callback
-   */
-  virtual void Output (DataOutputCallback &callback) const;
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-protected:
-  virtual void DoDispose (void);
+        /**
+         * Updates all variables of TimeMinMaxAvgTotalCalculator
+         * \param i value of type Time to use for updating the calculator
+         */
+        void Update(const Time i);
 
-  uint32_t m_count; //!< Count value of TimeMinMaxAvgTotalCalculator
-  Time m_total;     //!< Total value of TimeMinMaxAvgTotalCalculator
-  Time m_min;       //!< Minimum value of TimeMinMaxAvgTotalCalculator
-  Time m_max;       //!< Maximum value of TimeMinMaxAvgTotalCalculator
+        /**
+         * Outputs data based on the provided callback
+         * \param callback
+         */
+        virtual void Output(DataOutputCallback &callback) const;
 
-  // end class TimeMinMaxAvgTotalCalculator
-};
+    protected:
+        virtual void DoDispose(void);
 
-// end namespace ns3
+        uint32_t m_count; //!< Count value of TimeMinMaxAvgTotalCalculator
+        Time m_total; //!< Total value of TimeMinMaxAvgTotalCalculator
+        Time m_min; //!< Minimum value of TimeMinMaxAvgTotalCalculator
+        Time m_max; //!< Maximum value of TimeMinMaxAvgTotalCalculator
+
+        // end class TimeMinMaxAvgTotalCalculator
+    };
+
+    // end namespace ns3
 };
 
 

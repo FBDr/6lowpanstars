@@ -27,7 +27,7 @@
 namespace ns3 {
 
 
-extern Ptr<SpectrumModel> SpectrumModel300Khz300GhzLog;
+    extern Ptr<SpectrumModel> SpectrumModel300Khz300GhzLog;
 
 
 }

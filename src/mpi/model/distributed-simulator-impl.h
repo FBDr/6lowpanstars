@@ -29,133 +29,130 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mpi
- *
- * \brief Structure used for all-reduce LBTS computation
- */
-class LbtsMessage
-{
-public:
-  LbtsMessage ()
-    : m_txCount (0),
-      m_rxCount (0),
-      m_myId (0),
-      m_isFinished (false)
-  {
-  }
+    /**
+     * \ingroup mpi
+     *
+     * \brief Structure used for all-reduce LBTS computation
+     */
+    class LbtsMessage {
+    public:
 
-  /**
-   * \param rxc received count
-   * \param txc transmitted count
-   * \param id mpi rank
-   * \param isFinished whether message is finished
-   * \param t smallest time
-   */
-  LbtsMessage (uint32_t rxc, uint32_t txc, uint32_t id, bool isFinished, const Time& t)
-    : m_txCount (txc),
-      m_rxCount (rxc),
-      m_myId (id),
-      m_smallestTime (t),
-      m_isFinished (isFinished)
-  {
-  }
+        LbtsMessage()
+        : m_txCount(0),
+        m_rxCount(0),
+        m_myId(0),
+        m_isFinished(false) {
+        }
 
-  ~LbtsMessage ();
+        /**
+         * \param rxc received count
+         * \param txc transmitted count
+         * \param id mpi rank
+         * \param isFinished whether message is finished
+         * \param t smallest time
+         */
+        LbtsMessage(uint32_t rxc, uint32_t txc, uint32_t id, bool isFinished, const Time& t)
+        : m_txCount(txc),
+        m_rxCount(rxc),
+        m_myId(id),
+        m_smallestTime(t),
+        m_isFinished(isFinished) {
+        }
 
-  /**
-   * \return smallest time
-   */
-  Time GetSmallestTime ();
-  /**
-   * \return transmitted count
-   */
-  uint32_t GetTxCount ();
-  /**
-   * \return received count
-   */
-  uint32_t GetRxCount ();
-  /**
-   * \return id which corresponds to mpi rank
-   */
-  uint32_t GetMyId ();
-  /**
-   * \return true if system is finished
-   */
-  bool IsFinished ();
+        ~LbtsMessage();
 
-private:
-  uint32_t m_txCount;
-  uint32_t m_rxCount;
-  uint32_t m_myId;
-  Time     m_smallestTime;
-  bool     m_isFinished;
-};
+        /**
+         * \return smallest time
+         */
+        Time GetSmallestTime();
+        /**
+         * \return transmitted count
+         */
+        uint32_t GetTxCount();
+        /**
+         * \return received count
+         */
+        uint32_t GetRxCount();
+        /**
+         * \return id which corresponds to mpi rank
+         */
+        uint32_t GetMyId();
+        /**
+         * \return true if system is finished
+         */
+        bool IsFinished();
 
-/**
- * \ingroup simulator
- * \ingroup mpi
- *
- * \brief Distributed simulator implementation using lookahead
- */
-class DistributedSimulatorImpl : public SimulatorImpl
-{
-public:
-  static TypeId GetTypeId (void);
+    private:
+        uint32_t m_txCount;
+        uint32_t m_rxCount;
+        uint32_t m_myId;
+        Time m_smallestTime;
+        bool m_isFinished;
+    };
 
-  DistributedSimulatorImpl ();
-  ~DistributedSimulatorImpl ();
+    /**
+     * \ingroup simulator
+     * \ingroup mpi
+     *
+     * \brief Distributed simulator implementation using lookahead
+     */
+    class DistributedSimulatorImpl : public SimulatorImpl {
+    public:
+        static TypeId GetTypeId(void);
 
-  // virtual from SimulatorImpl
-  virtual void Destroy ();
-  virtual bool IsFinished (void) const;
-  virtual void Stop (void);
-  virtual void Stop (Time const &delay);
-  virtual EventId Schedule (Time const &delay, EventImpl *event);
-  virtual void ScheduleWithContext (uint32_t context, Time const &delay, EventImpl *event);
-  virtual EventId ScheduleNow (EventImpl *event);
-  virtual EventId ScheduleDestroy (EventImpl *event);
-  virtual void Remove (const EventId &id);
-  virtual void Cancel (const EventId &id);
-  virtual bool IsExpired (const EventId &id) const;
-  virtual void Run (void);
-  virtual Time Now (void) const;
-  virtual Time GetDelayLeft (const EventId &id) const;
-  virtual Time GetMaximumSimulationTime (void) const;
-  virtual void SetMaximumLookAhead (const Time lookAhead);
-  virtual void SetScheduler (ObjectFactory schedulerFactory);
-  virtual uint32_t GetSystemId (void) const;
-  virtual uint32_t GetContext (void) const;
+        DistributedSimulatorImpl();
+        ~DistributedSimulatorImpl();
 
-private:
-  virtual void DoDispose (void);
-  void CalculateLookAhead (void);
-  bool IsLocalFinished (void) const;
+        // virtual from SimulatorImpl
+        virtual void Destroy();
+        virtual bool IsFinished(void) const;
+        virtual void Stop(void);
+        virtual void Stop(Time const &delay);
+        virtual EventId Schedule(Time const &delay, EventImpl *event);
+        virtual void ScheduleWithContext(uint32_t context, Time const &delay, EventImpl *event);
+        virtual EventId ScheduleNow(EventImpl *event);
+        virtual EventId ScheduleDestroy(EventImpl *event);
+        virtual void Remove(const EventId &id);
+        virtual void Cancel(const EventId &id);
+        virtual bool IsExpired(const EventId &id) const;
+        virtual void Run(void);
+        virtual Time Now(void) const;
+        virtual Time GetDelayLeft(const EventId &id) const;
+        virtual Time GetMaximumSimulationTime(void) const;
+        virtual void SetMaximumLookAhead(const Time lookAhead);
+        virtual void SetScheduler(ObjectFactory schedulerFactory);
+        virtual uint32_t GetSystemId(void) const;
+        virtual uint32_t GetContext(void) const;
 
-  void ProcessOneEvent (void);
-  uint64_t NextTs (void) const;
-  Time Next (void) const;
-  typedef std::list<EventId> DestroyEvents;
+    private:
+        virtual void DoDispose(void);
+        void CalculateLookAhead(void);
+        bool IsLocalFinished(void) const;
 
-  DestroyEvents m_destroyEvents;
-  bool m_stop;
-  bool m_globalFinished;     // Are all parallel instances completed.
-  Ptr<Scheduler> m_events;
-  uint32_t m_uid;
-  uint32_t m_currentUid;
-  uint64_t m_currentTs;
-  uint32_t m_currentContext;
-  // number of events that have been inserted but not yet scheduled,
-  // not counting the "destroy" events; this is used for validation
-  int m_unscheduledEvents;
+        void ProcessOneEvent(void);
+        uint64_t NextTs(void) const;
+        Time Next(void) const;
+        typedef std::list<EventId> DestroyEvents;
 
-  LbtsMessage* m_pLBTS;       // Allocated once we know how many systems
-  uint32_t     m_myId;        // MPI Rank
-  uint32_t     m_systemCount; // MPI Size
-  Time         m_grantedTime; // Last LBTS
-  static Time  m_lookAhead;   // Lookahead value
+        DestroyEvents m_destroyEvents;
+        bool m_stop;
+        bool m_globalFinished; // Are all parallel instances completed.
+        Ptr<Scheduler> m_events;
+        uint32_t m_uid;
+        uint32_t m_currentUid;
+        uint64_t m_currentTs;
+        uint32_t m_currentContext;
+        // number of events that have been inserted but not yet scheduled,
+        // not counting the "destroy" events; this is used for validation
+        int m_unscheduledEvents;
 
-};
+        LbtsMessage* m_pLBTS; // Allocated once we know how many systems
+        uint32_t m_myId; // MPI Rank
+        uint32_t m_systemCount; // MPI Size
+        Time m_grantedTime; // Last LBTS
+        static Time m_lookAhead; // Lookahead value
+
+    };
 
 } // namespace ns3
 

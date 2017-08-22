@@ -57,69 +57,64 @@
 #include "network-monitor-impl-osx.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-NetworkMonitor::Impl::Impl(NetworkMonitor& nm, boost::asio::io_service& io)
-  : m_nm(nm)
-  , m_scheduler(io)
-  , m_cfLoopEvent(m_scheduler)
-{
-  scheduleCfLoop();
+        NetworkMonitor::Impl::Impl(NetworkMonitor& nm, boost::asio::io_service& io)
+        : m_nm(nm)
+        , m_scheduler(io)
+        , m_cfLoopEvent(m_scheduler) {
+            scheduleCfLoop();
 
-  // Potentially useful System Configuration regex patterns:
-  //
-  // State:/Network/Interface/.*/Link
-  // State:/Network/Interface/.*/IPv4
-  // State:/Network/Interface/.*/IPv6
-  //
-  // State:/Network/Global/DNS
-  // State:/Network/Global/IPv4
-  //
-  // Potentially useful notifications from Darwin Notify Center:
-  //
-  // com.apple.system.config.network_change
-  //
-  CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                  static_cast<void*>(this),
-                                  &Impl::afterNotificationCenterEvent,
-                                  CFSTR("com.apple.system.config.network_change"),
-                                  nullptr, // object to observe
-                                  CFNotificationSuspensionBehaviorDeliverImmediately);
-}
+            // Potentially useful System Configuration regex patterns:
+            //
+            // State:/Network/Interface/.*/Link
+            // State:/Network/Interface/.*/IPv4
+            // State:/Network/Interface/.*/IPv6
+            //
+            // State:/Network/Global/DNS
+            // State:/Network/Global/IPv4
+            //
+            // Potentially useful notifications from Darwin Notify Center:
+            //
+            // com.apple.system.config.network_change
+            //
+            CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                    static_cast<void*> (this),
+                    &Impl::afterNotificationCenterEvent,
+                    CFSTR("com.apple.system.config.network_change"),
+                    nullptr, // object to observe
+                    CFNotificationSuspensionBehaviorDeliverImmediately);
+        }
 
-NetworkMonitor::Impl::~Impl()
-{
-  CFNotificationCenterRemoveEveryObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                          static_cast<void*>(this));
-}
+        NetworkMonitor::Impl::~Impl() {
+            CFNotificationCenterRemoveEveryObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+                    static_cast<void*> (this));
+        }
 
-void
-NetworkMonitor::Impl::afterNotificationCenterEvent(CFNotificationCenterRef center,
-                                                   void *observer,
-                                                   CFStringRef name,
-                                                   const void *object,
-                                                   CFDictionaryRef userInfo)
-{
-  static_cast<Impl*>(observer)->m_nm.onNetworkStateChanged();
-}
+        void
+        NetworkMonitor::Impl::afterNotificationCenterEvent(CFNotificationCenterRef center,
+                void *observer,
+                CFStringRef name,
+                const void *object,
+                CFDictionaryRef userInfo) {
+            static_cast<Impl*> (observer)->m_nm.onNetworkStateChanged();
+        }
 
-void
-NetworkMonitor::Impl::scheduleCfLoop()
-{
-  // poll each second for new events
-  m_cfLoopEvent = m_scheduler.scheduleEvent(time::seconds(1), bind(&Impl::pollCfLoop, this));
-}
+        void
+        NetworkMonitor::Impl::scheduleCfLoop() {
+            // poll each second for new events
+            m_cfLoopEvent = m_scheduler.scheduleEvent(time::seconds(1), bind(&Impl::pollCfLoop, this));
+        }
 
-void
-NetworkMonitor::Impl::pollCfLoop()
-{
-  // this should dispatch ready events and exit
-  CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+        void
+        NetworkMonitor::Impl::pollCfLoop() {
+            // this should dispatch ready events and exit
+            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
 
-  scheduleCfLoop();
-}
+            scheduleCfLoop();
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_CXX_HAVE_COREFOUNDATION_COREFOUNDATION_H

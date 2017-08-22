@@ -26,20 +26,19 @@
 #include "retx-suppression.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-time::steady_clock::TimePoint
-RetxSuppression::getLastOutgoing(const pit::Entry& pitEntry) const
-{
-  pit::OutRecordCollection::const_iterator lastOutgoing = std::max_element(
-    pitEntry.out_begin(), pitEntry.out_end(),
-    [] (const pit::OutRecord& a, const pit::OutRecord& b) {
-      return a.getLastRenewed() < b.getLastRenewed();
-    });
-  BOOST_ASSERT(lastOutgoing != pitEntry.out_end()); // otherwise it's new PIT entry
+        time::steady_clock::TimePoint
+        RetxSuppression::getLastOutgoing(const pit::Entry& pitEntry) const {
+            pit::OutRecordCollection::const_iterator lastOutgoing = std::max_element(
+                    pitEntry.out_begin(), pitEntry.out_end(),
+                    [] (const pit::OutRecord& a, const pit::OutRecord & b) {
+                        return a.getLastRenewed() < b.getLastRenewed();
+                    });
+            BOOST_ASSERT(lastOutgoing != pitEntry.out_end()); // otherwise it's new PIT entry
 
-  return lastOutgoing->getLastRenewed();
-}
+            return lastOutgoing->getLastRenewed();
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

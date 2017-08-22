@@ -29,34 +29,33 @@
 #include "strategy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief Best Route strategy version 1
- *
- *  This strategy forwards a new Interest to the lowest-cost nexthop
- *  that is not same as the downstream, and does not violate scope.
- *  Subsequent similar Interests or consumer retransmissions are suppressed
- *  until after InterestLifetime expiry.
- *
- *  \deprecated This strategy is superceded by Best Route strategy version 2,
- *              which allows consumer retransmissions. This version is kept for
- *              comparison purposes and is not recommended for general usage.
- */
-class BestRouteStrategy : public Strategy
-{
-public:
-  explicit
-  BestRouteStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        /** \brief Best Route strategy version 1
+         *
+         *  This strategy forwards a new Interest to the lowest-cost nexthop
+         *  that is not same as the downstream, and does not violate scope.
+         *  Subsequent similar Interests or consumer retransmissions are suppressed
+         *  until after InterestLifetime expiry.
+         *
+         *  \deprecated This strategy is superceded by Best Route strategy version 2,
+         *              which allows consumer retransmissions. This version is kept for
+         *              comparison purposes and is not recommended for general usage.
+         */
+        class BestRouteStrategy : public Strategy {
+        public:
+            explicit
+            BestRouteStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-public:
-  static const Name STRATEGY_NAME;
-};
+        public:
+            static const Name STRATEGY_NAME;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_BEST_ROUTE_STRATEGY_HPP

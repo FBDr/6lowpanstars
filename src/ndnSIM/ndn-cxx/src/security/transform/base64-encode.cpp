@@ -24,112 +24,102 @@
 #include "../detail/openssl.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The implementation class which contains the internal state of the filter
- *        which includes openssl specific structures.
- */
-class Base64Encode::Impl
-{
-public:
-  Impl()
-    : m_base64(BIO_new(BIO_f_base64()))
-    , m_sink(BIO_new(BIO_s_mem()))
-  {
-    // connect base64 transform to the data sink.
-    BIO_push(m_base64, m_sink);
-  }
+            /**
+             * @brief The implementation class which contains the internal state of the filter
+             *        which includes openssl specific structures.
+             */
+            class Base64Encode::Impl {
+            public:
 
-  ~Impl()
-  {
-    BIO_free_all(m_base64);
-  }
+                Impl()
+                : m_base64(BIO_new(BIO_f_base64()))
+                , m_sink(BIO_new(BIO_s_mem())) {
+                    // connect base64 transform to the data sink.
+                    BIO_push(m_base64, m_sink);
+                }
 
-public:
-  BIO* m_base64;
-  BIO* m_sink; // BIO_f_base64 alone does not work without a sink
-};
+                ~Impl() {
+                    BIO_free_all(m_base64);
+                }
 
-Base64Encode::Base64Encode(bool needBreak)
-  : m_impl(new Impl)
-{
-  if (!needBreak)
-    BIO_set_flags(m_impl->m_base64, BIO_FLAGS_BASE64_NO_NL);
-}
+            public:
+                BIO* m_base64;
+                BIO* m_sink; // BIO_f_base64 alone does not work without a sink
+            };
 
-void
-Base64Encode::preTransform()
-{
-  fillOutputBuffer();
-}
+            Base64Encode::Base64Encode(bool needBreak)
+            : m_impl(new Impl) {
+                if (!needBreak)
+                    BIO_set_flags(m_impl->m_base64, BIO_FLAGS_BASE64_NO_NL);
+            }
 
-size_t
-Base64Encode::convert(const uint8_t* data, size_t dataLen)
-{
-  if (dataLen == 0)
-    return 0;
+            void
+            Base64Encode::preTransform() {
+                fillOutputBuffer();
+            }
 
-  int wLen = BIO_write(m_impl->m_base64, data, dataLen);
+            size_t
+            Base64Encode::convert(const uint8_t* data, size_t dataLen) {
+                if (dataLen == 0)
+                    return 0;
 
-  if (wLen <= 0) { // fail to write data
-    if (!BIO_should_retry(m_impl->m_base64)) {
-      // we haven't written everything but some error happens, and we cannot retry
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
-    }
-    return 0;
-  }
-  else { // update number of bytes written
-    fillOutputBuffer();
-    return wLen;
-  }
-}
+                int wLen = BIO_write(m_impl->m_base64, data, dataLen);
 
-void
-Base64Encode::finalize()
-{
-  if (BIO_flush(m_impl->m_base64) != 1)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to flush"));
+                if (wLen <= 0) { // fail to write data
+                    if (!BIO_should_retry(m_impl->m_base64)) {
+                        // we haven't written everything but some error happens, and we cannot retry
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
+                    }
+                    return 0;
+                } else { // update number of bytes written
+                    fillOutputBuffer();
+                    return wLen;
+                }
+            }
 
-  while (!isConverterEmpty()) {
-    fillOutputBuffer();
-    while (!isOutputBufferEmpty()) {
-      flushOutputBuffer();
-    }
-  }
-}
+            void
+            Base64Encode::finalize() {
+                if (BIO_flush(m_impl->m_base64) != 1)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to flush"));
 
-void
-Base64Encode::fillOutputBuffer()
-{
-  int nRead = BIO_pending(m_impl->m_sink);
-  if (nRead <= 0)
-    return;
+                while (!isConverterEmpty()) {
+                    fillOutputBuffer();
+                    while (!isOutputBufferEmpty()) {
+                        flushOutputBuffer();
+                    }
+                }
+            }
 
-  // there is something to read from BIO
-  auto buffer = make_unique<OBuffer>(nRead);
-  int rLen = BIO_read(m_impl->m_sink, &(*buffer)[0], nRead);
-  if (rLen < 0)
-    return;
+            void
+            Base64Encode::fillOutputBuffer() {
+                int nRead = BIO_pending(m_impl->m_sink);
+                if (nRead <= 0)
+                    return;
 
-  if (rLen < nRead)
-    buffer->erase(buffer->begin() + rLen, buffer->end());
-  setOutputBuffer(std::move(buffer));
-}
+                // there is something to read from BIO
+                auto buffer = make_unique<OBuffer>(nRead);
+                int rLen = BIO_read(m_impl->m_sink, &(*buffer)[0], nRead);
+                if (rLen < 0)
+                    return;
 
-bool
-Base64Encode::isConverterEmpty()
-{
-  return (BIO_pending(m_impl->m_sink) <= 0);
-}
+                if (rLen < nRead)
+                    buffer->erase(buffer->begin() + rLen, buffer->end());
+                setOutputBuffer(std::move(buffer));
+            }
 
-unique_ptr<Transform>
-base64Encode(bool needBreak)
-{
-  return make_unique<Base64Encode>(needBreak);
-}
+            bool
+            Base64Encode::isConverterEmpty() {
+                return (BIO_pending(m_impl->m_sink) <= 0);
+            }
 
-} // namespace transform
-} // namespace security
+            unique_ptr<Transform>
+            base64Encode(bool needBreak) {
+                return make_unique<Base64Encode>(needBreak);
+            }
+
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

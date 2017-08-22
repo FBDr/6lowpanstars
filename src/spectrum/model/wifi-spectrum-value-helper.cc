@@ -21,97 +21,87 @@
 
 #include "wifi-spectrum-value-helper.h"
 
-namespace ns3 {
-
-
-static Ptr<SpectrumModel> g_WifiSpectrumModel5Mhz;
-
-WifiSpectrumValueHelper::~WifiSpectrumValueHelper ()
+namespace ns3
 {
-}
-
-WifiSpectrumValue5MhzFactory::~WifiSpectrumValue5MhzFactory ()
-{
-}
-
-static class WifiSpectrumModel5MhzInitializer
-{
-public:
-  WifiSpectrumModel5MhzInitializer ()
-  {
-    Bands bands;
-    for (int i = -4; i < 13 + 7; i++)
-      {
-        BandInfo bi;
-        bi.fl = 2407.0e6 + i * 5.0e6;
-        bi.fh = 2407.0e6 + (i + 1) * 5.0e6;
-        bi.fc = (bi.fl +  bi.fh) / 2;
-        bands.push_back (bi);
-      }
-    g_WifiSpectrumModel5Mhz = Create<SpectrumModel> (bands);
-  }
-} g_WifiSpectrumModel5MhzInitializerInstance;
 
 
+    static Ptr<SpectrumModel> g_WifiSpectrumModel5Mhz;
 
-Ptr<SpectrumValue>
-WifiSpectrumValue5MhzFactory::CreateConstant (double v)
-{
-  Ptr<SpectrumValue> c = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
-  (*c) = v;
-  return c;
-}
+    WifiSpectrumValueHelper::~WifiSpectrumValueHelper() {
+    }
 
+    WifiSpectrumValue5MhzFactory::~WifiSpectrumValue5MhzFactory() {
+    }
 
-Ptr<SpectrumValue>
-WifiSpectrumValue5MhzFactory::CreateTxPowerSpectralDensity (double txPower, uint32_t channel)
-{
-  Ptr<SpectrumValue> txPsd = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
+    static class WifiSpectrumModel5MhzInitializer
+            {
+        public :
+        WifiSpectrumModel5MhzInitializer()
+        {
+            Bands bands;
+            for (int i = -4; i < 13 + 7; i++) {
+                BandInfo bi;
+                bi.fl = 2407.0e6 + i * 5.0e6;
+                bi.fh = 2407.0e6 + (i + 1) * 5.0e6;
+                bi.fc = (bi.fl + bi.fh) / 2;
+                bands.push_back(bi);
+            }
+            g_WifiSpectrumModel5Mhz = Create<SpectrumModel> (bands);
+        }} g_WifiSpectrumModel5MhzInitializerInstance;
 
-  // since the spectrum model has a resolution of 5 MHz, we model
-  // the transmitted signal with a constant density over a 20MHz
-  // bandwidth centered on the center frequency of the channel. The
-  // transmission power outside the transmission power density is
-  // calculated considering the transmit spectrum mask, see IEEE
-  // Std. 802.11-2007, Annex I
+    Ptr<SpectrumValue>
+            WifiSpectrumValue5MhzFactory::CreateConstant(double v) {
+        Ptr<SpectrumValue> c = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
+        (*c) = v;
+        return c;
+    }
 
-  double txPowerDensity = txPower / 20e6;
+    Ptr<SpectrumValue>
+            WifiSpectrumValue5MhzFactory::CreateTxPowerSpectralDensity(double txPower, uint32_t channel) {
+        Ptr<SpectrumValue> txPsd = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
 
-  NS_ASSERT (channel >= 1);
-  NS_ASSERT (channel <= 13);
+        // since the spectrum model has a resolution of 5 MHz, we model
+        // the transmitted signal with a constant density over a 20MHz
+        // bandwidth centered on the center frequency of the channel. The
+        // transmission power outside the transmission power density is
+        // calculated considering the transmit spectrum mask, see IEEE
+        // Std. 802.11-2007, Annex I
 
-  (*txPsd)[channel - 1] = txPowerDensity * 1e-4;      // -40dB
-  (*txPsd)[channel]     = txPowerDensity * 1e-4;      // -40dB
-  (*txPsd)[channel + 1] = txPowerDensity * 0.0015849; // -28dB
-  (*txPsd)[channel + 2] = txPowerDensity * 0.0015849; // -28dB
-  (*txPsd)[channel + 3] = txPowerDensity;
-  (*txPsd)[channel + 4] = txPowerDensity;
-  (*txPsd)[channel + 5] = txPowerDensity;
-  (*txPsd)[channel + 6] = txPowerDensity;
-  (*txPsd)[channel + 7] = txPowerDensity * 0.0015849; // -28dB
-  (*txPsd)[channel + 8] = txPowerDensity * 0.0015849; // -28dB
-  (*txPsd)[channel + 9] = txPowerDensity * 1e-4;      // -40dB
-  (*txPsd)[channel + 10] = txPowerDensity * 1e-4;      // -40dB
+        double txPowerDensity = txPower / 20e6;
 
-  return txPsd;
-}
+        NS_ASSERT(channel >= 1);
+        NS_ASSERT(channel <= 13);
 
+        (*txPsd)[channel - 1] = txPowerDensity * 1e-4; // -40dB
+        (*txPsd)[channel] = txPowerDensity * 1e-4; // -40dB
+        (*txPsd)[channel + 1] = txPowerDensity * 0.0015849; // -28dB
+        (*txPsd)[channel + 2] = txPowerDensity * 0.0015849; // -28dB
+        (*txPsd)[channel + 3] = txPowerDensity;
+        (*txPsd)[channel + 4] = txPowerDensity;
+        (*txPsd)[channel + 5] = txPowerDensity;
+        (*txPsd)[channel + 6] = txPowerDensity;
+        (*txPsd)[channel + 7] = txPowerDensity * 0.0015849; // -28dB
+        (*txPsd)[channel + 8] = txPowerDensity * 0.0015849; // -28dB
+        (*txPsd)[channel + 9] = txPowerDensity * 1e-4; // -40dB
+        (*txPsd)[channel + 10] = txPowerDensity * 1e-4; // -40dB
 
-Ptr<SpectrumValue>
-WifiSpectrumValue5MhzFactory::CreateRfFilter (uint32_t channel)
-{
-  Ptr<SpectrumValue> rf = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
+        return txPsd;
+    }
 
-  NS_ASSERT (channel >= 1);
-  NS_ASSERT (channel <= 13);
+    Ptr<SpectrumValue>
+            WifiSpectrumValue5MhzFactory::CreateRfFilter(uint32_t channel) {
+        Ptr<SpectrumValue> rf = Create <SpectrumValue> (g_WifiSpectrumModel5Mhz);
 
-  (*rf)[channel + 3] = 1;
-  (*rf)[channel + 4] = 1;
-  (*rf)[channel + 5] = 1;
-  (*rf)[channel + 6] = 1;
+        NS_ASSERT(channel >= 1);
+        NS_ASSERT(channel <= 13);
 
-  return rf;
-}
+        (*rf)[channel + 3] = 1;
+        (*rf)[channel + 4] = 1;
+        (*rf)[channel + 5] = 1;
+        (*rf)[channel + 6] = 1;
+
+        return rf;
+    }
 
 
 } // namespace ns3

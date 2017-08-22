@@ -29,50 +29,49 @@
 #include "module.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-using ndn::nfd::RibEntry;
-using ndn::nfd::Route;
+            using ndn::nfd::RibEntry;
+            using ndn::nfd::Route;
 
-/** \brief provides access to NFD RIB management
- *  \sa https://redmine.named-data.net/projects/nfd/wiki/RibMgmt
- */
-class RibModule : public Module, noncopyable
-{
-public:
-  virtual void
-  fetchStatus(Controller& controller,
-              const function<void()>& onSuccess,
-              const Controller::DatasetFailCallback& onFailure,
-              const CommandOptions& options) override;
+            /** \brief provides access to NFD RIB management
+             *  \sa https://redmine.named-data.net/projects/nfd/wiki/RibMgmt
+             */
+            class RibModule : public Module, noncopyable {
+            public:
+                virtual void
+                fetchStatus(Controller& controller,
+                        const function<void()>& onSuccess,
+                        const Controller::DatasetFailCallback& onFailure,
+                        const CommandOptions& options) override;
 
-  virtual void
-  formatStatusXml(std::ostream& os) const override;
+                virtual void
+                formatStatusXml(std::ostream& os) const override;
 
-  /** \brief format a single status item as XML
-   *  \param os output stream
-   *  \param item status item
-   */
-  void
-  formatItemXml(std::ostream& os, const RibEntry& item) const;
+                /** \brief format a single status item as XML
+                 *  \param os output stream
+                 *  \param item status item
+                 */
+                void
+                formatItemXml(std::ostream& os, const RibEntry& item) const;
 
-  virtual void
-  formatStatusText(std::ostream& os) const override;
+                virtual void
+                formatStatusText(std::ostream& os) const override;
 
-  /** \brief format a single status item as text
-   *  \param os output stream
-   *  \param item status item
-   */
-  void
-  formatItemText(std::ostream& os, const RibEntry& item) const;
+                /** \brief format a single status item as text
+                 *  \param os output stream
+                 *  \param item status item
+                 */
+                void
+                formatItemText(std::ostream& os, const RibEntry& item) const;
 
-private:
-  std::vector<RibEntry> m_status;
-};
+            private:
+                std::vector<RibEntry> m_status;
+            };
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_RIB_MODULE_HPP

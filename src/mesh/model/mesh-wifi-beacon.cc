@@ -21,47 +21,45 @@
 #include "ns3/mesh-wifi-beacon.h"
 
 
-namespace ns3 {
-
-MeshWifiBeacon::MeshWifiBeacon (Ssid ssid, SupportedRates rates, uint64_t us)
+namespace ns3
 {
-  m_header.SetSsid (ssid);
-  m_header.SetSupportedRates (rates);
-  m_header.SetBeaconIntervalUs (us);
-}
-void
-MeshWifiBeacon::AddInformationElement (Ptr<WifiInformationElement> ie)
-{
-  m_elements.AddInformationElement (ie);
-}
 
-Time
-MeshWifiBeacon::GetBeaconInterval () const
-{
-  return MicroSeconds (m_header.GetBeaconIntervalUs ());
-}
+    MeshWifiBeacon::MeshWifiBeacon(Ssid ssid, SupportedRates rates, uint64_t us) {
+        m_header.SetSsid(ssid);
+        m_header.SetSupportedRates(rates);
+        m_header.SetBeaconIntervalUs(us);
+    }
 
-Ptr<Packet>
-MeshWifiBeacon::CreatePacket ()
-{
-  Ptr<Packet> packet = Create <Packet> ();
-  packet->AddHeader (m_elements);
-  packet->AddHeader (BeaconHeader ());
-  return packet;
-}
-WifiMacHeader
-MeshWifiBeacon::CreateHeader (Mac48Address address, Mac48Address mpAddress)
-{
-  WifiMacHeader hdr;
+    void
+    MeshWifiBeacon::AddInformationElement(Ptr<WifiInformationElement> ie) {
+        m_elements.AddInformationElement(ie);
+    }
 
-  hdr.SetBeacon ();
-  hdr.SetAddr1 (Mac48Address::GetBroadcast ());
-  hdr.SetAddr2 (address);
-  hdr.SetAddr3 (mpAddress);
-  hdr.SetDsNotFrom ();
-  hdr.SetDsNotTo ();
+    Time
+    MeshWifiBeacon::GetBeaconInterval() const {
+        return MicroSeconds(m_header.GetBeaconIntervalUs());
+    }
 
-  return hdr;
-}
+    Ptr<Packet>
+            MeshWifiBeacon::CreatePacket() {
+        Ptr<Packet> packet = Create <Packet> ();
+        packet->AddHeader(m_elements);
+        packet->AddHeader(BeaconHeader());
+        return packet;
+    }
+
+    WifiMacHeader
+    MeshWifiBeacon::CreateHeader(Mac48Address address, Mac48Address mpAddress) {
+        WifiMacHeader hdr;
+
+        hdr.SetBeacon();
+        hdr.SetAddr1(Mac48Address::GetBroadcast());
+        hdr.SetAddr2(address);
+        hdr.SetAddr3(mpAddress);
+        hdr.SetDsNotFrom();
+        hdr.SetDsNotTo();
+
+        return hdr;
+    }
 } // namespace ns3
 

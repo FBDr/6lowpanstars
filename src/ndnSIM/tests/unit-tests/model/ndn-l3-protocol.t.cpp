@@ -25,131 +25,126 @@
 #include "../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(ModelNdnL3Protocol, ScenarioHelperWithCleanupFixture)
+        BOOST_FIXTURE_TEST_SUITE(ModelNdnL3Protocol, ScenarioHelperWithCleanupFixture)
 
-class TesterApp
-{
-public:
-  TesterApp(const std::function<void(::ndn::Face& face)>& func)
-  {
-    func(m_face);
-  }
+        class TesterApp {
+        public:
 
-protected:
-  ::ndn::Face m_face;
-};
-
-class ManagerCheckFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  void
-  setupAndRun()
-  {
-    createTopology({
-        {"1"},
-          });
-
-    requestedDatasets = {
-      "/localhost/nfd/rib/list",
-      "/localhost/nfd/faces/list",
-      "/localhost/nfd/strategy-choice/list",
-      "/localhost/nfd/status/general"
-    };
-
-    FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
-        return make_shared<TesterApp>([this] (::ndn::Face& face) {
-            for (const Name& dataset : requestedDatasets) {
-              face.expressInterest(dataset, [&] (const Interest& i, Data& data) {
-                  BOOST_TEST_MESSAGE(data.getName());
-                  receivedDatasets.insert(data.getName().getPrefix(-2));
-                },
-                std::bind([]{}));
+            TesterApp(const std::function<void(::ndn::Face& face)>& func) {
+                func(m_face);
             }
-          });
-      })
-      .Start(Seconds(0.01));
 
-    Simulator::Stop(Seconds(1.0));
-    Simulator::Run();
-  }
+        protected:
+            ::ndn::Face m_face;
+        };
 
-public:
-  std::set<Name> requestedDatasets;
-  std::set<Name> receivedDatasets;
-};
+        class ManagerCheckFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-BOOST_FIXTURE_TEST_SUITE(ManagerCheck, ManagerCheckFixture)
+            void
+            setupAndRun() {
+                createTopology({
+                    {"1"},
+                });
 
-BOOST_AUTO_TEST_CASE(AllEnabled)
-{
-  setupAndRun();
+                requestedDatasets = {
+                    "/localhost/nfd/rib/list",
+                    "/localhost/nfd/faces/list",
+                    "/localhost/nfd/strategy-choice/list",
+                    "/localhost/nfd/status/general"
+                };
 
-  BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size());
-  BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-                                receivedDatasets.begin(), receivedDatasets.end());
-}
+                FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
+                    return make_shared<TesterApp>([this] (::ndn::Face & face) {
+                        for (const Name& dataset : requestedDatasets) {
+                            face.expressInterest(dataset, [&] (const Interest& i, Data & data) {
+                                BOOST_TEST_MESSAGE(data.getName());
+                                receivedDatasets.insert(data.getName().getPrefix(-2));
+                            },
+                            std::bind([] {
+                            }));
+                        }
+                    });
+                })
+                .Start(Seconds(0.01));
 
-BOOST_AUTO_TEST_CASE(DisabledRibManager)
-{
-  // Disable RIB manager
-  disableRibManager();
+                Simulator::Stop(Seconds(1.0));
+                Simulator::Run();
+            }
 
-  setupAndRun();
+        public:
+            std::set<Name> requestedDatasets;
+            std::set<Name> receivedDatasets;
+        };
 
-  BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
+        BOOST_FIXTURE_TEST_SUITE(ManagerCheck, ManagerCheckFixture)
 
-  requestedDatasets.erase("/localhost/nfd/rib/list");
-  BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-                                receivedDatasets.begin(), receivedDatasets.end());
-}
+        BOOST_AUTO_TEST_CASE(AllEnabled) {
+            setupAndRun();
 
-// BOOST_AUTO_TEST_CASE(DisabledFaceManager)
-// {
-//   // Disable Face manager
-//   disableFaceManager();
+            BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size());
+            BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
+                    receivedDatasets.begin(), receivedDatasets.end());
+        }
 
-//   setupAndRun();
+        BOOST_AUTO_TEST_CASE(DisabledRibManager) {
+            // Disable RIB manager
+            disableRibManager();
 
-//   BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
+            setupAndRun();
 
-//   requestedDatasets.erase("/localhost/nfd/faces/list");
-//   BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-//                                 receivedDatasets.begin(), receivedDatasets.end());
-// }
+            BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
 
-BOOST_AUTO_TEST_CASE(DisabledStrategyChoiceManager)
-{
-  // Disable Strategy Choice Manager manager
-  disableStrategyChoiceManager();
+            requestedDatasets.erase("/localhost/nfd/rib/list");
+            BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
+                    receivedDatasets.begin(), receivedDatasets.end());
+        }
 
-  setupAndRun();
+        // BOOST_AUTO_TEST_CASE(DisabledFaceManager)
+        // {
+        //   // Disable Face manager
+        //   disableFaceManager();
 
-  BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
+        //   setupAndRun();
 
-  requestedDatasets.erase("/localhost/nfd/strategy-choice/list");
-  BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-                                receivedDatasets.begin(), receivedDatasets.end());
-}
+        //   BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
 
-BOOST_AUTO_TEST_CASE(DisabledForwarderStatusManager)
-{
-  // Disable Forwarder Status Manager
-  disableForwarderStatusManager();
+        //   requestedDatasets.erase("/localhost/nfd/faces/list");
+        //   BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
+        //                                 receivedDatasets.begin(), receivedDatasets.end());
+        // }
 
-  setupAndRun();
+        BOOST_AUTO_TEST_CASE(DisabledStrategyChoiceManager) {
+            // Disable Strategy Choice Manager manager
+            disableStrategyChoiceManager();
 
-  BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
+            setupAndRun();
 
-  requestedDatasets.erase("/localhost/nfd/status/general");
-  BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-                                receivedDatasets.begin(), receivedDatasets.end());
-}
+            BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
 
-BOOST_AUTO_TEST_SUITE_END() // ManagerCheck
+            requestedDatasets.erase("/localhost/nfd/strategy-choice/list");
+            BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
+                    receivedDatasets.begin(), receivedDatasets.end());
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // ModelNdnL3Protocol
+        BOOST_AUTO_TEST_CASE(DisabledForwarderStatusManager) {
+            // Disable Forwarder Status Manager
+            disableForwarderStatusManager();
 
-} // namespace ndn
+            setupAndRun();
+
+            BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
+
+            requestedDatasets.erase("/localhost/nfd/status/general");
+            BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
+                    receivedDatasets.begin(), receivedDatasets.end());
+        }
+
+        BOOST_AUTO_TEST_SUITE_END() // ManagerCheck
+
+        BOOST_AUTO_TEST_SUITE_END() // ModelNdnL3Protocol
+
+    } // namespace ndn
 } // namespace ns3

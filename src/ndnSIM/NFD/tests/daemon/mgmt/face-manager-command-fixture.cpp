@@ -26,75 +26,71 @@
 #include "face-manager-command-fixture.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-FaceManagerCommandNode::FaceManagerCommandNode(ndn::KeyChain& keyChain, uint16_t port)
-  : face(getGlobalIoService(), keyChain, {true, true})
-  , dispatcher(face, keyChain, ndn::security::SigningInfo())
-  , authenticator(CommandAuthenticator::create())
-  , manager(faceTable, dispatcher, *authenticator)
-{
-  dispatcher.addTopPrefix("/localhost/nfd");
+        FaceManagerCommandNode::FaceManagerCommandNode(ndn::KeyChain& keyChain, uint16_t port)
+        : face(getGlobalIoService(), keyChain,{true, true})
+        , dispatcher(face, keyChain, ndn::security::SigningInfo())
+        , authenticator(CommandAuthenticator::create())
+        , manager(faceTable, dispatcher, *authenticator) {
+            dispatcher.addTopPrefix("/localhost/nfd");
 
-  std::string config =
-    "face_system\n"
-    "{\n"
-    "  tcp\n"
-    "  {\n"
-    "    port " + to_string(port) + "\n"
-    "  }\n"
-    "  udp\n"
-    "  {\n"
-    "    port " + to_string(port) + "\n"
-    "    mcast no\n"
-    "  }\n"
-    "  ether\n"
-    "  {\n"
-    "    mcast no\n"
-    "  }\n"
-    "}\n"
-    "authorizations\n"
-    "{\n"
-    "  authorize\n"
-    "  {\n"
-    "    certfile any\n"
-    "    privileges\n"
-    "    {\n"
-    "      faces\n"
-    "    }\n"
-    "  }\n"
-    "}\n"
-    "\n";
+            std::string config =
+                    "face_system\n"
+                    "{\n"
+                    "  tcp\n"
+                    "  {\n"
+                    "    port " + to_string(port) + "\n"
+                    "  }\n"
+                    "  udp\n"
+                    "  {\n"
+                    "    port " + to_string(port) + "\n"
+                    "    mcast no\n"
+                    "  }\n"
+                    "  ether\n"
+                    "  {\n"
+                    "    mcast no\n"
+                    "  }\n"
+                    "}\n"
+                    "authorizations\n"
+                    "{\n"
+                    "  authorize\n"
+                    "  {\n"
+                    "    certfile any\n"
+                    "    privileges\n"
+                    "    {\n"
+                    "      faces\n"
+                    "    }\n"
+                    "  }\n"
+                    "}\n"
+                    "\n";
 
-  ConfigFile cf;
-  manager.setConfigFile(cf);
-  authenticator->setConfigFile(cf);
-  cf.parse(config, false, "dummy-config");
-}
+            ConfigFile cf;
+            manager.setConfigFile(cf);
+            authenticator->setConfigFile(cf);
+            cf.parse(config, false, "dummy-config");
+        }
 
-FaceManagerCommandNode::~FaceManagerCommandNode()
-{
-  // Explicitly closing faces is necessary. Otherwise, in a subsequent test case,
-  // incoming packets may be delivered to an old socket from a previous test case.
-  // This should be handled by the FaceTable destructor - see #2517
-  std::vector<std::reference_wrapper<Face>> facesToClose;
-  std::copy(faceTable.begin(), faceTable.end(), std::back_inserter(facesToClose));
-  for (Face& face : facesToClose) {
-    face.close();
-  }
-}
+        FaceManagerCommandNode::~FaceManagerCommandNode() {
+            // Explicitly closing faces is necessary. Otherwise, in a subsequent test case,
+            // incoming packets may be delivered to an old socket from a previous test case.
+            // This should be handled by the FaceTable destructor - see #2517
+            std::vector<std::reference_wrapper < Face>> facesToClose;
+            std::copy(faceTable.begin(), faceTable.end(), std::back_inserter(facesToClose));
+            for (Face& face : facesToClose) {
+                face.close();
+            }
+        }
 
-FaceManagerCommandFixture::FaceManagerCommandFixture()
-  : node1(m_keyChain, 16363)
-  , node2(m_keyChain, 26363)
-{
-  advanceClocks(time::milliseconds(1), 5);
-}
+        FaceManagerCommandFixture::FaceManagerCommandFixture()
+        : node1(m_keyChain, 16363)
+        , node2(m_keyChain, 26363) {
+            advanceClocks(time::milliseconds(1), 5);
+        }
 
-FaceManagerCommandFixture::~FaceManagerCommandFixture()
-{
-  advanceClocks(time::milliseconds(1), 5);
-}
+        FaceManagerCommandFixture::~FaceManagerCommandFixture() {
+            advanceClocks(time::milliseconds(1), 5);
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

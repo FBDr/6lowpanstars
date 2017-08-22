@@ -22,15 +22,13 @@
 #include "lte-enb-cmac-sap.h"
 
 
-namespace ns3 {
-
-
-LteEnbCmacSapProvider::~LteEnbCmacSapProvider ()
+namespace ns3
 {
-}
 
-LteEnbCmacSapUser::~LteEnbCmacSapUser ()
-{
-}
+    LteEnbCmacSapProvider::~LteEnbCmacSapProvider() {
+    }
+
+    LteEnbCmacSapUser::~LteEnbCmacSapUser() {
+    }
 
 } // namespace ns3

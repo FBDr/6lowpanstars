@@ -16,7 +16,7 @@
  * Authors: Faker Moatamri <faker.moatamri@sophia.inria.fr>
  *          Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  */
- 
+
 #ifndef ATTRIBUTE_DEFAULT_ITERATOR_H
 #define ATTRIBUTE_DEFAULT_ITERATOR_H
 
@@ -25,35 +25,34 @@
 
 namespace ns3 {
 
-class AttributeDefaultIterator
-{
-public:
-  virtual ~AttributeDefaultIterator () = 0;
-  /**
-   * \brief This function will go through all the TypeIds and get only the attributes which are
-   * explicit values (not vectors or pointer or arrays) and apply StartVisitTypeId
-   * and VisitAttribute on the attributes in one TypeId. At the end of each TypeId
-   * EndVisitTypeId is called.
-   */
-  void Iterate (void);
-private:
-  /**
-   * \brief Just an interface that needs to be implemented
-   */
-  virtual void StartVisitTypeId (std::string name);
-  /**
-   * \brief Just an interface that needs to be implemented
-   */
-  virtual void EndVisitTypeId (void);
-  /**
-   * \brief This method can be implemented, otherwise, it will call DoVisitAttribute
-   */
-  virtual void VisitAttribute (TypeId tid, std::string name, std::string defaultValue, uint32_t index);
-  /**
-   * \brief This method is just an interface and needs to be implemented
-   */
-  virtual void DoVisitAttribute (std::string name, std::string defaultValue);
-};
+    class AttributeDefaultIterator {
+    public:
+        virtual ~AttributeDefaultIterator() = 0;
+        /**
+         * \brief This function will go through all the TypeIds and get only the attributes which are
+         * explicit values (not vectors or pointer or arrays) and apply StartVisitTypeId
+         * and VisitAttribute on the attributes in one TypeId. At the end of each TypeId
+         * EndVisitTypeId is called.
+         */
+        void Iterate(void);
+    private:
+        /**
+         * \brief Just an interface that needs to be implemented
+         */
+        virtual void StartVisitTypeId(std::string name);
+        /**
+         * \brief Just an interface that needs to be implemented
+         */
+        virtual void EndVisitTypeId(void);
+        /**
+         * \brief This method can be implemented, otherwise, it will call DoVisitAttribute
+         */
+        virtual void VisitAttribute(TypeId tid, std::string name, std::string defaultValue, uint32_t index);
+        /**
+         * \brief This method is just an interface and needs to be implemented
+         */
+        virtual void DoVisitAttribute(std::string name, std::string defaultValue);
+    };
 
 } // namespace ns3
 

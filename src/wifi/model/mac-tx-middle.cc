@@ -25,96 +25,77 @@
 #include "mac-tx-middle.h"
 #include "wifi-mac-header.h"
 
-namespace ns3 {
-
-MacTxMiddle::MacTxMiddle ()
-  : m_sequence (0)
+namespace ns3
 {
-}
 
-MacTxMiddle::~MacTxMiddle ()
-{
-  for (std::map<Mac48Address,uint16_t*>::iterator i = m_qosSequences.begin (); i != m_qosSequences.end (); i++)
-    {
-      delete [] i->second;
+    MacTxMiddle::MacTxMiddle()
+            : m_sequence(0) {
     }
-}
 
-uint16_t
-MacTxMiddle::GetNextSequenceNumberfor (const WifiMacHeader *hdr)
-{
-  uint16_t retval;
-  if (hdr->IsQosData ()
-      && !hdr->GetAddr1 ().IsGroup ())
-    {
-      uint8_t tid = hdr->GetQosTid ();
-      NS_ASSERT (tid < 16);
-      std::map<Mac48Address, uint16_t*>::iterator it = m_qosSequences.find (hdr->GetAddr1 ());
-      if (it != m_qosSequences.end ())
-        {
-          retval = it->second[tid];
-          it->second[tid]++;
-          it->second[tid] %= 4096;
+    MacTxMiddle::~MacTxMiddle() {
+        for (std::map<Mac48Address, uint16_t*>::iterator i = m_qosSequences.begin(); i != m_qosSequences.end(); i++) {
+            delete [] i->second;
         }
-      else
-        {
-          retval = 0;
-          std::pair <Mac48Address,uint16_t*> newSeq (hdr->GetAddr1 (), new uint16_t[16]);
-          std::pair <std::map<Mac48Address,uint16_t*>::iterator,bool> newIns = m_qosSequences.insert (newSeq);
-          NS_ASSERT (newIns.second == true);
-          for (uint8_t i = 0; i < 16; i++)
-            {
-              newIns.first->second[i] = 0;
+    }
+
+    uint16_t
+    MacTxMiddle::GetNextSequenceNumberfor(const WifiMacHeader * hdr) {
+        uint16_t retval;
+        if (hdr->IsQosData()
+                && !hdr->GetAddr1().IsGroup()) {
+            uint8_t tid = hdr->GetQosTid();
+            NS_ASSERT(tid < 16);
+            std::map<Mac48Address, uint16_t*>::iterator it = m_qosSequences.find(hdr->GetAddr1());
+            if (it != m_qosSequences.end()) {
+                retval = it->second[tid];
+                it->second[tid]++;
+                it->second[tid] %= 4096;
+            } else {
+                retval = 0;
+                std::pair <Mac48Address, uint16_t*> newSeq(hdr->GetAddr1(), new uint16_t[16]);
+                std::pair <std::map<Mac48Address, uint16_t*>::iterator, bool> newIns = m_qosSequences.insert(newSeq);
+                NS_ASSERT(newIns.second == true);
+                for (uint8_t i = 0; i < 16; i++) {
+                    newIns.first->second[i] = 0;
+                }
+                newIns.first->second[tid]++;
             }
-          newIns.first->second[tid]++;
+        } else {
+            retval = m_sequence;
+            m_sequence++;
+            m_sequence %= 4096;
         }
+        return retval;
     }
-  else
-    {
-      retval = m_sequence;
-      m_sequence++;
-      m_sequence %= 4096;
-    }
-  return retval;
-}
 
-uint16_t
-MacTxMiddle::PeekNextSequenceNumberfor (const WifiMacHeader *hdr)
-{
-  uint16_t retval;
-  if (hdr->IsQosData ()
-      && !hdr->GetAddr1 ().IsGroup ())
-    {
-      uint8_t tid = hdr->GetQosTid ();
-      NS_ASSERT (tid < 16);
-      std::map<Mac48Address, uint16_t*>::iterator it = m_qosSequences.find (hdr->GetAddr1 ());
-      if (it != m_qosSequences.end ())
-        {
-          retval = it->second[tid];
+    uint16_t
+    MacTxMiddle::PeekNextSequenceNumberfor(const WifiMacHeader * hdr) {
+        uint16_t retval;
+        if (hdr->IsQosData()
+                && !hdr->GetAddr1().IsGroup()) {
+            uint8_t tid = hdr->GetQosTid();
+            NS_ASSERT(tid < 16);
+            std::map<Mac48Address, uint16_t*>::iterator it = m_qosSequences.find(hdr->GetAddr1());
+            if (it != m_qosSequences.end()) {
+                retval = it->second[tid];
+            } else {
+                retval = 0;
+            }
+        } else {
+            retval = m_sequence;
         }
-      else
-        {
-          retval = 0;
-        }
+        return retval;
     }
-  else
-    {
-      retval = m_sequence;
-    }
-  return retval;
-}
 
-uint16_t
-MacTxMiddle::GetNextSeqNumberByTidAndAddress (uint8_t tid, Mac48Address addr) const
-{
-  NS_ASSERT (tid < 16);
-  uint16_t seq = 0;
-  std::map <Mac48Address,uint16_t*>::const_iterator it = m_qosSequences.find (addr);
-  if (it != m_qosSequences.end ())
-    {
-      return it->second[tid];
+    uint16_t
+    MacTxMiddle::GetNextSeqNumberByTidAndAddress(uint8_t tid, Mac48Address addr) const {
+        NS_ASSERT(tid < 16);
+        uint16_t seq = 0;
+        std::map <Mac48Address, uint16_t*>::const_iterator it = m_qosSequences.find(addr);
+        if (it != m_qosSequences.end()) {
+            return it->second[tid];
+        }
+        return seq;
     }
-  return seq;
-}
 
 } //namespace ns3

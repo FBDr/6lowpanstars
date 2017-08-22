@@ -27,71 +27,67 @@
 #include "../fields.hpp"
 
 namespace ndn {
-namespace lp {
-namespace detail {
+    namespace lp {
+        namespace detail {
 
-class FieldInfo
-{
-public:
-  FieldInfo();
+            class FieldInfo {
+            public:
+                FieldInfo();
 
-  explicit
-  FieldInfo(uint64_t tlv);
+                explicit
+                FieldInfo(uint64_t tlv);
 
-public:
-  /**
-   * \brief TLV-TYPE of the field; 0 if field does not exist
-   */
-  uint64_t tlvType;
+            public:
+                /**
+                 * \brief TLV-TYPE of the field; 0 if field does not exist
+                 */
+                uint64_t tlvType;
 
-  /**
-   * \brief is this field known
-   */
-  bool isRecognized;
+                /**
+                 * \brief is this field known
+                 */
+                bool isRecognized;
 
-  /**
-   * \brief can this unknown field be ignored
-   */
-  bool canIgnore;
+                /**
+                 * \brief can this unknown field be ignored
+                 */
+                bool canIgnore;
 
-  /**
-   * \brief is the field repeatable
-   */
-  bool isRepeatable;
+                /**
+                 * \brief is the field repeatable
+                 */
+                bool isRepeatable;
 
-  /**
-   * \brief sort order of field_location_tag
-   */
-  int locationSortOrder;
-};
+                /**
+                 * \brief sort order of field_location_tag
+                 */
+                int locationSortOrder;
+            };
 
-template<typename TAG>
-inline int
-getLocationSortOrder();
+            template<typename TAG>
+            inline int
+            getLocationSortOrder();
 
-template<>
-inline int
-getLocationSortOrder<field_location_tags::Header>()
-{
-  return 1;
-}
+            template<>
+            inline int
+            getLocationSortOrder<field_location_tags::Header>() {
+                return 1;
+            }
 
-template<>
-inline int
-getLocationSortOrder<field_location_tags::Fragment>()
-{
-  return 2;
-}
+            template<>
+            inline int
+            getLocationSortOrder<field_location_tags::Fragment>() {
+                return 2;
+            }
 
-inline bool
-compareFieldSortOrder(const FieldInfo& first, const FieldInfo& second)
-{
-  return (first.locationSortOrder < second.locationSortOrder) ||
-         (first.locationSortOrder == second.locationSortOrder && first.tlvType < second.tlvType);
-}
+            inline bool
+            compareFieldSortOrder(const FieldInfo& first, const FieldInfo& second) {
+                return (first.locationSortOrder < second.locationSortOrder) ||
+                        (first.locationSortOrder == second.locationSortOrder && first.tlvType < second.tlvType);
+            }
 
-} // namespace detail
-} // namespace lp
+        } // namespace detail
+    } // namespace lp
 } // namespace ndn
 
 #endif // NDN_CXX_LP_DETAIL_FIELD_INFO_HPP

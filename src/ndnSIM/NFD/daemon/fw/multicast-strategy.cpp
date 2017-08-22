@@ -27,35 +27,33 @@
 #include "algorithm.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const Name MulticastStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/multicast/%FD%01");
-NFD_REGISTER_STRATEGY(MulticastStrategy);
+        const Name MulticastStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/multicast/%FD%01");
+        NFD_REGISTER_STRATEGY(MulticastStrategy);
 
-MulticastStrategy::MulticastStrategy(Forwarder& forwarder, const Name& name)
-  : Strategy(forwarder, name)
-{
-}
+        MulticastStrategy::MulticastStrategy(Forwarder& forwarder, const Name& name)
+        : Strategy(forwarder, name) {
+        }
 
-void
-MulticastStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
-                                        const shared_ptr<pit::Entry>& pitEntry)
-{
-  const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
-  const fib::NextHopList& nexthops = fibEntry.getNextHops();
+        void
+        MulticastStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+                const shared_ptr<pit::Entry>& pitEntry) {
+            const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
+            const fib::NextHopList& nexthops = fibEntry.getNextHops();
 
-  for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
-    Face& outFace = it->getFace();
-    if (!wouldViolateScope(inFace, interest, outFace) &&
-        canForwardToLegacy(*pitEntry, outFace)) {
-      this->sendInterest(pitEntry, outFace, interest);
-    }
-  }
+            for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
+                Face& outFace = it->getFace();
+                if (!wouldViolateScope(inFace, interest, outFace) &&
+                        canForwardToLegacy(*pitEntry, outFace)) {
+                    this->sendInterest(pitEntry, outFace, interest);
+                }
+            }
 
-  if (!hasPendingOutRecords(*pitEntry)) {
-    this->rejectPendingInterest(pitEntry);
-  }
-}
+            if (!hasPendingOutRecords(*pitEntry)) {
+                this->rejectPendingInterest(pitEntry);
+            }
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

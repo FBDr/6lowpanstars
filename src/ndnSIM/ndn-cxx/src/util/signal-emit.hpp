@@ -34,17 +34,16 @@
 #define NDN_UTIL_SIGNAL_EMIT_HPP
 
 namespace ndn {
-namespace util {
-namespace signal {
+    namespace util {
+        namespace signal {
 
-/** \brief (implementation detail) a filler for extra argument
- */
-class DummyExtraArg
-{
-};
+            /** \brief (implementation detail) a filler for extra argument
+             */
+            class DummyExtraArg {
+            };
 
-} // namespace signal
-} // namespace util
+        } // namespace signal
+    } // namespace util
 } // namespace ndn
 
 /** \brief (implementation detail) declares a 'emit_signalName' method

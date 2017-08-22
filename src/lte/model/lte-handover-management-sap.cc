@@ -21,17 +21,14 @@
 
 #include "lte-handover-management-sap.h"
 
-namespace ns3 {
-
-
-LteHandoverManagementSapProvider::~LteHandoverManagementSapProvider ()
+namespace ns3
 {
-}
 
+    LteHandoverManagementSapProvider::~LteHandoverManagementSapProvider() {
+    }
 
-LteHandoverManagementSapUser::~LteHandoverManagementSapUser ()
-{
-}
+    LteHandoverManagementSapUser::~LteHandoverManagementSapUser() {
+    }
 
 
 } // end of namespace ns3

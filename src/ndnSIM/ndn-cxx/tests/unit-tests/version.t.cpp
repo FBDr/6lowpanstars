@@ -25,28 +25,26 @@
 #include <stdio.h>
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(TestVersion)
+        BOOST_AUTO_TEST_SUITE(TestVersion)
 
-BOOST_AUTO_TEST_CASE(Version)
-{
-  BOOST_CHECK_EQUAL(NDN_CXX_VERSION, NDN_CXX_VERSION_MAJOR * 1000000 +
-                                     NDN_CXX_VERSION_MINOR * 1000 +
-                                     NDN_CXX_VERSION_PATCH);
-}
+        BOOST_AUTO_TEST_CASE(Version) {
+            BOOST_CHECK_EQUAL(NDN_CXX_VERSION, NDN_CXX_VERSION_MAJOR * 1000000 +
+                    NDN_CXX_VERSION_MINOR * 1000 +
+                    NDN_CXX_VERSION_PATCH);
+        }
 
-BOOST_AUTO_TEST_CASE(VersionString)
-{
-  BOOST_STATIC_ASSERT(NDN_CXX_VERSION_MAJOR < 1000);
-  char buf[20];
-  snprintf(buf, sizeof(buf), "%d.%d.%d",
-           NDN_CXX_VERSION_MAJOR, NDN_CXX_VERSION_MINOR, NDN_CXX_VERSION_PATCH);
+        BOOST_AUTO_TEST_CASE(VersionString) {
+            BOOST_STATIC_ASSERT(NDN_CXX_VERSION_MAJOR < 1000);
+            char buf[20];
+            snprintf(buf, sizeof (buf), "%d.%d.%d",
+                    NDN_CXX_VERSION_MAJOR, NDN_CXX_VERSION_MINOR, NDN_CXX_VERSION_PATCH);
 
-  BOOST_CHECK_EQUAL(std::string(NDN_CXX_VERSION_STRING), std::string(buf));
-}
+            BOOST_CHECK_EQUAL(std::string(NDN_CXX_VERSION_STRING), std::string(buf));
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

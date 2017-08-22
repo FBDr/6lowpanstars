@@ -27,30 +27,28 @@
 #include "core/logger.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-NFD_LOG_INIT("ClientControlStrategy");
+        NFD_LOG_INIT("ClientControlStrategy");
 
-const Name ClientControlStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/client-control/%FD%02");
-NFD_REGISTER_STRATEGY(ClientControlStrategy);
+        const Name ClientControlStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/client-control/%FD%02");
+        NFD_REGISTER_STRATEGY(ClientControlStrategy);
 
-ClientControlStrategy::ClientControlStrategy(Forwarder& forwarder, const Name& name)
-  : BestRouteStrategy(forwarder, name)
-{
-}
+        ClientControlStrategy::ClientControlStrategy(Forwarder& forwarder, const Name& name)
+        : BestRouteStrategy(forwarder, name) {
+        }
 
-void
-ClientControlStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
-                                            const shared_ptr<pit::Entry>& pitEntry)
-{
-  if (m_isFirstUse) {
-    NFD_LOG_WARN("NextHopFaceId field is honored universally and "
-                 "it's unnecessary to set client-control strategy.");
-    m_isFirstUse = false;
-  }
+        void
+        ClientControlStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+                const shared_ptr<pit::Entry>& pitEntry) {
+            if (m_isFirstUse) {
+                NFD_LOG_WARN("NextHopFaceId field is honored universally and "
+                        "it's unnecessary to set client-control strategy.");
+                m_isFirstUse = false;
+            }
 
-  this->BestRouteStrategy::afterReceiveInterest(inFace, interest, pitEntry);
-}
+            this->BestRouteStrategy::afterReceiveInterest(inFace, interest, pitEntry);
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

@@ -27,54 +27,51 @@
 
 namespace ns3 {
 
-class Tag;
+    class Tag;
 
-/**
- * Tag to calculate the per-PDU delay from eNb RLC to UE RLC
- */
+    /**
+     * Tag to calculate the per-PDU delay from eNb RLC to UE RLC
+     */
 
-class RlcTag : public Tag
-{
-public:
-  static TypeId  GetTypeId (void);
-  virtual TypeId  GetInstanceTypeId (void) const;
+    class RlcTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create an empty RLC tag
-   */
-  RlcTag ();
-  /**
-   * Create an RLC tag with the given senderTimestamp
-   */
-  RlcTag (Time senderTimestamp);
+        /**
+         * Create an empty RLC tag
+         */
+        RlcTag();
+        /**
+         * Create an RLC tag with the given senderTimestamp
+         */
+        RlcTag(Time senderTimestamp);
 
-  virtual void  Serialize (TagBuffer i) const;
-  virtual void  Deserialize (TagBuffer i);
-  virtual uint32_t  GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Print(std::ostream &os) const;
 
-  /**
-   * Get the instant when the RLC delivers the PDU to the MAC SAP provider
-   * @return the sender timestamp
-   */
-  Time  GetSenderTimestamp (void) const
-  {
-    return m_senderTimestamp;
-  }
+        /**
+         * Get the instant when the RLC delivers the PDU to the MAC SAP provider
+         * @return the sender timestamp
+         */
+        Time GetSenderTimestamp(void) const {
+            return m_senderTimestamp;
+        }
 
-  /**
-   * Set the sender timestamp
-   * @param senderTimestamp time stamp of the instant when the RLC delivers the PDU to the MAC SAP provider
-   */
-  void  SetSenderTimestamp (Time senderTimestamp)
-  {
-    this->m_senderTimestamp = senderTimestamp;
-  }
+        /**
+         * Set the sender timestamp
+         * @param senderTimestamp time stamp of the instant when the RLC delivers the PDU to the MAC SAP provider
+         */
+        void SetSenderTimestamp(Time senderTimestamp) {
+            this->m_senderTimestamp = senderTimestamp;
+        }
 
-private:
-  Time m_senderTimestamp;
+    private:
+        Time m_senderTimestamp;
 
-};
+    };
 
 } //namespace ns3
 

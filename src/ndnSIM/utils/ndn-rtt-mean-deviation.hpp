@@ -31,52 +31,52 @@
 #include "ndn-rtt-estimator.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * \ingroup ndn-apps
- *
- * \brief The modified version of "Mean--Deviation" RTT estimator, as discussed by Van Jacobson that
- *better suits NDN communication model
- *
- * This class implements the "Mean--Deviation" RTT estimator, as discussed
- * by Van Jacobson and Michael J. Karels, in
- * "Congestion Avoidance and Control", SIGCOMM 88, Appendix A
- *
- */
-class RttMeanDeviation : public RttEstimator {
-public:
-  static TypeId
-  GetTypeId(void);
+        /**
+         * \ingroup ndn-apps
+         *
+         * \brief The modified version of "Mean--Deviation" RTT estimator, as discussed by Van Jacobson that
+         *better suits NDN communication model
+         *
+         * This class implements the "Mean--Deviation" RTT estimator, as discussed
+         * by Van Jacobson and Michael J. Karels, in
+         * "Congestion Avoidance and Control", SIGCOMM 88, Appendix A
+         *
+         */
+        class RttMeanDeviation : public RttEstimator {
+        public:
+            static TypeId
+            GetTypeId(void);
 
-  RttMeanDeviation();
-  RttMeanDeviation(const RttMeanDeviation&);
+            RttMeanDeviation();
+            RttMeanDeviation(const RttMeanDeviation&);
 
-  virtual TypeId
-  GetInstanceTypeId(void) const;
+            virtual TypeId
+            GetInstanceTypeId(void) const;
 
-  void
-  SentSeq(SequenceNumber32 seq, uint32_t size);
-  Time
-  AckSeq(SequenceNumber32 ackSeq);
-  void
-  Measurement(Time measure);
-  Time
-  RetransmitTimeout();
-  Ptr<RttEstimator>
-  Copy() const;
-  void
-  Reset();
-  void
-  Gain(double g);
+            void
+            SentSeq(SequenceNumber32 seq, uint32_t size);
+            Time
+            AckSeq(SequenceNumber32 ackSeq);
+            void
+            Measurement(Time measure);
+            Time
+            RetransmitTimeout();
+            Ptr<RttEstimator>
+            Copy() const;
+            void
+            Reset();
+            void
+            Gain(double g);
 
-private:
-  double m_gain;   // Filter gain
-  double m_gain2;  // Filter gain
-  Time m_variance; // Current variance
-};
+        private:
+            double m_gain; // Filter gain
+            double m_gain2; // Filter gain
+            Time m_variance; // Current variance
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_RTT_MEAN_DEVIATION

@@ -29,73 +29,67 @@
 #include "fw/strategy.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-/** \brief strategy for unit testing
- *
- *  Unless otherwise indicated, triggers are recorded but does nothing.
- */
-class DummyStrategy : public fw::Strategy
-{
-public:
-  DummyStrategy(Forwarder& forwarder, const Name& name)
-    : Strategy(forwarder, name)
-    , afterReceiveInterest_count(0)
-    , beforeSatisfyInterest_count(0)
-    , beforeExpirePendingInterest_count(0)
-    , afterReceiveNack_count(0)
-  {
-  }
+        /** \brief strategy for unit testing
+         *
+         *  Unless otherwise indicated, triggers are recorded but does nothing.
+         */
+        class DummyStrategy : public fw::Strategy {
+        public:
 
-  /** \brief after receive Interest trigger
-   *
-   *  If \p interestOutFace is not null, Interest is forwarded to that face via send Interest action;
-   *  otherwise, reject pending Interest action is invoked.
-   */
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override
-  {
-    ++afterReceiveInterest_count;
+            DummyStrategy(Forwarder& forwarder, const Name& name)
+            : Strategy(forwarder, name)
+            , afterReceiveInterest_count(0)
+            , beforeSatisfyInterest_count(0)
+            , beforeExpirePendingInterest_count(0)
+            , afterReceiveNack_count(0) {
+            }
 
-    if (interestOutFace != nullptr) {
-      this->sendInterest(pitEntry, *interestOutFace, interest);
-    }
-    else {
-      this->rejectPendingInterest(pitEntry);
-    }
-  }
+            /** \brief after receive Interest trigger
+             *
+             *  If \p interestOutFace is not null, Interest is forwarded to that face via send Interest action;
+             *  otherwise, reject pending Interest action is invoked.
+             */
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override {
+                ++afterReceiveInterest_count;
 
-  virtual void
-  beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
-                        const Face& inFace, const Data& data) override
-  {
-    ++beforeSatisfyInterest_count;
-  }
+                if (interestOutFace != nullptr) {
+                    this->sendInterest(pitEntry, *interestOutFace, interest);
+                } else {
+                    this->rejectPendingInterest(pitEntry);
+                }
+            }
 
-  virtual void
-  beforeExpirePendingInterest(const shared_ptr<pit::Entry>& pitEntry) override
-  {
-    ++beforeExpirePendingInterest_count;
-  }
+            virtual void
+            beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                    const Face& inFace, const Data& data) override {
+                ++beforeSatisfyInterest_count;
+            }
 
-  virtual void
-  afterReceiveNack(const Face& inFace, const lp::Nack& nack,
-                   const shared_ptr<pit::Entry>& pitEntry) override
-  {
-    ++afterReceiveNack_count;
-  }
+            virtual void
+            beforeExpirePendingInterest(const shared_ptr<pit::Entry>& pitEntry) override {
+                ++beforeExpirePendingInterest_count;
+            }
 
-public:
-  int afterReceiveInterest_count;
-  int beforeSatisfyInterest_count;
-  int beforeExpirePendingInterest_count;
-  int afterReceiveNack_count;
+            virtual void
+            afterReceiveNack(const Face& inFace, const lp::Nack& nack,
+                    const shared_ptr<pit::Entry>& pitEntry) override {
+                ++afterReceiveNack_count;
+            }
 
-  shared_ptr<Face> interestOutFace;
-};
+        public:
+            int afterReceiveInterest_count;
+            int beforeSatisfyInterest_count;
+            int beforeExpirePendingInterest_count;
+            int afterReceiveNack_count;
 
-} // namespace tests
+            shared_ptr<Face> interestOutFace;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FW_DUMMY_STRATEGY_HPP

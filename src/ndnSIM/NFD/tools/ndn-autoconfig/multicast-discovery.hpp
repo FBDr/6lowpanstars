@@ -31,68 +31,67 @@
 #include <ndn-cxx/security/validator-null.hpp>
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-/**
- * @brief Multicast discovery stage
- *
- * - Request
- *
- *     The end host sends an Interest over a multicast face.
- *
- *     Interest Name is /localhop/ndn-autoconf/hub.
- *
- * - Response
- *
- *     A producer app on the HUB answer this Interest with a Data packet that contains a
- *     TLV-encoded Uri block.  The value of this block is the URI for the HUB, preferably a
- *     UDP tunnel.
- */
-class MulticastDiscovery : public Base
-{
-public:
-  /**
-   * @brief Create multicast discovery stage
-   * @sa Base::Base
-   */
-  MulticastDiscovery(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
+            /**
+             * @brief Multicast discovery stage
+             *
+             * - Request
+             *
+             *     The end host sends an Interest over a multicast face.
+             *
+             *     Interest Name is /localhop/ndn-autoconf/hub.
+             *
+             * - Response
+             *
+             *     A producer app on the HUB answer this Interest with a Data packet that contains a
+             *     TLV-encoded Uri block.  The value of this block is the URI for the HUB, preferably a
+             *     UDP tunnel.
+             */
+            class MulticastDiscovery : public Base {
+            public:
+                /**
+                 * @brief Create multicast discovery stage
+                 * @sa Base::Base
+                 */
+                MulticastDiscovery(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
 
-  virtual void
-  start() override;
+                virtual void
+                start() override;
 
-private:
-  void
-  registerHubDiscoveryPrefix(const ConstBufferPtr& buffer);
+            private:
+                void
+                registerHubDiscoveryPrefix(const ConstBufferPtr& buffer);
 
-  void
-  onRegisterSuccess();
+                void
+                onRegisterSuccess();
 
-  void
-  onRegisterFailure(const nfd::ControlResponse& response);
+                void
+                onRegisterFailure(const nfd::ControlResponse& response);
 
-  void
-  setStrategy();
+                void
+                setStrategy();
 
-  void
-  onSetStrategyFailure(const nfd::ControlResponse& response);
+                void
+                onSetStrategyFailure(const nfd::ControlResponse& response);
 
-  // Start to look for a hub (NDN hub discovery first stage)
-  void
-  requestHubData();
+                // Start to look for a hub (NDN hub discovery first stage)
+                void
+                requestHubData();
 
-  void
-  onSuccess(Data& data);
+                void
+                onSuccess(Data& data);
 
-private:
-  size_t nRequestedRegs;
-  size_t nFinishedRegs;
+            private:
+                size_t nRequestedRegs;
+                size_t nFinishedRegs;
 
-  ndn::ValidatorNull m_validator;
-};
+                ndn::ValidatorNull m_validator;
+            };
 
-} // namespace autoconfig
-} // namespace tools
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn
 
 #endif // NFD_TOOLS_NDN_AUTOCONFIG_MULTICAST_DISCOVERY_HPP

@@ -30,4 +30,5 @@
 
 #include <iostream>
 
-BOOST_AUTO_TEST_CASE( placeholder ) {}
+BOOST_AUTO_TEST_CASE(placeholder) {
+}

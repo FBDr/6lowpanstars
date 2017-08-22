@@ -34,92 +34,87 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
-namespace ip = boost::asio::ip;
-using ip::udp;
+            using namespace nfd::tests;
+            namespace ip = boost::asio::ip;
+            using ip::udp;
 
-class UnicastUdpTransportFixture : public BaseFixture
-{
-protected:
-  UnicastUdpTransportFixture()
-    : transport(nullptr)
-    , remoteSocket(g_io)
-    , defaultAddr(getTestIp<ip::address_v4>())
-    , receivedPackets(nullptr)
-  {
-  }
+            class UnicastUdpTransportFixture : public BaseFixture {
+            protected:
 
-  void
-  initialize(ip::address address = ip::address_v4::loopback(),
-             ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT)
-  {
-    udp::socket sock(g_io);
-    sock.connect(udp::endpoint(address, 7070));
-    localEp = sock.local_endpoint();
+                UnicastUdpTransportFixture()
+                : transport(nullptr)
+                , remoteSocket(g_io)
+                , defaultAddr(getTestIp<ip::address_v4>())
+                , receivedPackets(nullptr) {
+                }
 
-    remoteConnect(address);
+                void
+                initialize(ip::address address = ip::address_v4::loopback(),
+                        ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT) {
+                    udp::socket sock(g_io);
+                    sock.connect(udp::endpoint(address, 7070));
+                    localEp = sock.local_endpoint();
 
-    face = make_unique<Face>(
-             make_unique<DummyReceiveLinkService>(),
-             make_unique<UnicastUdpTransport>(std::move(sock), persistency, time::seconds(3)));
-    transport = static_cast<UnicastUdpTransport*>(face->getTransport());
-    receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
+                    remoteConnect(address);
 
-    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
-  }
+                    face = make_unique<Face>(
+                            make_unique<DummyReceiveLinkService>(),
+                            make_unique<UnicastUdpTransport>(std::move(sock), persistency, time::seconds(3)));
+                    transport = static_cast<UnicastUdpTransport*> (face->getTransport());
+                    receivedPackets = &static_cast<DummyReceiveLinkService*> (face->getLinkService())->receivedPackets;
 
-  void
-  remoteConnect(ip::address address = ip::address_v4::loopback())
-  {
-    udp::endpoint remoteEp(address, 7070);
-    remoteSocket.open(remoteEp.protocol());
-    remoteSocket.set_option(udp::socket::reuse_address(true));
-    remoteSocket.bind(remoteEp);
-    remoteSocket.connect(localEp);
-  }
+                    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
+                }
 
-  void
-  remoteRead(std::vector<uint8_t>& buf, bool needToCheck = true)
-  {
-    remoteSocket.async_receive(boost::asio::buffer(buf),
-      [this, needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-        limitedIo.afterOp();
-      });
-    BOOST_REQUIRE_EQUAL(limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
-  }
+                void
+                remoteConnect(ip::address address = ip::address_v4::loopback()) {
+                    udp::endpoint remoteEp(address, 7070);
+                    remoteSocket.open(remoteEp.protocol());
+                    remoteSocket.set_option(udp::socket::reuse_address(true));
+                    remoteSocket.bind(remoteEp);
+                    remoteSocket.connect(localEp);
+                }
 
-  void
-  remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true)
-  {
-    remoteSocket.async_send(boost::asio::buffer(buf),
-      [needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-      });
-    limitedIo.defer(time::seconds(1));
-  }
+                void
+                remoteRead(std::vector<uint8_t>& buf, bool needToCheck = true) {
+                    remoteSocket.async_receive(boost::asio::buffer(buf),
+                            [this, needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                                limitedIo.afterOp();
+                            });
+                    BOOST_REQUIRE_EQUAL(limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
+                }
 
-protected:
-  LimitedIo limitedIo;
-  UnicastUdpTransport* transport;
-  udp::endpoint localEp;
-  udp::socket remoteSocket;
-  const ip::address defaultAddr;
-  std::vector<Transport::Packet>* receivedPackets;
+                void
+                remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true) {
+                    remoteSocket.async_send(boost::asio::buffer(buf),
+                            [needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                            });
+                    limitedIo.defer(time::seconds(1));
+                }
 
-private:
-  unique_ptr<Face> face;
-};
+            protected:
+                LimitedIo limitedIo;
+                UnicastUdpTransport* transport;
+                udp::endpoint localEp;
+                udp::socket remoteSocket;
+                const ip::address defaultAddr;
+                std::vector<Transport::Packet>* receivedPackets;
 
-} // namespace tests
-} // namespace face
+            private:
+                unique_ptr<Face> face;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_UNICAST_UDP_TRANSPORT_FIXTURE_HPP

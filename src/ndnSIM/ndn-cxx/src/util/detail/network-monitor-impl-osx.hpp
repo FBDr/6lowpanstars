@@ -31,37 +31,36 @@
 #include <SystemConfiguration/SystemConfiguration.h>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-class NetworkMonitor::Impl
-{
-public:
-  Impl(NetworkMonitor& nm, boost::asio::io_service& io);
+        class NetworkMonitor::Impl {
+        public:
+            Impl(NetworkMonitor& nm, boost::asio::io_service& io);
 
-  ~Impl();
+            ~Impl();
 
-  static void
-  afterNotificationCenterEvent(CFNotificationCenterRef center,
-                               void *observer,
-                               CFStringRef name,
-                               const void *object,
-                               CFDictionaryRef userInfo);
+            static void
+            afterNotificationCenterEvent(CFNotificationCenterRef center,
+                    void *observer,
+                    CFStringRef name,
+                    const void *object,
+                    CFDictionaryRef userInfo);
 
-private:
-  void
-  scheduleCfLoop();
+        private:
+            void
+            scheduleCfLoop();
 
-  void
-  pollCfLoop();
+            void
+            pollCfLoop();
 
-private:
-  NetworkMonitor& m_nm;
+        private:
+            NetworkMonitor& m_nm;
 
-  Scheduler m_scheduler;
-  scheduler::ScopedEventId m_cfLoopEvent;
-};
+            Scheduler m_scheduler;
+            scheduler::ScopedEventId m_cfLoopEvent;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_NETWORK_MONITOR_IMPL_OSX_HPP

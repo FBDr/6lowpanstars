@@ -35,40 +35,43 @@
 
 namespace ns3 {
 
-/**
- * \ingroup access
- * A base class for (non-Singleton) objects which shouldn't be copied.
- *
- * To prevent copying of your `class ExampleNC` just inherit from NonCopyable:
- * \code
- *   class ExampleNC : private NonCopyable { ... };
- * \endcode
- *
- * This class prevents each instance of a derived class from being copied.
- * If you want only a single global instance of the derived class,
- * see Singleton.
- *
- * \internal
- * This is based on `boost::noncopyable`.
- */
-class NonCopyable
-{
-protected:
-  /** Constructor. */
-  NonCopyable () {}
-  /** Destructor. */
-  ~NonCopyable () {}
+    /**
+     * \ingroup access
+     * A base class for (non-Singleton) objects which shouldn't be copied.
+     *
+     * To prevent copying of your `class ExampleNC` just inherit from NonCopyable:
+     * \code
+     *   class ExampleNC : private NonCopyable { ... };
+     * \endcode
+     *
+     * This class prevents each instance of a derived class from being copied.
+     * If you want only a single global instance of the derived class,
+     * see Singleton.
+     *
+     * \internal
+     * This is based on `boost::noncopyable`.
+     */
+    class NonCopyable {
+    protected:
 
-private:
-  /** Copy constructor.  Private, so not copyable. */
-  NonCopyable (const NonCopyable &);
-  /**
-   * Assignment.  Private, so not copyable.
-   * \param [in] other The dummy argument
-   * \return The unmodified copy.
-   */
-  NonCopyable & operator = (const NonCopyable &other);
-}; 
+        /** Constructor. */
+        NonCopyable() {
+        }
+
+        /** Destructor. */
+        ~NonCopyable() {
+        }
+
+    private:
+        /** Copy constructor.  Private, so not copyable. */
+        NonCopyable(const NonCopyable &);
+        /**
+         * Assignment.  Private, so not copyable.
+         * \param [in] other The dummy argument
+         * \return The unmodified copy.
+         */
+        NonCopyable & operator=(const NonCopyable &other);
+    };
 
 } // namespace ns3 
 

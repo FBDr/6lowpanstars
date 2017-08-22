@@ -29,32 +29,31 @@
 #include "retx-suppression.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief a retransmission suppression decision algorithm that
- *         suppresses retransmissions within a fixed duration
- */
-class RetxSuppressionFixed : public RetxSuppression
-{
-public:
-  explicit
-  RetxSuppressionFixed(const time::milliseconds& minRetxInterval = DEFAULT_MIN_RETX_INTERVAL);
+        /** \brief a retransmission suppression decision algorithm that
+         *         suppresses retransmissions within a fixed duration
+         */
+        class RetxSuppressionFixed : public RetxSuppression {
+        public:
+            explicit
+            RetxSuppressionFixed(const time::milliseconds& minRetxInterval = DEFAULT_MIN_RETX_INTERVAL);
 
-  /** \brief determines whether Interest is a retransmission,
-   *         and if so, whether it shall be forwarded or suppressed
-   */
-  virtual Result
-  decide(const Face& inFace, const Interest& interest,
-         pit::Entry& pitEntry) const override;
+            /** \brief determines whether Interest is a retransmission,
+             *         and if so, whether it shall be forwarded or suppressed
+             */
+            virtual Result
+            decide(const Face& inFace, const Interest& interest,
+                    pit::Entry& pitEntry) const override;
 
-public:
-  static const time::milliseconds DEFAULT_MIN_RETX_INTERVAL;
+        public:
+            static const time::milliseconds DEFAULT_MIN_RETX_INTERVAL;
 
-private:
-  const time::milliseconds m_minRetxInterval;
-};
+        private:
+            const time::milliseconds m_minRetxInterval;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_RETX_SUPPRESSION_FIXED_HPP

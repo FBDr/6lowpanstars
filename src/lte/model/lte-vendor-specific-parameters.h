@@ -29,20 +29,19 @@
 
 namespace ns3 {
 
-/**
-* \brief Define the RNTI that has generated the 
-*/
-class SrsCqiRntiVsp : public VendorSpecificValue
-{
-  public:
-  SrsCqiRntiVsp (uint16_t rnti);
-  virtual ~SrsCqiRntiVsp ();
-  
-  uint16_t GetRnti ();
-  
-  private:
-  uint16_t m_rnti;
-};
+    /**
+     * \brief Define the RNTI that has generated the 
+     */
+    class SrsCqiRntiVsp : public VendorSpecificValue {
+    public:
+        SrsCqiRntiVsp(uint16_t rnti);
+        virtual ~SrsCqiRntiVsp();
+
+        uint16_t GetRnti();
+
+    private:
+        uint16_t m_rnti;
+    };
 
 
 

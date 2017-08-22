@@ -30,83 +30,74 @@
  * ns3::AttributeChecker implementations.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("AttributeValue");
+    NS_LOG_COMPONENT_DEFINE("AttributeValue");
 
-AttributeValue::AttributeValue ()
-{
-}
-AttributeValue::~AttributeValue ()
-{
-}
-
-
-AttributeAccessor::AttributeAccessor ()
-{
-}
-AttributeAccessor::~AttributeAccessor ()
-{
-}
-
-AttributeChecker::AttributeChecker ()
-{
-}
-AttributeChecker::~AttributeChecker ()
-{
-}
-
-Ptr<AttributeValue> 
-AttributeChecker::CreateValidValue (const AttributeValue &value) const
-{
-  NS_LOG_FUNCTION (this << &value);
-  if (Check (value))
-    {
-      return value.Copy ();
+    AttributeValue::AttributeValue() {
     }
-  // attempt to convert to string.
-  const StringValue *str = dynamic_cast<const StringValue *> (&value);
-  if (str == 0)
-    {
-      return 0;
-    }
-  // attempt to convert back to value.
-  Ptr<AttributeValue> v = Create ();
-  bool ok = v->DeserializeFromString (str->Get (), this);
-  if (!ok)
-    {
-      return 0;
-    }
-  ok = Check (*v);
-  if (!ok)
-    {
-      return 0;
-    }
-  return v;
-}
 
-EmptyAttributeValue::EmptyAttributeValue ()
-{
-  NS_LOG_FUNCTION (this);
-}
-Ptr<AttributeValue>
-EmptyAttributeValue::Copy (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Create<EmptyAttributeValue> ();
-}
-std::string
-EmptyAttributeValue::SerializeToString (Ptr<const AttributeChecker> checker) const
-{
-  NS_LOG_FUNCTION (this << checker);
-  return "";
-}
-bool
-EmptyAttributeValue::DeserializeFromString (std::string value, Ptr<const AttributeChecker> checker)
-{
-  NS_LOG_FUNCTION (this << value << checker);
-  return true;
-}
+    AttributeValue::~AttributeValue() {
+    }
+
+    AttributeAccessor::AttributeAccessor() {
+    }
+
+    AttributeAccessor::~AttributeAccessor() {
+    }
+
+    AttributeChecker::AttributeChecker() {
+    }
+
+    AttributeChecker::~AttributeChecker() {
+    }
+
+    Ptr<AttributeValue>
+            AttributeChecker::CreateValidValue(const AttributeValue & value) const {
+        NS_LOG_FUNCTION(this << &value);
+        if (Check(value)) {
+            return value.Copy();
+        }
+        // attempt to convert to string.
+        const StringValue *str = dynamic_cast<const StringValue *> (&value);
+        if (str == 0) {
+            return 0;
+        }
+        // attempt to convert back to value.
+        Ptr<AttributeValue> v = Create();
+        bool ok = v->DeserializeFromString(str->Get(), this);
+        if (!ok) {
+            return 0;
+        }
+        ok = Check(*v);
+        if (!ok) {
+            return 0;
+        }
+        return v;
+    }
+
+    EmptyAttributeValue::EmptyAttributeValue() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    Ptr<AttributeValue>
+            EmptyAttributeValue::Copy(void) const {
+        NS_LOG_FUNCTION(this);
+        return Create<EmptyAttributeValue> ();
+    }
+
+    std::string
+    EmptyAttributeValue::SerializeToString(Ptr<const AttributeChecker> checker) const {
+        NS_LOG_FUNCTION(this << checker);
+        return "";
+    }
+
+    bool
+    EmptyAttributeValue::DeserializeFromString(std::string value, Ptr<const AttributeChecker> checker) {
+        NS_LOG_FUNCTION(this << value << checker);
+        return true;
+    }
 
 
 } // namespace ns3

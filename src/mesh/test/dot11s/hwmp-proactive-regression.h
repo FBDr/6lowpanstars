@@ -54,57 +54,56 @@ using namespace ns3;
  * \endverbatim
  *
  */
-class HwmpProactiveRegressionTest : public TestCase
-{
+class HwmpProactiveRegressionTest : public TestCase {
 public:
-  HwmpProactiveRegressionTest ();
-  virtual ~HwmpProactiveRegressionTest();
+    HwmpProactiveRegressionTest();
+    virtual ~HwmpProactiveRegressionTest();
 
-  virtual void DoRun ();
-  void CheckResults ();
+    virtual void DoRun();
+    void CheckResults();
 
 private:
-  /// \internal It is important to have pointers here
-  NodeContainer * m_nodes;
-  /// Simulation time
-  Time m_time;
-  Ipv4InterfaceContainer m_interfaces;
+    /// \internal It is important to have pointers here
+    NodeContainer * m_nodes;
+    /// Simulation time
+    Time m_time;
+    Ipv4InterfaceContainer m_interfaces;
 
-  void CreateNodes ();
-  void CreateDevices ();
-  void InstallApplications ();
-  void ResetPosition ();
+    void CreateNodes();
+    void CreateDevices();
+    void InstallApplications();
+    void ResetPosition();
 
-  /// Server-side socket
-  Ptr<Socket> m_serverSocket;
-  /// Client-side socket
-  Ptr<Socket> m_clientSocket;
+    /// Server-side socket
+    Ptr<Socket> m_serverSocket;
+    /// Client-side socket
+    Ptr<Socket> m_clientSocket;
 
-  // sent packets counter
-  uint32_t m_sentPktsCounter;
+    // sent packets counter
+    uint32_t m_sentPktsCounter;
 
-  /**
-   * Send data
-   * \param socket the sending socket
-   */
-  void SendData (Ptr<Socket> socket);
+    /**
+     * Send data
+     * \param socket the sending socket
+     */
+    void SendData(Ptr<Socket> socket);
 
-  /**
-   * \brief Handle a packet reception.
-   *
-   * This function is called by lower layers.
-   *
-   * \param socket the socket the packet was received to.
-   */
-  void HandleReadServer (Ptr<Socket> socket);
+    /**
+     * \brief Handle a packet reception.
+     *
+     * This function is called by lower layers.
+     *
+     * \param socket the socket the packet was received to.
+     */
+    void HandleReadServer(Ptr<Socket> socket);
 
-  /**
-   * \brief Handle a packet reception.
-   *
-   * This function is called by lower layers.
-   *
-   * \param socket the socket the packet was received to.
-   */
-  void HandleReadClient (Ptr<Socket> socket);
+    /**
+     * \brief Handle a packet reception.
+     *
+     * This function is called by lower layers.
+     *
+     * \param socket the socket the packet was received to.
+     */
+    void HandleReadClient(Ptr<Socket> socket);
 };
 

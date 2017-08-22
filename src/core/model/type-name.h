@@ -31,37 +31,36 @@
 
 namespace ns3 {
 
-/**
- * \ingroup attributeimpl
- * Type name strings for numeric AttributeValue types.
- *
- * \tparam T \explicit The numeric type.
- * \returns The numeric type name as a string.
- */
-template <typename T>
-std::string TypeNameGet (void)
-{
-  return "unknown";
-}
+    /**
+     * \ingroup attributeimpl
+     * Type name strings for numeric AttributeValue types.
+     *
+     * \tparam T \explicit The numeric type.
+     * \returns The numeric type name as a string.
+     */
+    template <typename T>
+    std::string TypeNameGet(void) {
+        return "unknown";
+    }
 
-/**
- * \ingroup attributeimpl
- * ns3::TypeNameGet(void) specializaton.
- * \returns The numeric type name as a string.
- * @{
- */
-template <> std::string TypeNameGet< int8_t  > (void);
-template <> std::string TypeNameGet< int16_t > (void);
-template <> std::string TypeNameGet< int32_t > (void);
-template <> std::string TypeNameGet< int64_t > (void);
-template <> std::string TypeNameGet< uint8_t > (void);
-template <> std::string TypeNameGet< uint16_t> (void);
-template <> std::string TypeNameGet< uint32_t> (void);
-template <> std::string TypeNameGet< uint64_t> (void);
-template <> std::string TypeNameGet< float   > (void);
-template <> std::string TypeNameGet< double  > (void);
-/**@}*/
-  
+    /**
+     * \ingroup attributeimpl
+     * ns3::TypeNameGet(void) specializaton.
+     * \returns The numeric type name as a string.
+     * @{
+     */
+    template <> std::string TypeNameGet< int8_t > (void);
+    template <> std::string TypeNameGet< int16_t > (void);
+    template <> std::string TypeNameGet< int32_t > (void);
+    template <> std::string TypeNameGet< int64_t > (void);
+    template <> std::string TypeNameGet< uint8_t > (void);
+    template <> std::string TypeNameGet< uint16_t> (void);
+    template <> std::string TypeNameGet< uint32_t> (void);
+    template <> std::string TypeNameGet< uint64_t> (void);
+    template <> std::string TypeNameGet< float > (void);
+    template <> std::string TypeNameGet< double > (void);
+    /**@}*/
+
 } // namespace ns3
 
 #endif /* TYPE_NAME_H */

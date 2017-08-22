@@ -39,11 +39,11 @@ struct config {
     typedef websocketpp::http::parser::request request_type;
 };
 typedef websocketpp::extensions::permessage_deflate::enabled<config>
-    compressor_type;
+compressor_type;
 
 using namespace websocketpp;
 
-BOOST_AUTO_TEST_CASE( deflate_init ) {
+BOOST_AUTO_TEST_CASE(deflate_init) {
     /*compressor_type compressor;
     websocketpp::http::parser::attribute_list attributes;
     std::pair<lib::error_code,std::string> neg_ret;
@@ -117,82 +117,82 @@ BOOST_AUTO_TEST_CASE( deflate_init ) {
 
 
 
-   /* processor::extensions::deflate_method d(true);
-    http::parser::attribute_list attributes;
-    lib::error_code ec;
+    /* processor::extensions::deflate_method d(true);
+     http::parser::attribute_list attributes;
+     lib::error_code ec;
 
-    attributes.push_back(http::parser::attribute("foo","bar"));
-    ec = d.init(attributes);
-    BOOST_CHECK(ec == processor::extensions::error::unknown_method_parameter);
+     attributes.push_back(http::parser::attribute("foo","bar"));
+     ec = d.init(attributes);
+     BOOST_CHECK(ec == processor::extensions::error::unknown_method_parameter);
 
-    attributes.clear();
-    attributes.push_back(http::parser::attribute("s2c_max_window_bits","bar"));
-    ec = d.init(attributes);
-    BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
+     attributes.clear();
+     attributes.push_back(http::parser::attribute("s2c_max_window_bits","bar"));
+     ec = d.init(attributes);
+     BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
 
-    attributes.clear();
-    attributes.push_back(http::parser::attribute("s2c_max_window_bits","7"));
-    ec = d.init(attributes);
-    BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
+     attributes.clear();
+     attributes.push_back(http::parser::attribute("s2c_max_window_bits","7"));
+     ec = d.init(attributes);
+     BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
 
-    attributes.clear();
-    attributes.push_back(http::parser::attribute("s2c_max_window_bits","16"));
-    ec = d.init(attributes);
-    BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
+     attributes.clear();
+     attributes.push_back(http::parser::attribute("s2c_max_window_bits","16"));
+     ec = d.init(attributes);
+     BOOST_CHECK(ec == processor::extensions::error::invalid_algorithm_settings);
 
-    attributes.clear();
-    attributes.push_back(http::parser::attribute("s2c_max_window_bits","9"));
-    ec = d.init(attributes);
-    BOOST_CHECK( !ec);
+     attributes.clear();
+     attributes.push_back(http::parser::attribute("s2c_max_window_bits","9"));
+     ec = d.init(attributes);
+     BOOST_CHECK( !ec);
 
-    attributes.clear();
-    ec = d.init(attributes);
-    BOOST_CHECK( !ec);
+     attributes.clear();
+     ec = d.init(attributes);
+     BOOST_CHECK( !ec);
 
-    processor::extensions::deflate_engine de;
+     processor::extensions::deflate_engine de;
 
-    unsigned char test_in[] = "HelloHelloHelloHello";
-    unsigned char test_out[30];
+     unsigned char test_in[] = "HelloHelloHelloHello";
+     unsigned char test_out[30];
 
-    uLongf test_out_size = 30;
+     uLongf test_out_size = 30;
 
-    int ret;
+     int ret;
 
-    ret = compress(test_out, &test_out_size, test_in, 20);
+     ret = compress(test_out, &test_out_size, test_in, 20);
 
-    std::cout << ret << std::endl
-              << websocketpp::utility::to_hex(test_in,20) << std::endl
-              << websocketpp::utility::to_hex(test_out,test_out_size) << std::endl;
+     std::cout << ret << std::endl
+               << websocketpp::utility::to_hex(test_in,20) << std::endl
+               << websocketpp::utility::to_hex(test_out,test_out_size) << std::endl;
 
-    std::string input = "Hello";
-    std::string output;
-    ec = de.compress(input,output);
+     std::string input = "Hello";
+     std::string output;
+     ec = de.compress(input,output);
 
-    BOOST_CHECK( ec == processor::extensions::error::uninitialized );
+     BOOST_CHECK( ec == processor::extensions::error::uninitialized );
 
-    //std::cout << ec.message() << websocketpp::utility::to_hex(output) << std::endl;
+     //std::cout << ec.message() << websocketpp::utility::to_hex(output) << std::endl;
 
-    ec = de.init(15,15,Z_DEFAULT_COMPRESSION,8,Z_FIXED);
-    //ec = de.init();
-    BOOST_CHECK( !ec );
+     ec = de.init(15,15,Z_DEFAULT_COMPRESSION,8,Z_FIXED);
+     //ec = de.init();
+     BOOST_CHECK( !ec );
 
-    ec = de.compress(input,output);
-    std::cout << ec.message() << std::endl
-              << websocketpp::utility::to_hex(input) << std::endl
-              << websocketpp::utility::to_hex(output) << std::endl;
+     ec = de.compress(input,output);
+     std::cout << ec.message() << std::endl
+               << websocketpp::utility::to_hex(input) << std::endl
+               << websocketpp::utility::to_hex(output) << std::endl;
 
-    output.clear();
+     output.clear();
 
-    ec = de.compress(input,output);
-    std::cout << ec.message() << std::endl
-              << websocketpp::utility::to_hex(input) << std::endl
-              << websocketpp::utility::to_hex(output) << std::endl;
+     ec = de.compress(input,output);
+     std::cout << ec.message() << std::endl
+               << websocketpp::utility::to_hex(input) << std::endl
+               << websocketpp::utility::to_hex(output) << std::endl;
 
-    input = output;
-    output.clear();
-    ec = de.decompress(input,output);
-    std::cout << ec.message() << std::endl
-              << websocketpp::utility::to_hex(input) << std::endl
-              << websocketpp::utility::to_hex(output) << std::endl;
-    */
+     input = output;
+     output.clear();
+     ec = de.decompress(input,output);
+     std::cout << ec.message() << std::endl
+               << websocketpp::utility::to_hex(input) << std::endl
+               << websocketpp::utility::to_hex(output) << std::endl;
+     */
 }

@@ -22,84 +22,85 @@
 #include "../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-BOOST_AUTO_TEST_SUITE(HelperNdnFibHelper)
+        BOOST_AUTO_TEST_SUITE(HelperNdnFibHelper)
 
-class AddRouteFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  AddRouteFixture()
-  {
-    createTopology({
-        {"1", "2"}
-      });
+        class AddRouteFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-    addApps({
-        {"1", "ns3::ndn::ConsumerCbr",
-            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "9.99s"},
-        {"2", "ns3::ndn::Producer",
-            {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
-            "0s", "100s"}
-      });
-  }
+            AddRouteFixture() {
+                createTopology({
+                    {"1", "2"}
+                });
 
-  ~AddRouteFixture()
-  {
-    Simulator::Stop(Seconds(20.001));
-    Simulator::Run();
+                addApps({
+                    {"1", "ns3::ndn::ConsumerCbr",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"Frequency", "1"}},
+                        "0s", "9.99s"},
+                    {"2", "ns3::ndn::Producer",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"PayloadSize", "1024"}},
+                        "0s", "100s"}
+                });
+            }
 
-    BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 10);
-    BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 10);
+            ~AddRouteFixture() {
+                Simulator::Stop(Seconds(20.001));
+                Simulator::Run();
 
-    BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 10);
-    BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 10);
-  }
-};
+                BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 10);
+                BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 10);
 
-BOOST_FIXTURE_TEST_SUITE(AddRoute, AddRouteFixture)
+                BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 10);
+                BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 10);
+            }
+        };
 
-// static void
-// AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, int32_t metric);
-BOOST_AUTO_TEST_CASE(Base)
-{
-  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2"), 1);
-}
+        BOOST_FIXTURE_TEST_SUITE(AddRoute, AddRouteFixture)
+
+        // static void
+        // AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, int32_t metric);
+        BOOST_AUTO_TEST_CASE(Base) {
+            FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2"), 1);
+        }
 
 
-// static void
-// AddRoute(const std::string& nodeName, const Name& prefix, uint32_t faceId, int32_t metric);
-BOOST_AUTO_TEST_CASE(Helper1)
-{
-  FibHelper::AddRoute("1", Name("/prefix"), getFace("1", "2")->getId(), 10);
-}
+        // static void
+        // AddRoute(const std::string& nodeName, const Name& prefix, uint32_t faceId, int32_t metric);
 
-// static void
-// AddRoute(Ptr<Node> node, const Name& prefix, uint32_t faceId, int32_t metric);
-BOOST_AUTO_TEST_CASE(Helper2)
-{
-  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2")->getId(), 10);
-}
+        BOOST_AUTO_TEST_CASE(Helper1) {
+            FibHelper::AddRoute("1", Name("/prefix"), getFace("1", "2")->getId(), 10);
+        }
 
-// static void
-// AddRoute(const std::string& nodeName, const Name& prefix, const std::string& otherNodeName,
-//          int32_t metric);
-BOOST_AUTO_TEST_CASE(Helper3)
-{
-  FibHelper::AddRoute("1", "/prefix", "2", 1);
-}
+        // static void
+        // AddRoute(Ptr<Node> node, const Name& prefix, uint32_t faceId, int32_t metric);
 
-// static void
-// AddRoute(Ptr<Node> node, const Name& prefix, Ptr<Node> otherNode, int32_t metric);
-BOOST_AUTO_TEST_CASE(Helper4)
-{
-  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getNode("2"), 10);
-}
+        BOOST_AUTO_TEST_CASE(Helper2) {
+            FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2")->getId(), 10);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // AddRoute
+        // static void
+        // AddRoute(const std::string& nodeName, const Name& prefix, const std::string& otherNodeName,
+        //          int32_t metric);
 
-BOOST_AUTO_TEST_SUITE_END() // HelperNdnFibHelper
+        BOOST_AUTO_TEST_CASE(Helper3) {
+            FibHelper::AddRoute("1", "/prefix", "2", 1);
+        }
 
-} // namespace ndn
+        // static void
+        // AddRoute(Ptr<Node> node, const Name& prefix, Ptr<Node> otherNode, int32_t metric);
+
+        BOOST_AUTO_TEST_CASE(Helper4) {
+            FibHelper::AddRoute(getNode("1"), Name("/prefix"), getNode("2"), 10);
+        }
+
+        BOOST_AUTO_TEST_SUITE_END() // AddRoute
+
+        BOOST_AUTO_TEST_SUITE_END() // HelperNdnFibHelper
+
+    } // namespace ndn
 } // namespace ns3

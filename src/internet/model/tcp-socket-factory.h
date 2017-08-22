@@ -24,36 +24,35 @@
 
 namespace ns3 {
 
-class Socket;
+    class Socket;
 
-/**
- * \ingroup socket
- *
- * \brief API to create TCP socket instances 
- *
- * This abstract class defines the API for TCP sockets.
- * This class also holds the global default variables used to
- * initialize newly created sockets, such as values that are
- * set through the sysctl or proc interfaces in Linux.
+    /**
+     * \ingroup socket
+     *
+     * \brief API to create TCP socket instances 
+     *
+     * This abstract class defines the API for TCP sockets.
+     * This class also holds the global default variables used to
+     * initialize newly created sockets, such as values that are
+     * set through the sysctl or proc interfaces in Linux.
 
- * All TCP socket factory implementations must provide an implementation 
- * of CreateSocket
- * below, and should make use of the default values configured below.
- * 
- * \see TcpSocketFactoryImpl
- *
- */
-class TcpSocketFactory : public SocketFactory
-{
-public:
-  /**
-   * Get the type ID.
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+     * All TCP socket factory implementations must provide an implementation 
+     * of CreateSocket
+     * below, and should make use of the default values configured below.
+     * 
+     * \see TcpSocketFactoryImpl
+     *
+     */
+    class TcpSocketFactory : public SocketFactory {
+    public:
+        /**
+         * Get the type ID.
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-};
+    };
 
 } // namespace ns3
 

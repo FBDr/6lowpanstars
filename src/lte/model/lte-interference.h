@@ -34,127 +34,124 @@ namespace ns3 {
 
 
 
-class LteChunkProcessor;
+    class LteChunkProcessor;
+
+    /**
+     * This class implements a gaussian interference model, i.e., all
+     * incoming signals are added to the total interference.
+     *
+     */
+    class LteInterference : public Object {
+    public:
+        LteInterference();
+        virtual ~LteInterference();
+
+        // inherited from Object
+        static TypeId GetTypeId(void);
+        virtual void DoDispose();
+
+        /**
+         * Add a LteChunkProcessor that will use the time-vs-frequency SINR
+         * calculated by this LteInterference instance. Note that all the
+         * added LteChunkProcessors will work in parallel.
+         *
+         * @param p
+         */
+        void AddSinrChunkProcessor(Ptr<LteChunkProcessor> p);
+
+        /**
+         * Add a LteChunkProcessor that will use the time-vs-frequency
+         *  interference calculated by this LteInterference instance. Note 
+         *  that all the added LteChunkProcessors will work in parallel.
+         *
+         * @param p
+         */
+        void AddInterferenceChunkProcessor(Ptr<LteChunkProcessor> p);
+
+        /**
+         * Add a LteChunkProcessor that will use the time-vs-frequency
+         *  power calculated by this LteInterference instance. Note
+         *  that all the added LteChunkProcessors will work in parallel.
+         *
+         * @param p
+         */
+        void AddRsPowerChunkProcessor(Ptr<LteChunkProcessor> p);
+
+        /**
+         * notify that the PHY is starting a RX attempt
+         *
+         * @param rxPsd the power spectral density of the signal being RX
+         */
+        void StartRx(Ptr<const SpectrumValue> rxPsd);
+
+
+        /**
+         * notify that the RX attempt has ended. The receiving PHY must call
+         * this method when RX ends or RX is aborted.
+         *
+         */
+        void EndRx();
+
+
+        /**
+         * notify that a new signal is being perceived in the medium. This
+         * method is to be called for all incoming signal, regardless of
+         * wether they're useful signals or interferers.
+         *
+         * @param spd the power spectral density of the new signal
+         * @param duration the duration of the new signal
+         */
+        void AddSignal(Ptr<const SpectrumValue> spd, const Time duration);
+
+
+        /**
+         *
+         * @param noisePsd the Noise Power Spectral Density in power units
+         * (Watt, Pascal...) per Hz.
+         */
+        void SetNoisePowerSpectralDensity(Ptr<const SpectrumValue> noisePsd);
+
+    private:
+        void ConditionallyEvaluateChunk();
+        void DoAddSignal(Ptr<const SpectrumValue> spd);
+        void DoSubtractSignal(Ptr<const SpectrumValue> spd, uint32_t signalId);
 
 
 
-/**
- * This class implements a gaussian interference model, i.e., all
- * incoming signals are added to the total interference.
- *
- */
-class LteInterference : public Object
-{
-public:
-  LteInterference ();
-  virtual ~LteInterference ();
+        bool m_receiving;
 
-  // inherited from Object
-  static TypeId GetTypeId (void);
-  virtual void DoDispose ();
-
-  /**
-   * Add a LteChunkProcessor that will use the time-vs-frequency SINR
-   * calculated by this LteInterference instance. Note that all the
-   * added LteChunkProcessors will work in parallel.
-   *
-   * @param p
-   */
-  void AddSinrChunkProcessor (Ptr<LteChunkProcessor> p);
-
-  /**
-   * Add a LteChunkProcessor that will use the time-vs-frequency
-   *  interference calculated by this LteInterference instance. Note 
-   *  that all the added LteChunkProcessors will work in parallel.
-   *
-   * @param p
-   */
-  void AddInterferenceChunkProcessor (Ptr<LteChunkProcessor> p);
-
-  /**
-   * Add a LteChunkProcessor that will use the time-vs-frequency
-   *  power calculated by this LteInterference instance. Note
-   *  that all the added LteChunkProcessors will work in parallel.
-   *
-   * @param p
-   */
-  void AddRsPowerChunkProcessor (Ptr<LteChunkProcessor> p);
-
-  /**
-   * notify that the PHY is starting a RX attempt
-   *
-   * @param rxPsd the power spectral density of the signal being RX
-   */
-  void StartRx (Ptr<const SpectrumValue> rxPsd);
-
-
-  /**
-   * notify that the RX attempt has ended. The receiving PHY must call
-   * this method when RX ends or RX is aborted.
-   *
-   */
-  void EndRx ();
-
-
-  /**
-   * notify that a new signal is being perceived in the medium. This
-   * method is to be called for all incoming signal, regardless of
-   * wether they're useful signals or interferers.
-   *
-   * @param spd the power spectral density of the new signal
-   * @param duration the duration of the new signal
-   */
-  void AddSignal (Ptr<const SpectrumValue> spd, const Time duration);
-
-
-  /**
-   *
-   * @param noisePsd the Noise Power Spectral Density in power units
-   * (Watt, Pascal...) per Hz.
-   */
-  void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
-
-private:
-  void ConditionallyEvaluateChunk ();
-  void DoAddSignal  (Ptr<const SpectrumValue> spd);
-  void DoSubtractSignal  (Ptr<const SpectrumValue> spd, uint32_t signalId);
-
-
-
-  bool m_receiving;
-
-  Ptr<SpectrumValue> m_rxSignal; /**< stores the power spectral density of
+        Ptr<SpectrumValue> m_rxSignal; /**< stores the power spectral density of
                                   * the signal whose RX is being
                                   * attempted
                                   */
 
-  Ptr<SpectrumValue> m_allSignals; /**< stores the spectral
+        Ptr<SpectrumValue> m_allSignals; /**< stores the spectral
                                     * power density of the sum of incoming signals;
                                     * does not include noise, includes the SPD of the signal being RX
                                     */
 
-  Ptr<const SpectrumValue> m_noise;
+        Ptr<const SpectrumValue> m_noise;
 
-  Time m_lastChangeTime;     /**< the time of the last change in
+        Time m_lastChangeTime; /**< the time of the last change in
                                 m_TotalPower */
 
-  uint32_t m_lastSignalId;
-  uint32_t m_lastSignalIdBeforeReset;
+        uint32_t m_lastSignalId;
+        uint32_t m_lastSignalIdBeforeReset;
 
-  /** all the processor instances that need to be notified whenever
-  a new interference chunk is calculated */
-  std::list<Ptr<LteChunkProcessor> > m_rsPowerChunkProcessorList;
+        /** all the processor instances that need to be notified whenever
+        a new interference chunk is calculated */
+        std::list<Ptr<LteChunkProcessor> > m_rsPowerChunkProcessorList;
 
-  /** all the processor instances that need to be notified whenever
-      a new SINR chunk is calculated */
-  std::list<Ptr<LteChunkProcessor> > m_sinrChunkProcessorList;
+        /** all the processor instances that need to be notified whenever
+            a new SINR chunk is calculated */
+        std::list<Ptr<LteChunkProcessor> > m_sinrChunkProcessorList;
 
-  /** all the processor instances that need to be notified whenever
-      a new interference chunk is calculated */
-  std::list<Ptr<LteChunkProcessor> > m_interfChunkProcessorList;
+        /** all the processor instances that need to be notified whenever
+            a new interference chunk is calculated */
+        std::list<Ptr<LteChunkProcessor> > m_interfChunkProcessorList;
 
 
-};
+    };
 
 
 

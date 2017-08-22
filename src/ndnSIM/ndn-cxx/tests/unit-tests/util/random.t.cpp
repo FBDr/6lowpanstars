@@ -28,198 +28,183 @@
 #include <cmath>
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_AUTO_TEST_SUITE(TestRandom)
+        BOOST_AUTO_TEST_SUITE(Util)
+        BOOST_AUTO_TEST_SUITE(TestRandom)
 
-class PseudoRandomWord32
-{
-public:
-  static uint32_t
-  generate()
-  {
-    return random::generateWord32();
-  }
-};
+        class PseudoRandomWord32 {
+        public:
 
-class PseudoRandomWord64
-{
-public:
-  static uint64_t
-  generate()
-  {
-    return random::generateWord64();
-  }
-};
+            static uint32_t
+            generate() {
+                return random::generateWord32();
+            }
+        };
 
-class SecureRandomWord32
-{
-public:
-  static uint32_t
-  generate()
-  {
-    return random::generateSecureWord32();
-  }
-};
+        class PseudoRandomWord64 {
+        public:
 
-class SecureRandomWord64
-{
-public:
-  static uint64_t
-  generate()
-  {
-    return random::generateSecureWord64();
-  }
-};
+            static uint64_t
+            generate() {
+                return random::generateWord64();
+            }
+        };
 
-typedef boost::mpl::vector<PseudoRandomWord32,
-                           PseudoRandomWord64,
-                           SecureRandomWord32,
-                           SecureRandomWord64> RandomGenerators;
+        class SecureRandomWord32 {
+        public:
 
+            static uint32_t
+            generate() {
+                return random::generateSecureWord32();
+            }
+        };
 
-static double
-getDeviation(const std::vector<uint32_t>& counts, size_t size)
-{
-  // Kolmogorov-Smirnov Goodness-of-Fit Test
-  // http://www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
+        class SecureRandomWord64 {
+        public:
 
-  std::vector<double> edf(counts.size(), 0.0);
-  double probability = 0.0;
-  for (size_t i = 0; i < counts.size(); i++) {
-    probability += 1.0 * counts[i] / size;
-    edf[i] = probability;
-  }
+            static uint64_t
+            generate() {
+                return random::generateSecureWord64();
+            }
+        };
 
-  double t = 0.0;
-  for (size_t i = 0; i < counts.size(); i++) {
-    t = std::max(t, std::abs(edf[i] - (i * 1.0 / counts.size())));
-  }
+        typedef boost::mpl::vector<PseudoRandomWord32,
+        PseudoRandomWord64,
+        SecureRandomWord32,
+        SecureRandomWord64> RandomGenerators;
 
-  return t;
-}
+        static double
+        getDeviation(const std::vector<uint32_t>& counts, size_t size) {
+            // Kolmogorov-Smirnov Goodness-of-Fit Test
+            // http://www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
 
+            std::vector<double> edf(counts.size(), 0.0);
+            double probability = 0.0;
+            for (size_t i = 0; i < counts.size(); i++) {
+                probability += 1.0 * counts[i] / size;
+                edf[i] = probability;
+            }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(GoodnessOfFit, RandomGenerator, RandomGenerators)
-{
-  const size_t MAX_BINS = 32;
-  const uint32_t MAX_ITERATIONS = 35;
+            double t = 0.0;
+            for (size_t i = 0; i < counts.size(); i++) {
+                t = std::max(t, std::abs(edf[i] - (i * 1.0 / counts.size())));
+            }
 
-  std::vector<uint32_t> counts(MAX_BINS, 0);
+            return t;
+        }
 
-  for (uint32_t i = 0; i < MAX_ITERATIONS; i++) {
-    counts[RandomGenerator::generate() % MAX_BINS]++;
-  }
+        BOOST_AUTO_TEST_CASE_TEMPLATE(GoodnessOfFit, RandomGenerator, RandomGenerators) {
+            const size_t MAX_BINS = 32;
+            const uint32_t MAX_ITERATIONS = 35;
 
-  // Check if it is uniform distribution with confidence 0.95
-  // http://dlc.erieri.com/onlinetextbook/index.cfm?fuseaction=textbook.appendix&FileName=Table7
-  BOOST_WARN_LE(getDeviation(counts, MAX_ITERATIONS), 0.230);
-}
+            std::vector<uint32_t> counts(MAX_BINS, 0);
 
-BOOST_AUTO_TEST_CASE(GenerateRandomBytes)
-{
-  // Kolmogorov-Smirnov Goodness-of-Fit Test
-  // http://www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
+            for (uint32_t i = 0; i < MAX_ITERATIONS; i++) {
+                counts[RandomGenerator::generate() % MAX_BINS]++;
+            }
 
-  uint8_t buf[1024] = {0};
-  random::generateSecureBytes(buf, sizeof(buf));
+            // Check if it is uniform distribution with confidence 0.95
+            // http://dlc.erieri.com/onlinetextbook/index.cfm?fuseaction=textbook.appendix&FileName=Table7
+            BOOST_WARN_LE(getDeviation(counts, MAX_ITERATIONS), 0.230);
+        }
 
-  std::vector<uint32_t> counts(256, 0);
+        BOOST_AUTO_TEST_CASE(GenerateRandomBytes) {
+            // Kolmogorov-Smirnov Goodness-of-Fit Test
+            // http://www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
 
-  for (size_t i = 0; i < sizeof(buf); i++) {
-    counts[buf[i]]++;
-  }
+            uint8_t buf[1024] = {0};
+            random::generateSecureBytes(buf, sizeof (buf));
 
-  // Check if it is uniform distribution with confidence 0.95
-  // http://dlc.erieri.com/onlinetextbook/index.cfm?fuseaction=textbook.appendix&FileName=Table7
-  BOOST_WARN_LE(getDeviation(counts, sizeof(buf)), 0.230);
-}
+            std::vector<uint32_t> counts(256, 0);
 
-// This fixture uses OpenSSL routines to set a dummy random generator that always fails
-class FailRandMethodFixture
-{
-public:
-  FailRandMethodFixture()
-    : m_dummyRandMethod{&FailRandMethodFixture::seed,
-                        &FailRandMethodFixture::bytes,
-                        &FailRandMethodFixture::cleanup,
-                        &FailRandMethodFixture::add,
-                        &FailRandMethodFixture::pseudorand,
-                        &FailRandMethodFixture::status}
-  {
-    m_origRandMethod = RAND_get_rand_method();
-    RAND_set_rand_method(&m_dummyRandMethod);
-  }
+            for (size_t i = 0; i < sizeof (buf); i++) {
+                counts[buf[i]]++;
+            }
 
-  ~FailRandMethodFixture()
-  {
-    RAND_set_rand_method(m_origRandMethod);
-  }
+            // Check if it is uniform distribution with confidence 0.95
+            // http://dlc.erieri.com/onlinetextbook/index.cfm?fuseaction=textbook.appendix&FileName=Table7
+            BOOST_WARN_LE(getDeviation(counts, sizeof (buf)), 0.230);
+        }
 
-private: // RAND_METHOD callbacks
+        // This fixture uses OpenSSL routines to set a dummy random generator that always fails
+
+        class FailRandMethodFixture {
+        public:
+            FailRandMethodFixture()
+            : m_dummyRandMethod{&FailRandMethodFixture::seed,
+                &FailRandMethodFixture::bytes,
+                &FailRandMethodFixture::cleanup,
+                &FailRandMethodFixture::add,
+                &FailRandMethodFixture::pseudorand,
+                &FailRandMethodFixture::status}
+            {
+                m_origRandMethod = RAND_get_rand_method();
+                RAND_set_rand_method(&m_dummyRandMethod);
+            }
+
+            ~FailRandMethodFixture() {
+                RAND_set_rand_method(m_origRandMethod);
+            }
+
+        private: // RAND_METHOD callbacks
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  static void
-  seed(const void* buf, int num)
-  {
-  }
+
+            static void
+            seed(const void* buf, int num) {
+            }
 #else
-  static int
-  seed(const void* buf, int num)
-  {
-    return 0;
-  }
+
+            static int
+            seed(const void* buf, int num) {
+                return 0;
+            }
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
 
-  static int
-  bytes(unsigned char *buf, int num)
-  {
-    return 0;
-  }
+            static int
+            bytes(unsigned char *buf, int num) {
+                return 0;
+            }
 
-  static void
-  cleanup()
-  {
-  }
+            static void
+            cleanup() {
+            }
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  static void
-  add(const void *buf, int num, double entropy)
-  {
-  }
+
+            static void
+            add(const void *buf, int num, double entropy) {
+            }
 #else
-  static int
-  add(const void *buf, int num, double entropy)
-  {
-    return 0;
-  }
+
+            static int
+            add(const void *buf, int num, double entropy) {
+                return 0;
+            }
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
 
-  static int
-  pseudorand(unsigned char *buf, int num)
-  {
-    return 0;
-  }
+            static int
+            pseudorand(unsigned char *buf, int num) {
+                return 0;
+            }
 
-  static int
-  status()
-  {
-    return 0;
-  }
+            static int
+            status() {
+                return 0;
+            }
 
-private:
-  const RAND_METHOD* m_origRandMethod;
-  RAND_METHOD m_dummyRandMethod;
-};
+        private:
+            const RAND_METHOD* m_origRandMethod;
+            RAND_METHOD m_dummyRandMethod;
+        };
 
-BOOST_FIXTURE_TEST_CASE(Error, FailRandMethodFixture)
-{
-  uint8_t buf[1024] = {0};
-  BOOST_CHECK_THROW(random::generateSecureBytes(buf, sizeof(buf)), std::runtime_error);
-}
+        BOOST_FIXTURE_TEST_CASE(Error, FailRandMethodFixture) {
+            uint8_t buf[1024] = {0};
+            BOOST_CHECK_THROW(random::generateSecureBytes(buf, sizeof (buf)), std::runtime_error);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRandom
-BOOST_AUTO_TEST_SUITE_END() // Util
+        BOOST_AUTO_TEST_SUITE_END() // TestRandom
+        BOOST_AUTO_TEST_SUITE_END() // Util
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

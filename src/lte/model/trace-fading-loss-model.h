@@ -33,100 +33,98 @@
 namespace ns3 {
 
 
-class MobilityModel;
+    class MobilityModel;
+
+    /**
+     * \ingroup lte
+     *
+     * \brief fading loss model based on precalculated fading traces
+     */
+    class TraceFadingLossModel : public SpectrumPropagationLossModel {
+    public:
+        TraceFadingLossModel();
+        virtual ~TraceFadingLossModel();
+
+        static TypeId GetTypeId();
+
+        virtual void DoInitialize(void);
+
+        /**
+         * \brief The couple of mobility mnode that form a fading channel realization
+         */
+        typedef std::pair<Ptr<const MobilityModel>, Ptr<const MobilityModel> > ChannelRealizationId_t;
+
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         * \return the number of stream indices assigned by this model
+         */
+        int64_t AssignStreams(int64_t stream);
 
 
-/**
- * \ingroup lte
- *
- * \brief fading loss model based on precalculated fading traces
- */
-class TraceFadingLossModel : public SpectrumPropagationLossModel
-{
-public:
-  TraceFadingLossModel ();
-  virtual ~TraceFadingLossModel ();
+    private:
+        /**
+         * \param txPsd set of values vs frequency representing the
+         *              transmission power. See SpectrumChannel for details.
+         * \param a sender mobility
+         * \param b receiver mobility
+         * \return set of values vs frequency representing the received
+         *         power in the same units used for the txPsd parameter.
+         */
+        Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+                Ptr<const MobilityModel> a,
+                Ptr<const MobilityModel> b) const;
 
-  static TypeId GetTypeId ();
-  
-  virtual void DoInitialize (void);
+        /**
+         * \brief Get the value for a particular sub channel and a given speed
+         * \param subChannel the sub channel for which a value is requested
+         * \param speed the relative speed of the two devices
+         * \return the loss for a particular sub channel
+         */
+        double GetValue(int subChannel, double speed);
 
-  /**
-   * \brief The couple of mobility mnode that form a fading channel realization
-   */
-  typedef std::pair<Ptr<const MobilityModel>, Ptr<const MobilityModel> > ChannelRealizationId_t;
+        void SetTraceFileName(std::string fileName);
+        void SetTraceLength(Time t);
 
- /**
-  * Assign a fixed random variable stream number to the random variables
-  * used by this model.  Return the number of streams (possibly zero) that
-  * have been assigned.
-  *
-  * \param stream first stream index to use
-  * \return the number of stream indices assigned by this model
-  */
-  int64_t AssignStreams (int64_t stream);
-
-  
-private:
-  /**
-   * \param txPsd set of values vs frequency representing the
-   *              transmission power. See SpectrumChannel for details.
-   * \param a sender mobility
-   * \param b receiver mobility
-   * \return set of values vs frequency representing the received
-   *         power in the same units used for the txPsd parameter.
-   */
-  Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                   Ptr<const MobilityModel> a,
-                                                   Ptr<const MobilityModel> b) const;
-                                                   
-  /**
-  * \brief Get the value for a particular sub channel and a given speed
-  * \param subChannel the sub channel for which a value is requested
-  * \param speed the relative speed of the two devices
-  * \return the loss for a particular sub channel
-  */
-  double GetValue (int subChannel, double speed);
-  
-  void SetTraceFileName (std::string fileName);
-  void SetTraceLength (Time t);
-  
-  void LoadTrace ();
+        void LoadTrace();
 
 
-   
-  mutable std::map <ChannelRealizationId_t, int > m_windowOffsetsMap;
-  
-  mutable std::map <ChannelRealizationId_t, Ptr<UniformRandomVariable> > m_startVariableMap;
-  
-  /**
-   * Vector with fading samples in time domain (for a fixed RB)
-   */
-  typedef std::vector<double> FadingTraceSample;
-  /**
-   * Vector collecting the time fading traces in the frequency domain (per RB)
-   */
-  typedef std::vector<FadingTraceSample> FadingTrace;
+
+        mutable std::map <ChannelRealizationId_t, int > m_windowOffsetsMap;
+
+        mutable std::map <ChannelRealizationId_t, Ptr<UniformRandomVariable> > m_startVariableMap;
+
+        /**
+         * Vector with fading samples in time domain (for a fixed RB)
+         */
+        typedef std::vector<double> FadingTraceSample;
+        /**
+         * Vector collecting the time fading traces in the frequency domain (per RB)
+         */
+        typedef std::vector<FadingTraceSample> FadingTrace;
 
 
-  
-  std::string m_traceFile;
-  
-  FadingTrace m_fadingTrace;
 
-  
-  Time m_traceLength;
-  uint32_t m_samplesNum;
-  Time m_windowSize;
-  uint8_t m_rbNum;
-  mutable Time m_lastWindowUpdate;
-  uint8_t m_timeGranularity;
-  mutable uint64_t m_currentStream;
-  mutable uint64_t m_lastStream;
-  uint64_t m_streamSetSize;
-  mutable bool m_streamsAssigned;
-  
-};
+        std::string m_traceFile;
+
+        FadingTrace m_fadingTrace;
+
+
+        Time m_traceLength;
+        uint32_t m_samplesNum;
+        Time m_windowSize;
+        uint8_t m_rbNum;
+        mutable Time m_lastWindowUpdate;
+        uint8_t m_timeGranularity;
+        mutable uint64_t m_currentStream;
+        mutable uint64_t m_lastStream;
+        uint64_t m_streamSetSize;
+        mutable bool m_streamsAssigned;
+
+    };
 
 
 

@@ -22,166 +22,147 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-Error::Error(size_t index, const std::string& what)
-  : std::runtime_error("Error in module " + std::to_string(index) + ": " + what)
-  , m_index(index)
-{
-}
+            Error::Error(size_t index, const std::string& what)
+            : std::runtime_error("Error in module " + std::to_string(index) + ": " + what)
+            , m_index(index) {
+            }
 
-Downstream::Downstream()
-  : m_isEnd(false)
-  , m_index(0)
-{
-}
+            Downstream::Downstream()
+            : m_isEnd(false)
+            , m_index(0) {
+            }
 
-size_t
-Downstream::write(const uint8_t* buf, size_t size)
-{
-  if (m_isEnd)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Module is closed, no more input"));
+            size_t
+            Downstream::write(const uint8_t* buf, size_t size) {
+                if (m_isEnd)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Module is closed, no more input"));
 
-  size_t nBytesWritten = doWrite(buf, size);
-  BOOST_ASSERT(nBytesWritten <= size);
-  return nBytesWritten;
-}
+                size_t nBytesWritten = doWrite(buf, size);
+                BOOST_ASSERT(nBytesWritten <= size);
+                return nBytesWritten;
+            }
 
-void
-Downstream::end()
-{
-  if (m_isEnd)
-    return;
+            void
+            Downstream::end() {
+                if (m_isEnd)
+                    return;
 
-  m_isEnd = true;
-  return doEnd();
-}
+                m_isEnd = true;
+                return doEnd();
+            }
 
-Upstream::Upstream()
-  : m_next(nullptr)
-{
-}
+            Upstream::Upstream()
+            : m_next(nullptr) {
+            }
 
-void
-Upstream::appendChain(unique_ptr<Downstream> tail)
-{
-  if (m_next == nullptr) {
-    m_next = std::move(tail);
-  }
-  else {
-    BOOST_ASSERT(dynamic_cast<Transform*>(m_next.get()) != nullptr);
-    static_cast<Transform*>(m_next.get())->appendChain(std::move(tail));
-  }
-}
+            void
+            Upstream::appendChain(unique_ptr<Downstream> tail) {
+                if (m_next == nullptr) {
+                    m_next = std::move(tail);
+                } else {
+                    BOOST_ASSERT(dynamic_cast<Transform*> (m_next.get()) != nullptr);
+                    static_cast<Transform*> (m_next.get())->appendChain(std::move(tail));
+                }
+            }
 
-Transform::Transform()
-  : m_oBuffer(nullptr)
-  , m_outputOffset(0)
-{
-}
+            Transform::Transform()
+            : m_oBuffer(nullptr)
+            , m_outputOffset(0) {
+            }
 
-void
-Transform::flushOutputBuffer()
-{
-  if (isOutputBufferEmpty())
-    return;
+            void
+            Transform::flushOutputBuffer() {
+                if (isOutputBufferEmpty())
+                    return;
 
-  size_t nWritten = m_next->write(&(*m_oBuffer)[m_outputOffset],
-                                  m_oBuffer->size() - m_outputOffset);
-  m_outputOffset += nWritten;
-}
+                size_t nWritten = m_next->write(&(*m_oBuffer)[m_outputOffset],
+                        m_oBuffer->size() - m_outputOffset);
+                m_outputOffset += nWritten;
+            }
 
-void
-Transform::flushAllOutput()
-{
-  while (!isOutputBufferEmpty()) {
-    flushOutputBuffer();
-  }
-}
+            void
+            Transform::flushAllOutput() {
+                while (!isOutputBufferEmpty()) {
+                    flushOutputBuffer();
+                }
+            }
 
-void
-Transform::setOutputBuffer(unique_ptr<OBuffer> buffer)
-{
-  BOOST_ASSERT(isOutputBufferEmpty());
-  m_oBuffer = std::move(buffer);
-  m_outputOffset = 0;
-}
+            void
+            Transform::setOutputBuffer(unique_ptr<OBuffer> buffer) {
+                BOOST_ASSERT(isOutputBufferEmpty());
+                m_oBuffer = std::move(buffer);
+                m_outputOffset = 0;
+            }
 
-bool
-Transform::isOutputBufferEmpty() const
-{
-  return (m_oBuffer == nullptr || m_oBuffer->size() == m_outputOffset);
-}
+            bool
+            Transform::isOutputBufferEmpty() const {
+                return (m_oBuffer == nullptr || m_oBuffer->size() == m_outputOffset);
+            }
 
-size_t
-Transform::doWrite(const uint8_t* data, size_t dataLen)
-{
-  flushOutputBuffer();
-  if (!isOutputBufferEmpty())
-    return 0;
+            size_t
+            Transform::doWrite(const uint8_t* data, size_t dataLen) {
+                flushOutputBuffer();
+                if (!isOutputBufferEmpty())
+                    return 0;
 
-  preTransform();
-  flushOutputBuffer();
-  if (!isOutputBufferEmpty())
-    return 0;
+                preTransform();
+                flushOutputBuffer();
+                if (!isOutputBufferEmpty())
+                    return 0;
 
-  size_t nConverted = convert(data, dataLen);
+                size_t nConverted = convert(data, dataLen);
 
-  flushOutputBuffer();
+                flushOutputBuffer();
 
-  return nConverted;
-}
+                return nConverted;
+            }
 
-void
-Transform::doEnd()
-{
-  finalize();
-  m_next->end();
-}
+            void
+            Transform::doEnd() {
+                finalize();
+                m_next->end();
+            }
 
-void
-Transform::preTransform()
-{
-}
+            void
+            Transform::preTransform() {
+            }
 
-void
-Transform::finalize()
-{
-  flushAllOutput();
-}
+            void
+            Transform::finalize() {
+                flushAllOutput();
+            }
 
-Source::Source()
-  : m_nModules(1) // source per se is counted as one module
-{
-}
+            Source::Source()
+            : m_nModules(1) // source per se is counted as one module
+            {
+            }
 
-void
-Source::pump()
-{
-  doPump();
-}
+            void
+            Source::pump() {
+                doPump();
+            }
 
-Source&
-Source::operator>>(unique_ptr<Transform> transform)
-{
-  transform->setIndex(m_nModules);
-  m_nModules++;
-  this->appendChain(std::move(transform));
+            Source&
+            Source::operator>>(unique_ptr<Transform> transform) {
+                transform->setIndex(m_nModules);
+                m_nModules++;
+                this->appendChain(std::move(transform));
 
-  return *this;
-}
+                return *this;
+            }
 
-void
-Source::operator>>(unique_ptr<Sink> sink)
-{
-  sink->setIndex(m_nModules);
-  m_nModules++;
-  this->appendChain(std::move(sink));
+            void
+            Source::operator>>(unique_ptr<Sink> sink) {
+                sink->setIndex(m_nModules);
+                m_nModules++;
+                this->appendChain(std::move(sink));
 
-  this->pump();
-}
+                this->pump();
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

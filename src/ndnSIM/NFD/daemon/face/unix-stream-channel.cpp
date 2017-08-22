@@ -33,112 +33,105 @@
 
 namespace nfd {
 
-NFD_LOG_INIT("UnixStreamChannel");
+    NFD_LOG_INIT("UnixStreamChannel");
 
-UnixStreamChannel::UnixStreamChannel(const unix_stream::Endpoint& endpoint)
-  : m_endpoint(endpoint)
-  , m_acceptor(getGlobalIoService())
-  , m_socket(getGlobalIoService())
-{
-  setUri(FaceUri(m_endpoint));
-}
-
-UnixStreamChannel::~UnixStreamChannel()
-{
-  if (isListening()) {
-    // use the non-throwing variants during destruction
-    // and ignore any errors
-    boost::system::error_code error;
-    m_acceptor.close(error);
-    NFD_LOG_DEBUG("[" << m_endpoint << "] Removing socket file");
-    boost::filesystem::remove(m_endpoint.path(), error);
-  }
-}
-
-void
-UnixStreamChannel::listen(const FaceCreatedCallback& onFaceCreated,
-                          const FaceCreationFailedCallback& onAcceptFailed,
-                          int backlog/* = acceptor::max_connections*/)
-{
-  if (isListening()) {
-    NFD_LOG_WARN("[" << m_endpoint << "] Already listening");
-    return;
-  }
-
-  namespace fs = boost::filesystem;
-
-  fs::path socketPath(m_endpoint.path());
-  fs::file_type type = fs::symlink_status(socketPath).type();
-
-  if (type == fs::socket_file) {
-    boost::system::error_code error;
-    boost::asio::local::stream_protocol::socket socket(getGlobalIoService());
-    socket.connect(m_endpoint, error);
-    NFD_LOG_TRACE("[" << m_endpoint << "] connect() on existing socket file returned: "
-                  + error.message());
-    if (!error) {
-      // someone answered, leave the socket alone
-      BOOST_THROW_EXCEPTION(Error("Socket file at " + m_endpoint.path()
-                                  + " belongs to another NFD process"));
+    UnixStreamChannel::UnixStreamChannel(const unix_stream::Endpoint& endpoint)
+    : m_endpoint(endpoint)
+    , m_acceptor(getGlobalIoService())
+    , m_socket(getGlobalIoService()) {
+        setUri(FaceUri(m_endpoint));
     }
-    else if (error == boost::asio::error::connection_refused ||
-             error == boost::asio::error::timed_out) {
-      // no one is listening on the remote side,
-      // we can safely remove the stale socket
-      NFD_LOG_DEBUG("[" << m_endpoint << "] Removing stale socket file");
-      fs::remove(socketPath);
+
+    UnixStreamChannel::~UnixStreamChannel() {
+        if (isListening()) {
+            // use the non-throwing variants during destruction
+            // and ignore any errors
+            boost::system::error_code error;
+            m_acceptor.close(error);
+            NFD_LOG_DEBUG("[" << m_endpoint << "] Removing socket file");
+            boost::filesystem::remove(m_endpoint.path(), error);
+        }
     }
-  }
-  else if (type != fs::file_not_found) {
-    BOOST_THROW_EXCEPTION(Error(m_endpoint.path() + " already exists and is not a socket file"));
-  }
 
-  m_acceptor.open();
-  m_acceptor.bind(m_endpoint);
-  m_acceptor.listen(backlog);
+    void
+    UnixStreamChannel::listen(const FaceCreatedCallback& onFaceCreated,
+            const FaceCreationFailedCallback& onAcceptFailed,
+            int backlog/* = acceptor::max_connections*/) {
+        if (isListening()) {
+            NFD_LOG_WARN("[" << m_endpoint << "] Already listening");
+            return;
+        }
 
-  if (::chmod(m_endpoint.path().c_str(), 0666) < 0) {
-    BOOST_THROW_EXCEPTION(Error("chmod(" + m_endpoint.path() + ") failed: " +
-                                std::strerror(errno)));
-  }
+        namespace fs = boost::filesystem;
 
-  // start accepting connections
-  accept(onFaceCreated, onAcceptFailed);
-}
+        fs::path socketPath(m_endpoint.path());
+        fs::file_type type = fs::symlink_status(socketPath).type();
 
-void
-UnixStreamChannel::accept(const FaceCreatedCallback& onFaceCreated,
-                          const FaceCreationFailedCallback& onAcceptFailed)
-{
-  m_acceptor.async_accept(m_socket, bind(&UnixStreamChannel::handleAccept, this,
-                                         boost::asio::placeholders::error,
-                                         onFaceCreated, onAcceptFailed));
-}
+        if (type == fs::socket_file) {
+            boost::system::error_code error;
+            boost::asio::local::stream_protocol::socket socket(getGlobalIoService());
+            socket.connect(m_endpoint, error);
+            NFD_LOG_TRACE("[" << m_endpoint << "] connect() on existing socket file returned: "
+                    + error.message());
+            if (!error) {
+                // someone answered, leave the socket alone
+                BOOST_THROW_EXCEPTION(Error("Socket file at " + m_endpoint.path()
+                        + " belongs to another NFD process"));
+            } else if (error == boost::asio::error::connection_refused ||
+                    error == boost::asio::error::timed_out) {
+                // no one is listening on the remote side,
+                // we can safely remove the stale socket
+                NFD_LOG_DEBUG("[" << m_endpoint << "] Removing stale socket file");
+                fs::remove(socketPath);
+            }
+        } else if (type != fs::file_not_found) {
+            BOOST_THROW_EXCEPTION(Error(m_endpoint.path() + " already exists and is not a socket file"));
+        }
 
-void
-UnixStreamChannel::handleAccept(const boost::system::error_code& error,
-                                const FaceCreatedCallback& onFaceCreated,
-                                const FaceCreationFailedCallback& onAcceptFailed)
-{
-  if (error) {
-    if (error == boost::asio::error::operation_aborted) // when the socket is closed by someone
-      return;
+        m_acceptor.open();
+        m_acceptor.bind(m_endpoint);
+        m_acceptor.listen(backlog);
 
-    NFD_LOG_DEBUG("[" << m_endpoint << "] Accept failed: " << error.message());
-    if (onAcceptFailed)
-      onAcceptFailed(500, "Accept failed: " + error.message());
-    return;
-  }
+        if (::chmod(m_endpoint.path().c_str(), 0666) < 0) {
+            BOOST_THROW_EXCEPTION(Error("chmod(" + m_endpoint.path() + ") failed: " +
+                    std::strerror(errno)));
+        }
 
-  NFD_LOG_DEBUG("[" << m_endpoint << "] Incoming connection");
+        // start accepting connections
+        accept(onFaceCreated, onAcceptFailed);
+    }
 
-  auto linkService = make_unique<face::GenericLinkService>();
-  auto transport = make_unique<face::UnixStreamTransport>(std::move(m_socket));
-  auto face = make_shared<Face>(std::move(linkService), std::move(transport));
-  onFaceCreated(face);
+    void
+    UnixStreamChannel::accept(const FaceCreatedCallback& onFaceCreated,
+            const FaceCreationFailedCallback& onAcceptFailed) {
+        m_acceptor.async_accept(m_socket, bind(&UnixStreamChannel::handleAccept, this,
+                boost::asio::placeholders::error,
+                onFaceCreated, onAcceptFailed));
+    }
 
-  // prepare accepting the next connection
-  accept(onFaceCreated, onAcceptFailed);
-}
+    void
+    UnixStreamChannel::handleAccept(const boost::system::error_code& error,
+            const FaceCreatedCallback& onFaceCreated,
+            const FaceCreationFailedCallback& onAcceptFailed) {
+        if (error) {
+            if (error == boost::asio::error::operation_aborted) // when the socket is closed by someone
+                return;
+
+            NFD_LOG_DEBUG("[" << m_endpoint << "] Accept failed: " << error.message());
+            if (onAcceptFailed)
+                onAcceptFailed(500, "Accept failed: " + error.message());
+            return;
+        }
+
+        NFD_LOG_DEBUG("[" << m_endpoint << "] Incoming connection");
+
+        auto linkService = make_unique<face::GenericLinkService>();
+        auto transport = make_unique<face::UnixStreamTransport>(std::move(m_socket));
+        auto face = make_shared<Face>(std::move(linkService), std::move(transport));
+        onFaceCreated(face);
+
+        // prepare accepting the next connection
+        accept(onFaceCreated, onAcceptFailed);
+    }
 
 } // namespace nfd

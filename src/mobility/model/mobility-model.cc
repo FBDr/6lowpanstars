@@ -23,95 +23,87 @@
 #include "mobility-model.h"
 #include "ns3/trace-source-accessor.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (MobilityModel);
-
-TypeId 
-MobilityModel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::MobilityModel")
-    .SetParent<Object> ()
-    .SetGroupName ("Mobility")
-    .AddAttribute ("Position", "The current position of the mobility model.",
-                   TypeId::ATTR_SET | TypeId::ATTR_GET,
-                   VectorValue (Vector (0.0, 0.0, 0.0)),
-                   MakeVectorAccessor (&MobilityModel::SetPosition,
-                                       &MobilityModel::GetPosition),
-                   MakeVectorChecker ())
-    .AddAttribute ("Velocity", "The current velocity of the mobility model.",
-                   TypeId::ATTR_GET,
-                   VectorValue (Vector (0.0, 0.0, 0.0)), // ignored initial value.
-                   MakeVectorAccessor (&MobilityModel::GetVelocity),
-                   MakeVectorChecker ())
-    .AddTraceSource ("CourseChange", 
-                     "The value of the position and/or velocity vector changed",
-                     MakeTraceSourceAccessor (&MobilityModel::m_courseChangeTrace),
-                     "ns3::MobilityModel::CourseChangeTracedCallback")
-  ;
-  return tid;
-}
 
-MobilityModel::MobilityModel ()
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(MobilityModel);
 
-MobilityModel::~MobilityModel ()
-{
-}
+    TypeId
+    MobilityModel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::MobilityModel")
+                .SetParent<Object> ()
+                .SetGroupName("Mobility")
+                .AddAttribute("Position", "The current position of the mobility model.",
+                TypeId::ATTR_SET | TypeId::ATTR_GET,
+                VectorValue(Vector(0.0, 0.0, 0.0)),
+                MakeVectorAccessor(&MobilityModel::SetPosition,
+                &MobilityModel::GetPosition),
+                MakeVectorChecker())
+                .AddAttribute("Velocity", "The current velocity of the mobility model.",
+                TypeId::ATTR_GET,
+                VectorValue(Vector(0.0, 0.0, 0.0)), // ignored initial value.
+                MakeVectorAccessor(&MobilityModel::GetVelocity),
+                MakeVectorChecker())
+                .AddTraceSource("CourseChange",
+                "The value of the position and/or velocity vector changed",
+                MakeTraceSourceAccessor(&MobilityModel::m_courseChangeTrace),
+                "ns3::MobilityModel::CourseChangeTracedCallback")
+                ;
+        return tid;
+    }
 
-Vector
-MobilityModel::GetPosition (void) const
-{
-  return DoGetPosition ();
-}
-Vector
-MobilityModel::GetVelocity (void) const
-{
-  return DoGetVelocity ();
-}
+    MobilityModel::MobilityModel() {
+    }
 
-void 
-MobilityModel::SetPosition (const Vector &position)
-{
-  DoSetPosition (position);
-}
+    MobilityModel::~MobilityModel() {
+    }
 
-double 
-MobilityModel::GetDistanceFrom (Ptr<const MobilityModel> other) const
-{
-  Vector oPosition = other->DoGetPosition ();
-  Vector position = DoGetPosition ();
-  return CalculateDistance (position, oPosition);
-}
+    Vector
+    MobilityModel::GetPosition(void) const {
+        return DoGetPosition();
+    }
 
-double
-MobilityModel::GetRelativeSpeed (Ptr<const MobilityModel> other) const
-{
-  double x = GetVelocity().x - other->GetVelocity().x;
-  double y = GetVelocity().y - other->GetVelocity().y;
-  double z = GetVelocity().z - other->GetVelocity().z;
-  return sqrt( (x*x) + (y*y) + (z*z) );
-}
+    Vector
+    MobilityModel::GetVelocity(void) const {
+        return DoGetVelocity();
+    }
 
-void
-MobilityModel::NotifyCourseChange (void) const
-{
-  m_courseChangeTrace (this);
-}
+    void
+    MobilityModel::SetPosition(const Vector & position) {
+        DoSetPosition(position);
+    }
 
-int64_t
-MobilityModel::AssignStreams (int64_t start)
-{
-  return DoAssignStreams (start);
-}
+    double
+    MobilityModel::GetDistanceFrom(Ptr<const MobilityModel> other) const {
+        Vector oPosition = other->DoGetPosition();
+        Vector position = DoGetPosition();
+        return CalculateDistance(position, oPosition);
+    }
 
-// Default implementation does nothing
-int64_t
-MobilityModel::DoAssignStreams (int64_t start)
-{
-  return 0;
-}
+    double
+    MobilityModel::GetRelativeSpeed(Ptr<const MobilityModel> other) const {
+        double x = GetVelocity().x - other->GetVelocity().x;
+        double y = GetVelocity().y - other->GetVelocity().y;
+        double z = GetVelocity().z - other->GetVelocity().z;
+        return sqrt((x * x) + (y * y) + (z * z));
+    }
+
+    void
+    MobilityModel::NotifyCourseChange(void) const {
+        m_courseChangeTrace(this);
+    }
+
+    int64_t
+    MobilityModel::AssignStreams(int64_t start) {
+        return DoAssignStreams(start);
+    }
+
+    // Default implementation does nothing
+
+    int64_t
+    MobilityModel::DoAssignStreams(int64_t start) {
+        return 0;
+    }
 
 
 } // namespace ns3

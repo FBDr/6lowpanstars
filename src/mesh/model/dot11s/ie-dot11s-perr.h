@@ -26,36 +26,36 @@
 #include "ns3/hwmp-protocol.h"
 
 namespace ns3 {
-namespace dot11s {
-/**
- * \ingroup dot11s
- * \brief See 7.3.2.98 of 802.11s draft 2.07
- */
-class IePerr : public WifiInformationElement
-{
-public:
-  IePerr ();
-  ~IePerr ();
-  uint8_t   GetNumOfDest () const;
-  void AddAddressUnit (HwmpProtocol::FailedDestination unit);
-  bool IsFull () const;
-  std::vector<HwmpProtocol::FailedDestination> GetAddressUnitVector () const;
-  void DeleteAddressUnit (Mac48Address address);
-  void ResetPerr ();
+    namespace dot11s {
 
-  // Inherited from WifiInformationElement
-  virtual WifiInformationElementId ElementId () const;
-  virtual void SerializeInformationField (Buffer::Iterator i) const;
-  virtual uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
-  virtual void Print (std::ostream& os) const;
-  virtual uint8_t GetInformationFieldSize () const;
+        /**
+         * \ingroup dot11s
+         * \brief See 7.3.2.98 of 802.11s draft 2.07
+         */
+        class IePerr : public WifiInformationElement {
+        public:
+            IePerr();
+            ~IePerr();
+            uint8_t GetNumOfDest() const;
+            void AddAddressUnit(HwmpProtocol::FailedDestination unit);
+            bool IsFull() const;
+            std::vector<HwmpProtocol::FailedDestination> GetAddressUnitVector() const;
+            void DeleteAddressUnit(Mac48Address address);
+            void ResetPerr();
 
-private:
-  std::vector<HwmpProtocol::FailedDestination> m_addressUnits;
-  friend bool operator== (const IePerr & a, const IePerr & b);
-};
-bool operator== (const IePerr & a, const IePerr & b);
-std::ostream &operator << (std::ostream &os, const IePerr &perr);
-} // namespace dot11s
+            // Inherited from WifiInformationElement
+            virtual WifiInformationElementId ElementId() const;
+            virtual void SerializeInformationField(Buffer::Iterator i) const;
+            virtual uint8_t DeserializeInformationField(Buffer::Iterator start, uint8_t length);
+            virtual void Print(std::ostream& os) const;
+            virtual uint8_t GetInformationFieldSize() const;
+
+        private:
+            std::vector<HwmpProtocol::FailedDestination> m_addressUnits;
+            friend bool operator==(const IePerr & a, const IePerr & b);
+        };
+        bool operator==(const IePerr & a, const IePerr & b);
+        std::ostream &operator<<(std::ostream &os, const IePerr &perr);
+    } // namespace dot11s
 } // namespace ns3
 #endif

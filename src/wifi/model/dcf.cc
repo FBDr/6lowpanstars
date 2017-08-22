@@ -22,34 +22,34 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Dcf");
-
-NS_OBJECT_ENSURE_REGISTERED (Dcf);
-
-TypeId
-Dcf::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Dcf")
-    .SetParent<Object> ()
-    .AddAttribute ("MinCw", "The minimum value of the contention window.",
-                   UintegerValue (15),
-                   MakeUintegerAccessor (&Dcf::SetMinCw,
-                                         &Dcf::GetMinCw),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("MaxCw", "The maximum value of the contention window.",
-                   UintegerValue (1023),
-                   MakeUintegerAccessor (&Dcf::SetMaxCw,
-                                         &Dcf::GetMaxCw),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("Aifsn", "The AIFSN: the default value conforms to simple DCA.",
-                   UintegerValue (2),
-                   MakeUintegerAccessor (&Dcf::SetAifsn,
-                                         &Dcf::GetAifsn),
-                   MakeUintegerChecker<uint32_t> ())
-  ;
-  return tid;
-}
+
+    NS_LOG_COMPONENT_DEFINE("Dcf");
+
+    NS_OBJECT_ENSURE_REGISTERED(Dcf);
+
+    TypeId
+    Dcf::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Dcf")
+                .SetParent<Object> ()
+                .AddAttribute("MinCw", "The minimum value of the contention window.",
+                UintegerValue(15),
+                MakeUintegerAccessor(&Dcf::SetMinCw,
+                &Dcf::GetMinCw),
+                MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("MaxCw", "The maximum value of the contention window.",
+                UintegerValue(1023),
+                MakeUintegerAccessor(&Dcf::SetMaxCw,
+                &Dcf::GetMaxCw),
+                MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("Aifsn", "The AIFSN: the default value conforms to simple DCA.",
+                UintegerValue(2),
+                MakeUintegerAccessor(&Dcf::SetAifsn,
+                &Dcf::GetAifsn),
+                MakeUintegerChecker<uint32_t> ())
+                ;
+        return tid;
+    }
 
 } //namespace ns3

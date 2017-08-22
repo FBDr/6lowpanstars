@@ -67,48 +67,62 @@ std::string ndnsec_helper("\
 ");
 
 int
-main(int argc, char** argv)
-{
-  if (argc < 2)
-    {
-      std::cerr << ndnsec_helper << std::endl;
-      return 1;
-    }
-
-  std::string command(argv[1]);
-
-  try
-    {
-      if (command == "help")              { std::cout << ndnsec_helper << std::endl; }
-      else if (command == "version")      { std::cout << NDN_CXX_VERSION_BUILD_STRING
-                                                      << std::endl; }
-      else if (command == "list")         { return ndnsec_list(argc - 1, argv + 1); }
-      else if (command == "get-default")  { return ndnsec_get_default(argc - 1, argv + 1); }
-      else if (command == "set-default")  { return ndnsec_set_default(argc - 1, argv + 1); }
-      else if (command == "key-gen")      { return ndnsec_key_gen(argc - 1, argv + 1); }
-      else if (command == "dsk-gen")      { return ndnsec_dsk_gen(argc - 1, argv + 1); }
-      else if (command == "sign-req")     { return ndnsec_sign_req(argc - 1, argv + 1); }
-      else if (command == "cert-gen")     { return ndnsec_cert_gen(argc - 1, argv + 1); }
-      else if (command == "cert-revoke")  { return ndnsec_cert_revoke(argc - 1, argv + 1); }
-      else if (command == "cert-dump")    { return ndnsec_cert_dump(argc - 1, argv + 1); }
-      else if (command == "cert-install") { return ndnsec_cert_install(argc - 1, argv + 1); }
-      else if (command == "delete")       { return ndnsec_delete(argc - 1, argv + 1); }
-      else if (command == "export")       { return ndnsec_export(argc - 1, argv + 1); }
-      else if (command == "import")       { return ndnsec_import(argc - 1, argv + 1); }
-      else if (command == "sig-verify")   { return ndnsec_sig_verify(argc - 1, argv + 1); }
-      else if (command == "set-acl")      { return ndnsec_set_acl(argc - 1, argv + 1); }
-      else if (command == "unlock-tpm")   { return ndnsec_unlock_tpm(argc - 1, argv + 1); }
-      else if (command == "op-tool")      { return ndnsec_op_tool(argc - 1, argv + 1); }
-      else {
+main(int argc, char** argv) {
+    if (argc < 2) {
         std::cerr << ndnsec_helper << std::endl;
         return 1;
-      }
-    }
-  catch (const std::runtime_error& e)
-    {
-      std::cerr << "ERROR: " << e.what() << std::endl;
-      return 1;
     }
 
-  return 0;
+    std::string command(argv[1]);
+
+    try {
+        if (command == "help") {
+            std::cout << ndnsec_helper << std::endl;
+        } else if (command == "version") {
+            std::cout << NDN_CXX_VERSION_BUILD_STRING
+                    << std::endl;
+        } else if (command == "list") {
+            return ndnsec_list(argc - 1, argv + 1);
+        } else if (command == "get-default") {
+            return ndnsec_get_default(argc - 1, argv + 1);
+        } else if (command == "set-default") {
+            return ndnsec_set_default(argc - 1, argv + 1);
+        } else if (command == "key-gen") {
+            return ndnsec_key_gen(argc - 1, argv + 1);
+        } else if (command == "dsk-gen") {
+            return ndnsec_dsk_gen(argc - 1, argv + 1);
+        } else if (command == "sign-req") {
+            return ndnsec_sign_req(argc - 1, argv + 1);
+        } else if (command == "cert-gen") {
+            return ndnsec_cert_gen(argc - 1, argv + 1);
+        } else if (command == "cert-revoke") {
+            return ndnsec_cert_revoke(argc - 1, argv + 1);
+        } else if (command == "cert-dump") {
+            return ndnsec_cert_dump(argc - 1, argv + 1);
+        } else if (command == "cert-install") {
+            return ndnsec_cert_install(argc - 1, argv + 1);
+        } else if (command == "delete") {
+            return ndnsec_delete(argc - 1, argv + 1);
+        } else if (command == "export") {
+            return ndnsec_export(argc - 1, argv + 1);
+        } else if (command == "import") {
+            return ndnsec_import(argc - 1, argv + 1);
+        } else if (command == "sig-verify") {
+            return ndnsec_sig_verify(argc - 1, argv + 1);
+        } else if (command == "set-acl") {
+            return ndnsec_set_acl(argc - 1, argv + 1);
+        } else if (command == "unlock-tpm") {
+            return ndnsec_unlock_tpm(argc - 1, argv + 1);
+        } else if (command == "op-tool") {
+            return ndnsec_op_tool(argc - 1, argv + 1);
+        } else {
+            std::cerr << ndnsec_helper << std::endl;
+            return 1;
+        }
+    } catch (const std::runtime_error& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
 }

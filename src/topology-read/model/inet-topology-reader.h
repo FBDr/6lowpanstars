@@ -28,61 +28,61 @@
 namespace ns3 {
 
 
-// ------------------------------------------------------------
-// --------------------------------------------
-/**
- * \ingroup topology
- *
- * \brief Topology file reader (Inet-format type).
- *
- * This class takes an input file in Inet format and extracts all
- * the informations needed to build the topology
- * (i.e.number of nodes, links and links structure).
- * It have been tested with Inet 3.0
- * http://topology.eecs.umich.edu/inet/
- *
- * It might set a link attribute named "Weight", corresponding to
- * the euclidean distance between two nodes, the nodes being randomly positioned.
- */
-class InetTopologyReader : public TopologyReader
-{
-public:
-  InetTopologyReader ();
-  virtual ~InetTopologyReader ();
+    // ------------------------------------------------------------
+    // --------------------------------------------
 
-  /**
-   * \brief Main topology reading function.
-   *
-   * This method opens an input stream and reads the Inet-format file.
-   * From the first line it takes the total number of nodes and links.
-   * Then discards a number of rows equals to total nodes (containing
-   * useless geographical informations).
-   * Then reads until the end of the file (total links number rows) and saves
-   * the structure of every single link in the topology.
-   *
-   * \return The container of the nodes created (or empty container if there was an error)
-   */
-  virtual NodeContainer Read (void);
+    /**
+     * \ingroup topology
+     *
+     * \brief Topology file reader (Inet-format type).
+     *
+     * This class takes an input file in Inet format and extracts all
+     * the informations needed to build the topology
+     * (i.e.number of nodes, links and links structure).
+     * It have been tested with Inet 3.0
+     * http://topology.eecs.umich.edu/inet/
+     *
+     * It might set a link attribute named "Weight", corresponding to
+     * the euclidean distance between two nodes, the nodes being randomly positioned.
+     */
+    class InetTopologyReader : public TopologyReader {
+    public:
+        InetTopologyReader();
+        virtual ~InetTopologyReader();
 
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   */
-  InetTopologyReader (const InetTopologyReader&);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   * \returns
-   */
-  InetTopologyReader& operator= (const InetTopologyReader&);
+        /**
+         * \brief Main topology reading function.
+         *
+         * This method opens an input stream and reads the Inet-format file.
+         * From the first line it takes the total number of nodes and links.
+         * Then discards a number of rows equals to total nodes (containing
+         * useless geographical informations).
+         * Then reads until the end of the file (total links number rows) and saves
+         * the structure of every single link in the topology.
+         *
+         * \return The container of the nodes created (or empty container if there was an error)
+         */
+        virtual NodeContainer Read(void);
 
-  // end class InetTopologyReader
-};
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         */
+        InetTopologyReader(const InetTopologyReader&);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         * \returns
+         */
+        InetTopologyReader& operator=(const InetTopologyReader&);
 
-// end namespace ns3
+        // end class InetTopologyReader
+    };
+
+    // end namespace ns3
 };
 
 

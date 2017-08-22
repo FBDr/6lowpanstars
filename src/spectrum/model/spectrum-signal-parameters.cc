@@ -26,35 +26,32 @@
 #include <ns3/antenna-model.h>
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SpectrumSignalParameters");
-
-SpectrumSignalParameters::SpectrumSignalParameters ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-SpectrumSignalParameters::~SpectrumSignalParameters ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("SpectrumSignalParameters");
 
-SpectrumSignalParameters::SpectrumSignalParameters (const SpectrumSignalParameters& p)
-{
-  NS_LOG_FUNCTION (this << &p);
-  psd = p.psd->Copy ();
-  duration = p.duration;
-  txPhy = p.txPhy;
-  txAntenna = p.txAntenna;
-}
+    SpectrumSignalParameters::SpectrumSignalParameters() {
+        NS_LOG_FUNCTION(this);
+    }
 
-Ptr<SpectrumSignalParameters>
-SpectrumSignalParameters::Copy ()
-{
-  NS_LOG_FUNCTION (this);
-  return Create<SpectrumSignalParameters> (*this);
-}
+    SpectrumSignalParameters::~SpectrumSignalParameters() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    SpectrumSignalParameters::SpectrumSignalParameters(const SpectrumSignalParameters & p) {
+        NS_LOG_FUNCTION(this << &p);
+        psd = p.psd->Copy();
+        duration = p.duration;
+        txPhy = p.txPhy;
+        txAntenna = p.txAntenna;
+    }
+
+    Ptr<SpectrumSignalParameters>
+            SpectrumSignalParameters::Copy() {
+        NS_LOG_FUNCTION(this);
+        return Create<SpectrumSignalParameters> (*this);
+    }
 
 
 

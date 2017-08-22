@@ -13,7 +13,8 @@
 
 #include "g_function_header.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("extra-functions");
 
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {

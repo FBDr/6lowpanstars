@@ -31,38 +31,36 @@
 
 namespace nfd {
 
-namespace name_tree {
-class Entry;
-} // namespace name_tree
+    namespace name_tree {
+        class Entry;
+    } // namespace name_tree
 
-namespace measurements {
+    namespace measurements {
 
-/** \brief represents a Measurements entry
- */
-class Entry : public StrategyInfoHost, noncopyable
-{
-public:
-  explicit
-  Entry(const Name& name);
+        /** \brief represents a Measurements entry
+         */
+        class Entry : public StrategyInfoHost, noncopyable {
+        public:
+            explicit
+            Entry(const Name& name);
 
-  const Name&
-  getName() const
-  {
-    return m_name;
-  }
+            const Name&
+            getName() const {
+                return m_name;
+            }
 
-private:
-  Name m_name;
-  time::steady_clock::TimePoint m_expiry;
-  scheduler::EventId m_cleanup;
+        private:
+            Name m_name;
+            time::steady_clock::TimePoint m_expiry;
+            scheduler::EventId m_cleanup;
 
-  name_tree::Entry* m_nameTreeEntry;
+            name_tree::Entry* m_nameTreeEntry;
 
-  friend class Measurements;
-  friend class name_tree::Entry;
-};
+            friend class Measurements;
+            friend class name_tree::Entry;
+        };
 
-} // namespace measurements
+    } // namespace measurements
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_MEASUREMENTS_ENTRY_HPP

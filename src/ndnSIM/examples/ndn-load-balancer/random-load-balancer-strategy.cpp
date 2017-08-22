@@ -34,68 +34,63 @@
 NFD_LOG_INIT("RandomLoadBalancerStrategy");
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const Name
-  RandomLoadBalancerStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/random-load-balancer");
+        const Name
+        RandomLoadBalancerStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/random-load-balancer");
 
-RandomLoadBalancerStrategy::RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name)
-  : Strategy(forwarder, name)
-{
-}
+        RandomLoadBalancerStrategy::RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name)
+        : Strategy(forwarder, name) {
+        }
 
-RandomLoadBalancerStrategy::~RandomLoadBalancerStrategy()
-{
-}
+        RandomLoadBalancerStrategy::~RandomLoadBalancerStrategy() {
+        }
 
-static bool
-canForwardToNextHop(const Face& inFace, shared_ptr<pit::Entry> pitEntry, const fib::NextHop& nexthop)
-{
-  return !wouldViolateScope(inFace, pitEntry->getInterest(), nexthop.getFace()) &&
-    canForwardToLegacy(*pitEntry, nexthop.getFace());
-}
+        static bool
+        canForwardToNextHop(const Face& inFace, shared_ptr<pit::Entry> pitEntry, const fib::NextHop& nexthop) {
+            return !wouldViolateScope(inFace, pitEntry->getInterest(), nexthop.getFace()) &&
+                    canForwardToLegacy(*pitEntry, nexthop.getFace());
+        }
 
-static bool
-hasFaceForForwarding(const Face& inFace, const fib::NextHopList& nexthops, const shared_ptr<pit::Entry>& pitEntry)
-{
-  return std::find_if(nexthops.begin(), nexthops.end(), bind(&canForwardToNextHop, cref(inFace), pitEntry, _1))
-         != nexthops.end();
-}
+        static bool
+        hasFaceForForwarding(const Face& inFace, const fib::NextHopList& nexthops, const shared_ptr<pit::Entry>& pitEntry) {
+            return std::find_if(nexthops.begin(), nexthops.end(), bind(&canForwardToNextHop, cref(inFace), pitEntry, _1))
+                    != nexthops.end();
+        }
 
-void
-RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
-                                                 const shared_ptr<pit::Entry>& pitEntry)
-{
-  NFD_LOG_TRACE("afterReceiveInterest");
+        void
+        RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+                const shared_ptr<pit::Entry>& pitEntry) {
+            NFD_LOG_TRACE("afterReceiveInterest");
 
-  if (hasPendingOutRecords(*pitEntry)) {
-    // not a new Interest, don't forward
-    return;
-  }
+            if (hasPendingOutRecords(*pitEntry)) {
+                // not a new Interest, don't forward
+                return;
+            }
 
-  const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
-  const fib::NextHopList& nexthops = fibEntry.getNextHops();
+            const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
+            const fib::NextHopList& nexthops = fibEntry.getNextHops();
 
-  // Ensure there is at least 1 Face is available for forwarding
-  if (!hasFaceForForwarding(inFace, nexthops, pitEntry)) {
-    this->rejectPendingInterest(pitEntry);
-    return;
-  }
+            // Ensure there is at least 1 Face is available for forwarding
+            if (!hasFaceForForwarding(inFace, nexthops, pitEntry)) {
+                this->rejectPendingInterest(pitEntry);
+                return;
+            }
 
-  fib::NextHopList::const_iterator selected;
-  do {
-    boost::random::uniform_int_distribution<> dist(0, nexthops.size() - 1);
-    const size_t randomIndex = dist(m_randomGenerator);
+            fib::NextHopList::const_iterator selected;
+            do {
+                boost::random::uniform_int_distribution<> dist(0, nexthops.size() - 1);
+                const size_t randomIndex = dist(m_randomGenerator);
 
-    uint64_t currentIndex = 0;
+                uint64_t currentIndex = 0;
 
-    for (selected = nexthops.begin(); selected != nexthops.end() && currentIndex != randomIndex;
-         ++selected, ++currentIndex) {
-    }
-  } while (!canForwardToNextHop(inFace, pitEntry, *selected));
+                for (selected = nexthops.begin(); selected != nexthops.end() && currentIndex != randomIndex;
+                        ++selected, ++currentIndex) {
+                }
+            } while (!canForwardToNextHop(inFace, pitEntry, *selected));
 
-  this->sendInterest(pitEntry, selected->getFace(), interest);
-}
+            this->sendInterest(pitEntry, selected->getFace(), interest);
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

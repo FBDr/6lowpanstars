@@ -22,70 +22,60 @@
 #include <string>
 #include <ostream>
 
-namespace ns3 {
-
-StatusCode::StatusCode ()
+namespace ns3
 {
-}
 
-void
-StatusCode::SetSuccess (void)
-{
-  m_code = 0;
-}
-
-void
-StatusCode::SetFailure (void)
-{
-  m_code = 1;
-}
-
-bool
-StatusCode::IsSuccess (void) const
-{
-  return (m_code == 0);
-}
-
-uint32_t
-StatusCode::GetSerializedSize (void) const
-{
-  return 2;
-}
-
-Buffer::Iterator
-StatusCode::Serialize (Buffer::Iterator start) const
-{
-  start.WriteHtolsbU16 (m_code);
-  return start;
-}
-
-Buffer::Iterator
-StatusCode::Deserialize (Buffer::Iterator start)
-{
-  m_code = start.ReadLsbtohU16 ();
-  return start;
-}
-
-/**
- * Serialize StatusCode to the given ostream.
- *
- * \param os
- * \param code
- *
- * \return std::ostream
- */
-std::ostream &
-operator << (std::ostream &os, const StatusCode &code)
-{
-  if (code.IsSuccess ())
-    {
-      os << "success";
+    StatusCode::StatusCode() {
     }
-  else
-    {
-      os << "failure";
+
+    void
+    StatusCode::SetSuccess(void) {
+        m_code = 0;
     }
-  return os;
-}
+
+    void
+    StatusCode::SetFailure(void) {
+        m_code = 1;
+    }
+
+    bool
+    StatusCode::IsSuccess(void) const {
+        return (m_code == 0);
+    }
+
+    uint32_t
+    StatusCode::GetSerializedSize(void) const {
+        return 2;
+    }
+
+    Buffer::Iterator
+    StatusCode::Serialize(Buffer::Iterator start) const {
+        start.WriteHtolsbU16(m_code);
+        return start;
+    }
+
+    Buffer::Iterator
+    StatusCode::Deserialize(Buffer::Iterator start) {
+        m_code = start.ReadLsbtohU16();
+        return start;
+    }
+
+    /**
+     * Serialize StatusCode to the given ostream.
+     *
+     * \param os
+     * \param code
+     *
+     * \return std::ostream
+     */
+    std::ostream &
+            operator << (std::ostream &os, const StatusCode & code) {
+        if (code.IsSuccess()) {
+            os << "success";
+        } else {
+            os << "failure";
+        }
+        return os;
+    }
 
 } //namespace ns3

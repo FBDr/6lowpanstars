@@ -26,112 +26,101 @@
 #include "format-helpers.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-namespace xml {
+            namespace xml {
 
-void
-printHeader(std::ostream& os)
-{
-  os << "<?xml version=\"1.0\"?>"
-     << "<nfdStatus xmlns=\"ndn:/localhost/nfd/status/1\">";
-}
+                void
+                printHeader(std::ostream& os) {
+                    os << "<?xml version=\"1.0\"?>"
+                            << "<nfdStatus xmlns=\"ndn:/localhost/nfd/status/1\">";
+                }
 
-void
-printFooter(std::ostream& os)
-{
-  os << "</nfdStatus>";
-}
+                void
+                printFooter(std::ostream& os) {
+                    os << "</nfdStatus>";
+                }
 
-std::ostream&
-operator<<(std::ostream& os, const Text& text)
-{
-  for (char ch : text.s) {
-    switch (ch) {
-      case '"':
-        os << "&quot;";
-        break;
-      case '&':
-        os << "&amp;";
-        break;
-      case '\'':
-        os << "&apos;";
-        break;
-      case '<':
-        os << "&lt;";
-        break;
-      case '>':
-        os << "&gt;";
-        break;
-      default:
-        os << ch;
-        break;
-    }
-  }
-  return os;
-}
+                std::ostream&
+                operator<<(std::ostream& os, const Text& text) {
+                    for (char ch : text.s) {
+                        switch (ch) {
+                            case '"':
+                                os << "&quot;";
+                                break;
+                            case '&':
+                                os << "&amp;";
+                                break;
+                            case '\'':
+                                os << "&apos;";
+                                break;
+                            case '<':
+                                os << "&lt;";
+                                break;
+                            case '>':
+                                os << "&gt;";
+                                break;
+                            default:
+                                os << ch;
+                                break;
+                        }
+                    }
+                    return os;
+                }
 
-std::string
-formatSeconds(time::seconds d)
-{
-  return "PT" + to_string(d.count()) + "S";
-}
+                std::string
+                formatSeconds(time::seconds d) {
+                    return "PT" + to_string(d.count()) + "S";
+                }
 
-std::string
-formatTimestamp(time::system_clock::TimePoint t)
-{
-  return time::toString(t, "%Y-%m-%dT%H:%M:%S%F");
-}
+                std::string
+                formatTimestamp(time::system_clock::TimePoint t) {
+                    return time::toString(t, "%Y-%m-%dT%H:%M:%S%F");
+                }
 
-} // namespace xml
+            } // namespace xml
 
-namespace text {
+            namespace text {
 
-std::ostream&
-operator<<(std::ostream& os, const Spaces& spaces)
-{
-  for (int i = 0; i < spaces.nSpaces; ++i) {
-    os << ' ';
-  }
-  return os;
-}
+                std::ostream&
+                operator<<(std::ostream& os, const Spaces& spaces) {
+                    for (int i = 0; i < spaces.nSpaces; ++i) {
+                        os << ' ';
+                    }
+                    return os;
+                }
 
-Separator::Separator(const std::string& first, const std::string& subsequent)
-  : m_first(first)
-  , m_subsequent(subsequent)
-  , m_count(0)
-{
-}
+                Separator::Separator(const std::string& first, const std::string& subsequent)
+                : m_first(first)
+                , m_subsequent(subsequent)
+                , m_count(0) {
+                }
 
-Separator::Separator(const std::string& subsequent)
-  : Separator("", subsequent)
-{
-}
+                Separator::Separator(const std::string& subsequent)
+                : Separator("", subsequent) {
+                }
 
-std::ostream&
-operator<<(std::ostream& os, Separator& sep)
-{
-  if (++sep.m_count == 1) {
-    return os << sep.m_first;
-  }
-  return os << sep.m_subsequent;
-}
+                std::ostream&
+                operator<<(std::ostream& os, Separator& sep) {
+                    if (++sep.m_count == 1) {
+                        return os << sep.m_first;
+                    }
+                    return os << sep.m_subsequent;
+                }
 
-std::string
-formatSeconds(time::seconds d, bool isLong)
-{
-  return to_string(d.count()) + (isLong ? " seconds" : "s");
-}
+                std::string
+                formatSeconds(time::seconds d, bool isLong) {
+                    return to_string(d.count()) + (isLong ? " seconds" : "s");
+                }
 
-std::string
-formatTimestamp(time::system_clock::TimePoint t)
-{
-  return time::toIsoString(t);
-}
+                std::string
+                formatTimestamp(time::system_clock::TimePoint t) {
+                    return time::toIsoString(t);
+                }
 
-} // namespace text
+            } // namespace text
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

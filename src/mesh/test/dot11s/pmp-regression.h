@@ -25,6 +25,7 @@
 #include "ns3/nstime.h"
 
 using namespace ns3;
+
 /**
  * \ingroup dot11s
  * 
@@ -42,22 +43,21 @@ using namespace ns3;
  * |<---------->|  Other beacons
  * \endverbatim
  */
-class PeerManagementProtocolRegressionTest : public TestCase
-{
+class PeerManagementProtocolRegressionTest : public TestCase {
 public:
-  PeerManagementProtocolRegressionTest ();
-  ~PeerManagementProtocolRegressionTest ();
+    PeerManagementProtocolRegressionTest();
+    ~PeerManagementProtocolRegressionTest();
 
 private:
-  /// \internal It is important to have pointers here
-  NodeContainer * m_nodes;
-  /// Simulation time
-  Time m_time;
+    /// \internal It is important to have pointers here
+    NodeContainer * m_nodes;
+    /// Simulation time
+    Time m_time;
 
-  void CreateNodes ();
-  void CreateDevices ();
-  void CheckResults ();
-  void DoRun ();
+    void CreateNodes();
+    void CreateDevices();
+    void CheckResults();
+    void DoRun();
 };
 #endif /* PMP_REGRESSION_H */
 

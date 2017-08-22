@@ -28,93 +28,91 @@
 
 namespace ns3 {
 
-class OkumuraHataPropagationLossModel;
-class ItuR1411LosPropagationLossModel;
-class ItuR1411NlosOverRooftopPropagationLossModel;
-class ItuR1238PropagationLossModel;
-class Kun2600MhzPropagationLossModel;
+    class OkumuraHataPropagationLossModel;
+    class ItuR1411LosPropagationLossModel;
+    class ItuR1411NlosOverRooftopPropagationLossModel;
+    class ItuR1238PropagationLossModel;
+    class Kun2600MhzPropagationLossModel;
 
-/**
- * \ingroup propagation
- *
- *  \brief The HybridBuildingsPropagationModel is a compound of different models able to evaluate the pathloss from 200 to 2600 MHz, in different environments and with buildings (i.e., indoor and outdoor communications).
- *
- *  This model includes Hata model, COST231, ITU-R P.1411 (short range
- *  communications), ITU-R P.1238 (indoor communications), which are combined in order
- *  to be able to evaluate the pathloss under different scenarios, in detail:
- *  - Environments: urban, suburban, open-areas;
- *  - frequency: from 200 uo to 2600 MHz
- *  - short range communications vs long range communications
- *  - Node position respect to buildings: indoor, outdoor and hybrid (indoor <-> outdoor)
- *  - Building penetretation loss
- *  - floors, etc...
- *
- *  \warning This model works only with MobilityBuildingInfo
- *
- */
+    /**
+     * \ingroup propagation
+     *
+     *  \brief The HybridBuildingsPropagationModel is a compound of different models able to evaluate the pathloss from 200 to 2600 MHz, in different environments and with buildings (i.e., indoor and outdoor communications).
+     *
+     *  This model includes Hata model, COST231, ITU-R P.1411 (short range
+     *  communications), ITU-R P.1238 (indoor communications), which are combined in order
+     *  to be able to evaluate the pathloss under different scenarios, in detail:
+     *  - Environments: urban, suburban, open-areas;
+     *  - frequency: from 200 uo to 2600 MHz
+     *  - short range communications vs long range communications
+     *  - Node position respect to buildings: indoor, outdoor and hybrid (indoor <-> outdoor)
+     *  - Building penetretation loss
+     *  - floors, etc...
+     *
+     *  \warning This model works only with MobilityBuildingInfo
+     *
+     */
 
-class HybridBuildingsPropagationLossModel : public BuildingsPropagationLossModel
-{
-
-public:
-  static TypeId GetTypeId (void);
-  HybridBuildingsPropagationLossModel ();
-  ~HybridBuildingsPropagationLossModel ();
+    class HybridBuildingsPropagationLossModel : public BuildingsPropagationLossModel {
+    public:
+        static TypeId GetTypeId(void);
+        HybridBuildingsPropagationLossModel();
+        ~HybridBuildingsPropagationLossModel();
 
 
-  /** 
-   * set the environment type
-   * 
-   * \param env 
-   */
-  void SetEnvironment (EnvironmentType env);
+        /** 
+         * set the environment type
+         * 
+         * \param env 
+         */
+        void SetEnvironment(EnvironmentType env);
 
-  /** 
-   * set the size of the city
-   * 
-   * \param size 
-   */
-  void SetCitySize (CitySize size);
+        /** 
+         * set the size of the city
+         * 
+         * \param size 
+         */
+        void SetCitySize(CitySize size);
 
-  /** 
-   * set the propagation frequency
-   * 
-   * \param freq 
-   */
-  void SetFrequency (double freq);
+        /** 
+         * set the propagation frequency
+         * 
+         * \param freq 
+         */
+        void SetFrequency(double freq);
 
-  /** 
-   * set the rooftop height
-   * 
-   * \param rooftopHeight
-   */
-  void SetRooftopHeight (double rooftopHeight);
+        /** 
+         * set the rooftop height
+         * 
+         * \param rooftopHeight
+         */
+        void SetRooftopHeight(double rooftopHeight);
 
-  /**
-   * \param a the mobility model of the source
-   * \param b the mobility model of the destination
-   * \returns the propagation loss (in dBm)
-   */
-  virtual double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        /**
+         * \param a the mobility model of the source
+         * \param b the mobility model of the destination
+         * \returns the propagation loss (in dBm)
+         */
+        virtual double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  
-private:
 
-  double OkumuraHata (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
-  double ItuR1411 (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
-  double ItuR1238 (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+    private:
 
-  Ptr<OkumuraHataPropagationLossModel> m_okumuraHata;
-  Ptr<ItuR1411LosPropagationLossModel> m_ituR1411Los;
-  Ptr<ItuR1411NlosOverRooftopPropagationLossModel> m_ituR1411NlosOverRooftop;
-  Ptr<ItuR1238PropagationLossModel> m_ituR1238;
-  Ptr<Kun2600MhzPropagationLossModel> m_kun2600Mhz;
+        double OkumuraHata(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        double ItuR1411(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        double ItuR1238(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  double m_itu1411NlosThreshold; ///< in meters (switch Los -> NLoS)
-  double m_rooftopHeight;
-  double m_frequency;
+        Ptr<OkumuraHataPropagationLossModel> m_okumuraHata;
+        Ptr<ItuR1411LosPropagationLossModel> m_ituR1411Los;
+        Ptr<ItuR1411NlosOverRooftopPropagationLossModel> m_ituR1411NlosOverRooftop;
+        Ptr<ItuR1238PropagationLossModel> m_ituR1238;
+        Ptr<Kun2600MhzPropagationLossModel> m_kun2600Mhz;
 
-};
+        double m_itu1411NlosThreshold; ///< in meters (switch Los -> NLoS)
+        double m_rooftopHeight;
+        double m_frequency;
+
+    };
 
 }
 

@@ -29,15 +29,13 @@
 using namespace ns3;
 
 void
-FillHistoRangeUniformly (double *array, uint32_t n, double start, double end)
-{
-  double increment = (end - start) / (n - 1.);
-  double d = start;
+FillHistoRangeUniformly(double *array, uint32_t n, double start, double end) {
+    double increment = (end - start) / (n - 1.);
+    double d = start;
 
-  for (uint32_t i = 0; i < n; ++i)
-    {
-      array[i] = d;
-      d += increment;
+    for (uint32_t i = 0; i < n; ++i) {
+        array[i] = d;
+        d += increment;
     }
 }
 
@@ -46,82 +44,73 @@ FillHistoRangeUniformly (double *array, uint32_t n, double start, double end)
 // ===========================================================================
 class RngUniformTestCase : public TestCase
 {
-public:
-  static const uint32_t N_RUNS = 5;
-  static const uint32_t N_BINS = 50;
-  static const uint32_t N_MEASUREMENTS = 1000000;
+    public :
+    static const uint32_t N_RUNS = 5;
+    static const uint32_t N_BINS = 50;
+    static const uint32_t N_MEASUREMENTS = 1000000;
 
-  RngUniformTestCase ();
-  virtual ~RngUniformTestCase ();
+    RngUniformTestCase();
+    virtual ~RngUniformTestCase();
 
-  double ChiSquaredTest (Ptr<UniformRandomVariable> u);
+    double ChiSquaredTest(Ptr<UniformRandomVariable> u);
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-RngUniformTestCase::RngUniformTestCase ()
-  : TestCase ("Uniform Random Number Generator")
-{
+RngUniformTestCase::RngUniformTestCase()
+: TestCase("Uniform Random Number Generator") {
 }
 
-RngUniformTestCase::~RngUniformTestCase ()
-{
+RngUniformTestCase::~RngUniformTestCase() {
 }
 
 double
-RngUniformTestCase::ChiSquaredTest (Ptr<UniformRandomVariable> u)
-{
- gsl_histogram * h = gsl_histogram_alloc (N_BINS);
-  gsl_histogram_set_ranges_uniform (h, 0., 1.);
+RngUniformTestCase::ChiSquaredTest(Ptr<UniformRandomVariable> u) {
+    gsl_histogram * h = gsl_histogram_alloc(N_BINS);
+    gsl_histogram_set_ranges_uniform(h, 0., 1.);
 
-  for (uint32_t i = 0; i < N_MEASUREMENTS; ++i)
-    {
-      gsl_histogram_increment (h, u->GetValue ());
+    for (uint32_t i = 0; i < N_MEASUREMENTS; ++i) {
+        gsl_histogram_increment(h, u->GetValue());
     }
 
-  double tmp[N_BINS];
+    double tmp[N_BINS];
 
-  double expected = ((double)N_MEASUREMENTS / (double)N_BINS);
+    double expected = ((double) N_MEASUREMENTS / (double) N_BINS);
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      tmp[i] = gsl_histogram_get (h, i);
-      tmp[i] -= expected;
-      tmp[i] *= tmp[i];
-      tmp[i] /= expected;
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        tmp[i] = gsl_histogram_get(h, i);
+        tmp[i] -= expected;
+        tmp[i] *= tmp[i];
+        tmp[i] /= expected;
     }
 
-  gsl_histogram_free (h);
+    gsl_histogram_free(h);
 
-  double chiSquared = 0;
+    double chiSquared = 0;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      chiSquared += tmp[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        chiSquared += tmp[i];
     }
 
-  return chiSquared;
+    return chiSquared;
 }
 
 void
-RngUniformTestCase::DoRun (void)
-{
-  RngSeedManager::SetSeed (static_cast<uint32_t> (time (0)));
+RngUniformTestCase::DoRun(void) {
+    RngSeedManager::SetSeed(static_cast<uint32_t> (time(0)));
 
-  double sum = 0.;
-  double maxStatistic = gsl_cdf_chisq_Qinv (0.05, N_BINS);
+    double sum = 0.;
+    double maxStatistic = gsl_cdf_chisq_Qinv(0.05, N_BINS);
 
-  for (uint32_t i = 0; i < N_RUNS; ++i)
-    {
-      Ptr<UniformRandomVariable> u = CreateObject<UniformRandomVariable> ();
-      double result = ChiSquaredTest (u);
-      sum += result;
+    for (uint32_t i = 0; i < N_RUNS; ++i) {
+        Ptr<UniformRandomVariable> u = CreateObject<UniformRandomVariable> ();
+        double result = ChiSquaredTest(u);
+        sum += result;
     }
 
-  sum /= (double)N_RUNS;
+    sum /= (double) N_RUNS;
 
-  NS_TEST_ASSERT_MSG_LT (sum, maxStatistic, "Chi-squared statistic out of range");
+    NS_TEST_ASSERT_MSG_LT(sum, maxStatistic, "Chi-squared statistic out of range");
 }
 
 // ===========================================================================
@@ -129,96 +118,86 @@ RngUniformTestCase::DoRun (void)
 // ===========================================================================
 class RngNormalTestCase : public TestCase
 {
-public:
-  static const uint32_t N_RUNS = 5;
-  static const uint32_t N_BINS = 50;
-  static const uint32_t N_MEASUREMENTS = 1000000;
+    public :
+    static const uint32_t N_RUNS = 5;
+    static const uint32_t N_BINS = 50;
+    static const uint32_t N_MEASUREMENTS = 1000000;
 
-  RngNormalTestCase ();
-  virtual ~RngNormalTestCase ();
+    RngNormalTestCase();
+    virtual ~RngNormalTestCase();
 
-  double ChiSquaredTest (Ptr<NormalRandomVariable> n);
+    double ChiSquaredTest(Ptr<NormalRandomVariable> n);
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-RngNormalTestCase::RngNormalTestCase ()
-  : TestCase ("Normal Random Number Generator")
-{
+RngNormalTestCase::RngNormalTestCase()
+: TestCase("Normal Random Number Generator") {
 }
 
-RngNormalTestCase::~RngNormalTestCase ()
-{
+RngNormalTestCase::~RngNormalTestCase() {
 }
 
 double
-RngNormalTestCase::ChiSquaredTest (Ptr<NormalRandomVariable> n)
-{
-  gsl_histogram * h = gsl_histogram_alloc (N_BINS);
+RngNormalTestCase::ChiSquaredTest(Ptr<NormalRandomVariable> n) {
+    gsl_histogram * h = gsl_histogram_alloc(N_BINS);
 
-  double range[N_BINS + 1];
-  FillHistoRangeUniformly (range, N_BINS + 1, -4., 4.);
-  range[0] = -std::numeric_limits<double>::max ();
-  range[N_BINS] = std::numeric_limits<double>::max ();
+    double range[N_BINS + 1];
+    FillHistoRangeUniformly(range, N_BINS + 1, -4., 4.);
+    range[0] = -std::numeric_limits<double>::max();
+    range[N_BINS] = std::numeric_limits<double>::max();
 
-  gsl_histogram_set_ranges (h, range, N_BINS + 1);
+    gsl_histogram_set_ranges(h, range, N_BINS + 1);
 
-  double expected[N_BINS];
+    double expected[N_BINS];
 
-  double sigma = 1.;
+    double sigma = 1.;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      expected[i] = gsl_cdf_gaussian_P (range[i + 1], sigma) - gsl_cdf_gaussian_P (range[i], sigma);
-      expected[i] *= N_MEASUREMENTS;
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        expected[i] = gsl_cdf_gaussian_P(range[i + 1], sigma) - gsl_cdf_gaussian_P(range[i], sigma);
+        expected[i] *= N_MEASUREMENTS;
     }
 
-  for (uint32_t i = 0; i < N_MEASUREMENTS; ++i)
-    {
-      gsl_histogram_increment (h, n->GetValue ());
+    for (uint32_t i = 0; i < N_MEASUREMENTS; ++i) {
+        gsl_histogram_increment(h, n->GetValue());
     }
 
-  double tmp[N_BINS];
+    double tmp[N_BINS];
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      tmp[i] = gsl_histogram_get (h, i);
-      tmp[i] -= expected[i];
-      tmp[i] *= tmp[i];
-      tmp[i] /= expected[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        tmp[i] = gsl_histogram_get(h, i);
+        tmp[i] -= expected[i];
+        tmp[i] *= tmp[i];
+        tmp[i] /= expected[i];
     }
 
-  gsl_histogram_free (h);
+    gsl_histogram_free(h);
 
-  double chiSquared = 0;
+    double chiSquared = 0;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      chiSquared += tmp[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        chiSquared += tmp[i];
     }
 
-  return chiSquared;
+    return chiSquared;
 }
 
 void
-RngNormalTestCase::DoRun (void)
-{
-  RngSeedManager::SetSeed (static_cast<uint32_t> (time (0)));
+RngNormalTestCase::DoRun(void) {
+    RngSeedManager::SetSeed(static_cast<uint32_t> (time(0)));
 
-  double sum = 0.;
-  double maxStatistic = gsl_cdf_chisq_Qinv (0.05, N_BINS);
+    double sum = 0.;
+    double maxStatistic = gsl_cdf_chisq_Qinv(0.05, N_BINS);
 
-  for (uint32_t i = 0; i < N_RUNS; ++i)
-    {
-      Ptr<NormalRandomVariable> n = CreateObject<NormalRandomVariable> ();
-      double result = ChiSquaredTest (n);
-      sum += result;
+    for (uint32_t i = 0; i < N_RUNS; ++i) {
+        Ptr<NormalRandomVariable> n = CreateObject<NormalRandomVariable> ();
+        double result = ChiSquaredTest(n);
+        sum += result;
     }
 
-  sum /= (double)N_RUNS;
+    sum /= (double) N_RUNS;
 
-  NS_TEST_ASSERT_MSG_LT (sum, maxStatistic, "Chi-squared statistic out of range");
+    NS_TEST_ASSERT_MSG_LT(sum, maxStatistic, "Chi-squared statistic out of range");
 }
 
 // ===========================================================================
@@ -226,95 +205,85 @@ RngNormalTestCase::DoRun (void)
 // ===========================================================================
 class RngExponentialTestCase : public TestCase
 {
-public:
-  static const uint32_t N_RUNS = 5;
-  static const uint32_t N_BINS = 50;
-  static const uint32_t N_MEASUREMENTS = 1000000;
+    public :
+    static const uint32_t N_RUNS = 5;
+    static const uint32_t N_BINS = 50;
+    static const uint32_t N_MEASUREMENTS = 1000000;
 
-  RngExponentialTestCase ();
-  virtual ~RngExponentialTestCase ();
+    RngExponentialTestCase();
+    virtual ~RngExponentialTestCase();
 
-  double ChiSquaredTest (Ptr<ExponentialRandomVariable> n);
+    double ChiSquaredTest(Ptr<ExponentialRandomVariable> n);
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-RngExponentialTestCase::RngExponentialTestCase ()
-  : TestCase ("Exponential Random Number Generator")
-{
+RngExponentialTestCase::RngExponentialTestCase()
+: TestCase("Exponential Random Number Generator") {
 }
 
-RngExponentialTestCase::~RngExponentialTestCase ()
-{
+RngExponentialTestCase::~RngExponentialTestCase() {
 }
 
 double
-RngExponentialTestCase::ChiSquaredTest (Ptr<ExponentialRandomVariable> e)
-{
-  gsl_histogram * h = gsl_histogram_alloc (N_BINS);
+RngExponentialTestCase::ChiSquaredTest(Ptr<ExponentialRandomVariable> e) {
+    gsl_histogram * h = gsl_histogram_alloc(N_BINS);
 
-  double range[N_BINS + 1];
-  FillHistoRangeUniformly (range, N_BINS + 1, 0., 10.);
-  range[N_BINS] = std::numeric_limits<double>::max ();
+    double range[N_BINS + 1];
+    FillHistoRangeUniformly(range, N_BINS + 1, 0., 10.);
+    range[N_BINS] = std::numeric_limits<double>::max();
 
-  gsl_histogram_set_ranges (h, range, N_BINS + 1);
+    gsl_histogram_set_ranges(h, range, N_BINS + 1);
 
-  double expected[N_BINS];
+    double expected[N_BINS];
 
-  double mu = 1.;
+    double mu = 1.;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      expected[i] = gsl_cdf_exponential_P (range[i + 1], mu) - gsl_cdf_exponential_P (range[i], mu);
-      expected[i] *= N_MEASUREMENTS;
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        expected[i] = gsl_cdf_exponential_P(range[i + 1], mu) - gsl_cdf_exponential_P(range[i], mu);
+        expected[i] *= N_MEASUREMENTS;
     }
 
-  for (uint32_t i = 0; i < N_MEASUREMENTS; ++i)
-    {
-      gsl_histogram_increment (h, e->GetValue ());
+    for (uint32_t i = 0; i < N_MEASUREMENTS; ++i) {
+        gsl_histogram_increment(h, e->GetValue());
     }
 
-  double tmp[N_BINS];
+    double tmp[N_BINS];
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      tmp[i] = gsl_histogram_get (h, i);
-      tmp[i] -= expected[i];
-      tmp[i] *= tmp[i];
-      tmp[i] /= expected[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        tmp[i] = gsl_histogram_get(h, i);
+        tmp[i] -= expected[i];
+        tmp[i] *= tmp[i];
+        tmp[i] /= expected[i];
     }
 
-  gsl_histogram_free (h);
+    gsl_histogram_free(h);
 
-  double chiSquared = 0;
+    double chiSquared = 0;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      chiSquared += tmp[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        chiSquared += tmp[i];
     }
 
-  return chiSquared;
+    return chiSquared;
 }
 
 void
-RngExponentialTestCase::DoRun (void)
-{
-  RngSeedManager::SetSeed (static_cast<uint32_t> (time (0)));
+RngExponentialTestCase::DoRun(void) {
+    RngSeedManager::SetSeed(static_cast<uint32_t> (time(0)));
 
-  double sum = 0.;
-  double maxStatistic = gsl_cdf_chisq_Qinv (0.05, N_BINS);
+    double sum = 0.;
+    double maxStatistic = gsl_cdf_chisq_Qinv(0.05, N_BINS);
 
-  for (uint32_t i = 0; i < N_RUNS; ++i)
-    {
-      Ptr<ExponentialRandomVariable> e = CreateObject<ExponentialRandomVariable> ();
-      double result = ChiSquaredTest (e);
-      sum += result;
+    for (uint32_t i = 0; i < N_RUNS; ++i) {
+        Ptr<ExponentialRandomVariable> e = CreateObject<ExponentialRandomVariable> ();
+        double result = ChiSquaredTest(e);
+        sum += result;
     }
 
-  sum /= (double)N_RUNS;
+    sum /= (double) N_RUNS;
 
-  NS_TEST_ASSERT_MSG_LT (sum, maxStatistic, "Chi-squared statistic out of range");
+    NS_TEST_ASSERT_MSG_LT(sum, maxStatistic, "Chi-squared statistic out of range");
 }
 
 // ===========================================================================
@@ -322,114 +291,102 @@ RngExponentialTestCase::DoRun (void)
 // ===========================================================================
 class RngParetoTestCase : public TestCase
 {
-public:
-  static const uint32_t N_RUNS = 5;
-  static const uint32_t N_BINS = 50;
-  static const uint32_t N_MEASUREMENTS = 1000000;
+    public :
+    static const uint32_t N_RUNS = 5;
+    static const uint32_t N_BINS = 50;
+    static const uint32_t N_MEASUREMENTS = 1000000;
 
-  RngParetoTestCase ();
-  virtual ~RngParetoTestCase ();
+    RngParetoTestCase();
+    virtual ~RngParetoTestCase();
 
-  double ChiSquaredTest (Ptr<ParetoRandomVariable> p);
+    double ChiSquaredTest(Ptr<ParetoRandomVariable> p);
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-RngParetoTestCase::RngParetoTestCase ()
-  : TestCase ("Pareto Random Number Generator")
-{
+RngParetoTestCase::RngParetoTestCase()
+: TestCase("Pareto Random Number Generator") {
 }
 
-RngParetoTestCase::~RngParetoTestCase ()
-{
+RngParetoTestCase::~RngParetoTestCase() {
 }
 
 double
-RngParetoTestCase::ChiSquaredTest (Ptr<ParetoRandomVariable> p)
-{
-  gsl_histogram * h = gsl_histogram_alloc (N_BINS);
+RngParetoTestCase::ChiSquaredTest(Ptr<ParetoRandomVariable> p) {
+    gsl_histogram * h = gsl_histogram_alloc(N_BINS);
 
-  double range[N_BINS + 1];
-  FillHistoRangeUniformly (range, N_BINS + 1, 1., 10.);
-  range[N_BINS] = std::numeric_limits<double>::max ();
+    double range[N_BINS + 1];
+    FillHistoRangeUniformly(range, N_BINS + 1, 1., 10.);
+    range[N_BINS] = std::numeric_limits<double>::max();
 
-  gsl_histogram_set_ranges (h, range, N_BINS + 1);
+    gsl_histogram_set_ranges(h, range, N_BINS + 1);
 
-  double expected[N_BINS];
+    double expected[N_BINS];
 
-  double a = 1.5;
-  double b = 0.33333333;
+    double a = 1.5;
+    double b = 0.33333333;
 
-  // mean is 1 with these values
+    // mean is 1 with these values
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      expected[i] = gsl_cdf_pareto_P (range[i + 1], a, b) - gsl_cdf_pareto_P (range[i], a, b);
-      expected[i] *= N_MEASUREMENTS;
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        expected[i] = gsl_cdf_pareto_P(range[i + 1], a, b) - gsl_cdf_pareto_P(range[i], a, b);
+        expected[i] *= N_MEASUREMENTS;
     }
 
-  for (uint32_t i = 0; i < N_MEASUREMENTS; ++i)
-    {
-      gsl_histogram_increment (h, p->GetValue ());
+    for (uint32_t i = 0; i < N_MEASUREMENTS; ++i) {
+        gsl_histogram_increment(h, p->GetValue());
     }
 
-  double tmp[N_BINS];
+    double tmp[N_BINS];
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      tmp[i] = gsl_histogram_get (h, i);
-      tmp[i] -= expected[i];
-      tmp[i] *= tmp[i];
-      tmp[i] /= expected[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        tmp[i] = gsl_histogram_get(h, i);
+        tmp[i] -= expected[i];
+        tmp[i] *= tmp[i];
+        tmp[i] /= expected[i];
     }
 
-  gsl_histogram_free (h);
+    gsl_histogram_free(h);
 
-  double chiSquared = 0;
+    double chiSquared = 0;
 
-  for (uint32_t i = 0; i < N_BINS; ++i)
-    {
-      chiSquared += tmp[i];
+    for (uint32_t i = 0; i < N_BINS; ++i) {
+        chiSquared += tmp[i];
     }
 
-  return chiSquared;
+    return chiSquared;
 }
 
 void
-RngParetoTestCase::DoRun (void)
-{
-  RngSeedManager::SetSeed (static_cast<uint32_t> (time (0)));
+RngParetoTestCase::DoRun(void) {
+    RngSeedManager::SetSeed(static_cast<uint32_t> (time(0)));
 
-  double sum = 0.;
-  double maxStatistic = gsl_cdf_chisq_Qinv (0.05, N_BINS);
+    double sum = 0.;
+    double maxStatistic = gsl_cdf_chisq_Qinv(0.05, N_BINS);
 
-  for (uint32_t i = 0; i < N_RUNS; ++i)
-    {
-      Ptr<ParetoRandomVariable> e = CreateObject<ParetoRandomVariable> ();
-      e->SetAttribute ("Shape", DoubleValue (1.5));
-      double result = ChiSquaredTest (e);
-      sum += result;
+    for (uint32_t i = 0; i < N_RUNS; ++i) {
+        Ptr<ParetoRandomVariable> e = CreateObject<ParetoRandomVariable> ();
+        e->SetAttribute("Shape", DoubleValue(1.5));
+        double result = ChiSquaredTest(e);
+        sum += result;
     }
 
-  sum /= (double)N_RUNS;
+    sum /= (double) N_RUNS;
 
-  NS_TEST_ASSERT_MSG_LT (sum, maxStatistic, "Chi-squared statistic out of range");
+    NS_TEST_ASSERT_MSG_LT(sum, maxStatistic, "Chi-squared statistic out of range");
 }
 
 class RngTestSuite : public TestSuite
 {
-public:
-  RngTestSuite ();
-};
+    public :
+    RngTestSuite();};
 
-RngTestSuite::RngTestSuite ()
-  : TestSuite ("random-number-generators", UNIT)
-{
-  AddTestCase (new RngUniformTestCase, TestCase::QUICK);
-  AddTestCase (new RngNormalTestCase, TestCase::QUICK);
-  AddTestCase (new RngExponentialTestCase, TestCase::QUICK);
-  AddTestCase (new RngParetoTestCase, TestCase::QUICK);
+RngTestSuite::RngTestSuite()
+: TestSuite("random-number-generators", UNIT) {
+    AddTestCase(new RngUniformTestCase, TestCase::QUICK);
+    AddTestCase(new RngNormalTestCase, TestCase::QUICK);
+    AddTestCase(new RngExponentialTestCase, TestCase::QUICK);
+    AddTestCase(new RngParetoTestCase, TestCase::QUICK);
 }
 
 static RngTestSuite rngTestSuite;

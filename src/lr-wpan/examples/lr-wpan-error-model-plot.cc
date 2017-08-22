@@ -35,35 +35,34 @@
 using namespace ns3;
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("LrWpanErrorModelPlot");
+NS_LOG_COMPONENT_DEFINE("LrWpanErrorModelPlot");
 
 //
 // Plot 802.15.4 BER curve (compare against Figure E.2 of IEEE-802.15.4-2006)
 //
-int main (int argc, char *argv[])
-{
-  std::ofstream berfile ("802.15.4-ber.plt");
-  Ptr<LrWpanErrorModel>  lrWpanError = CreateObject<LrWpanErrorModel> ();
 
-  double increment = 0.1;
-  double minSnr = -10;  //dB
-  double maxSnr = 5;
+int main(int argc, char *argv[]) {
+    std::ofstream berfile("802.15.4-ber.plt");
+    Ptr<LrWpanErrorModel> lrWpanError = CreateObject<LrWpanErrorModel> ();
 
-  Gnuplot berplot = Gnuplot ("802.15.4-ber.eps");
-  Gnuplot2dDataset berdataset ("802.15.4");
+    double increment = 0.1;
+    double minSnr = -10; //dB
+    double maxSnr = 5;
 
-  for (double snr = minSnr; snr <= maxSnr; snr += increment)
-    {
-      double ber = 1.0 - lrWpanError->GetChunkSuccessRate (pow (10.0,snr / 10.0), 1);
-      NS_LOG_DEBUG (snr << "(dB) " << ber << " (BER)");
-      berdataset.Add (snr, ber);
+    Gnuplot berplot = Gnuplot("802.15.4-ber.eps");
+    Gnuplot2dDataset berdataset("802.15.4");
+
+    for (double snr = minSnr; snr <= maxSnr; snr += increment) {
+        double ber = 1.0 - lrWpanError->GetChunkSuccessRate(pow(10.0, snr / 10.0), 1);
+        NS_LOG_DEBUG(snr << "(dB) " << ber << " (BER)");
+        berdataset.Add(snr, ber);
     }
 
-  berplot.AddDataset (berdataset);
+    berplot.AddDataset(berdataset);
 
-  berplot.SetTerminal ("postscript eps color enh \"Times-BoldItalic\"");
-  berplot.SetLegend ("SNR (dB)", "Bit Error Rate (BER)");
-  berplot.SetExtra  ("set xrange [-10:15]\n\
+    berplot.SetTerminal("postscript eps color enh \"Times-BoldItalic\"");
+    berplot.SetLegend("SNR (dB)", "Bit Error Rate (BER)");
+    berplot.SetExtra("set xrange [-10:15]\n\
 set yrange [1e-9:1]\n\
 set log y\n\
 set grid\n\
@@ -76,9 +75,9 @@ set style line 6 linewidth 5\n\
 set style line 7 linewidth 5\n\
 set style line 8 linewidth 5\n\
 set style increment user");
-  berplot.GenerateOutput (berfile);
-  berfile.close ();
+    berplot.GenerateOutput(berfile);
+    berfile.close();
 
-  return 0;
+    return 0;
 }
 

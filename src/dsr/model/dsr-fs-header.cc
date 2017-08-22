@@ -34,298 +34,295 @@
 #include "ns3/header.h"
 #include "dsr-fs-header.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("DsrFsHeader");
-
-namespace dsr {
-
-NS_OBJECT_ENSURE_REGISTERED (DsrFsHeader);
-
-TypeId DsrFsHeader::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::dsr::DsrFsHeader")
-    .AddConstructor<DsrFsHeader> ()
-    .SetParent<Header> ()
-    .SetGroupName ("Dsr")
-  ;
-  return tid;
-}
 
-TypeId DsrFsHeader::GetInstanceTypeId () const
-{
-  return GetTypeId ();
-}
+    NS_LOG_COMPONENT_DEFINE("DsrFsHeader");
 
-DsrFsHeader::DsrFsHeader ()
-  : m_nextHeader (0),
-    m_messageType (0),
-    m_payloadLen (0),
-    m_sourceId (0),
-    m_destId (0),
-    m_data (0)
-{
-}
+    namespace dsr{
 
-DsrFsHeader::~DsrFsHeader ()
-{
-}
+        NS_OBJECT_ENSURE_REGISTERED(DsrFsHeader);
 
-void DsrFsHeader::SetNextHeader (uint8_t protocol)
-{
-  m_nextHeader = protocol;
-}
+        TypeId DsrFsHeader::GetTypeId()
+        {
+            static TypeId tid = TypeId("ns3::dsr::DsrFsHeader")
+            .AddConstructor<DsrFsHeader> ()
+            .SetParent<Header> ()
+            .SetGroupName("Dsr")
+            ;
+            return tid;
+        }
 
-uint8_t DsrFsHeader::GetNextHeader () const
-{
-  return m_nextHeader;
-}
+        TypeId DsrFsHeader::GetInstanceTypeId() const
+        {
+            return GetTypeId();
+        }
 
-void DsrFsHeader::SetMessageType (uint8_t messageType)
-{
-  m_messageType = messageType;
-}
+        DsrFsHeader::DsrFsHeader()
+        : m_nextHeader(0),
+        m_messageType(0),
+        m_payloadLen(0),
+        m_sourceId(0),
+        m_destId(0),
+        m_data(0)
+        {
+        }
 
-uint8_t DsrFsHeader::GetMessageType () const
-{
-  return m_messageType;
-}
+        DsrFsHeader::~DsrFsHeader()
+        {
+        }
 
-void DsrFsHeader::SetPayloadLength (uint16_t length)
-{
-  m_payloadLen = length;
-}
+        void DsrFsHeader::SetNextHeader(uint8_t protocol)
+        {
+            m_nextHeader = protocol;
+        }
 
-uint16_t DsrFsHeader::GetPayloadLength () const
-{
-  return m_payloadLen;
-}
+        uint8_t DsrFsHeader::GetNextHeader() const
+        {
+            return m_nextHeader;
+        }
 
-void DsrFsHeader::SetSourceId (uint16_t sourceId)
-{
-  m_sourceId = sourceId;
-}
+        void DsrFsHeader::SetMessageType(uint8_t messageType)
+        {
+            m_messageType = messageType;
+        }
 
-uint16_t DsrFsHeader::GetSourceId () const
-{
-  return m_sourceId;
-}
+        uint8_t DsrFsHeader::GetMessageType() const
+        {
+            return m_messageType;
+        }
 
-void DsrFsHeader::SetDestId (uint16_t destId)
-{
-  m_destId = destId;
-}
+        void DsrFsHeader::SetPayloadLength(uint16_t length)
+        {
+            m_payloadLen = length;
+        }
 
-uint16_t DsrFsHeader::GetDestId () const
-{
-  return m_destId;
-}
+        uint16_t DsrFsHeader::GetPayloadLength() const
+        {
+            return m_payloadLen;
+        }
 
-void DsrFsHeader::Print (std::ostream &os) const
-{
-  os
-  << "nextHeader: " << (uint32_t)GetNextHeader () << " messageType: " << (uint32_t)GetMessageType ()
-  << " sourceId: " << (uint32_t)GetSourceId () << " destinationId: " << (uint32_t)GetDestId ()
-  << " length: " << (uint32_t)GetPayloadLength ();
-}
+        void DsrFsHeader::SetSourceId(uint16_t sourceId)
+        {
+            m_sourceId = sourceId;
+        }
 
-uint32_t DsrFsHeader::GetSerializedSize () const
-{
-  return 8;
-}
+        uint16_t DsrFsHeader::GetSourceId() const
+        {
+            return m_sourceId;
+        }
 
-void DsrFsHeader::Serialize (Buffer::Iterator start) const
-{
-  Buffer::Iterator i = start;
+        void DsrFsHeader::SetDestId(uint16_t destId)
+        {
+            m_destId = destId;
+        }
 
-  i.WriteU8 (m_nextHeader);
-  i.WriteU8 (m_messageType);
-  i.WriteU16 (m_sourceId);
-  i.WriteU16 (m_destId);
-  i.WriteU16 (m_payloadLen);
+        uint16_t DsrFsHeader::GetDestId() const
+        {
+            return m_destId;
+        }
 
-  i.Write (m_data.PeekData (), m_data.GetSize ());
-}
+        void DsrFsHeader::Print(std::ostream & os) const
+        {
+            os
+            << "nextHeader: " << (uint32_t) GetNextHeader() << " messageType: " << (uint32_t) GetMessageType()
+            << " sourceId: " << (uint32_t) GetSourceId() << " destinationId: " << (uint32_t) GetDestId()
+            << " length: " << (uint32_t) GetPayloadLength();
+        }
 
-uint32_t DsrFsHeader::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
+        uint32_t DsrFsHeader::GetSerializedSize() const
+        {
+            return 8;
+        }
 
-  m_nextHeader = i.ReadU8 ();
-  m_messageType = i.ReadU8 ();
-  m_sourceId = i.ReadU16 ();
-  m_destId = i.ReadU16 ();
-  m_payloadLen = i.ReadU16 ();
+        void DsrFsHeader::Serialize(Buffer::Iterator start) const
+        {
+            Buffer::Iterator i = start;
 
-  uint32_t dataLength = GetPayloadLength ();
-  uint8_t data[dataLength];
-  i.Read (data, dataLength);
+            i.WriteU8(m_nextHeader);
+            i.WriteU8(m_messageType);
+            i.WriteU16(m_sourceId);
+            i.WriteU16(m_destId);
+            i.WriteU16(m_payloadLen);
 
-  if (dataLength > m_data.GetSize ())
-    {
-      m_data.AddAtEnd (dataLength - m_data.GetSize ());
-    }
-  else
-    {
-      m_data.RemoveAtEnd (m_data.GetSize () - dataLength);
-    }
+            i.Write(m_data.PeekData(), m_data.GetSize());
+        }
 
-  i = m_data.Begin ();
-  i.Write (data, dataLength);
+        uint32_t DsrFsHeader::Deserialize(Buffer::Iterator start)
+        {
+            Buffer::Iterator i = start;
 
-  return GetSerializedSize ();
-}
+            m_nextHeader = i.ReadU8();
+            m_messageType = i.ReadU8();
+            m_sourceId = i.ReadU16();
+            m_destId = i.ReadU16();
+            m_payloadLen = i.ReadU16();
 
-DsrOptionField::DsrOptionField (uint32_t optionsOffset)
-  : m_optionData (0),
-    m_optionsOffset (optionsOffset)
-{
-}
+            uint32_t dataLength = GetPayloadLength();
+            uint8_t data[dataLength];
+            i.Read(data, dataLength);
 
-DsrOptionField::~DsrOptionField ()
-{
-}
+            if (dataLength > m_data.GetSize()) {
+                m_data.AddAtEnd(dataLength - m_data.GetSize());
+            } else {
+                m_data.RemoveAtEnd(m_data.GetSize() - dataLength);
+            }
 
-uint32_t DsrOptionField::GetSerializedSize () const
-{
-  DsrOptionHeader::Alignment align = {4,0};
-  return m_optionData.GetSize () + CalculatePad (align);
-}
+            i = m_data.Begin();
+            i.Write(data, dataLength);
 
-void DsrOptionField::Serialize (Buffer::Iterator start) const
-{
-  start.Write (m_optionData.Begin (), m_optionData.End ());
-  DsrOptionHeader::Alignment align = {4,0};
-  uint32_t fill = CalculatePad (align);
-  NS_LOG_LOGIC ("fill with " << fill << " bytes padding");
-  switch (fill)
-    {
-    case 0:
-      return;
-    case 1:
-      DsrOptionPad1Header ().Serialize (start);
-      return;
-    default:
-      DsrOptionPadnHeader (fill).Serialize (start);
-      return;
-    }
-}
+            return GetSerializedSize();
+        }
 
-uint32_t DsrOptionField::Deserialize (Buffer::Iterator start, uint32_t length)
-{
-  uint8_t buf[length];
-  start.Read (buf, length);
-  m_optionData = Buffer ();
-  m_optionData.AddAtEnd (length);
-  m_optionData.Begin ().Write (buf, length);
-  return length;
-}
+        DsrOptionField::DsrOptionField(uint32_t optionsOffset)
+        : m_optionData(0),
+        m_optionsOffset(optionsOffset)
+        {
+        }
 
-void DsrOptionField::AddDsrOption (DsrOptionHeader const& option)
-{
-  NS_LOG_FUNCTION_NOARGS ();
+        DsrOptionField::~DsrOptionField()
+        {
+        }
 
-  uint32_t pad = CalculatePad (option.GetAlignment ());
-  NS_LOG_LOGIC ("need " << pad << " bytes padding");
-  switch (pad)
-    {
-    case 0:
-      break;       // no padding needed
-    case 1:
-      AddDsrOption (DsrOptionPad1Header ());
-      break;
-    default:
-      AddDsrOption (DsrOptionPadnHeader (pad));
-      break;
-    }
+        uint32_t DsrOptionField::GetSerializedSize() const
+        {
+            DsrOptionHeader::Alignment align =
+            {4, 0};
+            return m_optionData.GetSize() + CalculatePad(align);
+        }
 
-  m_optionData.AddAtEnd (option.GetSerializedSize ());
-  Buffer::Iterator it = m_optionData.End ();
-  it.Prev (option.GetSerializedSize ());
-  option.Serialize (it);
-}
+        void DsrOptionField::Serialize(Buffer::Iterator start) const
+        {
+            start.Write(m_optionData.Begin(), m_optionData.End());
+            DsrOptionHeader::Alignment align =
+            {4, 0};
+            uint32_t fill = CalculatePad(align);
+            NS_LOG_LOGIC("fill with " << fill << " bytes padding");
+            switch (fill) {
+                case 0:
+                    return;
+                case 1:
+                    DsrOptionPad1Header().Serialize(start);
+                    return;
+                default:
+                    DsrOptionPadnHeader(fill).Serialize(start);
+                    return;
+            }
+        }
 
-uint32_t DsrOptionField::CalculatePad (DsrOptionHeader::Alignment alignment) const
-{
-  return (alignment.offset - (m_optionData.GetSize () + m_optionsOffset)) % alignment.factor;
-}
+        uint32_t DsrOptionField::Deserialize(Buffer::Iterator start, uint32_t length)
+        {
+            uint8_t buf[length];
+            start.Read(buf, length);
+            m_optionData = Buffer();
+            m_optionData.AddAtEnd(length);
+            m_optionData.Begin().Write(buf, length);
+            return length;
+        }
 
-uint32_t DsrOptionField::GetDsrOptionsOffset ()
-{
-  return m_optionsOffset;
-}
+        void DsrOptionField::AddDsrOption(DsrOptionHeader const& option)
+        {
+            NS_LOG_FUNCTION_NOARGS();
 
-Buffer DsrOptionField::GetDsrOptionBuffer ()
-{
-  return m_optionData;
-}
+            uint32_t pad = CalculatePad(option.GetAlignment());
+            NS_LOG_LOGIC("need " << pad << " bytes padding");
+            switch (pad) {
+                case 0:
+                    break; // no padding needed
+                case 1:
+                    AddDsrOption(DsrOptionPad1Header());
+                    break;
+                default:
+                    AddDsrOption(DsrOptionPadnHeader(pad));
+                    break;
+            }
 
-NS_OBJECT_ENSURE_REGISTERED (DsrRoutingHeader);
+            m_optionData.AddAtEnd(option.GetSerializedSize());
+            Buffer::Iterator it = m_optionData.End();
+            it.Prev(option.GetSerializedSize());
+            option.Serialize(it);
+        }
 
-TypeId DsrRoutingHeader::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::DsrRoutingHeader")
-    .AddConstructor<DsrRoutingHeader> ()
-    .SetParent<DsrFsHeader> ()
-  ;
-  return tid;
-}
+        uint32_t DsrOptionField::CalculatePad(DsrOptionHeader::Alignment alignment) const
+        {
+            return (alignment.offset - (m_optionData.GetSize() + m_optionsOffset)) % alignment.factor;
+        }
 
-TypeId DsrRoutingHeader::GetInstanceTypeId () const
-{
-  return GetTypeId ();
-}
+        uint32_t DsrOptionField::GetDsrOptionsOffset()
+        {
+            return m_optionsOffset;
+        }
 
-DsrRoutingHeader::DsrRoutingHeader ()
-  : DsrOptionField (8)
-{
-}
+        Buffer DsrOptionField::GetDsrOptionBuffer()
+        {
+            return m_optionData;
+        }
 
-DsrRoutingHeader::~DsrRoutingHeader ()
-{
-}
+        NS_OBJECT_ENSURE_REGISTERED(DsrRoutingHeader);
 
-void DsrRoutingHeader::Print (std::ostream &os) const
-{
-  os
-  << " nextHeader: " << (uint32_t)GetNextHeader () << " messageType: " << (uint32_t)GetMessageType ()
-  << " sourceId: " << (uint32_t)GetSourceId () << " destinationId: " << (uint32_t)GetDestId ()
-  << " length: " << (uint32_t)GetPayloadLength ();
-}
+        TypeId DsrRoutingHeader::GetTypeId()
+        {
+            static TypeId tid = TypeId("ns3::DsrRoutingHeader")
+            .AddConstructor<DsrRoutingHeader> ()
+            .SetParent<DsrFsHeader> ()
+            ;
+            return tid;
+        }
 
-uint32_t DsrRoutingHeader::GetSerializedSize () const
-{
-  // 8 bytes is the DsrFsHeader length
-  return 8 + DsrOptionField::GetSerializedSize ();
-}
+        TypeId DsrRoutingHeader::GetInstanceTypeId() const
+        {
+            return GetTypeId();
+        }
 
-void DsrRoutingHeader::Serialize (Buffer::Iterator start) const
-{
-  Buffer::Iterator i = start;
+        DsrRoutingHeader::DsrRoutingHeader()
+        : DsrOptionField(8)
+        {
+        }
 
-  i.WriteU8 (GetNextHeader ());
-  i.WriteU8 (GetMessageType ());
-  i.WriteU16 (GetSourceId ());
-  i.WriteU16 (GetDestId ());
-  i.WriteU16 (GetPayloadLength ());
+        DsrRoutingHeader::~DsrRoutingHeader()
+        {
+        }
 
-  DsrOptionField::Serialize (i);
-}
+        void DsrRoutingHeader::Print(std::ostream & os) const
+        {
+            os
+            << " nextHeader: " << (uint32_t) GetNextHeader() << " messageType: " << (uint32_t) GetMessageType()
+            << " sourceId: " << (uint32_t) GetSourceId() << " destinationId: " << (uint32_t) GetDestId()
+            << " length: " << (uint32_t) GetPayloadLength();
+        }
 
-uint32_t DsrRoutingHeader::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
+        uint32_t DsrRoutingHeader::GetSerializedSize() const
+        {
+            // 8 bytes is the DsrFsHeader length
+            return 8 + DsrOptionField::GetSerializedSize();
+        }
 
-  SetNextHeader (i.ReadU8 ());
-  SetMessageType (i.ReadU8 ());
-  SetSourceId (i.ReadU16 ());
-  SetDestId (i.ReadU16 ());
-  SetPayloadLength (i.ReadU16 ());
+        void DsrRoutingHeader::Serialize(Buffer::Iterator start) const
+        {
+            Buffer::Iterator i = start;
 
-  DsrOptionField::Deserialize (i, GetPayloadLength ());
+            i.WriteU8(GetNextHeader());
+            i.WriteU8(GetMessageType());
+            i.WriteU16(GetSourceId());
+            i.WriteU16(GetDestId());
+            i.WriteU16(GetPayloadLength());
 
-  return GetSerializedSize ();
-}
+            DsrOptionField::Serialize(i);
+        }
 
-}  /* namespace dsr */
-}  /* namespace ns3 */
+        uint32_t DsrRoutingHeader::Deserialize(Buffer::Iterator start)
+        {
+            Buffer::Iterator i = start;
+
+            SetNextHeader(i.ReadU8());
+            SetMessageType(i.ReadU8());
+            SetSourceId(i.ReadU16());
+            SetDestId(i.ReadU16());
+            SetPayloadLength(i.ReadU16());
+
+            DsrOptionField::Deserialize(i, GetPayloadLength());
+
+            return GetSerializedSize();
+        }
+} /* namespace dsr */
+} /* namespace ns3 */

@@ -28,83 +28,77 @@
 #include "scheduler-scoped-event-id.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
- /** @brief Represents an in-memory storage entry
- */
-class InMemoryStorageEntry : noncopyable
-{
-public:
+/** @brief Represents an in-memory storage entry
+         */
+        class InMemoryStorageEntry : noncopyable {
+        public:
 
-  /** @brief Create an entry
-   */
-  InMemoryStorageEntry();
+            /** @brief Create an entry
+             */
+            InMemoryStorageEntry();
 
-  /** @brief Releases reference counts on shared objects
-   */
-  void
-  release();
+            /** @brief Releases reference counts on shared objects
+             */
+            void
+            release();
 
-  /** @brief Returns the name of the Data packet stored in the in-memory storage entry
-   */
-  const Name&
-  getName() const
-  {
-    return m_dataPacket->getName();
-  }
+            /** @brief Returns the name of the Data packet stored in the in-memory storage entry
+             */
+            const Name&
+            getName() const {
+                return m_dataPacket->getName();
+            }
 
-  /** @brief Returns the full name (including implicit digest) of the Data packet stored
-   *         in the in-memory storage entry
-   */
-  const Name&
-  getFullName() const
-  {
-    return m_dataPacket->getFullName();
-  }
+            /** @brief Returns the full name (including implicit digest) of the Data packet stored
+             *         in the in-memory storage entry
+             */
+            const Name&
+            getFullName() const {
+                return m_dataPacket->getFullName();
+            }
 
-
-  /** @brief Returns the Data packet stored in the in-memory storage entry
-   */
-  const Data&
-  getData() const
-  {
-    return *m_dataPacket;
-  }
+            /** @brief Returns the Data packet stored in the in-memory storage entry
+             */
+            const Data&
+            getData() const {
+                return *m_dataPacket;
+            }
 
 
-  /** @brief Changes the content of in-memory storage entry
-   *
-   *  This method also allows data to satisfy Interest with MustBeFresh
-   */
-  void
-  setData(const Data& data);
+            /** @brief Changes the content of in-memory storage entry
+             *
+             *  This method also allows data to satisfy Interest with MustBeFresh
+             */
+            void
+            setData(const Data& data);
 
-  /** @brief Set eventId for the markStale event.
-   */
-  void
-  setMarkStaleEventId(unique_ptr<scheduler::ScopedEventId>&& eventId);
+            /** @brief Set eventId for the markStale event.
+             */
+            void
+            setMarkStaleEventId(unique_ptr<scheduler::ScopedEventId>&& eventId);
 
-  /** @brief Disable the data from satisfying interest with MustBeFresh
-   */
-  void
-  markStale();
+            /** @brief Disable the data from satisfying interest with MustBeFresh
+             */
+            void
+            markStale();
 
-  /** @brief Check if the data can satisfy an interest with MustBeFresh
-   */
-  bool
-  isFresh()
-  {
-    return m_isFresh;
-  }
+            /** @brief Check if the data can satisfy an interest with MustBeFresh
+             */
+            bool
+            isFresh() {
+                return m_isFresh;
+            }
 
-private:
-  shared_ptr<const Data> m_dataPacket;
+        private:
+            shared_ptr<const Data> m_dataPacket;
 
-  bool m_isFresh;
-  unique_ptr<scheduler::ScopedEventId> m_markStaleEventId;
-};
+            bool m_isFresh;
+            unique_ptr<scheduler::ScopedEventId> m_markStaleEventId;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_IN_MEMORY_STORAGE_ENTRY_HPP

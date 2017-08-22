@@ -22,97 +22,91 @@
 #include "hex-decode.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-static const int8_t C2H[256] = { // hex decoding pad.
-// 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0-15
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 16-31
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 32-47
-   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1, // 48-63
-  -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 64-79
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 80-95
-  -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 96-111
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 112-127
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 128-143
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 144-159
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 160-175
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 176-191
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 192-207
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 208-223
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 224-239
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 240-255
-};
+            static const int8_t C2H[256] = {// hex decoding pad.
+                // 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0-15
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 16-31
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 32-47
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, // 48-63
+                -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 64-79
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 80-95
+                -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 96-111
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 112-127
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 128-143
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 144-159
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 160-175
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 176-191
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 192-207
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 208-223
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 224-239
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 240-255
+            };
 
-HexDecode::HexDecode()
-  : m_hasOddByte(false)
-  , m_oddByte(0)
-{
-}
+            HexDecode::HexDecode()
+            : m_hasOddByte(false)
+            , m_oddByte(0) {
+            }
 
-size_t
-HexDecode::convert(const uint8_t* hex, size_t hexLen)
-{
-  if (hexLen == 0)
-    return 0;
+            size_t
+            HexDecode::convert(const uint8_t* hex, size_t hexLen) {
+                if (hexLen == 0)
+                    return 0;
 
-  setOutputBuffer(toBytes(hex, hexLen));
+                setOutputBuffer(toBytes(hex, hexLen));
 
-  size_t totalDecodedLen = hexLen + (m_hasOddByte ? 1 : 0);
-  if (totalDecodedLen % 2 == 1) {
-    m_oddByte = hex[hexLen - 1];
-    m_hasOddByte = true;
-  }
-  else
-    m_hasOddByte = false;
+                size_t totalDecodedLen = hexLen + (m_hasOddByte ? 1 : 0);
+                if (totalDecodedLen % 2 == 1) {
+                    m_oddByte = hex[hexLen - 1];
+                    m_hasOddByte = true;
+                } else
+                    m_hasOddByte = false;
 
-  return hexLen;
-}
+                return hexLen;
+            }
 
-void
-HexDecode::finalize()
-{
-  if (m_hasOddByte)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Incomplete input"));
-}
+            void
+            HexDecode::finalize() {
+                if (m_hasOddByte)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Incomplete input"));
+            }
 
-unique_ptr<Transform::OBuffer>
-HexDecode::toBytes(const uint8_t* hex, size_t hexLen)
-{
-  size_t bufferSize = (hexLen + (m_hasOddByte ? 1 : 0)) >> 1;
-  auto buffer = make_unique<OBuffer>(bufferSize);
-  uint8_t* buf = &buffer->front();
+            unique_ptr<Transform::OBuffer>
+            HexDecode::toBytes(const uint8_t* hex, size_t hexLen) {
+                size_t bufferSize = (hexLen + (m_hasOddByte ? 1 : 0)) >> 1;
+                auto buffer = make_unique<OBuffer>(bufferSize);
+                uint8_t* buf = &buffer->front();
 
-  if (m_hasOddByte) {
-    if (C2H[hex[0]] < 0 || C2H[m_oddByte] < 0)
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Wrong input byte"));
+                if (m_hasOddByte) {
+                    if (C2H[hex[0]] < 0 || C2H[m_oddByte] < 0)
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Wrong input byte"));
 
-    buf[0] = (C2H[m_oddByte] << 4) + (C2H[hex[0]]);
-    buf += 1;
-    hex += 1;
-    hexLen -= 1;
-  }
+                    buf[0] = (C2H[m_oddByte] << 4) + (C2H[hex[0]]);
+                    buf += 1;
+                    hex += 1;
+                    hexLen -= 1;
+                }
 
-  while (hexLen > 1) {
-    if (C2H[hex[0]] < 0 || C2H[hex[1]] < 0)
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Wrong input byte"));
+                while (hexLen > 1) {
+                    if (C2H[hex[0]] < 0 || C2H[hex[1]] < 0)
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Wrong input byte"));
 
-    buf[0] = (C2H[hex[0]] << 4) + (C2H[hex[1]]);
-    buf += 1;
-    hex += 2;
-    hexLen -= 2;
-  }
+                    buf[0] = (C2H[hex[0]] << 4) + (C2H[hex[1]]);
+                    buf += 1;
+                    hex += 2;
+                    hexLen -= 2;
+                }
 
-  return buffer;
-}
+                return buffer;
+            }
 
-unique_ptr<Transform>
-hexDecode()
-{
-  return make_unique<HexDecode>();
-}
+            unique_ptr<Transform>
+            hexDecode() {
+                return make_unique<HexDecode>();
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

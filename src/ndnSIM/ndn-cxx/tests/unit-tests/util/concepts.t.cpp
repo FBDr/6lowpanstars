@@ -28,34 +28,31 @@
 #include "util/concepts.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-class WireEncodableType
-{
-public:
-  const Block&
-  wireEncode();
-};
-BOOST_CONCEPT_ASSERT((WireEncodable<WireEncodableType>));
+        class WireEncodableType {
+        public:
+            const Block&
+            wireEncode();
+        };
+        BOOST_CONCEPT_ASSERT((WireEncodable<WireEncodableType>));
 
-class WireEncodableType2
-{
-public:
-  Block
-  wireEncode();
-};
-BOOST_CONCEPT_ASSERT((WireEncodable<WireEncodableType2>));
+        class WireEncodableType2 {
+        public:
+            Block
+            wireEncode();
+        };
+        BOOST_CONCEPT_ASSERT((WireEncodable<WireEncodableType2>));
 
-class WireDecodableType
-{
-public:
-  explicit
-  WireDecodableType(const Block& wire);
+        class WireDecodableType {
+        public:
+            explicit
+            WireDecodableType(const Block& wire);
 
-  void
-  wireDecode(const Block& wire);
-};
-BOOST_CONCEPT_ASSERT((WireDecodable<WireDecodableType>));
+            void
+            wireDecode(const Block& wire);
+        };
+        BOOST_CONCEPT_ASSERT((WireDecodable<WireDecodableType>));
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

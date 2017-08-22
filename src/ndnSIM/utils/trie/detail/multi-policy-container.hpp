@@ -26,187 +26,174 @@
 #include <boost/mpl/at.hpp>
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
-namespace detail {
+    namespace ndn {
+        namespace ndnSIM {
+            namespace detail {
 
-template<class Base, class Value>
-struct policy_wrap {
-  policy_wrap(Base& base)
-    : value_(base)
-  {
-  }
-  Value value_;
-};
+                template<class Base, class Value>
+                struct policy_wrap {
 
-template<class Base, class Super /*empy_wrap/previous level*/,
-         class Value /*policy_wrap< element in vector >*/>
-struct inherit_with_base : Super, Value {
-  inherit_with_base(Base& base)
-    : Super(base)
-    , Value(base)
-  {
-  }
+                    policy_wrap(Base& base)
+                    : value_(base) {
+                    }
+                    Value value_;
+                };
 
-  void
-  update(typename Base::iterator item)
-  {
-    Value::value_.update(item);
-    Super::update(item);
-  }
+                template<class Base, class Super /*empy_wrap/previous level*/,
+                class Value /*policy_wrap< element in vector >*/>
+                struct inherit_with_base : Super, Value {
 
-  bool
-  insert(typename Base::iterator item)
-  {
-    bool ok = Value::value_.insert(item);
-    if (!ok)
-      return false;
+                    inherit_with_base(Base& base)
+                    : Super(base)
+                    , Value(base) {
+                    }
 
-    ok = Super::insert(item);
-    if (!ok) {
-      Value::value_.erase(item);
-      return false;
-    }
-    return true;
-  }
+                    void
+                    update(typename Base::iterator item) {
+                        Value::value_.update(item);
+                        Super::update(item);
+                    }
 
-  void
-  lookup(typename Base::iterator item)
-  {
-    Value::value_.lookup(item);
-    Super::lookup(item);
-  }
+                    bool
+                    insert(typename Base::iterator item) {
+                        bool ok = Value::value_.insert(item);
+                        if (!ok)
+                            return false;
 
-  void
-  erase(typename Base::iterator item)
-  {
-    Value::value_.erase(item);
-    Super::erase(item);
-  }
+                        ok = Super::insert(item);
+                        if (!ok) {
+                            Value::value_.erase(item);
+                            return false;
+                        }
+                        return true;
+                    }
 
-  void
-  clear()
-  {
-    Value::value_.clear();
-    Super::clear();
-  }
-};
+                    void
+                    lookup(typename Base::iterator item) {
+                        Value::value_.lookup(item);
+                        Super::lookup(item);
+                    }
 
-template<class Base>
-struct empty_policy_wrap {
-  empty_policy_wrap(Base& base)
-  {
-  }
+                    void
+                    erase(typename Base::iterator item) {
+                        Value::value_.erase(item);
+                        Super::erase(item);
+                    }
 
-  void
-  update(typename Base::iterator item)
-  {
-  }
-  bool
-  insert(typename Base::iterator item)
-  {
-    return true;
-  }
-  void
-  lookup(typename Base::iterator item)
-  {
-  }
-  void
-  erase(typename Base::iterator item)
-  {
-  }
-  void
-  clear()
-  {
-  }
-};
+                    void
+                    clear() {
+                        Value::value_.clear();
+                        Super::clear();
+                    }
+                };
 
-template<class Base, class Vector>
-struct multi_policy_container
-  : public boost::mpl::
-      fold<Vector, empty_policy_wrap<Base>,
-           inherit_with_base<Base, boost::mpl::_1 /*empty/previous*/,
-                             policy_wrap<Base, boost::mpl::_2> /*element in vector*/>>::type {
-  typedef typename boost::mpl::
-    fold<Vector, empty_policy_wrap<Base>,
-         inherit_with_base<Base, boost::mpl::_1 /*empty/previous*/,
-                           policy_wrap<Base, boost::mpl::_2> /*element in vector*/>>::type super;
+                template<class Base>
+                struct empty_policy_wrap {
 
-  typedef typename boost::mpl::at_c<Vector, 0>::type::iterator iterator;
-  typedef typename boost::mpl::at_c<Vector, 0>::type::const_iterator const_iterator;
+                    empty_policy_wrap(Base& base) {
+                    }
 
-  iterator
-  begin()
-  {
-    return this->get<0>().begin();
-  }
-  const_iterator
-  begin() const
-  {
-    return this->get<0>().begin();
-  }
+                    void
+                    update(typename Base::iterator item) {
+                    }
 
-  iterator
-  end()
-  {
-    return this->get<0>().end();
-  }
-  const_iterator
-  end() const
-  {
-    return this->get<0>().end();
-  }
+                    bool
+                    insert(typename Base::iterator item) {
+                        return true;
+                    }
 
-  size_t
-  size() const
-  {
-    return this->get<0>().size();
-  }
+                    void
+                    lookup(typename Base::iterator item) {
+                    }
 
-  multi_policy_container(Base& base)
-    : super(base)
-  {
-  }
+                    void
+                    erase(typename Base::iterator item) {
+                    }
 
-  template<int N>
-  struct index {
-    typedef typename boost::mpl::at_c<Vector, N>::type type;
-  };
+                    void
+                    clear() {
+                    }
+                };
 
-  template<class T>
-  T&
-  get()
-  {
-    return static_cast<policy_wrap<Base, T>&>(*this).value_;
-  }
+                template<class Base, class Vector>
+                struct multi_policy_container
+                : public boost::mpl::
+                fold<Vector, empty_policy_wrap<Base>,
+                inherit_with_base<Base, boost::mpl::_1 /*empty/previous*/,
+                policy_wrap<Base, boost::mpl::_2> /*element in vector*/>>::type
+                {
+                    typedef typename boost::mpl::
+                            fold<Vector, empty_policy_wrap<Base>,
+                            inherit_with_base<Base, boost::mpl::_1 /*empty/previous*/,
+                            policy_wrap<Base, boost::mpl::_2> /*element in vector*/>>::type super;
 
-  template<class T>
-  const T&
-  get() const
-  {
-    return static_cast<const policy_wrap<Base, T>&>(*this).value_;
-  }
+                    typedef typename boost::mpl::at_c<Vector, 0>::type::iterator iterator;
+                    typedef typename boost::mpl::at_c<Vector, 0>::type::const_iterator const_iterator;
 
-  template<int N>
-  typename boost::mpl::at_c<Vector, N>::type&
-  get()
-  {
-    typedef typename boost::mpl::at_c<Vector, N>::type T;
-    return static_cast<policy_wrap<Base, T>&>(*this).value_;
-  }
+                    iterator
+                    begin() {
+                        return this->get<0>().begin();
+                    }
 
-  template<int N>
-  const typename boost::mpl::at_c<Vector, N>::type&
-  get() const
-  {
-    typedef typename boost::mpl::at_c<Vector, N>::type T;
-    return static_cast<const policy_wrap<Base, T>&>(*this).value_;
-  }
-};
+                    const_iterator
+                    begin() const {
+                        return this->get<0>().begin();
+                    }
 
-} // detail
-} // ndnSIM
-} // ndn
+                    iterator
+                    end() {
+                        return this->get<0>().end();
+                    }
+
+                    const_iterator
+                    end() const {
+                        return this->get<0>().end();
+                    }
+
+                    size_t
+                    size() const {
+                        return this->get<0>().size();
+                    }
+
+                    multi_policy_container(Base & base)
+                            : super(base) {
+                    }
+
+                    template<int N>
+                            struct index {
+                        typedef typename boost::mpl::at_c<Vector, N>::type type;
+                    };
+
+                    template<class T >
+                    T &
+                    get() {
+                        return static_cast<policy_wrap<Base, T>&> (*this).value_;
+                    }
+
+                    template<class T>
+                    const T &
+                    get() const {
+                        return static_cast<const policy_wrap<Base, T>&> (*this).value_;
+                    }
+
+                    template<int N>
+                            typename boost::mpl::at_c<Vector, N>::type &
+                            get() {
+                        typedef typename boost::mpl::at_c<Vector, N>::type T;
+                        return static_cast<policy_wrap<Base, T>&> (*this).value_;
+                    }
+
+                    template<int N>
+                            const typename boost::mpl::at_c<Vector, N>::type &
+                            get() const {
+                        typedef typename boost::mpl::at_c<Vector, N>::type T;
+                        return static_cast<const policy_wrap<Base, T>&> (*this).value_;
+                    }
+                };
+
+            } // detail
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

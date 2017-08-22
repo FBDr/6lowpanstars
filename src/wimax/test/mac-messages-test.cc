@@ -28,74 +28,68 @@ using namespace ns3;
  */
 class DsaRequestTestCase : public TestCase
 {
-public:
-  DsaRequestTestCase ();
-  virtual ~DsaRequestTestCase ();
+    public :
+    DsaRequestTestCase();
+    virtual ~DsaRequestTestCase();
 
 private:
-  virtual void DoRun (void);
-
+    virtual void DoRun(void);
 };
 
-DsaRequestTestCase::DsaRequestTestCase ()
-  : TestCase ("Test the DSA request messages")
-{
+DsaRequestTestCase::DsaRequestTestCase()
+: TestCase("Test the DSA request messages") {
 }
 
-DsaRequestTestCase::~DsaRequestTestCase ()
-{
+DsaRequestTestCase::~DsaRequestTestCase() {
 }
 
 void
-DsaRequestTestCase::DoRun (void)
-{
-  IpcsClassifierRecord classifier = IpcsClassifierRecord ();
-  CsParameters csParam (CsParameters::ADD, classifier);
-  ServiceFlow sf = ServiceFlow (ServiceFlow::SF_DIRECTION_DOWN);
+DsaRequestTestCase::DoRun(void) {
+    IpcsClassifierRecord classifier = IpcsClassifierRecord();
+    CsParameters csParam(CsParameters::ADD, classifier);
+    ServiceFlow sf = ServiceFlow(ServiceFlow::SF_DIRECTION_DOWN);
 
-  sf.SetSfid (100);
-  sf.SetConvergenceSublayerParam (csParam);
-  sf.SetCsSpecification (ServiceFlow::IPV4);
-  sf.SetServiceSchedulingType (ServiceFlow::SF_TYPE_UGS);
-  sf.SetMaxSustainedTrafficRate (1000000);
-  sf.SetMinReservedTrafficRate (1000000);
-  sf.SetMinTolerableTrafficRate (1000000);
-  sf.SetMaximumLatency (10);
-  sf.SetMaxTrafficBurst (1000);
-  sf.SetTrafficPriority (1);
+    sf.SetSfid(100);
+    sf.SetConvergenceSublayerParam(csParam);
+    sf.SetCsSpecification(ServiceFlow::IPV4);
+    sf.SetServiceSchedulingType(ServiceFlow::SF_TYPE_UGS);
+    sf.SetMaxSustainedTrafficRate(1000000);
+    sf.SetMinReservedTrafficRate(1000000);
+    sf.SetMinTolerableTrafficRate(1000000);
+    sf.SetMaximumLatency(10);
+    sf.SetMaxTrafficBurst(1000);
+    sf.SetTrafficPriority(1);
 
-  DsaReq dsaReq (sf);
-  Ptr<Packet> packet = Create<Packet> ();
-  packet->AddHeader (dsaReq);
+    DsaReq dsaReq(sf);
+    Ptr<Packet> packet = Create<Packet> ();
+    packet->AddHeader(dsaReq);
 
-  DsaReq dsaReqRecv;
-  packet->RemoveHeader (dsaReqRecv);
+    DsaReq dsaReqRecv;
+    packet->RemoveHeader(dsaReqRecv);
 
-  ServiceFlow sfRecv = dsaReqRecv.GetServiceFlow ();
+    ServiceFlow sfRecv = dsaReqRecv.GetServiceFlow();
 
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetDirection (), ServiceFlow::SF_DIRECTION_DOWN, "The sfRecv had the wrong direction.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetSfid (), 100, "The sfRecv had the wrong sfid.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetCsSpecification (), ServiceFlow::IPV4, "The sfRecv had the wrong cs specification.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetServiceSchedulingType (), ServiceFlow::SF_TYPE_UGS, "The sfRecv had the wrong service scheduling type.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetMaxSustainedTrafficRate (), 1000000, "The sfRecv had the wrong maximum sustained traffic rate.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetMinReservedTrafficRate (), 1000000, "The sfRecv had the wrong minimum reserved traffic rate.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetMinTolerableTrafficRate (), 1000000, "The sfRecv had the wrong minimum tolerable traffic rate.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetMaximumLatency (), 10, "The sfRecv had the wrong maximum latency.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetMaxTrafficBurst (), 1000, "The sfRecv had the wrong maximum traffic burst.");
-  NS_TEST_ASSERT_MSG_EQ (sfRecv.GetTrafficPriority (), 1, "The sfRecv had the wrong traffic priority.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetDirection(), ServiceFlow::SF_DIRECTION_DOWN, "The sfRecv had the wrong direction.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetSfid(), 100, "The sfRecv had the wrong sfid.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetCsSpecification(), ServiceFlow::IPV4, "The sfRecv had the wrong cs specification.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetServiceSchedulingType(), ServiceFlow::SF_TYPE_UGS, "The sfRecv had the wrong service scheduling type.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetMaxSustainedTrafficRate(), 1000000, "The sfRecv had the wrong maximum sustained traffic rate.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetMinReservedTrafficRate(), 1000000, "The sfRecv had the wrong minimum reserved traffic rate.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetMinTolerableTrafficRate(), 1000000, "The sfRecv had the wrong minimum tolerable traffic rate.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetMaximumLatency(), 10, "The sfRecv had the wrong maximum latency.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetMaxTrafficBurst(), 1000, "The sfRecv had the wrong maximum traffic burst.");
+    NS_TEST_ASSERT_MSG_EQ(sfRecv.GetTrafficPriority(), 1, "The sfRecv had the wrong traffic priority.");
 }
 
 // ==============================================================================
 class Ns3WimaxMacMessagesTestSuite : public TestSuite
 {
-public:
-  Ns3WimaxMacMessagesTestSuite ();
-};
+    public :
+    Ns3WimaxMacMessagesTestSuite();};
 
-Ns3WimaxMacMessagesTestSuite::Ns3WimaxMacMessagesTestSuite ()
-  : TestSuite ("wimax-mac-messages", UNIT)
-{
-  AddTestCase (new DsaRequestTestCase, TestCase::QUICK);
+Ns3WimaxMacMessagesTestSuite::Ns3WimaxMacMessagesTestSuite()
+: TestSuite("wimax-mac-messages", UNIT) {
+    AddTestCase(new DsaRequestTestCase, TestCase::QUICK);
 }
 
 static Ns3WimaxMacMessagesTestSuite ns3WimaxMacMessagesTestSuite;

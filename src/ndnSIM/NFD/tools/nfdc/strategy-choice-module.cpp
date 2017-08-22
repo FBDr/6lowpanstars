@@ -27,59 +27,54 @@
 #include "format-helpers.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-void
-StrategyChoiceModule::fetchStatus(Controller& controller,
-                                  const function<void()>& onSuccess,
-                                  const Controller::DatasetFailCallback& onFailure,
-                                  const CommandOptions& options)
-{
-  controller.fetch<ndn::nfd::StrategyChoiceDataset>(
-    [this, onSuccess] (const std::vector<StrategyChoice>& result) {
-      m_status = result;
-      onSuccess();
-    },
-    onFailure, options);
-}
+            void
+            StrategyChoiceModule::fetchStatus(Controller& controller,
+                    const function<void()>& onSuccess,
+                    const Controller::DatasetFailCallback& onFailure,
+                    const CommandOptions& options) {
+                controller.fetch<ndn::nfd::StrategyChoiceDataset>(
+                        [this, onSuccess] (const std::vector<StrategyChoice>& result) {
+                            m_status = result;
+                            onSuccess();
+                        },
+                onFailure, options);
+            }
 
-void
-StrategyChoiceModule::formatStatusXml(std::ostream& os) const
-{
-  os << "<strategyChoices>";
-  for (const StrategyChoice& item : m_status) {
-    this->formatItemXml(os, item);
-  }
-  os << "</strategyChoices>";
-}
+            void
+            StrategyChoiceModule::formatStatusXml(std::ostream& os) const {
+                os << "<strategyChoices>";
+                for (const StrategyChoice& item : m_status) {
+                    this->formatItemXml(os, item);
+                }
+                os << "</strategyChoices>";
+            }
 
-void
-StrategyChoiceModule::formatItemXml(std::ostream& os, const StrategyChoice& item) const
-{
-  os << "<strategyChoice>";
-  os << "<namespace>" << xml::Text{item.getName().toUri()} << "</namespace>";
-  os << "<strategy><name>" << xml::Text{item.getStrategy().toUri()} << "</name></strategy>";
-  os << "</strategyChoice>";
-}
+            void
+            StrategyChoiceModule::formatItemXml(std::ostream& os, const StrategyChoice& item) const {
+                os << "<strategyChoice>";
+                os << "<namespace>" << xml::Text{item.getName().toUri()} << "</namespace>";
+                os << "<strategy><name>" << xml::Text{item.getStrategy().toUri()} << "</name></strategy>";
+                os << "</strategyChoice>";
+            }
 
-void
-StrategyChoiceModule::formatStatusText(std::ostream& os) const
-{
-  os << "Strategy choices:\n";
-  for (const StrategyChoice& item : m_status) {
-    this->formatItemText(os, item);
-  }
-}
+            void
+            StrategyChoiceModule::formatStatusText(std::ostream& os) const {
+                os << "Strategy choices:\n";
+                for (const StrategyChoice& item : m_status) {
+                    this->formatItemText(os, item);
+                }
+            }
 
-void
-StrategyChoiceModule::formatItemText(std::ostream& os, const StrategyChoice& item) const
-{
-  os << "  " << item.getName()
-     << " strategy=" << item.getStrategy()
-     << "\n";
-}
+            void
+            StrategyChoiceModule::formatItemText(std::ostream& os, const StrategyChoice& item) const {
+                os << "  " << item.getName()
+                        << " strategy=" << item.getStrategy()
+                        << "\n";
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

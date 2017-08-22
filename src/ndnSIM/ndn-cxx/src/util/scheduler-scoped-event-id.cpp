@@ -22,53 +22,47 @@
 #include "scheduler-scoped-event-id.hpp"
 
 namespace ndn {
-namespace util {
-namespace scheduler {
+    namespace util {
+        namespace scheduler {
 
 #if NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
-static_assert(std::is_nothrow_move_constructible<ScopedEventId>::value,
-              "ScopedEventId must be MoveConstructible with noexcept");
+            static_assert(std::is_nothrow_move_constructible<ScopedEventId>::value,
+                    "ScopedEventId must be MoveConstructible with noexcept");
 #endif // NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
 
-ScopedEventId::ScopedEventId(Scheduler& scheduler)
-  : m_scheduler(&scheduler)
-{
-}
+            ScopedEventId::ScopedEventId(Scheduler& scheduler)
+            : m_scheduler(&scheduler) {
+            }
 
-ScopedEventId::ScopedEventId(ScopedEventId&& other) noexcept
-  : m_scheduler(other.m_scheduler)
-  , m_event(other.m_event)
-{
-  other.release();
-}
+            ScopedEventId::ScopedEventId(ScopedEventId&& other) noexcept
+            : m_scheduler(other.m_scheduler)
+            , m_event(other.m_event) {
+                other.release();
+            }
 
-ScopedEventId&
-ScopedEventId::operator=(const EventId& event)
-{
-  if (m_event != event) {
-    m_scheduler->cancelEvent(m_event);
-    m_event = event;
-  }
-  return *this;
-}
+            ScopedEventId&
+                    ScopedEventId::operator=(const EventId& event) {
+                if (m_event != event) {
+                    m_scheduler->cancelEvent(m_event);
+                    m_event = event;
+                }
+                return *this;
+            }
 
-ScopedEventId::~ScopedEventId() noexcept
-{
-  m_scheduler->cancelEvent(m_event);
-}
+            ScopedEventId::~ScopedEventId() noexcept {
+                m_scheduler->cancelEvent(m_event);
+            }
 
-void
-ScopedEventId::cancel()
-{
-  m_scheduler->cancelEvent(m_event);
-}
+            void
+            ScopedEventId::cancel() {
+                m_scheduler->cancelEvent(m_event);
+            }
 
-void
-ScopedEventId::release() noexcept
-{
-  m_event.reset();
-}
+            void
+            ScopedEventId::release() noexcept {
+                m_event.reset();
+            }
 
-} // namespace scheduler
-} // namespace util
+        } // namespace scheduler
+    } // namespace util
 } // namespace ndn

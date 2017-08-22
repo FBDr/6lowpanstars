@@ -24,76 +24,74 @@
 #include "uan-mac.h"
 #include "uan-address.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 
-class UanPhy;
-class UanTxMode;
+    class UanPhy;
+    class UanTxMode;
 
-/**
- * \ingroup uan
- *
- * ALOHA MAC Protocol, the simplest MAC protocol for wireless networks.
- *
- * Packets enqueued are immediately transmitted.  This MAC attaches
- * a UanHeaderCommon to outgoing packets for address information.
- * (The type field is not used)
- */
-class UanMacAloha : public UanMac
-{
-public:
-  /** Default constructor */
-  UanMacAloha ();
-  /** Dummy destructor, see DoDispose. */
-  virtual ~UanMacAloha ();
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup uan
+     *
+     * ALOHA MAC Protocol, the simplest MAC protocol for wireless networks.
+     *
+     * Packets enqueued are immediately transmitted.  This MAC attaches
+     * a UanHeaderCommon to outgoing packets for address information.
+     * (The type field is not used)
+     */
+    class UanMacAloha : public UanMac {
+    public:
+        /** Default constructor */
+        UanMacAloha();
+        /** Dummy destructor, see DoDispose. */
+        virtual ~UanMacAloha();
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
 
-  // Inherited methods
-  Address GetAddress (void);
-  virtual void SetAddress (UanAddress addr);
-  virtual bool Enqueue (Ptr<Packet> pkt, const Address &dest, uint16_t protocolNumber);
-  virtual void SetForwardUpCb (Callback<void, Ptr<Packet>, const UanAddress& > cb);
-  virtual void AttachPhy (Ptr<UanPhy> phy);
-  virtual Address GetBroadcast (void) const;
-  virtual void Clear (void);
-  int64_t AssignStreams (int64_t stream);
+        // Inherited methods
+        Address GetAddress(void);
+        virtual void SetAddress(UanAddress addr);
+        virtual bool Enqueue(Ptr<Packet> pkt, const Address &dest, uint16_t protocolNumber);
+        virtual void SetForwardUpCb(Callback<void, Ptr<Packet>, const UanAddress& > cb);
+        virtual void AttachPhy(Ptr<UanPhy> phy);
+        virtual Address GetBroadcast(void) const;
+        virtual void Clear(void);
+        int64_t AssignStreams(int64_t stream);
 
-private:
-  /** The MAC address. */
-  UanAddress m_address;
-  /** PHY layer attached to this MAC. */
-  Ptr<UanPhy> m_phy;
-  /** Forwarding up callback. */
-  Callback<void, Ptr<Packet>, const UanAddress& > m_forUpCb;
-  /** Flag when we've been cleared. */
-  bool m_cleared;
+    private:
+        /** The MAC address. */
+        UanAddress m_address;
+        /** PHY layer attached to this MAC. */
+        Ptr<UanPhy> m_phy;
+        /** Forwarding up callback. */
+        Callback<void, Ptr<Packet>, const UanAddress& > m_forUpCb;
+        /** Flag when we've been cleared. */
+        bool m_cleared;
 
-  /**
-   * Receive packet from lower layer (passed to PHY as callback).
-   *
-   * \param pkt Packet being received.
-   * \param sinr SINR of received packet.
-   * \param txMode Mode of received packet.
-   */
-  void RxPacketGood (Ptr<Packet> pkt, double sinr, UanTxMode txMode);
+        /**
+         * Receive packet from lower layer (passed to PHY as callback).
+         *
+         * \param pkt Packet being received.
+         * \param sinr SINR of received packet.
+         * \param txMode Mode of received packet.
+         */
+        void RxPacketGood(Ptr<Packet> pkt, double sinr, UanTxMode txMode);
 
-  /**
-   * Packet received at lower layer in error.
-   *
-   * \param pkt Packet received in error.
-   * \param sinr SINR of received packet.
-   */
-  void RxPacketError (Ptr<Packet> pkt, double sinr);
-protected:
-  virtual void DoDispose ();
+        /**
+         * Packet received at lower layer in error.
+         *
+         * \param pkt Packet received in error.
+         * \param sinr SINR of received packet.
+         */
+        void RxPacketError(Ptr<Packet> pkt, double sinr);
+    protected:
+        virtual void DoDispose();
 
-};  // class UanMacAloha
+    }; // class UanMacAloha
 
 } // namespace ns3
 

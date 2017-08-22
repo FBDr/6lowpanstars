@@ -28,109 +28,107 @@
 #include <map>
 
 namespace ndn {
-namespace security {
-namespace v2 {
+    namespace security {
+        namespace v2 {
 
-/**
- * @brief Abstraction of AdditionalDescription
- * @sa docs/tutorials/certificate-format.rst
- */
-class AdditionalDescription
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+            /**
+             * @brief Abstraction of AdditionalDescription
+             * @sa docs/tutorials/certificate-format.rst
+             */
+            class AdditionalDescription {
+            public:
 
-  typedef std::map<std::string, std::string>::iterator iterator;
-  typedef std::map<std::string, std::string>::const_iterator const_iterator;
+                class Error : public tlv::Error {
+                public:
 
-public:
+                    explicit
+                    Error(const std::string& what)
+                    : tlv::Error(what) {
+                    }
+                };
 
-  /**
-   * @brief Create an empty AdditionalDescription
-   */
-  AdditionalDescription() = default;
+                typedef std::map<std::string, std::string>::iterator iterator;
+                typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
-  /**
-   * @brief Create AdditionalDescription from @p block
-   */
-  explicit
-  AdditionalDescription(const Block& block);
+            public:
 
-  const std::string&
-  get(const std::string& key) const;
+                /**
+                 * @brief Create an empty AdditionalDescription
+                 */
+                AdditionalDescription() = default;
 
-  void
-  set(const std::string& key, const std::string& value);
+                /**
+                 * @brief Create AdditionalDescription from @p block
+                 */
+                explicit
+                AdditionalDescription(const Block& block);
 
-  bool
-  has(const std::string& key) const;
+                const std::string&
+                get(const std::string& key) const;
 
-  size_t
-  size() const
-  {
-    return m_info.size();
-  }
+                void
+                set(const std::string& key, const std::string& value);
 
-  iterator
-  begin();
+                bool
+                has(const std::string& key) const;
 
-  iterator
-  end();
+                size_t
+                size() const {
+                    return m_info.size();
+                }
 
-  const_iterator
-  begin() const;
+                iterator
+                begin();
 
-  const_iterator
-  end() const;
+                iterator
+                end();
 
-  /** @brief Fast encoding or block size estimation
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+                const_iterator
+                begin() const;
 
-  /** @brief Encode ValidityPeriod into TLV block
-   */
-  const Block&
-  wireEncode() const;
+                const_iterator
+                end() const;
 
-  /** @brief Decode ValidityPeriod from TLV block
-   *  @throw Error when an invalid TLV block supplied
-   */
-  void
-  wireDecode(const Block& wire);
+                /** @brief Fast encoding or block size estimation
+                 */
+                template<encoding::Tag TAG>
+                size_t
+                wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // EqualityComparable concept
+                /** @brief Encode ValidityPeriod into TLV block
+                 */
+                const Block&
+                wireEncode() const;
 
-  bool
-  operator==(const AdditionalDescription& other) const;
+                /** @brief Decode ValidityPeriod from TLV block
+                 *  @throw Error when an invalid TLV block supplied
+                 */
+                void
+                wireDecode(const Block& wire);
 
-  bool
-  operator!=(const AdditionalDescription& other) const;
+            public: // EqualityComparable concept
 
-private:
+                bool
+                operator==(const AdditionalDescription& other) const;
 
-  std::map<std::string, std::string> m_info;
+                bool
+                operator!=(const AdditionalDescription& other) const;
 
-  mutable Block m_wire;
-};
+            private:
 
-std::ostream&
-operator<<(std::ostream& os, const AdditionalDescription& period);
+                std::map<std::string, std::string> m_info;
 
-} // namespace v2
+                mutable Block m_wire;
+            };
 
-using v2::AdditionalDescription;
+            std::ostream&
+            operator<<(std::ostream& os, const AdditionalDescription& period);
 
-} // namespace security
+        } // namespace v2
+
+        using v2::AdditionalDescription;
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_V2_ADDITIONAL_DESCRIPTION_HPP

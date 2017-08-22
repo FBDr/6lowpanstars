@@ -50,170 +50,156 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("CoDelDropTailBasicTest");
+NS_LOG_COMPONENT_DEFINE("CoDelDropTailBasicTest");
 
 static void
-CwndTracer (Ptr<OutputStreamWrapper>stream, uint32_t oldval, uint32_t newval)
-{
-  *stream->GetStream () << oldval << " " << newval << std::endl;
+CwndTracer(Ptr<OutputStreamWrapper>stream, uint32_t oldval, uint32_t newval) {
+    *stream->GetStream() << oldval << " " << newval << std::endl;
 }
 
 static void
-TraceCwnd (std::string cwndTrFileName)
-{
-  AsciiTraceHelper ascii;
-  if (cwndTrFileName.compare ("") == 0)
-    {
-      NS_LOG_DEBUG ("No trace file for cwnd provided");
-      return;
-    }
-  else
-    {
-      Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream (cwndTrFileName.c_str ());
-      Config::ConnectWithoutContext ("/NodeList/1/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow",MakeBoundCallback (&CwndTracer, stream));
+TraceCwnd(std::string cwndTrFileName) {
+    AsciiTraceHelper ascii;
+    if (cwndTrFileName.compare("") == 0) {
+        NS_LOG_DEBUG("No trace file for cwnd provided");
+        return;
+    } else {
+        Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream(cwndTrFileName.c_str());
+        Config::ConnectWithoutContext("/NodeList/1/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow", MakeBoundCallback(&CwndTracer, stream));
     }
 }
 
-int main (int argc, char *argv[])
-{
-  std::string bottleneckBandwidth = "5Mbps";
-  std::string bottleneckDelay = "5ms";
-  std::string accessBandwidth = "100Mbps";
-  std::string accessDelay = "0.1ms";
+int main(int argc, char *argv[]) {
+    std::string bottleneckBandwidth = "5Mbps";
+    std::string bottleneckDelay = "5ms";
+    std::string accessBandwidth = "100Mbps";
+    std::string accessDelay = "0.1ms";
 
-  std::string queueType = "DropTail";       //DropTail or CoDel
-  uint32_t queueSize = 1000;      //in packets
-  uint32_t pktSize = 1458;        //in bytes. 1458 to prevent fragments
-  float startTime = 0.1;
-  float simDuration = 60;        //in seconds
+    std::string queueType = "DropTail"; //DropTail or CoDel
+    uint32_t queueSize = 1000; //in packets
+    uint32_t pktSize = 1458; //in bytes. 1458 to prevent fragments
+    float startTime = 0.1;
+    float simDuration = 60; //in seconds
 
-  bool isPcapEnabled = true;
-  std::string pcapFileName = "pcapFileDropTail.pcap";
-  std::string cwndTrFileName = "cwndDropTail.tr";
-  bool logging = false;
+    bool isPcapEnabled = true;
+    std::string pcapFileName = "pcapFileDropTail.pcap";
+    std::string cwndTrFileName = "cwndDropTail.tr";
+    bool logging = false;
 
-  CommandLine cmd;
-  cmd.AddValue ("bottleneckBandwidth", "Bottleneck bandwidth", bottleneckBandwidth);
-  cmd.AddValue ("bottleneckDelay", "Bottleneck delay", bottleneckDelay);
-  cmd.AddValue ("accessBandwidth", "Access link bandwidth", accessBandwidth);
-  cmd.AddValue ("accessDelay", "Access link delay", accessDelay);
-  cmd.AddValue ("queueType", "Queue type: DropTail, CoDel", queueType);
-  cmd.AddValue ("queueSize", "Queue size in packets", queueSize);
-  cmd.AddValue ("pktSize", "Packet size in bytes", pktSize);
-  cmd.AddValue ("startTime", "Simulation start time", startTime);
-  cmd.AddValue ("simDuration", "Simulation duration in seconds", simDuration);
-  cmd.AddValue ("isPcapEnabled", "Flag to enable/disable pcap", isPcapEnabled);
-  cmd.AddValue ("pcapFileName", "Name of pcap file", pcapFileName);
-  cmd.AddValue ("cwndTrFileName", "Name of cwnd trace file", cwndTrFileName);
-  cmd.AddValue ("logging", "Flag to enable/disable logging", logging);
-  cmd.Parse (argc, argv);
+    CommandLine cmd;
+    cmd.AddValue("bottleneckBandwidth", "Bottleneck bandwidth", bottleneckBandwidth);
+    cmd.AddValue("bottleneckDelay", "Bottleneck delay", bottleneckDelay);
+    cmd.AddValue("accessBandwidth", "Access link bandwidth", accessBandwidth);
+    cmd.AddValue("accessDelay", "Access link delay", accessDelay);
+    cmd.AddValue("queueType", "Queue type: DropTail, CoDel", queueType);
+    cmd.AddValue("queueSize", "Queue size in packets", queueSize);
+    cmd.AddValue("pktSize", "Packet size in bytes", pktSize);
+    cmd.AddValue("startTime", "Simulation start time", startTime);
+    cmd.AddValue("simDuration", "Simulation duration in seconds", simDuration);
+    cmd.AddValue("isPcapEnabled", "Flag to enable/disable pcap", isPcapEnabled);
+    cmd.AddValue("pcapFileName", "Name of pcap file", pcapFileName);
+    cmd.AddValue("cwndTrFileName", "Name of cwnd trace file", cwndTrFileName);
+    cmd.AddValue("logging", "Flag to enable/disable logging", logging);
+    cmd.Parse(argc, argv);
 
-  float stopTime = startTime + simDuration;
+    float stopTime = startTime + simDuration;
 
-  if (logging)
-    {
-      LogComponentEnable ("CoDelDropTailBasicTest", LOG_LEVEL_ALL);
-      LogComponentEnable ("BulkSendApplication", LOG_LEVEL_INFO);
-      LogComponentEnable ("DropTailQueue", LOG_LEVEL_ALL);
-      LogComponentEnable ("CoDelQueue", LOG_LEVEL_ALL);
+    if (logging) {
+        LogComponentEnable("CoDelDropTailBasicTest", LOG_LEVEL_ALL);
+        LogComponentEnable("BulkSendApplication", LOG_LEVEL_INFO);
+        LogComponentEnable("DropTailQueue", LOG_LEVEL_ALL);
+        LogComponentEnable("CoDelQueue", LOG_LEVEL_ALL);
     }
 
-  // Enable checksum
-  if (isPcapEnabled)
-    {
-      GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
+    // Enable checksum
+    if (isPcapEnabled) {
+        GlobalValue::Bind("ChecksumEnabled", BooleanValue(true));
     }
 
-  // Create gateway, source, and sink
-  NodeContainer gateway;
-  gateway.Create (1);
-  NodeContainer source;
-  source.Create (1);
-  NodeContainer sink;
-  sink.Create (1);
+    // Create gateway, source, and sink
+    NodeContainer gateway;
+    gateway.Create(1);
+    NodeContainer source;
+    source.Create(1);
+    NodeContainer sink;
+    sink.Create(1);
 
-  // Create and configure access link and bottleneck link
-  PointToPointHelper accessLink;
-  accessLink.SetDeviceAttribute ("DataRate", StringValue (accessBandwidth));
-  accessLink.SetChannelAttribute ("Delay", StringValue (accessDelay));
+    // Create and configure access link and bottleneck link
+    PointToPointHelper accessLink;
+    accessLink.SetDeviceAttribute("DataRate", StringValue(accessBandwidth));
+    accessLink.SetChannelAttribute("Delay", StringValue(accessDelay));
 
-  PointToPointHelper bottleneckLink;
-  bottleneckLink.SetDeviceAttribute ("DataRate", StringValue (bottleneckBandwidth));
-  bottleneckLink.SetChannelAttribute ("Delay", StringValue (bottleneckDelay));
+    PointToPointHelper bottleneckLink;
+    bottleneckLink.SetDeviceAttribute("DataRate", StringValue(bottleneckBandwidth));
+    bottleneckLink.SetChannelAttribute("Delay", StringValue(bottleneckDelay));
 
-  // Configure the queue
-  if (queueType.compare ("DropTail") == 0)
-    {
-      bottleneckLink.SetQueue ("ns3::DropTailQueue",
-                               "Mode", StringValue ("QUEUE_MODE_PACKETS"),
-                               "MaxPackets", UintegerValue (queueSize));
-    }
-  else if (queueType.compare ("CoDel") == 0)
-    {
-      bottleneckLink.SetQueue ("ns3::CoDelQueue",
-                               "Mode", StringValue ("QUEUE_MODE_PACKETS"),
-                               "MaxPackets", UintegerValue (queueSize));
-    }
-  else
-    {
-      NS_LOG_DEBUG ("Invalid queue type");
-      exit (1);
+    // Configure the queue
+    if (queueType.compare("DropTail") == 0) {
+        bottleneckLink.SetQueue("ns3::DropTailQueue",
+                "Mode", StringValue("QUEUE_MODE_PACKETS"),
+                "MaxPackets", UintegerValue(queueSize));
+    } else if (queueType.compare("CoDel") == 0) {
+        bottleneckLink.SetQueue("ns3::CoDelQueue",
+                "Mode", StringValue("QUEUE_MODE_PACKETS"),
+                "MaxPackets", UintegerValue(queueSize));
+    } else {
+        NS_LOG_DEBUG("Invalid queue type");
+        exit(1);
     }
 
-  InternetStackHelper stack;
-  stack.InstallAll ();
+    InternetStackHelper stack;
+    stack.InstallAll();
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.0.0.0", "255.255.255.0");
+    Ipv4AddressHelper address;
+    address.SetBase("10.0.0.0", "255.255.255.0");
 
-  // Configure the source and sink net devices
-  // and the channels between the source/sink and the gateway
-  Ipv4InterfaceContainer sinkInterface;
+    // Configure the source and sink net devices
+    // and the channels between the source/sink and the gateway
+    Ipv4InterfaceContainer sinkInterface;
 
-  NetDeviceContainer devices;
-  devices = accessLink.Install (source.Get (0), gateway.Get (0));
-  address.NewNetwork ();
-  Ipv4InterfaceContainer interfaces = address.Assign (devices);
-  devices = bottleneckLink.Install (gateway.Get (0), sink.Get (0));
-  address.NewNetwork ();
-  interfaces = address.Assign (devices);
+    NetDeviceContainer devices;
+    devices = accessLink.Install(source.Get(0), gateway.Get(0));
+    address.NewNetwork();
+    Ipv4InterfaceContainer interfaces = address.Assign(devices);
+    devices = bottleneckLink.Install(gateway.Get(0), sink.Get(0));
+    address.NewNetwork();
+    interfaces = address.Assign(devices);
 
-  sinkInterface.Add (interfaces.Get (1));
+    sinkInterface.Add(interfaces.Get(1));
 
-  NS_LOG_INFO ("Initialize Global Routing.");
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+    NS_LOG_INFO("Initialize Global Routing.");
+    Ipv4GlobalRoutingHelper::PopulateRoutingTables();
 
-  uint16_t port = 50000;
-  Address sinkLocalAddress (InetSocketAddress (Ipv4Address::GetAny (), port));
-  PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", sinkLocalAddress);
+    uint16_t port = 50000;
+    Address sinkLocalAddress(InetSocketAddress(Ipv4Address::GetAny(), port));
+    PacketSinkHelper sinkHelper("ns3::TcpSocketFactory", sinkLocalAddress);
 
-  // Configure application
-  AddressValue remoteAddress (InetSocketAddress (sinkInterface.GetAddress (0, 0), port));
-  Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (pktSize));
-  BulkSendHelper ftp ("ns3::TcpSocketFactory", Address ());
-  ftp.SetAttribute ("Remote", remoteAddress);
-  ftp.SetAttribute ("SendSize", UintegerValue (pktSize));
-  ftp.SetAttribute ("MaxBytes", UintegerValue (0));
+    // Configure application
+    AddressValue remoteAddress(InetSocketAddress(sinkInterface.GetAddress(0, 0), port));
+    Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(pktSize));
+    BulkSendHelper ftp("ns3::TcpSocketFactory", Address());
+    ftp.SetAttribute("Remote", remoteAddress);
+    ftp.SetAttribute("SendSize", UintegerValue(pktSize));
+    ftp.SetAttribute("MaxBytes", UintegerValue(0));
 
-  ApplicationContainer sourceApp = ftp.Install (source.Get (0));
-  sourceApp.Start (Seconds (0));
-  sourceApp.Stop (Seconds (stopTime - 3));
+    ApplicationContainer sourceApp = ftp.Install(source.Get(0));
+    sourceApp.Start(Seconds(0));
+    sourceApp.Stop(Seconds(stopTime - 3));
 
-  sinkHelper.SetAttribute ("Protocol", TypeIdValue (TcpSocketFactory::GetTypeId ()));
-  ApplicationContainer sinkApp = sinkHelper.Install (sink);
-  sinkApp.Start (Seconds (0));
-  sinkApp.Stop (Seconds (stopTime));
+    sinkHelper.SetAttribute("Protocol", TypeIdValue(TcpSocketFactory::GetTypeId()));
+    ApplicationContainer sinkApp = sinkHelper.Install(sink);
+    sinkApp.Start(Seconds(0));
+    sinkApp.Stop(Seconds(stopTime));
 
-  Simulator::Schedule (Seconds (0.00001), &TraceCwnd, cwndTrFileName);
+    Simulator::Schedule(Seconds(0.00001), &TraceCwnd, cwndTrFileName);
 
-  if (isPcapEnabled)
-    {
-      accessLink.EnablePcap (pcapFileName,source,true);
+    if (isPcapEnabled) {
+        accessLink.EnablePcap(pcapFileName, source, true);
     }
 
-  Simulator::Stop (Seconds (stopTime));
-  Simulator::Run ();
+    Simulator::Stop(Seconds(stopTime));
+    Simulator::Run();
 
-  Simulator::Destroy ();
-  return 0;
+    Simulator::Destroy();
+    return 0;
 }

@@ -26,71 +26,70 @@
 #include "../../encoding/block.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/**
- * \ingroup management
- */
-enum FaceEventKind {
-  FACE_EVENT_CREATED = 1, ///< face created
-  FACE_EVENT_DESTROYED = 2, ///< face destroyed
-  FACE_EVENT_UP = 3, ///< face went UP (from DOWN state)
-  FACE_EVENT_DOWN = 4 ///< face went DOWN (from UP state)
-};
+        /**
+         * \ingroup management
+         */
+        enum FaceEventKind {
+            FACE_EVENT_CREATED = 1, ///< face created
+            FACE_EVENT_DESTROYED = 2, ///< face destroyed
+            FACE_EVENT_UP = 3, ///< face went UP (from DOWN state)
+            FACE_EVENT_DOWN = 4 ///< face went DOWN (from UP state)
+        };
 
-/**
- * \ingroup management
- * \brief represents a Face status change notification
- * \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Face-Status-Change-Notification
- */
-class FaceEventNotification : public FaceTraits<FaceEventNotification>
-{
-public:
-  FaceEventNotification();
+        /**
+         * \ingroup management
+         * \brief represents a Face status change notification
+         * \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Face-Status-Change-Notification
+         */
+        class FaceEventNotification : public FaceTraits<FaceEventNotification> {
+        public:
+            FaceEventNotification();
 
-  explicit
-  FaceEventNotification(const Block& block);
+            explicit
+            FaceEventNotification(const Block& block);
 
-  /** \brief prepend FaceEventNotification to the encoder
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            /** \brief prepend FaceEventNotification to the encoder
+             */
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-  /** \brief encode FaceEventNotification
-   */
-  const Block&
-  wireEncode() const;
+            /** \brief encode FaceEventNotification
+             */
+            const Block&
+            wireEncode() const;
 
-  /** \brief decode FaceEventNotification
-   */
-  void
-  wireDecode(const Block& wire);
+            /** \brief decode FaceEventNotification
+             */
+            void
+            wireDecode(const Block& wire);
 
-public: // getters & setters
-  FaceEventKind
-  getKind() const
-  {
-    return m_kind;
-  }
+        public: // getters & setters
 
-  FaceEventNotification&
-  setKind(FaceEventKind kind);
+            FaceEventKind
+            getKind() const {
+                return m_kind;
+            }
 
-protected:
-  void
-  wireReset() const;
+            FaceEventNotification&
+            setKind(FaceEventKind kind);
 
-private:
-  FaceEventKind m_kind;
+        protected:
+            void
+            wireReset() const;
 
-  mutable Block m_wire;
-};
+        private:
+            FaceEventKind m_kind;
 
-std::ostream&
-operator<<(std::ostream& os, const FaceEventNotification& notification);
+            mutable Block m_wire;
+        };
 
-} // namespace nfd
+        std::ostream&
+        operator<<(std::ostream& os, const FaceEventNotification& notification);
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FACE_EVENT_NOTIFICATION_HPP

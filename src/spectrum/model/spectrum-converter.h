@@ -26,63 +26,62 @@
 
 namespace ns3 {
 
-/**
- * \ingroup spectrum
- *
- * Class which implements a converter between SpectrumValue which are
- * defined over different SpectrumModel. In more formal terms, this class
- * allows conversion between different function spaces. In practical
- * terms, this allows you to mix different spectrum representation
- * within the same channel, such as a device using a coarse spectrum
- * representation (e.g., one frequency for each IEEE 802.11 channel)
- * and devices using a finer representation (e.g., one frequency for
- * each OFDM subcarrier).
- *
- */
-class SpectrumConverter : public SimpleRefCount<SpectrumConverter>
-{
-public:
-  /**
-   * Create a SpectrumConverter class that will be able to convert ValueVsFreq
-   * instances defined over one SpectrumModel to corresponding ValueVsFreq
-   * instances defined over a diffent SpectrumModel
-   *
-   * @param fromSpectrumModel the SpectrumModel to convert from
-   * @param toSpectrumModel the SpectrumModel to convert to
-   */
-  SpectrumConverter (Ptr<const SpectrumModel> fromSpectrumModel, Ptr<const SpectrumModel> toSpectrumModel);
+    /**
+     * \ingroup spectrum
+     *
+     * Class which implements a converter between SpectrumValue which are
+     * defined over different SpectrumModel. In more formal terms, this class
+     * allows conversion between different function spaces. In practical
+     * terms, this allows you to mix different spectrum representation
+     * within the same channel, such as a device using a coarse spectrum
+     * representation (e.g., one frequency for each IEEE 802.11 channel)
+     * and devices using a finer representation (e.g., one frequency for
+     * each OFDM subcarrier).
+     *
+     */
+    class SpectrumConverter : public SimpleRefCount<SpectrumConverter> {
+    public:
+        /**
+         * Create a SpectrumConverter class that will be able to convert ValueVsFreq
+         * instances defined over one SpectrumModel to corresponding ValueVsFreq
+         * instances defined over a diffent SpectrumModel
+         *
+         * @param fromSpectrumModel the SpectrumModel to convert from
+         * @param toSpectrumModel the SpectrumModel to convert to
+         */
+        SpectrumConverter(Ptr<const SpectrumModel> fromSpectrumModel, Ptr<const SpectrumModel> toSpectrumModel);
 
-  SpectrumConverter ();
-
+        SpectrumConverter();
 
 
-  /**
-   * Convert a particular ValueVsFreq instance to
-   *
-   * @param vvf the ValueVsFreq instance to be converted
-   *
-   * @return the converted version of the provided ValueVsFreq
-   */
-  Ptr<SpectrumValue> Convert (Ptr<const SpectrumValue> vvf) const;
+
+        /**
+         * Convert a particular ValueVsFreq instance to
+         *
+         * @param vvf the ValueVsFreq instance to be converted
+         *
+         * @return the converted version of the provided ValueVsFreq
+         */
+        Ptr<SpectrumValue> Convert(Ptr<const SpectrumValue> vvf) const;
 
 
-private:
-  /**
-   * Calculate the coefficient for value conversion between elements
-   *
-   * @param from BandInfo to convert from
-   * @param to  BandInfo to convert to
-   *
-   * @return the fraction of the value of the "from" BandInfos that is
-   * mapped to the "to" BandInfo
-   */
-  double GetCoefficient (const BandInfo& from, const BandInfo& to) const;
+    private:
+        /**
+         * Calculate the coefficient for value conversion between elements
+         *
+         * @param from BandInfo to convert from
+         * @param to  BandInfo to convert to
+         *
+         * @return the fraction of the value of the "from" BandInfos that is
+         * mapped to the "to" BandInfo
+         */
+        double GetCoefficient(const BandInfo& from, const BandInfo& to) const;
 
-  std::vector<std::vector<double> > m_conversionMatrix; // /< matrix of conversion coefficients
-  Ptr<const SpectrumModel> m_fromSpectrumModel;  // /<  the SpectrumModel this SpectrumConverter instance can convert from
-  Ptr<const SpectrumModel> m_toSpectrumModel;    // /<  the SpectrumModel this SpectrumConverter instance can convert to
+        std::vector<std::vector<double> > m_conversionMatrix; // /< matrix of conversion coefficients
+        Ptr<const SpectrumModel> m_fromSpectrumModel; // /<  the SpectrumModel this SpectrumConverter instance can convert from
+        Ptr<const SpectrumModel> m_toSpectrumModel; // /<  the SpectrumModel this SpectrumConverter instance can convert to
 
-};
+    };
 
 
 

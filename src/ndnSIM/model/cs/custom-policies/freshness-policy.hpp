@@ -32,140 +32,133 @@
 #include <ns3/traced-callback.h>
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-/**
- * @brief Traits for freshness policy
- */
-struct freshness_policy_traits {
-  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string
-  GetName()
-  {
-    return "Freshness";
-  }
+            /**
+             * @brief Traits for freshness policy
+             */
+            struct freshness_policy_traits {
+                /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
 
-  struct policy_hook_type : public boost::intrusive::set_member_hook<> {
-    Time timeWhenShouldExpire;
-  };
+                static std::string
+                GetName() {
+                    return "Freshness";
+                }
 
-  template<class Container>
-  struct container_hook {
-    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
-      type;
-  };
+                struct policy_hook_type : public boost::intrusive::set_member_hook<> {
+                    Time timeWhenShouldExpire;
+                };
 
-  template<class Base, class Container, class Hook>
-  struct policy {
-    static Time&
-    get_freshness(typename Container::iterator item)
-    {
-      return static_cast<typename policy_container::value_traits::hook_type*>(
-               policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
-    }
+                template<class Container>
+                struct container_hook {
+                    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
+                    type;
+                };
 
-    static const Time&
-    get_freshness(typename Container::const_iterator item)
-    {
-      return static_cast<const typename policy_container::value_traits::hook_type*>(
-               policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
-    }
+                template<class Base, class Container, class Hook>
+                struct policy {
 
-    template<class Key>
-    struct MemberHookLess {
-      bool
-      operator()(const Key& a, const Key& b) const
-      {
-        return get_freshness(&a) < get_freshness(&b);
-      }
-    };
+                    static Time&
+                    get_freshness(typename Container::iterator item) {
+                        return static_cast<typename policy_container::value_traits::hook_type*> (
+                                policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
+                    }
 
-    typedef boost::intrusive::multiset<Container,
-                                       boost::intrusive::compare<MemberHookLess<Container>>,
-                                       Hook> policy_container;
+                    static const Time&
+                    get_freshness(typename Container::const_iterator item) {
+                        return static_cast<const typename policy_container::value_traits::hook_type*> (
+                                policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
+                    }
 
-    class type : public policy_container {
-    public:
-      typedef policy policy_base; // to get access to get_freshness methods from outside
-      typedef Container parent_trie;
+                    template<class Key>
+                    struct MemberHookLess {
 
-      type(Base& base)
-        : base_(base)
-        , max_size_(100)
-      {
-      }
+                        bool
+                        operator()(const Key& a, const Key& b) const {
+                            return get_freshness(&a) < get_freshness(&b);
+                        }
+                    };
 
-      inline void
-      update(typename parent_trie::iterator item)
-      {
-        // do nothing
-      }
+                    typedef boost::intrusive::multiset<Container,
+                    boost::intrusive::compare<MemberHookLess<Container>>,
+                    Hook> policy_container;
 
-      inline bool
-      insert(typename parent_trie::iterator item)
-      {
-        time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
-        if (freshness > time::milliseconds::zero()) {
-          get_freshness(item) = Simulator::Now() + MilliSeconds(freshness.count());
+                    class type : public policy_container {
+                    public:
+                        typedef policy policy_base; // to get access to get_freshness methods from outside
+                        typedef Container parent_trie;
 
-          // push item only if freshness is non zero. otherwise, this payload is not
-          // controlled by the policy.
-          // Note that .size() on this policy would return only the number of items with
-          // non-infinite freshness policy
-          policy_container::insert(*item);
-        }
+                        type(Base& base)
+                        : base_(base)
+                        , max_size_(100) {
+                        }
 
-        return true;
-      }
+                        inline void
+                        update(typename parent_trie::iterator item) {
+                            // do nothing
+                        }
 
-      inline void
-      lookup(typename parent_trie::iterator item)
-      {
-        // do nothing. it's random policy
-      }
+                        inline bool
+                        insert(typename parent_trie::iterator item) {
+                            time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
+                            if (freshness > time::milliseconds::zero()) {
+                                get_freshness(item) = Simulator::Now() + MilliSeconds(freshness.count());
 
-      inline void
-      erase(typename parent_trie::iterator item)
-      {
-        time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
-        if (freshness > time::milliseconds::zero()) {
-          // erase only if freshness is positive (otherwise an item is not in the policy)
-          policy_container::erase(policy_container::s_iterator_to(*item));
-        }
-      }
+                                // push item only if freshness is non zero. otherwise, this payload is not
+                                // controlled by the policy.
+                                // Note that .size() on this policy would return only the number of items with
+                                // non-infinite freshness policy
+                                policy_container::insert(*item);
+                            }
 
-      inline void
-      clear()
-      {
-        policy_container::clear();
-      }
+                            return true;
+                        }
 
-      inline void
-      set_max_size(size_t max_size)
-      {
-        max_size_ = max_size;
-      }
+                        inline void
+                        lookup(typename parent_trie::iterator item) {
+                            // do nothing. it's random policy
+                        }
 
-      inline size_t
-      get_max_size() const
-      {
-        return max_size_;
-      }
+                        inline void
+                        erase(typename parent_trie::iterator item) {
+                            time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
+                            if (freshness > time::milliseconds::zero()) {
+                                // erase only if freshness is positive (otherwise an item is not in the policy)
+                                policy_container::erase(policy_container::s_iterator_to(*item));
+                            }
+                        }
 
-    private:
-      type()
-        : base_(*((Base*)0)){};
+                        inline void
+                        clear() {
+                            policy_container::clear();
+                        }
 
-    private:
-      Base& base_;
-      size_t max_size_;
-    };
-  };
-};
+                        inline void
+                        set_max_size(size_t max_size) {
+                            max_size_ = max_size;
+                        }
 
-} // ndnSIM
-} // ndn
+                        inline size_t
+                        get_max_size() const {
+                            return max_size_;
+                        }
+
+                    private:
+
+                        type()
+                        : base_(*((Base*) 0)) {
+                        };
+
+                    private:
+                        Base& base_;
+                        size_t max_size_;
+                    };
+                };
+            };
+
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

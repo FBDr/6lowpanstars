@@ -74,55 +74,54 @@
 // }
 
 int
-ndnsec_sig_verify(int argc, char** argv)
-{
-  std::cerr << "Not supported yet" << std::endl;
-  return 1;
-  // bool isDataPacket = false;
-  // std::string certString;
+ndnsec_sig_verify(int argc, char** argv) {
+    std::cerr << "Not supported yet" << std::endl;
+    return 1;
+    // bool isDataPacket = false;
+    // std::string certString;
 
-  // po::options_description desc("General Usage\n  ndn-sig-verify [-h] [-d] certificate\nGeneral options");
-  // desc.add_options()
-  //   ("help,h", "produce help message")
-  //   ("data,d", "if specified, input from stdin will be treated as a Data packet, otherwise binary data")
-  //   ("certificate,c", po::value<std::string>(&certString), "the certificate bits")
-  //   ;
+    // po::options_description desc("General Usage\n  ndn-sig-verify [-h] [-d] certificate\nGeneral options");
+    // desc.add_options()
+    //   ("help,h", "produce help message")
+    //   ("data,d", "if specified, input from stdin will be treated as a Data packet, otherwise binary data")
+    //   ("certificate,c", po::value<std::string>(&certString), "the certificate bits")
+    //   ;
 
-  // po::positional_options_description p;
-  // p.add("certificate", 1);
+    // po::positional_options_description p;
+    // p.add("certificate", 1);
 
-  // po::variables_map vm;
-  // try
-  //   {
-  //     po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
-  //     po::notify(vm);
-  //   }
-  // catch( const std::exception& e)
-  //   {
-  //     std::cerr << e.what() << std::endl;
-  //     std::cerr << desc << std::endl;
-  //     return 1;
-  //   }
+    // po::variables_map vm;
+    // try
+    //   {
+    //     po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+    //     po::notify(vm);
+    //   }
+    // catch( const std::exception& e)
+    //   {
+    //     std::cerr << e.what() << std::endl;
+    //     std::cerr << desc << std::endl;
+    //     return 1;
+    //   }
 
-  // if (vm.count("help") || vm.count("certificate")==0)
-  //   {
-  //     std::cerr << desc << std::endl;
-  //     return 1;
-  //   }
-  // if (vm.count("data"))
-  //   isDataPacket = true;
+    // if (vm.count("help") || vm.count("certificate")==0)
+    //   {
+    //     std::cerr << desc << std::endl;
+    //     return 1;
+    //   }
+    // if (vm.count("data"))
+    //   isDataPacket = true;
 
-  // try
-  //   {
-  //     shared_ptr<IdentityCertificate> certificate = getCertificate(certString);
-  //     bool res = verifySignature(certificate, isDataPacket);
-  //     return (res ? 0 : 1);
-  //   }
-  // catch(const std::exception &e)
-  //   {
-  //     std::cerr << "ERROR: " << e.what() << std::endl;
-  //     return 1;
-  //   }
+    // try
+    //   {
+    //     shared_ptr<IdentityCertificate> certificate = getCertificate(certString);
+    //     bool res = verifySignature(certificate, isDataPacket);
+    //     return (res ? 0 : 1);
+    //   }
+    // catch(const std::exception &e)
+    //   {
+    //     std::cerr << "ERROR: " << e.what() << std::endl;
+    //     return 1;
+    //   }
 }
 
 #endif // NDN_TOOLS_NDNSEC_SIG_VERIFY_HPP

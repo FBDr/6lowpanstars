@@ -27,105 +27,102 @@
 
 namespace ns3 {
 
-class MobilityModel;
+    class MobilityModel;
 
-/**
- * \ingroup propagation
- *
- * \brief calculate a propagation delay.
- */
-class PropagationDelayModel : public Object
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual ~PropagationDelayModel ();
-  /**
-   * \param a the source
-   * \param b the destination
-   * \returns the calculated propagation delay
-   *
-   * Calculate the propagation delay between the specified
-   * source and destination.
-   */
-  virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const = 0;
-  /**
-   * If this delay model uses objects of type RandomVariableStream,
-   * set the stream numbers to the integers starting with the offset
-   * 'stream'.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream
-   * \return the number of stream indices assigned by this model
-   */
-  int64_t AssignStreams (int64_t stream);
-private:
-  /**
-   * Subclasses must implement this; those not using random variables
-   * can return zero
-   */
-  virtual int64_t DoAssignStreams (int64_t stream) = 0;
-};
+    /**
+     * \ingroup propagation
+     *
+     * \brief calculate a propagation delay.
+     */
+    class PropagationDelayModel : public Object {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual ~PropagationDelayModel();
+        /**
+         * \param a the source
+         * \param b the destination
+         * \returns the calculated propagation delay
+         *
+         * Calculate the propagation delay between the specified
+         * source and destination.
+         */
+        virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const = 0;
+        /**
+         * If this delay model uses objects of type RandomVariableStream,
+         * set the stream numbers to the integers starting with the offset
+         * 'stream'.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream
+         * \return the number of stream indices assigned by this model
+         */
+        int64_t AssignStreams(int64_t stream);
+    private:
+        /**
+         * Subclasses must implement this; those not using random variables
+         * can return zero
+         */
+        virtual int64_t DoAssignStreams(int64_t stream) = 0;
+    };
 
-/**
- * \ingroup propagation
- *
- * \brief the propagation delay is random
- */
-class RandomPropagationDelayModel : public PropagationDelayModel
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup propagation
+     *
+     * \brief the propagation delay is random
+     */
+    class RandomPropagationDelayModel : public PropagationDelayModel {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-  /**
-   * Use the default parameters from PropagationDelayRandomDistribution.
-   */
-  RandomPropagationDelayModel ();
-  virtual ~RandomPropagationDelayModel ();
-  virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
-private:
-  virtual int64_t DoAssignStreams (int64_t stream);
-  Ptr<RandomVariableStream> m_variable; //!< random generator
-};
+        /**
+         * Use the default parameters from PropagationDelayRandomDistribution.
+         */
+        RandomPropagationDelayModel();
+        virtual ~RandomPropagationDelayModel();
+        virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+    private:
+        virtual int64_t DoAssignStreams(int64_t stream);
+        Ptr<RandomVariableStream> m_variable; //!< random generator
+    };
 
-/**
- * \ingroup propagation
- *
- * \brief the propagation speed is constant
- */
-class ConstantSpeedPropagationDelayModel : public PropagationDelayModel
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup propagation
+     *
+     * \brief the propagation speed is constant
+     */
+    class ConstantSpeedPropagationDelayModel : public PropagationDelayModel {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-  /**
-   * Use the default parameters from PropagationDelayConstantSpeed.
-   */
-  ConstantSpeedPropagationDelayModel ();
-  virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
-  /**
-   * \param speed the new speed (m/s)
-   */
-  void SetSpeed (double speed);
-  /**
-   * \returns the current propagation speed (m/s).
-   */
-  double GetSpeed (void) const;
-private:
-  virtual int64_t DoAssignStreams (int64_t stream);
-  double m_speed; //!< speed
-};
+        /**
+         * Use the default parameters from PropagationDelayConstantSpeed.
+         */
+        ConstantSpeedPropagationDelayModel();
+        virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        /**
+         * \param speed the new speed (m/s)
+         */
+        void SetSpeed(double speed);
+        /**
+         * \returns the current propagation speed (m/s).
+         */
+        double GetSpeed(void) const;
+    private:
+        virtual int64_t DoAssignStreams(int64_t stream);
+        double m_speed; //!< speed
+    };
 
 } // namespace ns3
 

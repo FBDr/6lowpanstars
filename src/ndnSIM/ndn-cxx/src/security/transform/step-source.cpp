@@ -22,27 +22,23 @@
 #include "step-source.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-size_t
-StepSource::write(const uint8_t* buf, size_t size)
-{
-  return m_next->write(buf, size);
-}
+            size_t
+            StepSource::write(const uint8_t* buf, size_t size) {
+                return m_next->write(buf, size);
+            }
 
-void
-StepSource::end()
-{
-  m_next->end();
-}
+            void
+            StepSource::end() {
+                m_next->end();
+            }
 
+            void
+            StepSource::doPump() {
+            }
 
-void
-StepSource::doPump()
-{
-}
-
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

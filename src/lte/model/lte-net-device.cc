@@ -36,255 +36,207 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/log.h>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("LteNetDevice");
-
-NS_OBJECT_ENSURE_REGISTERED ( LteNetDevice);
-
-////////////////////////////////
-// LteNetDevice
-////////////////////////////////
-
-TypeId LteNetDevice::GetTypeId (void)
+namespace ns3
 {
-  static TypeId
-    tid =
-    TypeId ("ns3::LteNetDevice")
 
-    .SetParent<NetDevice> ()
+    NS_LOG_COMPONENT_DEFINE("LteNetDevice");
 
-    .AddAttribute ("Mtu", "The MAC-level Maximum Transmission Unit",
-                   UintegerValue (30000),
-                   MakeUintegerAccessor (&LteNetDevice::SetMtu,
-                                         &LteNetDevice::GetMtu),
-                   MakeUintegerChecker<uint16_t> ())
-  ;
-  return tid;
-}
+    NS_OBJECT_ENSURE_REGISTERED(LteNetDevice);
 
-LteNetDevice::LteNetDevice (void)
-{
-  NS_LOG_FUNCTION (this);
-}
+    ////////////////////////////////
+    // LteNetDevice
+    ////////////////////////////////
 
+    TypeId LteNetDevice::GetTypeId(void) {
+        static TypeId
+        tid =
+                TypeId("ns3::LteNetDevice")
 
-LteNetDevice::~LteNetDevice (void)
-{
-  NS_LOG_FUNCTION (this);
-}
+                .SetParent<NetDevice> ()
 
+                .AddAttribute("Mtu", "The MAC-level Maximum Transmission Unit",
+                UintegerValue(30000),
+                MakeUintegerAccessor(&LteNetDevice::SetMtu,
+                &LteNetDevice::GetMtu),
+                MakeUintegerChecker<uint16_t> ())
+                ;
+        return tid;
+    }
 
-void
-LteNetDevice::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
+    LteNetDevice::LteNetDevice(void) {
+        NS_LOG_FUNCTION(this);
+    }
 
-  m_node = 0;
-  NetDevice::DoDispose ();
-}
+    LteNetDevice::~LteNetDevice(void) {
+        NS_LOG_FUNCTION(this);
+    }
 
+    void
+    LteNetDevice::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
 
-Ptr<Channel>
-LteNetDevice::GetChannel (void) const
-{
-  NS_LOG_FUNCTION (this);
-  // we can't return a meaningful channel here, because LTE devices using FDD have actually two channels.
-  return 0;
-}
+        m_node = 0;
+        NetDevice::DoDispose();
+    }
 
+    Ptr<Channel>
+            LteNetDevice::GetChannel(void) const {
+        NS_LOG_FUNCTION(this);
+        // we can't return a meaningful channel here, because LTE devices using FDD have actually two channels.
+        return 0;
+    }
 
-void
-LteNetDevice::SetAddress (Address address)
-{
-  NS_LOG_FUNCTION (this << address);
-  m_address = Mac48Address::ConvertFrom (address);
-}
+    void
+    LteNetDevice::SetAddress(Address address) {
+        NS_LOG_FUNCTION(this << address);
+        m_address = Mac48Address::ConvertFrom(address);
+    }
 
+    Address
+    LteNetDevice::GetAddress(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_address;
+    }
 
-Address
-LteNetDevice::GetAddress (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_address;
-}
+    void
+    LteNetDevice::SetNode(Ptr<Node> node) {
+        NS_LOG_FUNCTION(this << node);
+        m_node = node;
+    }
 
+    Ptr<Node>
+            LteNetDevice::GetNode(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_node;
+    }
 
-void
-LteNetDevice::SetNode (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (this << node);
-  m_node = node;
-}
+    void
+    LteNetDevice::SetReceiveCallback(ReceiveCallback cb) {
+        NS_LOG_FUNCTION(this);
+        m_rxCallback = cb;
+    }
 
+    bool
+    LteNetDevice::SendFrom(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber) {
+        NS_FATAL_ERROR("SendFrom () not supported");
+        return false;
+    }
 
-Ptr<Node>
-LteNetDevice::GetNode (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_node;
-}
+    bool
+    LteNetDevice::SupportsSendFrom(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
+    bool
+    LteNetDevice::SetMtu(const uint16_t mtu) {
+        NS_LOG_FUNCTION(this << mtu);
+        m_mtu = mtu;
+        return true;
+    }
 
-void
-LteNetDevice::SetReceiveCallback (ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this);
-  m_rxCallback = cb;
-}
+    uint16_t
+    LteNetDevice::GetMtu(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_mtu;
+    }
 
+    void
+    LteNetDevice::SetIfIndex(const uint32_t index) {
+        NS_LOG_FUNCTION(this << index);
+        m_ifIndex = index;
+    }
 
-bool
-LteNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
-{
-  NS_FATAL_ERROR ("SendFrom () not supported");
-  return false;
-}
+    uint32_t
+    LteNetDevice::GetIfIndex(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_ifIndex;
+    }
 
+    bool
+    LteNetDevice::IsLinkUp(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_linkUp;
+    }
 
-bool
-LteNetDevice::SupportsSendFrom (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    bool
+    LteNetDevice::IsBroadcast(void) const {
+        NS_LOG_FUNCTION(this);
+        return true;
+    }
 
+    Address
+    LteNetDevice::GetBroadcast(void) const {
+        NS_LOG_FUNCTION(this);
+        return Mac48Address::GetBroadcast();
+    }
 
+    bool
+    LteNetDevice::IsMulticast(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-bool
-LteNetDevice::SetMtu (const uint16_t mtu)
-{
-  NS_LOG_FUNCTION (this << mtu);
-  m_mtu = mtu;
-  return true;
-}
+    bool
+    LteNetDevice::IsPointToPoint(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-uint16_t
-LteNetDevice::GetMtu (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_mtu;
-}
+    bool
+    LteNetDevice::NeedsArp(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
+    bool
+    LteNetDevice::IsBridge(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-void
-LteNetDevice::SetIfIndex (const uint32_t index)
-{
-  NS_LOG_FUNCTION (this << index);
-  m_ifIndex = index;
-}
+    Address
+    LteNetDevice::GetMulticast(Ipv4Address multicastGroup) const {
+        NS_LOG_FUNCTION(this << multicastGroup);
 
-uint32_t
-LteNetDevice::GetIfIndex (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_ifIndex;
-}
+        Mac48Address ad = Mac48Address::GetMulticast(multicastGroup);
 
+        //
+        // Implicit conversion (operator Address ()) is defined for Mac48Address, so
+        // use it by just returning the EUI-48 address which is automagically converted
+        // to an Address.
+        //
+        NS_LOG_LOGIC("multicast address is " << ad);
 
-bool
-LteNetDevice::IsLinkUp (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_linkUp;
-}
+        return ad;
+    }
 
+    Address
+    LteNetDevice::GetMulticast(Ipv6Address addr) const {
+        NS_LOG_FUNCTION(this << addr);
+        Mac48Address ad = Mac48Address::GetMulticast(addr);
 
-bool
-LteNetDevice::IsBroadcast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return true;
-}
+        NS_LOG_LOGIC("MAC IPv6 multicast address is " << ad);
+        return ad;
+    }
 
-Address
-LteNetDevice::GetBroadcast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Mac48Address::GetBroadcast ();
-}
+    void
+    LteNetDevice::AddLinkChangeCallback(Callback<void> callback) {
+        NS_LOG_FUNCTION(this);
+        m_linkChangeCallbacks.ConnectWithoutContext(callback);
+    }
 
-bool
-LteNetDevice::IsMulticast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    void
+    LteNetDevice::SetPromiscReceiveCallback(PromiscReceiveCallback cb) {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_WARN("Promisc mode not supported");
+    }
 
-
-bool
-LteNetDevice::IsPointToPoint (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
-
-
-bool
-LteNetDevice::NeedsArp (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
-
-
-bool
-LteNetDevice::IsBridge (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
-
-Address
-LteNetDevice::GetMulticast (Ipv4Address multicastGroup) const
-{
-  NS_LOG_FUNCTION (this << multicastGroup);
-
-  Mac48Address ad = Mac48Address::GetMulticast (multicastGroup);
-
-  //
-  // Implicit conversion (operator Address ()) is defined for Mac48Address, so
-  // use it by just returning the EUI-48 address which is automagically converted
-  // to an Address.
-  //
-  NS_LOG_LOGIC ("multicast address is " << ad);
-
-  return ad;
-}
-
-Address
-LteNetDevice::GetMulticast (Ipv6Address addr) const
-{
-  NS_LOG_FUNCTION (this << addr);
-  Mac48Address ad = Mac48Address::GetMulticast (addr);
-
-  NS_LOG_LOGIC ("MAC IPv6 multicast address is " << ad);
-  return ad;
-}
-
-void
-LteNetDevice::AddLinkChangeCallback (Callback<void> callback)
-{
-  NS_LOG_FUNCTION (this);
-  m_linkChangeCallbacks.ConnectWithoutContext (callback);
-}
-
-
-void
-LteNetDevice::SetPromiscReceiveCallback (PromiscReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_WARN ("Promisc mode not supported");
-}
-
-
-
-void
-LteNetDevice::Receive (Ptr<Packet> p)
-{
-  NS_LOG_FUNCTION (this << p);
-  m_rxCallback (this, p, Ipv4L3Protocol::PROT_NUMBER, Address ());
-}
+    void
+    LteNetDevice::Receive(Ptr<Packet> p) {
+        NS_LOG_FUNCTION(this << p);
+        m_rxCallback(this, p, Ipv4L3Protocol::PROT_NUMBER, Address());
+    }
 
 
 }

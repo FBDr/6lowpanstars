@@ -25,50 +25,46 @@
 #include <boost/bind.hpp>
 
 namespace ndn {
-namespace lp {
-namespace detail {
+    namespace lp {
+        namespace detail {
 
-struct ExtractFieldInfo
-{
-  typedef void result_type;
+            struct ExtractFieldInfo {
+                typedef void result_type;
 
-  template<typename T>
-  void
-  operator()(FieldInfo* info, T)
-  {
-    if (T::TlvType::value != info->tlvType) {
-      return;
-    }
-    info->isRecognized = true;
-    info->canIgnore = false;
-    info->isRepeatable = T::IsRepeatable::value;
-    info->locationSortOrder = getLocationSortOrder<typename T::FieldLocation>();
-  }
-};
+                template<typename T>
+                void
+                operator()(FieldInfo* info, T) {
+                    if (T::TlvType::value != info->tlvType) {
+                        return;
+                    }
+                    info->isRecognized = true;
+                    info->canIgnore = false;
+                    info->isRepeatable = T::IsRepeatable::value;
+                    info->locationSortOrder = getLocationSortOrder<typename T::FieldLocation > ();
+                }
+            };
 
-FieldInfo::FieldInfo()
-  : tlvType(0)
-  , isRecognized(false)
-  , canIgnore(false)
-  , isRepeatable(false)
-  , locationSortOrder(getLocationSortOrder<field_location_tags::Header>())
-{
-}
+            FieldInfo::FieldInfo()
+            : tlvType(0)
+            , isRecognized(false)
+            , canIgnore(false)
+            , isRepeatable(false)
+            , locationSortOrder(getLocationSortOrder<field_location_tags::Header>()) {
+            }
 
-FieldInfo::FieldInfo(uint64_t tlv)
-  : tlvType(tlv)
-  , isRecognized(false)
-  , canIgnore(false)
-  , isRepeatable(false)
-  , locationSortOrder(getLocationSortOrder<field_location_tags::Header>())
-{
-  boost::mpl::for_each<FieldSet>(boost::bind(ExtractFieldInfo(), this, _1));
-  if (!isRecognized) {
-    canIgnore = tlv::HEADER3_MIN <= tlvType && tlvType <= tlv::HEADER3_MAX &&
-                (tlvType & 0x01) == 0x01;
-  }
-}
+            FieldInfo::FieldInfo(uint64_t tlv)
+            : tlvType(tlv)
+            , isRecognized(false)
+            , canIgnore(false)
+            , isRepeatable(false)
+            , locationSortOrder(getLocationSortOrder<field_location_tags::Header>()) {
+                boost::mpl::for_each<FieldSet>(boost::bind(ExtractFieldInfo(), this, _1));
+                if (!isRecognized) {
+                    canIgnore = tlv::HEADER3_MIN <= tlvType && tlvType <= tlv::HEADER3_MAX &&
+                            (tlvType & 0x01) == 0x01;
+                }
+            }
 
-} // namespace detail
-} // namespace lp
+        } // namespace detail
+    } // namespace lp
 } // namespace ndn

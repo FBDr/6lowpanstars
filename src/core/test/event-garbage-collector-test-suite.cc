@@ -25,62 +25,54 @@ using namespace ns3;
 
 class EventGarbageCollectorTestCase : public TestCase
 {
-  int m_counter;
-  EventGarbageCollector *m_events;
+    int m_counter;
+    EventGarbageCollector *m_events;
 
-  void EventGarbageCollectorCallback ();
+    void EventGarbageCollectorCallback();
 
 public:
 
-  EventGarbageCollectorTestCase ();
-  virtual ~EventGarbageCollectorTestCase ();
-  virtual void DoRun (void);
-};
+    EventGarbageCollectorTestCase();
+    virtual ~EventGarbageCollectorTestCase();
+    virtual void DoRun(void);};
 
-EventGarbageCollectorTestCase::EventGarbageCollectorTestCase ()
-  : TestCase ("EventGarbageCollector"), m_counter (0), m_events (0)
-{
+EventGarbageCollectorTestCase::EventGarbageCollectorTestCase()
+: TestCase("EventGarbageCollector"), m_counter(0), m_events(0) {
 }
 
-EventGarbageCollectorTestCase::~EventGarbageCollectorTestCase ()
-{
+EventGarbageCollectorTestCase::~EventGarbageCollectorTestCase() {
 }
 
 void
-EventGarbageCollectorTestCase::EventGarbageCollectorCallback ()
-{
-  m_counter++;
-  if (m_counter == 50)
-    {
-      // this should cause the remaining (50) events to be cancelled
-      delete m_events;
-      m_events = 0;
+EventGarbageCollectorTestCase::EventGarbageCollectorCallback() {
+    m_counter++;
+    if (m_counter == 50) {
+        // this should cause the remaining (50) events to be cancelled
+        delete m_events;
+        m_events = 0;
     }
 }
 
-void EventGarbageCollectorTestCase::DoRun (void)
-{
-  m_events = new EventGarbageCollector ();
+void EventGarbageCollectorTestCase::DoRun(void) {
+    m_events = new EventGarbageCollector();
 
-  for (int n = 0; n < 100; n++)
-    {
-      m_events->Track (Simulator::Schedule
-                         (Simulator::Now (),
-                         &EventGarbageCollectorTestCase::EventGarbageCollectorCallback,
-                         this));
+    for (int n = 0; n < 100; n++) {
+        m_events->Track(Simulator::Schedule
+                (Simulator::Now(),
+                &EventGarbageCollectorTestCase::EventGarbageCollectorCallback,
+                this));
     }
-  Simulator::Run ();
-  NS_TEST_EXPECT_MSG_EQ (m_events, 0, "");
-  NS_TEST_EXPECT_MSG_EQ (m_counter, 50, "");
-  Simulator::Destroy ();
+    Simulator::Run();
+    NS_TEST_EXPECT_MSG_EQ(m_events, 0, "");
+    NS_TEST_EXPECT_MSG_EQ(m_counter, 50, "");
+    Simulator::Destroy();
 }
 
 static class EventGarbageCollectorTestSuite : public TestSuite
 {
-public:
-  EventGarbageCollectorTestSuite ()
-    : TestSuite ("event-garbage-collector", UNIT) 
-  {
-    AddTestCase (new EventGarbageCollectorTestCase (), TestCase::QUICK);
-  }
-} g_eventGarbageCollectorTests;
+    public :
+    EventGarbageCollectorTestSuite()
+    : TestSuite("event-garbage-collector", UNIT)
+    {
+        AddTestCase(new EventGarbageCollectorTestCase(), TestCase::QUICK);
+    }} g_eventGarbageCollectorTests;

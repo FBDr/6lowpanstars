@@ -30,52 +30,49 @@
 
 namespace nfd {
 
-/**
- * \brief Prototype for the callback that is invoked when the face
- *        is created (as a response to incoming connection or after
- *        connection is established)
- */
-typedef function<void(const shared_ptr<Face>& newFace)> FaceCreatedCallback;
+    /**
+     * \brief Prototype for the callback that is invoked when the face
+     *        is created (as a response to incoming connection or after
+     *        connection is established)
+     */
+    typedef function<void(const shared_ptr<Face>& newFace) > FaceCreatedCallback;
 
-/**
- * \brief Prototype for the callback that is invoked when the face
- *        fails to be created
- */
-typedef function<void(uint32_t status, const std::string& reason)> FaceCreationFailedCallback;
+    /**
+     * \brief Prototype for the callback that is invoked when the face
+     *        fails to be created
+     */
+    typedef function<void(uint32_t status, const std::string& reason) > FaceCreationFailedCallback;
 
+    class Channel : noncopyable {
+    public:
+        virtual
+        ~Channel();
 
-class Channel : noncopyable
-{
-public:
-  virtual
-  ~Channel();
+        const FaceUri&
+        getUri() const;
 
-  const FaceUri&
-  getUri() const;
+    protected:
+        void
+        setUri(const FaceUri& uri);
 
-protected:
-  void
-  setUri(const FaceUri& uri);
+    private:
+        FaceUri m_uri;
+    };
 
-private:
-  FaceUri m_uri;
-};
+    inline const FaceUri&
+    Channel::getUri() const {
+        return m_uri;
+    }
 
-inline const FaceUri&
-Channel::getUri() const
-{
-  return m_uri;
-}
-
-/** \brief invokes a callback when the face is closed
- *  \param face the face
- *  \param f the callback to be invoked when the face enters CLOSED state
- *
- *  This function connects a callback to the afterStateChange signal on the \p face,
- *  and invokes \p f when the state becomes CLOSED.
- */
-void
-connectFaceClosedSignal(Face& face, const std::function<void()>& f);
+    /** \brief invokes a callback when the face is closed
+     *  \param face the face
+     *  \param f the callback to be invoked when the face enters CLOSED state
+     *
+     *  This function connects a callback to the afterStateChange signal on the \p face,
+     *  and invokes \p f when the state becomes CLOSED.
+     */
+    void
+    connectFaceClosedSignal(Face& face, const std::function<void()>& f);
 
 } // namespace nfd
 

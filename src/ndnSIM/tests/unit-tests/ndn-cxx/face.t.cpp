@@ -28,277 +28,279 @@
 #include "../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-class NndCxxFaceFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  NndCxxFaceFixture()
-    : hasFired(false)
-  {
-    Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
-    Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-    Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+        class NndCxxFaceFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-    createTopology({{"A", "B"}});
-    addRoutes({{"A", "B", "/test", 1}});
-  }
+            NndCxxFaceFixture()
+            : hasFired(false) {
+                Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
+                Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+                Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
 
-protected:
-  bool hasFired;
-};
+                createTopology({
+                    {"A", "B"}});
+                addRoutes({
+                    {"A", "B", "/test", 1}});
+            }
 
-BOOST_FIXTURE_TEST_SUITE(NdnCxxFace, NndCxxFaceFixture)
+        protected:
+            bool hasFired;
+        };
 
-class BaseTesterApp
-{
-public:
-  typedef std::function<void(const Name&)> NameCallback;
-  typedef std::function<void()> VoidCallback;
+        BOOST_FIXTURE_TEST_SUITE(NdnCxxFace, NndCxxFaceFixture)
 
-protected:
-  ::ndn::Face m_face;
-};
+        class BaseTesterApp {
+        public:
+            typedef std::function<void(const Name&) > NameCallback;
+            typedef std::function<void() > VoidCallback;
 
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+        protected:
+            ::ndn::Face m_face;
+        };
 
-class BasicProducer : public BaseTesterApp
-{
-public:
-  BasicProducer(const Name& name, const NameCallback& onInterest, const VoidCallback& onFail)
-  {
-    m_face.setInterestFilter(name,
-                             [this, onInterest] (const ::ndn::InterestFilter& filter, const Interest& interest) {
-                               auto data = make_shared<Data>(Name(interest.getName()));
-                               StackHelper::getKeyChain().sign(*data);
-                               m_face.put(*data);
-                               onInterest(interest.getName());
-                             },
-                             std::bind(onFail));
-  }
-};
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
 
-BOOST_AUTO_TEST_CASE(SetInterestFilter)
-{
-  FactoryCallbackApp::Install(getNode("B"), [this] () -> shared_ptr<void> {
-      return make_shared<BasicProducer>("/test", [this] (const Name& interest) {
-          BOOST_CHECK_EQUAL(interest, "/test/prefix/%FE%00");
-          this->hasFired = true;
-        },
-        [] {
-          BOOST_ERROR("Unexpected failure to set interest filter");
-        });
-    })
-    .Start(Seconds(0.01));
+        class BasicProducer : public BaseTesterApp {
+        public:
 
-  addApps({{"A", "ns3::ndn::ConsumerBatches",
-            {{"Prefix", "/test/prefix"}, {"Batches", "0s 1"}}, "1s", "5.1s"}});
+            BasicProducer(const Name& name, const NameCallback& onInterest, const VoidCallback& onFail) {
+                m_face.setInterestFilter(name,
+                        [this, onInterest] (const ::ndn::InterestFilter& filter, const Interest & interest) {
+                            auto data = make_shared<Data>(Name(interest.getName()));
+                            StackHelper::getKeyChain().sign(*data);
+                            m_face.put(*data);
+                            onInterest(interest.getName());
+                        },
+                std::bind(onFail));
+            }
+        };
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(SetInterestFilter) {
+            FactoryCallbackApp::Install(getNode("B"), [this] () -> shared_ptr<void> {
+                return make_shared<BasicProducer>("/test", [this] (const Name & interest) {
+                    BOOST_CHECK_EQUAL(interest, "/test/prefix/%FE%00");
+                    this->hasFired = true;
+                },
+                [] {
+                    BOOST_ERROR("Unexpected failure to set interest filter");
+                });
+            })
+            .Start(Seconds(0.01));
 
-  BOOST_CHECK(hasFired);
-}
+            addApps({
+                {"A", "ns3::ndn::ConsumerBatches",
+                    {
+                        {"Prefix", "/test/prefix"},
+                        {"Batches", "0s 1"}}, "1s", "5.1s"}});
 
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
 
-class SingleInterest : public BaseTesterApp
-{
-public:
-  SingleInterest(const Name& name, const std::function<void(const Data&)>& onData, const VoidCallback& onTimeout)
-  {
-    m_face.expressInterest(name, std::bind([onData] (const Data& data) {
-          onData(data);
-        }, _2),
-      std::bind(onTimeout));
-  }
-};
+            BOOST_CHECK(hasFired);
+        }
 
-BOOST_AUTO_TEST_CASE(ExpressInterestLocalhost)
-{
-  // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/localhost", [this] (const Data& data) {
-          BOOST_CHECK(Name("/localhost").isPrefixOf(data.getName()));
-          this->hasFired = true;
-          BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 1.01);
-        },
-        [] {
-          BOOST_ERROR("Unexpected timeout");
-        });
-    })
-    .Start(Seconds(1.01));
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
+        class SingleInterest : public BaseTesterApp {
+        public:
 
-  BOOST_CHECK(hasFired);
-}
+            SingleInterest(const Name& name, const std::function<void(const Data&) >& onData, const VoidCallback& onTimeout) {
+                m_face.expressInterest(name, std::bind([onData] (const Data & data) {
+                    onData(data);
+                }, _2),
+                        std::bind(onTimeout));
+            }
+        };
 
-BOOST_AUTO_TEST_CASE(ExpressInterestRemote)
-{
-  addApps({{"B", "ns3::ndn::Producer", {{"Prefix", "/test"}}, "0s", "100s"}});
+        BOOST_AUTO_TEST_CASE(ExpressInterestLocalhost) {
+            // Retrieve data from remote
+            FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+                return make_shared<SingleInterest>("/localhost", [this] (const Data & data) {
+                    BOOST_CHECK(Name("/localhost").isPrefixOf(data.getName()));
+                    this->hasFired = true;
+                    BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 1.01);
+                },
+                [] {
+                    BOOST_ERROR("Unexpected timeout");
+                });
+            })
+            .Start(Seconds(1.01));
 
-  // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [this] (const Data& data) {
-          BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
-          BOOST_REQUIRE(data.getTag<lp::HopCountTag>() != nullptr);
-          BOOST_CHECK_EQUAL(*data.getTag<lp::HopCountTag>(), 2);
-          this->hasFired = true;
-          BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
-        },
-        [] {
-          BOOST_ERROR("Unexpected timeout");
-        });
-    })
-    .Start(Seconds(1.01));
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
+            BOOST_CHECK(hasFired);
+        }
 
-  BOOST_CHECK(hasFired);
-}
+        BOOST_AUTO_TEST_CASE(ExpressInterestRemote) {
+            addApps({
+                {"B", "ns3::ndn::Producer",
+                    {
+                        {"Prefix", "/test"}}, "0s", "100s"}});
 
-BOOST_AUTO_TEST_CASE(ExpressInterestTimeout)
-{
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [] (const Data&) {
-          BOOST_ERROR("Unexpected data");
-        },
-        [this] {
-          BOOST_CHECK_GT(Simulator::Now().ToDouble(Time::S), 6.0);
-          this->hasFired = true;
-        });
-    })
-    .Start(Seconds(2.01));
+            // Retrieve data from remote
+            FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+                return make_shared<SingleInterest>("/test/prefix", [this] (const Data & data) {
+                    BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
+                    BOOST_REQUIRE(data.getTag<lp::HopCountTag>() != nullptr);
+                    BOOST_CHECK_EQUAL(*data.getTag<lp::HopCountTag>(), 2);
+                    this->hasFired = true;
+                    BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
+                },
+                [] {
+                    BOOST_ERROR("Unexpected timeout");
+                });
+            })
+            .Start(Seconds(1.01));
 
-  // Make sure NACKs are never received
-  Ptr<ns3::RateErrorModel> model = CreateObject<ns3::RateErrorModel>();
-  model->SetRate(std::numeric_limits<double>::max());
-  Config::Set("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/ReceiveErrorModel", PointerValue(model));
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
+            BOOST_CHECK(hasFired);
+        }
 
-  BOOST_CHECK(hasFired);
-}
+        BOOST_AUTO_TEST_CASE(ExpressInterestTimeout) {
+            FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+                return make_shared<SingleInterest>("/test/prefix", [] (const Data&) {
+                    BOOST_ERROR("Unexpected data");
+                },
+                [this] {
+                    BOOST_CHECK_GT(Simulator::Now().ToDouble(Time::S), 6.0);
+                    this->hasFired = true;
+                });
+            })
+            .Start(Seconds(2.01));
 
-// Expected failure until issue #3121 is resolved
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(ExpressInterestWithRib, 2);
-BOOST_AUTO_TEST_CASE(ExpressInterestWithRib)
-{
-  addApps({{"A", "ns3::ndn::Producer", {{"Prefix", "/"}}, "0s", "100s"}});
+            // Make sure NACKs are never received
+            Ptr<ns3::RateErrorModel> model = CreateObject<ns3::RateErrorModel>();
+            model->SetRate(std::numeric_limits<double>::max());
+            Config::Set("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/ReceiveErrorModel", PointerValue(model));
 
-  // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [this] (const Data& data) {
-          BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
-          this->hasFired = true;
-          BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
-        },
-        [] {
-          BOOST_ERROR("Unexpected timeout");
-        });
-    })
-    .Start(Seconds(1.01));
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
+            BOOST_CHECK(hasFired);
+        }
 
-  BOOST_CHECK(hasFired);
-}
+        // Expected failure until issue #3121 is resolved
+        BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(ExpressInterestWithRib, 2);
 
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+        BOOST_AUTO_TEST_CASE(ExpressInterestWithRib) {
+            addApps({
+                {"A", "ns3::ndn::Producer",
+                    {
+                        {"Prefix", "/"}}, "0s", "100s"}});
 
-class MultipleInterest : public BaseTesterApp
-{
-public:
-  MultipleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout)
-    : m_scheduler(m_face.getIoService())
-    , m_event(m_scheduler)
-  {
-    expressNextInterest(name, 0, onData, onTimeout);
-  }
+            // Retrieve data from remote
+            FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+                return make_shared<SingleInterest>("/test/prefix", [this] (const Data & data) {
+                    BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
+                    this->hasFired = true;
+                    BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
+                },
+                [] {
+                    BOOST_ERROR("Unexpected timeout");
+                });
+            })
+            .Start(Seconds(1.01));
 
-private:
-  void
-  expressNextInterest(const Name& name, uint32_t seqNo, const NameCallback& onData, const VoidCallback& onTimeout)
-  {
-    m_face.expressInterest(Name(name).appendSegment(seqNo), std::bind([=] (const Data& data) {
-          onData(data.getName());
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
 
-          m_event = m_scheduler.scheduleEvent(time::seconds(1),
-                                              std::bind(&MultipleInterest::expressNextInterest, this,
-                                                        name, seqNo + 1, onData, onTimeout));
-        }, _2),
-      std::bind(onTimeout));
-  }
+            BOOST_CHECK(hasFired);
+        }
 
-private:
-  ::ndn::Scheduler m_scheduler;
-  ::ndn::util::scheduler::ScopedEventId m_event;
-};
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
 
-BOOST_AUTO_TEST_CASE(ExpressMultipleInterests)
-{
-  addApps({{"B", "ns3::ndn::Producer", {{"Prefix", "/test"}}, "0s", "100s"}});
+        class MultipleInterest : public BaseTesterApp {
+        public:
 
-  size_t recvCount = 0;
+            MultipleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout)
+            : m_scheduler(m_face.getIoService())
+            , m_event(m_scheduler) {
+                expressNextInterest(name, 0, onData, onTimeout);
+            }
 
-  // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this, &recvCount] () -> shared_ptr<void> {
-      return make_shared<MultipleInterest>("/test/prefix", [this, &recvCount] (const Name& data) {
-          BOOST_CHECK_EQUAL(data, Name("/test/prefix").appendSegment(recvCount));
-          ++recvCount;
-        },
-        [] {
-          BOOST_ERROR("Unexpected timeout");
-        });
-    })
-    .Start(Seconds(1.01));
+        private:
 
-  Simulator::Stop(Seconds(10.9)); // this test case also checks that apps stops properly
-  Simulator::Run();
+            void
+            expressNextInterest(const Name& name, uint32_t seqNo, const NameCallback& onData, const VoidCallback& onTimeout) {
+                m_face.expressInterest(Name(name).appendSegment(seqNo), std::bind([ = ] (const Data & data){
+                    onData(data.getName());
 
-  BOOST_CHECK_EQUAL(recvCount, 10);
-}
+                    m_event = m_scheduler.scheduleEvent(time::seconds(1),
+                    std::bind(&MultipleInterest::expressNextInterest, this,
+                    name, seqNo + 1, onData, onTimeout));
+                }, _2),
+                        std::bind(onTimeout));
+            }
 
-class SingleInterestWithFaceShutdown : public BaseTesterApp
-{
-public:
-  SingleInterestWithFaceShutdown()
-  {
-    m_face.expressInterest(Name("/interest/to/timeout"),
-                           std::bind([] {
-                               BOOST_ERROR("Unexpected response");
-                             }),
-                           std::bind([this] {
-                               m_face.shutdown();
-                             }));
-  }
-};
+        private:
+            ::ndn::Scheduler m_scheduler;
+            ::ndn::util::scheduler::ScopedEventId m_event;
+        };
 
-BOOST_AUTO_TEST_CASE(FaceShutdownFromTimeoutCallback)
-{
-  // This test case to check if Face.shutdown from an onTimeout callback doesn't cause segfaults
+        BOOST_AUTO_TEST_CASE(ExpressMultipleInterests) {
+            addApps({
+                {"B", "ns3::ndn::Producer",
+                    {
+                        {"Prefix", "/test"}}, "0s", "100s"}});
 
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterestWithFaceShutdown>();
-    })
-    .Start(Seconds(1.01));
+            size_t recvCount = 0;
 
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
-}
+            // Retrieve data from remote
+            FactoryCallbackApp::Install(getNode("A"), [this, &recvCount] () -> shared_ptr<void> {
+                return make_shared<MultipleInterest>("/test/prefix", [this, &recvCount] (const Name & data) {
+                    BOOST_CHECK_EQUAL(data, Name("/test/prefix").appendSegment(recvCount));
+                    ++recvCount;
+                },
+                [] {
+                    BOOST_ERROR("Unexpected timeout");
+                });
+            })
+            .Start(Seconds(1.01));
 
-BOOST_AUTO_TEST_SUITE_END()
+            Simulator::Stop(Seconds(10.9)); // this test case also checks that apps stops properly
+            Simulator::Run();
 
-} // namespace ndn
+            BOOST_CHECK_EQUAL(recvCount, 10);
+        }
+
+        class SingleInterestWithFaceShutdown : public BaseTesterApp {
+        public:
+
+            SingleInterestWithFaceShutdown() {
+                m_face.expressInterest(Name("/interest/to/timeout"),
+                        std::bind([] {
+                            BOOST_ERROR("Unexpected response");
+                        }),
+                std::bind([this] {
+                    m_face.shutdown();
+                }));
+            }
+        };
+
+        BOOST_AUTO_TEST_CASE(FaceShutdownFromTimeoutCallback) {
+            // This test case to check if Face.shutdown from an onTimeout callback doesn't cause segfaults
+
+            FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+                return make_shared<SingleInterestWithFaceShutdown>();
+            })
+            .Start(Seconds(1.01));
+
+            Simulator::Stop(Seconds(20));
+            Simulator::Run();
+        }
+
+        BOOST_AUTO_TEST_SUITE_END()
+
+    } // namespace ndn
 } // namespace ns3

@@ -29,145 +29,138 @@
 #include <boost/intrusive/set.hpp>
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-/**
- * @brief Traits for random replacement policy
- */
-struct random_policy_traits {
-  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string
-  GetName()
-  {
-    return "Random";
-  }
+            /**
+             * @brief Traits for random replacement policy
+             */
+            struct random_policy_traits {
+                /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
 
-  struct policy_hook_type : public boost::intrusive::set_member_hook<> {
-    uint32_t randomOrder;
-  };
+                static std::string
+                GetName() {
+                    return "Random";
+                }
 
-  template<class Container>
-  struct container_hook {
-    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
-      type;
-  };
+                struct policy_hook_type : public boost::intrusive::set_member_hook<> {
+                    uint32_t randomOrder;
+                };
 
-  template<class Base, class Container, class Hook>
-  struct policy {
-    static uint32_t&
-    get_order(typename Container::iterator item)
-    {
-      return static_cast<typename policy_container::value_traits::hook_type*>(
-               policy_container::value_traits::to_node_ptr(*item))->randomOrder;
-    }
+                template<class Container>
+                struct container_hook {
+                    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
+                    type;
+                };
 
-    static const uint32_t&
-    get_order(typename Container::const_iterator item)
-    {
-      return static_cast<const typename policy_container::value_traits::hook_type*>(
-               policy_container::value_traits::to_node_ptr(*item))->randomOrder;
-    }
+                template<class Base, class Container, class Hook>
+                struct policy {
 
-    template<class Key>
-    struct MemberHookLess {
-      bool
-      operator()(const Key& a, const Key& b) const
-      {
-        return get_order(&a) < get_order(&b);
-      }
-    };
+                    static uint32_t&
+                    get_order(typename Container::iterator item) {
+                        return static_cast<typename policy_container::value_traits::hook_type*> (
+                                policy_container::value_traits::to_node_ptr(*item))->randomOrder;
+                    }
 
-    typedef boost::intrusive::multiset<Container,
-                                       boost::intrusive::compare<MemberHookLess<Container>>,
-                                       Hook> policy_container;
+                    static const uint32_t&
+                    get_order(typename Container::const_iterator item) {
+                        return static_cast<const typename policy_container::value_traits::hook_type*> (
+                                policy_container::value_traits::to_node_ptr(*item))->randomOrder;
+                    }
 
-    // could be just typedef
-    class type : public policy_container {
-    public:
-      typedef policy policy_base; // to get access to get_order methods from outside
-      typedef Container parent_trie;
+                    template<class Key>
+                    struct MemberHookLess {
 
-      type(Base& base)
-        : base_(base)
-        , u_rand(CreateObject<UniformRandomVariable>())
-        , max_size_(100)
-      {
-        u_rand->SetAttribute("Min", DoubleValue(0));
-        u_rand->SetAttribute("Max", DoubleValue(std::numeric_limits<uint32_t>::max()));
-      }
+                        bool
+                        operator()(const Key& a, const Key& b) const {
+                            return get_order(&a) < get_order(&b);
+                        }
+                    };
 
-      inline void
-      update(typename parent_trie::iterator item)
-      {
-        // do nothing. it's random policy
-      }
+                    typedef boost::intrusive::multiset<Container,
+                    boost::intrusive::compare<MemberHookLess<Container>>,
+                    Hook> policy_container;
 
-      inline bool
-      insert(typename parent_trie::iterator item)
-      {
-        get_order(item) = u_rand->GetValue();
+                    // could be just typedef
 
-        if (max_size_ != 0 && policy_container::size() >= max_size_) {
-          if (MemberHookLess<Container>()(*item, *policy_container::begin())) {
-            // std::cout << "Cannot add. Signaling fail\n";
-            // just return false. Indicating that insert "failed"
-            return false;
-          }
-          else {
-            // removing some random element
-            base_.erase(&(*policy_container::begin()));
-          }
-        }
+                    class type : public policy_container {
+                    public:
+                        typedef policy policy_base; // to get access to get_order methods from outside
+                        typedef Container parent_trie;
 
-        policy_container::insert(*item);
-        return true;
-      }
+                        type(Base& base)
+                        : base_(base)
+                        , u_rand(CreateObject<UniformRandomVariable>())
+                        , max_size_(100) {
+                            u_rand->SetAttribute("Min", DoubleValue(0));
+                            u_rand->SetAttribute("Max", DoubleValue(std::numeric_limits<uint32_t>::max()));
+                        }
 
-      inline void
-      lookup(typename parent_trie::iterator item)
-      {
-        // do nothing. it's random policy
-      }
+                        inline void
+                        update(typename parent_trie::iterator item) {
+                            // do nothing. it's random policy
+                        }
 
-      inline void
-      erase(typename parent_trie::iterator item)
-      {
-        policy_container::erase(policy_container::s_iterator_to(*item));
-      }
+                        inline bool
+                        insert(typename parent_trie::iterator item) {
+                            get_order(item) = u_rand->GetValue();
 
-      inline void
-      clear()
-      {
-        policy_container::clear();
-      }
+                            if (max_size_ != 0 && policy_container::size() >= max_size_) {
+                                if (MemberHookLess<Container>()(*item, *policy_container::begin())) {
+                                    // std::cout << "Cannot add. Signaling fail\n";
+                                    // just return false. Indicating that insert "failed"
+                                    return false;
+                                } else {
+                                    // removing some random element
+                                    base_.erase(&(*policy_container::begin()));
+                                }
+                            }
 
-      inline void
-      set_max_size(size_t max_size)
-      {
-        max_size_ = max_size;
-      }
+                            policy_container::insert(*item);
+                            return true;
+                        }
 
-      inline size_t
-      get_max_size() const
-      {
-        return max_size_;
-      }
+                        inline void
+                        lookup(typename parent_trie::iterator item) {
+                            // do nothing. it's random policy
+                        }
 
-    private:
-      type()
-        : base_(*((Base*)0)){};
+                        inline void
+                        erase(typename parent_trie::iterator item) {
+                            policy_container::erase(policy_container::s_iterator_to(*item));
+                        }
 
-    private:
-      Base& base_;
-      Ptr<UniformRandomVariable> u_rand;
-      size_t max_size_;
-    };
-  };
-};
+                        inline void
+                        clear() {
+                            policy_container::clear();
+                        }
 
-} // ndnSIM
-} // ndn
+                        inline void
+                        set_max_size(size_t max_size) {
+                            max_size_ = max_size;
+                        }
+
+                        inline size_t
+                        get_max_size() const {
+                            return max_size_;
+                        }
+
+                    private:
+
+                        type()
+                        : base_(*((Base*) 0)) {
+                        };
+
+                    private:
+                        Base& base_;
+                        Ptr<UniformRandomVariable> u_rand;
+                        size_t max_size_;
+                    };
+                };
+            };
+
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

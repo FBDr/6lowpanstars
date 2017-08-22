@@ -28,31 +28,30 @@
 #include "unix-stream-transport-fixture.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestUnixStreamTransport, UnixStreamTransportFixture)
+            BOOST_AUTO_TEST_SUITE(Face)
+            BOOST_FIXTURE_TEST_SUITE(TestUnixStreamTransport, UnixStreamTransportFixture)
 
-BOOST_AUTO_TEST_CASE(StaticProperties)
-{
-  initialize();
+            BOOST_AUTO_TEST_CASE(StaticProperties) {
+                initialize();
 
-  checkStaticPropertiesInitialized(*transport);
+                checkStaticPropertiesInitialized(*transport);
 
-  BOOST_CHECK_EQUAL(transport->getLocalUri().getScheme(), "unix");
-  BOOST_CHECK_EQUAL(transport->getLocalUri().getHost(), "");
-  BOOST_CHECK_EQUAL(transport->getLocalUri().getPath(), localEp.path());
-  BOOST_CHECK_EQUAL(transport->getRemoteUri().getScheme(), "fd");
-  BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
-  BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
-}
+                BOOST_CHECK_EQUAL(transport->getLocalUri().getScheme(), "unix");
+                BOOST_CHECK_EQUAL(transport->getLocalUri().getHost(), "");
+                BOOST_CHECK_EQUAL(transport->getLocalUri().getPath(), localEp.path());
+                BOOST_CHECK_EQUAL(transport->getRemoteUri().getScheme(), "fd");
+                BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
+                BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+                BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+                BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestUnixStreamTransport
-BOOST_AUTO_TEST_SUITE_END() // Face
+            BOOST_AUTO_TEST_SUITE_END() // TestUnixStreamTransport
+            BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

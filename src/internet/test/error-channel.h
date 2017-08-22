@@ -28,64 +28,62 @@
 
 namespace ns3 {
 
-class SimpleNetDevice;
-class Packet;
+    class SimpleNetDevice;
+    class Packet;
 
-/**
- * \ingroup channel
- * \brief A Error channel, introducing deterministic delays on even/odd packets. Used for testing
- */
-class ErrorChannel : public SimpleChannel
-{
-public:
-  static TypeId GetTypeId (void);
-  ErrorChannel ();
+    /**
+     * \ingroup channel
+     * \brief A Error channel, introducing deterministic delays on even/odd packets. Used for testing
+     */
+    class ErrorChannel : public SimpleChannel {
+    public:
+        static TypeId GetTypeId(void);
+        ErrorChannel();
 
-  virtual void Send (Ptr<Packet> p, uint16_t protocol, Mac48Address to, Mac48Address from,
-                     Ptr<SimpleNetDevice> sender);
+        virtual void Send(Ptr<Packet> p, uint16_t protocol, Mac48Address to, Mac48Address from,
+                Ptr<SimpleNetDevice> sender);
 
-  virtual void Add (Ptr<SimpleNetDevice> device);
+        virtual void Add(Ptr<SimpleNetDevice> device);
 
-  // inherited from ns3::Channel
-  virtual uint32_t GetNDevices (void) const;
-  virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
+        // inherited from ns3::Channel
+        virtual uint32_t GetNDevices(void) const;
+        virtual Ptr<NetDevice> GetDevice(uint32_t i) const;
 
-  /**
-   * \brief Set the delay for the odd packets (even ones are not delayed)
-   * \param delay Delay for the odd packets.
-   */
-  void SetJumpingTime(Time delay);
+        /**
+         * \brief Set the delay for the odd packets (even ones are not delayed)
+         * \param delay Delay for the odd packets.
+         */
+        void SetJumpingTime(Time delay);
 
-  /**
-   * \brief Set if the odd packets are delayed (even ones are not delayed ever)
-   * \param mode true if the odd packets should be delayed.
-   */
-void SetJumpingMode(bool mode);
+        /**
+         * \brief Set if the odd packets are delayed (even ones are not delayed ever)
+         * \param mode true if the odd packets should be delayed.
+         */
+        void SetJumpingMode(bool mode);
 
-private:
-  std::vector<Ptr<SimpleNetDevice> > m_devices;
-  Time jumpingTime;
-  uint8_t jumpingState;
-  bool jumping;
+    private:
+        std::vector<Ptr<SimpleNetDevice> > m_devices;
+        Time jumpingTime;
+        uint8_t jumpingState;
+        bool jumping;
 
-};
+    };
 
-class BinaryErrorModel : public ErrorModel
-{
-public:
-  static TypeId GetTypeId (void);
+    class BinaryErrorModel : public ErrorModel {
+    public:
+        static TypeId GetTypeId(void);
 
-  BinaryErrorModel ();
-  virtual ~BinaryErrorModel ();
-  void Reset (void);
+        BinaryErrorModel();
+        virtual ~BinaryErrorModel();
+        void Reset(void);
 
-private:
-  virtual bool DoCorrupt (Ptr<Packet> p);
-  virtual void DoReset (void);
+    private:
+        virtual bool DoCorrupt(Ptr<Packet> p);
+        virtual void DoReset(void);
 
-  uint8_t counter;
+        uint8_t counter;
 
-};
+    };
 
 } // namespace ns3
 

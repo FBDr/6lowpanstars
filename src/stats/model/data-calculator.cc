@@ -25,131 +25,123 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("DataCalculator");
+NS_LOG_COMPONENT_DEFINE("DataCalculator");
 
 static double zero = 0;
 const double ns3::NaN = zero / zero;
 
 //--------------------------------------------------------------
 //----------------------------------------------
+
 DataCalculator::DataCalculator() :
-  m_enabled (true)
-{
-  NS_LOG_FUNCTION (this);
+m_enabled(true) {
+    NS_LOG_FUNCTION(this);
 }
 
-DataCalculator::~DataCalculator()
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::~DataCalculator() {
+    NS_LOG_FUNCTION(this);
 }
 
 /* static */
 TypeId
-DataCalculator::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::DataCalculator")
-    .SetParent<Object> ()
-    .SetGroupName ("Stats")
-    // No AddConstructor because this is an abstract class.
-    ;
-  return tid;
+DataCalculator::GetTypeId(void) {
+    static TypeId tid = TypeId("ns3::DataCalculator")
+            .SetParent<Object> ()
+            .SetGroupName("Stats")
+            // No AddConstructor because this is an abstract class.
+            ;
+    return tid;
 }
-  
+
 void
-DataCalculator::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::DoDispose(void) {
+    NS_LOG_FUNCTION(this);
 
-  Simulator::Cancel (m_startEvent);
-  Simulator::Cancel (m_stopEvent);
+    Simulator::Cancel(m_startEvent);
+    Simulator::Cancel(m_stopEvent);
 
-  Object::DoDispose ();
-  // DataCalculator::DoDispose
+    Object::DoDispose();
+    // DataCalculator::DoDispose
 }
 
 //----------------------------------------------
-void
-DataCalculator::SetKey (const std::string key)
-{
-  NS_LOG_FUNCTION (this << key);
 
-  m_key = key;
-  // end DataCalculator::SetKey
+void
+DataCalculator::SetKey(const std::string key) {
+    NS_LOG_FUNCTION(this << key);
+
+    m_key = key;
+    // end DataCalculator::SetKey
 }
 
 std::string
-DataCalculator::GetKey () const
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::GetKey() const {
+    NS_LOG_FUNCTION(this);
 
-  return m_key;
-  // end DataCalculator::GetKey
+    return m_key;
+    // end DataCalculator::GetKey
 }
 
 //----------------------------------------------
-void
-DataCalculator::SetContext (const std::string context)
-{
-  NS_LOG_FUNCTION (this << context);
 
-  m_context = context;
-  // end DataCalculator::SetContext
+void
+DataCalculator::SetContext(const std::string context) {
+    NS_LOG_FUNCTION(this << context);
+
+    m_context = context;
+    // end DataCalculator::SetContext
 }
 
 std::string
-DataCalculator::GetContext () const
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::GetContext() const {
+    NS_LOG_FUNCTION(this);
 
-  return m_context;
-  // end DataCalculator::GetContext
+    return m_context;
+    // end DataCalculator::GetContext
 }
 //----------------------------------------------
-void
-DataCalculator::Enable ()
-{
-  NS_LOG_FUNCTION (this);
 
-  m_enabled = true;
-  // end DataCalculator::Enable
+void
+DataCalculator::Enable() {
+    NS_LOG_FUNCTION(this);
+
+    m_enabled = true;
+    // end DataCalculator::Enable
 }
 
 void
-DataCalculator::Disable ()
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::Disable() {
+    NS_LOG_FUNCTION(this);
 
-  m_enabled = false;
-  // end DataCalculator::Disable
+    m_enabled = false;
+    // end DataCalculator::Disable
 }
 
 bool
-DataCalculator::GetEnabled () const
-{
-  NS_LOG_FUNCTION (this);
+DataCalculator::GetEnabled() const {
+    NS_LOG_FUNCTION(this);
 
-  return m_enabled;
-  // end DataCalculator::GetEnabled
+    return m_enabled;
+    // end DataCalculator::GetEnabled
 }
 
 //----------------------------------------------
+
 void
-DataCalculator::Start (const Time& startTime)
-{
-  NS_LOG_FUNCTION (this << startTime);
+DataCalculator::Start(const Time& startTime) {
+    NS_LOG_FUNCTION(this << startTime);
 
-  m_startEvent = Simulator::Schedule (startTime,
-                                      &DataCalculator::Enable, this);
+    m_startEvent = Simulator::Schedule(startTime,
+            &DataCalculator::Enable, this);
 
-  // end DataCalculator::Start
+    // end DataCalculator::Start
 }
 
 void
-DataCalculator::Stop (const Time& stopTime)
-{
-  NS_LOG_FUNCTION (this << stopTime);
+DataCalculator::Stop(const Time& stopTime) {
+    NS_LOG_FUNCTION(this << stopTime);
 
-  m_stopEvent = Simulator::Schedule (stopTime,
-                                     &DataCalculator::Disable, this);
-  // end DataCalculator::Stop
+    m_stopEvent = Simulator::Schedule(stopTime,
+            &DataCalculator::Disable, this);
+    // end DataCalculator::Stop
 }

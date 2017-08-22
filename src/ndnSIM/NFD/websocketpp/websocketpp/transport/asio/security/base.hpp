@@ -60,100 +60,103 @@
 // post_init(init_handler);
 
 namespace websocketpp {
-namespace transport {
-namespace asio {
-namespace socket {
+    namespace transport {
+        namespace asio {
+            namespace socket {
 
-typedef lib::function<void(lib::asio::error_code const &)> shutdown_handler;
+                typedef lib::function<void(lib::asio::error_code const &) > shutdown_handler;
 
-/**
- * The transport::asio::socket::* classes are a set of security/socket related
- * policies and support code for the ASIO transport types.
- */
+                /**
+                 * The transport::asio::socket::* classes are a set of security/socket related
+                 * policies and support code for the ASIO transport types.
+                 */
 
-/// Errors related to asio transport sockets
-namespace error {
-    enum value {
-        /// Catch-all error for security policy errors that don't fit in other
-        /// categories
-        security = 1,
+                /// Errors related to asio transport sockets
+                namespace error {
 
-        /// Catch-all error for socket component errors that don't fit in other
-        /// categories
-        socket,
+                    enum value {
+                        /// Catch-all error for security policy errors that don't fit in other
+                        /// categories
+                        security = 1,
 
-        /// A function was called in a state that it was illegal to do so.
-        invalid_state,
+                        /// Catch-all error for socket component errors that don't fit in other
+                        /// categories
+                        socket,
 
-        /// The application was prompted to provide a TLS context and it was
-        /// empty or otherwise invalid
-        invalid_tls_context,
+                        /// A function was called in a state that it was illegal to do so.
+                        invalid_state,
 
-        /// TLS Handshake Timeout
-        tls_handshake_timeout,
+                        /// The application was prompted to provide a TLS context and it was
+                        /// empty or otherwise invalid
+                        invalid_tls_context,
 
-        /// pass_through from underlying library
-        pass_through,
+                        /// TLS Handshake Timeout
+                        tls_handshake_timeout,
 
-        /// Required tls_init handler not present
-        missing_tls_init_handler,
+                        /// pass_through from underlying library
+                        pass_through,
 
-        /// TLS Handshake Failed
-        tls_handshake_failed,
-        
-        /// Failed to set TLS SNI hostname
-        tls_failed_sni_hostname
-    };
-} // namespace error
+                        /// Required tls_init handler not present
+                        missing_tls_init_handler,
 
-/// Error category related to asio transport socket policies
-class socket_category : public lib::error_category {
-public:
-    char const * name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
-        return "websocketpp.transport.asio.socket";
-    }
+                        /// TLS Handshake Failed
+                        tls_handshake_failed,
 
-    std::string message(int value) const {
-        switch(value) {
-            case error::security:
-                return "Security policy error";
-            case error::socket:
-                return "Socket component error";
-            case error::invalid_state:
-                return "Invalid state";
-            case error::invalid_tls_context:
-                return "Invalid or empty TLS context supplied";
-            case error::tls_handshake_timeout:
-                return "TLS handshake timed out";
-            case error::pass_through:
-                return "Pass through from socket policy";
-            case error::missing_tls_init_handler:
-                return "Required tls_init handler not present.";
-            case error::tls_handshake_failed:
-                return "TLS handshake failed";
-            case error::tls_failed_sni_hostname:
-                return "Failed to set TLS SNI hostname";
-            default:
-                return "Unknown";
-        }
-    }
-};
+                        /// Failed to set TLS SNI hostname
+                        tls_failed_sni_hostname
+                    };
+                } // namespace error
 
-inline lib::error_category const & get_socket_category() {
-    static socket_category instance;
-    return instance;
-}
+                /// Error category related to asio transport socket policies
 
-inline lib::error_code make_error_code(error::value e) {
-    return lib::error_code(static_cast<int>(e), get_socket_category());
-}
+                class socket_category : public lib::error_category {
+                public:
 
-/// Type of asio transport socket policy initialization handlers
-typedef lib::function<void(const lib::error_code&)> init_handler;
+                    char const * name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
+                        return "websocketpp.transport.asio.socket";
+                    }
 
-} // namespace socket
-} // namespace asio
-} // namespace transport
+                    std::string message(int value) const {
+                        switch (value) {
+                            case error::security:
+                                return "Security policy error";
+                            case error::socket:
+                                return "Socket component error";
+                            case error::invalid_state:
+                                return "Invalid state";
+                            case error::invalid_tls_context:
+                                return "Invalid or empty TLS context supplied";
+                            case error::tls_handshake_timeout:
+                                return "TLS handshake timed out";
+                            case error::pass_through:
+                                return "Pass through from socket policy";
+                            case error::missing_tls_init_handler:
+                                return "Required tls_init handler not present.";
+                            case error::tls_handshake_failed:
+                                return "TLS handshake failed";
+                            case error::tls_failed_sni_hostname:
+                                return "Failed to set TLS SNI hostname";
+                            default:
+                                return "Unknown";
+                        }
+                    }
+                };
+
+                inline lib::error_category const & get_socket_category() {
+                    static socket_category instance;
+                    return instance;
+                }
+
+                inline lib::error_code make_error_code(error::value e) {
+                    return lib::error_code(static_cast<int> (e), get_socket_category());
+                }
+
+                /// Type of asio transport socket policy initialization handlers
+                typedef lib::function<void(const lib::error_code&) > init_handler;
+
+            } // namespace socket
+        } // namespace asio
+    } // namespace transport
 } // namespace websocketpp
 
 #endif // WEBSOCKETPP_TRANSPORT_ASIO_SOCKET_BASE_HPP

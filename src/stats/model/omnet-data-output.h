@@ -28,113 +28,115 @@
 namespace ns3 {
 
 
-//------------------------------------------------------------
-//--------------------------------------------
-/**
- * \ingroup dataoutput
- * \class OmnetDataOutput
- * \brief Outputs data in a format compatible with OMNeT library and framework
- *
- */
-class OmnetDataOutput : public DataOutputInterface {
-public:
-  OmnetDataOutput();
-  virtual ~OmnetDataOutput();
-
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  virtual void Output (DataCollector &dc);
-
-protected:
-  virtual void DoDispose ();
-
-private:
-  /**
-   * \ingroup dataoutput
-   *
-   * \brief Class to generate OMNeT output
-   */
-  class OmnetOutputCallback : public DataOutputCallback {
-public:
-    /**
-     * Constructor
-     * \param scalar the output stream
-     */
-    OmnetOutputCallback(std::ostream *scalar);
+    //------------------------------------------------------------
+    //--------------------------------------------
 
     /**
-     * \brief Generates data statistics
-     * \param context the output context
-     * \param name the output name
-     * \param statSum the stats to print
+     * \ingroup dataoutput
+     * \class OmnetDataOutput
+     * \brief Outputs data in a format compatible with OMNeT library and framework
+     *
      */
-    void OutputStatistic (std::string context,
-                          std::string name,
-                          const StatisticalSummary *statSum);
+    class OmnetDataOutput : public DataOutputInterface {
+    public:
+        OmnetDataOutput();
+        virtual ~OmnetDataOutput();
 
-    /**
-     * \brief Generates a single data output
-     * \param context the output context
-     * \param name the output name
-     * \param val the value
-     */
-    void OutputSingleton (std::string context,
-                          std::string name,
-                          int val);
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-    /**
-     * \brief Generates a single data output
-     * \param context the output context
-     * \param name the output name
-     * \param val the value
-     */
-    void OutputSingleton (std::string context,
-                          std::string name,
-                          uint32_t val);
+        virtual void Output(DataCollector &dc);
 
-    /**
-     * \brief Generates a single data output
-     * \param context the output context
-     * \param name the output name
-     * \param val the value
-     */
-    void OutputSingleton (std::string context,
-                          std::string name,
-                          double val);
+    protected:
+        virtual void DoDispose();
 
-    /**
-     * \brief Generates a single data output
-     * \param context the output context
-     * \param name the output name
-     * \param val the value
-     */
-    void OutputSingleton (std::string context,
-                          std::string name,
-                          std::string val);
+    private:
 
-    /**
-     * \brief Generates a single data output
-     * \param context the output context
-     * \param name the output name
-     * \param val the value
-     */
-    void OutputSingleton (std::string context,
-                          std::string name,
-                          Time val);
+        /**
+         * \ingroup dataoutput
+         *
+         * \brief Class to generate OMNeT output
+         */
+        class OmnetOutputCallback : public DataOutputCallback {
+        public:
+            /**
+             * Constructor
+             * \param scalar the output stream
+             */
+            OmnetOutputCallback(std::ostream *scalar);
 
-private:
-    std::ostream *m_scalar; //!< output stream
-    // end class OmnetOutputCallback
-  };
+            /**
+             * \brief Generates data statistics
+             * \param context the output context
+             * \param name the output name
+             * \param statSum the stats to print
+             */
+            void OutputStatistic(std::string context,
+                    std::string name,
+                    const StatisticalSummary *statSum);
 
-  // end class OmnetDataOutput
-};
+            /**
+             * \brief Generates a single data output
+             * \param context the output context
+             * \param name the output name
+             * \param val the value
+             */
+            void OutputSingleton(std::string context,
+                    std::string name,
+                    int val);
 
-// end namespace ns3
+            /**
+             * \brief Generates a single data output
+             * \param context the output context
+             * \param name the output name
+             * \param val the value
+             */
+            void OutputSingleton(std::string context,
+                    std::string name,
+                    uint32_t val);
+
+            /**
+             * \brief Generates a single data output
+             * \param context the output context
+             * \param name the output name
+             * \param val the value
+             */
+            void OutputSingleton(std::string context,
+                    std::string name,
+                    double val);
+
+            /**
+             * \brief Generates a single data output
+             * \param context the output context
+             * \param name the output name
+             * \param val the value
+             */
+            void OutputSingleton(std::string context,
+                    std::string name,
+                    std::string val);
+
+            /**
+             * \brief Generates a single data output
+             * \param context the output context
+             * \param name the output name
+             * \param val the value
+             */
+            void OutputSingleton(std::string context,
+                    std::string name,
+                    Time val);
+
+        private:
+            std::ostream *m_scalar; //!< output stream
+            // end class OmnetOutputCallback
+        };
+
+        // end class OmnetDataOutput
+    };
+
+    // end namespace ns3
 };
 
 

@@ -24,20 +24,19 @@
 NDN_LOG_INIT(Module1);
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-void
-logFromModule1()
-{
-  NDN_LOG_TRACE("trace" << 1);
-  NDN_LOG_DEBUG("debug" << 1);
-  NDN_LOG_INFO("info" << 1);
-  NDN_LOG_WARN("warn" << 1);
-  NDN_LOG_ERROR("error" << 1);
-  NDN_LOG_FATAL("fatal" << 1);
-}
+            void
+            logFromModule1() {
+                NDN_LOG_TRACE("trace" << 1);
+                NDN_LOG_DEBUG("debug" << 1);
+                NDN_LOG_INFO("info" << 1);
+                NDN_LOG_WARN("warn" << 1);
+                NDN_LOG_ERROR("error" << 1);
+                NDN_LOG_FATAL("fatal" << 1);
+            }
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

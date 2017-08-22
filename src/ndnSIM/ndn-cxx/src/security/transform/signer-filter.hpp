@@ -27,45 +27,44 @@
 #include "../security-common.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to sign data.
- */
-class SignerFilter : public Transform
-{
-public:
-  /**
-   * @brief Create a signer module to generate signature using algorithm @p algo and @p key
-   */
-  SignerFilter(DigestAlgorithm algo, const PrivateKey& key);
+            /**
+             * @brief The module to sign data.
+             */
+            class SignerFilter : public Transform {
+            public:
+                /**
+                 * @brief Create a signer module to generate signature using algorithm @p algo and @p key
+                 */
+                SignerFilter(DigestAlgorithm algo, const PrivateKey& key);
 
-private:
-  /**
-   * @brief Write data @p buf into signer
-   *
-   * @return The number of bytes that are actually accepted
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Write data @p buf into signer
+                 *
+                 * @return The number of bytes that are actually accepted
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize signing and write the signature into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize signing and write the signature into next module.
+                 */
+                virtual void
+                finalize() final;
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-signerFilter(DigestAlgorithm algo, const PrivateKey& key);
+            unique_ptr<Transform>
+            signerFilter(DigestAlgorithm algo, const PrivateKey& key);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_SIGNER_FILTER_HPP

@@ -33,22 +33,21 @@
 
 namespace ns3 {
 
-/**
- * \brief A deprecated way to get reference-counting powers
- *
- * \deprecated
- * Users who wish to use reference counting for a class of their own should use
- * instead the template \ref ns3::SimpleRefCount. This class is maintained
- * purely for compatibility to avoid breaking the code of users.
- */
-class RefCountBase : public SimpleRefCount<RefCountBase>
-{ 
-public:
-  /**
-   * This only thing this class does it declare a virtual destructor
-   */
-  virtual ~RefCountBase ();
-};
+    /**
+     * \brief A deprecated way to get reference-counting powers
+     *
+     * \deprecated
+     * Users who wish to use reference counting for a class of their own should use
+     * instead the template \ref ns3::SimpleRefCount. This class is maintained
+     * purely for compatibility to avoid breaking the code of users.
+     */
+    class RefCountBase : public SimpleRefCount<RefCountBase> {
+    public:
+        /**
+         * This only thing this class does it declare a virtual destructor
+         */
+        virtual ~RefCountBase();
+    };
 
 } // namespace ns3
 

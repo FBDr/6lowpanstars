@@ -28,176 +28,175 @@
 
 namespace ns3 {
 
-/**
- * \ingroup lte
- * \brief The packet header for the AM Radio Link Control (RLC) protocol packets
- *
- * This class has fields corresponding to those in an RLC header as well as
- * methods for serialization to and deserialization from a byte buffer.
- * It follows 3GPP TS 36.322 Radio Link Control (RLC) protocol specification.
- */
-class LteRlcAmHeader : public Header
-{
-public:
+    /**
+     * \ingroup lte
+     * \brief The packet header for the AM Radio Link Control (RLC) protocol packets
+     *
+     * This class has fields corresponding to those in an RLC header as well as
+     * methods for serialization to and deserialization from a byte buffer.
+     * It follows 3GPP TS 36.322 Radio Link Control (RLC) protocol specification.
+     */
+    class LteRlcAmHeader : public Header {
+    public:
 
-  /**
-   * \brief Constructor
-   *
-   * Creates a null header
-   */
-  LteRlcAmHeader ();
-  ~LteRlcAmHeader ();
+        /**
+         * \brief Constructor
+         *
+         * Creates a null header
+         */
+        LteRlcAmHeader();
+        ~LteRlcAmHeader();
 
-  void SetDataPdu (void);
-  void SetControlPdu (uint8_t controlPduType);
-  bool IsDataPdu (void) const;
-  bool IsControlPdu (void) const;
+        void SetDataPdu(void);
+        void SetControlPdu(uint8_t controlPduType);
+        bool IsDataPdu(void) const;
+        bool IsControlPdu(void) const;
 
-  typedef enum {
-    CONTROL_PDU = 0,
-    DATA_PDU    = 1
-  } DataControlPdu_t;
+        typedef enum {
+            CONTROL_PDU = 0,
+            DATA_PDU = 1
+        } DataControlPdu_t;
 
-  typedef enum {
-    STATUS_PDU = 000,
-  } ControPduType_t;
+        typedef enum {
+            STATUS_PDU = 000,
+        } ControPduType_t;
 
-  //
-  // DATA PDU
-  //
+        //
+        // DATA PDU
+        //
 
-  void SetSequenceNumber (SequenceNumber10 sequenceNumber);
-  SequenceNumber10 GetSequenceNumber () const;
+        void SetSequenceNumber(SequenceNumber10 sequenceNumber);
+        SequenceNumber10 GetSequenceNumber() const;
 
-  void SetFramingInfo (uint8_t framingInfo);
-  uint8_t GetFramingInfo () const;
+        void SetFramingInfo(uint8_t framingInfo);
+        uint8_t GetFramingInfo() const;
 
-  typedef enum {
-    FIRST_BYTE    = 0x00,
-    NO_FIRST_BYTE = 0x02
-  } FramingInfoFirstByte_t;
+        typedef enum {
+            FIRST_BYTE = 0x00,
+            NO_FIRST_BYTE = 0x02
+        } FramingInfoFirstByte_t;
 
-  typedef enum {
-    LAST_BYTE    = 0x00,
-    NO_LAST_BYTE = 0x01
-  } FramingInfoLastByte_t;
+        typedef enum {
+            LAST_BYTE = 0x00,
+            NO_LAST_BYTE = 0x01
+        } FramingInfoLastByte_t;
 
-  void PushExtensionBit (uint8_t extensionBit);
-  void PushLengthIndicator (uint16_t lengthIndicator);
+        void PushExtensionBit(uint8_t extensionBit);
+        void PushLengthIndicator(uint16_t lengthIndicator);
 
-  uint8_t PopExtensionBit (void);
-  uint16_t PopLengthIndicator (void);
+        uint8_t PopExtensionBit(void);
+        uint16_t PopLengthIndicator(void);
 
-  typedef enum {
-    DATA_FIELD_FOLLOWS  = 0,
-    E_LI_FIELDS_FOLLOWS = 1
-  } ExtensionBit_t;
+        typedef enum {
+            DATA_FIELD_FOLLOWS = 0,
+            E_LI_FIELDS_FOLLOWS = 1
+        } ExtensionBit_t;
 
-  void SetResegmentationFlag (uint8_t resegFlag);
-  uint8_t GetResegmentationFlag () const;
+        void SetResegmentationFlag(uint8_t resegFlag);
+        uint8_t GetResegmentationFlag() const;
 
-  typedef enum {
-    PDU = 0,
-    SEGMENT = 1
-  } ResegmentationFlag_t;
+        typedef enum {
+            PDU = 0,
+            SEGMENT = 1
+        } ResegmentationFlag_t;
 
-  void SetPollingBit (uint8_t pollingBit);
-  uint8_t GetPollingBit () const;
+        void SetPollingBit(uint8_t pollingBit);
+        uint8_t GetPollingBit() const;
 
-  typedef enum {
-    STATUS_REPORT_NOT_REQUESTED = 0,
-    STATUS_REPORT_IS_REQUESTED  = 1
-  } PollingBit_t;
+        typedef enum {
+            STATUS_REPORT_NOT_REQUESTED = 0,
+            STATUS_REPORT_IS_REQUESTED = 1
+        } PollingBit_t;
 
-  void SetLastSegmentFlag (uint8_t lsf);
-  uint8_t GetLastSegmentFlag () const;
+        void SetLastSegmentFlag(uint8_t lsf);
+        uint8_t GetLastSegmentFlag() const;
 
-  typedef enum {
-    NO_LAST_PDU_SEGMENT = 0,
-    LAST_PDU_SEGMENT    = 1
-  } LastSegmentFlag_t;
+        typedef enum {
+            NO_LAST_PDU_SEGMENT = 0,
+            LAST_PDU_SEGMENT = 1
+        } LastSegmentFlag_t;
 
-  void SetSegmentOffset (uint16_t segmentOffset);
-  uint16_t GetSegmentOffset () const;
-  uint16_t GetLastOffset () const;
+        void SetSegmentOffset(uint16_t segmentOffset);
+        uint16_t GetSegmentOffset() const;
+        uint16_t GetLastOffset() const;
 
-  //
-  // CONTROL PDU
-  //
+        //
+        // CONTROL PDU
+        //
 
-  void SetAckSn (SequenceNumber10 ackSn);
-  SequenceNumber10 GetAckSn () const;
-
-
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual void Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-
-  /** 
-   * 
-   * 
-   * \param bytes max allowed CONTROL PDU size
-   * 
-   * \return true if one more NACK would fit in the CONTROL PDU; false otherwise
-   */
-  bool OneMoreNackWouldFitIn (uint16_t bytes);
-
-  /** 
-   * Add one more NACK to the CONTROL PDU
-   * 
-   * \param nack 
-   */
-  void PushNack (int nack);
-
-  /** 
-   * 
-   * 
-   * \param nack SN of the NACK
-   * 
-   * \return true if the NACK is present in the STATUS PDU, false otherwise
-   */
-  bool IsNackPresent (SequenceNumber10 nack);
+        void SetAckSn(SequenceNumber10 ackSn);
+        SequenceNumber10 GetAckSn() const;
 
 
-  /** 
-   * Retrieve one NACK from the CONTROL PDU
-   * 
-   * 
-   * \return the SN  >= 0 of the next nack; returns -1 if no NACK is left
-   */
-  int PopNack (void);
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
+        virtual void Print(std::ostream &os) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
+
+        /** 
+         * 
+         * 
+         * \param bytes max allowed CONTROL PDU size
+         * 
+         * \return true if one more NACK would fit in the CONTROL PDU; false otherwise
+         */
+        bool OneMoreNackWouldFitIn(uint16_t bytes);
+
+        /** 
+         * Add one more NACK to the CONTROL PDU
+         * 
+         * \param nack 
+         */
+        void PushNack(int nack);
+
+        /** 
+         * 
+         * 
+         * \param nack SN of the NACK
+         * 
+         * \return true if the NACK is present in the STATUS PDU, false otherwise
+         */
+        bool IsNackPresent(SequenceNumber10 nack);
 
 
-private:
-  uint16_t m_headerLength;
-  uint8_t  m_dataControlBit;
+        /** 
+         * Retrieve one NACK from the CONTROL PDU
+         * 
+         * 
+         * \return the SN  >= 0 of the next nack; returns -1 if no NACK is left
+         */
+        int PopNack(void);
 
-  // Data PDU fields
-  uint8_t  m_resegmentationFlag;
-  uint8_t  m_pollingBit;
-  uint8_t  m_framingInfo;      //  2 bits
-  SequenceNumber10 m_sequenceNumber;
-  uint8_t  m_lastSegmentFlag;
-  uint16_t m_segmentOffset;
-  uint16_t m_lastOffset;
 
-  std::list <uint8_t> m_extensionBits; // Includes extensionBit of the fixed part
-  std::list <uint16_t> m_lengthIndicators;
+    private:
+        uint16_t m_headerLength;
+        uint8_t m_dataControlBit;
 
-  // Control PDU fields
-  uint8_t  m_controlPduType;
+        // Data PDU fields
+        uint8_t m_resegmentationFlag;
+        uint8_t m_pollingBit;
+        uint8_t m_framingInfo; //  2 bits
+        SequenceNumber10 m_sequenceNumber;
+        uint8_t m_lastSegmentFlag;
+        uint16_t m_segmentOffset;
+        uint16_t m_lastOffset;
 
-  // Status PDU fields
-  SequenceNumber10 m_ackSn;
-  std::list <int> m_nackSnList;
+        std::list <uint8_t> m_extensionBits; // Includes extensionBit of the fixed part
+        std::list <uint16_t> m_lengthIndicators;
 
-  std::list <uint8_t> m_extensionBits1; // Includes E1 after ACK_SN
-  std::list <uint8_t> m_extensionBits2;
+        // Control PDU fields
+        uint8_t m_controlPduType;
 
-};
+        // Status PDU fields
+        SequenceNumber10 m_ackSn;
+        std::list <int> m_nackSnList;
+
+        std::list <uint8_t> m_extensionBits1; // Includes E1 after ACK_SN
+        std::list <uint8_t> m_extensionBits2;
+
+    };
 
 }; // namespace ns3
 

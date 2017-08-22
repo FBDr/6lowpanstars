@@ -32,135 +32,129 @@
 
 namespace ns3 {
 
+    class X2IfaceInfo : public SimpleRefCount<X2IfaceInfo> {
+    public:
+        X2IfaceInfo(Ipv4Address remoteIpAddr, Ptr<Socket> localCtrlPlaneSocket, Ptr<Socket> localUserPlaneSocket);
+        virtual ~X2IfaceInfo(void);
 
-class X2IfaceInfo : public SimpleRefCount<X2IfaceInfo>
-{
-public:
-  X2IfaceInfo (Ipv4Address remoteIpAddr, Ptr<Socket> localCtrlPlaneSocket, Ptr<Socket> localUserPlaneSocket);
-  virtual ~X2IfaceInfo (void);
+        X2IfaceInfo& operator=(const X2IfaceInfo &);
 
-  X2IfaceInfo& operator= (const X2IfaceInfo &);
+    public:
+        Ipv4Address m_remoteIpAddr;
+        Ptr<Socket> m_localCtrlPlaneSocket;
+        Ptr<Socket> m_localUserPlaneSocket;
+    };
 
-public:
-  Ipv4Address   m_remoteIpAddr;
-  Ptr<Socket>   m_localCtrlPlaneSocket;
-  Ptr<Socket>   m_localUserPlaneSocket;
-};
+    class X2CellInfo : public SimpleRefCount<X2CellInfo> {
+    public:
+        X2CellInfo(uint16_t localCellId, uint16_t remoteCellId);
+        virtual ~X2CellInfo(void);
 
+        X2CellInfo& operator=(const X2CellInfo &);
 
-class X2CellInfo : public SimpleRefCount<X2CellInfo>
-{
-public:
-  X2CellInfo (uint16_t localCellId, uint16_t remoteCellId);
-  virtual ~X2CellInfo (void);
+    public:
+        uint16_t m_localCellId;
+        uint16_t m_remoteCellId;
+    };
 
-  X2CellInfo& operator= (const X2CellInfo &);
+    /**
+     * \ingroup lte
+     *
+     * This entity is installed inside an eNB and provides the functionality for the X2 interface
+     */
+    class EpcX2 : public Object {
+        friend class EpcX2SpecificEpcX2SapProvider<EpcX2>;
 
-public:
-  uint16_t m_localCellId;
-  uint16_t m_remoteCellId;
-};
+    public:
+        /** 
+         * Constructor
+         */
+        EpcX2();
 
+        /**
+         * Destructor
+         */
+        virtual ~EpcX2(void);
 
-/**
- * \ingroup lte
- *
- * This entity is installed inside an eNB and provides the functionality for the X2 interface
- */
-class EpcX2 : public Object
-{
-  friend class EpcX2SpecificEpcX2SapProvider<EpcX2>;
-
-public:
-  /** 
-   * Constructor
-   */
-  EpcX2 ();
-
-  /**
-   * Destructor
-   */
-  virtual ~EpcX2 (void);
-
-  static TypeId GetTypeId (void);
-  virtual void DoDispose (void);
+        static TypeId GetTypeId(void);
+        virtual void DoDispose(void);
 
 
-  /**
-   * \param s the X2 SAP User to be used by this EPC X2 entity
-   */
-  void SetEpcX2SapUser (EpcX2SapUser * s);
+        /**
+         * \param s the X2 SAP User to be used by this EPC X2 entity
+         */
+        void SetEpcX2SapUser(EpcX2SapUser * s);
 
-  /**
-   * \return the X2 SAP Provider interface offered by this EPC X2 entity
-   */
-  EpcX2SapProvider* GetEpcX2SapProvider ();
-
-
-  /**
-   * Add an X2 interface to this EPC X2 entity
-   * \param enb1CellId the cell ID of the current eNodeB
-   * \param enb1X2Address the address of the current eNodeB
-   * \param enb2CellId the cell ID of the neighbouring eNodeB
-   * \param enb2X2Address the address of the neighbouring eNodeB
-   */
-  void AddX2Interface (uint16_t enb1CellId, Ipv4Address enb1X2Address,
-                       uint16_t enb2CellId, Ipv4Address enb2X2Address);
+        /**
+         * \return the X2 SAP Provider interface offered by this EPC X2 entity
+         */
+        EpcX2SapProvider* GetEpcX2SapProvider();
 
 
-  /** 
-   * Method to be assigned to the recv callback of the X2-C (X2 Control Plane) socket.
-   * It is called when the eNB receives a packet from the peer eNB of the X2-C interface
-   * 
-   * \param socket socket of the X2-C interface
-   */
-  void RecvFromX2cSocket (Ptr<Socket> socket);
-
-  /** 
-   * Method to be assigned to the recv callback of the X2-U (X2 User Plane) socket.
-   * It is called when the eNB receives a packet from the peer eNB of the X2-U interface
-   * 
-   * \param socket socket of the X2-U interface
-   */
-  void RecvFromX2uSocket (Ptr<Socket> socket);
+        /**
+         * Add an X2 interface to this EPC X2 entity
+         * \param enb1CellId the cell ID of the current eNodeB
+         * \param enb1X2Address the address of the current eNodeB
+         * \param enb2CellId the cell ID of the neighbouring eNodeB
+         * \param enb2X2Address the address of the neighbouring eNodeB
+         */
+        void AddX2Interface(uint16_t enb1CellId, Ipv4Address enb1X2Address,
+                uint16_t enb2CellId, Ipv4Address enb2X2Address);
 
 
-protected:
-  // Interface provided by EpcX2SapProvider
-  virtual void DoSendHandoverRequest (EpcX2SapProvider::HandoverRequestParams params);
-  virtual void DoSendHandoverRequestAck (EpcX2SapProvider::HandoverRequestAckParams params);
-  virtual void DoSendHandoverPreparationFailure (EpcX2SapProvider::HandoverPreparationFailureParams params);
-  virtual void DoSendSnStatusTransfer (EpcX2SapProvider::SnStatusTransferParams params);
-  virtual void DoSendUeContextRelease (EpcX2SapProvider::UeContextReleaseParams params);
-  virtual void DoSendLoadInformation (EpcX2SapProvider::LoadInformationParams params);
-  virtual void DoSendResourceStatusUpdate (EpcX2SapProvider::ResourceStatusUpdateParams params);
-  virtual void DoSendUeData (EpcX2SapProvider::UeDataParams params);
+        /** 
+         * Method to be assigned to the recv callback of the X2-C (X2 Control Plane) socket.
+         * It is called when the eNB receives a packet from the peer eNB of the X2-C interface
+         * 
+         * \param socket socket of the X2-C interface
+         */
+        void RecvFromX2cSocket(Ptr<Socket> socket);
 
-  EpcX2SapUser* m_x2SapUser;
-  EpcX2SapProvider* m_x2SapProvider;
+        /** 
+         * Method to be assigned to the recv callback of the X2-U (X2 User Plane) socket.
+         * It is called when the eNB receives a packet from the peer eNB of the X2-U interface
+         * 
+         * \param socket socket of the X2-U interface
+         */
+        void RecvFromX2uSocket(Ptr<Socket> socket);
 
 
-private:
+    protected:
+        // Interface provided by EpcX2SapProvider
+        virtual void DoSendHandoverRequest(EpcX2SapProvider::HandoverRequestParams params);
+        virtual void DoSendHandoverRequestAck(EpcX2SapProvider::HandoverRequestAckParams params);
+        virtual void DoSendHandoverPreparationFailure(EpcX2SapProvider::HandoverPreparationFailureParams params);
+        virtual void DoSendSnStatusTransfer(EpcX2SapProvider::SnStatusTransferParams params);
+        virtual void DoSendUeContextRelease(EpcX2SapProvider::UeContextReleaseParams params);
+        virtual void DoSendLoadInformation(EpcX2SapProvider::LoadInformationParams params);
+        virtual void DoSendResourceStatusUpdate(EpcX2SapProvider::ResourceStatusUpdateParams params);
+        virtual void DoSendUeData(EpcX2SapProvider::UeDataParams params);
 
-  /**
-   * Map the targetCellId to the corresponding (sourceSocket, remoteIpAddr) to be used
-   * to send the X2 message
-   */
-  std::map < uint16_t, Ptr<X2IfaceInfo> > m_x2InterfaceSockets;
+        EpcX2SapUser* m_x2SapUser;
+        EpcX2SapProvider* m_x2SapProvider;
 
-  /**
-   * Map the localSocket (the one receiving the X2 message) 
-   * to the corresponding (sourceCellId, targetCellId) associated with the X2 interface
-   */
-  std::map < Ptr<Socket>, Ptr<X2CellInfo> > m_x2InterfaceCellIds;
 
-  /**
-   * UDP ports to be used for the X2 interfaces: X2-C and X2-U
-   */
-  uint16_t m_x2cUdpPort;
-  uint16_t m_x2uUdpPort;
+    private:
 
-};
+        /**
+         * Map the targetCellId to the corresponding (sourceSocket, remoteIpAddr) to be used
+         * to send the X2 message
+         */
+        std::map < uint16_t, Ptr<X2IfaceInfo> > m_x2InterfaceSockets;
+
+        /**
+         * Map the localSocket (the one receiving the X2 message) 
+         * to the corresponding (sourceCellId, targetCellId) associated with the X2 interface
+         */
+        std::map < Ptr<Socket>, Ptr<X2CellInfo> > m_x2InterfaceCellIds;
+
+        /**
+         * UDP ports to be used for the X2 interfaces: X2-C and X2-U
+         */
+        uint16_t m_x2cUdpPort;
+        uint16_t m_x2uUdpPort;
+
+    };
 
 } //namespace ns3
 

@@ -29,71 +29,66 @@
 
 namespace nfd {
 
-NFD_LOG_INIT("StrategyChoiceManager");
+    NFD_LOG_INIT("StrategyChoiceManager");
 
-StrategyChoiceManager::StrategyChoiceManager(StrategyChoice& strategyChoice,
-                                             Dispatcher& dispatcher,
-                                             CommandAuthenticator& authenticator)
-  : NfdManagerBase(dispatcher, authenticator, "strategy-choice")
-  , m_table(strategyChoice)
-{
-  registerCommandHandler<ndn::nfd::StrategyChoiceSetCommand>("set",
-    bind(&StrategyChoiceManager::setStrategy, this, _2, _3, _4, _5));
-  registerCommandHandler<ndn::nfd::StrategyChoiceUnsetCommand>("unset",
-    bind(&StrategyChoiceManager::unsetStrategy, this, _2, _3, _4, _5));
+    StrategyChoiceManager::StrategyChoiceManager(StrategyChoice& strategyChoice,
+            Dispatcher& dispatcher,
+            CommandAuthenticator& authenticator)
+    : NfdManagerBase(dispatcher, authenticator, "strategy-choice")
+    , m_table(strategyChoice) {
+        registerCommandHandler<ndn::nfd::StrategyChoiceSetCommand>("set",
+                bind(&StrategyChoiceManager::setStrategy, this, _2, _3, _4, _5));
+        registerCommandHandler<ndn::nfd::StrategyChoiceUnsetCommand>("unset",
+                bind(&StrategyChoiceManager::unsetStrategy, this, _2, _3, _4, _5));
 
-  registerStatusDatasetHandler("list",
-    bind(&StrategyChoiceManager::listChoices, this, _1, _2, _3));
-}
+        registerStatusDatasetHandler("list",
+                bind(&StrategyChoiceManager::listChoices, this, _1, _2, _3));
+    }
 
-void
-StrategyChoiceManager::setStrategy(const Name& topPrefix, const Interest& interest,
-                                   ControlParameters parameters,
-                                   const ndn::mgmt::CommandContinuation& done)
-{
-  const Name& prefix = parameters.getName();
-  const Name& selectedStrategy = parameters.getStrategy();
+    void
+    StrategyChoiceManager::setStrategy(const Name& topPrefix, const Interest& interest,
+            ControlParameters parameters,
+            const ndn::mgmt::CommandContinuation& done) {
+        const Name& prefix = parameters.getName();
+        const Name& selectedStrategy = parameters.getStrategy();
 
-  if (!m_table.hasStrategy(selectedStrategy)) {
-    NFD_LOG_DEBUG("strategy-choice result: FAIL reason: unknown-strategy: "
-                  << parameters.getStrategy());
-    return done(ControlResponse(504, "Unsupported strategy"));
-  }
+        if (!m_table.hasStrategy(selectedStrategy)) {
+            NFD_LOG_DEBUG("strategy-choice result: FAIL reason: unknown-strategy: "
+                    << parameters.getStrategy());
+            return done(ControlResponse(504, "Unsupported strategy"));
+        }
 
-  if (m_table.insert(prefix, selectedStrategy)) {
-    NFD_LOG_DEBUG("strategy-choice result: SUCCESS");
-    auto currentStrategyChoice = m_table.get(prefix);
-    BOOST_ASSERT(currentStrategyChoice.first);
-    parameters.setStrategy(currentStrategyChoice.second);
-    return done(ControlResponse(200, "OK").setBody(parameters.wireEncode()));
-  }
-  else {
-    NFD_LOG_DEBUG("strategy-choice result: FAIL reason: not-installed");
-    return done(ControlResponse(405, "Strategy not installed"));
-  }
-}
+        if (m_table.insert(prefix, selectedStrategy)) {
+            NFD_LOG_DEBUG("strategy-choice result: SUCCESS");
+            auto currentStrategyChoice = m_table.get(prefix);
+            BOOST_ASSERT(currentStrategyChoice.first);
+            parameters.setStrategy(currentStrategyChoice.second);
+            return done(ControlResponse(200, "OK").setBody(parameters.wireEncode()));
+        } else {
+            NFD_LOG_DEBUG("strategy-choice result: FAIL reason: not-installed");
+            return done(ControlResponse(405, "Strategy not installed"));
+        }
+    }
 
-void
-StrategyChoiceManager::unsetStrategy(const Name& topPrefix, const Interest& interest,
-                                     ControlParameters parameters,
-                                     const ndn::mgmt::CommandContinuation& done)
-{
-  m_table.erase(parameters.getName());
+    void
+    StrategyChoiceManager::unsetStrategy(const Name& topPrefix, const Interest& interest,
+            ControlParameters parameters,
+            const ndn::mgmt::CommandContinuation& done) {
+        m_table.erase(parameters.getName());
 
-  NFD_LOG_DEBUG("strategy-choice result: SUCCESS");
-  done(ControlResponse(200, "OK").setBody(parameters.wireEncode()));
-}
+        NFD_LOG_DEBUG("strategy-choice result: SUCCESS");
+        done(ControlResponse(200, "OK").setBody(parameters.wireEncode()));
+    }
 
-void
-StrategyChoiceManager::listChoices(const Name& topPrefix, const Interest& interest,
-                                   ndn::mgmt::StatusDatasetContext& context)
-{
-  for (auto&& i : m_table) {
-    ndn::nfd::StrategyChoice entry;
-    entry.setName(i.getPrefix()).setStrategy(i.getStrategyName());
-    context.append(entry.wireEncode());
-  }
-  context.end();
-}
+    void
+    StrategyChoiceManager::listChoices(const Name& topPrefix, const Interest& interest,
+            ndn::mgmt::StatusDatasetContext& context) {
+        for (auto&& i : m_table) {
+            ndn::nfd::StrategyChoice entry;
+            entry.setName(i.getPrefix()).setStrategy(i.getStrategyName());
+            context.append(entry.wireEncode());
+        }
+        context.end();
+    }
 
 } // namespace nfd

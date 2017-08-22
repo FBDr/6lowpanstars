@@ -32,84 +32,82 @@
 #include <exception>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-/** \brief provides IO operations limit and/or time limit for unit testing
- */
-class LimitedIo : noncopyable
-{
-public:
-  /** \brief construct with UnitTestTimeFixture
-   */
-  explicit
-  LimitedIo(UnitTestTimeFixture* uttf = nullptr);
+        /** \brief provides IO operations limit and/or time limit for unit testing
+         */
+        class LimitedIo : noncopyable {
+        public:
+            /** \brief construct with UnitTestTimeFixture
+             */
+            explicit
+            LimitedIo(UnitTestTimeFixture* uttf = nullptr);
 
-  /// indicates why .run returns
-  enum StopReason {
-    /// g_io.run() returns normally because there's no work to do
-    NO_WORK,
-    /// .afterOp() has been invoked nOpsLimit times
-    EXCEED_OPS,
-    /// nTimeLimit has elapsed
-    EXCEED_TIME,
-    /// an exception is thrown
-    EXCEPTION
-  };
+            /// indicates why .run returns
 
-  /** \brief g_io.run() with operation count and/or time limit
-   *  \param nOpsLimit operation count limit, pass UNLIMITED_OPS for no limit
-   *  \param timeLimit time limit, pass UNLIMITED_TIME for no limit
-   *  \param tick if this LimitedIo is constructed with UnitTestTimeFixture,
-   *              this is passed to .advanceClocks(), otherwise ignored
-   */
-  StopReason
-  run(int nOpsLimit, const time::nanoseconds& timeLimit,
-      const time::nanoseconds& tick = time::milliseconds(1));
+            enum StopReason {
+                /// g_io.run() returns normally because there's no work to do
+                NO_WORK,
+                /// .afterOp() has been invoked nOpsLimit times
+                EXCEED_OPS,
+                /// nTimeLimit has elapsed
+                EXCEED_TIME,
+                /// an exception is thrown
+                EXCEPTION
+            };
 
-  /// count an operation
-  void
-  afterOp();
+            /** \brief g_io.run() with operation count and/or time limit
+             *  \param nOpsLimit operation count limit, pass UNLIMITED_OPS for no limit
+             *  \param timeLimit time limit, pass UNLIMITED_TIME for no limit
+             *  \param tick if this LimitedIo is constructed with UnitTestTimeFixture,
+             *              this is passed to .advanceClocks(), otherwise ignored
+             */
+            StopReason
+            run(int nOpsLimit, const time::nanoseconds& timeLimit,
+                    const time::nanoseconds& tick = time::milliseconds(1));
 
-  /** \brief defer for specified duration
-   *
-   *  equivalent to .run(UNLIMITED_OPS, d)
-   */
-  void
-  defer(const time::nanoseconds& d)
-  {
-    this->run(UNLIMITED_OPS, d);
-  }
+            /// count an operation
+            void
+            afterOp();
 
-  std::exception_ptr
-  getLastException() const
-  {
-    return m_lastException;
-  }
+            /** \brief defer for specified duration
+             *
+             *  equivalent to .run(UNLIMITED_OPS, d)
+             */
+            void
+            defer(const time::nanoseconds& d) {
+                this->run(UNLIMITED_OPS, d);
+            }
 
-private:
-  /** \brief an exception to stop IO operation
-   */
-  class StopException : public std::exception
-  {
-  };
+            std::exception_ptr
+            getLastException() const {
+                return m_lastException;
+            }
 
-  void
-  afterTimeout();
+        private:
 
-public:
-  static const int UNLIMITED_OPS;
-  static const time::nanoseconds UNLIMITED_TIME;
+            /** \brief an exception to stop IO operation
+             */
+            class StopException : public std::exception {
+            };
 
-private:
-  UnitTestTimeFixture* m_uttf;
-  StopReason m_reason;
-  int m_nOpsRemaining;
-  scheduler::EventId m_timeout;
-  std::exception_ptr m_lastException;
-  bool m_isRunning;
-};
+            void
+            afterTimeout();
 
-} // namespace tests
+        public:
+            static const int UNLIMITED_OPS;
+            static const time::nanoseconds UNLIMITED_TIME;
+
+        private:
+            UnitTestTimeFixture* m_uttf;
+            StopReason m_reason;
+            int m_nOpsRemaining;
+            scheduler::EventId m_timeout;
+            std::exception_ptr m_lastException;
+            bool m_isRunning;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_LIMITED_IO_HPP

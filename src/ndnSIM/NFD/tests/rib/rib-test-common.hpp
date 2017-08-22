@@ -26,21 +26,20 @@
 #include "rib/route.hpp"
 
 namespace nfd {
-namespace rib {
-namespace tests {
+    namespace rib {
+        namespace tests {
 
-inline Route
-createRoute(uint64_t faceId, uint64_t origin, uint64_t cost, uint64_t flags)
-{
-  Route temp;
-  temp.faceId = faceId;
-  temp.origin = origin;
-  temp.cost = cost;
-  temp.flags = flags;
+            inline Route
+            createRoute(uint64_t faceId, uint64_t origin, uint64_t cost, uint64_t flags) {
+                Route temp;
+                temp.faceId = faceId;
+                temp.origin = origin;
+                temp.cost = cost;
+                temp.flags = flags;
 
-  return temp;
-}
+                return temp;
+            }
 
-} // namespace tests
-} // namespace rib
+        } // namespace tests
+    } // namespace rib
 } // namespace nfd

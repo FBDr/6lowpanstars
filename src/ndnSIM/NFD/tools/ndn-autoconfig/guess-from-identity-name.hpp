@@ -29,46 +29,45 @@
 #include "base-dns.hpp"
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-/**
- * @brief Guessing home router based on the default identity name
- *
- * This stage assumes that user has configured default certificate using
- * http://ndncert.named-data.net/
- *
- * - Request
- *
- *     The end host loads the default user identity (eg. /ndn/edu/ucla/cs/afanasev), and
- *     converts it to DNS format.
- *
- *     The end host sends a DNS query for an SRV record of name _ndn._udp. + user identity in
- *     DNS format + _homehub._auto-conf.named-data.net. For example:
- *
- *         _ndn._udp.afanasev.cs.ucla.edu.ndn._homehub._autoconf.named-data.net
- *
- * - Response
- *
- *     The DNS server should answer with an SRV record that contains the hostname and UDP port
- *     number of the home NDN router of this user's site.
- */
-class GuessFromIdentityName : public BaseDns
-{
-public:
-  /**
-   * @brief Create stage to guess home router based on the default identity name
-   * @sa Base::Base
-   */
-  GuessFromIdentityName(Face& face, KeyChain& keyChain,
+            /**
+             * @brief Guessing home router based on the default identity name
+             *
+             * This stage assumes that user has configured default certificate using
+             * http://ndncert.named-data.net/
+             *
+             * - Request
+             *
+             *     The end host loads the default user identity (eg. /ndn/edu/ucla/cs/afanasev), and
+             *     converts it to DNS format.
+             *
+             *     The end host sends a DNS query for an SRV record of name _ndn._udp. + user identity in
+             *     DNS format + _homehub._auto-conf.named-data.net. For example:
+             *
+             *         _ndn._udp.afanasev.cs.ucla.edu.ndn._homehub._autoconf.named-data.net
+             *
+             * - Response
+             *
+             *     The DNS server should answer with an SRV record that contains the hostname and UDP port
+             *     number of the home NDN router of this user's site.
+             */
+            class GuessFromIdentityName : public BaseDns {
+            public:
+                /**
+                 * @brief Create stage to guess home router based on the default identity name
+                 * @sa Base::Base
+                 */
+                GuessFromIdentityName(Face& face, KeyChain& keyChain,
                         const NextStageCallback& nextStageOnFailure);
 
-  virtual void
-  start() override;
-};
+                virtual void
+                start() override;
+            };
 
-} // namespace autoconfig
-} // namespace tools
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn
 
 #endif // NFD_TOOLS_NDN_AUTOCONFIG_GUESSING_FROM_IDENTITY_NAME_HPP

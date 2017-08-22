@@ -29,32 +29,31 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief contains arbitrary information forwarding strategy places on table entries
- */
-class StrategyInfo
-{
-public:
+        /** \brief contains arbitrary information forwarding strategy places on table entries
+         */
+        class StrategyInfo {
+        public:
 #ifdef DOXYGEN
-  /** \return an integer that uniquely identifies this StrategyInfo type
-   *  \sa https://redmine.named-data.net/projects/nfd/wiki/StrategyInfoType
-   */
-  static constexpr int
-  getTypeId()
-  {
-    return <type-identifier>;
-  }
+
+            /** \return an integer that uniquely identifies this StrategyInfo type
+             *  \sa https://redmine.named-data.net/projects/nfd/wiki/StrategyInfoType
+             */
+            static constexpr int
+            getTypeId() {
+                return <type - identifier>;
+            }
 #endif
 
-  virtual
-  ~StrategyInfo() = default;
+            virtual
+            ~StrategyInfo() = default;
 
-protected:
-  StrategyInfo() = default;
-};
+        protected:
+            StrategyInfo() = default;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_STRATEGY_INFO_HPP

@@ -28,29 +28,28 @@
 
 namespace ns3 {
 
-/**
- * \ingroup spectrum
- *
- */
-class AlohaNoackMacHeader : public Header
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-  virtual void Print (std::ostream &os) const;
+    /**
+     * \ingroup spectrum
+     *
+     */
+    class AlohaNoackMacHeader : public Header {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
+        virtual void Print(std::ostream &os) const;
 
-  void SetSource (Mac48Address source);
-  void SetDestination (Mac48Address destination);
-  Mac48Address GetSource () const;
-  Mac48Address GetDestination () const;
+        void SetSource(Mac48Address source);
+        void SetDestination(Mac48Address destination);
+        Mac48Address GetSource() const;
+        Mac48Address GetDestination() const;
 
-private:
-  Mac48Address m_source;
-  Mac48Address m_destination;
-};
+    private:
+        Mac48Address m_source;
+        Mac48Address m_destination;
+    };
 
 
 

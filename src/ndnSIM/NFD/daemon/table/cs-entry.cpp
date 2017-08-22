@@ -26,58 +26,52 @@
 #include "cs-entry.hpp"
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-void
-Entry::setData(shared_ptr<const Data> data, bool isUnsolicited)
-{
-  m_data = data;
-  m_isUnsolicited = isUnsolicited;
+        void
+        Entry::setData(shared_ptr<const Data> data, bool isUnsolicited) {
+            m_data = data;
+            m_isUnsolicited = isUnsolicited;
 
-  updateStaleTime();
-}
+            updateStaleTime();
+        }
 
-bool
-Entry::isStale() const
-{
-  BOOST_ASSERT(this->hasData());
-  return m_staleTime < time::steady_clock::now();
-}
+        bool
+        Entry::isStale() const {
+            BOOST_ASSERT(this->hasData());
+            return m_staleTime < time::steady_clock::now();
+        }
 
-void
-Entry::updateStaleTime()
-{
-  BOOST_ASSERT(this->hasData());
-  if (m_data->getFreshnessPeriod() >= time::milliseconds::zero()) {
-    m_staleTime = time::steady_clock::now() + time::milliseconds(m_data->getFreshnessPeriod());
-  }
-  else {
-    m_staleTime = time::steady_clock::TimePoint::max();
-  }
-}
+        void
+        Entry::updateStaleTime() {
+            BOOST_ASSERT(this->hasData());
+            if (m_data->getFreshnessPeriod() >= time::milliseconds::zero()) {
+                m_staleTime = time::steady_clock::now() + time::milliseconds(m_data->getFreshnessPeriod());
+            } else {
+                m_staleTime = time::steady_clock::TimePoint::max();
+            }
+        }
 
-bool
-Entry::canSatisfy(const Interest& interest) const
-{
-  BOOST_ASSERT(this->hasData());
-  if (!interest.matchesData(*m_data)) {
-    return false;
-  }
+        bool
+        Entry::canSatisfy(const Interest& interest) const {
+            BOOST_ASSERT(this->hasData());
+            if (!interest.matchesData(*m_data)) {
+                return false;
+            }
 
-  if (interest.getMustBeFresh() == static_cast<int>(true) && this->isStale()) {
-    return false;
-  }
+            if (interest.getMustBeFresh() == static_cast<int> (true) && this->isStale()) {
+                return false;
+            }
 
-  return true;
-}
+            return true;
+        }
 
-void
-Entry::reset()
-{
-  m_data.reset();
-  m_isUnsolicited = false;
-  m_staleTime = time::steady_clock::TimePoint();
-}
+        void
+        Entry::reset() {
+            m_data.reset();
+            m_isUnsolicited = false;
+            m_staleTime = time::steady_clock::TimePoint();
+        }
 
-} // namespace cs
+    } // namespace cs
 } // namespace nfd

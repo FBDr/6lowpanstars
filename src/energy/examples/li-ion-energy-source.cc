@@ -44,59 +44,56 @@ using namespace ns3;
  */
 
 static void
-PrintCellInfo (Ptr<LiIonEnergySource> es)
-{
-  std::cout << "At " << Simulator::Now ().GetSeconds () << " Cell voltage: " << es->GetSupplyVoltage () << " V Remaining Capacity: " <<
-  es->GetRemainingEnergy () / (3.6 * 3600) << " Ah" << std::endl;
+PrintCellInfo(Ptr<LiIonEnergySource> es) {
+    std::cout << "At " << Simulator::Now().GetSeconds() << " Cell voltage: " << es->GetSupplyVoltage() << " V Remaining Capacity: " <<
+            es->GetRemainingEnergy() / (3.6 * 3600) << " Ah" << std::endl;
 
-  if (!Simulator::IsFinished ())
-    {
-      Simulator::Schedule (Seconds (20),
-                           &PrintCellInfo,
-                           es);
+    if (!Simulator::IsFinished()) {
+        Simulator::Schedule(Seconds(20),
+                &PrintCellInfo,
+                es);
     }
 }
 
 int
-main (int argc, char **argv)
-{
-  // uncomment below to see the energy consumption details
-  // LogComponentEnable ("LiIonEnergySource", LOG_LEVEL_DEBUG);
+main(int argc, char **argv) {
+    // uncomment below to see the energy consumption details
+    // LogComponentEnable ("LiIonEnergySource", LOG_LEVEL_DEBUG);
 
-  Ptr<Node> node = CreateObject<Node> ();
+    Ptr<Node> node = CreateObject<Node> ();
 
-  Ptr<SimpleDeviceEnergyModel> sem = CreateObject<SimpleDeviceEnergyModel> ();
-  Ptr<EnergySourceContainer> esCont = CreateObject<EnergySourceContainer> ();
-  Ptr<LiIonEnergySource> es = CreateObject<LiIonEnergySource> ();
-  esCont->Add (es);
-  es->SetNode (node);
-  sem->SetEnergySource (es);
-  es->AppendDeviceEnergyModel (sem);
-  sem->SetNode (node);
-  node->AggregateObject (esCont);
+    Ptr<SimpleDeviceEnergyModel> sem = CreateObject<SimpleDeviceEnergyModel> ();
+    Ptr<EnergySourceContainer> esCont = CreateObject<EnergySourceContainer> ();
+    Ptr<LiIonEnergySource> es = CreateObject<LiIonEnergySource> ();
+    esCont->Add(es);
+    es->SetNode(node);
+    sem->SetEnergySource(es);
+    es->AppendDeviceEnergyModel(sem);
+    sem->SetNode(node);
+    node->AggregateObject(esCont);
 
-  Time now = Simulator::Now ();
+    Time now = Simulator::Now();
 
-  // discharge at 2.33 A for 1700 seconds
-  sem->SetCurrentA (2.33);
-  now += Seconds (1701);
+    // discharge at 2.33 A for 1700 seconds
+    sem->SetCurrentA(2.33);
+    now += Seconds(1701);
 
 
-  // discharge at 4.66 A for 628 seconds
-  Simulator::Schedule (now,
-                       &SimpleDeviceEnergyModel::SetCurrentA,
-                       sem,
-                       4.66);
-  now += Seconds (600);
+    // discharge at 4.66 A for 628 seconds
+    Simulator::Schedule(now,
+            &SimpleDeviceEnergyModel::SetCurrentA,
+            sem,
+            4.66);
+    now += Seconds(600);
 
-  PrintCellInfo (es);
+    PrintCellInfo(es);
 
-  Simulator::Stop (now);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(now);
+    Simulator::Run();
+    Simulator::Destroy();
 
-  // the cell voltage should be under 3.3v
-  DoubleValue v;
-  es->GetAttribute ("ThresholdVoltage", v);
-  NS_ASSERT (es->GetSupplyVoltage () <= v.Get ());
+    // the cell voltage should be under 3.3v
+    DoubleValue v;
+    es->GetAttribute("ThresholdVoltage", v);
+    NS_ASSERT(es->GetSupplyVoltage() <= v.Get());
 }

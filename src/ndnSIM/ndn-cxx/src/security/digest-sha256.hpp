@@ -27,28 +27,27 @@
 
 namespace ndn {
 
-/**
- * Represent a SHA256 digest.
- */
-class DigestSha256 : public Signature
-{
-public:
-  class Error : public Signature::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Signature::Error(what)
-    {
-    }
-  };
+    /**
+     * Represent a SHA256 digest.
+     */
+    class DigestSha256 : public Signature {
+    public:
 
-  DigestSha256();
+        class Error : public Signature::Error {
+        public:
 
-  explicit
-  DigestSha256(const Signature& signature);
+            explicit
+            Error(const std::string& what)
+            : Signature::Error(what) {
+            }
+        };
 
-};
+        DigestSha256();
+
+        explicit
+        DigestSha256(const Signature& signature);
+
+    };
 
 } // namespace ndn
 

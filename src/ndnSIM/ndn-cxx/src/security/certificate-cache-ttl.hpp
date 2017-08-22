@@ -29,57 +29,56 @@
 #include "../util/scheduler.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief Cache of validated certificates with freshness-based eviction policy
- *
- * Validated certificates will stay in cache for the duration of their freshness period.
- * The lifetime of the certificate in cache can be extended by "re-inserting" it in the cache.
- */
-class CertificateCacheTtl : public CertificateCache
-{
-public:
-  explicit
-  CertificateCacheTtl(boost::asio::io_service& io,
-                      const time::seconds& defaultTtl = time::seconds(3600));
+        /**
+         * @brief Cache of validated certificates with freshness-based eviction policy
+         *
+         * Validated certificates will stay in cache for the duration of their freshness period.
+         * The lifetime of the certificate in cache can be extended by "re-inserting" it in the cache.
+         */
+        class CertificateCacheTtl : public CertificateCache {
+        public:
+            explicit
+            CertificateCacheTtl(boost::asio::io_service& io,
+                    const time::seconds& defaultTtl = time::seconds(3600));
 
-  virtual
-  ~CertificateCacheTtl();
+            virtual
+            ~CertificateCacheTtl();
 
-  virtual void
-  insertCertificate(shared_ptr<const v1::IdentityCertificate> certificate);
+            virtual void
+            insertCertificate(shared_ptr<const v1::IdentityCertificate> certificate);
 
-  virtual shared_ptr<const v1::IdentityCertificate>
-  getCertificate(const Name& certificateNameWithoutVersion);
+            virtual shared_ptr<const v1::IdentityCertificate>
+            getCertificate(const Name& certificateNameWithoutVersion);
 
-  virtual void
-  reset();
+            virtual void
+            reset();
 
-  virtual size_t
-  getSize();
+            virtual size_t
+            getSize();
 
-private:
-  void
-  insert(shared_ptr<const v1::IdentityCertificate> certificate);
+        private:
+            void
+            insert(shared_ptr<const v1::IdentityCertificate> certificate);
 
-  void
-  remove(const Name& certificateName);
+            void
+            remove(const Name& certificateName);
 
-  void
-  removeAll();
+            void
+            removeAll();
 
-protected:
-  typedef std::map<Name, std::pair<shared_ptr<const v1::IdentityCertificate>, EventId> > Cache;
+        protected:
+            typedef std::map<Name, std::pair<shared_ptr<const v1::IdentityCertificate>, EventId> > Cache;
 
-  time::seconds m_defaultTtl;
-  Cache m_cache;
-  Scheduler m_scheduler;
-};
+            time::seconds m_defaultTtl;
+            Cache m_cache;
+            Scheduler m_scheduler;
+        };
 
-} // namespace security
+    } // namespace security
 
-using security::CertificateCacheTtl;
+    using security::CertificateCacheTtl;
 
 } // namespace ndn
 

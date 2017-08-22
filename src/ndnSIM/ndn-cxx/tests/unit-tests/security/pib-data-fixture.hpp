@@ -27,38 +27,37 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibDataFixture
-{
-public:
-  PibDataFixture();
+        class PibDataFixture {
+        public:
+            PibDataFixture();
 
-public:
-  Name id1;
-  Name id2;
+        public:
+            Name id1;
+            Name id2;
 
-  Name id1Key1Name;
-  Name id1Key2Name;
-  Name id2Key1Name;
-  Name id2Key2Name;
+            Name id1Key1Name;
+            Name id1Key2Name;
+            Name id2Key1Name;
+            Name id2Key2Name;
 
-  v1::PublicKey id1Key1;
-  v1::PublicKey id1Key2;
-  v1::PublicKey id2Key1;
-  v1::PublicKey id2Key2;
+            v1::PublicKey id1Key1;
+            v1::PublicKey id1Key2;
+            v1::PublicKey id2Key1;
+            v1::PublicKey id2Key2;
 
-  v1::IdentityCertificate id1Key1Cert1;
-  v1::IdentityCertificate id1Key1Cert2;
-  v1::IdentityCertificate id1Key2Cert1;
-  v1::IdentityCertificate id1Key2Cert2;
-  v1::IdentityCertificate id2Key1Cert1;
-  v1::IdentityCertificate id2Key1Cert2;
-  v1::IdentityCertificate id2Key2Cert1;
-  v1::IdentityCertificate id2Key2Cert2;
-};
+            v1::IdentityCertificate id1Key1Cert1;
+            v1::IdentityCertificate id1Key1Cert2;
+            v1::IdentityCertificate id1Key2Cert1;
+            v1::IdentityCertificate id1Key2Cert2;
+            v1::IdentityCertificate id2Key1Cert1;
+            v1::IdentityCertificate id2Key1Cert2;
+            v1::IdentityCertificate id2Key2Cert1;
+            v1::IdentityCertificate id2Key2Cert2;
+        };
 
-} // namespace security
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_TESTS_PIB_DATA_FIXTURE_HPP

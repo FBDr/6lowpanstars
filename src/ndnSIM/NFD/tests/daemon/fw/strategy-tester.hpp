@@ -30,78 +30,73 @@
 #include "fw/strategy.hpp"
 
 namespace nfd {
-namespace fw {
-namespace tests {
+    namespace fw {
+        namespace tests {
 
-/** \brief extends strategy S for unit testing
- *
- *  Actions invoked by S are recorded but not passed to forwarder
- */
-template<typename S>
-class StrategyTester : public S
-{
-public:
-  explicit
-  StrategyTester(Forwarder& forwarder)
-    : S(forwarder, Name(S::STRATEGY_NAME).append("tester"))
-  {
-  }
+            /** \brief extends strategy S for unit testing
+             *
+             *  Actions invoked by S are recorded but not passed to forwarder
+             */
+            template<typename S>
+            class StrategyTester : public S {
+            public:
 
-  /// fires after each Action
-  signal::Signal<StrategyTester<S>> afterAction;
+                explicit
+                StrategyTester(Forwarder& forwarder)
+                : S(forwarder, Name(S::STRATEGY_NAME).append("tester")) {
+                }
 
-protected:
-  virtual void
-  sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
-               const Interest& interest) override
-  {
-    sendInterestHistory.push_back({pitEntry->getInterest(), outFace.getId(), interest});
-    pitEntry->insertOrUpdateOutRecord(outFace, interest);
-    afterAction();
-  }
+                /// fires after each Action
+                signal::Signal<StrategyTester<S>> afterAction;
 
-  virtual void
-  rejectPendingInterest(const shared_ptr<pit::Entry>& pitEntry) override
-  {
-    rejectPendingInterestHistory.push_back({pitEntry->getInterest()});
-    afterAction();
-  }
+            protected:
 
-  virtual void
-  sendNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace,
-           const lp::NackHeader& header) override
-  {
-    sendNackHistory.push_back({pitEntry->getInterest(), outFace.getId(), header});
-    pitEntry->deleteInRecord(outFace);
-    afterAction();
-  }
+                virtual void
+                sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
+                        const Interest& interest) override {
+                    sendInterestHistory.push_back({pitEntry->getInterest(), outFace.getId(), interest});
+                    pitEntry->insertOrUpdateOutRecord(outFace, interest);
+                    afterAction();
+                }
 
-public:
-  struct SendInterestArgs
-  {
-    Interest pitInterest;
-    FaceId outFaceId;
-    Interest interest;
-  };
-  std::vector<SendInterestArgs> sendInterestHistory;
+                virtual void
+                rejectPendingInterest(const shared_ptr<pit::Entry>& pitEntry) override {
+                    rejectPendingInterestHistory.push_back({pitEntry->getInterest()});
+                    afterAction();
+                }
 
-  struct RejectPendingInterestArgs
-  {
-    Interest pitInterest;
-  };
-  std::vector<RejectPendingInterestArgs> rejectPendingInterestHistory;
+                virtual void
+                sendNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace,
+                        const lp::NackHeader& header) override {
+                    sendNackHistory.push_back({pitEntry->getInterest(), outFace.getId(), header});
+                    pitEntry->deleteInRecord(outFace);
+                    afterAction();
+                }
 
-  struct SendNackArgs
-  {
-    Interest pitInterest;
-    FaceId outFaceId;
-    lp::NackHeader header;
-  };
-  std::vector<SendNackArgs> sendNackHistory;
-};
+            public:
 
-} // namespace tests
-} // namespace fw
+                struct SendInterestArgs {
+                    Interest pitInterest;
+                    FaceId outFaceId;
+                    Interest interest;
+                };
+                std::vector<SendInterestArgs> sendInterestHistory;
+
+                struct RejectPendingInterestArgs {
+                    Interest pitInterest;
+                };
+                std::vector<RejectPendingInterestArgs> rejectPendingInterestHistory;
+
+                struct SendNackArgs {
+                    Interest pitInterest;
+                    FaceId outFaceId;
+                    lp::NackHeader header;
+                };
+                std::vector<SendNackArgs> sendNackHistory;
+            };
+
+        } // namespace tests
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FW_STRATEGY_TESTER_HPP

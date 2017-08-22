@@ -29,24 +29,23 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-/**
- * @brief IdentityManagementTimeFixture is a test suite level fixture.
- * Test cases in the suite can use this fixture to create identities.
- * Identities added via addIdentity method are automatically deleted
- * during test teardown.
- */
-class IdentityManagementTimeFixture : public tests::UnitTestTimeFixture
-                                    , public IdentityManagementFixture
-{
-public:
-  IdentityManagementTimeFixture();
+        /**
+         * @brief IdentityManagementTimeFixture is a test suite level fixture.
+         * Test cases in the suite can use this fixture to create identities.
+         * Identities added via addIdentity method are automatically deleted
+         * during test teardown.
+         */
+        class IdentityManagementTimeFixture : public tests::UnitTestTimeFixture
+        , public IdentityManagementFixture {
+        public:
+            IdentityManagementTimeFixture();
 
-  ~IdentityManagementTimeFixture();
-};
+            ~IdentityManagementTimeFixture();
+        };
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn
 
 #endif // NDN_TESTS_UNIT_TESTS_IDENTITY_MANAGEMENT_TIME_FIXTURE_HPP

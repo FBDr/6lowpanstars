@@ -27,47 +27,46 @@
 #include "../security-common.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to verify signature.
- *
- * The next module is usually SinkBool.
- */
-class VerifierFilter : public Transform
-{
-public:
-  /**
-   * @brief Create a verifier module to verify signature @p sig using algorithm @p algo and @p key
-   */
-  VerifierFilter(DigestAlgorithm algo, const PublicKey& key, const uint8_t* sig, size_t sigLen);
+            /**
+             * @brief The module to verify signature.
+             *
+             * The next module is usually SinkBool.
+             */
+            class VerifierFilter : public Transform {
+            public:
+                /**
+                 * @brief Create a verifier module to verify signature @p sig using algorithm @p algo and @p key
+                 */
+                VerifierFilter(DigestAlgorithm algo, const PublicKey& key, const uint8_t* sig, size_t sigLen);
 
-private:
-  /**
-   * @brief Write data @p buf into verifier
-   *
-   * @return The number of bytes that are actually written
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Write data @p buf into verifier
+                 *
+                 * @return The number of bytes that are actually written
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize verification and write the result (single byte) into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize verification and write the result (single byte) into next module.
+                 */
+                virtual void
+                finalize() final;
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-verifierFilter(DigestAlgorithm algo, const PublicKey& key, const uint8_t* sig, size_t sigLen);
+            unique_ptr<Transform>
+            verifierFilter(DigestAlgorithm algo, const PublicKey& key, const uint8_t* sig, size_t sigLen);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_VERIFIER_FILTER_HPP

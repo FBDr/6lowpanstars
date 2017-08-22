@@ -28,132 +28,123 @@
 #include "building-list.h"
 #include "building.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("BuildingList");
-
-/**
- * \brief private implementation detail of the BuildingList API.
- */
-class BuildingListPriv : public Object
+namespace ns3
 {
-public:
-  static TypeId GetTypeId (void);
-  BuildingListPriv ();
-  ~BuildingListPriv ();
 
-  uint32_t Add (Ptr<Building> building);
-  BuildingList::Iterator Begin (void) const;
-  BuildingList::Iterator End (void) const;
-  Ptr<Building> GetBuilding (uint32_t n);
-  uint32_t GetNBuildings (void);
+    NS_LOG_COMPONENT_DEFINE("BuildingList");
 
-  static Ptr<BuildingListPriv> Get (void);
+    /**
+     * \brief private implementation detail of the BuildingList API.
+     */
+    class BuildingListPriv : public Object
+            {
+        public :
+        static TypeId GetTypeId(void);
+        BuildingListPriv();
+        ~BuildingListPriv();
+
+        uint32_t Add(Ptr<Building> building);
+        BuildingList::Iterator Begin(void) const;
+        BuildingList::Iterator End(void) const;
+        Ptr<Building> GetBuilding(uint32_t n);
+        uint32_t GetNBuildings(void);
+
+        static Ptr<BuildingListPriv> Get(void);
 
 private:
-  virtual void DoDispose (void);
-  static Ptr<BuildingListPriv> *DoGet (void);
-  static void Delete (void);
-  std::vector<Ptr<Building> > m_buildings;
-};
+        virtual void DoDispose(void);
+        static Ptr<BuildingListPriv> *DoGet(void);
+        static void Delete(void);
+        std::vector<Ptr<Building> > m_buildings;};
 
-NS_OBJECT_ENSURE_REGISTERED (BuildingListPriv);
+    NS_OBJECT_ENSURE_REGISTERED(BuildingListPriv);
 
-TypeId
-BuildingListPriv::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::BuildingListPriv")
-    .SetParent<Object> ()
-    .SetGroupName ("Buildings")
-    .AddAttribute ("BuildingList", "The list of all buildings created during the simulation.",
-                   ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&BuildingListPriv::m_buildings),
-                   MakeObjectVectorChecker<Building> ())
-  ;
-  return tid;
-}
-
-Ptr<BuildingListPriv>
-BuildingListPriv::Get (void)
-{
-  return *DoGet ();
-}
-Ptr<BuildingListPriv> *
-BuildingListPriv::DoGet (void)
-{
-  static Ptr<BuildingListPriv> ptr = 0;
-  if (ptr == 0)
-    {
-      ptr = CreateObject<BuildingListPriv> ();
-      Config::RegisterRootNamespaceObject (ptr);
-      Simulator::ScheduleDestroy (&BuildingListPriv::Delete);
+    TypeId
+    BuildingListPriv::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::BuildingListPriv")
+                .SetParent<Object> ()
+                .SetGroupName("Buildings")
+                .AddAttribute("BuildingList", "The list of all buildings created during the simulation.",
+                ObjectVectorValue(),
+                MakeObjectVectorAccessor(&BuildingListPriv::m_buildings),
+                MakeObjectVectorChecker<Building> ())
+                ;
+        return tid;
     }
-  return &ptr;
-}
-void
-BuildingListPriv::Delete (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  Config::UnregisterRootNamespaceObject (Get ());
-  (*DoGet ()) = 0;
-}
 
-
-BuildingListPriv::BuildingListPriv ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-}
-BuildingListPriv::~BuildingListPriv ()
-{
-}
-void
-BuildingListPriv::DoDispose (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  for (std::vector<Ptr<Building> >::iterator i = m_buildings.begin ();
-       i != m_buildings.end (); i++)
-    {
-      Ptr<Building> building = *i;
-      building->Dispose ();
-      *i = 0;
+    Ptr<BuildingListPriv>
+            BuildingListPriv::Get(void) {
+        return *DoGet();
     }
-  m_buildings.erase (m_buildings.begin (), m_buildings.end ());
-  Object::DoDispose ();
-}
 
+    Ptr<BuildingListPriv> *
+            BuildingListPriv::DoGet(void) {
+        static Ptr<BuildingListPriv> ptr = 0;
+        if (ptr == 0) {
+            ptr = CreateObject<BuildingListPriv> ();
+            Config::RegisterRootNamespaceObject(ptr);
+            Simulator::ScheduleDestroy(&BuildingListPriv::Delete);
+        }
+        return &ptr;
+    }
 
-uint32_t
-BuildingListPriv::Add (Ptr<Building> building)
-{
-  uint32_t index = m_buildings.size ();
-  m_buildings.push_back (building);
-  Simulator::ScheduleWithContext (index, TimeStep (0), &Building::Initialize, building);
-  return index;
+    void
+    BuildingListPriv::Delete(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        Config::UnregisterRootNamespaceObject(Get());
+        (*DoGet()) = 0;
+    }
 
-}
-BuildingList::Iterator
-BuildingListPriv::Begin (void) const
-{
-  return m_buildings.begin ();
-}
-BuildingList::Iterator
-BuildingListPriv::End (void) const
-{
-  return m_buildings.end ();
-}
-uint32_t
-BuildingListPriv::GetNBuildings (void)
-{
-  return m_buildings.size ();
-}
+    BuildingListPriv::BuildingListPriv() {
+        NS_LOG_FUNCTION_NOARGS();
+    }
 
-Ptr<Building>
-BuildingListPriv::GetBuilding (uint32_t n)
-{
-  NS_ASSERT_MSG (n < m_buildings.size (), "Building index " << n <<
-                 " is out of range (only have " << m_buildings.size () << " buildings).");
-  return m_buildings.at (n);
-}
+    BuildingListPriv::~BuildingListPriv() {
+    }
+
+    void
+    BuildingListPriv::DoDispose(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        for (std::vector<Ptr<Building> >::iterator i = m_buildings.begin();
+                i != m_buildings.end(); i++) {
+            Ptr<Building> building = *i;
+            building->Dispose();
+            *i = 0;
+        }
+        m_buildings.erase(m_buildings.begin(), m_buildings.end());
+        Object::DoDispose();
+    }
+
+    uint32_t
+    BuildingListPriv::Add(Ptr<Building> building) {
+        uint32_t index = m_buildings.size();
+        m_buildings.push_back(building);
+        Simulator::ScheduleWithContext(index, TimeStep(0), &Building::Initialize, building);
+        return index;
+
+    }
+
+    BuildingList::Iterator
+    BuildingListPriv::Begin(void) const {
+        return m_buildings.begin();
+    }
+
+    BuildingList::Iterator
+    BuildingListPriv::End(void) const {
+        return m_buildings.end();
+    }
+
+    uint32_t
+    BuildingListPriv::GetNBuildings(void) {
+        return m_buildings.size();
+    }
+
+    Ptr<Building>
+            BuildingListPriv::GetBuilding(uint32_t n) {
+        NS_ASSERT_MSG(n < m_buildings.size(), "Building index " << n <<
+                " is out of range (only have " << m_buildings.size() << " buildings).");
+        return m_buildings.at(n);
+    }
 
 }
 
@@ -162,32 +153,31 @@ BuildingListPriv::GetBuilding (uint32_t n)
  * which calls into the private implementation through
  * the simulation singleton.
  */
-namespace ns3 {
+namespace ns3{
 
-uint32_t
-BuildingList::Add (Ptr<Building> building)
-{
-  return BuildingListPriv::Get ()->Add (building);
-}
-BuildingList::Iterator
-BuildingList::Begin (void)
-{
-  return BuildingListPriv::Get ()->Begin ();
-}
-BuildingList::Iterator
-BuildingList::End (void)
-{
-  return BuildingListPriv::Get ()->End ();
-}
-Ptr<Building>
-BuildingList::GetBuilding (uint32_t n)
-{
-  return BuildingListPriv::Get ()->GetBuilding (n);
-}
-uint32_t
-BuildingList::GetNBuildings (void)
-{
-  return BuildingListPriv::Get ()->GetNBuildings ();
-}
-
+    uint32_t
+    BuildingList::Add(Ptr<Building> building)
+    {
+        return BuildingListPriv::Get()->Add(building);
+    }
+    BuildingList::Iterator
+    BuildingList::Begin(void)
+    {
+        return BuildingListPriv::Get()->Begin();
+    }
+    BuildingList::Iterator
+    BuildingList::End(void)
+    {
+        return BuildingListPriv::Get()->End();
+    }
+    Ptr<Building>
+    BuildingList::GetBuilding(uint32_t n)
+    {
+        return BuildingListPriv::Get()->GetBuilding(n);
+    }
+    uint32_t
+    BuildingList::GetNBuildings(void)
+    {
+        return BuildingListPriv::Get()->GetNBuildings();
+    }
 } // namespace ns3

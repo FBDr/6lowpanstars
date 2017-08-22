@@ -27,27 +27,24 @@
 
 namespace nfd {
 
-Channel::~Channel()
-{
-}
+    Channel::~Channel() {
+    }
 
-void
-Channel::setUri(const FaceUri& uri)
-{
-  m_uri = uri;
-}
+    void
+    Channel::setUri(const FaceUri& uri) {
+        m_uri = uri;
+    }
 
-void
-connectFaceClosedSignal(Face& face, const std::function<void()>& f)
-{
-  using face::FaceState;
+    void
+    connectFaceClosedSignal(Face& face, const std::function<void()>& f) {
+        using face::FaceState;
 
-  face.afterStateChange.connect(
-    [f] (FaceState oldState, FaceState newState) {
-      if (newState == FaceState::CLOSED) {
-        f();
-      }
-    });
-}
+        face.afterStateChange.connect(
+                [f] (FaceState oldState, FaceState newState) {
+                    if (newState == FaceState::CLOSED) {
+                        f();
+                    }
+                });
+    }
 
 } // namespace nfd

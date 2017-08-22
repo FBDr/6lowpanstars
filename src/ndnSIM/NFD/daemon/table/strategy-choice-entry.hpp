@@ -30,55 +30,51 @@
 
 namespace nfd {
 
-namespace fw {
-class Strategy;
-} // namespace fw
+    namespace fw {
+        class Strategy;
+    } // namespace fw
 
-namespace name_tree {
-class Entry;
-} // namespace name_tree
+    namespace name_tree {
+        class Entry;
+    } // namespace name_tree
 
-namespace strategy_choice {
+    namespace strategy_choice {
 
-/** \brief represents a Strategy Choice entry
- */
-class Entry : noncopyable
-{
-public:
-  Entry(const Name& prefix);
+        /** \brief represents a Strategy Choice entry
+         */
+        class Entry : noncopyable {
+        public:
+            Entry(const Name& prefix);
 
-  const Name&
-  getPrefix() const
-  {
-    return m_prefix;
-  }
+            const Name&
+            getPrefix() const {
+                return m_prefix;
+            }
 
-  const Name&
-  getStrategyName() const;
+            const Name&
+            getStrategyName() const;
 
-  fw::Strategy&
-  getStrategy() const
-  {
-    BOOST_ASSERT(m_strategy != nullptr);
-    return *m_strategy;
-  }
+            fw::Strategy&
+            getStrategy() const {
+                BOOST_ASSERT(m_strategy != nullptr);
+                return *m_strategy;
+            }
 
-  void
-  setStrategy(fw::Strategy& strategy)
-  {
-    m_strategy = &strategy;
-  }
+            void
+            setStrategy(fw::Strategy& strategy) {
+                m_strategy = &strategy;
+            }
 
-private:
-  Name m_prefix;
-  fw::Strategy* m_strategy;
+        private:
+            Name m_prefix;
+            fw::Strategy* m_strategy;
 
-  name_tree::Entry* m_nameTreeEntry;
+            name_tree::Entry* m_nameTreeEntry;
 
-  friend class name_tree::Entry;
-};
+            friend class name_tree::Entry;
+        };
 
-} // namespace strategy_choice
+    } // namespace strategy_choice
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_STRATEGY_CHOICE_ENTRY_HPP

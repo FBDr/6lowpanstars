@@ -40,116 +40,115 @@ typedef pcap pcap_t;
 struct pcap_pkthdr;
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/**
- * \brief A multicast Transport that uses raw Ethernet II frames
- */
-class EthernetTransport final : public Transport
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        /**
+         * \brief A multicast Transport that uses raw Ethernet II frames
+         */
+        class EthernetTransport final : public Transport {
+        public:
 
-  /**
-   * @brief Creates an Ethernet-based transport for multicast communication
-   */
-  EthernetTransport(const NetworkInterfaceInfo& interface,
+            class Error : public std::runtime_error {
+            public:
+
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
+
+            /**
+             * @brief Creates an Ethernet-based transport for multicast communication
+             */
+            EthernetTransport(const NetworkInterfaceInfo& interface,
                     const ethernet::Address& mcastAddress);
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
 
-  virtual void
-  doClose() final;
+            virtual void
+            doClose() final;
 
-private:
-  virtual void
-  doSend(Transport::Packet&& packet) final;
+        private:
+            virtual void
+            doSend(Transport::Packet&& packet) final;
 
-  /**
-   * @brief Allocates and initializes a libpcap context for live capture
-   */
-  void
-  pcapInit();
+            /**
+             * @brief Allocates and initializes a libpcap context for live capture
+             */
+            void
+            pcapInit();
 
-  /**
-   * @brief Installs a BPF filter on the receiving socket
-   *
-   * @param filterString string containing the source BPF program
-   */
-  void
-  setPacketFilter(const char* filterString);
+            /**
+             * @brief Installs a BPF filter on the receiving socket
+             *
+             * @param filterString string containing the source BPF program
+             */
+            void
+            setPacketFilter(const char* filterString);
 
-  /**
-   * @brief Enables receiving frames addressed to our MAC multicast group
-   *
-   * @return true if successful, false otherwise
-   */
-  bool
-  joinMulticastGroup();
+            /**
+             * @brief Enables receiving frames addressed to our MAC multicast group
+             *
+             * @return true if successful, false otherwise
+             */
+            bool
+            joinMulticastGroup();
 
-  /**
-   * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
-   */
-  void
-  sendPacket(const ndn::Block& block);
+            /**
+             * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
+             */
+            void
+            sendPacket(const ndn::Block& block);
 
-  /**
-   * @brief Receive callback
-   */
-  void
-  handleRead(const boost::system::error_code& error, size_t nBytesRead);
+            /**
+             * @brief Receive callback
+             */
+            void
+            handleRead(const boost::system::error_code& error, size_t nBytesRead);
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  /**
-   * @brief Processes an incoming frame as captured by libpcap
-   *
-   * @param header pointer to capture metadata
-   * @param packet pointer to the received frame, including the link-layer header
-   */
-  void
-  processIncomingPacket(const pcap_pkthdr* header, const uint8_t* packet);
+            /**
+             * @brief Processes an incoming frame as captured by libpcap
+             *
+             * @param header pointer to capture metadata
+             * @param packet pointer to the received frame, including the link-layer header
+             */
+            void
+            processIncomingPacket(const pcap_pkthdr* header, const uint8_t* packet);
 
-private:
-  /**
-   * @brief Handles errors encountered by Boost.Asio on the receive path
-   */
-  void
-  processErrorCode(const boost::system::error_code& error);
+        private:
+            /**
+             * @brief Handles errors encountered by Boost.Asio on the receive path
+             */
+            void
+            processErrorCode(const boost::system::error_code& error);
 
-  /**
-   * @brief Returns the MTU of the underlying network interface
-   */
-  size_t
-  getInterfaceMtu();
+            /**
+             * @brief Returns the MTU of the underlying network interface
+             */
+            size_t
+            getInterfaceMtu();
 
-private:
-  unique_ptr<pcap_t, void(*)(pcap_t*)> m_pcap;
-  boost::asio::posix::stream_descriptor m_socket;
+        private:
+            unique_ptr<pcap_t, void(*)(pcap_t*) > m_pcap;
+            boost::asio::posix::stream_descriptor m_socket;
 
-  ethernet::Address m_srcAddress;
-  ethernet::Address m_destAddress;
-  std::string m_interfaceName;
+            ethernet::Address m_srcAddress;
+            ethernet::Address m_destAddress;
+            std::string m_interfaceName;
 #if defined(__linux__)
-  int m_interfaceIndex;
+            int m_interfaceIndex;
 #endif
 
 #ifdef _DEBUG
-  /// number of packets dropped by the kernel, as reported by libpcap
-  unsigned int m_nDropped;
+            /// number of packets dropped by the kernel, as reported by libpcap
+            unsigned int m_nDropped;
 #endif
-};
+        };
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_ETHERNET_TRANSPORT_HPP

@@ -30,90 +30,90 @@
 
 namespace ns3 {
 
-class Packet;
-class ServiceFlow;
-class WimaxNetDevice;
-class WimaxConnection;
-class SubscriberStationNetDevice;
+    class Packet;
+    class ServiceFlow;
+    class WimaxNetDevice;
+    class WimaxConnection;
+    class SubscriberStationNetDevice;
 
-/**
- * \ingroup wimax
- */
-class SsServiceFlowManager : public ServiceFlowManager
-{
-public:
-  enum ConfirmationCode // as per Table 384 (not all codes implemented)
-  {
-    CONFIRMATION_CODE_SUCCESS, CONFIRMATION_CODE_REJECT
-  };
-  /**
-   * \brief creates a service flow manager and attaches it to a device
-   * \param  device the device to which the service flow manager will be attached
-   */
-  SsServiceFlowManager (Ptr<SubscriberStationNetDevice> device);
-  ~SsServiceFlowManager (void);
-  void DoDispose (void);
+    /**
+     * \ingroup wimax
+     */
+    class SsServiceFlowManager : public ServiceFlowManager {
+    public:
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  /**
-   * \brief add a service flow to the list
-   * \param serviceFlow the service flow to add
-   */
-  void AddServiceFlow (ServiceFlow *serviceFlow);
-  /**
-   * \brief add a service flow to the list
-   * \param serviceFlow the service flow to add
-   */
-  void AddServiceFlow (ServiceFlow serviceFlow);
-  /**
-   * \brief sets the maximum retries on DSA request message
-   * \param maxDsaReqRetries the maximum retries on DSA request message
-   */
-  void SetMaxDsaReqRetries (uint8_t maxDsaReqRetries);
-  /**
-   * \return the maximum retries on DSA request message
-   */
-  uint8_t GetMaxDsaReqRetries (void) const;
+        enum ConfirmationCode // as per Table 384 (not all codes implemented)
+        {
+            CONFIRMATION_CODE_SUCCESS, CONFIRMATION_CODE_REJECT
+        };
+        /**
+         * \brief creates a service flow manager and attaches it to a device
+         * \param  device the device to which the service flow manager will be attached
+         */
+        SsServiceFlowManager(Ptr<SubscriberStationNetDevice> device);
+        ~SsServiceFlowManager(void);
+        void DoDispose(void);
 
-  EventId GetDsaRspTimeoutEvent (void) const;
-  EventId GetDsaAckTimeoutEvent (void) const;
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  void InitiateServiceFlows (void);
+        /**
+         * \brief add a service flow to the list
+         * \param serviceFlow the service flow to add
+         */
+        void AddServiceFlow(ServiceFlow *serviceFlow);
+        /**
+         * \brief add a service flow to the list
+         * \param serviceFlow the service flow to add
+         */
+        void AddServiceFlow(ServiceFlow serviceFlow);
+        /**
+         * \brief sets the maximum retries on DSA request message
+         * \param maxDsaReqRetries the maximum retries on DSA request message
+         */
+        void SetMaxDsaReqRetries(uint8_t maxDsaReqRetries);
+        /**
+         * \return the maximum retries on DSA request message
+         */
+        uint8_t GetMaxDsaReqRetries(void) const;
 
-  DsaReq CreateDsaReq (const ServiceFlow *serviceFlow);
+        EventId GetDsaRspTimeoutEvent(void) const;
+        EventId GetDsaAckTimeoutEvent(void) const;
 
-  Ptr<Packet> CreateDsaAck (void);
+        void InitiateServiceFlows(void);
 
-  void ScheduleDsaReq (const ServiceFlow *serviceFlow);
+        DsaReq CreateDsaReq(const ServiceFlow *serviceFlow);
 
-  void ProcessDsaRsp (const DsaRsp &dsaRsp);
+        Ptr<Packet> CreateDsaAck(void);
 
+        void ScheduleDsaReq(const ServiceFlow *serviceFlow);
 
-private:
-  Ptr<SubscriberStationNetDevice> m_device;
-
-  uint8_t m_maxDsaReqRetries;
-
-  EventId m_dsaRspTimeoutEvent;
-  EventId m_dsaAckTimeoutEvent;
-
-  DsaReq m_dsaReq;
-  DsaAck m_dsaAck;
-
-  uint16_t m_currentTransactionId;
-  uint16_t m_transactionIdIndex;
-  uint8_t m_dsaReqRetries;
-
-  // pointer to the service flow currently being configured
-  ServiceFlow *m_pendingServiceFlow;
+        void ProcessDsaRsp(const DsaRsp &dsaRsp);
 
 
-};
+    private:
+        Ptr<SubscriberStationNetDevice> m_device;
+
+        uint8_t m_maxDsaReqRetries;
+
+        EventId m_dsaRspTimeoutEvent;
+        EventId m_dsaAckTimeoutEvent;
+
+        DsaReq m_dsaReq;
+        DsaAck m_dsaAck;
+
+        uint16_t m_currentTransactionId;
+        uint16_t m_transactionIdIndex;
+        uint8_t m_dsaReqRetries;
+
+        // pointer to the service flow currently being configured
+        ServiceFlow *m_pendingServiceFlow;
+
+
+    };
 
 } // namespace ns3
 

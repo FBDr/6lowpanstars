@@ -23,59 +23,59 @@
 /// @cond include_hidden
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-/**
- * @brief Traits for empty (bogus) replacement policy
- */
-struct empty_policy_traits {
-  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string
-  GetName()
-  {
-    return "";
-  }
+            /**
+             * @brief Traits for empty (bogus) replacement policy
+             */
+            struct empty_policy_traits {
+                /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
 
-  typedef void* policy_hook_type;
+                static std::string
+                GetName() {
+                    return "";
+                }
 
-  template<class Container>
-  struct container_hook {
-    typedef void* type;
-  };
+                typedef void* policy_hook_type;
 
-  template<class Base, class Container, class Hook>
-  struct policy {
-    struct type {
-      inline type(Base& base)
-      {
-      }
+                template<class Container>
+                struct container_hook {
+                    typedef void* type;
+                };
 
-      inline void update(typename Container::iterator)
-      {
-      }
-      inline bool insert(typename Container::iterator)
-      {
-        return true;
-      }
-      inline void
-      lookup(typename Container::iterator item)
-      {
-      }
-      inline void
-      erase(typename Container::iterator item)
-      {
-      }
-      inline void
-      clear()
-      {
-      }
-    };
-  };
-};
+                template<class Base, class Container, class Hook>
+                struct policy {
 
-} // ndnSIM
-} // ndn
+                    struct type {
+
+                        inline type(Base& base) {
+                        }
+
+                        inline void update(typename Container::iterator) {
+                        }
+
+                        inline bool insert(typename Container::iterator) {
+                            return true;
+                        }
+
+                        inline void
+                        lookup(typename Container::iterator item) {
+                        }
+
+                        inline void
+                        erase(typename Container::iterator item) {
+                        }
+
+                        inline void
+                        clear() {
+                        }
+                    };
+                };
+            };
+
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

@@ -25,44 +25,43 @@
 
 namespace ns3 {
 
-/**
- * \brief AARF Rate control algorithm
- * \ingroup wifi
- *
- * This class implements the AARF rate control algorithm which
- * was initially described in <i>IEEE 802.11 Rate Adaptation:
- * A Practical Approach</i>, by M. Lacage, M.H. Manshaei, and
- * T. Turletti.
- */
-class AarfWifiManager : public WifiRemoteStationManager
-{
-public:
-  static TypeId GetTypeId (void);
-  AarfWifiManager ();
-  virtual ~AarfWifiManager ();
-private:
-  //overriden from base class
-  virtual WifiRemoteStation * DoCreateStation (void) const;
-  virtual void DoReportRxOk (WifiRemoteStation *station,
-                             double rxSnr, WifiMode txMode);
-  virtual void DoReportRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportDataFailed (WifiRemoteStation *station);
-  virtual void DoReportRtsOk (WifiRemoteStation *station,
-                              double ctsSnr, WifiMode ctsMode, double rtsSnr);
-  virtual void DoReportDataOk (WifiRemoteStation *station,
-                               double ackSnr, WifiMode ackMode, double dataSnr);
-  virtual void DoReportFinalRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportFinalDataFailed (WifiRemoteStation *station);
-  virtual WifiTxVector DoGetDataTxVector (WifiRemoteStation *station, uint32_t size);
-  virtual WifiTxVector DoGetRtsTxVector (WifiRemoteStation *station);
-  virtual bool IsLowLatency (void) const;
+    /**
+     * \brief AARF Rate control algorithm
+     * \ingroup wifi
+     *
+     * This class implements the AARF rate control algorithm which
+     * was initially described in <i>IEEE 802.11 Rate Adaptation:
+     * A Practical Approach</i>, by M. Lacage, M.H. Manshaei, and
+     * T. Turletti.
+     */
+    class AarfWifiManager : public WifiRemoteStationManager {
+    public:
+        static TypeId GetTypeId(void);
+        AarfWifiManager();
+        virtual ~AarfWifiManager();
+    private:
+        //overriden from base class
+        virtual WifiRemoteStation * DoCreateStation(void) const;
+        virtual void DoReportRxOk(WifiRemoteStation *station,
+                double rxSnr, WifiMode txMode);
+        virtual void DoReportRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportDataFailed(WifiRemoteStation *station);
+        virtual void DoReportRtsOk(WifiRemoteStation *station,
+                double ctsSnr, WifiMode ctsMode, double rtsSnr);
+        virtual void DoReportDataOk(WifiRemoteStation *station,
+                double ackSnr, WifiMode ackMode, double dataSnr);
+        virtual void DoReportFinalRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportFinalDataFailed(WifiRemoteStation *station);
+        virtual WifiTxVector DoGetDataTxVector(WifiRemoteStation *station, uint32_t size);
+        virtual WifiTxVector DoGetRtsTxVector(WifiRemoteStation *station);
+        virtual bool IsLowLatency(void) const;
 
-  uint32_t m_minTimerThreshold;
-  uint32_t m_minSuccessThreshold;
-  double m_successK;
-  uint32_t m_maxSuccessThreshold;
-  double m_timerK;
-};
+        uint32_t m_minTimerThreshold;
+        uint32_t m_minSuccessThreshold;
+        double m_successK;
+        uint32_t m_maxSuccessThreshold;
+        double m_timerK;
+    };
 
 } //namespace ns3
 

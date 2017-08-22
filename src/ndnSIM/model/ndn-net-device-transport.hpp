@@ -33,49 +33,48 @@
 #include "ns3/channel.h"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * \ingroup ndn-face
- * \brief ndnSIM-specific transport
- */
-class NetDeviceTransport : public nfd::face::Transport
-{
-public:
-  NetDeviceTransport(Ptr<Node> node, const Ptr<NetDevice>& netDevice,
-                     const std::string& localUri,
-                     const std::string& remoteUri,
-                     ::ndn::nfd::FaceScope scope = ::ndn::nfd::FACE_SCOPE_NON_LOCAL,
-                     ::ndn::nfd::FacePersistency persistency = ::ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-                     ::ndn::nfd::LinkType linkType = ::ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+        /**
+         * \ingroup ndn-face
+         * \brief ndnSIM-specific transport
+         */
+        class NetDeviceTransport : public nfd::face::Transport {
+        public:
+            NetDeviceTransport(Ptr<Node> node, const Ptr<NetDevice>& netDevice,
+                    const std::string& localUri,
+                    const std::string& remoteUri,
+                    ::ndn::nfd::FaceScope scope = ::ndn::nfd::FACE_SCOPE_NON_LOCAL,
+                    ::ndn::nfd::FacePersistency persistency = ::ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                    ::ndn::nfd::LinkType linkType = ::ndn::nfd::LINK_TYPE_POINT_TO_POINT);
 
-  ~NetDeviceTransport();
+            ~NetDeviceTransport();
 
-  Ptr<NetDevice>
-  GetNetDevice() const;
+            Ptr<NetDevice>
+            GetNetDevice() const;
 
-private:
-  virtual void
-  beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency) override;
+        private:
+            virtual void
+            beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency) override;
 
-  virtual void
-  doClose() override;
+            virtual void
+            doClose() override;
 
-  virtual void
-  doSend(Packet&& packet) override;
+            virtual void
+            doSend(Packet&& packet) override;
 
-  void
-  receiveFromNetDevice(Ptr<NetDevice> device,
-                       Ptr<const ns3::Packet> p,
-                       uint16_t protocol,
-                       const Address& from, const Address& to,
-                       NetDevice::PacketType packetType);
+            void
+            receiveFromNetDevice(Ptr<NetDevice> device,
+                    Ptr<const ns3::Packet> p,
+                    uint16_t protocol,
+                    const Address& from, const Address& to,
+                    NetDevice::PacketType packetType);
 
-  Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
-  Ptr<Node> m_node;
-};
+            Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
+            Ptr<Node> m_node;
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_NULL_TRANSPORT_HPP

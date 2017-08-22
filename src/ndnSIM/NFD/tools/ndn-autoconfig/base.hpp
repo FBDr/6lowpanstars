@@ -36,83 +36,82 @@
 #include <ndn-cxx/util/face-uri.hpp>
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-/**
- * @brief Base class for discovery stages
- */
-class Base : boost::noncopyable
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            /**
+             * @brief Base class for discovery stages
+             */
+            class Base : boost::noncopyable {
+            public:
 
-  /**
-   * @brief Callback to be called when the stage fails
-   */
-  typedef std::function<void(const std::string&)> NextStageCallback;
+                class Error : public std::runtime_error {
+                public:
 
-  /**
-   * @brief Start the stage
-   */
-  virtual void
-  start() = 0;
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-protected:
-  /**
-   * @brief Initialize variables and create nfd::Controller instance
-   * @param face Face to be used for all operations (e.g., will send registration commands)
-   * @param keyChain KeyChain object
-   * @param nextStageOnFailure Callback to be called after the stage failed
-   */
-  Base(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
+                /**
+                 * @brief Callback to be called when the stage fails
+                 */
+                typedef std::function<void(const std::string&) > NextStageCallback;
 
-  /**
-   * @brief Attempt to connect to local hub using the \p uri FaceUri
-   * @throw Base::Error when failed to establish the tunnel
-   */
-  void
-  connectToHub(const std::string& uri);
+                /**
+                 * @brief Start the stage
+                 */
+                virtual void
+                start() = 0;
 
-private:
-  void
-  onCanonizeSuccess(const util::FaceUri& canonicalUri);
+            protected:
+                /**
+                 * @brief Initialize variables and create nfd::Controller instance
+                 * @param face Face to be used for all operations (e.g., will send registration commands)
+                 * @param keyChain KeyChain object
+                 * @param nextStageOnFailure Callback to be called after the stage failed
+                 */
+                Base(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
 
-  void
-  onCanonizeFailure(const std::string& reason);
+                /**
+                 * @brief Attempt to connect to local hub using the \p uri FaceUri
+                 * @throw Base::Error when failed to establish the tunnel
+                 */
+                void
+                connectToHub(const std::string& uri);
 
-  void
-  onHubConnectSuccess(const nfd::ControlParameters& resp);
+            private:
+                void
+                onCanonizeSuccess(const util::FaceUri& canonicalUri);
 
-  void
-  onHubConnectError(const nfd::ControlResponse& response);
+                void
+                onCanonizeFailure(const std::string& reason);
 
-  void
-  registerPrefix(const Name& prefix, uint64_t faceId);
+                void
+                onHubConnectSuccess(const nfd::ControlParameters& resp);
 
-  void
-  onPrefixRegistrationSuccess(const nfd::ControlParameters& commandSuccessResult);
+                void
+                onHubConnectError(const nfd::ControlResponse& response);
 
-  void
-  onPrefixRegistrationError(const nfd::ControlResponse& response);
+                void
+                registerPrefix(const Name& prefix, uint64_t faceId);
 
-protected:
-  Face& m_face;
-  KeyChain& m_keyChain;
-  nfd::Controller m_controller;
-  NextStageCallback m_nextStageOnFailure;
-};
+                void
+                onPrefixRegistrationSuccess(const nfd::ControlParameters& commandSuccessResult);
 
-} // namespace autoconfig
-} // namespace tools
+                void
+                onPrefixRegistrationError(const nfd::ControlResponse& response);
+
+            protected:
+                Face& m_face;
+                KeyChain& m_keyChain;
+                nfd::Controller m_controller;
+                NextStageCallback m_nextStageOnFailure;
+            };
+
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn
 
 #endif // NFD_TOOLS_NDN_AUTOCONFIG_BASE_HPP

@@ -34,90 +34,87 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup spectrum
+     *
+     * Simple SpectrumPhy implemetation that averages the spectrum power
+     * density of incoming transmissions to produce a spectrogram.
+     *
+     *
+     * This PHY model supports a single antenna model instance which is
+     * used for reception (this PHY model never transmits). 
+     */
+    class SpectrumAnalyzer : public SpectrumPhy {
+    public:
+        SpectrumAnalyzer();
+        virtual ~SpectrumAnalyzer();
 
-/**
- * \ingroup spectrum
- *
- * Simple SpectrumPhy implemetation that averages the spectrum power
- * density of incoming transmissions to produce a spectrogram.
- *
- *
- * This PHY model supports a single antenna model instance which is
- * used for reception (this PHY model never transmits). 
- */
-class SpectrumAnalyzer : public SpectrumPhy
-{
+        static TypeId GetTypeId(void);
 
-public:
-  SpectrumAnalyzer ();
-  virtual ~SpectrumAnalyzer ();
-
-  static TypeId GetTypeId (void);
-
-// inherited from SpectrumPhy
-  void SetChannel (Ptr<SpectrumChannel> c);
-  void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice () const;
-  Ptr<const SpectrumModel> GetRxSpectrumModel () const;
-  Ptr<AntennaModel> GetRxAntenna ();
-  void StartRx (Ptr<SpectrumSignalParameters> params);
+        // inherited from SpectrumPhy
+        void SetChannel(Ptr<SpectrumChannel> c);
+        void SetMobility(Ptr<MobilityModel> m);
+        void SetDevice(Ptr<NetDevice> d);
+        Ptr<MobilityModel> GetMobility();
+        Ptr<NetDevice> GetDevice() const;
+        Ptr<const SpectrumModel> GetRxSpectrumModel() const;
+        Ptr<AntennaModel> GetRxAntenna();
+        void StartRx(Ptr<SpectrumSignalParameters> params);
 
 
-  /**
-   * Set the spectrum model used by the SpectrumAnalyzer to represent incoming signals
-   *
-   * @param m
-   */
-  void SetRxSpectrumModel (Ptr<SpectrumModel> m);
+        /**
+         * Set the spectrum model used by the SpectrumAnalyzer to represent incoming signals
+         *
+         * @param m
+         */
+        void SetRxSpectrumModel(Ptr<SpectrumModel> m);
 
-  /** 
-   * set the AntennaModel to be used
-   * 
-   * \param a the Antenna Model
-   */
-  void SetAntenna (Ptr<AntennaModel> a);
+        /** 
+         * set the AntennaModel to be used
+         * 
+         * \param a the Antenna Model
+         */
+        void SetAntenna(Ptr<AntennaModel> a);
 
-  /**
-   * Start the spectrum analyzer
-   *
-   */
-  virtual void Start ();
+        /**
+         * Start the spectrum analyzer
+         *
+         */
+        virtual void Start();
 
-  /**
-   * Stop the spectrum analyzer
-   *
-   */
-  virtual void Stop ();
+        /**
+         * Stop the spectrum analyzer
+         *
+         */
+        virtual void Stop();
 
 
-protected:
-  void DoDispose ();
+    protected:
+        void DoDispose();
 
-private:
-  Ptr<MobilityModel> m_mobility;
-  Ptr<AntennaModel> m_antenna;
-  Ptr<NetDevice> m_netDevice;
-  Ptr<SpectrumChannel> m_channel;
+    private:
+        Ptr<MobilityModel> m_mobility;
+        Ptr<AntennaModel> m_antenna;
+        Ptr<NetDevice> m_netDevice;
+        Ptr<SpectrumChannel> m_channel;
 
-  virtual void GenerateReport ();
+        virtual void GenerateReport();
 
-  void AddSignal (Ptr<const SpectrumValue> psd);
-  void SubtractSignal  (Ptr<const SpectrumValue> psd);
-  void UpdateEnergyReceivedSoFar ();
+        void AddSignal(Ptr<const SpectrumValue> psd);
+        void SubtractSignal(Ptr<const SpectrumValue> psd);
+        void UpdateEnergyReceivedSoFar();
 
-  Ptr<SpectrumModel> m_spectrumModel;
-  Ptr<SpectrumValue> m_sumPowerSpectralDensity;
-  Ptr<SpectrumValue> m_energySpectralDensity;
-  double m_noisePowerSpectralDensity;
-  Time m_resolution;
-  Time m_lastChangeTime;
-  bool m_active;
+        Ptr<SpectrumModel> m_spectrumModel;
+        Ptr<SpectrumValue> m_sumPowerSpectralDensity;
+        Ptr<SpectrumValue> m_energySpectralDensity;
+        double m_noisePowerSpectralDensity;
+        Time m_resolution;
+        Time m_lastChangeTime;
+        bool m_active;
 
-  TracedCallback<Ptr<const SpectrumValue> > m_averagePowerSpectralDensityReportTrace;
+        TracedCallback<Ptr<const SpectrumValue> > m_averagePowerSpectralDensityReportTrace;
 
-};
+    };
 
 
 

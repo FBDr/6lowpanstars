@@ -25,35 +25,35 @@
 #include <ndn-cxx/util/time-custom-clock.hpp>
 
 namespace ns3 {
-namespace ndn {
-namespace time {
+    namespace ndn {
+        namespace time {
 
-class CustomSystemClock : public CustomClock<system_clock> {
-public:
-  system_clock::time_point
-  getNow() const;
+            class CustomSystemClock : public CustomClock<system_clock> {
+            public:
+                system_clock::time_point
+                getNow() const;
 
-  std::string
-  getSince() const;
+                std::string
+                getSince() const;
 
-  boost::posix_time::time_duration
-  toPosixDuration(const system_clock::duration& duration) const;
-};
+                boost::posix_time::time_duration
+                toPosixDuration(const system_clock::duration& duration) const;
+            };
 
-class CustomSteadyClock : public CustomClock<steady_clock> {
-public:
-  steady_clock::time_point
-  getNow() const;
+            class CustomSteadyClock : public CustomClock<steady_clock> {
+            public:
+                steady_clock::time_point
+                getNow() const;
 
-  std::string
-  getSince() const;
+                std::string
+                getSince() const;
 
-  boost::posix_time::time_duration
-  toPosixDuration(const steady_clock::duration& duration) const;
-};
+                boost::posix_time::time_duration
+                toPosixDuration(const steady_clock::duration& duration) const;
+            };
 
-} // namespace time
-} // namespace ndn
+        } // namespace time
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDNSIM_UTILS_TIME_HPP

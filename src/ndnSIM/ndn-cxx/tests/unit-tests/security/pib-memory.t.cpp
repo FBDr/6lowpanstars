@@ -24,22 +24,22 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-// most functionalities are tested in pib-impl.t.cpp
-BOOST_AUTO_TEST_SUITE(SecurityPibMemory)
+            // most functionalities are tested in pib-impl.t.cpp
 
-BOOST_AUTO_TEST_CASE(TpmLocatorManagement)
-{
-  PibMemory pibImpl;
+            BOOST_AUTO_TEST_SUITE(SecurityPibMemory)
 
-  BOOST_CHECK_EQUAL(pibImpl.getTpmLocator(), "tpm-memory:");
-  BOOST_CHECK_THROW(pibImpl.setTpmLocator(""), PibImpl::Error);
-}
+            BOOST_AUTO_TEST_CASE(TpmLocatorManagement) {
+                PibMemory pibImpl;
 
-BOOST_AUTO_TEST_SUITE_END()
+                BOOST_CHECK_EQUAL(pibImpl.getTpmLocator(), "tpm-memory:");
+                BOOST_CHECK_THROW(pibImpl.setTpmLocator(""), PibImpl::Error);
+            }
 
-} // namespace tests
-} // namespace security
+            BOOST_AUTO_TEST_SUITE_END()
+
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

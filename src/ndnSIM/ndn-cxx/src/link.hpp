@@ -27,157 +27,156 @@
 
 namespace ndn {
 
-const size_t INVALID_SELECTED_DELEGATION_INDEX = std::numeric_limits<size_t>::max();
+    const size_t INVALID_SELECTED_DELEGATION_INDEX = std::numeric_limits<size_t>::max();
 
-/** @brief represents a Link instance
- */
-class Link : public Data
-{
-public:
-  class Error : public Data::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Data::Error(what)
-    {
-    }
-  };
+    /** @brief represents a Link instance
+     */
+    class Link : public Data {
+    public:
 
-  // The ordering is based on the preference number and needs to be preserved
-  typedef std::set<std::pair<uint32_t, Name>> DelegationSet;
+        class Error : public Data::Error {
+        public:
 
-  /**
-   * @brief Create an empty Link object
-   *
-   * Note that in certain contexts that use Link::shared_from_this(), Link must be
-   * created using `make_shared`:
-   *
-   *     shared_ptr<Link> linkObject = make_shared<Link>();
-   *
-   * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
-   */
-  Link() = default;
+            explicit
+            Error(const std::string& what)
+            : Data::Error(what) {
+            }
+        };
 
-  /**
-   * @brief Create a Link object from a Block
-   *
-   * Note that in certain contexts that use Link::shared_from_this(), Link must be
-   * created using `make_shared`:
-   *
-   *     shared_ptr<Link> linkObject = make_shared<Link>(block);
-   *
-   * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
-   */
-  explicit
-  Link(const Block& block);
+        // The ordering is based on the preference number and needs to be preserved
+        typedef std::set<std::pair<uint32_t, Name>> DelegationSet;
 
-  /**
-   * @brief Create a Link object with the given name
-   *
-   * @param name A reference to the name of the redirected namespace
-   *
-   * Note that in certain contexts that use Link::shared_from_this(), Link must be
-   * created using `make_shared`:
-   *
-   *     shared_ptr<Link> link = make_shared<Link>(name);
-   *
-   * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
-   */
-  explicit
-  Link(const Name& name);
+        /**
+         * @brief Create an empty Link object
+         *
+         * Note that in certain contexts that use Link::shared_from_this(), Link must be
+         * created using `make_shared`:
+         *
+         *     shared_ptr<Link> linkObject = make_shared<Link>();
+         *
+         * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
+         */
+        Link() = default;
 
- /**
-   * @brief Create a Link object with the given name and pairs of <Preference, Name>
-   *
-   * @param name A reference to the name of the redirected namespace
-   * @param links A reference to the list of pairs of the redirected namespace
-   * along with its priority
-   *
-   * Note that in certain contexts that use Link::shared_from_this(), Link must be
-   * created using `make_shared`:
-   *
-   *     shared_ptr<Link> link = make_shared<Link>(name, links);
-   *
-   * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
-   */
-  Link(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> links);
+        /**
+         * @brief Create a Link object from a Block
+         *
+         * Note that in certain contexts that use Link::shared_from_this(), Link must be
+         * created using `make_shared`:
+         *
+         *     shared_ptr<Link> linkObject = make_shared<Link>(block);
+         *
+         * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
+         */
+        explicit
+        Link(const Block& block);
 
-  /**
-   * @brief Add a delegation in the format of <Name, Preference>
-   * @param preference The preference of the delegation to be added
-   * @param name The name of the delegation to be added
-   * @note If a delegation with @p name exists, its preference will be updated
-   */
-  void
-  addDelegation(uint32_t preference, const Name& name);
+        /**
+         * @brief Create a Link object with the given name
+         *
+         * @param name A reference to the name of the redirected namespace
+         *
+         * Note that in certain contexts that use Link::shared_from_this(), Link must be
+         * created using `make_shared`:
+         *
+         *     shared_ptr<Link> link = make_shared<Link>(name);
+         *
+         * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
+         */
+        explicit
+        Link(const Name& name);
 
-  /**
-   * @brief Remove a delegation whose name is @p name
-   * @param name The name of the delegation to be removed
-   * @return true if delegation is removed, otherwise false
-   */
-  bool
-  removeDelegation(const Name& name);
+        /**
+         * @brief Create a Link object with the given name and pairs of <Preference, Name>
+         *
+         * @param name A reference to the name of the redirected namespace
+         * @param links A reference to the list of pairs of the redirected namespace
+         * along with its priority
+         *
+         * Note that in certain contexts that use Link::shared_from_this(), Link must be
+         * created using `make_shared`:
+         *
+         *     shared_ptr<Link> link = make_shared<Link>(name, links);
+         *
+         * Otherwise, Link::shared_from_this() will throw std::bad_weak_ptr.
+         */
+        Link(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> links);
 
-  /**
-   * @brief Get the pairs of <Name, Preference>
-   * @return a set of delegations
-   */
-  const DelegationSet&
-  getDelegations() const;
+        /**
+         * @brief Add a delegation in the format of <Name, Preference>
+         * @param preference The preference of the delegation to be added
+         * @param name The name of the delegation to be added
+         * @note If a delegation with @p name exists, its preference will be updated
+         */
+        void
+        addDelegation(uint32_t preference, const Name& name);
 
-  /**
-   * @brief Decode from the wire format
-   * @warning This method does not preserve the relative order between delegations.
-   *     To get a delegation by index, use @p getDelegationFromWire method.
-   */
-  void
-  wireDecode(const Block& wire);
+        /**
+         * @brief Remove a delegation whose name is @p name
+         * @param name The name of the delegation to be removed
+         * @return true if delegation is removed, otherwise false
+         */
+        bool
+        removeDelegation(const Name& name);
 
-  /** @brief gets the delegation at @p index from @p block
-   *  @param block wire format of a Link object
-   *  @param index 0-based index of a delegation in the Link object
-   *  @return delegation preference and name
-   *  @throw std::out_of_range index is out of range
-   */
-  static std::tuple<uint32_t, Name>
-  getDelegationFromWire(const Block& block, size_t index);
+        /**
+         * @brief Get the pairs of <Name, Preference>
+         * @return a set of delegations
+         */
+        const DelegationSet&
+        getDelegations() const;
 
-  /** @brief finds index of a delegation with @p delegationName from @p block
-   *  @param block wire format of a Link object
-   *  @param delegationName delegation name in the Link object
-   *  @return 0-based index of the first delegation with @p delegationName ,
-   *          or -1 if no such delegation exists
-   */
-  static ssize_t
-  findDelegationFromWire(const Block& block, const Name& delegationName);
+        /**
+         * @brief Decode from the wire format
+         * @warning This method does not preserve the relative order between delegations.
+         *     To get a delegation by index, use @p getDelegationFromWire method.
+         */
+        void
+        wireDecode(const Block& wire);
 
-  static ssize_t
-  countDelegationsFromWire(const Block& block);
+        /** @brief gets the delegation at @p index from @p block
+         *  @param block wire format of a Link object
+         *  @param index 0-based index of a delegation in the Link object
+         *  @return delegation preference and name
+         *  @throw std::out_of_range index is out of range
+         */
+        static std::tuple<uint32_t, Name>
+        getDelegationFromWire(const Block& block, size_t index);
 
-protected:
-  /** @brief prepend Link object as a Content block to the encoder
-   *
-   *  The outermost Content element is not part of Link object structure.
-   */
-  template<encoding::Tag TAG>
-  size_t
-  encodeContent(EncodingImpl<TAG>& encoder) const;
+        /** @brief finds index of a delegation with @p delegationName from @p block
+         *  @param block wire format of a Link object
+         *  @param delegationName delegation name in the Link object
+         *  @return 0-based index of the first delegation with @p delegationName ,
+         *          or -1 if no such delegation exists
+         */
+        static ssize_t
+        findDelegationFromWire(const Block& block, const Name& delegationName);
 
-  void
-  encodeContent();
+        static ssize_t
+        countDelegationsFromWire(const Block& block);
 
-  void
-  decodeContent();
+    protected:
+        /** @brief prepend Link object as a Content block to the encoder
+         *
+         *  The outermost Content element is not part of Link object structure.
+         */
+        template<encoding::Tag TAG>
+        size_t
+        encodeContent(EncodingImpl<TAG>& encoder) const;
 
-private:
-  bool
-  removeDelegationNoEncode(const Name& name);
+        void
+        encodeContent();
 
-private:
-  DelegationSet m_delegations;
-};
+        void
+        decodeContent();
+
+    private:
+        bool
+        removeDelegationNoEncode(const Name& name);
+
+    private:
+        DelegationSet m_delegations;
+    };
 
 } // namespace ndn
 

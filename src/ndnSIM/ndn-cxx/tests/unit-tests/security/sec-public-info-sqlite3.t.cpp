@@ -30,121 +30,114 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-class PibTmpPathFixture
-{
-public:
-  PibTmpPathFixture()
-  {
-    boost::system::error_code error;
-    tmpPath = boost::filesystem::temp_directory_path(error);
-    BOOST_REQUIRE(boost::system::errc::success == error.value());
-    tmpPath /= boost::lexical_cast<std::string>(random::generateWord32());
-  }
+            class PibTmpPathFixture {
+            public:
 
-  ~PibTmpPathFixture()
-  {
-    boost::filesystem::remove_all(tmpPath);
-  }
+                PibTmpPathFixture() {
+                    boost::system::error_code error;
+                    tmpPath = boost::filesystem::temp_directory_path(error);
+                    BOOST_REQUIRE(boost::system::errc::success == error.value());
+                    tmpPath /= boost::lexical_cast<std::string>(random::generateWord32());
+                }
 
-public:
-  boost::filesystem::path tmpPath;
-};
+                ~PibTmpPathFixture() {
+                    boost::filesystem::remove_all(tmpPath);
+                }
 
-BOOST_AUTO_TEST_SUITE(SecuritySecPublicInfoSqlite3)
+            public:
+                boost::filesystem::path tmpPath;
+            };
 
-const std::string RSA_DER("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuFoDcNtffwbfFix64fw0\
+            BOOST_AUTO_TEST_SUITE(SecuritySecPublicInfoSqlite3)
+
+            const std::string RSA_DER("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuFoDcNtffwbfFix64fw0\
 hI2tKMkFrc6Ex7yw0YLMK9vGE8lXOyBl/qXabow6RCz+GldmFN6E2Qhm1+AX3Zm5\
 sj3H53/HPtzMefvMQ9X7U+lK8eNMWawpRzvBh4/36VrK/awlkNIVIQ9aXj6q6BVe\
 zL+zWT/WYemLq/8A1/hHWiwCtfOH1xQhGqWHJzeSgwIgOOrzxTbRaCjhAb1u2TeV\
 yx/I9H/DV+AqSHCaYbB92HDcDN0kqwSnUf5H1+osE9MR5DLBLhXdSiULSgxT3Or/\
 y2QgsgUK59WrjhlVMPEiHHRs15NZJbL1uQFXjgScdEarohcY3dilqotineFZCeN8\
 DwIDAQAB");
-const std::string ECDSA_DER("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENZpqkPJDj8uhSpffOiCbvSYMLsGB\
+            const std::string ECDSA_DER("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENZpqkPJDj8uhSpffOiCbvSYMLsGB\
 1Eo/WU6mrexjGvduQXjqwon/eSHFI6EgHZk8L9KfiV5XVtVsk2g5wIpJVg==");
 
-BOOST_FIXTURE_TEST_CASE(Basic, PibTmpPathFixture)
-{
-  SecPublicInfoSqlite3 pib(tmpPath.generic_string());
+            BOOST_FIXTURE_TEST_CASE(Basic, PibTmpPathFixture) {
+                SecPublicInfoSqlite3 pib(tmpPath.generic_string());
 
-  BOOST_CHECK(pib.doesTableExist("Identity"));
-  BOOST_CHECK(pib.doesTableExist("Key"));
-  BOOST_CHECK(pib.doesTableExist("Certificate"));
-}
+                BOOST_CHECK(pib.doesTableExist("Identity"));
+                BOOST_CHECK(pib.doesTableExist("Key"));
+                BOOST_CHECK(pib.doesTableExist("Certificate"));
+            }
 
-BOOST_FIXTURE_TEST_CASE(TpmLocatorTest, PibTmpPathFixture)
-{
-  SecPublicInfoSqlite3 pib(tmpPath.generic_string());
+            BOOST_FIXTURE_TEST_CASE(TpmLocatorTest, PibTmpPathFixture) {
+                SecPublicInfoSqlite3 pib(tmpPath.generic_string());
 
-  BOOST_REQUIRE_THROW(pib.getTpmLocator(), SecPublicInfo::Error);
-  pib.addIdentity("/test/id1");
-  BOOST_CHECK(pib.doesIdentityExist("/test/id1"));
+                BOOST_REQUIRE_THROW(pib.getTpmLocator(), SecPublicInfo::Error);
+                pib.addIdentity("/test/id1");
+                BOOST_CHECK(pib.doesIdentityExist("/test/id1"));
 
-  // Pib does not have tpmInfo set yet, setTpmInfo simply set the tpmInfo.
-  std::string tpmLocator("tpm-file:");
-  tpmLocator.append((tmpPath / "tpm").generic_string());
-  pib.setTpmLocator(tpmLocator);
-  BOOST_CHECK(pib.doesIdentityExist("/test/id1"));
+                // Pib does not have tpmInfo set yet, setTpmInfo simply set the tpmInfo.
+                std::string tpmLocator("tpm-file:");
+                tpmLocator.append((tmpPath / "tpm").generic_string());
+                pib.setTpmLocator(tpmLocator);
+                BOOST_CHECK(pib.doesIdentityExist("/test/id1"));
 
-  BOOST_REQUIRE_NO_THROW(pib.getTpmLocator());
-  BOOST_CHECK_EQUAL(tpmLocator, pib.getTpmLocator());
+                BOOST_REQUIRE_NO_THROW(pib.getTpmLocator());
+                BOOST_CHECK_EQUAL(tpmLocator, pib.getTpmLocator());
 
-  // Pib has tpmInfo set, set a different tpmInfo will reset Pib content.
-  std::string tpmLocator3("tpm-osxkeychain:");
-  pib.setTpmLocator(tpmLocator3);
-  BOOST_CHECK(!pib.doesIdentityExist("/test/id1"));
-}
+                // Pib has tpmInfo set, set a different tpmInfo will reset Pib content.
+                std::string tpmLocator3("tpm-osxkeychain:");
+                pib.setTpmLocator(tpmLocator3);
+                BOOST_CHECK(!pib.doesIdentityExist("/test/id1"));
+            }
 
-BOOST_AUTO_TEST_CASE(KeyTypeRsa)
-{
-  using namespace CryptoPP;
+            BOOST_AUTO_TEST_CASE(KeyTypeRsa) {
+                using namespace CryptoPP;
 
-  OBufferStream os;
-  StringSource ss(reinterpret_cast<const uint8_t*>(RSA_DER.c_str()), RSA_DER.size(),
-                  true, new Base64Decoder(new FileSink(os)));
+                OBufferStream os;
+                StringSource ss(reinterpret_cast<const uint8_t*> (RSA_DER.c_str()), RSA_DER.size(),
+                        true, new Base64Decoder(new FileSink(os)));
 
-  shared_ptr<v1::PublicKey> rsaKey;
-  BOOST_REQUIRE_NO_THROW(rsaKey = make_shared<v1::PublicKey>(os.buf()->buf(), os.buf()->size()));
-  Name rsaKeyName("/TestSecPublicInfoSqlite3/KeyType/RSA/ksk-123");
-  SecPublicInfoSqlite3 pib;
-  pib.addKey(rsaKeyName, *rsaKey);
+                shared_ptr<v1::PublicKey> rsaKey;
+                BOOST_REQUIRE_NO_THROW(rsaKey = make_shared<v1::PublicKey>(os.buf()->buf(), os.buf()->size()));
+                Name rsaKeyName("/TestSecPublicInfoSqlite3/KeyType/RSA/ksk-123");
+                SecPublicInfoSqlite3 pib;
+                pib.addKey(rsaKeyName, *rsaKey);
 
-  BOOST_CHECK_EQUAL(KeyType::RSA, pib.getPublicKeyType(rsaKeyName));
+                BOOST_CHECK_EQUAL(KeyType::RSA, pib.getPublicKeyType(rsaKeyName));
 
-  pib.deleteIdentityInfo(Name("/TestSecPublicInfoSqlite3/KeyType/RSA"));
-}
+                pib.deleteIdentityInfo(Name("/TestSecPublicInfoSqlite3/KeyType/RSA"));
+            }
 
-BOOST_AUTO_TEST_CASE(KeyTypeEcdsa)
-{
-  using namespace CryptoPP;
+            BOOST_AUTO_TEST_CASE(KeyTypeEcdsa) {
+                using namespace CryptoPP;
 
-  OBufferStream os;
-  StringSource ss(reinterpret_cast<const uint8_t*>(ECDSA_DER.c_str()), ECDSA_DER.size(),
-                  true, new Base64Decoder(new FileSink(os)));
+                OBufferStream os;
+                StringSource ss(reinterpret_cast<const uint8_t*> (ECDSA_DER.c_str()), ECDSA_DER.size(),
+                        true, new Base64Decoder(new FileSink(os)));
 
-  shared_ptr<v1::PublicKey> ecdsaKey;
-  BOOST_REQUIRE_NO_THROW(ecdsaKey = make_shared<v1::PublicKey>(os.buf()->buf(), os.buf()->size()));
-  Name ecdsaKeyName("/TestSecPublicInfoSqlite3/KeyType/ECDSA/ksk-123");
-  SecPublicInfoSqlite3 pib;
-  pib.addKey(ecdsaKeyName, *ecdsaKey);
+                shared_ptr<v1::PublicKey> ecdsaKey;
+                BOOST_REQUIRE_NO_THROW(ecdsaKey = make_shared<v1::PublicKey>(os.buf()->buf(), os.buf()->size()));
+                Name ecdsaKeyName("/TestSecPublicInfoSqlite3/KeyType/ECDSA/ksk-123");
+                SecPublicInfoSqlite3 pib;
+                pib.addKey(ecdsaKeyName, *ecdsaKey);
 
-  BOOST_CHECK_EQUAL(KeyType::EC, pib.getPublicKeyType(ecdsaKeyName));
-  pib.deleteIdentityInfo(Name("/TestSecPublicInfoSqlite3/KeyType/ECDSA"));
-}
+                BOOST_CHECK_EQUAL(KeyType::EC, pib.getPublicKeyType(ecdsaKeyName));
+                pib.deleteIdentityInfo(Name("/TestSecPublicInfoSqlite3/KeyType/ECDSA"));
+            }
 
-BOOST_AUTO_TEST_CASE(KeyTypeNonExist)
-{
-  Name nullKeyName("/TestSecPublicInfoSqlite3/KeyType/Null");
-  SecPublicInfoSqlite3 pib;
+            BOOST_AUTO_TEST_CASE(KeyTypeNonExist) {
+                Name nullKeyName("/TestSecPublicInfoSqlite3/KeyType/Null");
+                SecPublicInfoSqlite3 pib;
 
-  BOOST_CHECK_EQUAL(KeyType::NONE, pib.getPublicKeyType(nullKeyName));
+                BOOST_CHECK_EQUAL(KeyType::NONE, pib.getPublicKeyType(nullKeyName));
 
-}
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

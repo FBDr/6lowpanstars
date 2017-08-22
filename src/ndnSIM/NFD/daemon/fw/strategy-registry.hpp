@@ -30,38 +30,38 @@
 
 namespace nfd {
 
-class Forwarder;
+    class Forwarder;
 
-namespace fw {
+    namespace fw {
 
-class Strategy;
+        class Strategy;
 
-unique_ptr<Strategy>
-makeDefaultStrategy(Forwarder& forwarder);
+        unique_ptr<Strategy>
+        makeDefaultStrategy(Forwarder& forwarder);
 
-void
-installStrategies(Forwarder& forwarder);
+        void
+        installStrategies(Forwarder& forwarder);
 
 
-typedef std::function<unique_ptr<Strategy>(Forwarder&)> StrategyCreateFunc;
+        typedef std::function<unique_ptr<Strategy>(Forwarder&) > StrategyCreateFunc;
 
-void
-registerStrategyImpl(const Name& strategyName, const StrategyCreateFunc& createFunc);
+        void
+        registerStrategyImpl(const Name& strategyName, const StrategyCreateFunc& createFunc);
 
-/** \brief registers a strategy to be installed later
- */
-template<typename S>
-void
-registerStrategy()
-{
-  registerStrategyImpl(S::STRATEGY_NAME,
-                       [] (Forwarder& forwarder) { return make_unique<S>(ref(forwarder)); });
-}
+        /** \brief registers a strategy to be installed later
+         */
+        template<typename S>
+        void
+        registerStrategy() {
+            registerStrategyImpl(S::STRATEGY_NAME,
+                    [] (Forwarder & forwarder) {
+                        return make_unique<S>(ref(forwarder)); });
+        }
 
-/** \brief registers a built-in strategy
- *
- *  This macro should appear once in .cpp of each built-in strategy.
- */
+        /** \brief registers a built-in strategy
+         *
+         *  This macro should appear once in .cpp of each built-in strategy.
+         */
 #define NFD_REGISTER_STRATEGY(StrategyType)                       \
 static class NfdAuto ## StrategyType ## StrategyRegistrationClass \
 {                                                                 \
@@ -72,7 +72,7 @@ public:                                                           \
   }                                                               \
 } g_nfdAuto ## StrategyType ## StrategyRegistrationVariable
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_STRATEGY_REGISTRY_HPP

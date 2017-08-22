@@ -30,217 +30,207 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace measurements {
-namespace tests {
+    namespace measurements {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Table)
+            BOOST_AUTO_TEST_SUITE(Table)
 
-class MeasurementsFixture : public UnitTestTimeFixture
-{
-public:
-  MeasurementsFixture()
-    : measurements(nameTree)
-  {
-  }
+            class MeasurementsFixture : public UnitTestTimeFixture {
+            public:
 
-public:
-  NameTree nameTree;
-  Measurements measurements;
-};
+                MeasurementsFixture()
+                : measurements(nameTree) {
+                }
 
-BOOST_FIXTURE_TEST_SUITE(TestMeasurements, MeasurementsFixture)
+            public:
+                NameTree nameTree;
+                Measurements measurements;
+            };
 
-BOOST_AUTO_TEST_CASE(Get_Parent)
-{
-  Entry& entryAB = measurements.get("/A/B");
-  BOOST_CHECK_EQUAL(entryAB.getName(), "/A/B");
+            BOOST_FIXTURE_TEST_SUITE(TestMeasurements, MeasurementsFixture)
 
-  Entry& entry0 = measurements.get("/");
-  BOOST_CHECK_EQUAL(entry0.getName(), "/");
+            BOOST_AUTO_TEST_CASE(Get_Parent) {
+                Entry& entryAB = measurements.get("/A/B");
+                BOOST_CHECK_EQUAL(entryAB.getName(), "/A/B");
 
-  Entry* entryA = measurements.getParent(entryAB);
-  BOOST_REQUIRE(entryA != nullptr);
-  BOOST_CHECK_EQUAL(entryA->getName(), "/A");
+                Entry& entry0 = measurements.get("/");
+                BOOST_CHECK_EQUAL(entry0.getName(), "/");
 
-  Entry* entry0c = measurements.getParent(*entryA);
-  BOOST_REQUIRE(entry0c != nullptr);
-  BOOST_CHECK_EQUAL(&entry0, entry0c);
-}
+                Entry* entryA = measurements.getParent(entryAB);
+                BOOST_REQUIRE(entryA != nullptr);
+                BOOST_CHECK_EQUAL(entryA->getName(), "/A");
 
-BOOST_AUTO_TEST_CASE(GetWithFibEntry)
-{
-  Fib fib(nameTree);
+                Entry* entry0c = measurements.getParent(*entryA);
+                BOOST_REQUIRE(entry0c != nullptr);
+                BOOST_CHECK_EQUAL(&entry0, entry0c);
+            }
 
-  const fib::Entry* fibA = fib.insert("/A").first;
-  const fib::Entry* fibAB = fib.insert("/A/B").first;
+            BOOST_AUTO_TEST_CASE(GetWithFibEntry) {
+                Fib fib(nameTree);
 
-  Entry& entryA = measurements.get(*fibA);
-  BOOST_CHECK_EQUAL(entryA.getName(), "/A");
+                const fib::Entry* fibA = fib.insert("/A").first;
+                const fib::Entry* fibAB = fib.insert("/A/B").first;
 
-  Entry& entryAB = measurements.get(*fibAB);
-  BOOST_CHECK_EQUAL(entryAB.getName(), "/A/B");
-}
+                Entry& entryA = measurements.get(*fibA);
+                BOOST_CHECK_EQUAL(entryA.getName(), "/A");
 
-BOOST_AUTO_TEST_CASE(GetWithEmptyFibEntry) // Bug 3275
-{
-  Fib fib(nameTree);
+                Entry& entryAB = measurements.get(*fibAB);
+                BOOST_CHECK_EQUAL(entryAB.getName(), "/A/B");
+            }
 
-  const fib::Entry& fib0 = fib.findLongestPrefixMatch("/");
+            BOOST_AUTO_TEST_CASE(GetWithEmptyFibEntry) // Bug 3275
+            {
+                Fib fib(nameTree);
 
-  Entry& entry0 = measurements.get(fib0);
-  BOOST_CHECK_EQUAL(entry0.getName(), "/");
-}
+                const fib::Entry& fib0 = fib.findLongestPrefixMatch("/");
 
-BOOST_AUTO_TEST_CASE(GetWithPitEntry)
-{
-  Pit pit(nameTree);
+                Entry& entry0 = measurements.get(fib0);
+                BOOST_CHECK_EQUAL(entry0.getName(), "/");
+            }
 
-  shared_ptr<Interest> interestA = makeInterest("/A");
-  shared_ptr<pit::Entry> pitA = pit.insert(*interestA).first;
-  shared_ptr<Data> dataABC = makeData("/A/B/C");
-  Name fullName = dataABC->getFullName();
-  shared_ptr<Interest> interestFull = makeInterest(fullName);
-  shared_ptr<pit::Entry> pitFull = pit.insert(*interestFull).first;
+            BOOST_AUTO_TEST_CASE(GetWithPitEntry) {
+                Pit pit(nameTree);
 
-  Entry& entryA = measurements.get(*pitA);
-  BOOST_CHECK_EQUAL(entryA.getName(), "/A");
+                shared_ptr<Interest> interestA = makeInterest("/A");
+                shared_ptr<pit::Entry> pitA = pit.insert(*interestA).first;
+                shared_ptr<Data> dataABC = makeData("/A/B/C");
+                Name fullName = dataABC->getFullName();
+                shared_ptr<Interest> interestFull = makeInterest(fullName);
+                shared_ptr<pit::Entry> pitFull = pit.insert(*interestFull).first;
 
-  Entry& entryFull = measurements.get(*pitFull);
-  BOOST_CHECK_EQUAL(entryFull.getName(), fullName);
-}
+                Entry& entryA = measurements.get(*pitA);
+                BOOST_CHECK_EQUAL(entryA.getName(), "/A");
 
-class DummyStrategyInfo1 : public fw::StrategyInfo
-{
-public:
-  static constexpr int
-  getTypeId()
-  {
-    return 21;
-  }
-};
+                Entry& entryFull = measurements.get(*pitFull);
+                BOOST_CHECK_EQUAL(entryFull.getName(), fullName);
+            }
 
-class DummyStrategyInfo2 : public fw::StrategyInfo
-{
-public:
-  static constexpr int
-  getTypeId()
-  {
-    return 22;
-  }
-};
+            class DummyStrategyInfo1 : public fw::StrategyInfo {
+            public:
 
-BOOST_AUTO_TEST_CASE(FindLongestPrefixMatch)
-{
-  measurements.get("/A");
-  measurements.get("/A/B/C").insertStrategyInfo<DummyStrategyInfo1>();
-  measurements.get("/A/B/C/D");
+                static constexpr int
+                getTypeId() {
+                    return 21;
+                }
+            };
 
-  Entry* found1 = measurements.findLongestPrefixMatch("/A/B/C/D/E");
-  BOOST_REQUIRE(found1 != nullptr);
-  BOOST_CHECK_EQUAL(found1->getName(), "/A/B/C/D");
+            class DummyStrategyInfo2 : public fw::StrategyInfo {
+            public:
 
-  Entry* found2 = measurements.findLongestPrefixMatch("/A/B/C/D/E",
-      EntryWithStrategyInfo<DummyStrategyInfo1>());
-  BOOST_REQUIRE(found2 != nullptr);
-  BOOST_CHECK_EQUAL(found2->getName(), "/A/B/C");
+                static constexpr int
+                getTypeId() {
+                    return 22;
+                }
+            };
 
-  Entry* found3 = measurements.findLongestPrefixMatch("/A/B/C/D/E",
-      EntryWithStrategyInfo<DummyStrategyInfo2>());
-  BOOST_CHECK(found3 == nullptr);
-}
+            BOOST_AUTO_TEST_CASE(FindLongestPrefixMatch) {
+                measurements.get("/A");
+                measurements.get("/A/B/C").insertStrategyInfo<DummyStrategyInfo1>();
+                measurements.get("/A/B/C/D");
 
-BOOST_AUTO_TEST_CASE(FindLongestPrefixMatchWithPitEntry)
-{
-  Pit pit(nameTree);
+                Entry* found1 = measurements.findLongestPrefixMatch("/A/B/C/D/E");
+                BOOST_REQUIRE(found1 != nullptr);
+                BOOST_CHECK_EQUAL(found1->getName(), "/A/B/C/D");
 
-  measurements.get("/A");
-  measurements.get("/A/B/C").insertStrategyInfo<DummyStrategyInfo1>();
-  measurements.get("/A/B/C/D");
+                Entry* found2 = measurements.findLongestPrefixMatch("/A/B/C/D/E",
+                        EntryWithStrategyInfo<DummyStrategyInfo1>());
+                BOOST_REQUIRE(found2 != nullptr);
+                BOOST_CHECK_EQUAL(found2->getName(), "/A/B/C");
 
-  shared_ptr<Interest> interest = makeInterest("/A/B/C/D/E");
-  shared_ptr<pit::Entry> pitEntry = pit.insert(*interest).first;
+                Entry* found3 = measurements.findLongestPrefixMatch("/A/B/C/D/E",
+                        EntryWithStrategyInfo<DummyStrategyInfo2>());
+                BOOST_CHECK(found3 == nullptr);
+            }
 
-  Entry* found1 = measurements.findLongestPrefixMatch(*pitEntry);
-  BOOST_REQUIRE(found1 != nullptr);
-  BOOST_CHECK_EQUAL(found1->getName(), "/A/B/C/D");
+            BOOST_AUTO_TEST_CASE(FindLongestPrefixMatchWithPitEntry) {
+                Pit pit(nameTree);
 
-  Entry* found2 = measurements.findLongestPrefixMatch(*pitEntry,
-      EntryWithStrategyInfo<DummyStrategyInfo1>());
-  BOOST_REQUIRE(found2 != nullptr);
-  BOOST_CHECK_EQUAL(found2->getName(), "/A/B/C");
+                measurements.get("/A");
+                measurements.get("/A/B/C").insertStrategyInfo<DummyStrategyInfo1>();
+                measurements.get("/A/B/C/D");
 
-  Entry* found3 = measurements.findLongestPrefixMatch(*pitEntry,
-      EntryWithStrategyInfo<DummyStrategyInfo2>());
-  BOOST_CHECK(found3 == nullptr);
-}
+                shared_ptr<Interest> interest = makeInterest("/A/B/C/D/E");
+                shared_ptr<pit::Entry> pitEntry = pit.insert(*interest).first;
 
-BOOST_AUTO_TEST_CASE(Lifetime)
-{
-  Name nameA("ndn:/A");
-  Name nameB("ndn:/B");
-  Name nameC("ndn:/C");
+                Entry* found1 = measurements.findLongestPrefixMatch(*pitEntry);
+                BOOST_REQUIRE(found1 != nullptr);
+                BOOST_CHECK_EQUAL(found1->getName(), "/A/B/C/D");
 
-  BOOST_CHECK_EQUAL(measurements.size(), 0);
+                Entry* found2 = measurements.findLongestPrefixMatch(*pitEntry,
+                        EntryWithStrategyInfo<DummyStrategyInfo1>());
+                BOOST_REQUIRE(found2 != nullptr);
+                BOOST_CHECK_EQUAL(found2->getName(), "/A/B/C");
 
-  Entry& entryA = measurements.get(nameA);
-  measurements.get(nameB);
-  Entry& entryC = measurements.get(nameC);
-  BOOST_CHECK_EQUAL(measurements.size(), 3);
+                Entry* found3 = measurements.findLongestPrefixMatch(*pitEntry,
+                        EntryWithStrategyInfo<DummyStrategyInfo2>());
+                BOOST_CHECK(found3 == nullptr);
+            }
 
-  const time::nanoseconds EXTEND_A = time::seconds(2);
-  const time::nanoseconds CHECK1 = time::seconds(3);
-  const time::nanoseconds CHECK2 = time::seconds(5);
-  const time::nanoseconds EXTEND_C = time::seconds(6);
-  const time::nanoseconds CHECK3 = time::seconds(7);
-  BOOST_ASSERT(EXTEND_A < CHECK1);
-  BOOST_ASSERT(CHECK1 < Measurements::getInitialLifetime());
-  BOOST_ASSERT(Measurements::getInitialLifetime() < CHECK2);
-  BOOST_ASSERT(CHECK2 < EXTEND_C);
-  BOOST_ASSERT(EXTEND_C < CHECK3);
+            BOOST_AUTO_TEST_CASE(Lifetime) {
+                Name nameA("ndn:/A");
+                Name nameB("ndn:/B");
+                Name nameC("ndn:/C");
 
-  measurements.extendLifetime(entryA, EXTEND_A);
-  measurements.extendLifetime(entryC, EXTEND_C);
-  // remaining lifetime:
-  //   A = initial lifetime, because it's extended by less duration
-  //   B = initial lifetime
-  //   C = EXTEND_C
+                BOOST_CHECK_EQUAL(measurements.size(), 0);
 
-  this->advanceClocks(time::milliseconds(100), CHECK1);
-  BOOST_CHECK(measurements.findExactMatch(nameA) != nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameB) != nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameC) != nullptr);
-  BOOST_CHECK_EQUAL(measurements.size(), 3);
+                Entry& entryA = measurements.get(nameA);
+                measurements.get(nameB);
+                Entry& entryC = measurements.get(nameC);
+                BOOST_CHECK_EQUAL(measurements.size(), 3);
 
-  this->advanceClocks(time::milliseconds(100), CHECK2 - CHECK1);
-  BOOST_CHECK(measurements.findExactMatch(nameA) == nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameB) == nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameC) != nullptr);
-  BOOST_CHECK_EQUAL(measurements.size(), 1);
+                const time::nanoseconds EXTEND_A = time::seconds(2);
+                const time::nanoseconds CHECK1 = time::seconds(3);
+                const time::nanoseconds CHECK2 = time::seconds(5);
+                const time::nanoseconds EXTEND_C = time::seconds(6);
+                const time::nanoseconds CHECK3 = time::seconds(7);
+                BOOST_ASSERT(EXTEND_A < CHECK1);
+                BOOST_ASSERT(CHECK1 < Measurements::getInitialLifetime());
+                BOOST_ASSERT(Measurements::getInitialLifetime() < CHECK2);
+                BOOST_ASSERT(CHECK2 < EXTEND_C);
+                BOOST_ASSERT(EXTEND_C < CHECK3);
 
-  this->advanceClocks(time::milliseconds(100), CHECK3 - CHECK2);
-  BOOST_CHECK(measurements.findExactMatch(nameA) == nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameB) == nullptr);
-  BOOST_CHECK(measurements.findExactMatch(nameC) == nullptr);
-  BOOST_CHECK_EQUAL(measurements.size(), 0);
-}
+                measurements.extendLifetime(entryA, EXTEND_A);
+                measurements.extendLifetime(entryC, EXTEND_C);
+                // remaining lifetime:
+                //   A = initial lifetime, because it's extended by less duration
+                //   B = initial lifetime
+                //   C = EXTEND_C
 
-BOOST_AUTO_TEST_CASE(EraseNameTreeEntry)
-{
-  size_t nNameTreeEntriesBefore = nameTree.size();
+                this->advanceClocks(time::milliseconds(100), CHECK1);
+                BOOST_CHECK(measurements.findExactMatch(nameA) != nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameB) != nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameC) != nullptr);
+                BOOST_CHECK_EQUAL(measurements.size(), 3);
 
-  measurements.get("/A");
-  BOOST_CHECK_EQUAL(measurements.size(), 1);
+                this->advanceClocks(time::milliseconds(100), CHECK2 - CHECK1);
+                BOOST_CHECK(measurements.findExactMatch(nameA) == nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameB) == nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameC) != nullptr);
+                BOOST_CHECK_EQUAL(measurements.size(), 1);
 
-  this->advanceClocks(Measurements::getInitialLifetime() + time::milliseconds(10));
-  BOOST_CHECK_EQUAL(measurements.size(), 0);
-  BOOST_CHECK_EQUAL(nameTree.size(), nNameTreeEntriesBefore);
-}
+                this->advanceClocks(time::milliseconds(100), CHECK3 - CHECK2);
+                BOOST_CHECK(measurements.findExactMatch(nameA) == nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameB) == nullptr);
+                BOOST_CHECK(measurements.findExactMatch(nameC) == nullptr);
+                BOOST_CHECK_EQUAL(measurements.size(), 0);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestMeasurements
-BOOST_AUTO_TEST_SUITE_END() // Table
+            BOOST_AUTO_TEST_CASE(EraseNameTreeEntry) {
+                size_t nNameTreeEntriesBefore = nameTree.size();
 
-} // namespace tests
-} // namespace measurements
+                measurements.get("/A");
+                BOOST_CHECK_EQUAL(measurements.size(), 1);
+
+                this->advanceClocks(Measurements::getInitialLifetime() + time::milliseconds(10));
+                BOOST_CHECK_EQUAL(measurements.size(), 0);
+                BOOST_CHECK_EQUAL(nameTree.size(), nNameTreeEntriesBefore);
+            }
+
+            BOOST_AUTO_TEST_SUITE_END() // TestMeasurements
+            BOOST_AUTO_TEST_SUITE_END() // Table
+
+        } // namespace tests
+    } // namespace measurements
 } // namespace nfd

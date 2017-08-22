@@ -24,49 +24,46 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Probe");
-
-NS_OBJECT_ENSURE_REGISTERED (Probe);
-
-TypeId
-Probe::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Probe")
-    .SetParent<DataCollectionObject> ()
-    .SetGroupName ("Stats")
-    .AddAttribute ("Start",
-                   "Time data collection starts",
-                   TimeValue (Seconds (0)),
-                   MakeTimeAccessor (&Probe::m_start),
-                   MakeTimeChecker ())
-    .AddAttribute ("Stop",
-                   "Time when data collection stops.  The special time value of 0 disables this attribute",
-                   TimeValue (Seconds (0)),
-                   MakeTimeAccessor (&Probe::m_stop),
-                   MakeTimeChecker ())
-  ;
-  return tid;
-}
 
-Probe::Probe ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("Probe");
 
-Probe::~Probe ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(Probe);
 
-bool
-Probe::IsEnabled (void) const
-{
-  return (DataCollectionObject::IsEnabled ()
-          && Simulator::Now () >= m_start
-          && (m_stop == Seconds (0) || Simulator::Now () < m_stop));
+    TypeId
+    Probe::GetTypeId() {
+        static TypeId tid = TypeId("ns3::Probe")
+                .SetParent<DataCollectionObject> ()
+                .SetGroupName("Stats")
+                .AddAttribute("Start",
+                "Time data collection starts",
+                TimeValue(Seconds(0)),
+                MakeTimeAccessor(&Probe::m_start),
+                MakeTimeChecker())
+                .AddAttribute("Stop",
+                "Time when data collection stops.  The special time value of 0 disables this attribute",
+                TimeValue(Seconds(0)),
+                MakeTimeAccessor(&Probe::m_stop),
+                MakeTimeChecker())
+                ;
+        return tid;
+    }
 
-}
+    Probe::Probe() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    Probe::~Probe() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    bool
+    Probe::IsEnabled(void) const {
+        return (DataCollectionObject::IsEnabled()
+                && Simulator::Now() >= m_start
+                && (m_stop == Seconds(0) || Simulator::Now() < m_stop));
+
+    }
 
 } // namespace ns3

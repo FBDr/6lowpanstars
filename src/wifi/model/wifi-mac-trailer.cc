@@ -21,57 +21,50 @@
 #include "wifi-mac-trailer.h"
 #include "ns3/assert.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (WifiMacTrailer);
-
-WifiMacTrailer::WifiMacTrailer ()
+namespace ns3
 {
-}
 
-WifiMacTrailer::~WifiMacTrailer ()
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(WifiMacTrailer);
 
-TypeId
-WifiMacTrailer::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::WifiMacTrailer")
-    .SetParent<Trailer> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<WifiMacTrailer> ()
-  ;
-  return tid;
-}
+    WifiMacTrailer::WifiMacTrailer() {
+    }
 
-TypeId
-WifiMacTrailer::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    WifiMacTrailer::~WifiMacTrailer() {
+    }
 
-void
-WifiMacTrailer::Print (std::ostream &os) const
-{
-}
+    TypeId
+    WifiMacTrailer::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::WifiMacTrailer")
+                .SetParent<Trailer> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<WifiMacTrailer> ()
+                ;
+        return tid;
+    }
 
-uint32_t
-WifiMacTrailer::GetSerializedSize (void) const
-{
-  return WIFI_MAC_FCS_LENGTH;
-}
+    TypeId
+    WifiMacTrailer::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-WifiMacTrailer::Serialize (Buffer::Iterator start) const
-{
-  start.Prev (WIFI_MAC_FCS_LENGTH);
-  start.WriteU32 (0);
-}
+    void
+    WifiMacTrailer::Print(std::ostream & os) const {
+    }
 
-uint32_t
-WifiMacTrailer::Deserialize (Buffer::Iterator start)
-{
-  return WIFI_MAC_FCS_LENGTH;
-}
+    uint32_t
+    WifiMacTrailer::GetSerializedSize(void) const {
+        return WIFI_MAC_FCS_LENGTH;
+    }
+
+    void
+    WifiMacTrailer::Serialize(Buffer::Iterator start) const {
+        start.Prev(WIFI_MAC_FCS_LENGTH);
+        start.WriteU32(0);
+    }
+
+    uint32_t
+    WifiMacTrailer::Deserialize(Buffer::Iterator start) {
+        return WIFI_MAC_FCS_LENGTH;
+    }
 
 } //namespace ns3

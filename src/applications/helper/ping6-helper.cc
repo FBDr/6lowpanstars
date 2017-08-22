@@ -26,53 +26,45 @@
 namespace ns3
 {
 
-Ping6Helper::Ping6Helper ()
-  : m_ifIndex (0)
-{
-  m_factory.SetTypeId (Ping6::GetTypeId ());
-}
-
-void Ping6Helper::SetLocal (Ipv6Address ip)
-{
-  m_localIp = ip;
-}
-
-void Ping6Helper::SetRemote (Ipv6Address ip)
-{
-  m_remoteIp = ip;
-}
-
-void Ping6Helper::SetAttribute (std::string name, const AttributeValue& value)
-{
-  m_factory.Set (name, value);
-}
-
-ApplicationContainer Ping6Helper::Install (NodeContainer c)
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      Ptr<Node> node = *i;
-      Ptr<Ping6> client = m_factory.Create<Ping6> ();
-      client->SetLocal (m_localIp);
-      client->SetRemote (m_remoteIp);
-      client->SetIfIndex (m_ifIndex);
-      client->SetRouters (m_routers);
-      node->AddApplication (client);
-      apps.Add (client);
+    Ping6Helper::Ping6Helper()
+            : m_ifIndex(0) {
+        m_factory.SetTypeId(Ping6::GetTypeId());
     }
-  return apps;
-}
 
-void Ping6Helper::SetIfIndex (uint32_t ifIndex)
-{
-  m_ifIndex = ifIndex;
-}
+    void Ping6Helper::SetLocal(Ipv6Address ip) {
+        m_localIp = ip;
+    }
 
-void Ping6Helper::SetRoutersAddress (std::vector<Ipv6Address> routers)
-{
-  m_routers = routers;
-}
+    void Ping6Helper::SetRemote(Ipv6Address ip) {
+        m_remoteIp = ip;
+    }
+
+    void Ping6Helper::SetAttribute(std::string name, const AttributeValue & value) {
+        m_factory.Set(name, value);
+    }
+
+    ApplicationContainer Ping6Helper::Install(NodeContainer c) {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            Ptr<Node> node = *i;
+            Ptr<Ping6> client = m_factory.Create<Ping6> ();
+            client->SetLocal(m_localIp);
+            client->SetRemote(m_remoteIp);
+            client->SetIfIndex(m_ifIndex);
+            client->SetRouters(m_routers);
+            node->AddApplication(client);
+            apps.Add(client);
+        }
+        return apps;
+    }
+
+    void Ping6Helper::SetIfIndex(uint32_t ifIndex) {
+        m_ifIndex = ifIndex;
+    }
+
+    void Ping6Helper::SetRoutersAddress(std::vector<Ipv6Address> routers) {
+        m_routers = routers;
+    }
 
 } /* namespace ns3 */
 

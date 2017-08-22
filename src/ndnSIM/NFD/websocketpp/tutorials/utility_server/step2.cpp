@@ -41,8 +41,9 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class utility_server {
 public:
+
     utility_server() {
-         // Set logging settings
+        // Set logging settings
         m_endpoint.set_error_channels(websocketpp::log::elevel::all);
         m_endpoint.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
 
@@ -51,9 +52,9 @@ public:
 
         // Set the default message handler to the echo handler
         m_endpoint.set_message_handler(std::bind(
-            &utility_server::echo_handler, this,
-            std::placeholders::_1, std::placeholders::_2
-        ));
+                &utility_server::echo_handler, this,
+                std::placeholders::_1, std::placeholders::_2
+                ));
     }
 
     void echo_handler(websocketpp::connection_hdl hdl, server::message_ptr msg) {

@@ -38,43 +38,43 @@
   } while (false)
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-enum class LoopbackAddress {
-  No,
-  Yes,
-  DontCare,
-  Default = Yes
-};
+        enum class LoopbackAddress {
+            No,
+            Yes,
+            DontCare,
+            Default = Yes
+        };
 
-enum class MulticastInterface {
-  No,
-  Yes,
-  DontCare,
-  Default = DontCare
-};
+        enum class MulticastInterface {
+            No,
+            Yes,
+            DontCare,
+            Default = DontCare
+        };
 
-/** \brief get an IP address for test purposes from any available network interface
- *  \tparam A the address type, either boost::asio::ip::address_v4 or boost::asio::ip::address_v6
- *  \param loopback specifies if the address can, must, or must not be a loopback address
- *  \param mcast specifies if the address can, must, or must not be chosen from a multicast-capable interface
- *  \return an IP address
- *  \retval default-constructed A, if no appropriate address is available
- */
-template<typename A>
-A
-getTestIp(LoopbackAddress loopback = LoopbackAddress::Default,
-          MulticastInterface mcast = MulticastInterface::Default);
+        /** \brief get an IP address for test purposes from any available network interface
+         *  \tparam A the address type, either boost::asio::ip::address_v4 or boost::asio::ip::address_v6
+         *  \param loopback specifies if the address can, must, or must not be a loopback address
+         *  \param mcast specifies if the address can, must, or must not be chosen from a multicast-capable interface
+         *  \return an IP address
+         *  \retval default-constructed A, if no appropriate address is available
+         */
+        template<typename A>
+        A
+        getTestIp(LoopbackAddress loopback = LoopbackAddress::Default,
+                MulticastInterface mcast = MulticastInterface::Default);
 
-template<>
-boost::asio::ip::address_v4
-getTestIp(LoopbackAddress loopback, MulticastInterface mcast);
+        template<>
+        boost::asio::ip::address_v4
+        getTestIp(LoopbackAddress loopback, MulticastInterface mcast);
 
-template<>
-boost::asio::ip::address_v6
-getTestIp(LoopbackAddress loopback, MulticastInterface mcast);
+        template<>
+        boost::asio::ip::address_v6
+        getTestIp(LoopbackAddress loopback, MulticastInterface mcast);
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_TEST_IP_HPP

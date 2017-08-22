@@ -29,25 +29,24 @@
 #include "core/global-io.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(ndn::KeyChain& clientKeyChain)
-{
-  GenericLinkService::Options serviceOpts;
-  serviceOpts.allowLocalFields = true;
+        std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
+        makeInternalFace(ndn::KeyChain& clientKeyChain) {
+            GenericLinkService::Options serviceOpts;
+            serviceOpts.allowLocalFields = true;
 
-  auto face = make_shared<Face>(make_unique<GenericLinkService>(serviceOpts),
-                                make_unique<InternalForwarderTransport>());
+            auto face = make_shared<Face>(make_unique<GenericLinkService>(serviceOpts),
+                    make_unique<InternalForwarderTransport>());
 
-  auto forwarderTransport = static_cast<InternalForwarderTransport*>(face->getTransport());
-  auto clientTransport = make_shared<InternalClientTransport>();
-  clientTransport->connectToForwarder(forwarderTransport);
+            auto forwarderTransport = static_cast<InternalForwarderTransport*> (face->getTransport());
+            auto clientTransport = make_shared<InternalClientTransport>();
+            clientTransport->connectToForwarder(forwarderTransport);
 
-  auto clientFace = make_shared<ndn::Face>(clientTransport);
+            auto clientFace = make_shared<ndn::Face>(clientTransport);
 
-  return std::make_tuple(face, clientFace);
-}
+            return std::make_tuple(face, clientFace);
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

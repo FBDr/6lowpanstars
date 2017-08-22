@@ -31,53 +31,52 @@
 
 namespace ns3 {
 
-/**
- * \ingroup events
- * \brief A simulation event.
- *
- * Each subclass of this base class represents a simulation event. The
- * Invoke() method will be called by the simulation engine
- * when it reaches the time associated to this event. Most subclasses
- * are usually created by one of the many Simulator::Schedule
- * methods.
- */
-class EventImpl : public SimpleRefCount<EventImpl>
-{
-public:
-  /** Default constructor. */
-  EventImpl ();
-  /** Destructor. */
-  virtual ~EventImpl () = 0;
-  /**
-   * Called by the simulation engine to notify the event that it is time
-   * to execute.
-   */
-  void Invoke (void);
-  /**
-   * Marks the event as 'canceled'. The event is not removed from
-   * the event list but the simulation engine will check its canceled status
-   * before calling Invoke().
-   */
-  void Cancel (void);
-  /**
-   * \returns true if the event has been canceled.
-   *
-   * Checked by the simulation engine before calling Invoke().
-   */
-  bool IsCancelled (void);
+    /**
+     * \ingroup events
+     * \brief A simulation event.
+     *
+     * Each subclass of this base class represents a simulation event. The
+     * Invoke() method will be called by the simulation engine
+     * when it reaches the time associated to this event. Most subclasses
+     * are usually created by one of the many Simulator::Schedule
+     * methods.
+     */
+    class EventImpl : public SimpleRefCount<EventImpl> {
+    public:
+        /** Default constructor. */
+        EventImpl();
+        /** Destructor. */
+        virtual ~EventImpl() = 0;
+        /**
+         * Called by the simulation engine to notify the event that it is time
+         * to execute.
+         */
+        void Invoke(void);
+        /**
+         * Marks the event as 'canceled'. The event is not removed from
+         * the event list but the simulation engine will check its canceled status
+         * before calling Invoke().
+         */
+        void Cancel(void);
+        /**
+         * \returns true if the event has been canceled.
+         *
+         * Checked by the simulation engine before calling Invoke().
+         */
+        bool IsCancelled(void);
 
-protected:
-  /**
-   * Implementation for Invoke().
-   *
-   * This typically calls a method or function pointer with the
-   * arguments bound by a call to one of the MakeEvent() functions.
-   */
-  virtual void Notify (void) = 0;
+    protected:
+        /**
+         * Implementation for Invoke().
+         *
+         * This typically calls a method or function pointer with the
+         * arguments bound by a call to one of the MakeEvent() functions.
+         */
+        virtual void Notify(void) = 0;
 
-private:
-  bool m_cancel;  /**< Has this event been cancelled. */
-};
+    private:
+        bool m_cancel; /**< Has this event been cancelled. */
+    };
 
 } // namespace ns3
 

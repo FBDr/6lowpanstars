@@ -23,24 +23,23 @@
 #include "ns3/uinteger.h"
 #include "net-device.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("NetDevice");
-
-NS_OBJECT_ENSURE_REGISTERED (NetDevice);
-
-TypeId NetDevice::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::NetDevice")
-    .SetParent<Object> ()
-    .SetGroupName("Network")
-  ;
-  return tid;
-}
 
-NetDevice::~NetDevice ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("NetDevice");
+
+    NS_OBJECT_ENSURE_REGISTERED(NetDevice);
+
+    TypeId NetDevice::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::NetDevice")
+                .SetParent<Object> ()
+                .SetGroupName("Network")
+                ;
+        return tid;
+    }
+
+    NetDevice::~NetDevice() {
+        NS_LOG_FUNCTION(this);
+    }
 
 } // namespace ns3

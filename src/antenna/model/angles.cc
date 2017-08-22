@@ -24,64 +24,53 @@
 #include "angles.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Angles");
-
-double DegreesToRadians (double degrees)
+namespace ns3
 {
-  return degrees * M_PI / 180.0;
 
-}
+    NS_LOG_COMPONENT_DEFINE("Angles");
 
-double RadiansToDegrees (double radians)
-{
-  return radians * 180.0 / M_PI;
-}
+    double DegreesToRadians(double degrees) {
+        return degrees * M_PI / 180.0;
 
-std::ostream& operator<< (std::ostream& os, const Angles& a)
-{
-  os << "(" << a.phi << ", " << a.theta << ")";
-  return os;
-}
-
-std::istream &operator >> (std::istream &is, Angles &a)
-{
-  char c;
-  is >> a.phi >> c >> a.theta;
-  if (c != ':')
-    {
-      is.setstate (std::ios_base::failbit);
     }
-  return is;
-}
 
+    double RadiansToDegrees(double radians) {
+        return radians * 180.0 / M_PI;
+    }
 
-Angles::Angles ()
-  : phi (0),
-    theta (0)
-{
-}
+    std::ostream & operator << (std::ostream& os, const Angles & a) {
+        os << "(" << a.phi << ", " << a.theta << ")";
+        return os;
+    }
 
+    std::istream & operator >> (std::istream &is, Angles & a) {
+        char c;
+        is >> a.phi >> c >> a.theta;
+        if (c != ':') {
+            is.setstate(std::ios_base::failbit);
+        }
+        return is;
+    }
 
-Angles::Angles (double p, double t)
-  : phi (p),
-    theta (t)
-{
-}
+    Angles::Angles()
+            : phi(0),
+            theta(0) {
+    }
 
+    Angles::Angles(double p, double t)
+            : phi(p),
+            theta(t) {
+    }
 
-Angles::Angles (Vector v)
-  : phi (std::atan2 (v.y, v.x)),
-    theta (std::acos (v.z / sqrt (v.x*v.x + v.y*v.y + v.z*v.z)))
-{
-}
+    Angles::Angles(Vector v)
+            : phi(std::atan2(v.y, v.x)),
+            theta(std::acos(v.z / sqrt(v.x * v.x + v.y * v.y + v.z * v.z))) {
+    }
 
-Angles::Angles (Vector v, Vector o)
-  : phi (std::atan2 (v.y - o.y, v.x - o.x)),
-    theta (std::acos ((v.z - o.z) / CalculateDistance (v, o)))
-{
-}
+    Angles::Angles(Vector v, Vector o)
+            : phi(std::atan2(v.y - o.y, v.x - o.x)),
+            theta(std::acos((v.z - o.z) / CalculateDistance(v, o))) {
+    }
 
 
 }

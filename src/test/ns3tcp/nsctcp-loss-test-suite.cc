@@ -40,7 +40,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("NscTcpLossTest");
+NS_LOG_COMPONENT_DEFINE("NscTcpLossTest");
 
 // ===========================================================================
 // Tests of TCP implementation loss behavior
@@ -49,230 +49,218 @@ NS_LOG_COMPONENT_DEFINE ("NscTcpLossTest");
 
 class NscTcpLossTestCase1 : public TestCase
 {
-public:
-  NscTcpLossTestCase1 ();
-  virtual ~NscTcpLossTestCase1 () {}
+    public :
+    NscTcpLossTestCase1();
+    virtual ~NscTcpLossTestCase1()
+    {}
 
 private:
-  virtual void DoRun (void);
-  bool m_writeResults;
+    virtual void DoRun(void);
+    bool m_writeResults;
 
-  void SinkRx (std::string path, Ptr<const Packet> p, const Address &address);
+    void SinkRx(std::string path, Ptr<const Packet> p, const Address & address);
 
-  TestVectors<uint32_t> m_inputs;
-  TestVectors<uint32_t> m_responses;
-};
+    TestVectors<uint32_t> m_inputs;
+    TestVectors<uint32_t> m_responses;};
 
-NscTcpLossTestCase1::NscTcpLossTestCase1 ()
-  : TestCase ("Check that nsc TCP survives loss of first two SYNs"),
-    m_writeResults (false)
-{
-}
-
-void 
-NscTcpLossTestCase1::SinkRx (std::string path, Ptr<const Packet> p, const Address &address)
-{
-  m_responses.Add (p->GetSize ());
+NscTcpLossTestCase1::NscTcpLossTestCase1()
+: TestCase("Check that nsc TCP survives loss of first two SYNs"),
+m_writeResults(false) {
 }
 
 void
-NscTcpLossTestCase1::DoRun (void)
-{
-  uint16_t sinkPort = 50000;
-  double sinkStopTime = 40;  // sec; will trigger Socket::Close
-  double writerStopTime = 30;  // sec; will trigger Socket::Close
-  double simStopTime = 60;  // sec
-  Time sinkStopTimeObj = Seconds (sinkStopTime);
-  Time writerStopTimeObj = Seconds (writerStopTime);
-  Time simStopTimeObj= Seconds (simStopTime);
+NscTcpLossTestCase1::SinkRx(std::string path, Ptr<const Packet> p, const Address &address) {
+    m_responses.Add(p->GetSize());
+}
 
-  Ptr<Node> n0 = CreateObject<Node> ();
-  Ptr<Node> n1 = CreateObject<Node> ();
+void
+NscTcpLossTestCase1::DoRun(void) {
+    uint16_t sinkPort = 50000;
+    double sinkStopTime = 40; // sec; will trigger Socket::Close
+    double writerStopTime = 30; // sec; will trigger Socket::Close
+    double simStopTime = 60; // sec
+    Time sinkStopTimeObj = Seconds(sinkStopTime);
+    Time writerStopTimeObj = Seconds(writerStopTime);
+    Time simStopTimeObj = Seconds(simStopTime);
 
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("200ms"));
+    Ptr<Node> n0 = CreateObject<Node> ();
+    Ptr<Node> n1 = CreateObject<Node> ();
 
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (n0, n1);
+    PointToPointHelper pointToPoint;
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("200ms"));
 
-  InternetStackHelper internet;
-  internet.SetTcp ("ns3::NscTcpL4Protocol", "Library", StringValue ("liblinux2.6.26.so"));
-  internet.InstallAll ();
+    NetDeviceContainer devices;
+    devices = pointToPoint.Install(n0, n1);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.252");
-  Ipv4InterfaceContainer ifContainer = address.Assign (devices);
+    InternetStackHelper internet;
+    internet.SetTcp("ns3::NscTcpL4Protocol", "Library", StringValue("liblinux2.6.26.so"));
+    internet.InstallAll();
 
-  Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
-  Address sinkAddress (InetSocketAddress (ifContainer.GetAddress (1), sinkPort));
-  socketWriter->Setup (n0, sinkAddress);
-  n0->AddApplication (socketWriter);
-  socketWriter->SetStartTime (Seconds (0.));
-  socketWriter->SetStopTime (writerStopTimeObj);
+    Ipv4AddressHelper address;
+    address.SetBase("10.1.1.0", "255.255.255.252");
+    Ipv4InterfaceContainer ifContainer = address.Assign(devices);
 
-  PacketSinkHelper sink ("ns3::TcpSocketFactory",
-                         InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer apps = sink.Install (n1);
-  // Start the sink application at time zero, and stop it at sinkStopTime
-  apps.Start (Seconds (0.0));
-  apps.Stop (sinkStopTimeObj);
+    Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
+    Address sinkAddress(InetSocketAddress(ifContainer.GetAddress(1), sinkPort));
+    socketWriter->Setup(n0, sinkAddress);
+    n0->AddApplication(socketWriter);
+    socketWriter->SetStartTime(Seconds(0.));
+    socketWriter->SetStopTime(writerStopTimeObj);
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
-                   MakeCallback (&NscTcpLossTestCase1::SinkRx, this));
+    PacketSinkHelper sink("ns3::TcpSocketFactory",
+            InetSocketAddress(Ipv4Address::GetAny(), sinkPort));
+    ApplicationContainer apps = sink.Install(n1);
+    // Start the sink application at time zero, and stop it at sinkStopTime
+    apps.Start(Seconds(0.0));
+    apps.Stop(sinkStopTimeObj);
 
-  Simulator::Schedule (Seconds (2), &SocketWriter::Connect, socketWriter);
-  Simulator::Schedule (Seconds (10), &SocketWriter::Write, socketWriter, 500);
-  m_inputs.Add (500);
-  Simulator::Schedule (writerStopTimeObj, &SocketWriter::Close, socketWriter);
+    Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
+            MakeCallback(&NscTcpLossTestCase1::SinkRx, this));
 
-  std::list<uint32_t> sampleList;
-  // Lose first two SYNs
-  sampleList.push_back (0);
-  sampleList.push_back (1);
-  // This time, we'll explicitly create the error model we want
-  Ptr<ReceiveListErrorModel> pem = CreateObject<ReceiveListErrorModel> ();
-  pem->SetList (sampleList);
-  devices.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (pem));
+    Simulator::Schedule(Seconds(2), &SocketWriter::Connect, socketWriter);
+    Simulator::Schedule(Seconds(10), &SocketWriter::Write, socketWriter, 500);
+    m_inputs.Add(500);
+    Simulator::Schedule(writerStopTimeObj, &SocketWriter::Close, socketWriter);
 
-  if (m_writeResults)
-    {
-      pointToPoint.EnablePcapAll ("nsc-tcp-loss-test-case-1");
-      pointToPoint.EnableAsciiAll ("nsc-tcp-loss-test-case-1");
+    std::list<uint32_t> sampleList;
+    // Lose first two SYNs
+    sampleList.push_back(0);
+    sampleList.push_back(1);
+    // This time, we'll explicitly create the error model we want
+    Ptr<ReceiveListErrorModel> pem = CreateObject<ReceiveListErrorModel> ();
+    pem->SetList(sampleList);
+    devices.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(pem));
+
+    if (m_writeResults) {
+        pointToPoint.EnablePcapAll("nsc-tcp-loss-test-case-1");
+        pointToPoint.EnableAsciiAll("nsc-tcp-loss-test-case-1");
     }
 
-  Simulator::Stop (simStopTimeObj);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(simStopTimeObj);
+    Simulator::Run();
+    Simulator::Destroy();
 
-  // Compare inputs and outputs
-  NS_TEST_ASSERT_MSG_EQ (m_inputs.GetN (), m_responses.GetN (), "Incorrect number of expected receive events");
-  for (uint32_t i = 0; i < m_responses.GetN (); i++)
-    {
-      uint32_t in = m_inputs.Get (i);
-      uint32_t out = m_responses.Get (i);
-      NS_TEST_ASSERT_MSG_EQ (in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
+    // Compare inputs and outputs
+    NS_TEST_ASSERT_MSG_EQ(m_inputs.GetN(), m_responses.GetN(), "Incorrect number of expected receive events");
+    for (uint32_t i = 0; i < m_responses.GetN(); i++) {
+        uint32_t in = m_inputs.Get(i);
+        uint32_t out = m_responses.Get(i);
+        NS_TEST_ASSERT_MSG_EQ(in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
     }
 }
 
 class NscTcpLossTestCase2 : public TestCase
 {
-public:
-  NscTcpLossTestCase2 ();
-  virtual ~NscTcpLossTestCase2 () {}
+    public :
+    NscTcpLossTestCase2();
+    virtual ~NscTcpLossTestCase2()
+    {}
 
 private:
-  virtual void DoRun (void);
-  bool m_writeResults;
+    virtual void DoRun(void);
+    bool m_writeResults;
 
-  void SinkRx (std::string path, Ptr<const Packet> p, const Address &address);
+    void SinkRx(std::string path, Ptr<const Packet> p, const Address & address);
 
-  TestVectors<uint32_t> m_inputs;
-  TestVectors<uint32_t> m_responses;
-};
+    TestVectors<uint32_t> m_inputs;
+    TestVectors<uint32_t> m_responses;};
 
-NscTcpLossTestCase2::NscTcpLossTestCase2 ()
-  : TestCase ("Check that nsc TCP survives loss of first data packet"),
-    m_writeResults (false)
-{
-}
-
-void 
-NscTcpLossTestCase2::SinkRx (std::string path, Ptr<const Packet> p, const Address &address)
-{
-  m_responses.Add (p->GetSize ());
+NscTcpLossTestCase2::NscTcpLossTestCase2()
+: TestCase("Check that nsc TCP survives loss of first data packet"),
+m_writeResults(false) {
 }
 
 void
-NscTcpLossTestCase2::DoRun (void)
-{
-  uint16_t sinkPort = 50000;
-  double sinkStopTime = 40;  // sec; will trigger Socket::Close
-  double writerStopTime = 12;  // sec; will trigger Socket::Close
-  double simStopTime = 60;  // sec
-  Time sinkStopTimeObj = Seconds (sinkStopTime);
-  Time writerStopTimeObj = Seconds (writerStopTime);
-  Time simStopTimeObj= Seconds (simStopTime);
+NscTcpLossTestCase2::SinkRx(std::string path, Ptr<const Packet> p, const Address &address) {
+    m_responses.Add(p->GetSize());
+}
 
-  Ptr<Node> n0 = CreateObject<Node> ();
-  Ptr<Node> n1 = CreateObject<Node> ();
+void
+NscTcpLossTestCase2::DoRun(void) {
+    uint16_t sinkPort = 50000;
+    double sinkStopTime = 40; // sec; will trigger Socket::Close
+    double writerStopTime = 12; // sec; will trigger Socket::Close
+    double simStopTime = 60; // sec
+    Time sinkStopTimeObj = Seconds(sinkStopTime);
+    Time writerStopTimeObj = Seconds(writerStopTime);
+    Time simStopTimeObj = Seconds(simStopTime);
 
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("200ms"));
+    Ptr<Node> n0 = CreateObject<Node> ();
+    Ptr<Node> n1 = CreateObject<Node> ();
 
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (n0, n1);
+    PointToPointHelper pointToPoint;
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("200ms"));
 
-  InternetStackHelper internet;
-  internet.SetTcp ("ns3::NscTcpL4Protocol", "Library", StringValue ("liblinux2.6.26.so"));
-  internet.InstallAll ();
+    NetDeviceContainer devices;
+    devices = pointToPoint.Install(n0, n1);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.252");
-  Ipv4InterfaceContainer ifContainer = address.Assign (devices);
+    InternetStackHelper internet;
+    internet.SetTcp("ns3::NscTcpL4Protocol", "Library", StringValue("liblinux2.6.26.so"));
+    internet.InstallAll();
 
-  Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
-  Address sinkAddress (InetSocketAddress (ifContainer.GetAddress (1), sinkPort));
-  socketWriter->Setup (n0, sinkAddress);
-  n0->AddApplication (socketWriter);
-  socketWriter->SetStartTime (Seconds (0.));
-  socketWriter->SetStopTime (writerStopTimeObj);
+    Ipv4AddressHelper address;
+    address.SetBase("10.1.1.0", "255.255.255.252");
+    Ipv4InterfaceContainer ifContainer = address.Assign(devices);
 
-  PacketSinkHelper sink ("ns3::TcpSocketFactory",
-                         InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer apps = sink.Install (n1);
-  // Start the sink application at time zero, and stop it at sinkStopTime
-  apps.Start (Seconds (0.0));
-  apps.Stop (sinkStopTimeObj);
+    Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
+    Address sinkAddress(InetSocketAddress(ifContainer.GetAddress(1), sinkPort));
+    socketWriter->Setup(n0, sinkAddress);
+    n0->AddApplication(socketWriter);
+    socketWriter->SetStartTime(Seconds(0.));
+    socketWriter->SetStopTime(writerStopTimeObj);
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
-                   MakeCallback (&NscTcpLossTestCase2::SinkRx, this));
+    PacketSinkHelper sink("ns3::TcpSocketFactory",
+            InetSocketAddress(Ipv4Address::GetAny(), sinkPort));
+    ApplicationContainer apps = sink.Install(n1);
+    // Start the sink application at time zero, and stop it at sinkStopTime
+    apps.Start(Seconds(0.0));
+    apps.Stop(sinkStopTimeObj);
 
-  Simulator::Schedule (Seconds (2), &SocketWriter::Connect, socketWriter);
-  Simulator::Schedule (Seconds (10), &SocketWriter::Write, socketWriter, 500);
-  m_inputs.Add (500);
-  Simulator::Schedule (writerStopTimeObj, &SocketWriter::Close, socketWriter);
+    Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
+            MakeCallback(&NscTcpLossTestCase2::SinkRx, this));
 
-  std::list<uint32_t> sampleList;
-  // Lose first data segment
-  sampleList.push_back (2);
-  // This time, we'll explicitly create the error model we want
-  Ptr<ReceiveListErrorModel> pem = CreateObject<ReceiveListErrorModel> ();
-  pem->SetList (sampleList);
-  devices.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (pem));
+    Simulator::Schedule(Seconds(2), &SocketWriter::Connect, socketWriter);
+    Simulator::Schedule(Seconds(10), &SocketWriter::Write, socketWriter, 500);
+    m_inputs.Add(500);
+    Simulator::Schedule(writerStopTimeObj, &SocketWriter::Close, socketWriter);
 
-  if (m_writeResults)
-    {
-      pointToPoint.EnablePcapAll ("nsc-tcp-loss-test-case-2");
-      pointToPoint.EnableAsciiAll ("nsc-tcp-loss-test-case-2");
+    std::list<uint32_t> sampleList;
+    // Lose first data segment
+    sampleList.push_back(2);
+    // This time, we'll explicitly create the error model we want
+    Ptr<ReceiveListErrorModel> pem = CreateObject<ReceiveListErrorModel> ();
+    pem->SetList(sampleList);
+    devices.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(pem));
+
+    if (m_writeResults) {
+        pointToPoint.EnablePcapAll("nsc-tcp-loss-test-case-2");
+        pointToPoint.EnableAsciiAll("nsc-tcp-loss-test-case-2");
     }
 
-  Simulator::Stop (simStopTimeObj);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(simStopTimeObj);
+    Simulator::Run();
+    Simulator::Destroy();
 
-  // Compare inputs and outputs
-  NS_TEST_ASSERT_MSG_EQ (m_inputs.GetN (), m_responses.GetN (), "Incorrect number of expected receive events");
-  for (uint32_t i = 0; i < m_responses.GetN (); i++)
-    {
-      uint32_t in = m_inputs.Get (i);
-      uint32_t out = m_responses.Get (i);
-      NS_TEST_ASSERT_MSG_EQ (in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
+    // Compare inputs and outputs
+    NS_TEST_ASSERT_MSG_EQ(m_inputs.GetN(), m_responses.GetN(), "Incorrect number of expected receive events");
+    for (uint32_t i = 0; i < m_responses.GetN(); i++) {
+        uint32_t in = m_inputs.Get(i);
+        uint32_t out = m_responses.Get(i);
+        NS_TEST_ASSERT_MSG_EQ(in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
     }
 }
 
 class NscTcpLossTestSuite : public TestSuite
 {
-public:
-  NscTcpLossTestSuite ();
-};
+    public :
+    NscTcpLossTestSuite();};
 
-NscTcpLossTestSuite::NscTcpLossTestSuite ()
-  : TestSuite ("nsc-tcp-loss", SYSTEM)
-{
-  AddTestCase (new NscTcpLossTestCase1, TestCase::QUICK);
-  AddTestCase (new NscTcpLossTestCase2, TestCase::QUICK);
+NscTcpLossTestSuite::NscTcpLossTestSuite()
+: TestSuite("nsc-tcp-loss", SYSTEM) {
+    AddTestCase(new NscTcpLossTestCase1, TestCase::QUICK);
+    AddTestCase(new NscTcpLossTestCase2, TestCase::QUICK);
 }
 
 static NscTcpLossTestSuite nscTcpLossTestSuite;

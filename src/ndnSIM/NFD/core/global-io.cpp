@@ -28,27 +28,24 @@
 
 namespace nfd {
 
-namespace detail {
+    namespace detail {
 
-void
-SimulatorIo::post(const std::function<void()>& callback)
-{
-  scheduler::schedule(time::seconds(0), callback);
-}
+        void
+        SimulatorIo::post(const std::function<void()>& callback) {
+            scheduler::schedule(time::seconds(0), callback);
+        }
 
-void
-SimulatorIodispatch(const std::function<void()>& callback)
-{
-  scheduler::schedule(time::seconds(0), callback);
-}
+        void
+        SimulatorIodispatch(const std::function<void()>& callback) {
+            scheduler::schedule(time::seconds(0), callback);
+        }
 
-} // namespace detail
+    } // namespace detail
 
-detail::SimulatorIo&
-getGlobalIoService()
-{
-  static detail::SimulatorIo io;
-  return io;
-}
+    detail::SimulatorIo&
+    getGlobalIoService() {
+        static detail::SimulatorIo io;
+        return io;
+    }
 
 } // namespace nfd

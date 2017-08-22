@@ -24,26 +24,25 @@
 
 namespace ns3 {
 
-class Socket;
+    class Socket;
 
-/**
- * \ingroup socket
- *
- * \brief API to create RAW socket instances 
- *
- * This abstract class defines the API for RAW socket factory.
- * 
- */
-class Ipv4RawSocketFactory : public SocketFactory
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup socket
+     *
+     * \brief API to create RAW socket instances 
+     *
+     * This abstract class defines the API for RAW socket factory.
+     * 
+     */
+    class Ipv4RawSocketFactory : public SocketFactory {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-};
+    };
 
 } // namespace ns3
 

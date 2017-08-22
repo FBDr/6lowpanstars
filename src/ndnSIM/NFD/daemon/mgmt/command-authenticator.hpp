@@ -33,47 +33,46 @@
 
 namespace nfd {
 
-/** \brief provides ControlCommand authorization according to NFD configuration file
- */
-class CommandAuthenticator : public enable_shared_from_this<CommandAuthenticator>, noncopyable
-{
-public:
-  static shared_ptr<CommandAuthenticator>
-  create();
+    /** \brief provides ControlCommand authorization according to NFD configuration file
+     */
+    class CommandAuthenticator : public enable_shared_from_this<CommandAuthenticator>, noncopyable {
+    public:
+        static shared_ptr<CommandAuthenticator>
+        create();
 
-  void
-  setConfigFile(ConfigFile& configFile);
+        void
+        setConfigFile(ConfigFile& configFile);
 
-  /** \return an Authorization function for module/verb command
-   *  \param module management module name
-   *  \param verb command verb; currently it's ignored
-   *  \note This must be called before parsing configuration file
-   */
-  ndn::mgmt::Authorization
-  makeAuthorization(const std::string& module, const std::string& verb);
+        /** \return an Authorization function for module/verb command
+         *  \param module management module name
+         *  \param verb command verb; currently it's ignored
+         *  \note This must be called before parsing configuration file
+         */
+        ndn::mgmt::Authorization
+        makeAuthorization(const std::string& module, const std::string& verb);
 
-private:
-  CommandAuthenticator();
+    private:
+        CommandAuthenticator();
 
-  /** \brief process "authorizations" section
-   *  \throw ConfigFile::Error on parse error
-   */
-  void
-  processConfig(const ConfigSection& section, bool isDryRun, const std::string& filename);
+        /** \brief process "authorizations" section
+         *  \throw ConfigFile::Error on parse error
+         */
+        void
+        processConfig(const ConfigSection& section, bool isDryRun, const std::string& filename);
 
-  static std::pair<bool, Name>
-  extractKeyName(const Interest& interest);
+        static std::pair<bool, Name>
+        extractKeyName(const Interest& interest);
 
-private:
-  struct AuthorizedCerts
-  {
-    bool allowAny = false;
-    std::unordered_map<Name, ndn::PublicKey> certs; ///< keyName => publicKey
-  };
-  std::unordered_map<std::string, AuthorizedCerts> m_moduleAuth; ///< module => certs
+    private:
 
-  ndn::security::CommandInterestValidator m_validator;
-};
+        struct AuthorizedCerts {
+            bool allowAny = false;
+            std::unordered_map<Name, ndn::PublicKey> certs; ///< keyName => publicKey
+        };
+        std::unordered_map<std::string, AuthorizedCerts> m_moduleAuth; ///< module => certs
+
+        ndn::security::CommandInterestValidator m_validator;
+    };
 
 } // namespace nfd
 

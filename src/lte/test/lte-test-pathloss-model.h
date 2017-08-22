@@ -30,30 +30,26 @@
 
 using namespace ns3;
 
-
 /**
  * Test 1.1 pathloss calculation
  */
-class LtePathlossModelTestSuite : public TestSuite
-{
+class LtePathlossModelTestSuite : public TestSuite {
 public:
-  LtePathlossModelTestSuite ();
+    LtePathlossModelTestSuite();
 };
 
+class LtePathlossModelSystemTestCase : public TestCase {
+public:
+    LtePathlossModelSystemTestCase(std::string name, double snrDb, double dist, uint16_t mcsIndex);
+    LtePathlossModelSystemTestCase();
+    virtual ~LtePathlossModelSystemTestCase();
 
-class LtePathlossModelSystemTestCase : public TestCase
-{
-  public:
-    LtePathlossModelSystemTestCase (std::string name, double snrDb, double dist, uint16_t mcsIndex);
-    LtePathlossModelSystemTestCase ();
-    virtual ~LtePathlossModelSystemTestCase ();
-    
-    void DlScheduling (uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
-                       uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2);
-                       
-  private:
-    virtual void DoRun (void);
-    
+    void DlScheduling(uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
+            uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2);
+
+private:
+    virtual void DoRun(void);
+
     double m_snrDb;
     double m_distance;
     uint16_t m_mcsIndex;

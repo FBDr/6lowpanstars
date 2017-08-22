@@ -22,49 +22,43 @@
 #include "signal-connection.hpp"
 
 namespace ndn {
-namespace util {
-namespace signal {
+    namespace util {
+        namespace signal {
 
-BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Connection>));
+            BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Connection>));
 
-Connection::Connection()
-{
-}
+            Connection::Connection() {
+            }
 
-Connection::Connection(weak_ptr<function<void()>> disconnect)
-  : m_disconnect(disconnect)
-{
-}
+            Connection::Connection(weak_ptr<function<void() >> disconnect)
+            : m_disconnect(disconnect) {
+            }
 
-void
-Connection::disconnect()
-{
-  shared_ptr<function<void()>> f = m_disconnect.lock();
-  if (f != nullptr) {
-    (*f)();
-  }
-}
+            void
+            Connection::disconnect() {
+                shared_ptr < function<void() >> f = m_disconnect.lock();
+                if (f != nullptr) {
+                    (*f)();
+                }
+            }
 
-bool
-Connection::isConnected() const
-{
-  return !m_disconnect.expired();
-}
+            bool
+            Connection::isConnected() const {
+                return !m_disconnect.expired();
+            }
 
-bool
-Connection::operator==(const Connection& other) const
-{
-  shared_ptr<function<void()>> f1 = m_disconnect.lock();
-  shared_ptr<function<void()>> f2 = other.m_disconnect.lock();
-  return f1 == f2;
-}
+            bool
+            Connection::operator==(const Connection& other) const {
+                shared_ptr < function<void() >> f1 = m_disconnect.lock();
+                shared_ptr < function<void() >> f2 = other.m_disconnect.lock();
+                return f1 == f2;
+            }
 
-bool
-Connection::operator!=(const Connection& other) const
-{
-  return !(this->operator==(other));
-}
+            bool
+            Connection::operator!=(const Connection& other) const {
+                return !(this->operator==(other));
+            }
 
-} // namespace signal
-} // namespace util
+        } // namespace signal
+    } // namespace util
 } // namespace ndn

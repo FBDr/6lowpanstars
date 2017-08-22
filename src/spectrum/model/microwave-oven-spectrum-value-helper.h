@@ -26,36 +26,33 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup spectrum
+     *
+     * This class provides methods for the creation of SpectrumValue
+     * instances that mimic the Power Spectral Density of commercial
+     * microwave ovens based on the measurements reported in the following paper:
+     * Tanim M. Taher, Matthew J. Misurac, Joseph L. LoCicero, and Donald R. Ucci,
+     * "MICROWAVE OVEN SIGNAL MODELING", in Proc. of IEEE WCNC, 2008
+     *
+     */
+    class MicrowaveOvenSpectrumValueHelper {
+    public:
+        /**
+         *
+         * @return the Power Spectral Density of Micro Wave Oven #1 in the
+         * cited paper
+         */
+        static Ptr<SpectrumValue> CreatePowerSpectralDensityMwo1();
 
+        /**
+         *
+         * @return the Power Spectral Density of Micro Wave Oven #2 in the
+         * cited paper
+         */
+        static Ptr<SpectrumValue> CreatePowerSpectralDensityMwo2();
 
-/**
- * \ingroup spectrum
- *
- * This class provides methods for the creation of SpectrumValue
- * instances that mimic the Power Spectral Density of commercial
- * microwave ovens based on the measurements reported in the following paper:
- * Tanim M. Taher, Matthew J. Misurac, Joseph L. LoCicero, and Donald R. Ucci,
- * "MICROWAVE OVEN SIGNAL MODELING", in Proc. of IEEE WCNC, 2008
- *
- */
-class MicrowaveOvenSpectrumValueHelper
-{
-public:
-  /**
-   *
-   * @return the Power Spectral Density of Micro Wave Oven #1 in the
-   * cited paper
-   */
-  static Ptr<SpectrumValue> CreatePowerSpectralDensityMwo1 ();
-
-  /**
-   *
-   * @return the Power Spectral Density of Micro Wave Oven #2 in the
-   * cited paper
-   */
-  static Ptr<SpectrumValue> CreatePowerSpectralDensityMwo2 ();
-
-};
+    };
 
 
 

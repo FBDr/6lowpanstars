@@ -30,104 +30,94 @@
 
 
 namespace ndn {
-namespace security {
-namespace conf {
+    namespace security {
+        namespace conf {
 
-template<class Packet>
-class Rule
-{
-public:
-  explicit
-  Rule(const std::string& id)
-    : m_id(id)
-  {
-  }
+            template<class Packet>
+            class Rule {
+            public:
 
-  virtual
-  ~Rule()
-  {
-  }
+                explicit
+                Rule(const std::string& id)
+                : m_id(id) {
+                }
 
-  const std::string&
-  getId()
-  {
-    return m_id;
-  }
+                virtual
+                ~Rule() {
+                }
 
-  void
-  addFilter(const shared_ptr<Filter>& filter)
-  {
-    m_filters.push_back(filter);
-  }
+                const std::string&
+                getId() {
+                    return m_id;
+                }
 
-  void
-  addChecker(const shared_ptr<Checker>& checker)
-  {
-    m_checkers.push_back(checker);
-  }
+                void
+                addFilter(const shared_ptr<Filter>& filter) {
+                    m_filters.push_back(filter);
+                }
 
-  bool
-  match(const Packet& packet)
-  {
-    if (m_filters.empty())
-      return true;
+                void
+                addChecker(const shared_ptr<Checker>& checker) {
+                    m_checkers.push_back(checker);
+                }
 
-    for (FilterList::iterator it = m_filters.begin();
-         it != m_filters.end(); it++)
-      {
-        if (!(*it)->match(packet))
-          return false;
-      }
+                bool
+                match(const Packet& packet) {
+                    if (m_filters.empty())
+                        return true;
 
-    return true;
-  }
+                    for (FilterList::iterator it = m_filters.begin();
+                            it != m_filters.end(); it++) {
+                        if (!(*it)->match(packet))
+                            return false;
+                    }
 
-  /**
-   * @brief check if packet satisfies certain condition
-   *
-   * @param packet The packet
-   * @param onValidated Callback function which is called when packet is immediately valid
-   * @param onValidationFailed Call function which is called when packet is immediately invalid
-   * @return -1 if packet is immediately invalid (onValidationFailed has been called)
-   *          1 if packet is immediately valid (onValidated has been called)
-   *          0 if further signature verification is needed.
-   */
-  template<class ValidatedCallback, class ValidationFailureCallback>
-  int8_t
-  check(const Packet& packet,
-        const ValidatedCallback& onValidated,
-        const ValidationFailureCallback& onValidationFailed)
-  {
-    bool hasPendingResult = false;
-    for (CheckerList::iterator it = m_checkers.begin(); it != m_checkers.end(); it++) {
-      int8_t result = (*it)->check(packet);
-      if (result > 0) {
-        onValidated(packet.shared_from_this());
-        return result;
-      }
-      else if (result == 0)
-        hasPendingResult = true;
-    }
-    if (hasPendingResult) {
-      return 0;
-    }
-    else {
-      onValidationFailed(packet.shared_from_this(), "Packet cannot pass any checkers.");
-      return -1;
-    }
-  }
+                    return true;
+                }
+
+                /**
+                 * @brief check if packet satisfies certain condition
+                 *
+                 * @param packet The packet
+                 * @param onValidated Callback function which is called when packet is immediately valid
+                 * @param onValidationFailed Call function which is called when packet is immediately invalid
+                 * @return -1 if packet is immediately invalid (onValidationFailed has been called)
+                 *          1 if packet is immediately valid (onValidated has been called)
+                 *          0 if further signature verification is needed.
+                 */
+                template<class ValidatedCallback, class ValidationFailureCallback>
+                int8_t
+                check(const Packet& packet,
+                        const ValidatedCallback& onValidated,
+                        const ValidationFailureCallback& onValidationFailed) {
+                    bool hasPendingResult = false;
+                    for (CheckerList::iterator it = m_checkers.begin(); it != m_checkers.end(); it++) {
+                        int8_t result = (*it)->check(packet);
+                        if (result > 0) {
+                            onValidated(packet.shared_from_this());
+                            return result;
+                        } else if (result == 0)
+                            hasPendingResult = true;
+                    }
+                    if (hasPendingResult) {
+                        return 0;
+                    } else {
+                        onValidationFailed(packet.shared_from_this(), "Packet cannot pass any checkers.");
+                        return -1;
+                    }
+                }
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  typedef std::vector<shared_ptr<Filter>> FilterList;
-  typedef std::vector<shared_ptr<Checker>> CheckerList;
+                typedef std::vector<shared_ptr<Filter>> FilterList;
+                typedef std::vector<shared_ptr<Checker>> CheckerList;
 
-  std::string m_id;
-  FilterList m_filters;
-  CheckerList m_checkers;
-};
+                std::string m_id;
+                FilterList m_filters;
+                CheckerList m_checkers;
+            };
 
-} // namespace conf
-} // namespace security
+        } // namespace conf
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_CONF_RULE_HPP

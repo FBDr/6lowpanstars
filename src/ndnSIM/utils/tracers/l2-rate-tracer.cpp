@@ -154,21 +154,19 @@ const double alpha = 0.8;
      << STATS(2).fieldName << "\t" << STATS(3).fieldName << "\t" << STATS(0).fieldName << "\t"     \
      << STATS(1).fieldName / 1024.0 << "\n";
 
-void
-L2RateTracer::Print(std::ostream& os) const
-{
-  Time time = Simulator::Now();
+    void
+    L2RateTracer::Print(std::ostream& os) const {
+        Time time = Simulator::Now();
 
-  PRINTER("Drop", m_drop, "combined");
-}
+        PRINTER("Drop", m_drop, "combined");
+    }
 
-void
-L2RateTracer::Drop(Ptr<const Packet> packet)
-{
-  // no interface information... this should be part of this L2Tracer object data
+    void
+    L2RateTracer::Drop(Ptr<const Packet> packet) {
+        // no interface information... this should be part of this L2Tracer object data
 
-  std::get<0>(m_stats).m_drop++;
-  std::get<1>(m_stats).m_drop += packet->GetSize();
-}
+        std::get<0>(m_stats).m_drop++;
+        std::get<1>(m_stats).m_drop += packet->GetSize();
+    }
 
 } // namespace ns3

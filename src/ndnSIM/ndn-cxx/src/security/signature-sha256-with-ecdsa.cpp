@@ -23,26 +23,23 @@
 
 namespace ndn {
 
-SignatureSha256WithEcdsa::SignatureSha256WithEcdsa(const KeyLocator& keyLocator)
-  : Signature(SignatureInfo(tlv::SignatureSha256WithEcdsa, keyLocator))
-{
-}
+    SignatureSha256WithEcdsa::SignatureSha256WithEcdsa(const KeyLocator& keyLocator)
+    : Signature(SignatureInfo(tlv::SignatureSha256WithEcdsa, keyLocator)) {
+    }
 
-SignatureSha256WithEcdsa::SignatureSha256WithEcdsa(const Signature& signature)
-  : Signature(signature)
-{
-  if (getType() != tlv::SignatureSha256WithEcdsa)
-    BOOST_THROW_EXCEPTION(Error("Incorrect signature type"));
+    SignatureSha256WithEcdsa::SignatureSha256WithEcdsa(const Signature& signature)
+    : Signature(signature) {
+        if (getType() != tlv::SignatureSha256WithEcdsa)
+            BOOST_THROW_EXCEPTION(Error("Incorrect signature type"));
 
-  if (!hasKeyLocator()) {
-    BOOST_THROW_EXCEPTION(Error("KeyLocator is missing"));
-  }
-}
+        if (!hasKeyLocator()) {
+            BOOST_THROW_EXCEPTION(Error("KeyLocator is missing"));
+        }
+    }
 
-void
-SignatureSha256WithEcdsa::unsetKeyLocator()
-{
-  BOOST_THROW_EXCEPTION(Error("KeyLocator cannot be reset for SignatureSha256WithEcdsa"));
-}
+    void
+    SignatureSha256WithEcdsa::unsetKeyLocator() {
+        BOOST_THROW_EXCEPTION(Error("KeyLocator cannot be reset for SignatureSha256WithEcdsa"));
+    }
 
 } // namespace ndn

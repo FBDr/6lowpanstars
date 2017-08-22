@@ -40,12 +40,12 @@
 #include "websocketpp/server.hpp"
 
 namespace nfd {
-namespace websocket {
+    namespace websocket {
 
-typedef websocketpp::client<websocketpp::config::asio_client> Client;
-typedef websocketpp::server<websocketpp::config::asio> Server;
+        typedef websocketpp::client<websocketpp::config::asio_client> Client;
+        typedef websocketpp::server<websocketpp::config::asio> Server;
 
-} // namespace websocket
+    } // namespace websocket
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_WEBSOCKETPP_HPP

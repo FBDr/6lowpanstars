@@ -33,105 +33,109 @@
 
 namespace ns3 {
 
-/**
- * \ingroup attribute
- * \defgroup attributehelper Attribute Helper
- *
- * All these macros can be used to generate automatically the code
- * for subclasses of AttributeValue, AttributeAccessor, and, AttributeChecker,
- * which can be used to give attribute powers to a normal class. i.e.,
- * the user class can then effectively be made an attribute.
- *
- * There are two kinds of helper macros:
- *   -# The simple macros.
- *     - ATTRIBUTE_HELPER_HEADER(type)
- *     - ATTRIBUTE_HELPER_CPP(type)
- *   -# The more complex macros.
- *
- * The simple macros are implemented in terms of the complex
- * macros and should generally be preferred over the complex macros.
- *
- * \note
- * Because these macros generate class and function definitions, it's
- * difficult to document the results directly.  Instead, we use a
- * set of functions in print-introspected-doxygen.cc to generate
- * most of the APi documentation.  When using these macros,
- * please add the required function calls to print-introspected-doxygen.cc
- * so your new API is documented.
- */
+    /**
+     * \ingroup attribute
+     * \defgroup attributehelper Attribute Helper
+     *
+     * All these macros can be used to generate automatically the code
+     * for subclasses of AttributeValue, AttributeAccessor, and, AttributeChecker,
+     * which can be used to give attribute powers to a normal class. i.e.,
+     * the user class can then effectively be made an attribute.
+     *
+     * There are two kinds of helper macros:
+     *   -# The simple macros.
+     *     - ATTRIBUTE_HELPER_HEADER(type)
+     *     - ATTRIBUTE_HELPER_CPP(type)
+     *   -# The more complex macros.
+     *
+     * The simple macros are implemented in terms of the complex
+     * macros and should generally be preferred over the complex macros.
+     *
+     * \note
+     * Because these macros generate class and function definitions, it's
+     * difficult to document the results directly.  Instead, we use a
+     * set of functions in print-introspected-doxygen.cc to generate
+     * most of the APi documentation.  When using these macros,
+     * please add the required function calls to print-introspected-doxygen.cc
+     * so your new API is documented.
+     */
 
-/**
- * \ingroup attributehelper
- * \defgroup attributeimpl Attribute Implementation
- *
- * These are the internal implementation functions for the Attribute
- * system.
- *
- * Module code shouldn't need to call these directly.  Instead,
- * see \ref attributehelper.
- *
- * There are three versions of DoMakeAccessorHelperOne:
- *  - With a member variable: DoMakeAccessorHelperOne(U T::*)
- *  - With a class get functor: DoMakeAccessorHelperOne(U(T::*)(void) const)
- *  - With a class set method:  DoMakeAccessorHelperOne(void(T::*)(U))
- *
- * There are two pairs of DoMakeAccessorHelperTwo (four total):
- *  - Taking two arguments, a set method and get functor, in either order,
- *  - With set methods returning \c void or \c bool.
- */
+    /**
+     * \ingroup attributehelper
+     * \defgroup attributeimpl Attribute Implementation
+     *
+     * These are the internal implementation functions for the Attribute
+     * system.
+     *
+     * Module code shouldn't need to call these directly.  Instead,
+     * see \ref attributehelper.
+     *
+     * There are three versions of DoMakeAccessorHelperOne:
+     *  - With a member variable: DoMakeAccessorHelperOne(U T::*)
+     *  - With a class get functor: DoMakeAccessorHelperOne(U(T::*)(void) const)
+     *  - With a class set method:  DoMakeAccessorHelperOne(void(T::*)(U))
+     *
+     * There are two pairs of DoMakeAccessorHelperTwo (four total):
+     *  - Taking two arguments, a set method and get functor, in either order,
+     *  - With set methods returning \c void or \c bool.
+     */
 
-/**
- * \ingroup attributeimpl
- *
- * A simple string-based attribute checker
- *
- * \tparam T    \explicit The specific AttributeValue type used to represent
- *              the Attribute.
- * \tparam BASE \explicit The AttributeChecker type corresponding to \p T.
- * \param [in] name  The name of the AttributeValue type, essentially the
- *              string form of \p T.
- * \param [in] underlying Underlying type name.
- * \return Ptr to AttributeChecker.
- */
-template <typename T, typename BASE>
-Ptr<AttributeChecker>
-MakeSimpleAttributeChecker (std::string name, std::string underlying)
-{
-  /* String-based AttributeChecker implementation. */
-  struct SimpleAttributeChecker : public BASE
-  {
-    virtual bool Check (const AttributeValue &value) const {
-      return dynamic_cast<const T *> (&value) != 0;
+    /**
+     * \ingroup attributeimpl
+     *
+     * A simple string-based attribute checker
+     *
+     * \tparam T    \explicit The specific AttributeValue type used to represent
+     *              the Attribute.
+     * \tparam BASE \explicit The AttributeChecker type corresponding to \p T.
+     * \param [in] name  The name of the AttributeValue type, essentially the
+     *              string form of \p T.
+     * \param [in] underlying Underlying type name.
+     * \return Ptr to AttributeChecker.
+     */
+    template <typename T, typename BASE>
+    Ptr<AttributeChecker>
+    MakeSimpleAttributeChecker(std::string name, std::string underlying) {
+
+        /* String-based AttributeChecker implementation. */
+        struct SimpleAttributeChecker : public BASE {
+
+            virtual bool Check(const AttributeValue &value) const {
+                return dynamic_cast<const T *> (&value) != 0;
+            }
+
+            virtual std::string GetValueTypeName(void) const {
+                return m_type;
+            }
+
+            virtual bool HasUnderlyingTypeInformation(void) const {
+                return true;
+            }
+
+            virtual std::string GetUnderlyingTypeInformation(void) const {
+                return m_underlying;
+            }
+
+            virtual Ptr<AttributeValue> Create(void) const {
+                return ns3::Create<T> ();
+            }
+
+            virtual bool Copy(const AttributeValue &source, AttributeValue &destination) const {
+                const T *src = dynamic_cast<const T *> (&source);
+                T *dst = dynamic_cast<T *> (&destination);
+                if (src == 0 || dst == 0) {
+                    return false;
+                }
+                *dst = *src;
+                return true;
+            }
+            std::string m_type; // The name of the AttributeValue type.
+            std::string m_underlying; // The underlying attribute type name.
+        } *checker = new SimpleAttributeChecker();
+        checker->m_type = name;
+        checker->m_underlying = underlying;
+        return Ptr<AttributeChecker> (checker, false);
     }
-    virtual std::string GetValueTypeName (void) const {
-      return m_type;
-    }
-    virtual bool HasUnderlyingTypeInformation (void) const {
-      return true;
-    }
-    virtual std::string GetUnderlyingTypeInformation (void) const {
-      return m_underlying;
-    }
-    virtual Ptr<AttributeValue> Create (void) const {
-      return ns3::Create<T> ();
-    }
-    virtual bool Copy (const AttributeValue &source, AttributeValue &destination) const {
-      const T *src = dynamic_cast<const T *> (&source);
-      T *dst = dynamic_cast<T *> (&destination);
-      if (src == 0 || dst == 0)
-        {
-          return false;
-        }
-      *dst = *src;
-      return true;
-    }
-    std::string m_type;        // The name of the AttributeValue type.
-    std::string m_underlying;  // The underlying attribute type name.
-  } *checker = new SimpleAttributeChecker ();
-  checker->m_type = name;
-  checker->m_underlying = underlying;
-  return Ptr<AttributeChecker> (checker, false);
-}
 
 }
 

@@ -33,112 +33,110 @@
 
 namespace ns3 {
 
-class NetDevice;
-class PropagationLossModel;
-class PropagationDelayModel;
+    class NetDevice;
+    class PropagationLossModel;
+    class PropagationDelayModel;
 
-struct Parameters
-{
-  double rxPowerDbm;
-  struct mpduInfo aMpdu;
-  Time duration;
-  WifiTxVector txVector;
-  WifiPreamble preamble;
-};
+    struct Parameters {
+        double rxPowerDbm;
+        struct mpduInfo aMpdu;
+        Time duration;
+        WifiTxVector txVector;
+        WifiPreamble preamble;
+    };
 
-/**
- * \brief A Yans wifi channel
- * \ingroup wifi
- *
- * This wifi channel implements the propagation model described in
- * "Yet Another Network Simulator", (http://cutebugs.net/files/wns2-yans.pdf).
- *
- * This class is expected to be used in tandem with the ns3::YansWifiPhy
- * class and contains a ns3::PropagationLossModel and a ns3::PropagationDelayModel.
- * By default, no propagation models are set so, it is the caller's responsability
- * to set them before using the channel.
- */
-class YansWifiChannel : public WifiChannel
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \brief A Yans wifi channel
+     * \ingroup wifi
+     *
+     * This wifi channel implements the propagation model described in
+     * "Yet Another Network Simulator", (http://cutebugs.net/files/wns2-yans.pdf).
+     *
+     * This class is expected to be used in tandem with the ns3::YansWifiPhy
+     * class and contains a ns3::PropagationLossModel and a ns3::PropagationDelayModel.
+     * By default, no propagation models are set so, it is the caller's responsability
+     * to set them before using the channel.
+     */
+    class YansWifiChannel : public WifiChannel {
+    public:
+        static TypeId GetTypeId(void);
 
-  YansWifiChannel ();
-  virtual ~YansWifiChannel ();
+        YansWifiChannel();
+        virtual ~YansWifiChannel();
 
-  //inherited from Channel.
-  virtual uint32_t GetNDevices (void) const;
-  virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
+        //inherited from Channel.
+        virtual uint32_t GetNDevices(void) const;
+        virtual Ptr<NetDevice> GetDevice(uint32_t i) const;
 
-  /**
-   * Adds the given YansWifiPhy to the PHY list
-   *
-   * \param phy the YansWifiPhy to be added to the PHY list
-   */
-  void Add (Ptr<YansWifiPhy> phy);
+        /**
+         * Adds the given YansWifiPhy to the PHY list
+         *
+         * \param phy the YansWifiPhy to be added to the PHY list
+         */
+        void Add(Ptr<YansWifiPhy> phy);
 
-  /**
-   * \param loss the new propagation loss model.
-   */
-  void SetPropagationLossModel (Ptr<PropagationLossModel> loss);
-  /**
-   * \param delay the new propagation delay model.
-   */
-  void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
+        /**
+         * \param loss the new propagation loss model.
+         */
+        void SetPropagationLossModel(Ptr<PropagationLossModel> loss);
+        /**
+         * \param delay the new propagation delay model.
+         */
+        void SetPropagationDelayModel(Ptr<PropagationDelayModel> delay);
 
-  /**
-   * \param sender the device from which the packet is originating.
-   * \param packet the packet to send
-   * \param txPowerDbm the tx power associated to the packet
-   * \param txVector the TXVECTOR associated to the packet
-   * \param preamble the preamble associated to the packet
-   * \param aMpdu the type of the packet (0 is not A-MPDU, 1 is a MPDU that is part of an A-MPDU and 2 is the last MPDU in an A-MPDU)
-   *        and the A-MPDU reference number (must be a different value for each A-MPDU but the same for each subframe within one A-MPDU)
-   * \param duration the transmission duration associated to the packet
-   *
-   * This method should not be invoked by normal users. It is
-   * currently invoked only from WifiPhy::Send. YansWifiChannel
-   * delivers packets only between PHYs with the same m_channelNumber,
-   * e.g. PHYs that are operating on the same channel.
-   */
-  void Send (Ptr<YansWifiPhy> sender, Ptr<const Packet> packet, double txPowerDbm,
-             WifiTxVector txVector, WifiPreamble preamble, struct mpduInfo aMpdu, Time duration) const;
+        /**
+         * \param sender the device from which the packet is originating.
+         * \param packet the packet to send
+         * \param txPowerDbm the tx power associated to the packet
+         * \param txVector the TXVECTOR associated to the packet
+         * \param preamble the preamble associated to the packet
+         * \param aMpdu the type of the packet (0 is not A-MPDU, 1 is a MPDU that is part of an A-MPDU and 2 is the last MPDU in an A-MPDU)
+         *        and the A-MPDU reference number (must be a different value for each A-MPDU but the same for each subframe within one A-MPDU)
+         * \param duration the transmission duration associated to the packet
+         *
+         * This method should not be invoked by normal users. It is
+         * currently invoked only from WifiPhy::Send. YansWifiChannel
+         * delivers packets only between PHYs with the same m_channelNumber,
+         * e.g. PHYs that are operating on the same channel.
+         */
+        void Send(Ptr<YansWifiPhy> sender, Ptr<const Packet> packet, double txPowerDbm,
+                WifiTxVector txVector, WifiPreamble preamble, struct mpduInfo aMpdu, Time duration) const;
 
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream first stream index to use
-   *
-   * \return the number of stream indices assigned by this model
-   */
-  int64_t AssignStreams (int64_t stream);
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         *
+         * \return the number of stream indices assigned by this model
+         */
+        int64_t AssignStreams(int64_t stream);
 
 
-private:
-  /**
-   * A vector of pointers to YansWifiPhy.
-   */
-  typedef std::vector<Ptr<YansWifiPhy> > PhyList;
+    private:
+        /**
+         * A vector of pointers to YansWifiPhy.
+         */
+        typedef std::vector<Ptr<YansWifiPhy> > PhyList;
 
-  /**
-   * This method is scheduled by Send for each associated YansWifiPhy.
-   * The method then calls the corresponding YansWifiPhy that the first
-   * bit of the packet has arrived.
-   *
-   * \param i index of the corresponding YansWifiPhy in the PHY list
-   * \param packet the packet being sent
-   * \param atts a vector containing the received power in dBm and the packet type
-   * \param txVector the TXVECTOR of the packet
-   * \param preamble the type of preamble being used to send the packet
-   */
-  void Receive (uint32_t i, Ptr<Packet> packet, struct Parameters parameters) const;
+        /**
+         * This method is scheduled by Send for each associated YansWifiPhy.
+         * The method then calls the corresponding YansWifiPhy that the first
+         * bit of the packet has arrived.
+         *
+         * \param i index of the corresponding YansWifiPhy in the PHY list
+         * \param packet the packet being sent
+         * \param atts a vector containing the received power in dBm and the packet type
+         * \param txVector the TXVECTOR of the packet
+         * \param preamble the type of preamble being used to send the packet
+         */
+        void Receive(uint32_t i, Ptr<Packet> packet, struct Parameters parameters) const;
 
-  PhyList m_phyList;                   //!< List of YansWifiPhys connected to this YansWifiChannel
-  Ptr<PropagationLossModel> m_loss;    //!< Propagation loss model
-  Ptr<PropagationDelayModel> m_delay;  //!< Propagation delay model
-};
+        PhyList m_phyList; //!< List of YansWifiPhys connected to this YansWifiChannel
+        Ptr<PropagationLossModel> m_loss; //!< Propagation loss model
+        Ptr<PropagationDelayModel> m_delay; //!< Propagation delay model
+    };
 
 } //namespace ns3
 

@@ -37,166 +37,157 @@
 #endif
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class FaceBenchmark
-{
-public:
-  FaceBenchmark(const char* configFileName)
-    : m_terminationSignalSet{getGlobalIoService()}
-    , m_tcpChannel{tcp::Endpoint{boost::asio::ip::tcp::v4(), 6363}}
-    , m_udpChannel{udp::Endpoint{boost::asio::ip::udp::v4(), 6363}, time::minutes{10}}
-  {
-    m_terminationSignalSet.add(SIGINT);
-    m_terminationSignalSet.add(SIGTERM);
-    m_terminationSignalSet.async_wait(bind(&FaceBenchmark::terminate, _1, _2));
+        class FaceBenchmark {
+        public:
+            FaceBenchmark(const char* configFileName)
+            : m_terminationSignalSet{getGlobalIoService()}
+            , m_tcpChannel{tcp::Endpoint{boost::asio::ip::tcp::v4(), 6363}}
+            , m_udpChannel{udp::Endpoint{boost::asio::ip::udp::v4(), 6363}, time::minutes{10}}
+            {
+                m_terminationSignalSet.add(SIGINT);
+                m_terminationSignalSet.add(SIGTERM);
+                m_terminationSignalSet.async_wait(bind(&FaceBenchmark::terminate, _1, _2));
 
-    parseConfig(configFileName);
+                parseConfig(configFileName);
 
-    m_tcpChannel.listen(bind(&FaceBenchmark::onLeftFaceCreated, this, _1),
+                m_tcpChannel.listen(bind(&FaceBenchmark::onLeftFaceCreated, this, _1),
                         bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
-    std::clog << "Listening on " << m_tcpChannel.getUri() << std::endl;
+                std::clog << "Listening on " << m_tcpChannel.getUri() << std::endl;
 
-    m_udpChannel.listen(bind(&FaceBenchmark::onLeftFaceCreated, this, _1),
+                m_udpChannel.listen(bind(&FaceBenchmark::onLeftFaceCreated, this, _1),
                         bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
-    std::clog << "Listening on " << m_udpChannel.getUri() << std::endl;
-  }
+                std::clog << "Listening on " << m_udpChannel.getUri() << std::endl;
+            }
 
-private:
-  static void
-  terminate(const boost::system::error_code& error, int signalNo)
-  {
-    if (error)
-      return;
-    getGlobalIoService().stop();
-  }
+        private:
 
-  void
-  parseConfig(const char* configFileName)
-  {
-    std::ifstream file{configFileName};
-    std::string uriStrL;
-    std::string uriStrR;
+            static void
+            terminate(const boost::system::error_code& error, int signalNo) {
+                if (error)
+                    return;
+                getGlobalIoService().stop();
+            }
 
-    while (file >> uriStrL >> uriStrR) {
-      FaceUri uriL{uriStrL};
-      FaceUri uriR{uriStrR};
+            void
+            parseConfig(const char* configFileName) {
+                std::ifstream file{configFileName};
+                std::string uriStrL;
+                std::string uriStrR;
 
-      if (uriL.getScheme() != "tcp4" && uriL.getScheme() != "udp4") {
-        std::clog << "Unsupported protocol '" << uriL.getScheme() << "'" << std::endl;
-      }
-      else if (uriR.getScheme() != "tcp4" && uriR.getScheme() != "udp4") {
-        std::clog << "Unsupported protocol '" << uriR.getScheme() << "'" << std::endl;
-      }
-      else {
-        m_faceUris.push_back(std::make_pair(uriL, uriR));
-      }
-    }
+                while (file >> uriStrL >> uriStrR) {
+                    FaceUri uriL{uriStrL};
+                    FaceUri uriR{uriStrR};
 
-    if (m_faceUris.empty()) {
-      BOOST_THROW_EXCEPTION(std::runtime_error("No supported FaceUri pairs found in config file"));
-    }
-  }
+                    if (uriL.getScheme() != "tcp4" && uriL.getScheme() != "udp4") {
+                        std::clog << "Unsupported protocol '" << uriL.getScheme() << "'" << std::endl;
+                    } else if (uriR.getScheme() != "tcp4" && uriR.getScheme() != "udp4") {
+                        std::clog << "Unsupported protocol '" << uriR.getScheme() << "'" << std::endl;
+                    } else {
+                        m_faceUris.push_back(std::make_pair(uriL, uriR));
+                    }
+                }
 
-  void
-  onLeftFaceCreated(const shared_ptr<Face>& faceL)
-  {
-    std::clog << "Left face created: remote=" << faceL->getRemoteUri()
-              << " local=" << faceL->getLocalUri() << std::endl;
+                if (m_faceUris.empty()) {
+                    BOOST_THROW_EXCEPTION(std::runtime_error("No supported FaceUri pairs found in config file"));
+                }
+            }
 
-    // find a matching right uri
-    FaceUri uriR;
-    for (const auto& pair : m_faceUris) {
-      if (pair.first.getHost() == faceL->getRemoteUri().getHost() &&
-          pair.first.getScheme() == faceL->getRemoteUri().getScheme()) {
-        uriR = pair.second;
-      }
-      else if (pair.second.getHost() == faceL->getRemoteUri().getHost() &&
-               pair.second.getScheme() == faceL->getRemoteUri().getScheme()) {
-        uriR = pair.first;
-      }
-    }
+            void
+            onLeftFaceCreated(const shared_ptr<Face>& faceL) {
+                std::clog << "Left face created: remote=" << faceL->getRemoteUri()
+                        << " local=" << faceL->getLocalUri() << std::endl;
 
-    if (uriR == FaceUri()) {
-      std::clog << "No FaceUri matched, ignoring..." << std::endl;
-      faceL->close();
-      return;
-    }
+                // find a matching right uri
+                FaceUri uriR;
+                for (const auto& pair : m_faceUris) {
+                    if (pair.first.getHost() == faceL->getRemoteUri().getHost() &&
+                            pair.first.getScheme() == faceL->getRemoteUri().getScheme()) {
+                        uriR = pair.second;
+                    } else if (pair.second.getHost() == faceL->getRemoteUri().getHost() &&
+                            pair.second.getScheme() == faceL->getRemoteUri().getScheme()) {
+                        uriR = pair.first;
+                    }
+                }
 
-    // create the right face
-    auto addr = boost::asio::ip::address::from_string(uriR.getHost());
-    auto port = boost::lexical_cast<uint16_t>(uriR.getPort());
-    if (uriR.getScheme() == "tcp4") {
-      m_tcpChannel.connect(tcp::Endpoint(addr, port),
-                           false,
-                           bind(&FaceBenchmark::onRightFaceCreated, this, faceL, _1),
-                           bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
-    }
-    else if (uriR.getScheme() == "udp4") {
-      m_udpChannel.connect(udp::Endpoint(addr, port),
-                           ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-                           bind(&FaceBenchmark::onRightFaceCreated, this, faceL, _1),
-                           bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
-    }
-  }
+                if (uriR == FaceUri()) {
+                    std::clog << "No FaceUri matched, ignoring..." << std::endl;
+                    faceL->close();
+                    return;
+                }
 
-  void
-  onRightFaceCreated(const shared_ptr<Face>& faceL, const shared_ptr<Face>& faceR)
-  {
-    std::clog << "Right face created: remote=" << faceR->getRemoteUri()
-              << " local=" << faceR->getLocalUri() << std::endl;
+                // create the right face
+                auto addr = boost::asio::ip::address::from_string(uriR.getHost());
+                auto port = boost::lexical_cast<uint16_t>(uriR.getPort());
+                if (uriR.getScheme() == "tcp4") {
+                    m_tcpChannel.connect(tcp::Endpoint(addr, port),
+                            false,
+                            bind(&FaceBenchmark::onRightFaceCreated, this, faceL, _1),
+                            bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
+                } else if (uriR.getScheme() == "udp4") {
+                    m_udpChannel.connect(udp::Endpoint(addr, port),
+                            ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                            bind(&FaceBenchmark::onRightFaceCreated, this, faceL, _1),
+                            bind(&FaceBenchmark::onFaceCreationFailed, _1, _2));
+                }
+            }
 
-    tieFaces(faceR, faceL);
-    tieFaces(faceL, faceR);
-  }
+            void
+            onRightFaceCreated(const shared_ptr<Face>& faceL, const shared_ptr<Face>& faceR) {
+                std::clog << "Right face created: remote=" << faceR->getRemoteUri()
+                        << " local=" << faceR->getLocalUri() << std::endl;
 
-  static void
-  tieFaces(const shared_ptr<Face>& face1, const shared_ptr<Face>& face2)
-  {
-    face1->afterReceiveInterest.connect([face2] (const Interest& interest) { face2->sendInterest(interest); });
-    face1->afterReceiveData.connect([face2] (const Data& data) { face2->sendData(data); });
-    face1->afterReceiveNack.connect([face2] (const ndn::lp::Nack& nack) { face2->sendNack(nack); });
-  }
+                tieFaces(faceR, faceL);
+                tieFaces(faceL, faceR);
+            }
 
-  static void
-  onFaceCreationFailed(uint32_t status, const std::string& reason)
-  {
-    BOOST_THROW_EXCEPTION(std::runtime_error("Failed to create face: " + to_string(status) + ": " + reason));
-  }
+            static void
+            tieFaces(const shared_ptr<Face>& face1, const shared_ptr<Face>& face2) {
+                face1->afterReceiveInterest.connect([face2] (const Interest & interest) {
+                    face2->sendInterest(interest); });
+                face1->afterReceiveData.connect([face2] (const Data & data) {
+                    face2->sendData(data); });
+                face1->afterReceiveNack.connect([face2] (const ndn::lp::Nack & nack) {
+                    face2->sendNack(nack); });
+            }
 
-private:
-  boost::asio::signal_set m_terminationSignalSet;
-  TcpChannel m_tcpChannel;
-  UdpChannel m_udpChannel;
-  std::vector<std::pair<FaceUri, FaceUri>> m_faceUris;
-};
+            static void
+            onFaceCreationFailed(uint32_t status, const std::string& reason) {
+                BOOST_THROW_EXCEPTION(std::runtime_error("Failed to create face: " + to_string(status) + ": " + reason));
+            }
 
-} // namespace tests
+        private:
+            boost::asio::signal_set m_terminationSignalSet;
+            TcpChannel m_tcpChannel;
+            UdpChannel m_udpChannel;
+            std::vector<std::pair<FaceUri, FaceUri>> m_faceUris;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 int
-main(int argc, char** argv)
-{
+main(int argc, char** argv) {
 #ifdef _DEBUG
-  std::cerr << "Benchmark compiled in debug mode is unreliable, please compile in release mode.\n";
+    std::cerr << "Benchmark compiled in debug mode is unreliable, please compile in release mode.\n";
 #endif
 
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <config-file>" << std::endl;
-    return 2;
-  }
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <config-file>" << std::endl;
+        return 2;
+    }
 
-  try {
-    nfd::tests::FaceBenchmark bench{argv[1]};
+    try {
+        nfd::tests::FaceBenchmark bench{argv[1]};
 #ifdef HAVE_VALGRIND
-    CALLGRIND_START_INSTRUMENTATION;
+        CALLGRIND_START_INSTRUMENTATION;
 #endif
-    nfd::getGlobalIoService().run();
-  }
-  catch (const std::exception& e) {
-    std::cerr << "FATAL: " << nfd::getExtendedErrorMessage(e) << std::endl;
-    return 1;
-  }
+        nfd::getGlobalIoService().run();
+    } catch (const std::exception& e) {
+        std::cerr << "FATAL: " << nfd::getExtendedErrorMessage(e) << std::endl;
+        return 1;
+    }
 
-  return 0;
+    return 0;
 }

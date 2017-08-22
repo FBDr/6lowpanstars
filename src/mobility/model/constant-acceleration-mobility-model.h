@@ -23,42 +23,41 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mobility
- *
- * \brief Mobility model for which the current acceleration does not change once it has been set and until it is set again explicitely to a new value.
- */
-class ConstantAccelerationMobilityModel : public MobilityModel 
-{
-public:
-  /**
-   * Register this type with the TypeId system.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * Create position located at coordinates (0,0,0) with
-   * speed (0,0,0).
-   */
-  ConstantAccelerationMobilityModel ();
-  virtual ~ConstantAccelerationMobilityModel ();
-  /**
-   * Set the model's velocity and acceleration
-   * \param velocity the velocity (m/s)
-   * \param acceleration the acceleration (m/s^2)
-   */
-  void SetVelocityAndAcceleration (const Vector &velocity, const Vector &acceleration);
+    /**
+     * \ingroup mobility
+     *
+     * \brief Mobility model for which the current acceleration does not change once it has been set and until it is set again explicitely to a new value.
+     */
+    class ConstantAccelerationMobilityModel : public MobilityModel {
+    public:
+        /**
+         * Register this type with the TypeId system.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        /**
+         * Create position located at coordinates (0,0,0) with
+         * speed (0,0,0).
+         */
+        ConstantAccelerationMobilityModel();
+        virtual ~ConstantAccelerationMobilityModel();
+        /**
+         * Set the model's velocity and acceleration
+         * \param velocity the velocity (m/s)
+         * \param acceleration the acceleration (m/s^2)
+         */
+        void SetVelocityAndAcceleration(const Vector &velocity, const Vector &acceleration);
 
-private:
-  virtual Vector DoGetPosition (void) const;
-  virtual void DoSetPosition (const Vector &position);
-  virtual Vector DoGetVelocity (void) const;
+    private:
+        virtual Vector DoGetPosition(void) const;
+        virtual void DoSetPosition(const Vector &position);
+        virtual Vector DoGetVelocity(void) const;
 
-  Time m_baseTime;  //!< the base time
-  Vector m_basePosition; //!< the base position
-  Vector m_baseVelocity; //!< the base velocity
-  Vector m_acceleration;  //!< the acceleration
-};
+        Time m_baseTime; //!< the base time
+        Vector m_basePosition; //!< the base position
+        Vector m_baseVelocity; //!< the base velocity
+        Vector m_acceleration; //!< the acceleration
+    };
 
 } // namespace ns3
 

@@ -26,45 +26,44 @@
 #include <iostream>
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief A sink which directs output to an std::ostream.
- */
-class StreamSink : public Sink
-{
-public:
-  /**
-   * @brief Create a stream sink which outputs to @p os
-   */
-  explicit
-  StreamSink(std::ostream& os);
+            /**
+             * @brief A sink which directs output to an std::ostream.
+             */
+            class StreamSink : public Sink {
+            public:
+                /**
+                 * @brief Create a stream sink which outputs to @p os
+                 */
+                explicit
+                StreamSink(std::ostream& os);
 
-private:
-  /**
-   * @brief Write data into the stream
-   *
-   * @return number of bytes that have been written into the stream
-   */
-  virtual size_t
-  doWrite(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Write data into the stream
+                 *
+                 * @return number of bytes that have been written into the stream
+                 */
+                virtual size_t
+                doWrite(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize sink processing
-   */
-  virtual void
-  doEnd() final;
+                /**
+                 * @brief Finalize sink processing
+                 */
+                virtual void
+                doEnd() final;
 
-private:
-  std::ostream& m_os;
-};
+            private:
+                std::ostream& m_os;
+            };
 
-unique_ptr<Sink>
-streamSink(std::ostream& os);
+            unique_ptr<Sink>
+            streamSink(std::ostream& os);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_STREAM_SINK_HPP

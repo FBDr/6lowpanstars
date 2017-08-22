@@ -33,126 +33,114 @@
 #include <cstdlib>
 #include <cstdio>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PacketSocketClient");
-
-NS_OBJECT_ENSURE_REGISTERED (PacketSocketClient);
-
-TypeId
-PacketSocketClient::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PacketSocketClient")
-    .SetParent<Application> ()
-    .SetGroupName("Network")
-    .AddConstructor<PacketSocketClient> ()
-    .AddAttribute ("MaxPackets",
-                   "The maximum number of packets the application will send (zero means infinite)",
-                   UintegerValue (100),
-                   MakeUintegerAccessor (&PacketSocketClient::m_maxPackets),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("Interval",
-                   "The time to wait between packets", TimeValue (Seconds (1.0)),
-                   MakeTimeAccessor (&PacketSocketClient::m_interval),
-                   MakeTimeChecker ())
-    .AddAttribute ("PacketSize",
-                   "Size of packets generated (bytes).",
-                   UintegerValue (1024),
-                   MakeUintegerAccessor (&PacketSocketClient::m_size),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddTraceSource ("Tx", "A packet has been sent",
-                     MakeTraceSourceAccessor (&PacketSocketClient::m_txTrace),
-                     "ns3::Packet::PacketAddressTracedCallback")
-  ;
-  return tid;
-}
 
-PacketSocketClient::PacketSocketClient ()
-{
-  NS_LOG_FUNCTION (this);
-  m_sent = 0;
-  m_socket = 0;
-  m_sendEvent = EventId ();
-  m_peerAddressSet = false;
-}
+    NS_LOG_COMPONENT_DEFINE("PacketSocketClient");
 
-PacketSocketClient::~PacketSocketClient ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(PacketSocketClient);
 
-void
-PacketSocketClient::SetRemote (PacketSocketAddress addr)
-{
-  NS_LOG_FUNCTION (this << addr);
-  m_peerAddress = addr;
-  m_peerAddressSet = true;
-}
-
-void
-PacketSocketClient::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  Application::DoDispose ();
-}
-
-void
-PacketSocketClient::StartApplication (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT_MSG (m_peerAddressSet, "Peer address not set");
-
-  if (m_socket == 0)
-    {
-      TypeId tid = TypeId::LookupByName ("ns3::PacketSocketFactory");
-      m_socket = Socket::CreateSocket (GetNode (), tid);
-
-      m_socket->Bind (m_peerAddress);
-      m_socket->Connect (m_peerAddress);
+    TypeId
+    PacketSocketClient::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PacketSocketClient")
+                .SetParent<Application> ()
+                .SetGroupName("Network")
+                .AddConstructor<PacketSocketClient> ()
+                .AddAttribute("MaxPackets",
+                "The maximum number of packets the application will send (zero means infinite)",
+                UintegerValue(100),
+                MakeUintegerAccessor(&PacketSocketClient::m_maxPackets),
+                MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("Interval",
+                "The time to wait between packets", TimeValue(Seconds(1.0)),
+                MakeTimeAccessor(&PacketSocketClient::m_interval),
+                MakeTimeChecker())
+                .AddAttribute("PacketSize",
+                "Size of packets generated (bytes).",
+                UintegerValue(1024),
+                MakeUintegerAccessor(&PacketSocketClient::m_size),
+                MakeUintegerChecker<uint32_t> ())
+                .AddTraceSource("Tx", "A packet has been sent",
+                MakeTraceSourceAccessor(&PacketSocketClient::m_txTrace),
+                "ns3::Packet::PacketAddressTracedCallback")
+                ;
+        return tid;
     }
 
-  m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
-  m_sendEvent = Simulator::ScheduleNow (&PacketSocketClient::Send, this);
-}
-
-void
-PacketSocketClient::StopApplication (void)
-{
-  NS_LOG_FUNCTION (this);
-  Simulator::Cancel (m_sendEvent);
-  m_socket->Close ();
-}
-
-void
-PacketSocketClient::Send (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_sendEvent.IsExpired ());
-
-  Ptr<Packet> p = Create<Packet> (m_size);
-
-  std::stringstream peerAddressStringStream;
-  peerAddressStringStream << PacketSocketAddress::ConvertFrom (m_peerAddress);
-
-  if ((m_socket->Send (p)) >= 0)
-    {
-      NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-                                    << peerAddressStringStream.str () << " Uid: "
-                                    << p->GetUid () << " Time: "
-                                    << (Simulator::Now ()).GetSeconds ());
+    PacketSocketClient::PacketSocketClient() {
+        NS_LOG_FUNCTION(this);
+        m_sent = 0;
+        m_socket = 0;
+        m_sendEvent = EventId();
+        m_peerAddressSet = false;
     }
-  else
-    {
-      NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-                                          << peerAddressStringStream.str ());
-    }
-  m_sent++;
 
-  if ((m_sent < m_maxPackets) || (m_maxPackets == 0))
-    {
-      m_txTrace (p, m_peerAddress);
-      m_sendEvent = Simulator::Schedule (m_interval, &PacketSocketClient::Send, this);
+    PacketSocketClient::~PacketSocketClient() {
+        NS_LOG_FUNCTION(this);
     }
-}
+
+    void
+    PacketSocketClient::SetRemote(PacketSocketAddress addr) {
+        NS_LOG_FUNCTION(this << addr);
+        m_peerAddress = addr;
+        m_peerAddressSet = true;
+    }
+
+    void
+    PacketSocketClient::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        Application::DoDispose();
+    }
+
+    void
+    PacketSocketClient::StartApplication(void) {
+        NS_LOG_FUNCTION(this);
+        NS_ASSERT_MSG(m_peerAddressSet, "Peer address not set");
+
+        if (m_socket == 0) {
+            TypeId tid = TypeId::LookupByName("ns3::PacketSocketFactory");
+            m_socket = Socket::CreateSocket(GetNode(), tid);
+
+            m_socket->Bind(m_peerAddress);
+            m_socket->Connect(m_peerAddress);
+        }
+
+        m_socket->SetRecvCallback(MakeNullCallback<void, Ptr<Socket> > ());
+        m_sendEvent = Simulator::ScheduleNow(&PacketSocketClient::Send, this);
+    }
+
+    void
+    PacketSocketClient::StopApplication(void) {
+        NS_LOG_FUNCTION(this);
+        Simulator::Cancel(m_sendEvent);
+        m_socket->Close();
+    }
+
+    void
+    PacketSocketClient::Send(void) {
+        NS_LOG_FUNCTION(this);
+        NS_ASSERT(m_sendEvent.IsExpired());
+
+        Ptr<Packet> p = Create<Packet> (m_size);
+
+        std::stringstream peerAddressStringStream;
+        peerAddressStringStream << PacketSocketAddress::ConvertFrom(m_peerAddress);
+
+        if ((m_socket->Send(p)) >= 0) {
+            NS_LOG_INFO("TraceDelay TX " << m_size << " bytes to "
+                    << peerAddressStringStream.str() << " Uid: "
+                    << p->GetUid() << " Time: "
+                    << (Simulator::Now()).GetSeconds());
+        } else {
+            NS_LOG_INFO("Error while sending " << m_size << " bytes to "
+                    << peerAddressStringStream.str());
+        }
+        m_sent++;
+
+        if ((m_sent < m_maxPackets) || (m_maxPackets == 0)) {
+            m_txTrace(p, m_peerAddress);
+            m_sendEvent = Simulator::Schedule(m_interval, &PacketSocketClient::Send, this);
+        }
+    }
 
 } // Namespace ns3

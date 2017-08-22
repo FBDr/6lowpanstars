@@ -33,126 +33,122 @@
 
 namespace nfd {
 
-namespace measurements {
-class Entry;
-} // namespace measurements
-namespace pit {
-class Entry;
-} // namespace pit
+    namespace measurements {
+        class Entry;
+    } // namespace measurements
+    namespace pit {
+        class Entry;
+    } // namespace pit
 
-namespace fib {
+    namespace fib {
 
-/** \brief represents the Forwarding Information Base (FIB)
- */
-class Fib : noncopyable
-{
-public:
-  explicit
-  Fib(NameTree& nameTree);
+        /** \brief represents the Forwarding Information Base (FIB)
+         */
+        class Fib : noncopyable {
+        public:
+            explicit
+            Fib(NameTree& nameTree);
 
-  size_t
-  size() const
-  {
-    return m_nItems;
-  }
+            size_t
+            size() const {
+                return m_nItems;
+            }
 
-public: // lookup
-  /** \brief performs a longest prefix match
-   */
-  const Entry&
-  findLongestPrefixMatch(const Name& prefix) const;
+        public: // lookup
+            /** \brief performs a longest prefix match
+             */
+            const Entry&
+            findLongestPrefixMatch(const Name& prefix) const;
 
-  /** \brief performs a longest prefix match
-   *
-   *  This is equivalent to .findLongestPrefixMatch(pitEntry.getName())
-   */
-  const Entry&
-  findLongestPrefixMatch(const pit::Entry& pitEntry) const;
+            /** \brief performs a longest prefix match
+             *
+             *  This is equivalent to .findLongestPrefixMatch(pitEntry.getName())
+             */
+            const Entry&
+            findLongestPrefixMatch(const pit::Entry& pitEntry) const;
 
-  /** \brief performs a longest prefix match
-   *
-   *  This is equivalent to .findLongestPrefixMatch(measurementsEntry.getName())
-   */
-  const Entry&
-  findLongestPrefixMatch(const measurements::Entry& measurementsEntry) const;
+            /** \brief performs a longest prefix match
+             *
+             *  This is equivalent to .findLongestPrefixMatch(measurementsEntry.getName())
+             */
+            const Entry&
+            findLongestPrefixMatch(const measurements::Entry& measurementsEntry) const;
 
-  /** \brief performs an exact match lookup
-   */
-  Entry*
-  findExactMatch(const Name& prefix);
+            /** \brief performs an exact match lookup
+             */
+            Entry*
+            findExactMatch(const Name& prefix);
 
-public: // mutation
-  /** \brief inserts a FIB entry for prefix
-   *
-   *  If an entry for exact same prefix exists, that entry is returned.
-   *  \return the entry, and true for new entry or false for existing entry
-   */
-  std::pair<Entry*, bool>
-  insert(const Name& prefix);
+        public: // mutation
+            /** \brief inserts a FIB entry for prefix
+             *
+             *  If an entry for exact same prefix exists, that entry is returned.
+             *  \return the entry, and true for new entry or false for existing entry
+             */
+            std::pair<Entry*, bool>
+            insert(const Name& prefix);
 
-  void
-  erase(const Name& prefix);
+            void
+            erase(const Name& prefix);
 
-  void
-  erase(const Entry& entry);
+            void
+            erase(const Entry& entry);
 
-  /** \brief removes the NextHop record for face
-   */
-  void
-  removeNextHop(Entry& entry, const Face& face);
+            /** \brief removes the NextHop record for face
+             */
+            void
+            removeNextHop(Entry& entry, const Face& face);
 
-public: // enumeration
-  typedef boost::transformed_range<name_tree::GetTableEntry<Entry>, const name_tree::Range> Range;
-  typedef boost::range_iterator<Range>::type const_iterator;
+        public: // enumeration
+            typedef boost::transformed_range<name_tree::GetTableEntry<Entry>, const name_tree::Range> Range;
+            typedef boost::range_iterator<Range>::type const_iterator;
 
-  /** \return an iterator to the beginning
-   *  \note Iteration order is implementation-defined.
-   *  \warning Undefined behavior may occur if a FIB/PIT/Measurements/StrategyChoice entry
-   *           is inserted or erased during enumeration.
-   */
-  const_iterator
-  begin() const
-  {
-    return this->getRange().begin();
-  }
+            /** \return an iterator to the beginning
+             *  \note Iteration order is implementation-defined.
+             *  \warning Undefined behavior may occur if a FIB/PIT/Measurements/StrategyChoice entry
+             *           is inserted or erased during enumeration.
+             */
+            const_iterator
+            begin() const {
+                return this->getRange().begin();
+            }
 
-  /** \return an iterator to the end
-   *  \sa begin()
-   */
-  const_iterator
-  end() const
-  {
-    return this->getRange().end();
-  }
+            /** \return an iterator to the end
+             *  \sa begin()
+             */
+            const_iterator
+            end() const {
+                return this->getRange().end();
+            }
 
-private:
-  /** \tparam K a parameter acceptable to NameTree::findLongestPrefixMatch
-   */
-  template<typename K>
-  const Entry&
-  findLongestPrefixMatchImpl(const K& key) const;
+        private:
+            /** \tparam K a parameter acceptable to NameTree::findLongestPrefixMatch
+             */
+            template<typename K>
+            const Entry&
+            findLongestPrefixMatchImpl(const K& key) const;
 
-  void
-  erase(name_tree::Entry* nte, bool canDeleteNte = true);
+            void
+            erase(name_tree::Entry* nte, bool canDeleteNte = true);
 
-  Range
-  getRange() const;
+            Range
+            getRange() const;
 
-private:
-  NameTree& m_nameTree;
-  size_t m_nItems;
+        private:
+            NameTree& m_nameTree;
+            size_t m_nItems;
 
-  /** \brief the empty FIB entry.
-   *
-   *  This entry has no nexthops.
-   *  It is returned by findLongestPrefixMatch if nothing is matched.
-   */
-  static const unique_ptr<Entry> s_emptyEntry;
-};
+            /** \brief the empty FIB entry.
+             *
+             *  This entry has no nexthops.
+             *  It is returned by findLongestPrefixMatch if nothing is matched.
+             */
+            static const unique_ptr<Entry> s_emptyEntry;
+        };
 
-} // namespace fib
+    } // namespace fib
 
-using fib::Fib;
+    using fib::Fib;
 
 } // namespace nfd
 

@@ -28,127 +28,120 @@
 
 namespace ndn {
 
-/**
- * @brief Abstraction implementing Interest selectors
- */
-class Selectors
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+    /**
+     * @brief Abstraction implementing Interest selectors
+     */
+    class Selectors {
+    public:
 
-  Selectors();
+        class Error : public tlv::Error {
+        public:
 
-  /**
-   * @brief Create from wire encoding
-   */
-  explicit
-  Selectors(const Block& wire);
+            explicit
+            Error(const std::string& what)
+            : tlv::Error(what) {
+            }
+        };
 
-  bool
-  empty() const;
+        Selectors();
 
-  /**
-   * @brief Fast encoding or block size estimation
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+        /**
+         * @brief Create from wire encoding
+         */
+        explicit
+        Selectors(const Block& wire);
 
-  /**
-   * @brief Encode to a wire format
-   */
-  const Block&
-  wireEncode() const;
+        bool
+        empty() const;
 
-  /**
-   * @brief Decode the input from wire format
-   */
-  void
-  wireDecode(const Block& wire);
+        /**
+         * @brief Fast encoding or block size estimation
+         */
+        template<encoding::Tag TAG>
+        size_t
+        wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // getters & setters
-  int
-  getMinSuffixComponents() const
-  {
-    return m_minSuffixComponents;
-  }
+        /**
+         * @brief Encode to a wire format
+         */
+        const Block&
+        wireEncode() const;
 
-  Selectors&
-  setMinSuffixComponents(int minSuffixComponents);
+        /**
+         * @brief Decode the input from wire format
+         */
+        void
+        wireDecode(const Block& wire);
 
-  int
-  getMaxSuffixComponents() const
-  {
-    return m_maxSuffixComponents;
-  }
+    public: // getters & setters
 
-  Selectors&
-  setMaxSuffixComponents(int maxSuffixComponents);
+        int
+        getMinSuffixComponents() const {
+            return m_minSuffixComponents;
+        }
 
-  const KeyLocator&
-  getPublisherPublicKeyLocator() const
-  {
-    return m_publisherPublicKeyLocator;
-  }
+        Selectors&
+        setMinSuffixComponents(int minSuffixComponents);
 
-  Selectors&
-  setPublisherPublicKeyLocator(const KeyLocator& keyLocator);
+        int
+        getMaxSuffixComponents() const {
+            return m_maxSuffixComponents;
+        }
 
-  const Exclude&
-  getExclude() const
-  {
-    return m_exclude;
-  }
+        Selectors&
+        setMaxSuffixComponents(int maxSuffixComponents);
 
-  Selectors&
-  setExclude(const Exclude& exclude);
+        const KeyLocator&
+        getPublisherPublicKeyLocator() const {
+            return m_publisherPublicKeyLocator;
+        }
 
-  int
-  getChildSelector() const
-  {
-    return m_childSelector;
-  }
+        Selectors&
+        setPublisherPublicKeyLocator(const KeyLocator& keyLocator);
 
-  Selectors&
-  setChildSelector(int childSelector);
+        const Exclude&
+        getExclude() const {
+            return m_exclude;
+        }
 
-  int
-  getMustBeFresh() const
-  {
-    return m_mustBeFresh;
-  }
+        Selectors&
+        setExclude(const Exclude& exclude);
 
-  Selectors&
-  setMustBeFresh(bool mustBeFresh);
+        int
+        getChildSelector() const {
+            return m_childSelector;
+        }
 
-public: // EqualityComparable concept
-  bool
-  operator==(const Selectors& other) const;
+        Selectors&
+        setChildSelector(int childSelector);
 
-  bool
-  operator!=(const Selectors& other) const
-  {
-    return !this->operator==(other);
-  }
+        int
+        getMustBeFresh() const {
+            return m_mustBeFresh;
+        }
 
-private:
-  int m_minSuffixComponents;
-  int m_maxSuffixComponents;
-  KeyLocator m_publisherPublicKeyLocator;
-  Exclude m_exclude;
-  int m_childSelector;
-  bool m_mustBeFresh;
+        Selectors&
+        setMustBeFresh(bool mustBeFresh);
 
-  mutable Block m_wire;
-};
+    public: // EqualityComparable concept
+        bool
+        operator==(const Selectors& other) const;
+
+        bool
+        operator!=(const Selectors& other) const {
+            return !this->operator==(other);
+        }
+
+    private:
+        int m_minSuffixComponents;
+        int m_maxSuffixComponents;
+        KeyLocator m_publisherPublicKeyLocator;
+        Exclude m_exclude;
+        int m_childSelector;
+        bool m_mustBeFresh;
+
+        mutable Block m_wire;
+    };
 
 } // namespace ndn
 

@@ -26,43 +26,40 @@
 #include "rib-update.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-RibUpdate::RibUpdate()
-{
+        RibUpdate::RibUpdate() {
 
-}
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const RibUpdate::Action action)
-{
-  switch (action) {
-  case RibUpdate::REGISTER:
-    os << "REGISTER";
-    break;
-  case RibUpdate::UNREGISTER:
-    os << "UNREGISTER";
-    break;
-  case RibUpdate::REMOVE_FACE:
-    os << "REMOVE_FACE";
-    break;
-  }
+        std::ostream&
+        operator<<(std::ostream& os, const RibUpdate::Action action) {
+            switch (action) {
+                case RibUpdate::REGISTER:
+                    os << "REGISTER";
+                    break;
+                case RibUpdate::UNREGISTER:
+                    os << "UNREGISTER";
+                    break;
+                case RibUpdate::REMOVE_FACE:
+                    os << "REMOVE_FACE";
+                    break;
+            }
 
-  return os;
-}
+            return os;
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const RibUpdate& update)
-{
-  os << "RibUpdate {\n";
-  os << "  Name: " << update.getName() << "\n";
-  os << "  Action: " << update.getAction() << "\n";
-  os << "  " << update.getRoute() << "\n";
-  os << "}";
+        std::ostream&
+        operator<<(std::ostream& os, const RibUpdate& update) {
+            os << "RibUpdate {\n";
+            os << "  Name: " << update.getName() << "\n";
+            os << "  Action: " << update.getAction() << "\n";
+            os << "  " << update.getRoute() << "\n";
+            os << "}";
 
-  return os;
-}
+            return os;
+        }
 
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd

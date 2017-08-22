@@ -38,7 +38,7 @@ std::vector<Ipv6Address> CreateAddrResBucket(std::vector<Ipv6Address>& arrayf, i
 void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
         NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
         Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
-        std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket, 
+        std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
         NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul) {
     int subn = 0;
     RipNgHelper ripNgRouting;
@@ -104,11 +104,11 @@ void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
     uint32_t packetSize = 1024;
     uint32_t maxPacketCount = 20000;
     uint16_t port = 9;
-    
+
     Time interPacketInterval = Seconds(0.05);
     CoapClientHelper client(port);
     CoapServerHelper server(port);
-    
+
     //Server
     for (int itr = 0; itr < node_head; itr++) {
         for (int jdx = 0; jdx < node_periph; jdx++) {
@@ -120,7 +120,7 @@ void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[],
     }
     apps.Start(Seconds(1.0));
     apps.Stop(Seconds(60.0));
-    
+
     //Client
     client.SetAttribute("MaxPackets", UintegerValue(maxPacketCount));
     client.SetAttribute("Interval", TimeValue(interPacketInterval));
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
     int con_per;
     int pro_per;
     int dist = 500;
-    
+
     int totnumcontents = 100;
 
     CommandLine cmd;
@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
     /*
      IP
      */
-    
+
     Ipv6InterfaceContainer i_6lowpan[node_head];
     Ipv6InterfaceContainer i_csma[node_head];
     Ipv6InterfaceContainer i_backhaul;

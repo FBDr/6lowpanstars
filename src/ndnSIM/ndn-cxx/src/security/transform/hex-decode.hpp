@@ -25,56 +25,55 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to perform hexadecimal decoding transformation.
- *
- * For example, if the input is a string "012345", the output will be
- * a byte stream: 0x01, 0x23, 0x45.
- *
- * If the total length of input is not even (2n + 1), the module will throw Error.
- */
-class HexDecode : public Transform
-{
-public:
-  /**
-   * @brief Create a hex decoding module
-   */
-  HexDecode();
+            /**
+             * @brief The module to perform hexadecimal decoding transformation.
+             *
+             * For example, if the input is a string "012345", the output will be
+             * a byte stream: 0x01, 0x23, 0x45.
+             *
+             * If the total length of input is not even (2n + 1), the module will throw Error.
+             */
+            class HexDecode : public Transform {
+            public:
+                /**
+                 * @brief Create a hex decoding module
+                 */
+                HexDecode();
 
-private:
-  /**
-   * @brief Decode data @p buf, and write the result into output buffer directly.
-   *
-   * @return number of input bytes that are accepted
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Decode data @p buf, and write the result into output buffer directly.
+                 *
+                 * @return number of input bytes that are accepted
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @throws Error if pending byte exists.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @throws Error if pending byte exists.
+                 */
+                virtual void
+                finalize() final;
 
-  /**
-   * @return results of decoding concatenation of @p oddByte and @p hex.
-   */
-  unique_ptr<Transform::OBuffer>
-  toBytes(const uint8_t* hex, size_t hexLen);
+                /**
+                 * @return results of decoding concatenation of @p oddByte and @p hex.
+                 */
+                unique_ptr<Transform::OBuffer>
+                toBytes(const uint8_t* hex, size_t hexLen);
 
-private:
-  bool m_hasOddByte;
-  uint8_t m_oddByte;
-};
+            private:
+                bool m_hasOddByte;
+                uint8_t m_oddByte;
+            };
 
-unique_ptr<Transform>
-hexDecode();
+            unique_ptr<Transform>
+            hexDecode();
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_HEX_DECODE_HPP

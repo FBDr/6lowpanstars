@@ -33,103 +33,100 @@
 namespace ns3 {
 
 
-class SpectrumChannel;
-class Channel;
-class SpectrumErrorModel;
-class Queue;
+    class SpectrumChannel;
+    class Channel;
+    class SpectrumErrorModel;
+    class Queue;
+
+    /**
+     * \ingroup spectrum
+     *
+     * This class implements a device which does not communicate, in the
+     * sense that it does not interact with the above protocol stack. The
+     * purpose of this NetDevice is to be used for devices such as
+     * microwave ovens, waveform generators and spectrum
+     * analyzers. Since the ns-3 channel API is strongly based on the presence of
+     * NetDevice class instances, it is convenient to provide a NetDevice that can
+     * be used with such non-communicating devices.
+     */
+    class NonCommunicatingNetDevice : public NetDevice {
+    public:
+        static TypeId GetTypeId(void);
+
+        NonCommunicatingNetDevice();
+        virtual ~NonCommunicatingNetDevice();
+
+
+        /**
+         * This class doesn't talk directly with the underlying channel (a
+         * dedicated PHY class is expected to do it), however the NetDevice
+         * specification features a GetChannel() method. This method here
+         * is therefore provide to allow NonCommunicatingNetDevice::GetChannel() to have
+         * something meaningful to return.
+         *
+         * @param c the underlying channel
+         */
+        void SetChannel(Ptr<Channel> c);
+
+
+        /**
+         * Set the Phy object which is attached to this device.
+         * This object is needed so that we can set/get attributes and
+         * connect to trace sources of the PHY from the net device.
+         *
+         * @param phy the Phy object embedded within this device.
+         */
+        void SetPhy(Ptr<Object> phy);
+
+        /**
+         * @return a reference to the PHY object embedded in this NetDevice.
+         */
+        Ptr<Object> GetPhy() const;
 
 
 
-/**
- * \ingroup spectrum
- *
- * This class implements a device which does not communicate, in the
- * sense that it does not interact with the above protocol stack. The
- * purpose of this NetDevice is to be used for devices such as
- * microwave ovens, waveform generators and spectrum
- * analyzers. Since the ns-3 channel API is strongly based on the presence of
- * NetDevice class instances, it is convenient to provide a NetDevice that can
- * be used with such non-communicating devices.
- */
-class NonCommunicatingNetDevice : public NetDevice
-{
-public:
-  static TypeId GetTypeId (void);
-
-  NonCommunicatingNetDevice ();
-  virtual ~NonCommunicatingNetDevice ();
-
-
-  /**
-   * This class doesn't talk directly with the underlying channel (a
-   * dedicated PHY class is expected to do it), however the NetDevice
-   * specification features a GetChannel() method. This method here
-   * is therefore provide to allow NonCommunicatingNetDevice::GetChannel() to have
-   * something meaningful to return.
-   *
-   * @param c the underlying channel
-   */
-  void SetChannel (Ptr<Channel> c);
-
-
-  /**
-   * Set the Phy object which is attached to this device.
-   * This object is needed so that we can set/get attributes and
-   * connect to trace sources of the PHY from the net device.
-   *
-   * @param phy the Phy object embedded within this device.
-   */
-  void SetPhy (Ptr<Object> phy);
-
-  /**
-   * @return a reference to the PHY object embedded in this NetDevice.
-   */
-  Ptr<Object> GetPhy () const;
-
-
-
-  // inherited from NetDevice
-  virtual void SetIfIndex (const uint32_t index);
-  virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<Channel> GetChannel (void) const;
-  virtual bool SetMtu (const uint16_t mtu);
-  virtual uint16_t GetMtu (void) const;
-  virtual void SetAddress (Address address);
-  virtual Address GetAddress (void) const;
-  virtual bool IsLinkUp (void) const;
-  virtual void AddLinkChangeCallback (Callback<void> callback);
-  virtual bool IsBroadcast (void) const;
-  virtual Address GetBroadcast (void) const;
-  virtual bool IsMulticast (void) const;
-  virtual bool IsPointToPoint (void) const;
-  virtual bool IsBridge (void) const;
-  virtual bool Send (Ptr<Packet> packet, const Address& dest,
-                     uint16_t protocolNumber);
-  virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest,
-                         uint16_t protocolNumber);
-  virtual Ptr<Node> GetNode (void) const;
-  virtual void SetNode (Ptr<Node> node);
-  virtual bool NeedsArp (void) const;
-  virtual void SetReceiveCallback (NetDevice::ReceiveCallback cb);
-  virtual Address GetMulticast (Ipv4Address addr) const;
-  virtual Address GetMulticast (Ipv6Address addr) const;
-  virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
-  virtual bool SupportsSendFrom (void) const;
+        // inherited from NetDevice
+        virtual void SetIfIndex(const uint32_t index);
+        virtual uint32_t GetIfIndex(void) const;
+        virtual Ptr<Channel> GetChannel(void) const;
+        virtual bool SetMtu(const uint16_t mtu);
+        virtual uint16_t GetMtu(void) const;
+        virtual void SetAddress(Address address);
+        virtual Address GetAddress(void) const;
+        virtual bool IsLinkUp(void) const;
+        virtual void AddLinkChangeCallback(Callback<void> callback);
+        virtual bool IsBroadcast(void) const;
+        virtual Address GetBroadcast(void) const;
+        virtual bool IsMulticast(void) const;
+        virtual bool IsPointToPoint(void) const;
+        virtual bool IsBridge(void) const;
+        virtual bool Send(Ptr<Packet> packet, const Address& dest,
+                uint16_t protocolNumber);
+        virtual bool SendFrom(Ptr<Packet> packet, const Address& source, const Address& dest,
+                uint16_t protocolNumber);
+        virtual Ptr<Node> GetNode(void) const;
+        virtual void SetNode(Ptr<Node> node);
+        virtual bool NeedsArp(void) const;
+        virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
+        virtual Address GetMulticast(Ipv4Address addr) const;
+        virtual Address GetMulticast(Ipv6Address addr) const;
+        virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
+        virtual bool SupportsSendFrom(void) const;
 
 
 
 
 
-private:
-  virtual void DoDispose (void);
+    private:
+        virtual void DoDispose(void);
 
-  Ptr<Node>    m_node;
-  Ptr<Channel> m_channel;
+        Ptr<Node> m_node;
+        Ptr<Channel> m_channel;
 
-  uint32_t m_ifIndex;
+        uint32_t m_ifIndex;
 
-  Ptr<Object> m_phy;
-};
+        Ptr<Object> m_phy;
+    };
 
 
 } // namespace ns3

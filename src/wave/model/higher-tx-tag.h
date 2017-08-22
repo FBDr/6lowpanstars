@@ -26,48 +26,47 @@
 #include "ns3/wifi-tx-vector.h"
 
 namespace ns3 {
-class Tag;
-class WifiTxVector;
-class TypeId;
+    class Tag;
+    class WifiTxVector;
+    class TypeId;
 
-/**
- * \ingroup packet
- * \brief This tag will be used to support higher layer control DataRate
- * and TxPwr_Level for transmission.
- * If the high layer enables adaptable mode,  DataRate will be the
- * minimum allowable value and TxPwr_Level will be the maximum
- * allowable value for transmission.
- * If the higher layer does not enable adaptable parameter, the
- * DataRate and TxPwr_Level will be actual values for transmission.
- * However, if this tag is not used and inserted in the packet, the actual
- * DataRate and TxPwr_Level for transmission will be determined by MAC layer.
- */
-class HigherLayerTxVectorTag : public Tag
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \ingroup packet
+     * \brief This tag will be used to support higher layer control DataRate
+     * and TxPwr_Level for transmission.
+     * If the high layer enables adaptable mode,  DataRate will be the
+     * minimum allowable value and TxPwr_Level will be the maximum
+     * allowable value for transmission.
+     * If the higher layer does not enable adaptable parameter, the
+     * DataRate and TxPwr_Level will be actual values for transmission.
+     * However, if this tag is not used and inserted in the packet, the actual
+     * DataRate and TxPwr_Level for transmission will be determined by MAC layer.
+     */
+    class HigherLayerTxVectorTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  HigherLayerTxVectorTag (void);
-  HigherLayerTxVectorTag (WifiTxVector txVector, bool adaptable);
-  /**
-   * \returns the tx vector for transmission
-   */
-  WifiTxVector GetTxVector (void) const;
-  /**
-   * \returns the adaptable mode for transmission
-   */
-  bool IsAdaptable (void) const;
+        HigherLayerTxVectorTag(void);
+        HigherLayerTxVectorTag(WifiTxVector txVector, bool adaptable);
+        /**
+         * \returns the tx vector for transmission
+         */
+        WifiTxVector GetTxVector(void) const;
+        /**
+         * \returns the adaptable mode for transmission
+         */
+        bool IsAdaptable(void) const;
 
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual void Print (std::ostream &os) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual void Print(std::ostream &os) const;
 
-private:
-  WifiTxVector m_txVector;
-  bool m_adaptable;
-};
+    private:
+        WifiTxVector m_txVector;
+        bool m_adaptable;
+    };
 
 } // namespace ns3
 

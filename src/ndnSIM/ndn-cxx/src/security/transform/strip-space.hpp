@@ -27,39 +27,38 @@
 #include <climits>
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/** \brief strip whitespace characters from a stream
- *
- *  This transform interprets the input as a byte string, and puts all bytes except
- *  whitespace characters on the output.
- */
-class StripSpace : public Transform
-{
-public:
-  static const char* const DEFAULT_WHITESPACES;
+            /** \brief strip whitespace characters from a stream
+             *
+             *  This transform interprets the input as a byte string, and puts all bytes except
+             *  whitespace characters on the output.
+             */
+            class StripSpace : public Transform {
+            public:
+                static const char* const DEFAULT_WHITESPACES;
 
-  explicit
-  StripSpace(const char* whitespaces = DEFAULT_WHITESPACES);
+                explicit
+                StripSpace(const char* whitespaces = DEFAULT_WHITESPACES);
 
-private:
-  virtual size_t
-  convert(const uint8_t* buf, size_t buflen) final;
+            private:
+                virtual size_t
+                convert(const uint8_t* buf, size_t buflen) final;
 
-private:
-  static constexpr size_t CHARMAP_SIZE = 1 << CHAR_BIT;
-  std::bitset<CHARMAP_SIZE> m_isWhitespace; // char => whether char is whitespace
-};
+            private:
+                static constexpr size_t CHARMAP_SIZE = 1 << CHAR_BIT;
+                std::bitset<CHARMAP_SIZE> m_isWhitespace; // char => whether char is whitespace
+            };
 
-/** \brief constructs a StripSpace transform
- *  \param whitespaces characters classified as whitespaces, terminated with null
- */
-unique_ptr<Transform>
-stripSpace(const char* whitespaces = StripSpace::DEFAULT_WHITESPACES);
+            /** \brief constructs a StripSpace transform
+             *  \param whitespaces characters classified as whitespaces, terminated with null
+             */
+            unique_ptr<Transform>
+            stripSpace(const char* whitespaces = StripSpace::DEFAULT_WHITESPACES);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_STRIP_SPACE_HPP

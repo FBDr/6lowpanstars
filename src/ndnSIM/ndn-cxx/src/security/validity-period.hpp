@@ -28,107 +28,105 @@
 #include "../util/time.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
+        /** @brief Abstraction of validity period
+         *  @sa docs/tutorials/certificate-format.rst
+         */
+        class ValidityPeriod {
+        public:
 
-/** @brief Abstraction of validity period
- *  @sa docs/tutorials/certificate-format.rst
- */
-class ValidityPeriod
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+            class Error : public tlv::Error {
+            public:
 
-public:
-  /** @brief Set validity period (UNIX epoch, UNIX epoch) that is always invalid
-   */
-  ValidityPeriod() = default;
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  /** @brief Create validity period from @p block
-   */
-  explicit
-  ValidityPeriod(const Block& block);
+        public:
+            /** @brief Set validity period (UNIX epoch, UNIX epoch) that is always invalid
+             */
+            ValidityPeriod() = default;
 
-  /** @brief Create validity period (@p notBefore, @p notAfter)
-   *  @param notBefore exclusive beginning of the validity period range
-   *  @param notAfter exclusive end of the validity period range
-   *
-   *  @note The supplied time points will be rounded up to the whole seconds:
-   *        - @p notBefore is rounded up the next whole second
-   *        - @p notAfter is truncated to the previous whole second
-   */
-  ValidityPeriod(const time::system_clock::TimePoint& notBefore,
-                 const time::system_clock::TimePoint& notAfter);
+            /** @brief Create validity period from @p block
+             */
+            explicit
+            ValidityPeriod(const Block& block);
 
-  /** @brief Check if @p now falls within the validity period
-   *  @param now Time point to check if it falls within the period
-   *  @return periodBegin < @p now and @p now < periodEnd
-   */
-  bool
-  isValid(const time::system_clock::TimePoint& now = time::system_clock::now()) const;
+            /** @brief Create validity period (@p notBefore, @p notAfter)
+             *  @param notBefore exclusive beginning of the validity period range
+             *  @param notAfter exclusive end of the validity period range
+             *
+             *  @note The supplied time points will be rounded up to the whole seconds:
+             *        - @p notBefore is rounded up the next whole second
+             *        - @p notAfter is truncated to the previous whole second
+             */
+            ValidityPeriod(const time::system_clock::TimePoint& notBefore,
+                    const time::system_clock::TimePoint& notAfter);
 
-  /** @brief Set validity period (@p notBefore, @p notAfter)
-   *  @param notBefore exclusive beginning of the validity period range
-   *  @param notAfter exclusive end of the validity period range
-   *
-   *  @note The supplied time points will be rounded up to the whole seconds:
-   *        - @p notBefore is rounded up the next whole second
-   *        - @p notAfter is truncated to the previous whole second
-   */
-  ValidityPeriod&
-  setPeriod(const time::system_clock::TimePoint& notBefore,
-            const time::system_clock::TimePoint& notAfter);
+            /** @brief Check if @p now falls within the validity period
+             *  @param now Time point to check if it falls within the period
+             *  @return periodBegin < @p now and @p now < periodEnd
+             */
+            bool
+            isValid(const time::system_clock::TimePoint& now = time::system_clock::now()) const;
 
-  /** @brief Get the stored validity period
-   */
-  std::pair<time::system_clock::TimePoint, time::system_clock::TimePoint>
-  getPeriod() const;
+            /** @brief Set validity period (@p notBefore, @p notAfter)
+             *  @param notBefore exclusive beginning of the validity period range
+             *  @param notAfter exclusive end of the validity period range
+             *
+             *  @note The supplied time points will be rounded up to the whole seconds:
+             *        - @p notBefore is rounded up the next whole second
+             *        - @p notAfter is truncated to the previous whole second
+             */
+            ValidityPeriod&
+            setPeriod(const time::system_clock::TimePoint& notBefore,
+                    const time::system_clock::TimePoint& notAfter);
 
-  /** @brief Fast encoding or block size estimation
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            /** @brief Get the stored validity period
+             */
+            std::pair<time::system_clock::TimePoint, time::system_clock::TimePoint>
+            getPeriod() const;
 
-  /** @brief Encode ValidityPeriod into TLV block
-   */
-  const Block&
-  wireEncode() const;
+            /** @brief Fast encoding or block size estimation
+             */
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-  /** @brief Decode ValidityPeriod from TLV block
-   *  @throw Error when an invalid TLV block supplied
-   */
-  void
-  wireDecode(const Block& wire);
+            /** @brief Encode ValidityPeriod into TLV block
+             */
+            const Block&
+            wireEncode() const;
 
-public: // EqualityComparable concept
-  bool
-  operator==(const ValidityPeriod& other) const;
+            /** @brief Decode ValidityPeriod from TLV block
+             *  @throw Error when an invalid TLV block supplied
+             */
+            void
+            wireDecode(const Block& wire);
 
-  bool
-  operator!=(const ValidityPeriod& other) const;
+        public: // EqualityComparable concept
+            bool
+            operator==(const ValidityPeriod& other) const;
 
-private:
-  typedef boost::chrono::time_point<time::system_clock, time::seconds> TimePoint;
+            bool
+            operator!=(const ValidityPeriod& other) const;
 
-  TimePoint m_notBefore;
-  TimePoint m_notAfter;
+        private:
+            typedef boost::chrono::time_point<time::system_clock, time::seconds> TimePoint;
 
-  mutable Block m_wire;
-};
+            TimePoint m_notBefore;
+            TimePoint m_notAfter;
 
-std::ostream&
-operator<<(std::ostream& os, const ValidityPeriod& period);
+            mutable Block m_wire;
+        };
 
-} // namespace security
+        std::ostream&
+        operator<<(std::ostream& os, const ValidityPeriod& period);
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_VALIDITY_PERIOD_HPP

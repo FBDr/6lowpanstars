@@ -27,59 +27,54 @@
 
 namespace nfd {
 
-namespace ip = boost::asio::ip;
+    namespace ip = boost::asio::ip;
 
-shared_ptr<WebSocketChannel>
-WebSocketFactory::createChannel(const websocket::Endpoint& endpoint)
-{
-  auto channel = findChannel(endpoint);
-  if (channel)
-    return channel;
+    shared_ptr<WebSocketChannel>
+    WebSocketFactory::createChannel(const websocket::Endpoint& endpoint) {
+        auto channel = findChannel(endpoint);
+        if (channel)
+            return channel;
 
-  channel = make_shared<WebSocketChannel>(endpoint);
-  m_channels[endpoint] = channel;
+        channel = make_shared<WebSocketChannel>(endpoint);
+        m_channels[endpoint] = channel;
 
-  return channel;
-}
+        return channel;
+    }
 
-shared_ptr<WebSocketChannel>
-WebSocketFactory::createChannel(const std::string& localIp, const std::string& localPort)
-{
-  websocket::Endpoint endpoint(ip::address::from_string(localIp),
-                               boost::lexical_cast<uint16_t>(localPort));
-  return createChannel(endpoint);
-}
+    shared_ptr<WebSocketChannel>
+    WebSocketFactory::createChannel(const std::string& localIp, const std::string& localPort) {
+        websocket::Endpoint endpoint(ip::address::from_string(localIp),
+                boost::lexical_cast<uint16_t>(localPort));
+        return createChannel(endpoint);
+    }
 
-void
-WebSocketFactory::createFace(const FaceUri& uri,
-                             ndn::nfd::FacePersistency persistency,
-                             bool wantLocalFieldsEnabled,
-                             const FaceCreatedCallback& onCreated,
-                             const FaceCreationFailedCallback& onFailure)
-{
-  onFailure(406, "Unsupported protocol");
-}
+    void
+    WebSocketFactory::createFace(const FaceUri& uri,
+            ndn::nfd::FacePersistency persistency,
+            bool wantLocalFieldsEnabled,
+            const FaceCreatedCallback& onCreated,
+            const FaceCreationFailedCallback& onFailure) {
+        onFailure(406, "Unsupported protocol");
+    }
 
-std::vector<shared_ptr<const Channel>>
-WebSocketFactory::getChannels() const
-{
-  std::vector<shared_ptr<const Channel>> channels;
-  channels.reserve(m_channels.size());
+    std::vector<shared_ptr<const Channel>>
+    WebSocketFactory::getChannels() const {
+        std::vector<shared_ptr<const Channel>> channels;
+        channels.reserve(m_channels.size());
 
-  for (const auto& i : m_channels)
-    channels.push_back(i.second);
+        for (const auto& i : m_channels)
+            channels.push_back(i.second);
 
-  return channels;
-}
+        return channels;
+    }
 
-shared_ptr<WebSocketChannel>
-WebSocketFactory::findChannel(const websocket::Endpoint& endpoint) const
-{
-  auto i = m_channels.find(endpoint);
-  if (i != m_channels.end())
-    return i->second;
-  else
-    return nullptr;
-}
+    shared_ptr<WebSocketChannel>
+    WebSocketFactory::findChannel(const websocket::Endpoint& endpoint) const {
+        auto i = m_channels.find(endpoint);
+        if (i != m_channels.end())
+            return i->second;
+        else
+            return nullptr;
+    }
 
 } // namespace nfd

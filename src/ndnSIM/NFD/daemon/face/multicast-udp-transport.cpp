@@ -27,76 +27,71 @@
 #include "udp-protocol.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(DatagramTransport, MulticastUdpTransport::protocol,
-                                                Multicast, "MulticastUdpTransport");
+        NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(DatagramTransport, MulticastUdpTransport::protocol,
+                Multicast, "MulticastUdpTransport");
 
-MulticastUdpTransport::MulticastUdpTransport(const protocol::endpoint& localEndpoint,
-                                             const protocol::endpoint& multicastGroup,
-                                             protocol::socket&& recvSocket,
-                                             protocol::socket&& sendSocket)
-  : DatagramTransport(std::move(recvSocket))
-  , m_multicastGroup(multicastGroup)
-  , m_sendSocket(std::move(sendSocket))
-{
-  this->setLocalUri(FaceUri(localEndpoint));
-  this->setRemoteUri(FaceUri(multicastGroup));
-  this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT);
-  this->setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS);
-  this->setMtu(udp::computeMtu(localEndpoint));
+        MulticastUdpTransport::MulticastUdpTransport(const protocol::endpoint& localEndpoint,
+                const protocol::endpoint& multicastGroup,
+                protocol::socket&& recvSocket,
+                protocol::socket&& sendSocket)
+        : DatagramTransport(std::move(recvSocket))
+        , m_multicastGroup(multicastGroup)
+        , m_sendSocket(std::move(sendSocket)) {
+            this->setLocalUri(FaceUri(localEndpoint));
+            this->setRemoteUri(FaceUri(multicastGroup));
+            this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
+            this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT);
+            this->setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS);
+            this->setMtu(udp::computeMtu(localEndpoint));
 
-  NFD_LOG_FACE_INFO("Creating transport");
-}
+            NFD_LOG_FACE_INFO("Creating transport");
+        }
 
-void
-MulticastUdpTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency)
-{
-  if (newPersistency != ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
-    BOOST_THROW_EXCEPTION(
-      std::invalid_argument("MulticastUdpTransport supports only FACE_PERSISTENCY_PERMANENT"));
-  }
-}
+        void
+        MulticastUdpTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) {
+            if (newPersistency != ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
+                BOOST_THROW_EXCEPTION(
+                        std::invalid_argument("MulticastUdpTransport supports only FACE_PERSISTENCY_PERMANENT"));
+            }
+        }
 
-void
-MulticastUdpTransport::doSend(Transport::Packet&& packet)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        MulticastUdpTransport::doSend(Transport::Packet&& packet) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  m_sendSocket.async_send_to(boost::asio::buffer(packet.packet), m_multicastGroup,
-                             bind(&MulticastUdpTransport::handleSend, this,
-                                  boost::asio::placeholders::error,
-                                  boost::asio::placeholders::bytes_transferred,
-                                  packet.packet));
-}
+            m_sendSocket.async_send_to(boost::asio::buffer(packet.packet), m_multicastGroup,
+                    bind(&MulticastUdpTransport::handleSend, this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred,
+                    packet.packet));
+        }
 
-void
-MulticastUdpTransport::doClose()
-{
-  if (m_sendSocket.is_open()) {
-    NFD_LOG_FACE_TRACE("Closing sending socket");
+        void
+        MulticastUdpTransport::doClose() {
+            if (m_sendSocket.is_open()) {
+                NFD_LOG_FACE_TRACE("Closing sending socket");
 
-    // Cancel all outstanding operations and close the socket.
-    // Use the non-throwing variants and ignore errors, if any.
-    boost::system::error_code error;
-    m_sendSocket.cancel(error);
-    m_sendSocket.close(error);
-  }
+                // Cancel all outstanding operations and close the socket.
+                // Use the non-throwing variants and ignore errors, if any.
+                boost::system::error_code error;
+                m_sendSocket.cancel(error);
+                m_sendSocket.close(error);
+            }
 
-  DatagramTransport::doClose();
-}
+            DatagramTransport::doClose();
+        }
 
-template<>
-Transport::EndpointId
-DatagramTransport<boost::asio::ip::udp, Multicast>::makeEndpointId(const protocol::endpoint& ep)
-{
-  // IPv6 multicast is not supported
-  BOOST_ASSERT(ep.address().is_v4());
+        template<>
+        Transport::EndpointId
+        DatagramTransport<boost::asio::ip::udp, Multicast>::makeEndpointId(const protocol::endpoint& ep) {
+            // IPv6 multicast is not supported
+            BOOST_ASSERT(ep.address().is_v4());
 
-  return (static_cast<uint64_t>(ep.port()) << 32) |
-          static_cast<uint64_t>(ep.address().to_v4().to_ulong());
-}
+            return (static_cast<uint64_t> (ep.port()) << 32) |
+                    static_cast<uint64_t> (ep.address().to_v4().to_ulong());
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

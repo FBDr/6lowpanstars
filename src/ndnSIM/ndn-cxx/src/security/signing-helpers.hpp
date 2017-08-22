@@ -26,38 +26,38 @@
 #include "signing-info.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * \return a SigningInfo for signing with an identity
- */
-SigningInfo
-signingByIdentity(const Name& identity);
+        /**
+         * \return a SigningInfo for signing with an identity
+         */
+        SigningInfo
+        signingByIdentity(const Name& identity);
 
-/**
- * \return a SigningInfo for signing with a key
- */
-SigningInfo
-signingByKey(const Name& keyName);
+        /**
+         * \return a SigningInfo for signing with a key
+         */
+        SigningInfo
+        signingByKey(const Name& keyName);
 
-/**
- * \return a SigningInfo for signing with a certificate
- */
-SigningInfo
-signingByCertificate(const Name& certName);
+        /**
+         * \return a SigningInfo for signing with a certificate
+         */
+        SigningInfo
+        signingByCertificate(const Name& certName);
 
-/**
- * \return a SigningInfo for signing with Sha256
- */
-SigningInfo
-signingWithSha256();
+        /**
+         * \return a SigningInfo for signing with Sha256
+         */
+        SigningInfo
+        signingWithSha256();
 
-} // namespace security
+    } // namespace security
 
-using security::signingByIdentity;
-using security::signingByKey;
-using security::signingByCertificate;
-using security::signingWithSha256;
+    using security::signingByIdentity;
+    using security::signingByKey;
+    using security::signingByCertificate;
+    using security::signingWithSha256;
 
 } // namespace ndn
 

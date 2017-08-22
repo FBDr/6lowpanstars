@@ -33,76 +33,75 @@
 
 namespace ns3 {
 
-/**
- * \ingroup probes
- *
- * This class is designed to probe an underlying ns3 TraceSource exporting
- * a bool.  This probe exports a trace source "Output" of type bool.
- * The Output trace source emits a value when either the trace source
- * emits a new value, or when SetValue () is called.
- *
- * The current value of the probe can be polled with the GetValue ()
- * method.
- */
-class BooleanProbe : public Probe
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
-  BooleanProbe ();
-  virtual ~BooleanProbe ();
+    /**
+     * \ingroup probes
+     *
+     * This class is designed to probe an underlying ns3 TraceSource exporting
+     * a bool.  This probe exports a trace source "Output" of type bool.
+     * The Output trace source emits a value when either the trace source
+     * emits a new value, or when SetValue () is called.
+     *
+     * The current value of the probe can be polled with the GetValue ()
+     * method.
+     */
+    class BooleanProbe : public Probe {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId();
+        BooleanProbe();
+        virtual ~BooleanProbe();
 
-  /**
-   * \return the most recent value
-   */
-  bool GetValue (void) const;
+        /**
+         * \return the most recent value
+         */
+        bool GetValue(void) const;
 
-  /**
-   * \param value set the traced bool to a new value
-   */
-  void SetValue (bool value);
+        /**
+         * \param value set the traced bool to a new value
+         */
+        void SetValue(bool value);
 
-  /**
-   * \brief Set a probe value by its name in the Config system
-   *
-   * \param path Config path to access the probe
-   * \param value set the traced bool to a new value
-   */
-  static void SetValueByPath (std::string path, bool value);
+        /**
+         * \brief Set a probe value by its name in the Config system
+         *
+         * \param path Config path to access the probe
+         * \param value set the traced bool to a new value
+         */
+        static void SetValueByPath(std::string path, bool value);
 
-  /**
-   * \brief connect to a trace source attribute provided by a given object
-   *
-   * \param traceSource the name of the attribute TraceSource to connect to
-   * \param obj ns3::Object to connect to
-   * \return true if the trace source was successfully connected
-   */
-  virtual bool ConnectByObject (std::string traceSource, Ptr<Object> obj);
+        /**
+         * \brief connect to a trace source attribute provided by a given object
+         *
+         * \param traceSource the name of the attribute TraceSource to connect to
+         * \param obj ns3::Object to connect to
+         * \return true if the trace source was successfully connected
+         */
+        virtual bool ConnectByObject(std::string traceSource, Ptr<Object> obj);
 
-  /**
-   * \brief connect to a trace source provided by a config path
-   *
-   * \param path Config path to bind to
-   *
-   * Note, if an invalid path is provided, the probe will not be connected
-   * to anything.
-   */
-  virtual void ConnectByPath (std::string path);
+        /**
+         * \brief connect to a trace source provided by a config path
+         *
+         * \param path Config path to bind to
+         *
+         * Note, if an invalid path is provided, the probe will not be connected
+         * to anything.
+         */
+        virtual void ConnectByPath(std::string path);
 
-private:
-  /**
-   * \brief Method to connect to an underlying ns3::TraceSource of type bool
-   *
-   * \param oldData previous value of the bool
-   * \param newData new value of the bool
-   */
-  void TraceSink (bool oldData, bool newData);
+    private:
+        /**
+         * \brief Method to connect to an underlying ns3::TraceSource of type bool
+         *
+         * \param oldData previous value of the bool
+         * \param newData new value of the bool
+         */
+        void TraceSink(bool oldData, bool newData);
 
-  TracedValue<bool> m_output; //!< Output trace source.
-};
+        TracedValue<bool> m_output; //!< Output trace source.
+    };
 
 } // namespace ns3
 

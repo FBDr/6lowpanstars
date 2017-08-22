@@ -24,55 +24,51 @@
 #include "ns3/boolean.h"
 #include "ns3/dca-txop.h"
 
-namespace ns3 {
-
-NqosWifiMacHelper::NqosWifiMacHelper ()
+namespace ns3
 {
-}
 
-NqosWifiMacHelper::~NqosWifiMacHelper ()
-{
-}
+    NqosWifiMacHelper::NqosWifiMacHelper() {
+    }
 
-NqosWifiMacHelper
-NqosWifiMacHelper::Default (void)
-{
-  NqosWifiMacHelper helper;
-  //We're making non QoS-enabled Wi-Fi MACs here, so we set the
-  //necessary attribute. I've carefully positioned this here so that
-  //someone who knows what they're doing can override with explicit attributes.
-  helper.SetType ("ns3::AdhocWifiMac",
-                  "QosSupported", BooleanValue (false));
-  return helper;
-}
+    NqosWifiMacHelper::~NqosWifiMacHelper() {
+    }
 
-void
-NqosWifiMacHelper::SetType (std::string type,
-                            std::string n0, const AttributeValue &v0,
-                            std::string n1, const AttributeValue &v1,
-                            std::string n2, const AttributeValue &v2,
-                            std::string n3, const AttributeValue &v3,
-                            std::string n4, const AttributeValue &v4,
-                            std::string n5, const AttributeValue &v5,
-                            std::string n6, const AttributeValue &v6,
-                            std::string n7, const AttributeValue &v7)
-{
-  m_mac.SetTypeId (type);
-  m_mac.Set (n0, v0);
-  m_mac.Set (n1, v1);
-  m_mac.Set (n2, v2);
-  m_mac.Set (n3, v3);
-  m_mac.Set (n4, v4);
-  m_mac.Set (n5, v5);
-  m_mac.Set (n6, v6);
-  m_mac.Set (n7, v7);
-}
+    NqosWifiMacHelper
+    NqosWifiMacHelper::Default(void) {
+        NqosWifiMacHelper helper;
+        //We're making non QoS-enabled Wi-Fi MACs here, so we set the
+        //necessary attribute. I've carefully positioned this here so that
+        //someone who knows what they're doing can override with explicit attributes.
+        helper.SetType("ns3::AdhocWifiMac",
+                "QosSupported", BooleanValue(false));
+        return helper;
+    }
 
-Ptr<WifiMac>
-NqosWifiMacHelper::Create (void) const
-{
-  Ptr<WifiMac> mac = m_mac.Create<WifiMac> ();
-  return mac;
-}
+    void
+    NqosWifiMacHelper::SetType(std::string type,
+            std::string n0, const AttributeValue &v0,
+            std::string n1, const AttributeValue &v1,
+            std::string n2, const AttributeValue &v2,
+            std::string n3, const AttributeValue &v3,
+            std::string n4, const AttributeValue &v4,
+            std::string n5, const AttributeValue &v5,
+            std::string n6, const AttributeValue &v6,
+            std::string n7, const AttributeValue & v7) {
+        m_mac.SetTypeId(type);
+        m_mac.Set(n0, v0);
+        m_mac.Set(n1, v1);
+        m_mac.Set(n2, v2);
+        m_mac.Set(n3, v3);
+        m_mac.Set(n4, v4);
+        m_mac.Set(n5, v5);
+        m_mac.Set(n6, v6);
+        m_mac.Set(n7, v7);
+    }
+
+    Ptr<WifiMac>
+            NqosWifiMacHelper::Create(void) const {
+        Ptr<WifiMac> mac = m_mac.Create<WifiMac> ();
+        return mac;
+    }
 
 } //namespace ns3

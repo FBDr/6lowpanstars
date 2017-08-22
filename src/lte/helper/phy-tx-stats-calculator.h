@@ -32,118 +32,117 @@
 
 namespace ns3 {
 
-/**
- * \ingroup lte
- *
- * Takes care of storing the information generated at PHY layer regarding 
- * transmission. Metrics saved are:
- *
- *   - Timestamp (in seconds)
- *   - Frame index
- *   - Subframe index
- *   - C-RNTI
- *   - MCS for transport block 1
- *   - Size of transport block 1
- *   - MCS for transport block 2 (0 if not used)
- *   - Size of transport block 2 (0 if not used)
- */
-class PhyTxStatsCalculator : public LteStatsCalculator
-{
-public:
-  /**
-   * Constructor
-   */
-  PhyTxStatsCalculator ();
+    /**
+     * \ingroup lte
+     *
+     * Takes care of storing the information generated at PHY layer regarding 
+     * transmission. Metrics saved are:
+     *
+     *   - Timestamp (in seconds)
+     *   - Frame index
+     *   - Subframe index
+     *   - C-RNTI
+     *   - MCS for transport block 1
+     *   - Size of transport block 1
+     *   - MCS for transport block 2 (0 if not used)
+     *   - Size of transport block 2 (0 if not used)
+     */
+    class PhyTxStatsCalculator : public LteStatsCalculator {
+    public:
+        /**
+         * Constructor
+         */
+        PhyTxStatsCalculator();
 
-  /**
-   * Destructor
-   */
-  virtual ~PhyTxStatsCalculator ();
+        /**
+         * Destructor
+         */
+        virtual ~PhyTxStatsCalculator();
 
-  // Inherited from ns3::Object
-  /**
-   *  Register this type.
-   *  \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
+        // Inherited from ns3::Object
+        /**
+         *  Register this type.
+         *  \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  /**
-   * Set the name of the file where the UL Tx PHY statistics will be stored.
-   *
-   * @param outputFilename string with the name of the file
-   */
-  void SetUlTxOutputFilename (std::string outputFilename);
+        /**
+         * Set the name of the file where the UL Tx PHY statistics will be stored.
+         *
+         * @param outputFilename string with the name of the file
+         */
+        void SetUlTxOutputFilename(std::string outputFilename);
 
-  /**
-   * Get the name of the file where the UL RX PHY statistics will be stored.
-   * @return the name of the file where the UL RX PHY statistics will be stored
-   */
-  std::string GetUlTxOutputFilename (void);
+        /**
+         * Get the name of the file where the UL RX PHY statistics will be stored.
+         * @return the name of the file where the UL RX PHY statistics will be stored
+         */
+        std::string GetUlTxOutputFilename(void);
 
-  /**
-   * Set the name of the file where the DL TX PHY statistics will be stored.
-   *
-   * @param outputFilename string with the name of the file
-   */
-  void SetDlTxOutputFilename (std::string outputFilename);
+        /**
+         * Set the name of the file where the DL TX PHY statistics will be stored.
+         *
+         * @param outputFilename string with the name of the file
+         */
+        void SetDlTxOutputFilename(std::string outputFilename);
 
-  /**
-   * Get the name of the file where the DL TX PHY statistics will be stored.
-   * @return the name of the file where the DL TX PHY statistics will be stored
-   */
-  std::string GetDlTxOutputFilename (void);
+        /**
+         * Get the name of the file where the DL TX PHY statistics will be stored.
+         * @return the name of the file where the DL TX PHY statistics will be stored
+         */
+        std::string GetDlTxOutputFilename(void);
 
-  /**
-   * Notifies the stats calculator that an downlink trasmission has occurred.
-   * @param params Trace information regarding PHY transmission stats
-   */
-  void DlPhyTransmission (PhyTransmissionStatParameters params);
+        /**
+         * Notifies the stats calculator that an downlink trasmission has occurred.
+         * @param params Trace information regarding PHY transmission stats
+         */
+        void DlPhyTransmission(PhyTransmissionStatParameters params);
 
-  /**
-   * Notifies the stats calculator that an uplink trasmission has occurred.
-   * @param params Trace information regarding PHY transmission stats
-   */
-  void UlPhyTransmission (PhyTransmissionStatParameters params);
+        /**
+         * Notifies the stats calculator that an uplink trasmission has occurred.
+         * @param params Trace information regarding PHY transmission stats
+         */
+        void UlPhyTransmission(PhyTransmissionStatParameters params);
 
-  
-  /** 
-   * trace sink
-   * 
-   * \param phyTxStats 
-   * \param path 
-   * \param params 
-   */
-  static void DlPhyTransmissionCallback (Ptr<PhyTxStatsCalculator> phyTxStats,
-                                  std::string path, PhyTransmissionStatParameters params);
 
-  /** 
-   * trace sink
-   * 
-   * \param phyTxStats 
-   * \param path 
-   * \param params 
-   */
-  static void UlPhyTransmissionCallback (Ptr<PhyTxStatsCalculator> phyTxStats,
-                                  std::string path, PhyTransmissionStatParameters params);
+        /** 
+         * trace sink
+         * 
+         * \param phyTxStats 
+         * \param path 
+         * \param params 
+         */
+        static void DlPhyTransmissionCallback(Ptr<PhyTxStatsCalculator> phyTxStats,
+                std::string path, PhyTransmissionStatParameters params);
 
-private:
-  /**
-   * When writing DL TX PHY statistics first time to file,
-   * columns description is added. Then next lines are
-   * appended to file. This value is true if output
-   * files have not been opened yet
-   */
-  bool m_dlTxFirstWrite;
+        /** 
+         * trace sink
+         * 
+         * \param phyTxStats 
+         * \param path 
+         * \param params 
+         */
+        static void UlPhyTransmissionCallback(Ptr<PhyTxStatsCalculator> phyTxStats,
+                std::string path, PhyTransmissionStatParameters params);
 
-  /**
-   * When writing UL TX PHY statistics first time to file,
-   * columns description is added. Then next lines are
-   * appended to file. This value is true if output
-   * files have not been opened yet
-   */
-  bool m_ulTxFirstWrite;
+    private:
+        /**
+         * When writing DL TX PHY statistics first time to file,
+         * columns description is added. Then next lines are
+         * appended to file. This value is true if output
+         * files have not been opened yet
+         */
+        bool m_dlTxFirstWrite;
 
-};
+        /**
+         * When writing UL TX PHY statistics first time to file,
+         * columns description is added. Then next lines are
+         * appended to file. This value is true if output
+         * files have not been opened yet
+         */
+        bool m_ulTxFirstWrite;
+
+    };
 
 } // namespace ns3
 

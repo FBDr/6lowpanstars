@@ -32,53 +32,52 @@
 
 namespace ns3 {
 
-class EpcTft;
-class Packet;
+    class EpcTft;
+    class Packet;
 
-/**
- * \brief classifies IP packets accoding to Traffic Flow Templates (TFTs)
- * 
- * \note this implementation works with IPv4 only.
- */
-class EpcTftClassifier : public SimpleRefCount<EpcTftClassifier>
-{
-public:
-  
-  EpcTftClassifier ();
-  
-  /** 
-   * add a TFT to the Classifier
-   * 
-   * \param tft the TFT to be added
-   * 
-   */
-  void Add (Ptr<EpcTft> tft, uint32_t id);
+    /**
+     * \brief classifies IP packets accoding to Traffic Flow Templates (TFTs)
+     * 
+     * \note this implementation works with IPv4 only.
+     */
+    class EpcTftClassifier : public SimpleRefCount<EpcTftClassifier> {
+    public:
 
-  /** 
-   * delete an existing TFT from the classifier
-   * 
-   * \param id the identifier of the TFT to be deleted
-   */
-  void Delete (uint32_t id);
-  
+        EpcTftClassifier();
 
-  /** 
-   * classify an IP packet
-   * 
-   * \param p the IP packet. It is assumed that the outmost header is an IPv4 header.
-   * 
-   * \return the identifier (>0) of the first TFT that matches with the IP packet; 0 if no TFT matched.
-   */
-  uint32_t Classify (Ptr<Packet> p, EpcTft::Direction direction);
-  
-protected:
-  
-  std::map <uint32_t, Ptr<EpcTft> > m_tftMap;
-  
-};
+        /** 
+         * add a TFT to the Classifier
+         * 
+         * \param tft the TFT to be added
+         * 
+         */
+        void Add(Ptr<EpcTft> tft, uint32_t id);
+
+        /** 
+         * delete an existing TFT from the classifier
+         * 
+         * \param id the identifier of the TFT to be deleted
+         */
+        void Delete(uint32_t id);
+
+
+        /** 
+         * classify an IP packet
+         * 
+         * \param p the IP packet. It is assumed that the outmost header is an IPv4 header.
+         * 
+         * \return the identifier (>0) of the first TFT that matches with the IP packet; 0 if no TFT matched.
+         */
+        uint32_t Classify(Ptr<Packet> p, EpcTft::Direction direction);
+
+    protected:
+
+        std::map <uint32_t, Ptr<EpcTft> > m_tftMap;
+
+    };
 
 
 
 } // namespace ns3
-  
+
 #endif /* TFT_CLASSIFIER_H */ 

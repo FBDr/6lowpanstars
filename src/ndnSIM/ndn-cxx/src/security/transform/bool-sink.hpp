@@ -25,49 +25,48 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief A sink which outputs only one boolean value.
- *
- * It checks the first byte that is ever written into the sink,
- * and set output true if the byte is non-zero, otherwise false.
- */
-class BoolSink : public Sink
-{
-public:
-  /**
-   * @brief Create a bool sink whose output will be stored in @p value.
-   */
-  explicit
-  BoolSink(bool& value);
+            /**
+             * @brief A sink which outputs only one boolean value.
+             *
+             * It checks the first byte that is ever written into the sink,
+             * and set output true if the byte is non-zero, otherwise false.
+             */
+            class BoolSink : public Sink {
+            public:
+                /**
+                 * @brief Create a bool sink whose output will be stored in @p value.
+                 */
+                explicit
+                BoolSink(bool& value);
 
-private:
-  /**
-   * @brief Check the first byte that is ever received and set the boolean variable.
-   *
-   * @return the same value as @p size.
-   */
-  virtual size_t
-  doWrite(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Check the first byte that is ever received and set the boolean variable.
+                 *
+                 * @return the same value as @p size.
+                 */
+                virtual size_t
+                doWrite(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize sink processing
-   */
-  virtual void
-  doEnd() final;
+                /**
+                 * @brief Finalize sink processing
+                 */
+                virtual void
+                doEnd() final;
 
-private:
-  bool m_hasValue;
-  bool& m_value;
-};
+            private:
+                bool m_hasValue;
+                bool& m_value;
+            };
 
-unique_ptr<Sink>
-boolSink(bool& value);
+            unique_ptr<Sink>
+            boolSink(bool& value);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_BOOL_SINK_HPP

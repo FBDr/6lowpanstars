@@ -31,87 +31,84 @@
 #include "core/scheduler.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/** \brief counters provided by WebSocketTransport
- *  \note The type name 'WebSocketTransportCounters' is implementation detail.
- *        Use 'WebSocketTransport::Counters' in public API.
- */
-class WebSocketTransportCounters : public virtual Transport::Counters
-{
-public:
-  /** \brief count of outgoing Pings
-   */
-  PacketCounter nOutPings;
+        /** \brief counters provided by WebSocketTransport
+         *  \note The type name 'WebSocketTransportCounters' is implementation detail.
+         *        Use 'WebSocketTransport::Counters' in public API.
+         */
+        class WebSocketTransportCounters : public virtual Transport::Counters {
+        public:
+            /** \brief count of outgoing Pings
+             */
+            PacketCounter nOutPings;
 
-  /** \brief count of incoming Pongs
-   */
-  PacketCounter nInPongs;
-};
+            /** \brief count of incoming Pongs
+             */
+            PacketCounter nInPongs;
+        };
 
-/** \brief A Transport that communicates on a WebSocket connection
- */
-class WebSocketTransport final : public Transport
-                               , protected virtual WebSocketTransportCounters
-{
-public:
-  /** \brief counters provided by WebSocketTransport
-   */
-  typedef WebSocketTransportCounters Counters;
+        /** \brief A Transport that communicates on a WebSocket connection
+         */
+        class WebSocketTransport final : public Transport
+        , protected virtual WebSocketTransportCounters {
+        public:
+            /** \brief counters provided by WebSocketTransport
+             */
+            typedef WebSocketTransportCounters Counters;
 
-  WebSocketTransport(websocketpp::connection_hdl hdl,
-                     websocket::Server& server,
-                     time::milliseconds pingInterval);
+            WebSocketTransport(websocketpp::connection_hdl hdl,
+                    websocket::Server& server,
+                    time::milliseconds pingInterval);
 
-  virtual const Counters&
-  getCounters() const override;
+            virtual const Counters&
+            getCounters() const override;
 
-  /** \brief Translates a message into a Block
-   *         and delivers it to the link service
-   */
-  void
-  receiveMessage(const std::string& msg);
+            /** \brief Translates a message into a Block
+             *         and delivers it to the link service
+             */
+            void
+            receiveMessage(const std::string& msg);
 
-  void
-  handlePong();
+            void
+            handlePong();
 
-  void
-  handlePongTimeout();
+            void
+            handlePongTimeout();
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
 
-  virtual void
-  doClose() final;
+            virtual void
+            doClose() final;
 
-private:
-  virtual void
-  doSend(Transport::Packet&& packet) final;
+        private:
+            virtual void
+            doSend(Transport::Packet&& packet) final;
 
-  void
-  schedulePing();
+            void
+            schedulePing();
 
-  void
-  sendPing();
+            void
+            sendPing();
 
-  void
-  processErrorCode(const websocketpp::lib::error_code& error);
+            void
+            processErrorCode(const websocketpp::lib::error_code& error);
 
-private:
-  websocketpp::connection_hdl m_handle;
-  websocket::Server& m_server;
-  time::milliseconds m_pingInterval;
-  scheduler::ScopedEventId m_pingEventId;
-};
+        private:
+            websocketpp::connection_hdl m_handle;
+            websocket::Server& m_server;
+            time::milliseconds m_pingInterval;
+            scheduler::ScopedEventId m_pingEventId;
+        };
 
-inline const WebSocketTransport::Counters&
-WebSocketTransport::getCounters() const
-{
-  return *this;
-}
+        inline const WebSocketTransport::Counters&
+        WebSocketTransport::getCounters() const {
+            return *this;
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_WEBSOCKET_TRANSPORT_HPP

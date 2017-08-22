@@ -27,62 +27,59 @@
 #define NFD_TESTS_DAEMON_FW_INSTALL_STRATEGY_HPP
 
 namespace nfd {
-namespace fw {
-class Strategy;
-} // namespace fw
+    namespace fw {
+        class Strategy;
+    } // namespace fw
 
-namespace tests {
+    namespace tests {
 
-/** \brief install a strategy to forwarder
- *  \tparam S strategy type
- *  \param forwarder the forwarder
- *  \param args arguments to strategy constructor
- *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
- *                       and has an incompatible type
- *  \return a reference to the strategy
- */
-template<typename S, typename ...Args>
-typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
-install(Forwarder& forwarder, Args&&... args)
-{
-  auto strategy = make_unique<S>(ref(forwarder), std::forward<Args>(args)...);
-  fw::Strategy* installed = forwarder.getStrategyChoice().install(std::move(strategy)).second;
-  return dynamic_cast<S&>(*installed);
-}
+        /** \brief install a strategy to forwarder
+         *  \tparam S strategy type
+         *  \param forwarder the forwarder
+         *  \param args arguments to strategy constructor
+         *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
+         *                       and has an incompatible type
+         *  \return a reference to the strategy
+         */
+        template<typename S, typename ...Args>
+        typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
+        install(Forwarder& forwarder, Args&&... args) {
+            auto strategy = make_unique<S>(ref(forwarder), std::forward<Args>(args)...);
+            fw::Strategy* installed = forwarder.getStrategyChoice().install(std::move(strategy)).second;
+            return dynamic_cast<S&> (*installed);
+        }
 
-/** \brief install a strategy to forwarder, and choose the strategy for a namespace
- *  \tparam S strategy type
- *  \param forwarder the forwarder
- *  \param prefix namespace to choose the strategy for
- *  \param args arguments to strategy constructor
- *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
- *                       and has an incompatible type
- *  \return a reference to the strategy
- */
-template<typename S, typename ...Args>
-typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
-choose(Forwarder& forwarder, const Name& prefix, Args&&... args)
-{
-  S& strategy = install<S>(forwarder, std::forward<Args>(args)...);
-  forwarder.getStrategyChoice().insert(prefix, strategy.getName());
-  return strategy;
-}
+        /** \brief install a strategy to forwarder, and choose the strategy for a namespace
+         *  \tparam S strategy type
+         *  \param forwarder the forwarder
+         *  \param prefix namespace to choose the strategy for
+         *  \param args arguments to strategy constructor
+         *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
+         *                       and has an incompatible type
+         *  \return a reference to the strategy
+         */
+        template<typename S, typename ...Args>
+        typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
+        choose(Forwarder& forwarder, const Name& prefix, Args&&... args) {
+            S& strategy = install<S>(forwarder, std::forward<Args>(args)...);
+            forwarder.getStrategyChoice().insert(prefix, strategy.getName());
+            return strategy;
+        }
 
-/** \brief install a strategy to forwarder, and choose the strategy as default
- *  \tparam S strategy type
- *  \param forwarder the forwarder
- *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
- *                       and has an incompatible type
- *  \return a reference to the strategy
- */
-template<typename S>
-typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
-choose(Forwarder& forwarder)
-{
-  return choose<S>(forwarder, "ndn:/");
-}
+        /** \brief install a strategy to forwarder, and choose the strategy as default
+         *  \tparam S strategy type
+         *  \param forwarder the forwarder
+         *  \throw std::bad_cast a strategy with duplicate strategyName is already installed
+         *                       and has an incompatible type
+         *  \return a reference to the strategy
+         */
+        template<typename S>
+        typename std::enable_if<std::is_base_of<fw::Strategy, S>::value, S&>::type
+        choose(Forwarder& forwarder) {
+            return choose<S>(forwarder, "ndn:/");
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FW_INSTALL_STRATEGY_HPP

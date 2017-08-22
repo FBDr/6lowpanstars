@@ -34,124 +34,122 @@
 #include <ndn-cxx/util/dummy-client-face.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-/**
- * @brief a collection of common functions shared by all manager's testing fixtures.
- */
-class ManagerCommonFixture : public IdentityManagementTimeFixture
-{
-public: // initialize
-  ManagerCommonFixture();
+        /**
+         * @brief a collection of common functions shared by all manager's testing fixtures.
+         */
+        class ManagerCommonFixture : public IdentityManagementTimeFixture {
+        public: // initialize
+            ManagerCommonFixture();
 
-  /**
-   * @brief set topPrefix to the dispatcher.
-   *
-   * after setting @param topPrefix, call advanceClocks to ensure all added filters take effects.
-   *
-   * @param topPrefix top prefix for the dispatcher
-   */
-  void
-  setTopPrefix(const Name& topPrefix);
+            /**
+             * @brief set topPrefix to the dispatcher.
+             *
+             * after setting @param topPrefix, call advanceClocks to ensure all added filters take effects.
+             *
+             * @param topPrefix top prefix for the dispatcher
+             */
+            void
+            setTopPrefix(const Name& topPrefix);
 
-public: // test
-  typedef std::function<void(shared_ptr<Interest> interest)> InterestHandler;
+        public: // test
+            typedef std::function<void(shared_ptr<Interest> interest) > InterestHandler;
 
-  /**
-   * @brief create a ControlCommand request
-   *
-   * step1: append the @param parameters to the @param commandName and make an Interest.
-   * step2: call @param beforeSinging to do something with the Interest.
-   * step3: sign the generated command
-   *
-   * @param commandName the command name
-   * @param parameters the ControlParameters
-   * @param beforeSigning a callback that can modify the Interest before it's signed
-   *
-   * @return the signed ControlCommand request
-   */
-  shared_ptr<Interest>
-  makeControlCommandRequest(Name commandName,
-                            const ControlParameters& parameters,
-                            const InterestHandler& beforeSigning = nullptr);
+            /**
+             * @brief create a ControlCommand request
+             *
+             * step1: append the @param parameters to the @param commandName and make an Interest.
+             * step2: call @param beforeSinging to do something with the Interest.
+             * step3: sign the generated command
+             *
+             * @param commandName the command name
+             * @param parameters the ControlParameters
+             * @param beforeSigning a callback that can modify the Interest before it's signed
+             *
+             * @return the signed ControlCommand request
+             */
+            shared_ptr<Interest>
+            makeControlCommandRequest(Name commandName,
+                    const ControlParameters& parameters,
+                    const InterestHandler& beforeSigning = nullptr);
 
-  /**
-   * @brief cause management to receive an Interest
-   *
-   * call DummyClientFace::receive to receive Interest and then call advanceClocks to ensure
-   * the Interest dispatched
-   *
-   * @param interest the Interest to receive
-   */
-  void
-  receiveInterest(shared_ptr<Interest> interest);
+            /**
+             * @brief cause management to receive an Interest
+             *
+             * call DummyClientFace::receive to receive Interest and then call advanceClocks to ensure
+             * the Interest dispatched
+             *
+             * @param interest the Interest to receive
+             */
+            void
+            receiveInterest(shared_ptr<Interest> interest);
 
-public: // verify
-  ControlResponse
-  makeResponse(uint32_t code, const std::string& text,
-               const ControlParameters& parameters);
+        public: // verify
+            ControlResponse
+            makeResponse(uint32_t code, const std::string& text,
+                    const ControlParameters& parameters);
 
-  enum class CheckResponseResult
-  {
-    OK,
-    OUT_OF_BOUNDARY,
-    WRONG_NAME,
-    WRONG_CONTENT_TYPE,
-    INVALID_RESPONSE,
-    WRONG_CODE,
-    WRONG_TEXT,
-    WRONG_BODY_SIZE,
-    WRONG_BODY_VALUE
-  };
+            enum class CheckResponseResult {
+                OK,
+                OUT_OF_BOUNDARY,
+                WRONG_NAME,
+                WRONG_CONTENT_TYPE,
+                INVALID_RESPONSE,
+                WRONG_CODE,
+                WRONG_TEXT,
+                WRONG_BODY_SIZE,
+                WRONG_BODY_VALUE
+            };
 
-  /**
-   * @brief check a specified response data with the expected ControlResponse
-   *
-   * @param idx the index of the specified Data in m_responses
-   * @param expectedDataName the expected name of this Data
-   * @param expectedResponse the expected ControlResponse
-   * @param expectedContentType the expected content type of this Data, use -1 to skip this check
-   *
-   * @retval OK the response at the specified index can be decoded from the response data,
-   *            and its code, text and response body are all matched with the expected response
-   * @retval OUT_OF_BOUNDARY the specified index out of boundary
-   * @retval WRONG_NAME the name of the specified response data does not match
-   * @retval WRONG_CONTENT_TYPE the content type of the specified response data does not match
-   * @retval INVALID_RESPONSE the data name matches but it fails in decoding a ControlResponse from
-   *                          the content of the specified response data
-   * @retval WRONG_CODE a valid ControlResponse can be decoded but has a wrong code
-   * @retval WRONG_TEXT a valid ControlResponse can be decoded but has a wrong text
-   * @retval WRONG_BODY_SIZE the body size of decoded ControlResponse does not match
-   * @retval WRONT_BODY_VALUE the body value of decoded ControlResponse does not match
-   */
-  CheckResponseResult
-  checkResponse(size_t idx,
-                const Name& expectedName,
-                const ControlResponse& expectedResponse,
-                int expectedContentType = -1);
+            /**
+             * @brief check a specified response data with the expected ControlResponse
+             *
+             * @param idx the index of the specified Data in m_responses
+             * @param expectedDataName the expected name of this Data
+             * @param expectedResponse the expected ControlResponse
+             * @param expectedContentType the expected content type of this Data, use -1 to skip this check
+             *
+             * @retval OK the response at the specified index can be decoded from the response data,
+             *            and its code, text and response body are all matched with the expected response
+             * @retval OUT_OF_BOUNDARY the specified index out of boundary
+             * @retval WRONG_NAME the name of the specified response data does not match
+             * @retval WRONG_CONTENT_TYPE the content type of the specified response data does not match
+             * @retval INVALID_RESPONSE the data name matches but it fails in decoding a ControlResponse from
+             *                          the content of the specified response data
+             * @retval WRONG_CODE a valid ControlResponse can be decoded but has a wrong code
+             * @retval WRONG_TEXT a valid ControlResponse can be decoded but has a wrong text
+             * @retval WRONG_BODY_SIZE the body size of decoded ControlResponse does not match
+             * @retval WRONT_BODY_VALUE the body value of decoded ControlResponse does not match
+             */
+            CheckResponseResult
+            checkResponse(size_t idx,
+                    const Name& expectedName,
+                    const ControlResponse& expectedResponse,
+                    int expectedContentType = -1);
 
-  /**
-   * @brief concatenate specified response Data into a single block
-   *
-   * @param startIndex the start index in m_responses
-   * @param nResponses the number of response to concatenate
-   *
-   * @return the generated block
-   */
-  Block
-  concatenateResponses(size_t startIndex = 0, size_t nResponses = 0);
+            /**
+             * @brief concatenate specified response Data into a single block
+             *
+             * @param startIndex the start index in m_responses
+             * @param nResponses the number of response to concatenate
+             *
+             * @return the generated block
+             */
+            Block
+            concatenateResponses(size_t startIndex = 0, size_t nResponses = 0);
 
-protected:
-  ndn::util::DummyClientFace m_face;
-  ndn::mgmt::Dispatcher m_dispatcher;
-  std::vector<Data>& m_responses; ///< a reference of m_face->sentData
-  Name m_identityName; ///< the identity to sign requests
-};
+        protected:
+            ndn::util::DummyClientFace m_face;
+            ndn::mgmt::Dispatcher m_dispatcher;
+            std::vector<Data>& m_responses; ///< a reference of m_face->sentData
+            Name m_identityName; ///< the identity to sign requests
+        };
 
-std::ostream&
-operator<<(std::ostream &os, const ManagerCommonFixture::CheckResponseResult& result);
+        std::ostream&
+        operator<<(std::ostream &os, const ManagerCommonFixture::CheckResponseResult& result);
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_MANAGER_COMMON_FIXTURE_HPP

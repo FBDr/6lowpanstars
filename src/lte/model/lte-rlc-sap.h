@@ -25,122 +25,110 @@
 
 namespace ns3 {
 
-/**
- * Service Access Point (SAP) offered by the UM-RLC and AM-RLC entities to the PDCP entity
- * See 3GPP 36.322 Radio Link Control (RLC) protocol specification
- *
- * This is the RLC SAP Provider
- * (i.e. the part of the SAP that contains the RLC methods called by the PDCP)
- */
-class LteRlcSapProvider
-{
-public:
-  virtual ~LteRlcSapProvider ();
+    /**
+     * Service Access Point (SAP) offered by the UM-RLC and AM-RLC entities to the PDCP entity
+     * See 3GPP 36.322 Radio Link Control (RLC) protocol specification
+     *
+     * This is the RLC SAP Provider
+     * (i.e. the part of the SAP that contains the RLC methods called by the PDCP)
+     */
+    class LteRlcSapProvider {
+    public:
+        virtual ~LteRlcSapProvider();
 
-  /**
-   * Parameters for LteRlcSapProvider::TransmitPdcpPdu
-   */
-  struct TransmitPdcpPduParameters
-  {
-    Ptr<Packet> pdcpPdu;  /**< the PDCP PDU */
-    uint16_t    rnti; /**< the C-RNTI identifying the UE */
-    uint8_t     lcid; /**< the logical channel id corresponding to the sending RLC instance */
-  };
+        /**
+         * Parameters for LteRlcSapProvider::TransmitPdcpPdu
+         */
+        struct TransmitPdcpPduParameters {
+            Ptr<Packet> pdcpPdu; /**< the PDCP PDU */
+            uint16_t rnti; /**< the C-RNTI identifying the UE */
+            uint8_t lcid; /**< the logical channel id corresponding to the sending RLC instance */
+        };
 
-  /**
-   * Send a PDCP PDU to the RLC for transmission
-   * This method is to be called
-   * when upper PDCP entity has a PDCP PDU ready to send
-   */
-  virtual void TransmitPdcpPdu (TransmitPdcpPduParameters params) = 0;
-};
+        /**
+         * Send a PDCP PDU to the RLC for transmission
+         * This method is to be called
+         * when upper PDCP entity has a PDCP PDU ready to send
+         */
+        virtual void TransmitPdcpPdu(TransmitPdcpPduParameters params) = 0;
+    };
 
+    /**
+     * Service Access Point (SAP) offered by the UM-RLC and AM-RLC entities to the PDCP entity
+     * See 3GPP 36.322 Radio Link Control (RLC) protocol specification
+     *
+     * This is the RLC SAP User
+     * (i.e. the part of the SAP that contains the PDCP methos called by the RLC)
+     */
+    class LteRlcSapUser {
+    public:
+        virtual ~LteRlcSapUser();
 
-/**
- * Service Access Point (SAP) offered by the UM-RLC and AM-RLC entities to the PDCP entity
- * See 3GPP 36.322 Radio Link Control (RLC) protocol specification
- *
- * This is the RLC SAP User
- * (i.e. the part of the SAP that contains the PDCP methos called by the RLC)
- */
-class LteRlcSapUser
-{
-public:
-  virtual ~LteRlcSapUser ();
+        /**
+         * Called by the RLC entity to notify the PDCP entity of the reception of a new PDCP PDU
+         *
+         * \param p the PDCP PDU
+         */
+        virtual void ReceivePdcpPdu(Ptr<Packet> p) = 0;
+    };
 
-  /**
-  * Called by the RLC entity to notify the PDCP entity of the reception of a new PDCP PDU
-  *
-  * \param p the PDCP PDU
-  */
-  virtual void ReceivePdcpPdu (Ptr<Packet> p) = 0;
-};
+    ///////////////////////////////////////
 
-///////////////////////////////////////
+    template <class C>
+    class LteRlcSpecificLteRlcSapProvider : public LteRlcSapProvider {
+    public:
+        LteRlcSpecificLteRlcSapProvider(C* rlc);
 
-template <class C>
-class LteRlcSpecificLteRlcSapProvider : public LteRlcSapProvider
-{
-public:
-  LteRlcSpecificLteRlcSapProvider (C* rlc);
+        // Interface implemented from LteRlcSapProvider
+        virtual void TransmitPdcpPdu(TransmitPdcpPduParameters params);
 
-  // Interface implemented from LteRlcSapProvider
-  virtual void TransmitPdcpPdu (TransmitPdcpPduParameters params);
+    private:
+        LteRlcSpecificLteRlcSapProvider();
+        C* m_rlc;
+    };
 
-private:
-  LteRlcSpecificLteRlcSapProvider ();
-  C* m_rlc;
-};
+    template <class C>
+    LteRlcSpecificLteRlcSapProvider<C>::LteRlcSpecificLteRlcSapProvider(C* rlc)
+    : m_rlc(rlc) {
+    }
 
-template <class C>
-LteRlcSpecificLteRlcSapProvider<C>::LteRlcSpecificLteRlcSapProvider (C* rlc)
-  : m_rlc (rlc)
-{
-}
+    template <class C>
+    LteRlcSpecificLteRlcSapProvider<C>::LteRlcSpecificLteRlcSapProvider() {
+    }
 
-template <class C>
-LteRlcSpecificLteRlcSapProvider<C>::LteRlcSpecificLteRlcSapProvider ()
-{
-}
+    template <class C>
+    void LteRlcSpecificLteRlcSapProvider<C>::TransmitPdcpPdu(TransmitPdcpPduParameters params) {
+        m_rlc->DoTransmitPdcpPdu(params.pdcpPdu);
+    }
 
-template <class C>
-void LteRlcSpecificLteRlcSapProvider<C>::TransmitPdcpPdu (TransmitPdcpPduParameters params)
-{
-  m_rlc->DoTransmitPdcpPdu (params.pdcpPdu);
-}
+    ///////////////////////////////////////
 
-///////////////////////////////////////
+    template <class C>
+    class LteRlcSpecificLteRlcSapUser : public LteRlcSapUser {
+    public:
+        LteRlcSpecificLteRlcSapUser(C* pdcp);
 
-template <class C>
-class LteRlcSpecificLteRlcSapUser : public LteRlcSapUser
-{
-public:
-  LteRlcSpecificLteRlcSapUser (C* pdcp);
+        // Interface implemented from LteRlcSapUser
+        virtual void ReceivePdcpPdu(Ptr<Packet> p);
 
-  // Interface implemented from LteRlcSapUser
-  virtual void ReceivePdcpPdu (Ptr<Packet> p);
+    private:
+        LteRlcSpecificLteRlcSapUser();
+        C* m_pdcp;
+    };
 
-private:
-  LteRlcSpecificLteRlcSapUser ();
-  C* m_pdcp;
-};
+    template <class C>
+    LteRlcSpecificLteRlcSapUser<C>::LteRlcSpecificLteRlcSapUser(C* pdcp)
+    : m_pdcp(pdcp) {
+    }
 
-template <class C>
-LteRlcSpecificLteRlcSapUser<C>::LteRlcSpecificLteRlcSapUser (C* pdcp)
-  : m_pdcp (pdcp)
-{
-}
+    template <class C>
+    LteRlcSpecificLteRlcSapUser<C>::LteRlcSpecificLteRlcSapUser() {
+    }
 
-template <class C>
-LteRlcSpecificLteRlcSapUser<C>::LteRlcSpecificLteRlcSapUser ()
-{
-}
-
-template <class C>
-void LteRlcSpecificLteRlcSapUser<C>::ReceivePdcpPdu (Ptr<Packet> p)
-{
-  m_pdcp->DoReceivePdcpPdu (p);
-}
+    template <class C>
+    void LteRlcSpecificLteRlcSapUser<C>::ReceivePdcpPdu(Ptr<Packet> p) {
+        m_pdcp->DoReceivePdcpPdu(p);
+    }
 
 
 } // namespace ns3

@@ -29,130 +29,129 @@
 
 namespace ns3 {
 
-class RemSpectrumPhy;
-class Node;
-class NetDevice;
-class SpectrumChannel;
-//class BuildingsMobilityModel;
-class MobilityModel;
+    class RemSpectrumPhy;
+    class Node;
+    class NetDevice;
+    class SpectrumChannel;
+    //class BuildingsMobilityModel;
+    class MobilityModel;
 
-/** 
- * \ingroup lte
- *
- * Generates a 2D map of the SINR from the strongest transmitter in the
- * downlink of an LTE FDD system. For instructions on usage, please refer to
- * the User Documentation.
- */
-class RadioEnvironmentMapHelper : public Object
-{
-public:  
+    /** 
+     * \ingroup lte
+     *
+     * Generates a 2D map of the SINR from the strongest transmitter in the
+     * downlink of an LTE FDD system. For instructions on usage, please refer to
+     * the User Documentation.
+     */
+    class RadioEnvironmentMapHelper : public Object {
+    public:
 
-  RadioEnvironmentMapHelper ();
-  virtual ~RadioEnvironmentMapHelper ();
-  
-  // inherited from Object
-  virtual void DoDispose (void);
-  /**
-   *  Register this type.
-   *  \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
+        RadioEnvironmentMapHelper();
+        virtual ~RadioEnvironmentMapHelper();
 
-  /** 
-   * \return the bandwidth (in num of RBs) over which SINR is calculated
-   */
-  uint8_t GetBandwidth () const;
+        // inherited from Object
+        virtual void DoDispose(void);
+        /**
+         *  Register this type.
+         *  \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  /** 
-   *
-   * \param bw  the bandwidth (in num of RBs) over which SINR is calculated
-   */
-  void SetBandwidth (uint8_t bw);
+        /** 
+         * \return the bandwidth (in num of RBs) over which SINR is calculated
+         */
+        uint8_t GetBandwidth() const;
 
-  /** 
-   * Deploy the RemSpectrumPhy objects that generate the map according to the specified settings.
-   * 
-   */
-  void Install ();
+        /** 
+         *
+         * \param bw  the bandwidth (in num of RBs) over which SINR is calculated
+         */
+        void SetBandwidth(uint8_t bw);
 
-private:
+        /** 
+         * Deploy the RemSpectrumPhy objects that generate the map according to the specified settings.
+         * 
+         */
+        void Install();
 
-  /**
-   * Scheduled by Install() to perform the actual generation of map.
-   *
-   * If control channel is used for SINR calculation (the default), the delay
-   * is 2.6 milliseconds from the start of simulation. Otherwise, if data
-   * channel is used, the delay is 500.1 milliseconds from the start of
-   * simulation.
-   *
-   * The method will divide the whole map into parts (each contains at most a
-   * certain number of SINR listening points), and then call RunOneIteration()
-   * on each part, one by one.
-   */
-  void DelayedInstall ();
+    private:
 
-  /**
-   * Mobilize all the listeners to a specified area. Afterwards, schedule a
-   * call to PrintAndReset() in 0.5 milliseconds.
-   *
-   * \param xMin X coordinate of the first SINR listening point to deploy.
-   * \param xMax X coordinate of the last SINR listening point to deploy.
-   * \param yMin Y coordinate of the first SINR listening point to deploy.
-   * \param yMax Y coordinate of the last SINR listening point to deploy.
-   */
-  void RunOneIteration (double xMin, double xMax, double yMin, double yMax);
+        /**
+         * Scheduled by Install() to perform the actual generation of map.
+         *
+         * If control channel is used for SINR calculation (the default), the delay
+         * is 2.6 milliseconds from the start of simulation. Otherwise, if data
+         * channel is used, the delay is 500.1 milliseconds from the start of
+         * simulation.
+         *
+         * The method will divide the whole map into parts (each contains at most a
+         * certain number of SINR listening points), and then call RunOneIteration()
+         * on each part, one by one.
+         */
+        void DelayedInstall();
 
-  /// Go through every listener, write the computed SINR, and then reset it.
-  void PrintAndReset ();
+        /**
+         * Mobilize all the listeners to a specified area. Afterwards, schedule a
+         * call to PrintAndReset() in 0.5 milliseconds.
+         *
+         * \param xMin X coordinate of the first SINR listening point to deploy.
+         * \param xMax X coordinate of the last SINR listening point to deploy.
+         * \param yMin Y coordinate of the first SINR listening point to deploy.
+         * \param yMax Y coordinate of the last SINR listening point to deploy.
+         */
+        void RunOneIteration(double xMin, double xMax, double yMin, double yMax);
 
-  /// Called when the map generation procedure has been completed.
-  void Finalize ();
+        /// Go through every listener, write the computed SINR, and then reset it.
+        void PrintAndReset();
 
-  /// A complete Radio Environment Map is composed of many of this structure.
-  struct RemPoint 
-  {
-    /// Simplified listener which compute SINR over the DL channel.
-    Ptr<RemSpectrumPhy> phy;
-    /// Position of the listener in the environment.
-    Ptr<MobilityModel> bmm;
-  };
+        /// Called when the map generation procedure has been completed.
+        void Finalize();
 
-  /// List of listeners in the environment.
-  std::list<RemPoint> m_rem;
+        /// A complete Radio Environment Map is composed of many of this structure.
 
-  double m_xMin;   ///< The `XMin` attribute.
-  double m_xMax;   ///< The `XMax` attribute.
-  uint16_t m_xRes; ///< The `XRes` attribute.
-  double m_xStep;  ///< Distance along X axis between adjacent listening points.
+        struct RemPoint {
+            /// Simplified listener which compute SINR over the DL channel.
+            Ptr<RemSpectrumPhy> phy;
+            /// Position of the listener in the environment.
+            Ptr<MobilityModel> bmm;
+        };
 
-  double m_yMin;   ///< The `YMin` attribute.
-  double m_yMax;   ///< The `YMax` attribute.
-  uint16_t m_yRes; ///< The `YRes` attribute.
-  double m_yStep;  ///< Distance along Y axis between adjacent listening points.
+        /// List of listeners in the environment.
+        std::list<RemPoint> m_rem;
 
-  uint32_t m_maxPointsPerIteration;  ///< The `MaxPointsPerIteration` attribute.
+        double m_xMin; ///< The `XMin` attribute.
+        double m_xMax; ///< The `XMax` attribute.
+        uint16_t m_xRes; ///< The `XRes` attribute.
+        double m_xStep; ///< Distance along X axis between adjacent listening points.
 
-  uint16_t m_earfcn;     ///< The `Earfcn` attribute.
-  uint16_t m_bandwidth;  ///< The `Bandwidth` attribute.
- 
-  double m_z;  ///< The `Z` attribute.
+        double m_yMin; ///< The `YMin` attribute.
+        double m_yMax; ///< The `YMax` attribute.
+        uint16_t m_yRes; ///< The `YRes` attribute.
+        double m_yStep; ///< Distance along Y axis between adjacent listening points.
 
-  std::string m_channelPath;  ///< The `ChannelPath` attribute.
-  std::string m_outputFile;   ///< The `OutputFile` attribute.
+        uint32_t m_maxPointsPerIteration; ///< The `MaxPointsPerIteration` attribute.
 
-  bool m_stopWhenDone;   ///< The `StopWhenDone` attribute.
-  
-  /// The channel object taken from the `ChannelPath` attribute.
-  Ptr<SpectrumChannel> m_channel;
+        uint16_t m_earfcn; ///< The `Earfcn` attribute.
+        uint16_t m_bandwidth; ///< The `Bandwidth` attribute.
 
-  double m_noisePower;  ///< The `NoisePower` attribute.
+        double m_z; ///< The `Z` attribute.
 
-  std::ofstream m_outFile;  ///< Stream the output to a file.
+        std::string m_channelPath; ///< The `ChannelPath` attribute.
+        std::string m_outputFile; ///< The `OutputFile` attribute.
 
-  bool m_useDataChannel;  ///< The `UseDataChannel` attribute.
-  int32_t m_rbId;         ///< The `RbId` attribute.
+        bool m_stopWhenDone; ///< The `StopWhenDone` attribute.
 
-}; // end of `class RadioEnvironmentMapHelper`
+        /// The channel object taken from the `ChannelPath` attribute.
+        Ptr<SpectrumChannel> m_channel;
+
+        double m_noisePower; ///< The `NoisePower` attribute.
+
+        std::ofstream m_outFile; ///< Stream the output to a file.
+
+        bool m_useDataChannel; ///< The `UseDataChannel` attribute.
+        int32_t m_rbId; ///< The `RbId` attribute.
+
+    }; // end of `class RadioEnvironmentMapHelper`
 
 
 } // end of `namespace ns3`

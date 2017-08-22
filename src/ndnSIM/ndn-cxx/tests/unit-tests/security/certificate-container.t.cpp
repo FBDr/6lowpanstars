@@ -27,52 +27,51 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecurityCertificateContainer)
+            BOOST_AUTO_TEST_SUITE(SecurityCertificateContainer)
 
-BOOST_FIXTURE_TEST_CASE(TestCertificateContainer, PibDataFixture)
-{
-  auto pibImpl = make_shared<PibMemory>();
-  Pib pib("pib-memory", "", pibImpl);
+            BOOST_FIXTURE_TEST_CASE(TestCertificateContainer, PibDataFixture) {
+                auto pibImpl = make_shared<PibMemory>();
+                Pib pib("pib-memory", "", pibImpl);
 
-  Identity identity1 = pib.addIdentity(id1);
-  Key key11 = identity1.addKey(id1Key1, id1Key1Name.get(-1));
-  key11.addCertificate(id1Key1Cert1);
-  key11.addCertificate(id1Key1Cert2);
+                Identity identity1 = pib.addIdentity(id1);
+                Key key11 = identity1.addKey(id1Key1, id1Key1Name.get(-1));
+                key11.addCertificate(id1Key1Cert1);
+                key11.addCertificate(id1Key1Cert2);
 
-  CertificateContainer container = key11.getCertificates();
-  BOOST_CHECK_EQUAL(container.size(), 2);
-  BOOST_CHECK(container.find(id1Key1Cert1.getName()) != container.end());
-  BOOST_CHECK(container.find(id1Key1Cert2.getName()) != container.end());
+                CertificateContainer container = key11.getCertificates();
+                BOOST_CHECK_EQUAL(container.size(), 2);
+                BOOST_CHECK(container.find(id1Key1Cert1.getName()) != container.end());
+                BOOST_CHECK(container.find(id1Key1Cert2.getName()) != container.end());
 
-  std::set<Name> certNames;
-  certNames.insert(id1Key1Cert1.getName());
-  certNames.insert(id1Key1Cert2.getName());
+                std::set<Name> certNames;
+                certNames.insert(id1Key1Cert1.getName());
+                certNames.insert(id1Key1Cert2.getName());
 
-  CertificateContainer::const_iterator it = container.begin();
-  std::set<Name>::const_iterator testIt = certNames.begin();
-  BOOST_CHECK_EQUAL((*it).getName(), *testIt);
-  it++;
-  testIt++;
-  BOOST_CHECK_EQUAL((*it).getName(), *testIt);
-  ++it;
-  testIt++;
-  BOOST_CHECK(it == container.end());
+                CertificateContainer::const_iterator it = container.begin();
+                std::set<Name>::const_iterator testIt = certNames.begin();
+                BOOST_CHECK_EQUAL((*it).getName(), *testIt);
+                it++;
+                testIt++;
+                BOOST_CHECK_EQUAL((*it).getName(), *testIt);
+                ++it;
+                testIt++;
+                BOOST_CHECK(it == container.end());
 
-  size_t count = 0;
-  testIt = certNames.begin();
-  for (const auto& cert : container) {
-    BOOST_CHECK_EQUAL(cert.getName(), *testIt);
-    testIt++;
-    count++;
-  }
-  BOOST_CHECK_EQUAL(count, 2);
-}
+                size_t count = 0;
+                testIt = certNames.begin();
+                for (const auto& cert : container) {
+                    BOOST_CHECK_EQUAL(cert.getName(), *testIt);
+                    testIt++;
+                    count++;
+                }
+                BOOST_CHECK_EQUAL(count, 2);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

@@ -32,13 +32,13 @@
 
 namespace ndn {
 
-size_t
-DEREncodeGeneralTime(CryptoPP::BufferedTransformation& bt,
-                     const time::system_clock::TimePoint& time);
+    size_t
+    DEREncodeGeneralTime(CryptoPP::BufferedTransformation& bt,
+            const time::system_clock::TimePoint& time);
 
-void
-BERDecodeTime(CryptoPP::BufferedTransformation& bt,
-              time::system_clock::TimePoint& time);
+    void
+    BERDecodeTime(CryptoPP::BufferedTransformation& bt,
+            time::system_clock::TimePoint& time);
 
 } // namespace ndn
 

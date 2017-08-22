@@ -29,127 +29,115 @@
 #include "fib-entry.hpp"
 
 namespace nfd {
-namespace measurements {
+    namespace measurements {
 
-Measurements::Measurements(NameTree& nameTree)
-  : m_nameTree(nameTree)
-  , m_nItems(0)
-{
-}
+        Measurements::Measurements(NameTree& nameTree)
+        : m_nameTree(nameTree)
+        , m_nItems(0) {
+        }
 
-Entry&
-Measurements::get(name_tree::Entry& nte)
-{
-  Entry* entry = nte.getMeasurementsEntry();
-  if (entry != nullptr) {
-    return *entry;
-  }
+        Entry&
+        Measurements::get(name_tree::Entry& nte) {
+            Entry* entry = nte.getMeasurementsEntry();
+            if (entry != nullptr) {
+                return *entry;
+            }
 
-  nte.setMeasurementsEntry(make_unique<Entry>(nte.getName()));
-  ++m_nItems;
-  entry = nte.getMeasurementsEntry();
+            nte.setMeasurementsEntry(make_unique<Entry>(nte.getName()));
+            ++m_nItems;
+            entry = nte.getMeasurementsEntry();
 
-  entry->m_expiry = time::steady_clock::now() + getInitialLifetime();
-  entry->m_cleanup = scheduler::schedule(getInitialLifetime(),
-                                         bind(&Measurements::cleanup, this, ref(*entry)));
+            entry->m_expiry = time::steady_clock::now() + getInitialLifetime();
+            entry->m_cleanup = scheduler::schedule(getInitialLifetime(),
+                    bind(&Measurements::cleanup, this, ref(*entry)));
 
-  return *entry;
-}
+            return *entry;
+        }
 
-Entry&
-Measurements::get(const Name& name)
-{
-  name_tree::Entry& nte = m_nameTree.lookup(name);
-  return this->get(nte);
-}
+        Entry&
+        Measurements::get(const Name& name) {
+            name_tree::Entry& nte = m_nameTree.lookup(name);
+            return this->get(nte);
+        }
 
-Entry&
-Measurements::get(const fib::Entry& fibEntry)
-{
-  name_tree::Entry& nte = m_nameTree.lookup(fibEntry);
-  return this->get(nte);
-}
+        Entry&
+        Measurements::get(const fib::Entry& fibEntry) {
+            name_tree::Entry& nte = m_nameTree.lookup(fibEntry);
+            return this->get(nte);
+        }
 
-Entry&
-Measurements::get(const pit::Entry& pitEntry)
-{
-  name_tree::Entry& nte = m_nameTree.lookup(pitEntry);
-  return this->get(nte);
-}
+        Entry&
+        Measurements::get(const pit::Entry& pitEntry) {
+            name_tree::Entry& nte = m_nameTree.lookup(pitEntry);
+            return this->get(nte);
+        }
 
-Entry*
-Measurements::getParent(const Entry& child)
-{
-  if (child.getName().empty()) { // the root entry
-    return nullptr;
-  }
+        Entry*
+        Measurements::getParent(const Entry& child) {
+            if (child.getName().empty()) { // the root entry
+                return nullptr;
+            }
 
-  name_tree::Entry* nteChild = m_nameTree.getEntry(child);
-  name_tree::Entry* nte = nteChild->getParent();
-  BOOST_ASSERT(nte != nullptr);
-  return &this->get(*nte);
-}
+            name_tree::Entry* nteChild = m_nameTree.getEntry(child);
+            name_tree::Entry* nte = nteChild->getParent();
+            BOOST_ASSERT(nte != nullptr);
+            return &this->get(*nte);
+        }
 
-template<typename K>
-Entry*
-Measurements::findLongestPrefixMatchImpl(const K& key, const EntryPredicate& pred) const
-{
-  name_tree::Entry* match = m_nameTree.findLongestPrefixMatch(key,
-    [&pred] (const name_tree::Entry& nte) {
-      const Entry* entry = nte.getMeasurementsEntry();
-      return entry != nullptr && pred(*entry);
-    });
-  if (match != nullptr) {
-    return match->getMeasurementsEntry();
-  }
-  return nullptr;
-}
+        template<typename K>
+        Entry*
+        Measurements::findLongestPrefixMatchImpl(const K& key, const EntryPredicate& pred) const {
+            name_tree::Entry* match = m_nameTree.findLongestPrefixMatch(key,
+                    [&pred] (const name_tree::Entry & nte) {
+                        const Entry* entry = nte.getMeasurementsEntry();
+                        return entry != nullptr && pred(*entry);
+                    });
+            if (match != nullptr) {
+                return match->getMeasurementsEntry();
+            }
+            return nullptr;
+        }
 
-Entry*
-Measurements::findLongestPrefixMatch(const Name& name, const EntryPredicate& pred) const
-{
-  return this->findLongestPrefixMatchImpl(name, pred);
-}
+        Entry*
+        Measurements::findLongestPrefixMatch(const Name& name, const EntryPredicate& pred) const {
+            return this->findLongestPrefixMatchImpl(name, pred);
+        }
 
-Entry*
-Measurements::findLongestPrefixMatch(const pit::Entry& pitEntry, const EntryPredicate& pred) const
-{
-  return this->findLongestPrefixMatchImpl(pitEntry, pred);
-}
+        Entry*
+        Measurements::findLongestPrefixMatch(const pit::Entry& pitEntry, const EntryPredicate& pred) const {
+            return this->findLongestPrefixMatchImpl(pitEntry, pred);
+        }
 
-Entry*
-Measurements::findExactMatch(const Name& name) const
-{
-  const name_tree::Entry* nte = m_nameTree.findExactMatch(name);
-  return nte == nullptr ? nullptr : nte->getMeasurementsEntry();
-}
+        Entry*
+        Measurements::findExactMatch(const Name& name) const {
+            const name_tree::Entry* nte = m_nameTree.findExactMatch(name);
+            return nte == nullptr ? nullptr : nte->getMeasurementsEntry();
+        }
 
-void
-Measurements::extendLifetime(Entry& entry, const time::nanoseconds& lifetime)
-{
-  BOOST_ASSERT(m_nameTree.getEntry(entry) != nullptr);
+        void
+        Measurements::extendLifetime(Entry& entry, const time::nanoseconds& lifetime) {
+            BOOST_ASSERT(m_nameTree.getEntry(entry) != nullptr);
 
-  time::steady_clock::TimePoint expiry = time::steady_clock::now() + lifetime;
-  if (entry.m_expiry >= expiry) {
-    // has longer lifetime, not extending
-    return;
-  }
+            time::steady_clock::TimePoint expiry = time::steady_clock::now() + lifetime;
+            if (entry.m_expiry >= expiry) {
+                // has longer lifetime, not extending
+                return;
+            }
 
-  scheduler::cancel(entry.m_cleanup);
-  entry.m_expiry = expiry;
-  entry.m_cleanup = scheduler::schedule(lifetime, bind(&Measurements::cleanup, this, ref(entry)));
-}
+            scheduler::cancel(entry.m_cleanup);
+            entry.m_expiry = expiry;
+            entry.m_cleanup = scheduler::schedule(lifetime, bind(&Measurements::cleanup, this, ref(entry)));
+        }
 
-void
-Measurements::cleanup(Entry& entry)
-{
-  name_tree::Entry* nte = m_nameTree.getEntry(entry);
-  BOOST_ASSERT(nte != nullptr);
+        void
+        Measurements::cleanup(Entry& entry) {
+            name_tree::Entry* nte = m_nameTree.getEntry(entry);
+            BOOST_ASSERT(nte != nullptr);
 
-  nte->setMeasurementsEntry(nullptr);
-  m_nameTree.eraseIfEmpty(nte);
-  --m_nItems;
-}
+            nte->setMeasurementsEntry(nullptr);
+            m_nameTree.eraseIfEmpty(nte);
+            --m_nItems;
+        }
 
-} // namespace measurements
+    } // namespace measurements
 } // namespace nfd

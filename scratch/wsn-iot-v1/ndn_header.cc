@@ -1,6 +1,7 @@
 #include "stacks_header.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("ndn-stack");
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,

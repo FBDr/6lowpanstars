@@ -31,79 +31,79 @@
 #include <boost/mpl/set.hpp>
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          Sequence,
-                          tlv::Sequence> SequenceField;
-BOOST_CONCEPT_ASSERT((Field<SequenceField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        Sequence,
+        tlv::Sequence> SequenceField;
+        BOOST_CONCEPT_ASSERT((Field<SequenceField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::FragIndex> FragIndexField;
-BOOST_CONCEPT_ASSERT((Field<FragIndexField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::FragIndex> FragIndexField;
+        BOOST_CONCEPT_ASSERT((Field<FragIndexField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::FragCount> FragCountField;
-BOOST_CONCEPT_ASSERT((Field<FragCountField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::FragCount> FragCountField;
+        BOOST_CONCEPT_ASSERT((Field<FragCountField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          NackHeader,
-                          tlv::Nack> NackField;
-BOOST_CONCEPT_ASSERT((Field<NackField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        NackHeader,
+        tlv::Nack> NackField;
+        BOOST_CONCEPT_ASSERT((Field<NackField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::NextHopFaceId> NextHopFaceIdField;
-BOOST_CONCEPT_ASSERT((Field<NextHopFaceIdField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::NextHopFaceId> NextHopFaceIdField;
+        BOOST_CONCEPT_ASSERT((Field<NextHopFaceIdField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          CachePolicy,
-                          tlv::CachePolicy> CachePolicyField;
-BOOST_CONCEPT_ASSERT((Field<CachePolicyField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        CachePolicy,
+        tlv::CachePolicy> CachePolicyField;
+        BOOST_CONCEPT_ASSERT((Field<CachePolicyField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::IncomingFaceId> IncomingFaceIdField;
-BOOST_CONCEPT_ASSERT((Field<IncomingFaceIdField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::IncomingFaceId> IncomingFaceIdField;
+        BOOST_CONCEPT_ASSERT((Field<IncomingFaceIdField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::CongestionMark> CongestionMarkField;
-BOOST_CONCEPT_ASSERT((Field<CongestionMarkField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::CongestionMark> CongestionMarkField;
+        BOOST_CONCEPT_ASSERT((Field<CongestionMarkField>));
 
-typedef detail::FieldDecl<field_location_tags::Header,
-                          uint64_t,
-                          tlv::HopCountTag> HopCountTagField;
-BOOST_CONCEPT_ASSERT((Field<HopCountTagField>));
+        typedef detail::FieldDecl<field_location_tags::Header,
+        uint64_t,
+        tlv::HopCountTag> HopCountTagField;
+        BOOST_CONCEPT_ASSERT((Field<HopCountTagField>));
 
-/**
- * The value of the wire encoded field is the data between the provided iterators. During
- * encoding, the data is copied from the Buffer into the wire buffer.
- */
-typedef detail::FieldDecl<field_location_tags::Fragment,
-                          std::pair<Buffer::const_iterator, Buffer::const_iterator>,
-                          tlv::Fragment> FragmentField;
-BOOST_CONCEPT_ASSERT((Field<FragmentField>));
+        /**
+         * The value of the wire encoded field is the data between the provided iterators. During
+         * encoding, the data is copied from the Buffer into the wire buffer.
+         */
+        typedef detail::FieldDecl<field_location_tags::Fragment,
+        std::pair<Buffer::const_iterator, Buffer::const_iterator>,
+        tlv::Fragment> FragmentField;
+        BOOST_CONCEPT_ASSERT((Field<FragmentField>));
 
-/**
- * \brief set of all field declarations
- */
-typedef boost::mpl::set<
-  FragmentField,
-  SequenceField,
-  FragIndexField,
-  FragCountField,
-  NackField,
-  NextHopFaceIdField,
-  CachePolicyField,
-  IncomingFaceIdField,
-  CongestionMarkField,
-  HopCountTagField
-  > FieldSet;
+        /**
+         * \brief set of all field declarations
+         */
+        typedef boost::mpl::set<
+        FragmentField,
+        SequenceField,
+        FragIndexField,
+        FragCountField,
+        NackField,
+        NextHopFaceIdField,
+        CachePolicyField,
+        IncomingFaceIdField,
+        CongestionMarkField,
+        HopCountTagField
+        > FieldSet;
 
-} // namespace lp
+    } // namespace lp
 } // namespace ndn
 
 #endif // NDN_CXX_LP_FIELDS_HPP

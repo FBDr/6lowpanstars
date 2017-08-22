@@ -20,256 +20,219 @@
 
 #include "service-flow-record.h"
 
-namespace ns3 {
-
-ServiceFlowRecord::ServiceFlowRecord (void)
-  : m_grantSize (0),
-    m_grantTimeStamp (Seconds (0)),
-    m_dlTimeStamp (Seconds (0)),
-    m_pktsSent (0),
-    m_pktsRcvd (0),
-    m_bytesSent (0),
-    m_bytesRcvd (0),
-    m_requestedBandwidth (0),
-    m_grantedBandwidth (0),
-    m_bwSinceLastExpiry (0)
+namespace ns3
 {
 
-  m_lastGrantTime = Seconds (0);
-  m_backlogged = 0;
-  m_backloggedTemp = 0;
-  m_grantedBandwidthTemp = 0;
-}
+    ServiceFlowRecord::ServiceFlowRecord(void)
+            : m_grantSize(0),
+            m_grantTimeStamp(Seconds(0)),
+            m_dlTimeStamp(Seconds(0)),
+            m_pktsSent(0),
+            m_pktsRcvd(0),
+            m_bytesSent(0),
+            m_bytesRcvd(0),
+            m_requestedBandwidth(0),
+            m_grantedBandwidth(0),
+            m_bwSinceLastExpiry(0) {
 
-ServiceFlowRecord::~ServiceFlowRecord (void)
-{
-}
+        m_lastGrantTime = Seconds(0);
+        m_backlogged = 0;
+        m_backloggedTemp = 0;
+        m_grantedBandwidthTemp = 0;
+    }
 
-void
-ServiceFlowRecord::SetGrantSize (uint32_t grantSize)
-{
-  m_grantSize = grantSize;
-}
+    ServiceFlowRecord::~ServiceFlowRecord(void) {
+    }
 
-uint32_t
-ServiceFlowRecord::GetGrantSize (void) const
-{
-  return m_grantSize;
-}
+    void
+    ServiceFlowRecord::SetGrantSize(uint32_t grantSize) {
+        m_grantSize = grantSize;
+    }
 
-void
-ServiceFlowRecord::SetGrantTimeStamp (Time grantTimeStamp)
-{
-  m_grantTimeStamp = grantTimeStamp;
-}
+    uint32_t
+    ServiceFlowRecord::GetGrantSize(void) const {
+        return m_grantSize;
+    }
 
-Time
-ServiceFlowRecord::GetGrantTimeStamp (void) const
-{
-  return m_grantTimeStamp;
-}
+    void
+    ServiceFlowRecord::SetGrantTimeStamp(Time grantTimeStamp) {
+        m_grantTimeStamp = grantTimeStamp;
+    }
 
-void
-ServiceFlowRecord::SetDlTimeStamp (Time dlTimeStamp)
-{
-  m_dlTimeStamp = dlTimeStamp;
-}
+    Time
+    ServiceFlowRecord::GetGrantTimeStamp(void) const {
+        return m_grantTimeStamp;
+    }
 
-Time
-ServiceFlowRecord::GetDlTimeStamp (void) const
-{
-  return m_dlTimeStamp;
-}
+    void
+    ServiceFlowRecord::SetDlTimeStamp(Time dlTimeStamp) {
+        m_dlTimeStamp = dlTimeStamp;
+    }
 
-void
-ServiceFlowRecord::SetPktsSent (uint32_t pktsSent)
-{
-  m_pktsSent = pktsSent;
-}
+    Time
+    ServiceFlowRecord::GetDlTimeStamp(void) const {
+        return m_dlTimeStamp;
+    }
 
-void
-ServiceFlowRecord::UpdatePktsSent (uint32_t pktsSent)
-{
-  m_pktsSent += pktsSent;
-}
+    void
+    ServiceFlowRecord::SetPktsSent(uint32_t pktsSent) {
+        m_pktsSent = pktsSent;
+    }
 
-uint32_t
-ServiceFlowRecord::GetPktsSent (void) const
-{
-  return m_pktsSent;
-}
+    void
+    ServiceFlowRecord::UpdatePktsSent(uint32_t pktsSent) {
+        m_pktsSent += pktsSent;
+    }
 
-void
-ServiceFlowRecord::SetPktsRcvd (uint32_t pktsRcvd)
-{
-  m_pktsRcvd = pktsRcvd;
-}
+    uint32_t
+    ServiceFlowRecord::GetPktsSent(void) const {
+        return m_pktsSent;
+    }
 
-void
-ServiceFlowRecord::UpdatePktsRcvd (uint32_t pktsRcvd)
-{
-  m_pktsRcvd += pktsRcvd;
-}
+    void
+    ServiceFlowRecord::SetPktsRcvd(uint32_t pktsRcvd) {
+        m_pktsRcvd = pktsRcvd;
+    }
 
-uint32_t
-ServiceFlowRecord::GetPktsRcvd (void) const
-{
-  return m_pktsRcvd;
-}
+    void
+    ServiceFlowRecord::UpdatePktsRcvd(uint32_t pktsRcvd) {
+        m_pktsRcvd += pktsRcvd;
+    }
 
-void
-ServiceFlowRecord::SetBytesSent (uint32_t bytesSent)
-{
-  m_bytesSent = bytesSent;
-}
+    uint32_t
+    ServiceFlowRecord::GetPktsRcvd(void) const {
+        return m_pktsRcvd;
+    }
 
-void
-ServiceFlowRecord::UpdateBytesSent (uint32_t bytesSent)
-{
-  m_bytesSent += bytesSent;
-}
+    void
+    ServiceFlowRecord::SetBytesSent(uint32_t bytesSent) {
+        m_bytesSent = bytesSent;
+    }
 
-uint32_t
-ServiceFlowRecord::GetBytesSent (void) const
-{
-  return m_bytesSent;
-}
+    void
+    ServiceFlowRecord::UpdateBytesSent(uint32_t bytesSent) {
+        m_bytesSent += bytesSent;
+    }
 
-void
-ServiceFlowRecord::SetBytesRcvd (uint32_t bytesRcvd)
-{
-  m_bytesRcvd = bytesRcvd;
-}
+    uint32_t
+    ServiceFlowRecord::GetBytesSent(void) const {
+        return m_bytesSent;
+    }
 
-void
-ServiceFlowRecord::UpdateBytesRcvd (uint32_t bytesRcvd)
-{
-  m_bytesRcvd += bytesRcvd;
-}
+    void
+    ServiceFlowRecord::SetBytesRcvd(uint32_t bytesRcvd) {
+        m_bytesRcvd = bytesRcvd;
+    }
 
-uint32_t
-ServiceFlowRecord::GetBytesRcvd (void) const
-{
-  return m_bytesRcvd;
-}
+    void
+    ServiceFlowRecord::UpdateBytesRcvd(uint32_t bytesRcvd) {
+        m_bytesRcvd += bytesRcvd;
+    }
 
-void
-ServiceFlowRecord::SetRequestedBandwidth (uint32_t requestedBandwidth)
-{
-  m_requestedBandwidth = requestedBandwidth;
-}
-void
-ServiceFlowRecord::UpdateRequestedBandwidth (uint32_t requestedBandwidth)
-{
-  m_requestedBandwidth += requestedBandwidth;
-}
+    uint32_t
+    ServiceFlowRecord::GetBytesRcvd(void) const {
+        return m_bytesRcvd;
+    }
 
-uint32_t
-ServiceFlowRecord::GetRequestedBandwidth (void)
-{
-  return m_requestedBandwidth;
-}
+    void
+    ServiceFlowRecord::SetRequestedBandwidth(uint32_t requestedBandwidth) {
+        m_requestedBandwidth = requestedBandwidth;
+    }
 
-void
-ServiceFlowRecord::SetGrantedBandwidth (uint32_t grantedBandwidth)
-{
-  m_grantedBandwidth = grantedBandwidth;
-}
+    void
+    ServiceFlowRecord::UpdateRequestedBandwidth(uint32_t requestedBandwidth) {
+        m_requestedBandwidth += requestedBandwidth;
+    }
 
-void
-ServiceFlowRecord::UpdateGrantedBandwidth (uint32_t grantedBandwidth)
-{
-  m_grantedBandwidth += grantedBandwidth;
-}
+    uint32_t
+    ServiceFlowRecord::GetRequestedBandwidth(void) {
+        return m_requestedBandwidth;
+    }
 
-uint32_t
-ServiceFlowRecord::GetGrantedBandwidth (void)
-{
-  return m_grantedBandwidth;
-}
-void
-ServiceFlowRecord::SetGrantedBandwidthTemp (uint32_t grantedBandwidthTemp)
-{
-  m_grantedBandwidthTemp = grantedBandwidthTemp;
-}
+    void
+    ServiceFlowRecord::SetGrantedBandwidth(uint32_t grantedBandwidth) {
+        m_grantedBandwidth = grantedBandwidth;
+    }
 
-void
-ServiceFlowRecord::UpdateGrantedBandwidthTemp (
-  uint32_t grantedBandwidthTemp)
-{
-  m_grantedBandwidthTemp += grantedBandwidthTemp;
-}
+    void
+    ServiceFlowRecord::UpdateGrantedBandwidth(uint32_t grantedBandwidth) {
+        m_grantedBandwidth += grantedBandwidth;
+    }
 
-uint32_t
-ServiceFlowRecord::GetGrantedBandwidthTemp (void)
-{
-  return m_grantedBandwidthTemp;
-}
+    uint32_t
+    ServiceFlowRecord::GetGrantedBandwidth(void) {
+        return m_grantedBandwidth;
+    }
 
-void
-ServiceFlowRecord::SetLastGrantTime (Time grantTime)
-{
-  m_lastGrantTime = grantTime;
-}
+    void
+    ServiceFlowRecord::SetGrantedBandwidthTemp(uint32_t grantedBandwidthTemp) {
+        m_grantedBandwidthTemp = grantedBandwidthTemp;
+    }
 
-Time
-ServiceFlowRecord::GetLastGrantTime (void) const
-{
-  return m_lastGrantTime;
-}
+    void
+    ServiceFlowRecord::UpdateGrantedBandwidthTemp(
+            uint32_t grantedBandwidthTemp) {
+        m_grantedBandwidthTemp += grantedBandwidthTemp;
+    }
 
-void
-ServiceFlowRecord::SetBacklogged (uint32_t backlogged)
-{
-  m_backlogged = backlogged;
-}
+    uint32_t
+    ServiceFlowRecord::GetGrantedBandwidthTemp(void) {
+        return m_grantedBandwidthTemp;
+    }
 
-void
-ServiceFlowRecord::IncreaseBacklogged (uint32_t backlogged)
-{
-  m_backlogged += backlogged;
-}
+    void
+    ServiceFlowRecord::SetLastGrantTime(Time grantTime) {
+        m_lastGrantTime = grantTime;
+    }
 
-uint32_t
-ServiceFlowRecord::GetBacklogged (void) const
-{
-  return m_backlogged;
-}
+    Time
+    ServiceFlowRecord::GetLastGrantTime(void) const {
+        return m_lastGrantTime;
+    }
 
-void
-ServiceFlowRecord::SetBackloggedTemp (uint32_t backloggedTemp)
-{
-  m_backloggedTemp = backloggedTemp;
-}
+    void
+    ServiceFlowRecord::SetBacklogged(uint32_t backlogged) {
+        m_backlogged = backlogged;
+    }
 
-void
-ServiceFlowRecord::IncreaseBackloggedTemp (uint32_t backloggedTemp)
-{
-  m_backloggedTemp += backloggedTemp;
-}
+    void
+    ServiceFlowRecord::IncreaseBacklogged(uint32_t backlogged) {
+        m_backlogged += backlogged;
+    }
 
-uint32_t
-ServiceFlowRecord::GetBackloggedTemp (void) const
-{
-  return m_backloggedTemp;
-}
+    uint32_t
+    ServiceFlowRecord::GetBacklogged(void) const {
+        return m_backlogged;
+    }
 
-void
-ServiceFlowRecord::SetBwSinceLastExpiry (uint32_t bwSinceLastExpiry)
-{
-  m_bwSinceLastExpiry = bwSinceLastExpiry;
-}
+    void
+    ServiceFlowRecord::SetBackloggedTemp(uint32_t backloggedTemp) {
+        m_backloggedTemp = backloggedTemp;
+    }
 
-void
-ServiceFlowRecord::UpdateBwSinceLastExpiry (uint32_t bwSinceLastExpiry)
-{
-  m_bwSinceLastExpiry += bwSinceLastExpiry;
-}
+    void
+    ServiceFlowRecord::IncreaseBackloggedTemp(uint32_t backloggedTemp) {
+        m_backloggedTemp += backloggedTemp;
+    }
 
-uint32_t
-ServiceFlowRecord::GetBwSinceLastExpiry (void)
-{
-  return m_bwSinceLastExpiry;
-}
+    uint32_t
+    ServiceFlowRecord::GetBackloggedTemp(void) const {
+        return m_backloggedTemp;
+    }
+
+    void
+    ServiceFlowRecord::SetBwSinceLastExpiry(uint32_t bwSinceLastExpiry) {
+        m_bwSinceLastExpiry = bwSinceLastExpiry;
+    }
+
+    void
+    ServiceFlowRecord::UpdateBwSinceLastExpiry(uint32_t bwSinceLastExpiry) {
+        m_bwSinceLastExpiry += bwSinceLastExpiry;
+    }
+
+    uint32_t
+    ServiceFlowRecord::GetBwSinceLastExpiry(void) {
+        return m_bwSinceLastExpiry;
+    }
 
 } // namespace ns3

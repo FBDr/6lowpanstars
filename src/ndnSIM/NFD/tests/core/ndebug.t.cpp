@@ -28,32 +28,30 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(TestNdebug)
+        BOOST_AUTO_TEST_SUITE(TestNdebug)
 
-BOOST_AUTO_TEST_CASE(AssertFalse)
-{
+        BOOST_AUTO_TEST_CASE(AssertFalse) {
 #ifndef _DEBUG
-  // in release builds, assertion shouldn't execute
-  BOOST_ASSERT(false);
+            // in release builds, assertion shouldn't execute
+            BOOST_ASSERT(false);
 #endif
-  // Trivial check to avoid "test case did not check any assertions" message from Boost.Test
-  BOOST_CHECK(true);
-}
+            // Trivial check to avoid "test case did not check any assertions" message from Boost.Test
+            BOOST_CHECK(true);
+        }
 
-BOOST_AUTO_TEST_CASE(SideEffect)
-{
-  int a = 1;
-  BOOST_ASSERT((a = 2) > 0);
+        BOOST_AUTO_TEST_CASE(SideEffect) {
+            int a = 1;
+            BOOST_ASSERT((a = 2) > 0);
 #ifdef _DEBUG
-  BOOST_CHECK_EQUAL(a, 2);
+            BOOST_CHECK_EQUAL(a, 2);
 #else
-  BOOST_CHECK_EQUAL(a, 1);
+            BOOST_CHECK_EQUAL(a, 1);
 #endif
-}
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

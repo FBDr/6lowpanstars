@@ -27,16 +27,15 @@
 
 namespace ns3 {
 
-class MeshInformationElementVector : public WifiInformationElementVector
-{
-public:
-  MeshInformationElementVector ();
-  ~MeshInformationElementVector ();
+    class MeshInformationElementVector : public WifiInformationElementVector {
+    public:
+        MeshInformationElementVector();
+        ~MeshInformationElementVector();
 
-  static TypeId GetTypeId ();
-  TypeId GetInstanceTypeId () const;
-  virtual uint32_t DeserializeSingleIe (Buffer::Iterator start);
-};
+        static TypeId GetTypeId();
+        TypeId GetInstanceTypeId() const;
+        virtual uint32_t DeserializeSingleIe(Buffer::Iterator start);
+    };
 
 }
 

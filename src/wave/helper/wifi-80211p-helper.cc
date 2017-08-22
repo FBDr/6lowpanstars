@@ -28,84 +28,72 @@
 #include "wifi-80211p-helper.h"
 #include "ns3/unused.h"
 
-namespace ns3 {
-
-Wifi80211pHelper::Wifi80211pHelper ()
+namespace ns3
 {
-}
 
-Wifi80211pHelper::~Wifi80211pHelper ()
-{
-}
-
-Wifi80211pHelper
-Wifi80211pHelper::Default (void)
-{
-  Wifi80211pHelper helper;
-  helper.SetStandard (WIFI_PHY_STANDARD_80211_10MHZ);
-  helper.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                  "DataMode", StringValue ("OfdmRate6MbpsBW10MHz"),
-                                  "ControlMode",StringValue ("OfdmRate6MbpsBW10MHz"),
-                                  "NonUnicastMode", StringValue ("OfdmRate6MbpsBW10MHz"));
-  return helper;
-}
-
-void
-Wifi80211pHelper::SetStandard (enum WifiPhyStandard standard)
-{
-  if ((standard == WIFI_PHY_STANDARD_80211a) || (standard == WIFI_PHY_STANDARD_80211_10MHZ))
-    {
-      WifiHelper::SetStandard (standard);
-    }
-  else
-    {
-      NS_FATAL_ERROR ("802.11p only use 802.11 standard with 10MHz or 20MHz");
-    }
-}
-
-
-void
-Wifi80211pHelper::EnableLogComponents (void)
-{
-  WifiHelper::EnableLogComponents ();
-
-  LogComponentEnable ("OcbWifiMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("VendorSpecificAction", LOG_LEVEL_ALL);
-}
-
-NetDeviceContainer
-Wifi80211pHelper::Install (const WifiPhyHelper &phyHelper, const WifiMacHelper &macHelper, NodeContainer c) const
-{
-  bool isWaveMacHelper = false;
-  try
-    {
-      const QosWaveMacHelper& qosMac = dynamic_cast<const QosWaveMacHelper&> (macHelper);
-      isWaveMacHelper = true;
-      NS_UNUSED (qosMac);
-    }
-  catch (const std::bad_cast &)
-    {
-
+    Wifi80211pHelper::Wifi80211pHelper() {
     }
 
-  try
-    {
-      const NqosWaveMacHelper& nqosMac = dynamic_cast<const NqosWaveMacHelper&> (macHelper);
-      isWaveMacHelper = true;
-      NS_UNUSED (nqosMac);
-    }
-  catch (const std::bad_cast &)
-    {
-
+    Wifi80211pHelper::~Wifi80211pHelper() {
     }
 
-  if (!isWaveMacHelper)
-    {
-      NS_FATAL_ERROR ("the macHelper should be either QosWaveMacHelper or NqosWaveMacHelper"
-                      ", or should be the subclass of QosWaveMacHelper or NqosWaveMacHelper");
+    Wifi80211pHelper
+    Wifi80211pHelper::Default(void) {
+        Wifi80211pHelper helper;
+        helper.SetStandard(WIFI_PHY_STANDARD_80211_10MHZ);
+        helper.SetRemoteStationManager("ns3::ConstantRateWifiManager",
+                "DataMode", StringValue("OfdmRate6MbpsBW10MHz"),
+                "ControlMode", StringValue("OfdmRate6MbpsBW10MHz"),
+                "NonUnicastMode", StringValue("OfdmRate6MbpsBW10MHz"));
+        return helper;
     }
 
-  return WifiHelper::Install (phyHelper, macHelper, c);
-}
+    void
+    Wifi80211pHelper::SetStandard(enum WifiPhyStandard standard) {
+        if ((standard == WIFI_PHY_STANDARD_80211a) || (standard == WIFI_PHY_STANDARD_80211_10MHZ)) {
+            WifiHelper::SetStandard(standard);
+        } else {
+            NS_FATAL_ERROR("802.11p only use 802.11 standard with 10MHz or 20MHz");
+        }
+    }
+
+    void
+    Wifi80211pHelper::EnableLogComponents(void) {
+        WifiHelper::EnableLogComponents();
+
+        LogComponentEnable("OcbWifiMac", LOG_LEVEL_ALL);
+        LogComponentEnable("VendorSpecificAction", LOG_LEVEL_ALL);
+    }
+
+    NetDeviceContainer
+    Wifi80211pHelper::Install(const WifiPhyHelper &phyHelper, const WifiMacHelper &macHelper, NodeContainer c) const {
+        bool isWaveMacHelper = false;
+        try
+                {
+            const QosWaveMacHelper& qosMac = dynamic_cast<const QosWaveMacHelper&> (macHelper);
+            isWaveMacHelper = true;
+            NS_UNUSED(qosMac);}
+
+        catch(const std::bad_cast &) {
+
+        }
+
+        try
+                {
+            const NqosWaveMacHelper& nqosMac = dynamic_cast<const NqosWaveMacHelper&> (macHelper);
+            isWaveMacHelper = true;
+            NS_UNUSED(nqosMac);}
+
+        catch(const std::bad_cast &) {
+
+        }
+
+        if (!isWaveMacHelper) {
+            NS_FATAL_ERROR("the macHelper should be either QosWaveMacHelper or NqosWaveMacHelper"
+                    ", or should be the subclass of QosWaveMacHelper or NqosWaveMacHelper");
+        }
+
+        return WifiHelper::Install(phyHelper, macHelper, c);
+    }
 
 } // namespace ns3

@@ -50,15 +50,14 @@ using namespace ns3;
  * random number generator
  */
 
-int main (int argc, char *argv[])
-{
-  CommandLine cmd;
-  cmd.Parse (argc, argv);
+int main(int argc, char *argv[]) {
+    CommandLine cmd;
+    cmd.Parse(argc, argv);
 
-  // SeedManager::SetRun (3);
+    // SeedManager::SetRun (3);
 
-  Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
+    Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
 
-  std::cout << uv->GetValue () << std::endl;
+    std::cout << uv->GetValue() << std::endl;
 
 }

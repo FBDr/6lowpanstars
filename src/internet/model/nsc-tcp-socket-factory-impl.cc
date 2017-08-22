@@ -18,34 +18,31 @@
 #include "ns3/socket.h"
 #include "ns3/assert.h"
 
-namespace ns3 {
+namespace ns3
+{
 
-NscTcpSocketFactoryImpl::NscTcpSocketFactoryImpl ()
-  : m_tcp (0)
-{
-}
-NscTcpSocketFactoryImpl::~NscTcpSocketFactoryImpl ()
-{
-  NS_ASSERT (m_tcp == 0);
-}
+    NscTcpSocketFactoryImpl::NscTcpSocketFactoryImpl()
+            : m_tcp(0) {
+    }
 
-void
-NscTcpSocketFactoryImpl::SetTcp (Ptr<NscTcpL4Protocol> tcp)
-{
-  m_tcp = tcp;
-}
+    NscTcpSocketFactoryImpl::~NscTcpSocketFactoryImpl() {
+        NS_ASSERT(m_tcp == 0);
+    }
 
-Ptr<Socket>
-NscTcpSocketFactoryImpl::CreateSocket (void)
-{
-  return m_tcp->CreateSocket ();
-}
+    void
+    NscTcpSocketFactoryImpl::SetTcp(Ptr<NscTcpL4Protocol> tcp) {
+        m_tcp = tcp;
+    }
 
-void 
-NscTcpSocketFactoryImpl::DoDispose (void)
-{
-  m_tcp = 0;
-  TcpSocketFactory::DoDispose ();
-}
+    Ptr<Socket>
+            NscTcpSocketFactoryImpl::CreateSocket(void) {
+        return m_tcp->CreateSocket();
+    }
+
+    void
+    NscTcpSocketFactoryImpl::DoDispose(void) {
+        m_tcp = 0;
+        TcpSocketFactory::DoDispose();
+    }
 
 } // namespace ns3

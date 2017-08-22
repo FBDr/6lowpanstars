@@ -31,27 +31,26 @@
 
 namespace nfd {
 
-using ndn::mgmt::Dispatcher;
-using ndn::nfd::ControlParameters;
+    using ndn::mgmt::Dispatcher;
+    using ndn::nfd::ControlParameters;
 
-/**
- * @brief a collection of common functions shared by all NFD managers,
- *        such as communicating with the dispatcher and command validator.
- */
-class NfdManagerBase : public ManagerBase
-{
-public:
-  NfdManagerBase(Dispatcher& dispatcher,
-                 CommandAuthenticator& authenticator,
-                 const std::string& module);
+    /**
+     * @brief a collection of common functions shared by all NFD managers,
+     *        such as communicating with the dispatcher and command validator.
+     */
+    class NfdManagerBase : public ManagerBase {
+    public:
+        NfdManagerBase(Dispatcher& dispatcher,
+                CommandAuthenticator& authenticator,
+                const std::string& module);
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE: // command validation
-  virtual ndn::mgmt::Authorization
-  makeAuthorization(const std::string& verb) override;
+        virtual ndn::mgmt::Authorization
+        makeAuthorization(const std::string& verb) override;
 
-private:
-  CommandAuthenticator& m_authenticator;
-};
+    private:
+        CommandAuthenticator& m_authenticator;
+    };
 
 } // namespace nfd
 

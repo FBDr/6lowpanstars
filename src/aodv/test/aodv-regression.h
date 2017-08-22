@@ -150,49 +150,48 @@ using namespace ns3;
 ..................................................................
  * \endverbatim
  */
-class ChainRegressionTest : public TestCase
-{
+class ChainRegressionTest : public TestCase {
 public:
-  /**
-   * Create test case
-   * 
-   * \param prefix              Unique file names prefix
-   * \param size                Number of nodes in the chain
-   * \param time                Simulation time
-   * \param arpAliveTimeout     ARP alive timeout, this is used to check that ARP and routing do not interfere
-   */
-  ChainRegressionTest (const char * const prefix, Time time = Seconds (10), uint32_t size = 5, Time arpAliveTimeout = Seconds (120));
-  ~ChainRegressionTest ();
+    /**
+     * Create test case
+     * 
+     * \param prefix              Unique file names prefix
+     * \param size                Number of nodes in the chain
+     * \param time                Simulation time
+     * \param arpAliveTimeout     ARP alive timeout, this is used to check that ARP and routing do not interfere
+     */
+    ChainRegressionTest(const char * const prefix, Time time = Seconds(10), uint32_t size = 5, Time arpAliveTimeout = Seconds(120));
+    ~ChainRegressionTest();
 
 private:
-  /// \internal It is important to have pointers here
-  NodeContainer * m_nodes;
+    /// \internal It is important to have pointers here
+    NodeContainer * m_nodes;
 
-  /// PCAP file names prefix
-  const std::string m_prefix;
-  /// Total simulation time
-  const Time m_time;
-  /// Chain size
-  const uint32_t m_size;
-  /// Chain step, meters
-  const double m_step;
-  /// ARP alive timeout
-  const Time m_arpAliveTimeout;
-  /// Socket
-  Ptr<Socket> m_socket;
-  /// Sequence number
-  uint16_t m_seq;
+    /// PCAP file names prefix
+    const std::string m_prefix;
+    /// Total simulation time
+    const Time m_time;
+    /// Chain size
+    const uint32_t m_size;
+    /// Chain step, meters
+    const double m_step;
+    /// ARP alive timeout
+    const Time m_arpAliveTimeout;
+    /// Socket
+    Ptr<Socket> m_socket;
+    /// Sequence number
+    uint16_t m_seq;
 
-  /// Create test topology
-  void CreateNodes ();
-  /// Create devices, install TCP/IP stack and applications
-  void CreateDevices ();
-  /// Compare traces with reference ones
-  void CheckResults ();
-  /// Go
-  void DoRun ();
-  /// Send one ping
-  void SendPing ();
+    /// Create test topology
+    void CreateNodes();
+    /// Create devices, install TCP/IP stack and applications
+    void CreateDevices();
+    /// Compare traces with reference ones
+    void CheckResults();
+    /// Go
+    void DoRun();
+    /// Send one ping
+    void SendPing();
 };
 
 #endif /* AODV_REGRESSION_H */

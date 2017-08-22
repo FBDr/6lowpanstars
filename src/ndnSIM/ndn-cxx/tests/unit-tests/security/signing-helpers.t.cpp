@@ -24,44 +24,40 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecuritySigningHelpers)
+            BOOST_AUTO_TEST_SUITE(SecuritySigningHelpers)
 
-BOOST_AUTO_TEST_CASE(Identity)
-{
-  Name identity("/identity");
-  SigningInfo info = signingByIdentity(identity);
-  BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_ID);
-  BOOST_CHECK_EQUAL(info.getSignerName(), identity);
-}
+            BOOST_AUTO_TEST_CASE(Identity) {
+                Name identity("/identity");
+                SigningInfo info = signingByIdentity(identity);
+                BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_ID);
+                BOOST_CHECK_EQUAL(info.getSignerName(), identity);
+            }
 
-BOOST_AUTO_TEST_CASE(Key)
-{
-  Name key("/key");
-  SigningInfo info = signingByKey(key);
-  BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_KEY);
-  BOOST_CHECK_EQUAL(info.getSignerName(), key);
-}
+            BOOST_AUTO_TEST_CASE(Key) {
+                Name key("/key");
+                SigningInfo info = signingByKey(key);
+                BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_KEY);
+                BOOST_CHECK_EQUAL(info.getSignerName(), key);
+            }
 
-BOOST_AUTO_TEST_CASE(Certificate)
-{
-  Name cert("/cert");
-  SigningInfo info = signingByCertificate(cert);
-  BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_CERT);
-  BOOST_CHECK_EQUAL(info.getSignerName(), cert);
-}
+            BOOST_AUTO_TEST_CASE(Certificate) {
+                Name cert("/cert");
+                SigningInfo info = signingByCertificate(cert);
+                BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_CERT);
+                BOOST_CHECK_EQUAL(info.getSignerName(), cert);
+            }
 
-BOOST_AUTO_TEST_CASE(Sha256)
-{
-  SigningInfo info = signingWithSha256();
-  BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_SHA256);
-  BOOST_CHECK_EQUAL(info.getSignerName(), SigningInfo::EMPTY_NAME);
-}
+            BOOST_AUTO_TEST_CASE(Sha256) {
+                SigningInfo info = signingWithSha256();
+                BOOST_CHECK_EQUAL(info.getSignerType(), SigningInfo::SIGNER_TYPE_SHA256);
+                BOOST_CHECK_EQUAL(info.getSignerName(), SigningInfo::EMPTY_NAME);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

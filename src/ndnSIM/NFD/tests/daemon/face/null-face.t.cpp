@@ -28,42 +28,40 @@
 #include "transport-test-common.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestNullFace, BaseFixture)
+            BOOST_AUTO_TEST_SUITE(Face)
+            BOOST_FIXTURE_TEST_SUITE(TestNullFace, BaseFixture)
 
-using nfd::Face;
+            using nfd::Face;
 
-BOOST_AUTO_TEST_CASE(StaticProperties)
-{
-  shared_ptr<Face> face = makeNullFace(FaceUri("testnull://hhppt12sy"));
-  checkStaticPropertiesInitialized(*face->getTransport());
+            BOOST_AUTO_TEST_CASE(StaticProperties) {
+                shared_ptr<Face> face = makeNullFace(FaceUri("testnull://hhppt12sy"));
+                checkStaticPropertiesInitialized(*face->getTransport());
 
-  BOOST_CHECK_EQUAL(face->getLocalUri(), FaceUri("testnull://hhppt12sy"));
-  BOOST_CHECK_EQUAL(face->getRemoteUri(), FaceUri("testnull://hhppt12sy"));
-  BOOST_CHECK_EQUAL(face->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
-}
+                BOOST_CHECK_EQUAL(face->getLocalUri(), FaceUri("testnull://hhppt12sy"));
+                BOOST_CHECK_EQUAL(face->getRemoteUri(), FaceUri("testnull://hhppt12sy"));
+                BOOST_CHECK_EQUAL(face->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
+            }
 
-BOOST_AUTO_TEST_CASE(Send)
-{
-  shared_ptr<Face> face = makeNullFace();
+            BOOST_AUTO_TEST_CASE(Send) {
+                shared_ptr<Face> face = makeNullFace();
 
-  shared_ptr<Interest> interest = makeInterest("/A");
-  BOOST_CHECK_NO_THROW(face->sendInterest(*interest));
+                shared_ptr<Interest> interest = makeInterest("/A");
+                BOOST_CHECK_NO_THROW(face->sendInterest(*interest));
 
-  shared_ptr<Data> data = makeData("/B");
-  BOOST_CHECK_NO_THROW(face->sendData(*data));
+                shared_ptr<Data> data = makeData("/B");
+                BOOST_CHECK_NO_THROW(face->sendData(*data));
 
-  BOOST_CHECK_NO_THROW(face->close());
-}
+                BOOST_CHECK_NO_THROW(face->close());
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestNullFace
-BOOST_AUTO_TEST_SUITE_END() // Face
+            BOOST_AUTO_TEST_SUITE_END() // TestNullFace
+            BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

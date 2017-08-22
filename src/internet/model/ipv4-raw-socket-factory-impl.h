@@ -25,17 +25,16 @@
 
 namespace ns3 {
 
-/**
- * \ingroup socket
- *
- * \class Ipv4RawSocketFactoryImpl
- * \brief Implementation of IPv4 raw socket factory.
- */
-class Ipv4RawSocketFactoryImpl : public Ipv4RawSocketFactory
-{
-public:
-  virtual Ptr<Socket> CreateSocket (void);
-};
+    /**
+     * \ingroup socket
+     *
+     * \class Ipv4RawSocketFactoryImpl
+     * \brief Implementation of IPv4 raw socket factory.
+     */
+    class Ipv4RawSocketFactoryImpl : public Ipv4RawSocketFactory {
+    public:
+        virtual Ptr<Socket> CreateSocket(void);
+    };
 
 
 } // namespace ns3

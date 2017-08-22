@@ -26,64 +26,63 @@
 
 // forward declaration
 namespace boost {
-namespace asio {
-class io_service;
-} // namespace asio
+    namespace asio {
+        class io_service;
+    } // namespace asio
 } // namespace boost
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/**
- * @brief Network state change monitor
- *
- * When network change is detected, onNetworkStateChanged signal will be fired.
- * Monitoring is run for the lifetime of the NetworkMonitor instance.
- *
- * @note Implementation of this class is platform dependent and not all supported platforms
- *       are supported:
- *       - OS X: CFNotificationCenterAddObserver
- *       - Linux: rtnetlink notifications
- *
- * Network state change detection is not guaranteed to be precise and (zero or more)
- * notifications are expected to be fired for the following events:
- * - any network interface going up or down
- * - IPv4 or IPv6 address changes on any of the interfaces
- */
-class NetworkMonitor : boost::noncopyable
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        /**
+         * @brief Network state change monitor
+         *
+         * When network change is detected, onNetworkStateChanged signal will be fired.
+         * Monitoring is run for the lifetime of the NetworkMonitor instance.
+         *
+         * @note Implementation of this class is platform dependent and not all supported platforms
+         *       are supported:
+         *       - OS X: CFNotificationCenterAddObserver
+         *       - Linux: rtnetlink notifications
+         *
+         * Network state change detection is not guaranteed to be precise and (zero or more)
+         * notifications are expected to be fired for the following events:
+         * - any network interface going up or down
+         * - IPv4 or IPv6 address changes on any of the interfaces
+         */
+        class NetworkMonitor : boost::noncopyable {
+        public:
 
-  /**
-   * @brief Construct instance and start monitoring for network state changes
-   * @param io io_service thread that will dispatch events
-   * @throw Error when network monitoring is not supported or there is an error starting monitoring
-   */
-  explicit
-  NetworkMonitor(boost::asio::io_service& io);
+            class Error : public std::runtime_error {
+            public:
 
-  /**
-   * @brief Terminate network state monitoring
-   */
-  ~NetworkMonitor();
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
 
-  Signal<NetworkMonitor> onNetworkStateChanged;
+            /**
+             * @brief Construct instance and start monitoring for network state changes
+             * @param io io_service thread that will dispatch events
+             * @throw Error when network monitoring is not supported or there is an error starting monitoring
+             */
+            explicit
+            NetworkMonitor(boost::asio::io_service& io);
 
-private:
-  class Impl;
-  std::unique_ptr<Impl> m_impl;
-};
+            /**
+             * @brief Terminate network state monitoring
+             */
+            ~NetworkMonitor();
 
-} // namespace util
+            Signal<NetworkMonitor> onNetworkStateChanged;
+
+        private:
+            class Impl;
+            std::unique_ptr<Impl> m_impl;
+        };
+
+    } // namespace util
 } // namespace autoconfig
 
 #endif // NDN_UTIL_NETWORK_MONITOR_HPP

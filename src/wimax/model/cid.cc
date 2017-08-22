@@ -25,81 +25,73 @@
 // 0 will match IR CID, -1 will match broadcast CID 0xFFFF, hence 60000
 #define CID_UNINITIALIZED 60000
 
-namespace ns3 {
+namespace ns3
+{
 
-Cid::Cid (void)
-{
-  m_identifier = CID_UNINITIALIZED;
-}
+    Cid::Cid(void) {
+        m_identifier = CID_UNINITIALIZED;
+    }
 
-Cid::Cid (uint16_t identifier)
-{
-  m_identifier = identifier;
-}
+    Cid::Cid(uint16_t identifier) {
+        m_identifier = identifier;
+    }
 
-Cid::~Cid (void)
-{
-}
+    Cid::~Cid(void) {
+    }
 
-uint16_t
-Cid::GetIdentifier (void) const
-{
-  return m_identifier;
-}
+    uint16_t
+    Cid::GetIdentifier(void) const {
+        return m_identifier;
+    }
 
-bool
-Cid::IsMulticast (void) const
-{
-  return m_identifier >= 0xff00 && m_identifier <= 0xfffd;
-}
-bool
-Cid::IsBroadcast (void) const
-{
-  return *this == Broadcast ();
-}
-bool
-Cid::IsPadding (void) const
-{
-  return *this == Padding ();
-}
-bool
-Cid::IsInitialRanging (void) const
-{
-  return *this == InitialRanging ();
-}
+    bool
+    Cid::IsMulticast(void) const {
+        return m_identifier >= 0xff00 && m_identifier <= 0xfffd;
+    }
 
-Cid
-Cid::Broadcast (void)
-{
-  return 0xffff;
-}
-Cid
-Cid::Padding (void)
-{
-  return 0xfffe;
-}
-Cid
-Cid::InitialRanging (void)
-{
-  return 0;
-}
+    bool
+    Cid::IsBroadcast(void) const {
+        return *this == Broadcast();
+    }
 
-bool operator == (const Cid &lhs,
-                  const Cid &rhs)
-{
-  return lhs.m_identifier == rhs.m_identifier;
-}
+    bool
+    Cid::IsPadding(void) const {
+        return *this == Padding();
+    }
 
-bool operator != (const Cid &lhs,
-                  const Cid &rhs)
-{
-  return !(lhs == rhs);
-}
+    bool
+    Cid::IsInitialRanging(void) const {
+        return *this == InitialRanging();
+    }
 
-std::ostream & operator << (std::ostream &os, const Cid &cid)
-{
-  os << cid.GetIdentifier ();
-  return os;
-}
+    Cid
+    Cid::Broadcast(void) {
+        return 0xffff;
+    }
+
+    Cid
+    Cid::Padding(void) {
+        return 0xfffe;
+    }
+
+    Cid
+    Cid::InitialRanging(void) {
+        return 0;
+    }
+
+    bool operator == (const Cid &lhs,
+            const Cid & rhs) {
+        return lhs.m_identifier == rhs.m_identifier;
+    }
+
+    bool operator != (const Cid &lhs,
+            const Cid & rhs) {
+        return !(lhs == rhs);
+    }
+
+    std::ostream & operator << (std::ostream &os, const Cid & cid) {
+        os << cid.GetIdentifier();
+        return os;
+    }
 
 } // namespace ns3

@@ -28,107 +28,98 @@
 #include "inet-topology-reader.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("InetTopologyReader");
-
-InetTopologyReader::InetTopologyReader ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-InetTopologyReader::~InetTopologyReader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("InetTopologyReader");
 
-NodeContainer
-InetTopologyReader::Read (void)
-{
-  std::ifstream topgen;
-  topgen.open (GetFileName ().c_str ());
-  std::map<std::string, Ptr<Node> > nodeMap;
-  NodeContainer nodes;
-
-  if ( !topgen.is_open () )
-    {
-      NS_LOG_WARN ("Inet topology file object is not open, check file name and permissions");
-      return nodes;
+    InetTopologyReader::InetTopologyReader() {
+        NS_LOG_FUNCTION(this);
     }
 
-  std::string from;
-  std::string to;
-  std::string linkAttr;
-
-  int linksNumber = 0;
-  int nodesNumber = 0;
-
-  int totnode = 0;
-  int totlink = 0;
-
-  std::istringstream lineBuffer;
-  std::string line;
-
-  getline (topgen,line);
-  lineBuffer.str (line);
-
-  lineBuffer >> totnode;
-  lineBuffer >> totlink;
-  NS_LOG_INFO ("Inet topology should have " << totnode << " nodes and " << totlink << " links");
-
-  for (int i = 0; i < totnode && !topgen.eof (); i++)
-    {
-      getline (topgen,line);
+    InetTopologyReader::~InetTopologyReader() {
+        NS_LOG_FUNCTION(this);
     }
 
-  for (int i = 0; i < totlink && !topgen.eof (); i++)
-    {
-      getline (topgen,line);
-      lineBuffer.clear ();
-      lineBuffer.str (line);
+    NodeContainer
+    InetTopologyReader::Read(void) {
+        std::ifstream topgen;
+        topgen.open(GetFileName().c_str());
+        std::map<std::string, Ptr<Node> > nodeMap;
+        NodeContainer nodes;
 
-      lineBuffer >> from;
-      lineBuffer >> to;
-      lineBuffer >> linkAttr;
-
-      if ( (!from.empty ()) && (!to.empty ()) )
-        {
-          NS_LOG_INFO ( "Link " << linksNumber << " from: " << from << " to: " << to);
-
-          if ( nodeMap[from] == 0 )
-            {
-              NS_LOG_INFO ( "Node " << nodesNumber << " name: " << from);
-              Ptr<Node> tmpNode = CreateObject<Node> ();
-              nodeMap[from] = tmpNode;
-              nodes.Add (tmpNode);
-              nodesNumber++;
-            }
-
-          if (nodeMap[to] == 0)
-            {
-              NS_LOG_INFO ( "Node " << nodesNumber << " name: " << to);
-              Ptr<Node> tmpNode = CreateObject<Node> ();
-              nodeMap[to] = tmpNode;
-              nodes.Add (tmpNode);
-              nodesNumber++;
-            }
-
-          Link link ( nodeMap[from], from, nodeMap[to], to );
-          if ( !linkAttr.empty () )
-            {
-              NS_LOG_INFO ( "Link " << linksNumber << " weight: " << linkAttr);
-              link.SetAttribute ("Weight", linkAttr);
-            }
-          AddLink (link);
-
-          linksNumber++;
+        if (!topgen.is_open()) {
+            NS_LOG_WARN("Inet topology file object is not open, check file name and permissions");
+            return nodes;
         }
+
+        std::string from;
+        std::string to;
+        std::string linkAttr;
+
+        int linksNumber = 0;
+        int nodesNumber = 0;
+
+        int totnode = 0;
+        int totlink = 0;
+
+        std::istringstream lineBuffer;
+        std::string line;
+
+        getline(topgen, line);
+        lineBuffer.str(line);
+
+        lineBuffer >> totnode;
+        lineBuffer >> totlink;
+        NS_LOG_INFO("Inet topology should have " << totnode << " nodes and " << totlink << " links");
+
+        for (int i = 0; i < totnode && !topgen.eof(); i++) {
+            getline(topgen, line);
+        }
+
+        for (int i = 0; i < totlink && !topgen.eof(); i++) {
+            getline(topgen, line);
+            lineBuffer.clear();
+            lineBuffer.str(line);
+
+            lineBuffer >> from;
+            lineBuffer >> to;
+            lineBuffer >> linkAttr;
+
+            if ((!from.empty()) && (!to.empty())) {
+                NS_LOG_INFO("Link " << linksNumber << " from: " << from << " to: " << to);
+
+                if (nodeMap[from] == 0) {
+                    NS_LOG_INFO("Node " << nodesNumber << " name: " << from);
+                    Ptr<Node> tmpNode = CreateObject<Node> ();
+                    nodeMap[from] = tmpNode;
+                    nodes.Add(tmpNode);
+                    nodesNumber++;
+                }
+
+                if (nodeMap[to] == 0) {
+                    NS_LOG_INFO("Node " << nodesNumber << " name: " << to);
+                    Ptr<Node> tmpNode = CreateObject<Node> ();
+                    nodeMap[to] = tmpNode;
+                    nodes.Add(tmpNode);
+                    nodesNumber++;
+                }
+
+                Link link(nodeMap[from], from, nodeMap[to], to);
+                if (!linkAttr.empty()) {
+                    NS_LOG_INFO("Link " << linksNumber << " weight: " << linkAttr);
+                    link.SetAttribute("Weight", linkAttr);
+                }
+                AddLink(link);
+
+                linksNumber++;
+            }
+        }
+
+        NS_LOG_INFO("Inet topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
+        topgen.close();
+
+        return nodes;
     }
-
-  NS_LOG_INFO ("Inet topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
-  topgen.close ();
-
-  return nodes;
-}
 
 } /* namespace ns3 */

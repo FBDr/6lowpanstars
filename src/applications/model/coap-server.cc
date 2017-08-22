@@ -39,7 +39,8 @@
 #include <string>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapServerApplication");
 
@@ -229,7 +230,7 @@ namespace ns3 {
             received_packet->RemovePacketTag(coaptag);
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
-            
+
             uint32_t currentSequenceNumber = coaptag.GetSeq();
             uint64_t currentDelay = coaptag.GetT();
 

@@ -25,50 +25,49 @@
 
 namespace ns3 {
 
-/**
- * \ingroup flame
- *
- * \brief Helper class used to install FLAME mesh stack (actually single
- * protocol in this stack)
- */
-class FlameStack : public MeshStack
-{
-public:
+    /**
+     * \ingroup flame
+     *
+     * \brief Helper class used to install FLAME mesh stack (actually single
+     * protocol in this stack)
+     */
+    class FlameStack : public MeshStack {
+    public:
 
-  static TypeId GetTypeId ();
+        static TypeId GetTypeId();
 
-  /**
-   * Construct a FlameStack helper class.
-   */
-  FlameStack ();
+        /**
+         * Construct a FlameStack helper class.
+         */
+        FlameStack();
 
-  /**
-   * Destroy a FlameStack helper class.
-   */
-  ~FlameStack ();
+        /**
+         * Destroy a FlameStack helper class.
+         */
+        ~FlameStack();
 
-  /**
-   * Break any reference cycles in the installer helper.  Required for ns-3
-   * Object support.
-   */
-  void DoDispose ();
+        /**
+         * Break any reference cycles in the installer helper.  Required for ns-3
+         * Object support.
+         */
+        void DoDispose();
 
-  /**
-   * \brief Install a flame stack on the given MeshPointDevice
-   * \param mp The Ptr<MeshPointDevice> to use.
-   */
-  bool InstallStack (Ptr<MeshPointDevice> mp);
+        /**
+         * \brief Install a flame stack on the given MeshPointDevice
+         * \param mp The Ptr<MeshPointDevice> to use.
+         */
+        bool InstallStack(Ptr<MeshPointDevice> mp);
 
-  /**
-   * \brief Print flame protocol statistics.
-   */
-  void Report (const Ptr<MeshPointDevice> mp, std::ostream&);
+        /**
+         * \brief Print flame protocol statistics.
+         */
+        void Report(const Ptr<MeshPointDevice> mp, std::ostream&);
 
-  /**
-   * \brief Reset the statistics.
-   */
-  void ResetStats (const Ptr<MeshPointDevice> mp);
-};
+        /**
+         * \brief Reset the statistics.
+         */
+        void ResetStats(const Ptr<MeshPointDevice> mp);
+    };
 
 } // namespace ns3
 

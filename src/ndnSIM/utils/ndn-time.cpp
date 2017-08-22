@@ -22,51 +22,45 @@
 #include "ns3/simulator.h"
 
 namespace ns3 {
-namespace ndn {
-namespace time {
+    namespace ndn {
+        namespace time {
 
-system_clock::time_point
-CustomSystemClock::getNow() const
-{
-  boost::chrono::nanoseconds ns(Simulator::Now().GetNanoSeconds());
-  return system_clock::time_point(ns);
-}
+            system_clock::time_point
+            CustomSystemClock::getNow() const {
+                boost::chrono::nanoseconds ns(Simulator::Now().GetNanoSeconds());
+                return system_clock::time_point(ns);
+            }
 
-std::string
-CustomSystemClock::getSince() const
-{
-  return " since start of simulation";
-}
+            std::string
+            CustomSystemClock::getSince() const {
+                return " since start of simulation";
+            }
 
-boost::posix_time::time_duration
-CustomSystemClock::toPosixDuration(const system_clock::duration& duration) const
-{
-  BOOST_ASSERT_MSG(false, "Must not be called");
-  return boost::posix_time::microseconds(1);
-}
+            boost::posix_time::time_duration
+            CustomSystemClock::toPosixDuration(const system_clock::duration& duration) const {
+                BOOST_ASSERT_MSG(false, "Must not be called");
+                return boost::posix_time::microseconds(1);
+            }
 
-////////////////////////////////////
+            ////////////////////////////////////
 
-steady_clock::time_point
-CustomSteadyClock::getNow() const
-{
-  boost::chrono::nanoseconds ns(Simulator::Now().GetNanoSeconds());
-  return steady_clock::time_point(ns);
-}
+            steady_clock::time_point
+            CustomSteadyClock::getNow() const {
+                boost::chrono::nanoseconds ns(Simulator::Now().GetNanoSeconds());
+                return steady_clock::time_point(ns);
+            }
 
-std::string
-CustomSteadyClock::getSince() const
-{
-  return " since start of simulation";
-}
+            std::string
+            CustomSteadyClock::getSince() const {
+                return " since start of simulation";
+            }
 
-boost::posix_time::time_duration
-CustomSteadyClock::toPosixDuration(const steady_clock::duration& duration) const
-{
-  BOOST_ASSERT_MSG(false, "Must not be called");
-  return boost::posix_time::microseconds(1);
-}
+            boost::posix_time::time_duration
+            CustomSteadyClock::toPosixDuration(const steady_clock::duration& duration) const {
+                BOOST_ASSERT_MSG(false, "Must not be called");
+                return boost::posix_time::microseconds(1);
+            }
 
-} // namespace time
-} // namespace ndn
+        } // namespace time
+    } // namespace ndn
 } // namespace ns3

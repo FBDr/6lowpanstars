@@ -23,95 +23,86 @@
 #include "../detail/openssl-helper.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class HmacFilter::Impl
-{
-public:
+            class HmacFilter::Impl {
+            public:
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  Impl()
-  {
-    HMAC_CTX_init(&m_context);
-  }
 
-  ~Impl()
-  {
-    HMAC_CTX_cleanup(&m_context);
-  }
+                Impl() {
+                    HMAC_CTX_init(&m_context);
+                }
 
-  operator HMAC_CTX*()
-  {
-    return &m_context;
-  }
+                ~Impl() {
+                    HMAC_CTX_cleanup(&m_context);
+                }
 
-private:
-  HMAC_CTX m_context;
+                operator HMAC_CTX*() {
+                    return &m_context;
+                }
+
+            private:
+                HMAC_CTX m_context;
 #else
-  Impl()
-    : m_context(HMAC_CTX_new())
-  {
-  }
 
-  ~Impl()
-  {
-    HMAC_CTX_free(m_context);
-  }
+                Impl()
+                : m_context(HMAC_CTX_new()) {
+                }
 
-  operator HMAC_CTX*()
-  {
-    return m_context;
-  }
+                ~Impl() {
+                    HMAC_CTX_free(m_context);
+                }
 
-private:
-  HMAC_CTX* m_context;
+                operator HMAC_CTX*() {
+                    return m_context;
+                }
+
+            private:
+                HMAC_CTX* m_context;
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
-};
+            };
 
-HmacFilter::HmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen)
-  : m_impl(new Impl)
-{
-  BOOST_ASSERT(key != nullptr);
-  BOOST_ASSERT(keyLen > 0);
+            HmacFilter::HmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen)
+            : m_impl(new Impl) {
+                BOOST_ASSERT(key != nullptr);
+                BOOST_ASSERT(keyLen > 0);
 
-  const EVP_MD* algorithm = detail::toDigestEvpMd(algo);
-  if (algorithm == nullptr)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Unsupported digest algorithm"));
+                const EVP_MD* algorithm = detail::toDigestEvpMd(algo);
+                if (algorithm == nullptr)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Unsupported digest algorithm"));
 
-  if (HMAC_Init_ex(*m_impl, key, keyLen, algorithm, nullptr) == 0)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot initialize HMAC"));
-}
+                if (HMAC_Init_ex(*m_impl, key, keyLen, algorithm, nullptr) == 0)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot initialize HMAC"));
+            }
 
-size_t
-HmacFilter::convert(const uint8_t* buf, size_t size)
-{
-  if (HMAC_Update(*m_impl, buf, size) == 0)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to update HMAC"));
+            size_t
+            HmacFilter::convert(const uint8_t* buf, size_t size) {
+                if (HMAC_Update(*m_impl, buf, size) == 0)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to update HMAC"));
 
-  return size;
-}
+                return size;
+            }
 
-void
-HmacFilter::finalize()
-{
-  auto buffer = make_unique<OBuffer>(EVP_MAX_MD_SIZE);
-  unsigned int mdLen = 0;
+            void
+            HmacFilter::finalize() {
+                auto buffer = make_unique<OBuffer>(EVP_MAX_MD_SIZE);
+                unsigned int mdLen = 0;
 
-  if (HMAC_Final(*m_impl, &(*buffer)[0], &mdLen) == 0)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to finalize HMAC"));
+                if (HMAC_Final(*m_impl, &(*buffer)[0], &mdLen) == 0)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to finalize HMAC"));
 
-  buffer->erase(buffer->begin() + mdLen, buffer->end());
-  setOutputBuffer(std::move(buffer));
+                buffer->erase(buffer->begin() + mdLen, buffer->end());
+                setOutputBuffer(std::move(buffer));
 
-  flushAllOutput();
-}
+                flushAllOutput();
+            }
 
-unique_ptr<Transform>
-hmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen)
-{
-  return make_unique<HmacFilter>(algo, key, keyLen);
-}
+            unique_ptr<Transform>
+            hmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen) {
+                return make_unique<HmacFilter>(algo, key, keyLen);
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

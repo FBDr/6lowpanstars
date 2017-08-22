@@ -22,62 +22,55 @@
 #include "openssl-helper.hpp"
 
 namespace ndn {
-namespace security {
-namespace detail {
+    namespace security {
+        namespace detail {
 
-const EVP_MD*
-toDigestEvpMd(DigestAlgorithm algo)
-{
-  switch (algo) {
-  case DigestAlgorithm::SHA256:
-    return EVP_sha256();
-  default:
-    return nullptr;
-  }
-}
+            const EVP_MD*
+            toDigestEvpMd(DigestAlgorithm algo) {
+                switch (algo) {
+                    case DigestAlgorithm::SHA256:
+                        return EVP_sha256();
+                    default:
+                        return nullptr;
+                }
+            }
 
-EvpPkey::EvpPkey()
-  : m_key(nullptr)
-{
-}
+            EvpPkey::EvpPkey()
+            : m_key(nullptr) {
+            }
 
-EvpPkey::~EvpPkey()
-{
-  EVP_PKEY_free(m_key);
-}
+            EvpPkey::~EvpPkey() {
+                EVP_PKEY_free(m_key);
+            }
 
-EvpPkeyCtx::EvpPkeyCtx(EVP_PKEY* key)
-  : m_ctx(EVP_PKEY_CTX_new(key, nullptr))
-{
-  BOOST_ASSERT(m_ctx != nullptr);
-}
+            EvpPkeyCtx::EvpPkeyCtx(EVP_PKEY* key)
+            : m_ctx(EVP_PKEY_CTX_new(key, nullptr)) {
+                BOOST_ASSERT(m_ctx != nullptr);
+            }
 
-EvpPkeyCtx::EvpPkeyCtx(int id)
-  : m_ctx(EVP_PKEY_CTX_new_id(id, nullptr))
-{
-  BOOST_ASSERT(m_ctx != nullptr);
-}
+            EvpPkeyCtx::EvpPkeyCtx(int id)
+            : m_ctx(EVP_PKEY_CTX_new_id(id, nullptr)) {
+                BOOST_ASSERT(m_ctx != nullptr);
+            }
 
-EvpPkeyCtx::~EvpPkeyCtx()
-{
-  EVP_PKEY_CTX_free(m_ctx);
-}
+            EvpPkeyCtx::~EvpPkeyCtx() {
+                EVP_PKEY_CTX_free(m_ctx);
+            }
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-Bio::Bio(BIO_METHOD* method)
+            Bio::Bio(BIO_METHOD* method)
 #else
+
 Bio::Bio(const BIO_METHOD* method)
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
-  : m_bio(BIO_new(method))
-{
-  BOOST_ASSERT(m_bio != nullptr);
-}
+            : m_bio(BIO_new(method)) {
+                BOOST_ASSERT(m_bio != nullptr);
+            }
 
-Bio::~Bio()
-{
-  BIO_free_all(m_bio);
-}
+            Bio::~Bio() {
+                BIO_free_all(m_bio);
+            }
 
-} // namespace detail
-} // namespace security
+        } // namespace detail
+    } // namespace security
 } // namespace ndn

@@ -31,73 +31,65 @@
 #include "ns3/udp-l4-protocol.h"
 #include "ns3/tcp-l4-protocol.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("IpcsClassifier");
-
-NS_OBJECT_ENSURE_REGISTERED (IpcsClassifier);
-
-TypeId IpcsClassifier::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::IpcsClassifier")
-    .SetParent<Object> ()
-    .SetGroupName("Wimax");
-  return tid;
-}
 
-IpcsClassifier::IpcsClassifier (void)
-{
-}
+    NS_LOG_COMPONENT_DEFINE("IpcsClassifier");
 
-IpcsClassifier::~IpcsClassifier (void)
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(IpcsClassifier);
 
-ServiceFlow *
-IpcsClassifier::Classify (Ptr<const Packet> packet,
-                          Ptr<ServiceFlowManager> sfm, ServiceFlow::Direction dir)
-{
-  Ptr<Packet> C_Packet = packet->Copy ();
-
-  LlcSnapHeader llc;
-  C_Packet->RemoveHeader (llc);
-
-  Ipv4Header ipv4Header;
-  C_Packet->RemoveHeader (ipv4Header);
-  Ipv4Address source_address = ipv4Header.GetSource ();
-  Ipv4Address dest_address = ipv4Header.GetDestination ();
-  uint8_t protocol = ipv4Header.GetProtocol ();
-
-  uint16_t sourcePort = 0;
-  uint16_t destPort = 0;
-  if (protocol == UdpL4Protocol::PROT_NUMBER)
-    {
-      UdpHeader udpHeader;
-      C_Packet->RemoveHeader (udpHeader);
-      sourcePort = udpHeader.GetSourcePort ();
-      destPort = udpHeader.GetDestinationPort ();
-    }
-  else if (protocol == TcpL4Protocol::PROT_NUMBER)
-    {
-      TcpHeader tcpHeader;
-      C_Packet->RemoveHeader (tcpHeader);
-      sourcePort = tcpHeader.GetSourcePort ();
-      destPort = tcpHeader.GetDestinationPort ();
-    }
-  else
-    {
-      NS_LOG_INFO ("\t\t\tUnknown protocol: " << protocol);
-      return 0;
+    TypeId IpcsClassifier::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::IpcsClassifier")
+                .SetParent<Object> ()
+                .SetGroupName("Wimax");
+        return tid;
     }
 
-  NS_LOG_INFO ("Classifing packet: src_addr=" << source_address << " dst_addr="
-                                              << dest_address << " src_port=" << sourcePort << " dst_port="
-                                              << destPort << " proto=" << (uint16_t) protocol);
-  return (sfm->DoClassify (source_address,
-                           dest_address,
-                           sourcePort,
-                           destPort,
-                           protocol,dir));
-}
+    IpcsClassifier::IpcsClassifier(void) {
+    }
+
+    IpcsClassifier::~IpcsClassifier(void) {
+    }
+
+    ServiceFlow *
+            IpcsClassifier::Classify(Ptr<const Packet> packet,
+            Ptr<ServiceFlowManager> sfm, ServiceFlow::Direction dir) {
+        Ptr<Packet> C_Packet = packet->Copy();
+
+        LlcSnapHeader llc;
+        C_Packet->RemoveHeader(llc);
+
+        Ipv4Header ipv4Header;
+        C_Packet->RemoveHeader(ipv4Header);
+        Ipv4Address source_address = ipv4Header.GetSource();
+        Ipv4Address dest_address = ipv4Header.GetDestination();
+        uint8_t protocol = ipv4Header.GetProtocol();
+
+        uint16_t sourcePort = 0;
+        uint16_t destPort = 0;
+        if (protocol == UdpL4Protocol::PROT_NUMBER) {
+            UdpHeader udpHeader;
+            C_Packet->RemoveHeader(udpHeader);
+            sourcePort = udpHeader.GetSourcePort();
+            destPort = udpHeader.GetDestinationPort();
+        } else if (protocol == TcpL4Protocol::PROT_NUMBER) {
+            TcpHeader tcpHeader;
+            C_Packet->RemoveHeader(tcpHeader);
+            sourcePort = tcpHeader.GetSourcePort();
+            destPort = tcpHeader.GetDestinationPort();
+        } else {
+            NS_LOG_INFO("\t\t\tUnknown protocol: " << protocol);
+            return 0;
+        }
+
+        NS_LOG_INFO("Classifing packet: src_addr=" << source_address << " dst_addr="
+                << dest_address << " src_port=" << sourcePort << " dst_port="
+                << destPort << " proto=" << (uint16_t) protocol);
+        return (sfm->DoClassify(source_address,
+                dest_address,
+                sourcePort,
+                destPort,
+                protocol, dir));
+    }
 
 }

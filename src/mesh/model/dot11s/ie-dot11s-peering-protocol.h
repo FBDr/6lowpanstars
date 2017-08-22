@@ -23,25 +23,23 @@
 
 #include "ns3/mesh-information-element-vector.h"
 
-namespace ns3
-{
-namespace dot11s
-{
-class IePeeringProtocol : public WifiInformationElement
-{
-public:
-  IePeeringProtocol ();
+namespace ns3 {
+    namespace dot11s {
 
-  // Inherited from WifiInformationElement
-  virtual WifiInformationElementId ElementId () const;
-  virtual uint8_t GetInformationFieldSize () const;
-  virtual void SerializeInformationField (Buffer::Iterator i) const;
-  virtual uint8_t DeserializeInformationField (Buffer::Iterator i, uint8_t length);
-  virtual void Print (std::ostream& os) const;
+        class IePeeringProtocol : public WifiInformationElement {
+        public:
+            IePeeringProtocol();
 
-private:
-  uint8_t m_protocol;
-};
-} // namespace dot11s
+            // Inherited from WifiInformationElement
+            virtual WifiInformationElementId ElementId() const;
+            virtual uint8_t GetInformationFieldSize() const;
+            virtual void SerializeInformationField(Buffer::Iterator i) const;
+            virtual uint8_t DeserializeInformationField(Buffer::Iterator i, uint8_t length);
+            virtual void Print(std::ostream& os) const;
+
+        private:
+            uint8_t m_protocol;
+        };
+    } // namespace dot11s
 } // namespace ns3
 #endif

@@ -29,239 +29,203 @@
 #include "non-communicating-net-device.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("NonCommunicatingNetDevice");
-
-NS_OBJECT_ENSURE_REGISTERED (NonCommunicatingNetDevice);
-
-TypeId
-NonCommunicatingNetDevice::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::NonCommunicatingNetDevice")
-    .SetParent<NetDevice> ()
-    .SetGroupName ("Spectrum")
-    .AddConstructor<NonCommunicatingNetDevice> ()
-    .AddAttribute ("Phy", "The PHY layer attached to this device.",
-                   PointerValue (),
-                   MakePointerAccessor (&NonCommunicatingNetDevice::GetPhy,
-                                        &NonCommunicatingNetDevice::SetPhy),
-                   MakePointerChecker<Object> ())
-  ;
-  return tid;
-}
 
-NonCommunicatingNetDevice::NonCommunicatingNetDevice ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("NonCommunicatingNetDevice");
 
-NonCommunicatingNetDevice::~NonCommunicatingNetDevice ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(NonCommunicatingNetDevice);
 
-void
-NonCommunicatingNetDevice::DoDispose ()
-{
-  NS_LOG_FUNCTION (this);
-  m_node = 0;
-  m_channel = 0;
-  m_phy = 0;
-  NetDevice::DoDispose ();
-}
+    TypeId
+    NonCommunicatingNetDevice::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::NonCommunicatingNetDevice")
+                .SetParent<NetDevice> ()
+                .SetGroupName("Spectrum")
+                .AddConstructor<NonCommunicatingNetDevice> ()
+                .AddAttribute("Phy", "The PHY layer attached to this device.",
+                PointerValue(),
+                MakePointerAccessor(&NonCommunicatingNetDevice::GetPhy,
+                &NonCommunicatingNetDevice::SetPhy),
+                MakePointerChecker<Object> ())
+                ;
+        return tid;
+    }
 
+    NonCommunicatingNetDevice::NonCommunicatingNetDevice() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-NonCommunicatingNetDevice::SetIfIndex (const uint32_t index)
-{
-  NS_LOG_FUNCTION (index);
-  m_ifIndex = index;
-}
+    NonCommunicatingNetDevice::~NonCommunicatingNetDevice() {
+        NS_LOG_FUNCTION(this);
+    }
 
-uint32_t
-NonCommunicatingNetDevice::GetIfIndex (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_ifIndex;
-}
+    void
+    NonCommunicatingNetDevice::DoDispose() {
+        NS_LOG_FUNCTION(this);
+        m_node = 0;
+        m_channel = 0;
+        m_phy = 0;
+        NetDevice::DoDispose();
+    }
 
-bool
-NonCommunicatingNetDevice::SetMtu (uint16_t mtu)
-{
-  NS_LOG_FUNCTION (mtu);
-  return (mtu == 0);
-}
+    void
+    NonCommunicatingNetDevice::SetIfIndex(const uint32_t index) {
+        NS_LOG_FUNCTION(index);
+        m_ifIndex = index;
+    }
 
-uint16_t
-NonCommunicatingNetDevice::GetMtu (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return 0;
-}
+    uint32_t
+    NonCommunicatingNetDevice::GetIfIndex(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_ifIndex;
+    }
 
-void
-NonCommunicatingNetDevice::SetAddress (Address address)
-{
-  NS_LOG_FUNCTION (this);
-}
+    bool
+    NonCommunicatingNetDevice::SetMtu(uint16_t mtu) {
+        NS_LOG_FUNCTION(mtu);
+        return (mtu == 0);
+    }
 
-Address
-NonCommunicatingNetDevice::GetAddress (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Address ();
-}
+    uint16_t
+    NonCommunicatingNetDevice::GetMtu(void) const {
+        NS_LOG_FUNCTION(this);
+        return 0;
+    }
 
-bool
-NonCommunicatingNetDevice::IsBroadcast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    void
+    NonCommunicatingNetDevice::SetAddress(Address address) {
+        NS_LOG_FUNCTION(this);
+    }
 
-Address
-NonCommunicatingNetDevice::GetBroadcast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Address ();
-}
+    Address
+    NonCommunicatingNetDevice::GetAddress(void) const {
+        NS_LOG_FUNCTION(this);
+        return Address();
+    }
 
-bool
-NonCommunicatingNetDevice::IsMulticast (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    bool
+    NonCommunicatingNetDevice::IsBroadcast(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-Address
-NonCommunicatingNetDevice::GetMulticast (Ipv4Address addr) const
-{
-  NS_LOG_FUNCTION (addr);
-  return Address ();
-}
+    Address
+    NonCommunicatingNetDevice::GetBroadcast(void) const {
+        NS_LOG_FUNCTION(this);
+        return Address();
+    }
 
-Address
-NonCommunicatingNetDevice::GetMulticast (Ipv6Address addr) const
-{
-  NS_LOG_FUNCTION (addr);
-  return Address ();
-}
+    bool
+    NonCommunicatingNetDevice::IsMulticast(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-bool
-NonCommunicatingNetDevice::IsPointToPoint (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    Address
+    NonCommunicatingNetDevice::GetMulticast(Ipv4Address addr) const {
+        NS_LOG_FUNCTION(addr);
+        return Address();
+    }
 
-bool
-NonCommunicatingNetDevice::IsBridge (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    Address
+    NonCommunicatingNetDevice::GetMulticast(Ipv6Address addr) const {
+        NS_LOG_FUNCTION(addr);
+        return Address();
+    }
 
+    bool
+    NonCommunicatingNetDevice::IsPointToPoint(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-Ptr<Node>
-NonCommunicatingNetDevice::GetNode (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_node;
-}
+    bool
+    NonCommunicatingNetDevice::IsBridge(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-void
-NonCommunicatingNetDevice::SetNode (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (node);
+    Ptr<Node>
+            NonCommunicatingNetDevice::GetNode(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_node;
+    }
 
-  m_node = node;
-}
+    void
+    NonCommunicatingNetDevice::SetNode(Ptr<Node> node) {
+        NS_LOG_FUNCTION(node);
 
-void
-NonCommunicatingNetDevice::SetPhy (Ptr<Object> phy)
-{
-  NS_LOG_FUNCTION (this << phy);
-  m_phy = phy;
-}
+        m_node = node;
+    }
 
+    void
+    NonCommunicatingNetDevice::SetPhy(Ptr<Object> phy) {
+        NS_LOG_FUNCTION(this << phy);
+        m_phy = phy;
+    }
 
-Ptr<Object>
-NonCommunicatingNetDevice::GetPhy () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_phy;
-}
+    Ptr<Object>
+            NonCommunicatingNetDevice::GetPhy() const {
+        NS_LOG_FUNCTION(this);
+        return m_phy;
+    }
 
+    void
+    NonCommunicatingNetDevice::SetChannel(Ptr<Channel> c) {
+        NS_LOG_FUNCTION(this << c);
+        m_channel = c;
+    }
 
-void
-NonCommunicatingNetDevice::SetChannel (Ptr<Channel> c)
-{
-  NS_LOG_FUNCTION (this << c);
-  m_channel = c;
-}
+    Ptr<Channel>
+            NonCommunicatingNetDevice::GetChannel(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_channel;
+    }
 
-Ptr<Channel>
-NonCommunicatingNetDevice::GetChannel (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_channel;
-}
+    bool
+    NonCommunicatingNetDevice::NeedsArp(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
+    bool
+    NonCommunicatingNetDevice::IsLinkUp(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-bool
-NonCommunicatingNetDevice::NeedsArp (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    void
+    NonCommunicatingNetDevice::AddLinkChangeCallback(Callback<void> callback) {
+        NS_LOG_FUNCTION(&callback);
+    }
 
-bool
-NonCommunicatingNetDevice::IsLinkUp (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+    void
+    NonCommunicatingNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb) {
+        NS_LOG_FUNCTION(&cb);
+    }
 
-void
-NonCommunicatingNetDevice::AddLinkChangeCallback (Callback<void> callback)
-{
-  NS_LOG_FUNCTION (&callback);
-}
+    void
+    NonCommunicatingNetDevice::SetPromiscReceiveCallback(NetDevice::PromiscReceiveCallback cb) {
+        NS_LOG_FUNCTION(&cb);
+    }
 
-void
-NonCommunicatingNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (&cb);
-}
+    bool
+    NonCommunicatingNetDevice::SupportsSendFrom() const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
-void
-NonCommunicatingNetDevice::SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (&cb);
-}
+    bool
+    NonCommunicatingNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) {
+        NS_LOG_FUNCTION(packet << dest << protocolNumber);
+        return false;
+    }
 
-bool
-NonCommunicatingNetDevice::SupportsSendFrom () const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
-
-
-bool
-NonCommunicatingNetDevice::Send (Ptr<Packet> packet,const Address& dest, uint16_t protocolNumber)
-{
-  NS_LOG_FUNCTION (packet << dest << protocolNumber);
-  return false;
-}
-
-bool
-NonCommunicatingNetDevice::SendFrom (Ptr<Packet> packet, const Address& src, const Address& dest, uint16_t protocolNumber)
-{
-  NS_LOG_FUNCTION (packet << src << dest << protocolNumber);
-  return false;
-}
+    bool
+    NonCommunicatingNetDevice::SendFrom(Ptr<Packet> packet, const Address& src, const Address& dest, uint16_t protocolNumber) {
+        NS_LOG_FUNCTION(packet << src << dest << protocolNumber);
+        return false;
+    }
 
 
 } // namespace ns3

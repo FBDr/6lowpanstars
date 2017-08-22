@@ -25,58 +25,57 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief A source that can accept input step by step, and can close input explicitly.
- *
- * This source will not send data into the transformation chain when the chain is constructed.
- * Input will be explicitly sent into the chain using write(...) and will be closed explicitly
- * using end().
- *
- *   StepSource ss;
- *   ss >> transform1() >> transform2() >> sinkStream(...);
- *   ss.write(...);
- *   ...
- *   ss.write(...);
- *   ss.end();
- */
-class StepSource : public Source
-{
-public:
-  /**
-   * @brief Accept input data and directly write input into next transformation module.
-   *
-   * One can keep calling this method to until end() is called, which
-   * indicates the end of input.  After that, calling this method will cause Error.
-   *
-   * @return number of bytes that has been written into next module
-   */
-  size_t
-  write(const uint8_t* buf, size_t size);
+            /**
+             * @brief A source that can accept input step by step, and can close input explicitly.
+             *
+             * This source will not send data into the transformation chain when the chain is constructed.
+             * Input will be explicitly sent into the chain using write(...) and will be closed explicitly
+             * using end().
+             *
+             *   StepSource ss;
+             *   ss >> transform1() >> transform2() >> sinkStream(...);
+             *   ss.write(...);
+             *   ...
+             *   ss.write(...);
+             *   ss.end();
+             */
+            class StepSource : public Source {
+            public:
+                /**
+                 * @brief Accept input data and directly write input into next transformation module.
+                 *
+                 * One can keep calling this method to until end() is called, which
+                 * indicates the end of input.  After that, calling this method will cause Error.
+                 *
+                 * @return number of bytes that has been written into next module
+                 */
+                size_t
+                write(const uint8_t* buf, size_t size);
 
-  /**
-   * @brief Close the input interface and directly notify the next module the end of input
-   */
-  void
-  end();
+                /**
+                 * @brief Close the input interface and directly notify the next module the end of input
+                 */
+                void
+                end();
 
-private:
-  /**
-   * @brief This method intentionally does nothing
-   *
-   * use write() and end() method explicitly to input data.
-   */
-  virtual void
-  doPump() final;
+            private:
+                /**
+                 * @brief This method intentionally does nothing
+                 *
+                 * use write() and end() method explicitly to input data.
+                 */
+                virtual void
+                doPump() final;
 
-};
+            };
 
-typedef StepSource stepSource;
+            typedef StepSource stepSource;
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_STEP_SOURCE_HPP

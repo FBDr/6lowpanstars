@@ -25,27 +25,25 @@
 
 namespace ns3 {
 
+    class ConstantSpectrumPropagationLossModel : public SpectrumPropagationLossModel {
+    public:
+        ConstantSpectrumPropagationLossModel();
+        ~ConstantSpectrumPropagationLossModel();
 
-class ConstantSpectrumPropagationLossModel : public SpectrumPropagationLossModel
-{
-public:
-  ConstantSpectrumPropagationLossModel ();
-  ~ConstantSpectrumPropagationLossModel ();
+        static TypeId GetTypeId();
 
-  static TypeId GetTypeId ();
+        virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+                Ptr<const MobilityModel> a,
+                Ptr<const MobilityModel> b) const;
 
-  virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                           Ptr<const MobilityModel> a,
-                                                           Ptr<const MobilityModel> b) const;
+        void SetLossDb(double lossDb);
+        double GetLossDb() const;
 
-  void SetLossDb (double lossDb);
-  double GetLossDb () const;
-
-protected:
-  double m_lossDb;
-  double m_lossLinear;
-private:
-};
+    protected:
+        double m_lossDb;
+        double m_lossLinear;
+    private:
+    };
 
 
 } // namespace ns3

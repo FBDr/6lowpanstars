@@ -25,48 +25,47 @@
 
 namespace ns3 {
 
-/**
- * \ingroup socket
- * \ingroup tcp
- *
- * \brief An implementation of a stream socket using TCP.
- *
- * This class contains the Tahoe implementation of TCP. Tahoe is not officially
- * published in RFC. The reference for implementing this is based on
- * Kevin Fall and Sally Floyd, "Simulation-based Comparisons of Tahoe, Reno, and SACK TCP", CCR, 1996
- * http://inst.eecs.berkeley.edu/~ee122/fa05/projects/Project2/proj2_spec_files/sacks.pdf
- * In summary, we have slow start, congestion avoidance, and fast retransmit.
- * The implementation of these algorithms are based on W. R. Stevens's book and
- * also \RFC{2001}.
- */
-class TcpTahoe : public TcpSocketBase
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * Create an unbound tcp socket.
-   */
-  TcpTahoe (void);
-  /**
-   * \brief Copy constructor
-   * \param sock the object to copy
-   */
-  TcpTahoe (const TcpTahoe& sock);
-  virtual ~TcpTahoe (void);
+    /**
+     * \ingroup socket
+     * \ingroup tcp
+     *
+     * \brief An implementation of a stream socket using TCP.
+     *
+     * This class contains the Tahoe implementation of TCP. Tahoe is not officially
+     * published in RFC. The reference for implementing this is based on
+     * Kevin Fall and Sally Floyd, "Simulation-based Comparisons of Tahoe, Reno, and SACK TCP", CCR, 1996
+     * http://inst.eecs.berkeley.edu/~ee122/fa05/projects/Project2/proj2_spec_files/sacks.pdf
+     * In summary, we have slow start, congestion avoidance, and fast retransmit.
+     * The implementation of these algorithms are based on W. R. Stevens's book and
+     * also \RFC{2001}.
+     */
+    class TcpTahoe : public TcpSocketBase {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        /**
+         * Create an unbound tcp socket.
+         */
+        TcpTahoe(void);
+        /**
+         * \brief Copy constructor
+         * \param sock the object to copy
+         */
+        TcpTahoe(const TcpTahoe& sock);
+        virtual ~TcpTahoe(void);
 
-protected:
-  virtual Ptr<TcpSocketBase> Fork (void); // Call CopyObject<TcpTahoe> to clone me
-  virtual void NewAck (SequenceNumber32 const& seq); // Inc cwnd and call NewAck() of parent
-  virtual void DupAck (const TcpHeader& t, uint32_t count);  // Treat 3 dupack as timeout
-  virtual void Retransmit (void); // Retransmit time out
+    protected:
+        virtual Ptr<TcpSocketBase> Fork(void); // Call CopyObject<TcpTahoe> to clone me
+        virtual void NewAck(SequenceNumber32 const& seq); // Inc cwnd and call NewAck() of parent
+        virtual void DupAck(const TcpHeader& t, uint32_t count); // Treat 3 dupack as timeout
+        virtual void Retransmit(void); // Retransmit time out
 
-protected:
-  uint32_t               m_retxThresh;   //!< Fast Retransmit threshold
-};
+    protected:
+        uint32_t m_retxThresh; //!< Fast Retransmit threshold
+    };
 
 } // namespace ns3
 

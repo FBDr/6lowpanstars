@@ -29,47 +29,46 @@
 
 namespace ns3 {
 
-class Tag;
+    class Tag;
 
-class SnrTag : public Tag
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    class SnrTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create a SnrTag with the default snr 0
-   */
-  SnrTag ();
+        /**
+         * Create a SnrTag with the default snr 0
+         */
+        SnrTag();
 
-  /**
-   * Create a SnrTag with the given snr value
-   * \param snr the given SNR value
-   */
-  SnrTag (double snr);
+        /**
+         * Create a SnrTag with the given snr value
+         * \param snr the given SNR value
+         */
+        SnrTag(double snr);
 
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual void Print (std::ostream &os) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual void Print(std::ostream &os) const;
 
-  /**
-   * Set the SNR to the given value.
-   *
-   * \param snr the value of the snr to set
-   */
-  void Set (double snr);
-  /**
-   * Return the SNR value.
-   *
-   * \return the SNR value
-   */
-  double Get (void) const;
+        /**
+         * Set the SNR to the given value.
+         *
+         * \param snr the value of the snr to set
+         */
+        void Set(double snr);
+        /**
+         * Return the SNR value.
+         *
+         * \return the SNR value
+         */
+        double Get(void) const;
 
 
-private:
-  double m_snr;  //!< SNR value
-};
+    private:
+        double m_snr; //!< SNR value
+    };
 
 }
 #endif /* SNR_TAG_H */

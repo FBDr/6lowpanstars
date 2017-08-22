@@ -30,145 +30,138 @@
 #include <ndn-cxx/mgmt/nfd/control-command.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class TestCommandVoidParameters : public ndn::nfd::ControlCommand
-{
-public:
-  TestCommandVoidParameters()
-    : ndn::nfd::ControlCommand("test-module", "test-void-parameters")
-  {
-  }
-};
+        class TestCommandVoidParameters : public ndn::nfd::ControlCommand {
+        public:
 
-class TestCommandRequireName : public ndn::nfd::ControlCommand
-{
-public:
-  TestCommandRequireName()
-    : ndn::nfd::ControlCommand("test-module", "test-require-name")
-  {
-    m_requestValidator.required(ndn::nfd::CONTROL_PARAMETER_NAME);
-  }
-};
+            TestCommandVoidParameters()
+            : ndn::nfd::ControlCommand("test-module", "test-void-parameters") {
+            }
+        };
 
-class ManagerTester : public ManagerBase
-{
-public:
-  ManagerTester(Dispatcher& dispatcher,
-                const std::string& module)
-    : ManagerBase(dispatcher, module)
-  {
-  }
+        class TestCommandRequireName : public ndn::nfd::ControlCommand {
+        public:
 
-  virtual ndn::mgmt::Authorization
-  makeAuthorization(const std::string& verb) override
-  {
-    return [this] (const Name& prefix, const Interest& interest,
-                   const ndn::mgmt::ControlParameters* params,
-                   ndn::mgmt::AcceptContinuation accept,
-                   ndn::mgmt::RejectContinuation reject) {
-      accept("requester");
-    };
-  }
-};
+            TestCommandRequireName()
+            : ndn::nfd::ControlCommand("test-module", "test-require-name") {
+                m_requestValidator.required(ndn::nfd::CONTROL_PARAMETER_NAME);
+            }
+        };
 
-class ManagerBaseFixture : public ManagerCommonFixture
-{
-public:
-  ManagerBaseFixture()
-    : m_manager(m_dispatcher, "test-module")
-  {
-  }
+        class ManagerTester : public ManagerBase {
+        public:
 
-protected:
-  ManagerTester m_manager;
-};
+            ManagerTester(Dispatcher& dispatcher,
+                    const std::string& module)
+            : ManagerBase(dispatcher, module) {
+            }
 
-BOOST_FIXTURE_TEST_SUITE(TestManagerBase, ManagerBaseFixture)
+            virtual ndn::mgmt::Authorization
+            makeAuthorization(const std::string& verb) override {
+                return [this] (const Name& prefix, const Interest& interest,
+                        const ndn::mgmt::ControlParameters* params,
+                        ndn::mgmt::AcceptContinuation accept,
+                        ndn::mgmt::RejectContinuation reject) {
+                    accept("requester");
+                };
+            }
+        };
 
-BOOST_AUTO_TEST_CASE(RegisterCommandHandler)
-{
-  bool wasCommandHandlerCalled = false;
-  auto handler = bind([&] { wasCommandHandlerCalled = true; });
+        class ManagerBaseFixture : public ManagerCommonFixture {
+        public:
 
-  m_manager.registerCommandHandler<TestCommandVoidParameters>("test-void", handler);
-  m_manager.registerCommandHandler<TestCommandRequireName>("test-require-name", handler);
-  setTopPrefix("/localhost/nfd");
+            ManagerBaseFixture()
+            : m_manager(m_dispatcher, "test-module") {
+            }
 
-  auto testRegisterCommandHandler = [&wasCommandHandlerCalled, this] (const Name& commandName) {
-    wasCommandHandlerCalled = false;
-    receiveInterest(makeControlCommandRequest(commandName, ControlParameters()));
-  };
+        protected:
+            ManagerTester m_manager;
+        };
 
-  testRegisterCommandHandler("/localhost/nfd/test-module/test-void");
-  BOOST_CHECK(wasCommandHandlerCalled);
+        BOOST_FIXTURE_TEST_SUITE(TestManagerBase, ManagerBaseFixture)
 
-  testRegisterCommandHandler("/localhost/nfd/test-module/test-require-name");
-  BOOST_CHECK(!wasCommandHandlerCalled);
-}
+        BOOST_AUTO_TEST_CASE(RegisterCommandHandler) {
+            bool wasCommandHandlerCalled = false;
+            auto handler = bind([&] {
+                wasCommandHandlerCalled = true; });
 
-BOOST_AUTO_TEST_CASE(RegisterStatusDataset)
-{
-  bool isStatusDatasetCalled = false;
-  auto handler = bind([&] { isStatusDatasetCalled = true; });
+            m_manager.registerCommandHandler<TestCommandVoidParameters>("test-void", handler);
+            m_manager.registerCommandHandler<TestCommandRequireName>("test-require-name", handler);
+            setTopPrefix("/localhost/nfd");
 
-  m_manager.registerStatusDatasetHandler("test-status", handler);
-  setTopPrefix("/localhost/nfd");
+            auto testRegisterCommandHandler = [&wasCommandHandlerCalled, this] (const Name & commandName) {
+                wasCommandHandlerCalled = false;
+                receiveInterest(makeControlCommandRequest(commandName, ControlParameters()));
+            };
 
-  receiveInterest(makeInterest("/localhost/nfd/test-module/test-status"));
-  BOOST_CHECK(isStatusDatasetCalled);
-}
+            testRegisterCommandHandler("/localhost/nfd/test-module/test-void");
+            BOOST_CHECK(wasCommandHandlerCalled);
 
-BOOST_AUTO_TEST_CASE(RegisterNotificationStream)
-{
-  auto post = m_manager.registerNotificationStream("test-notification");
-  setTopPrefix("/localhost/nfd");
+            testRegisterCommandHandler("/localhost/nfd/test-module/test-require-name");
+            BOOST_CHECK(!wasCommandHandlerCalled);
+        }
 
-  post(Block("\x82\x01\x02", 3));
-  advanceClocks(time::milliseconds(1));
+        BOOST_AUTO_TEST_CASE(RegisterStatusDataset) {
+            bool isStatusDatasetCalled = false;
+            auto handler = bind([&] {
+                isStatusDatasetCalled = true; });
 
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(m_responses[0].getName(),
+            m_manager.registerStatusDatasetHandler("test-status", handler);
+            setTopPrefix("/localhost/nfd");
+
+            receiveInterest(makeInterest("/localhost/nfd/test-module/test-status"));
+            BOOST_CHECK(isStatusDatasetCalled);
+        }
+
+        BOOST_AUTO_TEST_CASE(RegisterNotificationStream) {
+            auto post = m_manager.registerNotificationStream("test-notification");
+            setTopPrefix("/localhost/nfd");
+
+            post(Block("\x82\x01\x02", 3));
+            advanceClocks(time::milliseconds(1));
+
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(m_responses[0].getName(),
                     Name("/localhost/nfd/test-module/test-notification/%FE%00"));
-}
+        }
 
-BOOST_AUTO_TEST_CASE(ExtractRequester)
-{
-  std::string requesterName;
-  auto testAccept = [&] (const std::string& requester) { requesterName = requester; };
+        BOOST_AUTO_TEST_CASE(ExtractRequester) {
+            std::string requesterName;
+            auto testAccept = [&] (const std::string & requester) {
+                requesterName = requester;
+            };
 
-  auto unsignedCommand = makeInterest("/test/interest/unsigned");
-  auto signedCommand = makeControlCommandRequest("/test/interest/signed", ControlParameters());
+            auto unsignedCommand = makeInterest("/test/interest/unsigned");
+            auto signedCommand = makeControlCommandRequest("/test/interest/signed", ControlParameters());
 
-  m_manager.extractRequester(*unsignedCommand, testAccept);
-  BOOST_CHECK(requesterName.empty());
+            m_manager.extractRequester(*unsignedCommand, testAccept);
+            BOOST_CHECK(requesterName.empty());
 
-  requesterName = "";
-  m_manager.extractRequester(*signedCommand, testAccept);
-  auto keyLocator = m_keyChain.getDefaultCertificateNameForIdentity(m_identityName).getPrefix(-1);
-  BOOST_CHECK_EQUAL(requesterName, keyLocator.toUri());
-}
+            requesterName = "";
+            m_manager.extractRequester(*signedCommand, testAccept);
+            auto keyLocator = m_keyChain.getDefaultCertificateNameForIdentity(m_identityName).getPrefix(-1);
+            BOOST_CHECK_EQUAL(requesterName, keyLocator.toUri());
+        }
 
-BOOST_AUTO_TEST_CASE(ValidateParameters)
-{
-  ControlParameters params;
-  TestCommandVoidParameters commandVoidParams;
-  TestCommandRequireName commandRequireName;
+        BOOST_AUTO_TEST_CASE(ValidateParameters) {
+            ControlParameters params;
+            TestCommandVoidParameters commandVoidParams;
+            TestCommandRequireName commandRequireName;
 
-  BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandVoidParams, params), true); // succeeds
-  BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandRequireName, params), false); // fails
+            BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandVoidParams, params), true); // succeeds
+            BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandRequireName, params), false); // fails
 
-  params.setName("test-name");
-  BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandRequireName, params), true); // succeeds
-}
+            params.setName("test-name");
+            BOOST_CHECK_EQUAL(ManagerBase::validateParameters(commandRequireName, params), true); // succeeds
+        }
 
-BOOST_AUTO_TEST_CASE(MakeRelPrefix)
-{
-  auto generatedRelPrefix = m_manager.makeRelPrefix("test-verb");
-  BOOST_CHECK_EQUAL(generatedRelPrefix, PartialName("/test-module/test-verb"));
-}
+        BOOST_AUTO_TEST_CASE(MakeRelPrefix) {
+            auto generatedRelPrefix = m_manager.makeRelPrefix("test-verb");
+            BOOST_CHECK_EQUAL(generatedRelPrefix, PartialName("/test-module/test-verb"));
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestManagerBase
+        BOOST_AUTO_TEST_SUITE_END() // TestManagerBase
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

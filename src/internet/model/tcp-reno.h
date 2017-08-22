@@ -25,45 +25,44 @@
 
 namespace ns3 {
 
-/**
- * \ingroup socket
- * \ingroup tcp
- *
- * \brief An implementation of a stream socket using TCP.
- *
- * This class contains the Reno implementation of TCP, according to \RFC{2581},
- * except sec.4.1 "re-starting idle connections", which we do not detect for
- * idleness and thus no slow start upon resumption.
- */
-class TcpReno : public TcpSocketBase
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * Create an unbound tcp socket.
-   */
-  TcpReno (void);
-  /**
-   * \brief Copy constructor
-   * \param sock the object to copy
-   */
-  TcpReno (const TcpReno& sock);
-  virtual ~TcpReno (void);
+    /**
+     * \ingroup socket
+     * \ingroup tcp
+     *
+     * \brief An implementation of a stream socket using TCP.
+     *
+     * This class contains the Reno implementation of TCP, according to \RFC{2581},
+     * except sec.4.1 "re-starting idle connections", which we do not detect for
+     * idleness and thus no slow start upon resumption.
+     */
+    class TcpReno : public TcpSocketBase {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        /**
+         * Create an unbound tcp socket.
+         */
+        TcpReno(void);
+        /**
+         * \brief Copy constructor
+         * \param sock the object to copy
+         */
+        TcpReno(const TcpReno& sock);
+        virtual ~TcpReno(void);
 
-protected:
-  virtual Ptr<TcpSocketBase> Fork (void); // Call CopyObject<TcpReno> to clone me
-  virtual void NewAck (const SequenceNumber32& seq); // Inc cwnd and call NewAck() of parent
-  virtual void DupAck (const TcpHeader& t, uint32_t count);  // Fast retransmit
-  virtual void Retransmit (void); // Retransmit timeout
+    protected:
+        virtual Ptr<TcpSocketBase> Fork(void); // Call CopyObject<TcpReno> to clone me
+        virtual void NewAck(const SequenceNumber32& seq); // Inc cwnd and call NewAck() of parent
+        virtual void DupAck(const TcpHeader& t, uint32_t count); // Fast retransmit
+        virtual void Retransmit(void); // Retransmit timeout
 
-protected:
-  uint32_t               m_retxThresh;   //!< Fast Retransmit threshold
-  bool                   m_inFastRec;    //!< currently in fast recovery
-};
+    protected:
+        uint32_t m_retxThresh; //!< Fast Retransmit threshold
+        bool m_inFastRec; //!< currently in fast recovery
+    };
 
 } // namespace ns3
 

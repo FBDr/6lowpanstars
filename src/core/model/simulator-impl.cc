@@ -26,20 +26,20 @@
  * Implementation of class ns3::SimulatorImpl.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SimulatorImpl");
-
-NS_OBJECT_ENSURE_REGISTERED (SimulatorImpl);
-  
-TypeId 
-SimulatorImpl::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SimulatorImpl")
-    .SetParent<Object> ()
-    .SetGroupName ("Core")
-  ;
-  return tid;
-}
+
+    NS_LOG_COMPONENT_DEFINE("SimulatorImpl");
+
+    NS_OBJECT_ENSURE_REGISTERED(SimulatorImpl);
+
+    TypeId
+    SimulatorImpl::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SimulatorImpl")
+                .SetParent<Object> ()
+                .SetGroupName("Core")
+                ;
+        return tid;
+    }
 
 } // namespace ns3

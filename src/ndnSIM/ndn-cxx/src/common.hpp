@@ -46,7 +46,7 @@
 
 // require C++11
 #if __cplusplus < 201103L && !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  error "ndn-cxx applications must be compiled using the C++11 standard (-std=c++11)"
+#error "ndn-cxx applications must be compiled using the C++11 standard (-std=c++11)"
 #endif
 
 #include <algorithm>
@@ -63,31 +63,31 @@
 #include <utility>
 
 #if defined(__GNUC__) || defined(__clang__)
-#  define DEPRECATED(func) func __attribute__ ((deprecated))
+#define DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
-#  define DEPRECATED(func) __declspec(deprecated) func
+#define DEPRECATED(func) __declspec(deprecated) func
 #else
-#  pragma message("DEPRECATED not implemented")
-#  define DEPRECATED(func) func
+#pragma message("DEPRECATED not implemented")
+#define DEPRECATED(func) func
 #endif
 
 namespace ndn {
 
-using std::shared_ptr;
-using std::unique_ptr;
-using std::weak_ptr;
-using std::bad_weak_ptr;
-using std::make_shared;
-using std::enable_shared_from_this;
+    using std::shared_ptr;
+    using std::unique_ptr;
+    using std::weak_ptr;
+    using std::bad_weak_ptr;
+    using std::make_shared;
+    using std::enable_shared_from_this;
 
-using std::static_pointer_cast;
-using std::dynamic_pointer_cast;
-using std::const_pointer_cast;
+    using std::static_pointer_cast;
+    using std::dynamic_pointer_cast;
+    using std::const_pointer_cast;
 
-using std::function;
-using std::bind;
-using std::ref;
-using std::cref;
+    using std::function;
+    using std::bind;
+    using std::ref;
+    using std::cref;
 
 } // namespace ndn
 
@@ -104,15 +104,15 @@ namespace boost {
       value = N \
     }; \
   };
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(1)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(2)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(3)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(4)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(5)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(6)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(7)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(8)
-NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(9)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(1)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(2)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(3)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(4)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(5)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(6)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(7)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(8)
+    NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(9)
 #undef NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER
 } // namespace boost
 
@@ -122,7 +122,7 @@ NDN_CXX_SPECIALIZE_BOOST_IS_PLACEHOLDER_FOR_STD_PLACEHOLDER(9)
 #include <boost/throw_exception.hpp>
 
 namespace ndn {
-using boost::noncopyable;
+    using boost::noncopyable;
 } // namespace ndn
 
 #include "util/backports.hpp"

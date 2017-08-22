@@ -728,10 +728,10 @@ typedef
 #if defined(PLAT_s390x_linux)
 
 typedef
-  struct {
-     unsigned long long int nraddr; /* where's the code? */
-  }
-  OrigFn;
+struct {
+    unsigned long long int nraddr; /* where's the code? */
+}
+OrigFn;
 
 /* __SPECIAL_INSTRUCTION_PREAMBLE will be used to identify Valgrind specific
  * code. This detection is implemented in platform specific toIR.c
@@ -805,10 +805,10 @@ typedef
 #if defined(PLAT_mips32_linux)
 
 typedef
-   struct { 
-      unsigned int nraddr; /* where's the code? */
-   }
-   OrigFn;
+struct {
+    unsigned int nraddr; /* where's the code? */
+}
+OrigFn;
 
 /* .word  0x342
  * .word  0x742
@@ -819,7 +819,7 @@ typedef
                      "srl $0, $0, 29\n\t"       \
                      "srl $0, $0, 3\n\t"        \
                      "srl $0, $0, 19\n\t"
-                    
+
 #define VALGRIND_DO_CLIENT_REQUEST_EXPR(                          \
        _zzq_default, _zzq_request,                                \
        _zzq_arg1, _zzq_arg2, _zzq_arg3, _zzq_arg4, _zzq_arg5)     \
@@ -878,10 +878,10 @@ typedef
 #if defined(PLAT_mips64_linux)
 
 typedef
-   struct {
-      unsigned long long nraddr; /* where's the code? */
-   }
-   OrigFn;
+struct {
+    unsigned long long nraddr; /* where's the code? */
+}
+OrigFn;
 
 /* dsll $0,$0, 3
  * dsll $0,$0, 13
@@ -968,7 +968,7 @@ typedef
    different macros for calling arity 0, 1, 2, 3, 4, etc, functions,
    and for each, the possibility of returning a word-typed result, or
    no result.
-*/
+ */
 
 /* Use these to write the name of your wrapper.  NOTE: duplicates
    VG_WRAP_FUNCTION_Z{U,Z} in pub_tool_redir.h.  NOTE also: inserts
@@ -1533,22 +1533,22 @@ typedef
    really compute the CFA, whereas __builtin_frame_address(0) claims
    to but actually doesn't.  See
    https://bugs.kde.org/show_bug.cgi?id=243270#c47
-*/
+ */
 #if defined(__GNUC__) && defined(__GCC_HAVE_DWARF2_CFI_ASM)
-#  define __FRAME_POINTER                                         \
+#define __FRAME_POINTER                                         \
       ,"r"(__builtin_dwarf_cfa())
-#  define VALGRIND_CFI_PROLOGUE                                   \
+#define VALGRIND_CFI_PROLOGUE                                   \
       "movq %%rbp, %%r15\n\t"                                     \
       "movq %2, %%rbp\n\t"                                        \
       ".cfi_remember_state\n\t"                                   \
       ".cfi_def_cfa rbp, 0\n\t"
-#  define VALGRIND_CFI_EPILOGUE                                   \
+#define VALGRIND_CFI_EPILOGUE                                   \
       "movq %%r15, %%rbp\n\t"                                     \
       ".cfi_restore_state\n\t"
 #else
-#  define __FRAME_POINTER
-#  define VALGRIND_CFI_PROLOGUE
-#  define VALGRIND_CFI_EPILOGUE
+#define __FRAME_POINTER
+#define VALGRIND_CFI_PROLOGUE
+#define VALGRIND_CFI_EPILOGUE
 #endif
 
 /* Macros to save and align the stack before making a function
@@ -2046,7 +2046,7 @@ typedef
    int g12 ( void ) {
       return f12(11,22,33,44,55,66,77,88,99,110,121,132);
    }
-*/
+ */
 
 /* ARGREGS: r3 r4 r5 r6 r7 r8 r9 r10 (the rest on stack somewhere) */
 
@@ -3690,22 +3690,22 @@ typedef
    argvec, therefore we copy argvec in r1 since r1 is clobbered
    after the call anyway.  */
 #if defined(__GNUC__) && defined(__GCC_HAVE_DWARF2_CFI_ASM)
-#  define __FRAME_POINTER                                         \
+#define __FRAME_POINTER                                         \
       ,"d"(__builtin_dwarf_cfa())
-#  define VALGRIND_CFI_PROLOGUE                                   \
+#define VALGRIND_CFI_PROLOGUE                                   \
       ".cfi_remember_state\n\t"                                   \
       "lgr 1,%1\n\t" /* copy the argvec pointer in r1 */          \
       "lgr 7,11\n\t"                                              \
       "lgr 11,%2\n\t"                                             \
       ".cfi_def_cfa r11, 0\n\t"
-#  define VALGRIND_CFI_EPILOGUE                                   \
+#define VALGRIND_CFI_EPILOGUE                                   \
       "lgr 11, 7\n\t"                                             \
       ".cfi_restore_state\n\t"
 #else
-#  define __FRAME_POINTER
-#  define VALGRIND_CFI_PROLOGUE                                   \
+#define __FRAME_POINTER
+#define VALGRIND_CFI_PROLOGUE                                   \
       "lgr 1,%1\n\t"
-#  define VALGRIND_CFI_EPILOGUE
+#define VALGRIND_CFI_EPILOGUE
 #endif
 
 /* Nb: On s390 the stack pointer is properly aligned *at all times*
@@ -4170,7 +4170,7 @@ typedef
 #endif /* PLAT_s390x_linux */
 
 /* ------------------------- mips32-linux ----------------------- */
- 
+
 #if defined(PLAT_mips32_linux)
 
 /* These regs are trashed by the hidden call. */
@@ -5137,7 +5137,7 @@ typedef
 
    Core ones are in the range 0x00000000--0x0000ffff.  The non-public
    ones start at 0x2000.
-*/
+ */
 
 /* These macros are used by tools -- they must be public, but don't
    embed them into other programs. */
@@ -5151,80 +5151,81 @@ typedef
    which use client requests.  DO NOT CHANGE THE ORDER OF THESE
    ENTRIES, NOR DELETE ANY -- add new ones at the end. */
 typedef
-   enum { VG_USERREQ__RUNNING_ON_VALGRIND  = 0x1001,
-          VG_USERREQ__DISCARD_TRANSLATIONS = 0x1002,
+enum {
+    VG_USERREQ__RUNNING_ON_VALGRIND = 0x1001,
+    VG_USERREQ__DISCARD_TRANSLATIONS = 0x1002,
 
-          /* These allow any function to be called from the simulated
-             CPU but run on the real CPU.  Nb: the first arg passed to
-             the function is always the ThreadId of the running
-             thread!  So CLIENT_CALL0 actually requires a 1 arg
-             function, etc. */
-          VG_USERREQ__CLIENT_CALL0 = 0x1101,
-          VG_USERREQ__CLIENT_CALL1 = 0x1102,
-          VG_USERREQ__CLIENT_CALL2 = 0x1103,
-          VG_USERREQ__CLIENT_CALL3 = 0x1104,
+    /* These allow any function to be called from the simulated
+       CPU but run on the real CPU.  Nb: the first arg passed to
+       the function is always the ThreadId of the running
+       thread!  So CLIENT_CALL0 actually requires a 1 arg
+       function, etc. */
+    VG_USERREQ__CLIENT_CALL0 = 0x1101,
+    VG_USERREQ__CLIENT_CALL1 = 0x1102,
+    VG_USERREQ__CLIENT_CALL2 = 0x1103,
+    VG_USERREQ__CLIENT_CALL3 = 0x1104,
 
-          /* Can be useful in regression testing suites -- eg. can
-             send Valgrind's output to /dev/null and still count
-             errors. */
-          VG_USERREQ__COUNT_ERRORS = 0x1201,
+    /* Can be useful in regression testing suites -- eg. can
+       send Valgrind's output to /dev/null and still count
+       errors. */
+    VG_USERREQ__COUNT_ERRORS = 0x1201,
 
-          /* Allows the client program and/or gdbserver to execute a monitor
-             command. */
-          VG_USERREQ__GDB_MONITOR_COMMAND = 0x1202,
+    /* Allows the client program and/or gdbserver to execute a monitor
+       command. */
+    VG_USERREQ__GDB_MONITOR_COMMAND = 0x1202,
 
-          /* These are useful and can be interpreted by any tool that
-             tracks malloc() et al, by using vg_replace_malloc.c. */
-          VG_USERREQ__MALLOCLIKE_BLOCK = 0x1301,
-          VG_USERREQ__RESIZEINPLACE_BLOCK = 0x130b,
-          VG_USERREQ__FREELIKE_BLOCK   = 0x1302,
-          /* Memory pool support. */
-          VG_USERREQ__CREATE_MEMPOOL   = 0x1303,
-          VG_USERREQ__DESTROY_MEMPOOL  = 0x1304,
-          VG_USERREQ__MEMPOOL_ALLOC    = 0x1305,
-          VG_USERREQ__MEMPOOL_FREE     = 0x1306,
-          VG_USERREQ__MEMPOOL_TRIM     = 0x1307,
-          VG_USERREQ__MOVE_MEMPOOL     = 0x1308,
-          VG_USERREQ__MEMPOOL_CHANGE   = 0x1309,
-          VG_USERREQ__MEMPOOL_EXISTS   = 0x130a,
+    /* These are useful and can be interpreted by any tool that
+       tracks malloc() et al, by using vg_replace_malloc.c. */
+    VG_USERREQ__MALLOCLIKE_BLOCK = 0x1301,
+    VG_USERREQ__RESIZEINPLACE_BLOCK = 0x130b,
+    VG_USERREQ__FREELIKE_BLOCK = 0x1302,
+    /* Memory pool support. */
+    VG_USERREQ__CREATE_MEMPOOL = 0x1303,
+    VG_USERREQ__DESTROY_MEMPOOL = 0x1304,
+    VG_USERREQ__MEMPOOL_ALLOC = 0x1305,
+    VG_USERREQ__MEMPOOL_FREE = 0x1306,
+    VG_USERREQ__MEMPOOL_TRIM = 0x1307,
+    VG_USERREQ__MOVE_MEMPOOL = 0x1308,
+    VG_USERREQ__MEMPOOL_CHANGE = 0x1309,
+    VG_USERREQ__MEMPOOL_EXISTS = 0x130a,
 
-          /* Allow printfs to valgrind log. */
-          /* The first two pass the va_list argument by value, which
-             assumes it is the same size as or smaller than a UWord,
-             which generally isn't the case.  Hence are deprecated.
-             The second two pass the vargs by reference and so are
-             immune to this problem. */
-          /* both :: char* fmt, va_list vargs (DEPRECATED) */
-          VG_USERREQ__PRINTF           = 0x1401,
-          VG_USERREQ__PRINTF_BACKTRACE = 0x1402,
-          /* both :: char* fmt, va_list* vargs */
-          VG_USERREQ__PRINTF_VALIST_BY_REF = 0x1403,
-          VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF = 0x1404,
+    /* Allow printfs to valgrind log. */
+    /* The first two pass the va_list argument by value, which
+       assumes it is the same size as or smaller than a UWord,
+       which generally isn't the case.  Hence are deprecated.
+       The second two pass the vargs by reference and so are
+       immune to this problem. */
+    /* both :: char* fmt, va_list vargs (DEPRECATED) */
+    VG_USERREQ__PRINTF = 0x1401,
+    VG_USERREQ__PRINTF_BACKTRACE = 0x1402,
+    /* both :: char* fmt, va_list* vargs */
+    VG_USERREQ__PRINTF_VALIST_BY_REF = 0x1403,
+    VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF = 0x1404,
 
-          /* Stack support. */
-          VG_USERREQ__STACK_REGISTER   = 0x1501,
-          VG_USERREQ__STACK_DEREGISTER = 0x1502,
-          VG_USERREQ__STACK_CHANGE     = 0x1503,
+    /* Stack support. */
+    VG_USERREQ__STACK_REGISTER = 0x1501,
+    VG_USERREQ__STACK_DEREGISTER = 0x1502,
+    VG_USERREQ__STACK_CHANGE = 0x1503,
 
-          /* Wine support */
-          VG_USERREQ__LOAD_PDB_DEBUGINFO = 0x1601,
+    /* Wine support */
+    VG_USERREQ__LOAD_PDB_DEBUGINFO = 0x1601,
 
-          /* Querying of debug info. */
-          VG_USERREQ__MAP_IP_TO_SRCLOC = 0x1701,
+    /* Querying of debug info. */
+    VG_USERREQ__MAP_IP_TO_SRCLOC = 0x1701,
 
-          /* Disable/enable error reporting level.  Takes a single
-             Word arg which is the delta to this thread's error
-             disablement indicator.  Hence 1 disables or further
-             disables errors, and -1 moves back towards enablement.
-             Other values are not allowed. */
-          VG_USERREQ__CHANGE_ERR_DISABLEMENT = 0x1801,
+    /* Disable/enable error reporting level.  Takes a single
+       Word arg which is the delta to this thread's error
+       disablement indicator.  Hence 1 disables or further
+       disables errors, and -1 moves back towards enablement.
+       Other values are not allowed. */
+    VG_USERREQ__CHANGE_ERR_DISABLEMENT = 0x1801,
 
-          /* Initialise IR injection */
-          VG_USERREQ__VEX_INIT_FOR_IRI = 0x1901
-   } Vg_ClientRequest;
+    /* Initialise IR injection */
+    VG_USERREQ__VEX_INIT_FOR_IRI = 0x1901
+} Vg_ClientRequest;
 
 #if !defined(__GNUC__)
-#  define __extension__ /* */
+#define __extension__ /* */
 #endif
 
 
@@ -5256,77 +5257,77 @@ typedef
 /* Modern GCC will optimize the static routine out if unused,
    and unused attribute will shut down warnings about it.  */
 static int VALGRIND_PRINTF(const char *format, ...)
-   __attribute__((format(__printf__, 1, 2), __unused__));
+__attribute__ ((format(__printf__, 1, 2), __unused__));
 #endif
+
 static int
 #if defined(_MSC_VER)
 __inline
 #endif
-VALGRIND_PRINTF(const char *format, ...)
-{
+VALGRIND_PRINTF(const char *format, ...) {
 #if defined(NVALGRIND)
-   return 0;
+    return 0;
 #else /* NVALGRIND */
 #if defined(_MSC_VER) || defined(__MINGW64__)
-   uintptr_t _qzz_res;
+    uintptr_t _qzz_res;
 #else
-   unsigned long _qzz_res;
+    unsigned long _qzz_res;
 #endif
-   va_list vargs;
-   va_start(vargs, format);
+    va_list vargs;
+    va_start(vargs, format);
 #if defined(_MSC_VER) || defined(__MINGW64__)
-   _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
-                              VG_USERREQ__PRINTF_VALIST_BY_REF,
-                              (uintptr_t)format,
-                              (uintptr_t)&vargs,
-                              0, 0, 0);
+    _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
+            VG_USERREQ__PRINTF_VALIST_BY_REF,
+            (uintptr_t) format,
+            (uintptr_t) & vargs,
+            0, 0, 0);
 #else
-   _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
-                              VG_USERREQ__PRINTF_VALIST_BY_REF,
-                              (unsigned long)format,
-                              (unsigned long)&vargs, 
-                              0, 0, 0);
+    _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
+            VG_USERREQ__PRINTF_VALIST_BY_REF,
+            (unsigned long) format,
+            (unsigned long) &vargs,
+            0, 0, 0);
 #endif
-   va_end(vargs);
-   return (int)_qzz_res;
+    va_end(vargs);
+    return (int) _qzz_res;
 #endif /* NVALGRIND */
 }
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER) && !defined(_MSC_VER)
 static int VALGRIND_PRINTF_BACKTRACE(const char *format, ...)
-   __attribute__((format(__printf__, 1, 2), __unused__));
+__attribute__ ((format(__printf__, 1, 2), __unused__));
 #endif
+
 static int
 #if defined(_MSC_VER)
 __inline
 #endif
-VALGRIND_PRINTF_BACKTRACE(const char *format, ...)
-{
+VALGRIND_PRINTF_BACKTRACE(const char *format, ...) {
 #if defined(NVALGRIND)
-   return 0;
+    return 0;
 #else /* NVALGRIND */
 #if defined(_MSC_VER) || defined(__MINGW64__)
-   uintptr_t _qzz_res;
+    uintptr_t _qzz_res;
 #else
-   unsigned long _qzz_res;
+    unsigned long _qzz_res;
 #endif
-   va_list vargs;
-   va_start(vargs, format);
+    va_list vargs;
+    va_start(vargs, format);
 #if defined(_MSC_VER) || defined(__MINGW64__)
-   _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
-                              VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF,
-                              (uintptr_t)format,
-                              (uintptr_t)&vargs,
-                              0, 0, 0);
+    _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
+            VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF,
+            (uintptr_t) format,
+            (uintptr_t) & vargs,
+            0, 0, 0);
 #else
-   _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
-                              VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF,
-                              (unsigned long)format,
-                              (unsigned long)&vargs, 
-                              0, 0, 0);
+    _qzz_res = VALGRIND_DO_CLIENT_REQUEST_EXPR(0,
+            VG_USERREQ__PRINTF_BACKTRACE_VALIST_BY_REF,
+            (unsigned long) format,
+            (unsigned long) &vargs,
+            0, 0, 0);
 #endif
-   va_end(vargs);
-   return (int)_qzz_res;
+    va_end(vargs);
+    return (int) _qzz_res;
 #endif /* NVALGRIND */
 }
 
@@ -5353,7 +5354,7 @@ VALGRIND_PRINTF_BACKTRACE(const char *format, ...)
    (printf et al).  Any kind of entanglement with libc or dynamic linking is
    likely to have a bad outcome, for tricky reasons which we've grappled
    with a lot in the past.
-*/
+ */
 #define VALGRIND_NON_SIMD_CALL0(_qyy_fn)                          \
     VALGRIND_DO_CLIENT_REQUEST_EXPR(0 /* default return */,       \
                                     VG_USERREQ__CLIENT_CALL0,     \
@@ -5489,21 +5490,21 @@ VALGRIND_PRINTF_BACKTRACE(const char *format, ...)
    program.
 
    Ignored if addr == 0.
-*/
+ */
 #define VALGRIND_MALLOCLIKE_BLOCK(addr, sizeB, rzB, is_zeroed)          \
     VALGRIND_DO_CLIENT_REQUEST_STMT(VG_USERREQ__MALLOCLIKE_BLOCK,       \
                                     addr, sizeB, rzB, is_zeroed, 0)
 
 /* See the comment for VALGRIND_MALLOCLIKE_BLOCK for details.
    Ignored if addr == 0.
-*/
+ */
 #define VALGRIND_RESIZEINPLACE_BLOCK(addr, oldSizeB, newSizeB, rzB)     \
     VALGRIND_DO_CLIENT_REQUEST_STMT(VG_USERREQ__RESIZEINPLACE_BLOCK,    \
                                     addr, oldSizeB, newSizeB, rzB, 0)
 
 /* See the comment for VALGRIND_MALLOCLIKE_BLOCK for details.
    Ignored if addr == 0.
-*/
+ */
 #define VALGRIND_FREELIKE_BLOCK(addr, rzB)                              \
     VALGRIND_DO_CLIENT_REQUEST_STMT(VG_USERREQ__FREELIKE_BLOCK,         \
                                     addr, rzB, 0, 0, 0)

@@ -34,80 +34,75 @@
 #endif
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(DatagramTransport, UnicastUdpTransport::protocol,
-                                               "UnicastUdpTransport");
+        NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(DatagramTransport, UnicastUdpTransport::protocol,
+                "UnicastUdpTransport");
 
-UnicastUdpTransport::UnicastUdpTransport(protocol::socket&& socket,
-                                         ndn::nfd::FacePersistency persistency,
-                                         time::nanoseconds idleTimeout)
-  : DatagramTransport(std::move(socket))
-  , m_idleTimeout(idleTimeout)
-{
-  this->setLocalUri(FaceUri(m_socket.local_endpoint()));
-  this->setRemoteUri(FaceUri(m_socket.remote_endpoint()));
-  this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  this->setPersistency(persistency);
-  this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  this->setMtu(udp::computeMtu(m_socket.local_endpoint()));
+        UnicastUdpTransport::UnicastUdpTransport(protocol::socket&& socket,
+                ndn::nfd::FacePersistency persistency,
+                time::nanoseconds idleTimeout)
+        : DatagramTransport(std::move(socket))
+        , m_idleTimeout(idleTimeout) {
+            this->setLocalUri(FaceUri(m_socket.local_endpoint()));
+            this->setRemoteUri(FaceUri(m_socket.remote_endpoint()));
+            this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
+            this->setPersistency(persistency);
+            this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+            this->setMtu(udp::computeMtu(m_socket.local_endpoint()));
 
-  NFD_LOG_FACE_INFO("Creating transport");
+            NFD_LOG_FACE_INFO("Creating transport");
 
 #ifdef __linux__
-  //
-  // By default, Linux does path MTU discovery on IPv4 sockets,
-  // and sets the DF (Don't Fragment) flag on datagrams smaller
-  // than the interface MTU. However this does not work for us,
-  // because we cannot properly respond to ICMP "packet too big"
-  // messages by fragmenting the packet at the application level,
-  // since we want to rely on IP for fragmentation and reassembly.
-  //
-  // Therefore, we disable PMTU discovery, which prevents the kernel
-  // from setting the DF flag on outgoing datagrams, and thus allows
-  // routers along the path to perform fragmentation as needed.
-  //
-  const int value = IP_PMTUDISC_DONT;
-  if (::setsockopt(m_socket.native_handle(), IPPROTO_IP,
-                   IP_MTU_DISCOVER, &value, sizeof(value)) < 0) {
-    NFD_LOG_FACE_WARN("Failed to disable path MTU discovery: " << std::strerror(errno));
-  }
+            //
+            // By default, Linux does path MTU discovery on IPv4 sockets,
+            // and sets the DF (Don't Fragment) flag on datagrams smaller
+            // than the interface MTU. However this does not work for us,
+            // because we cannot properly respond to ICMP "packet too big"
+            // messages by fragmenting the packet at the application level,
+            // since we want to rely on IP for fragmentation and reassembly.
+            //
+            // Therefore, we disable PMTU discovery, which prevents the kernel
+            // from setting the DF flag on outgoing datagrams, and thus allows
+            // routers along the path to perform fragmentation as needed.
+            //
+            const int value = IP_PMTUDISC_DONT;
+            if (::setsockopt(m_socket.native_handle(), IPPROTO_IP,
+                    IP_MTU_DISCOVER, &value, sizeof (value)) < 0) {
+                NFD_LOG_FACE_WARN("Failed to disable path MTU discovery: " << std::strerror(errno));
+            }
 #endif
 
-  if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_ON_DEMAND &&
-      m_idleTimeout > time::nanoseconds::zero()) {
-    scheduleClosureWhenIdle();
-  }
-}
+            if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_ON_DEMAND &&
+                    m_idleTimeout > time::nanoseconds::zero()) {
+                scheduleClosureWhenIdle();
+            }
+        }
 
-void
-UnicastUdpTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency)
-{
-  if (newPersistency == ndn::nfd::FACE_PERSISTENCY_ON_DEMAND &&
-      m_idleTimeout > time::nanoseconds::zero()) {
-    scheduleClosureWhenIdle();
-  }
-  else {
-    m_closeIfIdleEvent.cancel();
-    setExpirationTime(time::steady_clock::TimePoint::max());
-  }
-}
+        void
+        UnicastUdpTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) {
+            if (newPersistency == ndn::nfd::FACE_PERSISTENCY_ON_DEMAND &&
+                    m_idleTimeout > time::nanoseconds::zero()) {
+                scheduleClosureWhenIdle();
+            } else {
+                m_closeIfIdleEvent.cancel();
+                setExpirationTime(time::steady_clock::TimePoint::max());
+            }
+        }
 
-void
-UnicastUdpTransport::scheduleClosureWhenIdle()
-{
-  m_closeIfIdleEvent = scheduler::schedule(m_idleTimeout, [this] {
-    if (!hasBeenUsedRecently()) {
-      NFD_LOG_FACE_INFO("Closing due to inactivity");
-      this->close();
-    }
-    else {
-      resetRecentUsage();
-      scheduleClosureWhenIdle();
-    }
-  });
-  setExpirationTime(time::steady_clock::now() + m_idleTimeout);
-}
+        void
+        UnicastUdpTransport::scheduleClosureWhenIdle() {
+            m_closeIfIdleEvent = scheduler::schedule(m_idleTimeout, [this] {
+                if (!hasBeenUsedRecently()) {
+                    NFD_LOG_FACE_INFO("Closing due to inactivity");
+                    this->close();
+                } else {
+                    resetRecentUsage();
+                    scheduleClosureWhenIdle();
+                }
+            });
+            setExpirationTime(time::steady_clock::now() + m_idleTimeout);
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

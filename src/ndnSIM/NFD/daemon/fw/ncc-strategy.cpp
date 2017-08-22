@@ -28,303 +28,284 @@
 #include "core/random.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const Name NccStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/ncc/%FD%01");
-NFD_REGISTER_STRATEGY(NccStrategy);
+        const Name NccStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/ncc/%FD%01");
+        NFD_REGISTER_STRATEGY(NccStrategy);
 
-NccStrategy::NccStrategy(Forwarder& forwarder, const Name& name)
-  : Strategy(forwarder, name)
-{
-}
+        NccStrategy::NccStrategy(Forwarder& forwarder, const Name& name)
+        : Strategy(forwarder, name) {
+        }
 
-const time::microseconds NccStrategy::DEFER_FIRST_WITHOUT_BEST_FACE = time::microseconds(4000);
-const time::microseconds NccStrategy::DEFER_RANGE_WITHOUT_BEST_FACE = time::microseconds(75000);
-const time::nanoseconds NccStrategy::MEASUREMENTS_LIFETIME = time::seconds(16);
+        const time::microseconds NccStrategy::DEFER_FIRST_WITHOUT_BEST_FACE = time::microseconds(4000);
+        const time::microseconds NccStrategy::DEFER_RANGE_WITHOUT_BEST_FACE = time::microseconds(75000);
+        const time::nanoseconds NccStrategy::MEASUREMENTS_LIFETIME = time::seconds(16);
 
-void
-NccStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
-                                  const shared_ptr<pit::Entry>& pitEntry)
-{
-  const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
-  const fib::NextHopList& nexthops = fibEntry.getNextHops();
-  if (nexthops.size() == 0) {
-    this->rejectPendingInterest(pitEntry);
-    return;
-  }
+        void
+        NccStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+                const shared_ptr<pit::Entry>& pitEntry) {
+            const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
+            const fib::NextHopList& nexthops = fibEntry.getNextHops();
+            if (nexthops.size() == 0) {
+                this->rejectPendingInterest(pitEntry);
+                return;
+            }
 
-  PitEntryInfo* pitEntryInfo = pitEntry->insertStrategyInfo<PitEntryInfo>().first;
-  bool isNewPitEntry = !hasPendingOutRecords(*pitEntry);
-  if (!isNewPitEntry) {
-    return;
-  }
+            PitEntryInfo* pitEntryInfo = pitEntry->insertStrategyInfo<PitEntryInfo>().first;
+            bool isNewPitEntry = !hasPendingOutRecords(*pitEntry);
+            if (!isNewPitEntry) {
+                return;
+            }
 
-  MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
+            MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
 
-  time::microseconds deferFirst = DEFER_FIRST_WITHOUT_BEST_FACE;
-  time::microseconds deferRange = DEFER_RANGE_WITHOUT_BEST_FACE;
-  size_t nUpstreams = nexthops.size();
+            time::microseconds deferFirst = DEFER_FIRST_WITHOUT_BEST_FACE;
+            time::microseconds deferRange = DEFER_RANGE_WITHOUT_BEST_FACE;
+            size_t nUpstreams = nexthops.size();
 
-  shared_ptr<Face> bestFace = meInfo.getBestFace();
-  if (bestFace != nullptr && fibEntry.hasNextHop(*bestFace) &&
-      !wouldViolateScope(inFace, interest, *bestFace) &&
-      canForwardToLegacy(*pitEntry, *bestFace)) {
-    // TODO Should we use `randlow = 100 + nrand48(h->seed) % 4096U;` ?
-    deferFirst = meInfo.prediction;
-    deferRange = time::microseconds((deferFirst.count() + 1) / 2);
-    --nUpstreams;
-    this->sendInterest(pitEntry, *bestFace, interest);
-    pitEntryInfo->bestFaceTimeout = scheduler::schedule(
-      meInfo.prediction,
-      bind(&NccStrategy::timeoutOnBestFace, this, weak_ptr<pit::Entry>(pitEntry)));
-  }
-  else {
-    // use first eligible nexthop
-    auto firstEligibleNexthop = std::find_if(nexthops.begin(), nexthops.end(),
-        [&] (const fib::NextHop& nexthop) {
-          Face& outFace = nexthop.getFace();
-          return !wouldViolateScope(inFace, interest, outFace) &&
-                 canForwardToLegacy(*pitEntry, outFace);
-        });
-    if (firstEligibleNexthop != nexthops.end()) {
-      this->sendInterest(pitEntry, firstEligibleNexthop->getFace(), interest);
-    }
-    else {
-      this->rejectPendingInterest(pitEntry);
-      return;
-    }
-  }
+            shared_ptr<Face> bestFace = meInfo.getBestFace();
+            if (bestFace != nullptr && fibEntry.hasNextHop(*bestFace) &&
+                    !wouldViolateScope(inFace, interest, *bestFace) &&
+                    canForwardToLegacy(*pitEntry, *bestFace)) {
+                // TODO Should we use `randlow = 100 + nrand48(h->seed) % 4096U;` ?
+                deferFirst = meInfo.prediction;
+                deferRange = time::microseconds((deferFirst.count() + 1) / 2);
+                --nUpstreams;
+                this->sendInterest(pitEntry, *bestFace, interest);
+                pitEntryInfo->bestFaceTimeout = scheduler::schedule(
+                        meInfo.prediction,
+                        bind(&NccStrategy::timeoutOnBestFace, this, weak_ptr<pit::Entry>(pitEntry)));
+            } else {
+                // use first eligible nexthop
+                auto firstEligibleNexthop = std::find_if(nexthops.begin(), nexthops.end(),
+                        [&] (const fib::NextHop & nexthop) {
+                            Face& outFace = nexthop.getFace();
+                            return !wouldViolateScope(inFace, interest, outFace) &&
+                                    canForwardToLegacy(*pitEntry, outFace);
+                        });
+                if (firstEligibleNexthop != nexthops.end()) {
+                    this->sendInterest(pitEntry, firstEligibleNexthop->getFace(), interest);
+                } else {
+                    this->rejectPendingInterest(pitEntry);
+                    return;
+                }
+            }
 
-  shared_ptr<Face> previousFace = meInfo.previousFace.lock();
-  if (previousFace != nullptr && fibEntry.hasNextHop(*previousFace) &&
-      !wouldViolateScope(inFace, interest, *previousFace) &&
-      canForwardToLegacy(*pitEntry, *previousFace)) {
-    --nUpstreams;
-  }
+            shared_ptr<Face> previousFace = meInfo.previousFace.lock();
+            if (previousFace != nullptr && fibEntry.hasNextHop(*previousFace) &&
+                    !wouldViolateScope(inFace, interest, *previousFace) &&
+                    canForwardToLegacy(*pitEntry, *previousFace)) {
+                --nUpstreams;
+            }
 
-  if (nUpstreams > 0) {
-    pitEntryInfo->maxInterval = std::max(time::microseconds(1),
-      time::microseconds((2 * deferRange.count() + nUpstreams - 1) / nUpstreams));
-  }
-  else {
-    // Normally, maxInterval is unused if there aren't any face beyond best and previousBest.
-    // However, in case FIB entry gains a new nexthop before doPropagate executes (bug 1853),
-    // this maxInterval would be used to determine when the next doPropagate would happen.
-    pitEntryInfo->maxInterval = deferFirst;
-  }
-  pitEntryInfo->propagateTimer = scheduler::schedule(deferFirst,
-    bind(&NccStrategy::doPropagate, this, inFace.getId(), weak_ptr<pit::Entry>(pitEntry)));
-}
+            if (nUpstreams > 0) {
+                pitEntryInfo->maxInterval = std::max(time::microseconds(1),
+                        time::microseconds((2 * deferRange.count() + nUpstreams - 1) / nUpstreams));
+            } else {
+                // Normally, maxInterval is unused if there aren't any face beyond best and previousBest.
+                // However, in case FIB entry gains a new nexthop before doPropagate executes (bug 1853),
+                // this maxInterval would be used to determine when the next doPropagate would happen.
+                pitEntryInfo->maxInterval = deferFirst;
+            }
+            pitEntryInfo->propagateTimer = scheduler::schedule(deferFirst,
+                    bind(&NccStrategy::doPropagate, this, inFace.getId(), weak_ptr<pit::Entry>(pitEntry)));
+        }
 
-void
-NccStrategy::doPropagate(FaceId inFaceId, weak_ptr<pit::Entry> pitEntryWeak)
-{
-  Face* inFace = this->getFace(inFaceId);
-  if (inFace == nullptr) {
-    return;
-  }
-  shared_ptr<pit::Entry> pitEntry = pitEntryWeak.lock();
-  if (pitEntry == nullptr) {
-    return;
-  }
-  pit::InRecordCollection::const_iterator inRecord = pitEntry->getInRecord(*inFace);
-  if (inRecord == pitEntry->in_end()) {
-    return;
-  }
-  const Interest& interest = inRecord->getInterest();
-  const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
+        void
+        NccStrategy::doPropagate(FaceId inFaceId, weak_ptr<pit::Entry> pitEntryWeak) {
+            Face* inFace = this->getFace(inFaceId);
+            if (inFace == nullptr) {
+                return;
+            }
+            shared_ptr<pit::Entry> pitEntry = pitEntryWeak.lock();
+            if (pitEntry == nullptr) {
+                return;
+            }
+            pit::InRecordCollection::const_iterator inRecord = pitEntry->getInRecord(*inFace);
+            if (inRecord == pitEntry->in_end()) {
+                return;
+            }
+            const Interest& interest = inRecord->getInterest();
+            const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
 
-  PitEntryInfo* pitEntryInfo = pitEntry->getStrategyInfo<PitEntryInfo>();
-  // pitEntryInfo is guaranteed to exist here, because doPropagate is triggered
-  // from a timer set by NccStrategy.
-  BOOST_ASSERT(pitEntryInfo != nullptr);
+            PitEntryInfo* pitEntryInfo = pitEntry->getStrategyInfo<PitEntryInfo>();
+            // pitEntryInfo is guaranteed to exist here, because doPropagate is triggered
+            // from a timer set by NccStrategy.
+            BOOST_ASSERT(pitEntryInfo != nullptr);
 
-  MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
+            MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
 
-  shared_ptr<Face> previousFace = meInfo.previousFace.lock();
-  if (previousFace != nullptr && fibEntry.hasNextHop(*previousFace) &&
-      !wouldViolateScope(*inFace, interest, *previousFace) &&
-      canForwardToLegacy(*pitEntry, *previousFace)) {
-    this->sendInterest(pitEntry, *previousFace, interest);
-  }
+            shared_ptr<Face> previousFace = meInfo.previousFace.lock();
+            if (previousFace != nullptr && fibEntry.hasNextHop(*previousFace) &&
+                    !wouldViolateScope(*inFace, interest, *previousFace) &&
+                    canForwardToLegacy(*pitEntry, *previousFace)) {
+                this->sendInterest(pitEntry, *previousFace, interest);
+            }
 
-  const fib::NextHopList& nexthops = fibEntry.getNextHops();
-  bool isForwarded = false;
-  for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
-    Face& face = it->getFace();
-    if (!wouldViolateScope(*inFace, interest, face) &&
-        canForwardToLegacy(*pitEntry, face)) {
-      isForwarded = true;
-      this->sendInterest(pitEntry, face, interest);
-      break;
-    }
-  }
+            const fib::NextHopList& nexthops = fibEntry.getNextHops();
+            bool isForwarded = false;
+            for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
+                Face& face = it->getFace();
+                if (!wouldViolateScope(*inFace, interest, face) &&
+                        canForwardToLegacy(*pitEntry, face)) {
+                    isForwarded = true;
+                    this->sendInterest(pitEntry, face, interest);
+                    break;
+                }
+            }
 
-  if (isForwarded) {
-    std::uniform_int_distribution<time::nanoseconds::rep> dist(0, pitEntryInfo->maxInterval.count() - 1);
-    time::nanoseconds deferNext = time::nanoseconds(dist(getGlobalRng()));
-    pitEntryInfo->propagateTimer = scheduler::schedule(deferNext,
-      bind(&NccStrategy::doPropagate, this, inFaceId, weak_ptr<pit::Entry>(pitEntry)));
-  }
-}
+            if (isForwarded) {
+                std::uniform_int_distribution<time::nanoseconds::rep> dist(0, pitEntryInfo->maxInterval.count() - 1);
+                time::nanoseconds deferNext = time::nanoseconds(dist(getGlobalRng()));
+                pitEntryInfo->propagateTimer = scheduler::schedule(deferNext,
+                        bind(&NccStrategy::doPropagate, this, inFaceId, weak_ptr<pit::Entry>(pitEntry)));
+            }
+        }
 
-void
-NccStrategy::timeoutOnBestFace(weak_ptr<pit::Entry> pitEntryWeak)
-{
-  shared_ptr<pit::Entry> pitEntry = pitEntryWeak.lock();
-  if (pitEntry == nullptr) {
-    return;
-  }
-  measurements::Entry* measurementsEntry = this->getMeasurements().get(*pitEntry);
+        void
+        NccStrategy::timeoutOnBestFace(weak_ptr<pit::Entry> pitEntryWeak) {
+            shared_ptr<pit::Entry> pitEntry = pitEntryWeak.lock();
+            if (pitEntry == nullptr) {
+                return;
+            }
+            measurements::Entry* measurementsEntry = this->getMeasurements().get(*pitEntry);
 
-  for (int i = 0; i < UPDATE_MEASUREMENTS_N_LEVELS; ++i) {
-    if (measurementsEntry == nullptr) {
-      // going out of this strategy's namespace
-      break;
-    }
-    this->getMeasurements().extendLifetime(*measurementsEntry, MEASUREMENTS_LIFETIME);
+            for (int i = 0; i < UPDATE_MEASUREMENTS_N_LEVELS; ++i) {
+                if (measurementsEntry == nullptr) {
+                    // going out of this strategy's namespace
+                    break;
+                }
+                this->getMeasurements().extendLifetime(*measurementsEntry, MEASUREMENTS_LIFETIME);
 
-    MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(measurementsEntry);
-    meInfo.adjustPredictUp();
+                MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(measurementsEntry);
+                meInfo.adjustPredictUp();
 
-    measurementsEntry = this->getMeasurements().getParent(*measurementsEntry);
-  }
-}
+                measurementsEntry = this->getMeasurements().getParent(*measurementsEntry);
+            }
+        }
 
-void
-NccStrategy::beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
-                                   const Face& inFace, const Data& data)
-{
-  if (!pitEntry->hasInRecords()) {
-    // PIT entry has already been satisfied (and is now waiting for straggler timer to expire)
-    // NCC does not collect measurements for non-best face
-    return;
-  }
+        void
+        NccStrategy::beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                const Face& inFace, const Data& data) {
+            if (!pitEntry->hasInRecords()) {
+                // PIT entry has already been satisfied (and is now waiting for straggler timer to expire)
+                // NCC does not collect measurements for non-best face
+                return;
+            }
 
-  measurements::Entry* measurementsEntry = this->getMeasurements().get(*pitEntry);
+            measurements::Entry* measurementsEntry = this->getMeasurements().get(*pitEntry);
 
-  for (int i = 0; i < UPDATE_MEASUREMENTS_N_LEVELS; ++i) {
-    if (measurementsEntry == nullptr) {
-      // going out of this strategy's namespace
-      return;
-    }
-    this->getMeasurements().extendLifetime(*measurementsEntry, MEASUREMENTS_LIFETIME);
+            for (int i = 0; i < UPDATE_MEASUREMENTS_N_LEVELS; ++i) {
+                if (measurementsEntry == nullptr) {
+                    // going out of this strategy's namespace
+                    return;
+                }
+                this->getMeasurements().extendLifetime(*measurementsEntry, MEASUREMENTS_LIFETIME);
 
-    MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(measurementsEntry);
-    meInfo.updateBestFace(inFace);
+                MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(measurementsEntry);
+                meInfo.updateBestFace(inFace);
 
-    measurementsEntry = this->getMeasurements().getParent(*measurementsEntry);
-  }
+                measurementsEntry = this->getMeasurements().getParent(*measurementsEntry);
+            }
 
-  PitEntryInfo* pitEntryInfo = pitEntry->getStrategyInfo<PitEntryInfo>();
-  if (pitEntryInfo != nullptr) {
-    scheduler::cancel(pitEntryInfo->propagateTimer);
+            PitEntryInfo* pitEntryInfo = pitEntry->getStrategyInfo<PitEntryInfo>();
+            if (pitEntryInfo != nullptr) {
+                scheduler::cancel(pitEntryInfo->propagateTimer);
 
-    // Verify that the best face satisfied the interest before canceling the timeout call
-    MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
-    shared_ptr<Face> bestFace = meInfo.getBestFace();
+                // Verify that the best face satisfied the interest before canceling the timeout call
+                MeasurementsEntryInfo& meInfo = this->getMeasurementsEntryInfo(pitEntry);
+                shared_ptr<Face> bestFace = meInfo.getBestFace();
 
-    if (bestFace.get() == &inFace)
-      scheduler::cancel(pitEntryInfo->bestFaceTimeout);
-  }
-}
+                if (bestFace.get() == &inFace)
+                    scheduler::cancel(pitEntryInfo->bestFaceTimeout);
+            }
+        }
 
-NccStrategy::MeasurementsEntryInfo&
-NccStrategy::getMeasurementsEntryInfo(const shared_ptr<pit::Entry>& entry)
-{
-  measurements::Entry* measurementsEntry = this->getMeasurements().get(*entry);
-  return this->getMeasurementsEntryInfo(measurementsEntry);
-}
+        NccStrategy::MeasurementsEntryInfo&
+        NccStrategy::getMeasurementsEntryInfo(const shared_ptr<pit::Entry>& entry) {
+            measurements::Entry* measurementsEntry = this->getMeasurements().get(*entry);
+            return this->getMeasurementsEntryInfo(measurementsEntry);
+        }
 
-NccStrategy::MeasurementsEntryInfo&
-NccStrategy::getMeasurementsEntryInfo(measurements::Entry* entry)
-{
-  BOOST_ASSERT(entry != nullptr);
-  MeasurementsEntryInfo* info = nullptr;
-  bool isNew = false;
-  std::tie(info, isNew) = entry->insertStrategyInfo<MeasurementsEntryInfo>();
-  if (!isNew) {
-    return *info;
-  }
+        NccStrategy::MeasurementsEntryInfo&
+        NccStrategy::getMeasurementsEntryInfo(measurements::Entry* entry) {
+            BOOST_ASSERT(entry != nullptr);
+            MeasurementsEntryInfo* info = nullptr;
+            bool isNew = false;
+            std::tie(info, isNew) = entry->insertStrategyInfo<MeasurementsEntryInfo>();
+            if (!isNew) {
+                return *info;
+            }
 
-  measurements::Entry* parentEntry = this->getMeasurements().getParent(*entry);
-  if (parentEntry != nullptr) {
-    MeasurementsEntryInfo& parentInfo = this->getMeasurementsEntryInfo(parentEntry);
-    info->inheritFrom(parentInfo);
-  }
+            measurements::Entry* parentEntry = this->getMeasurements().getParent(*entry);
+            if (parentEntry != nullptr) {
+                MeasurementsEntryInfo& parentInfo = this->getMeasurementsEntryInfo(parentEntry);
+                info->inheritFrom(parentInfo);
+            }
 
-  return *info;
-}
+            return *info;
+        }
 
-const time::microseconds NccStrategy::MeasurementsEntryInfo::INITIAL_PREDICTION = time::microseconds(8192);
-const time::microseconds NccStrategy::MeasurementsEntryInfo::MIN_PREDICTION = time::microseconds(127);
-const time::microseconds NccStrategy::MeasurementsEntryInfo::MAX_PREDICTION = time::milliseconds(160);
+        const time::microseconds NccStrategy::MeasurementsEntryInfo::INITIAL_PREDICTION = time::microseconds(8192);
+        const time::microseconds NccStrategy::MeasurementsEntryInfo::MIN_PREDICTION = time::microseconds(127);
+        const time::microseconds NccStrategy::MeasurementsEntryInfo::MAX_PREDICTION = time::milliseconds(160);
 
-NccStrategy::MeasurementsEntryInfo::MeasurementsEntryInfo()
-  : prediction(INITIAL_PREDICTION)
-{
-}
+        NccStrategy::MeasurementsEntryInfo::MeasurementsEntryInfo()
+        : prediction(INITIAL_PREDICTION) {
+        }
 
-void
-NccStrategy::MeasurementsEntryInfo::inheritFrom(const MeasurementsEntryInfo& other)
-{
-  this->operator=(other);
-}
+        void
+        NccStrategy::MeasurementsEntryInfo::inheritFrom(const MeasurementsEntryInfo& other) {
+            this->operator=(other);
+        }
 
-shared_ptr<Face>
-NccStrategy::MeasurementsEntryInfo::getBestFace()
-{
-  shared_ptr<Face> best = this->bestFace.lock();
-  if (best != nullptr) {
-    return best;
-  }
-  this->bestFace = best = this->previousFace.lock();
-  return best;
-}
+        shared_ptr<Face>
+        NccStrategy::MeasurementsEntryInfo::getBestFace() {
+            shared_ptr<Face> best = this->bestFace.lock();
+            if (best != nullptr) {
+                return best;
+            }
+            this->bestFace = best = this->previousFace.lock();
+            return best;
+        }
 
-void
-NccStrategy::MeasurementsEntryInfo::updateBestFace(const Face& face)
-{
-  if (this->bestFace.expired()) {
-    this->bestFace = const_cast<Face&>(face).shared_from_this();
-    return;
-  }
-  shared_ptr<Face> bestFace = this->bestFace.lock();
-  if (bestFace.get() == &face) {
-    this->adjustPredictDown();
-  }
-  else {
-    this->previousFace = this->bestFace;
-    this->bestFace = const_cast<Face&>(face).shared_from_this();
-  }
-}
+        void
+        NccStrategy::MeasurementsEntryInfo::updateBestFace(const Face& face) {
+            if (this->bestFace.expired()) {
+                this->bestFace = const_cast<Face&> (face).shared_from_this();
+                return;
+            }
+            shared_ptr<Face> bestFace = this->bestFace.lock();
+            if (bestFace.get() == &face) {
+                this->adjustPredictDown();
+            } else {
+                this->previousFace = this->bestFace;
+                this->bestFace = const_cast<Face&> (face).shared_from_this();
+            }
+        }
 
-void
-NccStrategy::MeasurementsEntryInfo::adjustPredictDown()
-{
-  prediction = std::max(MIN_PREDICTION,
-    time::microseconds(prediction.count() - (prediction.count() >> ADJUST_PREDICT_DOWN_SHIFT)));
-}
+        void
+        NccStrategy::MeasurementsEntryInfo::adjustPredictDown() {
+            prediction = std::max(MIN_PREDICTION,
+                    time::microseconds(prediction.count() - (prediction.count() >> ADJUST_PREDICT_DOWN_SHIFT)));
+        }
 
-void
-NccStrategy::MeasurementsEntryInfo::adjustPredictUp()
-{
-  prediction = std::min(MAX_PREDICTION,
-    time::microseconds(prediction.count() + (prediction.count() >> ADJUST_PREDICT_UP_SHIFT)));
-}
+        void
+        NccStrategy::MeasurementsEntryInfo::adjustPredictUp() {
+            prediction = std::min(MAX_PREDICTION,
+                    time::microseconds(prediction.count() + (prediction.count() >> ADJUST_PREDICT_UP_SHIFT)));
+        }
 
-void
-NccStrategy::MeasurementsEntryInfo::ageBestFace()
-{
-  this->previousFace = this->bestFace;
-  this->bestFace.reset();
-}
+        void
+        NccStrategy::MeasurementsEntryInfo::ageBestFace() {
+            this->previousFace = this->bestFace;
+            this->bestFace.reset();
+        }
 
-NccStrategy::PitEntryInfo::~PitEntryInfo()
-{
-  scheduler::cancel(this->bestFaceTimeout);
-  scheduler::cancel(this->propagateTimer);
-}
+        NccStrategy::PitEntryInfo::~PitEntryInfo() {
+            scheduler::cancel(this->bestFaceTimeout);
+            scheduler::cancel(this->propagateTimer);
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

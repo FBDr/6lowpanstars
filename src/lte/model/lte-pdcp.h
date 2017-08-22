@@ -31,150 +31,149 @@
 
 namespace ns3 {
 
-/**
- * LTE PDCP entity, see 3GPP TS 36.323
- */
-class LtePdcp : public Object // SimpleRefCount<LtePdcp>
-{
-  friend class LtePdcpSpecificLteRlcSapUser;
-  friend class LtePdcpSpecificLtePdcpSapProvider<LtePdcp>;
-public:
-  LtePdcp ();
-  virtual ~LtePdcp ();
-  static TypeId GetTypeId (void);
-  virtual void DoDispose ();
+    /**
+     * LTE PDCP entity, see 3GPP TS 36.323
+     */
+    class LtePdcp : public Object // SimpleRefCount<LtePdcp>
+    {
+        friend class LtePdcpSpecificLteRlcSapUser;
+        friend class LtePdcpSpecificLtePdcpSapProvider<LtePdcp>;
+    public:
+        LtePdcp();
+        virtual ~LtePdcp();
+        static TypeId GetTypeId(void);
+        virtual void DoDispose();
 
-  /**
-   *
-   *
-   * \param rnti
-   */
-  void SetRnti (uint16_t rnti);
+        /**
+         *
+         *
+         * \param rnti
+         */
+        void SetRnti(uint16_t rnti);
 
-  /**
-   *
-   *
-   * \param lcId
-   */
-  void SetLcId (uint8_t lcId);
+        /**
+         *
+         *
+         * \param lcId
+         */
+        void SetLcId(uint8_t lcId);
 
-  /**
-   *
-   *
-   * \param s the PDCP SAP user to be used by this LTE_PDCP
-   */
-  void SetLtePdcpSapUser (LtePdcpSapUser * s);
+        /**
+         *
+         *
+         * \param s the PDCP SAP user to be used by this LTE_PDCP
+         */
+        void SetLtePdcpSapUser(LtePdcpSapUser * s);
 
-  /**
-   *
-   *
-   * \return the PDCP SAP Provider interface offered to the RRC by this LTE_PDCP
-   */
-  LtePdcpSapProvider* GetLtePdcpSapProvider ();
+        /**
+         *
+         *
+         * \return the PDCP SAP Provider interface offered to the RRC by this LTE_PDCP
+         */
+        LtePdcpSapProvider* GetLtePdcpSapProvider();
 
-  /**
-   *
-   *
-   * \param s the RLC SAP Provider to be used by this LTE_PDCP
-   */
-  void SetLteRlcSapProvider (LteRlcSapProvider * s);
+        /**
+         *
+         *
+         * \param s the RLC SAP Provider to be used by this LTE_PDCP
+         */
+        void SetLteRlcSapProvider(LteRlcSapProvider * s);
 
-  /**
-   *
-   *
-   * \return the RLC SAP User interface offered to the RLC by this LTE_PDCP
-   */
-  LteRlcSapUser* GetLteRlcSapUser ();
+        /**
+         *
+         *
+         * \return the RLC SAP User interface offered to the RLC by this LTE_PDCP
+         */
+        LteRlcSapUser* GetLteRlcSapUser();
 
-  static const uint16_t MAX_PDCP_SN = 4096;
+        static const uint16_t MAX_PDCP_SN = 4096;
 
-  /**
-   * Status variables of the PDCP
-   * 
-   */
-  struct Status
-  {
-    uint16_t txSn; ///< TX sequence number
-    uint16_t rxSn; ///< RX sequence number
-  };
+        /**
+         * Status variables of the PDCP
+         * 
+         */
+        struct Status {
+            uint16_t txSn; ///< TX sequence number
+            uint16_t rxSn; ///< RX sequence number
+        };
 
-  /** 
-   * 
-   * \return the current status of the PDCP
-   */
-  Status GetStatus ();
+        /** 
+         * 
+         * \return the current status of the PDCP
+         */
+        Status GetStatus();
 
-  /**
-   * Set the status of the PDCP
-   * 
-   * \param s 
-   */
-  void SetStatus (Status s);
+        /**
+         * Set the status of the PDCP
+         * 
+         * \param s 
+         */
+        void SetStatus(Status s);
 
-  /**
-   * TracedCallback for PDU transmission event.
-   *
-   * \param [in] rnti The C-RNTI identifying the UE.
-   * \param [in] lcid The logical channel id corresponding to
-   *             the sending RLC instance.
-   * \param [in] size Packet size.
-   */
-  typedef void (* PduTxTracedCallback)
-    (const uint16_t rnti, const uint8_t lcid, const uint32_t size);
+        /**
+         * TracedCallback for PDU transmission event.
+         *
+         * \param [in] rnti The C-RNTI identifying the UE.
+         * \param [in] lcid The logical channel id corresponding to
+         *             the sending RLC instance.
+         * \param [in] size Packet size.
+         */
+        typedef void (* PduTxTracedCallback)
+        (const uint16_t rnti, const uint8_t lcid, const uint32_t size);
 
-  /**
-   * TracedCallback signature for PDU receive event.
-   *
-   * \param [in] rnti The C-RNTI identifying the UE.
-   * \param [in] lcid The logical channel id corresponding to
-   *             the sending RLC instance.
-   * \param [in] size Packet size.
-   * \param [in] delay Delay since packet sent, in ns..
-   */
-  typedef void (* PduRxTracedCallback)
-    (const uint16_t rnti, const uint8_t lcid,
-     const uint32_t size, const uint64_t delay);
+        /**
+         * TracedCallback signature for PDU receive event.
+         *
+         * \param [in] rnti The C-RNTI identifying the UE.
+         * \param [in] lcid The logical channel id corresponding to
+         *             the sending RLC instance.
+         * \param [in] size Packet size.
+         * \param [in] delay Delay since packet sent, in ns..
+         */
+        typedef void (* PduRxTracedCallback)
+        (const uint16_t rnti, const uint8_t lcid,
+                const uint32_t size, const uint64_t delay);
 
-protected:
-  // Interface provided to upper RRC entity
-  virtual void DoTransmitPdcpSdu (Ptr<Packet> p);
+    protected:
+        // Interface provided to upper RRC entity
+        virtual void DoTransmitPdcpSdu(Ptr<Packet> p);
 
-  LtePdcpSapUser* m_pdcpSapUser;
-  LtePdcpSapProvider* m_pdcpSapProvider;
+        LtePdcpSapUser* m_pdcpSapUser;
+        LtePdcpSapProvider* m_pdcpSapProvider;
 
-  // Interface provided to lower RLC entity
-  virtual void DoReceivePdu (Ptr<Packet> p);
+        // Interface provided to lower RLC entity
+        virtual void DoReceivePdu(Ptr<Packet> p);
 
-  LteRlcSapUser* m_rlcSapUser;
-  LteRlcSapProvider* m_rlcSapProvider;
+        LteRlcSapUser* m_rlcSapUser;
+        LteRlcSapProvider* m_rlcSapProvider;
 
-  uint16_t m_rnti;
-  uint8_t m_lcid;
+        uint16_t m_rnti;
+        uint8_t m_lcid;
 
-  /**
-   * Used to inform of a PDU delivery to the RLC SAP provider.
-   * The parameters are RNTI, LCID and bytes delivered
-   */
-  TracedCallback<uint16_t, uint8_t, uint32_t> m_txPdu;
-  /**
-   * Used to inform of a PDU reception from the RLC SAP user.
-   * The parameters are RNTI, LCID, bytes delivered and delivery delay in nanoseconds. 
-   */
-  TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t> m_rxPdu;
+        /**
+         * Used to inform of a PDU delivery to the RLC SAP provider.
+         * The parameters are RNTI, LCID and bytes delivered
+         */
+        TracedCallback<uint16_t, uint8_t, uint32_t> m_txPdu;
+        /**
+         * Used to inform of a PDU reception from the RLC SAP user.
+         * The parameters are RNTI, LCID, bytes delivered and delivery delay in nanoseconds. 
+         */
+        TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t> m_rxPdu;
 
-private:
-  /**
-   * State variables. See section 7.1 in TS 36.323
-   */
-  uint16_t m_txSequenceNumber;
-  uint16_t m_rxSequenceNumber;
+    private:
+        /**
+         * State variables. See section 7.1 in TS 36.323
+         */
+        uint16_t m_txSequenceNumber;
+        uint16_t m_rxSequenceNumber;
 
-  /**
-   * Constants. See section 7.2 in TS 36.323
-   */
-  static const uint16_t m_maxPdcpSn = 4095;
+        /**
+         * Constants. See section 7.2 in TS 36.323
+         */
+        static const uint16_t m_maxPdcpSn = 4095;
 
-};
+    };
 
 
 } // namespace ns3

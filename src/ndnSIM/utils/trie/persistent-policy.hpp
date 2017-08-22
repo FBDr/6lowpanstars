@@ -26,106 +26,100 @@
 #include <boost/intrusive/list.hpp>
 
 namespace ns3 {
-namespace ndn {
-namespace ndnSIM {
+    namespace ndn {
+        namespace ndnSIM {
 
-/**
- * @brief Traits for persistent replacement policy
- *
- * In this policy entries are added until there is a space (controlled by set_max_size call).
- * If maximum is reached, new entries will not be added and nothing will be removed from the
- *container
- */
-struct persistent_policy_traits {
-  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string
-  GetName()
-  {
-    return "Persistent";
-  }
+            /**
+             * @brief Traits for persistent replacement policy
+             *
+             * In this policy entries are added until there is a space (controlled by set_max_size call).
+             * If maximum is reached, new entries will not be added and nothing will be removed from the
+             *container
+             */
+            struct persistent_policy_traits {
+                /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
 
-  struct policy_hook_type : public boost::intrusive::list_member_hook<> {
-  };
+                static std::string
+                GetName() {
+                    return "Persistent";
+                }
 
-  template<class Container>
-  struct container_hook {
-    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
-      type;
-  };
+                struct policy_hook_type : public boost::intrusive::list_member_hook<> {
+                };
 
-  template<class Base, class Container, class Hook>
-  struct policy {
-    typedef typename boost::intrusive::list<Container, Hook> policy_container;
+                template<class Container>
+                struct container_hook {
+                    typedef boost::intrusive::member_hook<Container, policy_hook_type, &Container::policy_hook_>
+                    type;
+                };
 
-    // could be just typedef
-    class type : public policy_container {
-    public:
-      typedef Container parent_trie;
+                template<class Base, class Container, class Hook>
+                struct policy {
+                    typedef typename boost::intrusive::list<Container, Hook> policy_container;
 
-      type(Base& base)
-        : base_(base)
-        , max_size_(100) // when 0, policy is not enforced
-      {
-      }
+                    // could be just typedef
 
-      inline void
-      update(typename parent_trie::iterator item)
-      {
-        // do nothing
-      }
+                    class type : public policy_container {
+                    public:
+                        typedef Container parent_trie;
 
-      inline bool
-      insert(typename parent_trie::iterator item)
-      {
-        if (max_size_ != 0 && policy_container::size() >= max_size_)
-          return false;
+                        type(Base& base)
+                        : base_(base)
+                        , max_size_(100) // when 0, policy is not enforced
+                        {
+                        }
 
-        policy_container::push_back(*item);
-        return true;
-      }
+                        inline void
+                        update(typename parent_trie::iterator item) {
+                            // do nothing
+                        }
 
-      inline void
-      lookup(typename parent_trie::iterator item)
-      {
-        // do nothing
-      }
+                        inline bool
+                        insert(typename parent_trie::iterator item) {
+                            if (max_size_ != 0 && policy_container::size() >= max_size_)
+                                return false;
 
-      inline void
-      erase(typename parent_trie::iterator item)
-      {
-        policy_container::erase(policy_container::s_iterator_to(*item));
-      }
+                            policy_container::push_back(*item);
+                            return true;
+                        }
 
-      inline void
-      clear()
-      {
-        policy_container::clear();
-      }
+                        inline void
+                        lookup(typename parent_trie::iterator item) {
+                            // do nothing
+                        }
 
-      inline void
-      set_max_size(size_t max_size)
-      {
-        max_size_ = max_size;
-      }
+                        inline void
+                        erase(typename parent_trie::iterator item) {
+                            policy_container::erase(policy_container::s_iterator_to(*item));
+                        }
 
-      inline size_t
-      get_max_size() const
-      {
-        return max_size_;
-      }
+                        inline void
+                        clear() {
+                            policy_container::clear();
+                        }
 
-    private:
-      // type () : base_(*((Base*)0)) { };
+                        inline void
+                        set_max_size(size_t max_size) {
+                            max_size_ = max_size;
+                        }
 
-    private:
-      Base& base_;
-      size_t max_size_;
-    };
-  };
-};
+                        inline size_t
+                        get_max_size() const {
+                            return max_size_;
+                        }
 
-} // ndnSIM
-} // ndn
+                    private:
+                        // type () : base_(*((Base*)0)) { };
+
+                    private:
+                        Base& base_;
+                        size_t max_size_;
+                    };
+                };
+            };
+
+        } // ndnSIM
+    } // ndn
 } // ns3
 
 /// @endcond

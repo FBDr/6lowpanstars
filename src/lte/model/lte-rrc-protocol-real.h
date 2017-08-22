@@ -35,140 +35,135 @@
 
 namespace ns3 {
 
-class LteUeRrcSapProvider;
-class LteUeRrcSapUser;
-class LteEnbRrcSapProvider;
-class LteUeRrc;
+    class LteUeRrcSapProvider;
+    class LteUeRrcSapUser;
+    class LteEnbRrcSapProvider;
+    class LteUeRrc;
+
+    /**
+     * Models the transmission of RRC messages from the UE to the eNB in
+     * a real fashion, by creating real RRC PDUs and transmitting them
+     * over Signaling Radio Bearers using radio resources allocated by the
+     * LTE MAC scheduler.
+     * 
+     */
+    class LteUeRrcProtocolReal : public Object {
+        friend class MemberLteUeRrcSapUser<LteUeRrcProtocolReal>;
+        friend class LteRlcSpecificLteRlcSapUser<LteUeRrcProtocolReal>;
+        friend class LtePdcpSpecificLtePdcpSapUser<LteUeRrcProtocolReal>;
+
+    public:
+        LteUeRrcProtocolReal();
+        virtual ~LteUeRrcProtocolReal();
+
+        // inherited from Object
+        virtual void DoDispose(void);
+        static TypeId GetTypeId(void);
+
+        void SetLteUeRrcSapProvider(LteUeRrcSapProvider* p);
+        LteUeRrcSapUser* GetLteUeRrcSapUser();
+
+        void SetUeRrc(Ptr<LteUeRrc> rrc);
 
 
-/**
- * Models the transmission of RRC messages from the UE to the eNB in
- * a real fashion, by creating real RRC PDUs and transmitting them
- * over Signaling Radio Bearers using radio resources allocated by the
- * LTE MAC scheduler.
- * 
- */
-class LteUeRrcProtocolReal : public Object
-{
-  friend class MemberLteUeRrcSapUser<LteUeRrcProtocolReal>;
-  friend class LteRlcSpecificLteRlcSapUser<LteUeRrcProtocolReal>;
-  friend class LtePdcpSpecificLtePdcpSapUser<LteUeRrcProtocolReal>;
+    private:
+        // methods forwarded from LteUeRrcSapUser
+        void DoSetup(LteUeRrcSapUser::SetupParameters params);
+        void DoSendRrcConnectionRequest(LteRrcSap::RrcConnectionRequest msg);
+        void DoSendRrcConnectionSetupCompleted(LteRrcSap::RrcConnectionSetupCompleted msg);
+        void DoSendRrcConnectionReconfigurationCompleted(LteRrcSap::RrcConnectionReconfigurationCompleted msg);
+        void DoSendRrcConnectionReestablishmentRequest(LteRrcSap::RrcConnectionReestablishmentRequest msg);
+        void DoSendRrcConnectionReestablishmentComplete(LteRrcSap::RrcConnectionReestablishmentComplete msg);
+        void DoSendMeasurementReport(LteRrcSap::MeasurementReport msg);
 
-public:
-  LteUeRrcProtocolReal ();
-  virtual ~LteUeRrcProtocolReal ();
+        void SetEnbRrcSapProvider();
+        void DoReceivePdcpPdu(Ptr<Packet> p);
+        void DoReceivePdcpSdu(LtePdcpSapUser::ReceivePdcpSduParameters params);
 
-  // inherited from Object
-  virtual void DoDispose (void);
-  static TypeId GetTypeId (void);
+        Ptr<LteUeRrc> m_rrc;
+        uint16_t m_rnti;
+        LteUeRrcSapProvider* m_ueRrcSapProvider;
+        LteUeRrcSapUser* m_ueRrcSapUser;
+        LteEnbRrcSapProvider* m_enbRrcSapProvider;
 
-  void SetLteUeRrcSapProvider (LteUeRrcSapProvider* p);
-  LteUeRrcSapUser* GetLteUeRrcSapUser ();
+        LteUeRrcSapUser::SetupParameters m_setupParameters;
+        LteUeRrcSapProvider::CompleteSetupParameters m_completeSetupParameters;
 
-  void SetUeRrc (Ptr<LteUeRrc> rrc);
+    };
 
+    /**
+     * Models the transmission of RRC messages from the UE to the eNB in
+     * a real fashion, by creating real RRC PDUs and transmitting them
+     * over Signaling Radio Bearers using radio resources allocated by the
+     * LTE MAC scheduler.
+     *
+     */
+    class LteEnbRrcProtocolReal : public Object {
+        friend class MemberLteEnbRrcSapUser<LteEnbRrcProtocolReal>;
+        friend class LtePdcpSpecificLtePdcpSapUser<LteEnbRrcProtocolReal>;
+        friend class LteRlcSpecificLteRlcSapUser<LteEnbRrcProtocolReal>;
+        friend class RealProtocolRlcSapUser;
 
-private:
-  // methods forwarded from LteUeRrcSapUser
-  void DoSetup (LteUeRrcSapUser::SetupParameters params);
-  void DoSendRrcConnectionRequest (LteRrcSap::RrcConnectionRequest msg);
-  void DoSendRrcConnectionSetupCompleted (LteRrcSap::RrcConnectionSetupCompleted msg);
-  void DoSendRrcConnectionReconfigurationCompleted (LteRrcSap::RrcConnectionReconfigurationCompleted msg);
-  void DoSendRrcConnectionReestablishmentRequest (LteRrcSap::RrcConnectionReestablishmentRequest msg);
-  void DoSendRrcConnectionReestablishmentComplete (LteRrcSap::RrcConnectionReestablishmentComplete msg);
-  void DoSendMeasurementReport (LteRrcSap::MeasurementReport msg);
+    public:
+        LteEnbRrcProtocolReal();
+        virtual ~LteEnbRrcProtocolReal();
 
-  void SetEnbRrcSapProvider ();
-  void DoReceivePdcpPdu (Ptr<Packet> p);
-  void DoReceivePdcpSdu (LtePdcpSapUser::ReceivePdcpSduParameters params);
+        // inherited from Object
+        virtual void DoDispose(void);
+        static TypeId GetTypeId(void);
 
-  Ptr<LteUeRrc> m_rrc;
-  uint16_t m_rnti;
-  LteUeRrcSapProvider* m_ueRrcSapProvider;
-  LteUeRrcSapUser* m_ueRrcSapUser;
-  LteEnbRrcSapProvider* m_enbRrcSapProvider;
+        void SetLteEnbRrcSapProvider(LteEnbRrcSapProvider* p);
+        LteEnbRrcSapUser* GetLteEnbRrcSapUser();
 
-  LteUeRrcSapUser::SetupParameters m_setupParameters;
-  LteUeRrcSapProvider::CompleteSetupParameters m_completeSetupParameters;
+        void SetCellId(uint16_t cellId);
 
-};
+        LteUeRrcSapProvider* GetUeRrcSapProvider(uint16_t rnti);
+        void SetUeRrcSapProvider(uint16_t rnti, LteUeRrcSapProvider* p);
 
+    private:
+        // methods forwarded from LteEnbRrcSapUser
+        void DoSetupUe(uint16_t rnti, LteEnbRrcSapUser::SetupUeParameters params);
+        void DoRemoveUe(uint16_t rnti);
+        void DoSendSystemInformation(LteRrcSap::SystemInformation msg);
+        void SendSystemInformation(LteRrcSap::SystemInformation msg);
+        void DoSendRrcConnectionSetup(uint16_t rnti, LteRrcSap::RrcConnectionSetup msg);
+        void DoSendRrcConnectionReconfiguration(uint16_t rnti, LteRrcSap::RrcConnectionReconfiguration msg);
+        void DoSendRrcConnectionReestablishment(uint16_t rnti, LteRrcSap::RrcConnectionReestablishment msg);
+        void DoSendRrcConnectionReestablishmentReject(uint16_t rnti, LteRrcSap::RrcConnectionReestablishmentReject msg);
+        void DoSendRrcConnectionRelease(uint16_t rnti, LteRrcSap::RrcConnectionRelease msg);
+        void DoSendRrcConnectionReject(uint16_t rnti, LteRrcSap::RrcConnectionReject msg);
+        Ptr<Packet> DoEncodeHandoverPreparationInformation(LteRrcSap::HandoverPreparationInfo msg);
+        LteRrcSap::HandoverPreparationInfo DoDecodeHandoverPreparationInformation(Ptr<Packet> p);
+        Ptr<Packet> DoEncodeHandoverCommand(LteRrcSap::RrcConnectionReconfiguration msg);
+        LteRrcSap::RrcConnectionReconfiguration DoDecodeHandoverCommand(Ptr<Packet> p);
 
-/**
- * Models the transmission of RRC messages from the UE to the eNB in
- * a real fashion, by creating real RRC PDUs and transmitting them
- * over Signaling Radio Bearers using radio resources allocated by the
- * LTE MAC scheduler.
- *
- */
-class LteEnbRrcProtocolReal : public Object
-{
-  friend class MemberLteEnbRrcSapUser<LteEnbRrcProtocolReal>;
-  friend class LtePdcpSpecificLtePdcpSapUser<LteEnbRrcProtocolReal>;
-  friend class LteRlcSpecificLteRlcSapUser<LteEnbRrcProtocolReal>;
-  friend class RealProtocolRlcSapUser;
+        void DoReceivePdcpSdu(LtePdcpSapUser::ReceivePdcpSduParameters params);
+        void DoReceivePdcpPdu(uint16_t rnti, Ptr<Packet> p);
 
-public:
-  LteEnbRrcProtocolReal ();
-  virtual ~LteEnbRrcProtocolReal ();
+        uint16_t m_rnti;
+        uint16_t m_cellId;
+        LteEnbRrcSapProvider* m_enbRrcSapProvider;
+        LteEnbRrcSapUser* m_enbRrcSapUser;
+        std::map<uint16_t, LteUeRrcSapProvider*> m_enbRrcSapProviderMap;
+        std::map<uint16_t, LteEnbRrcSapUser::SetupUeParameters> m_setupUeParametersMap;
+        std::map<uint16_t, LteEnbRrcSapProvider::CompleteSetupUeParameters> m_completeSetupUeParametersMap;
 
-  // inherited from Object
-  virtual void DoDispose (void);
-  static TypeId GetTypeId (void);
+    };
 
-  void SetLteEnbRrcSapProvider (LteEnbRrcSapProvider* p);
-  LteEnbRrcSapUser* GetLteEnbRrcSapUser ();
+    ///////////////////////////////////////
 
-  void SetCellId (uint16_t cellId);
+    class RealProtocolRlcSapUser : public LteRlcSapUser {
+    public:
+        RealProtocolRlcSapUser(LteEnbRrcProtocolReal* pdcp, uint16_t rnti);
 
-  LteUeRrcSapProvider* GetUeRrcSapProvider (uint16_t rnti);
-  void SetUeRrcSapProvider (uint16_t rnti, LteUeRrcSapProvider* p);
+        // Interface implemented from LteRlcSapUser
+        virtual void ReceivePdcpPdu(Ptr<Packet> p);
 
-private:
-  // methods forwarded from LteEnbRrcSapUser
-  void DoSetupUe (uint16_t rnti, LteEnbRrcSapUser::SetupUeParameters params);
-  void DoRemoveUe (uint16_t rnti);
-  void DoSendSystemInformation (LteRrcSap::SystemInformation msg);
-  void SendSystemInformation (LteRrcSap::SystemInformation msg);
-  void DoSendRrcConnectionSetup (uint16_t rnti, LteRrcSap::RrcConnectionSetup msg);
-  void DoSendRrcConnectionReconfiguration (uint16_t rnti, LteRrcSap::RrcConnectionReconfiguration msg);
-  void DoSendRrcConnectionReestablishment (uint16_t rnti, LteRrcSap::RrcConnectionReestablishment msg);
-  void DoSendRrcConnectionReestablishmentReject (uint16_t rnti, LteRrcSap::RrcConnectionReestablishmentReject msg);
-  void DoSendRrcConnectionRelease (uint16_t rnti, LteRrcSap::RrcConnectionRelease msg);
-  void DoSendRrcConnectionReject (uint16_t rnti, LteRrcSap::RrcConnectionReject msg);
-  Ptr<Packet> DoEncodeHandoverPreparationInformation (LteRrcSap::HandoverPreparationInfo msg);
-  LteRrcSap::HandoverPreparationInfo DoDecodeHandoverPreparationInformation (Ptr<Packet> p);
-  Ptr<Packet> DoEncodeHandoverCommand (LteRrcSap::RrcConnectionReconfiguration msg);
-  LteRrcSap::RrcConnectionReconfiguration DoDecodeHandoverCommand (Ptr<Packet> p);
-
-  void DoReceivePdcpSdu (LtePdcpSapUser::ReceivePdcpSduParameters params);
-  void DoReceivePdcpPdu (uint16_t rnti, Ptr<Packet> p);
-
-  uint16_t m_rnti;
-  uint16_t m_cellId;
-  LteEnbRrcSapProvider* m_enbRrcSapProvider;
-  LteEnbRrcSapUser* m_enbRrcSapUser;
-  std::map<uint16_t, LteUeRrcSapProvider*> m_enbRrcSapProviderMap;
-  std::map<uint16_t, LteEnbRrcSapUser::SetupUeParameters> m_setupUeParametersMap;
-  std::map<uint16_t, LteEnbRrcSapProvider::CompleteSetupUeParameters> m_completeSetupUeParametersMap;
-
-};
-
-///////////////////////////////////////
-
-class RealProtocolRlcSapUser : public LteRlcSapUser
-{
-public:
-  RealProtocolRlcSapUser (LteEnbRrcProtocolReal* pdcp, uint16_t rnti);
-
-  // Interface implemented from LteRlcSapUser
-  virtual void ReceivePdcpPdu (Ptr<Packet> p);
-
-private:
-  RealProtocolRlcSapUser ();
-  LteEnbRrcProtocolReal* m_pdcp;
-  uint16_t m_rnti;
-};
+    private:
+        RealProtocolRlcSapUser();
+        LteEnbRrcProtocolReal* m_pdcp;
+        uint16_t m_rnti;
+    };
 
 
 }

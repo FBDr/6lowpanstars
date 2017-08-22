@@ -28,53 +28,52 @@
 
 namespace ns3 {
 
-class SSRecord;
-class RngReq;
+    class SSRecord;
+    class RngReq;
 
-/**
- * \ingroup wimax
- */
-class BurstProfileManager : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  BurstProfileManager (Ptr<WimaxNetDevice> device);
-  ~BurstProfileManager (void);
-  void DoDispose (void);
-  /*
-   * \returns the number of available burst profile
-   */
-  uint16_t GetNrBurstProfilesToDefine (void);
+    /**
+     * \ingroup wimax
+     */
+    class BurstProfileManager : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        BurstProfileManager(Ptr<WimaxNetDevice> device);
+        ~BurstProfileManager(void);
+        void DoDispose(void);
+        /*
+         * \returns the number of available burst profile
+         */
+        uint16_t GetNrBurstProfilesToDefine(void);
 
-  /*
-   * \brief returns the modulation type of a given iuc
-   * \param direction should be uplink or downlink
-   * \param iuc the iuc
-   * \returns the modulation type of the selected iuc
-   */
-  WimaxPhy::ModulationType GetModulationType (uint8_t iuc,
-                                              WimaxNetDevice::Direction direction) const;
+        /*
+         * \brief returns the modulation type of a given iuc
+         * \param direction should be uplink or downlink
+         * \param iuc the iuc
+         * \returns the modulation type of the selected iuc
+         */
+        WimaxPhy::ModulationType GetModulationType(uint8_t iuc,
+                WimaxNetDevice::Direction direction) const;
 
-  uint8_t GetBurstProfile (WimaxPhy::ModulationType modulationType,
-                           WimaxNetDevice::Direction direction) const;
+        uint8_t GetBurstProfile(WimaxPhy::ModulationType modulationType,
+                WimaxNetDevice::Direction direction) const;
 
-  /*
-   * \brief during initial ranging or periodic ranging (or when RNG-REQ is used instead of
-   * DBPC) calculates the least robust burst profile for SS, e.g., based on distance,
-   * power, signal etc
-   *
-   */
-  uint8_t GetBurstProfileForSS (const SSRecord *ssRecord, const RngReq *rngreq,
-                                WimaxPhy::ModulationType &modulationType);
-  WimaxPhy::ModulationType GetModulationTypeForSS (const SSRecord *ssRecord,
-                                                   const RngReq *rngreq);
-  uint8_t GetBurstProfileToRequest (void);
-private:
-  BurstProfileManager (const BurstProfileManager &);
-  BurstProfileManager& operator= (const BurstProfileManager &);
+        /*
+         * \brief during initial ranging or periodic ranging (or when RNG-REQ is used instead of
+         * DBPC) calculates the least robust burst profile for SS, e.g., based on distance,
+         * power, signal etc
+         *
+         */
+        uint8_t GetBurstProfileForSS(const SSRecord *ssRecord, const RngReq *rngreq,
+                WimaxPhy::ModulationType &modulationType);
+        WimaxPhy::ModulationType GetModulationTypeForSS(const SSRecord *ssRecord,
+                const RngReq *rngreq);
+        uint8_t GetBurstProfileToRequest(void);
+    private:
+        BurstProfileManager(const BurstProfileManager &);
+        BurstProfileManager& operator=(const BurstProfileManager &);
 
-  Ptr<WimaxNetDevice> m_device;
-};
+        Ptr<WimaxNetDevice> m_device;
+    };
 
 } // namespace ns3
 

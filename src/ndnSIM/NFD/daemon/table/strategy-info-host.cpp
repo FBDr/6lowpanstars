@@ -27,10 +27,9 @@
 
 namespace nfd {
 
-void
-StrategyInfoHost::clearStrategyInfo()
-{
-  m_items.clear();
-}
+    void
+    StrategyInfoHost::clearStrategyInfo() {
+        m_items.clear();
+    }
 
 } // namespace nfd

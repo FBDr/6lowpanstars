@@ -25,105 +25,97 @@
 #include "util/concepts.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-BOOST_CONCEPT_ASSERT((WireEncodable<SafeBag>));
-BOOST_CONCEPT_ASSERT((WireDecodable<SafeBag>));
+        BOOST_CONCEPT_ASSERT((WireEncodable<SafeBag>));
+        BOOST_CONCEPT_ASSERT((WireDecodable<SafeBag>));
 
-SafeBag::SafeBag() = default;
+        SafeBag::SafeBag() = default;
 
-SafeBag::SafeBag(const Block& wire)
-{
-  this->wireDecode(wire);
-}
+        SafeBag::SafeBag(const Block& wire) {
+            this->wireDecode(wire);
+        }
 
-SafeBag::SafeBag(const Data& certificate,
-                 const Buffer& encryptedKeyBag)
-  : m_certificate(certificate)
-  , m_encryptedKeyBag(encryptedKeyBag)
-{
-}
+        SafeBag::SafeBag(const Data& certificate,
+                const Buffer& encryptedKeyBag)
+        : m_certificate(certificate)
+        , m_encryptedKeyBag(encryptedKeyBag) {
+        }
 
-SafeBag::SafeBag(const Data& certificate,
-                 const uint8_t* encryptedKey,
-                 size_t encryptedKeyLen)
-  : m_certificate(certificate)
-  , m_encryptedKeyBag(encryptedKey, encryptedKeyLen)
-{
-}
+        SafeBag::SafeBag(const Data& certificate,
+                const uint8_t* encryptedKey,
+                size_t encryptedKeyLen)
+        : m_certificate(certificate)
+        , m_encryptedKeyBag(encryptedKey, encryptedKeyLen) {
+        }
 
-///////////////////////////////////////////////////// encode & decode
+        ///////////////////////////////////////////////////// encode & decode
 
-template<encoding::Tag TAG>
-size_t
-SafeBag::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t totalLength = 0;
+        template<encoding::Tag TAG>
+        size_t
+        SafeBag::wireEncode(EncodingImpl<TAG>& encoder) const {
+            size_t totalLength = 0;
 
-  // EncryptedKeyBag
-  totalLength += encoder.prependByteArrayBlock(tlv::security::EncryptedKeyBag,
-                                               m_encryptedKeyBag.get(),
-                                               m_encryptedKeyBag.size());
+            // EncryptedKeyBag
+            totalLength += encoder.prependByteArrayBlock(tlv::security::EncryptedKeyBag,
+                    m_encryptedKeyBag.get(),
+                    m_encryptedKeyBag.size());
 
-  // Certificate
-  totalLength += this->m_certificate.wireEncode(encoder);
+            // Certificate
+            totalLength += this->m_certificate.wireEncode(encoder);
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::security::SafeBag);
+            totalLength += encoder.prependVarNumber(totalLength);
+            totalLength += encoder.prependVarNumber(tlv::security::SafeBag);
 
-  return totalLength;
-}
+            return totalLength;
+        }
 
-template size_t
-SafeBag::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+        template size_t
+        SafeBag::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
 
-template size_t
-SafeBag::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+        template size_t
+        SafeBag::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
 
-const Block&
-SafeBag::wireEncode() const
-{
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+        const Block&
+        SafeBag::wireEncode() const {
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  this->m_wire = buffer.block();
-  return m_wire;
-}
+            this->m_wire = buffer.block();
+            return m_wire;
+        }
 
-void
-SafeBag::wireDecode(const Block& wire)
-{
-  if (wire.type() != tlv::security::SafeBag)
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV type when decoding safebag"));
+        void
+        SafeBag::wireDecode(const Block& wire) {
+            if (wire.type() != tlv::security::SafeBag)
+                BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV type when decoding safebag"));
 
-  this->m_wire = wire;
-  m_wire.parse();
+            this->m_wire = wire;
+            m_wire.parse();
 
-  Block::element_const_iterator it = m_wire.elements_begin();
+            Block::element_const_iterator it = m_wire.elements_begin();
 
-  // Certificate must be the first part
-  if (it != m_wire.elements_end()) {
-    this->m_certificate.wireDecode(*it);
-    it++;
-  }
-  else
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure when decoding certificate"));
+            // Certificate must be the first part
+            if (it != m_wire.elements_end()) {
+                this->m_certificate.wireDecode(*it);
+                it++;
+            } else
+                BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure when decoding certificate"));
 
-  // EncryptedKeyBag
-  if (it != m_wire.elements_end() && it->type() == tlv::security::EncryptedKeyBag) {
-    this->m_encryptedKeyBag = Buffer(it->value(), it->value_size());
-    it++;
-  }
-  else
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure when decoding encryptedkeybag"));
+            // EncryptedKeyBag
+            if (it != m_wire.elements_end() && it->type() == tlv::security::EncryptedKeyBag) {
+                this->m_encryptedKeyBag = Buffer(it->value(), it->value_size());
+                it++;
+            } else
+                BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure when decoding encryptedkeybag"));
 
-  // Check if end
-  if (it != m_wire.elements_end())
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure after decoding the block"));
-}
+            // Check if end
+            if (it != m_wire.elements_end())
+                BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV structure after decoding the block"));
+        }
 
-} // namespace security
+    } // namespace security
 } // namespace ndn

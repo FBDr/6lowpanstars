@@ -31,48 +31,47 @@
 
 namespace nfd {
 
-/**
- * \brief Abstract base class for all protocol factories
- */
-class ProtocolFactory
-{
-public:
-  /**
-   * \brief Base class for all exceptions thrown by protocol factories
-   */
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+    /**
+     * \brief Abstract base class for all protocol factories
+     */
+    class ProtocolFactory {
+    public:
 
-  /** \brief Try to create Face using the supplied FaceUri
-   *
-   * This method should automatically choose channel, based on supplied FaceUri
-   * and create face.
-   *
-   * \param uri remote URI of the new face
-   * \param persistency persistency of the new face
-   * \param wantLocalFieldsEnabled whether local fields should be enabled on the face
-   * \param onCreated callback if face creation succeeds
-   *                  If a face with the same remote URI already exists, its persistency and
-   *                  LocalFieldsEnabled setting will not be modified.
-   * \param onFailure callback if face creation fails
-   */
-  virtual void
-  createFace(const FaceUri& uri,
-             ndn::nfd::FacePersistency persistency,
-             bool wantLocalFieldsEnabled,
-             const FaceCreatedCallback& onCreated,
-             const FaceCreationFailedCallback& onFailure) = 0;
+        /**
+         * \brief Base class for all exceptions thrown by protocol factories
+         */
+        class Error : public std::runtime_error {
+        public:
 
-  virtual std::vector<shared_ptr<const Channel>>
-  getChannels() const = 0;
-};
+            explicit
+            Error(const std::string& what)
+            : std::runtime_error(what) {
+            }
+        };
+
+        /** \brief Try to create Face using the supplied FaceUri
+         *
+         * This method should automatically choose channel, based on supplied FaceUri
+         * and create face.
+         *
+         * \param uri remote URI of the new face
+         * \param persistency persistency of the new face
+         * \param wantLocalFieldsEnabled whether local fields should be enabled on the face
+         * \param onCreated callback if face creation succeeds
+         *                  If a face with the same remote URI already exists, its persistency and
+         *                  LocalFieldsEnabled setting will not be modified.
+         * \param onFailure callback if face creation fails
+         */
+        virtual void
+        createFace(const FaceUri& uri,
+                ndn::nfd::FacePersistency persistency,
+                bool wantLocalFieldsEnabled,
+                const FaceCreatedCallback& onCreated,
+                const FaceCreationFailedCallback& onFailure) = 0;
+
+        virtual std::vector<shared_ptr<const Channel>>
+                getChannels() const = 0;
+    };
 
 } // namespace nfd
 

@@ -33,77 +33,73 @@
 
 namespace ns3 {
 
-class ShadowingLossModel;
-class JakesFadingLossModel;
+    class ShadowingLossModel;
+    class JakesFadingLossModel;
 
-/**
- * \ingroup propagation
- *
- *  This model provides means for simulating the following propagation
- *  phenomena in the presence of buildings: 
- *
- *   - shadowing (indoor, outdoor)
- *   - external wall penetration loss
- *   - internal wall penetration loss
- *  
- *  The distance-dependent component of propagation loss is deferred
- *  to derived classes which are expected to implement the GetLoss method.
- *  
- *  \warning This model works only when MobilityBuildingInfo is aggreegated
- *  to the mobility model
- *
- */
+    /**
+     * \ingroup propagation
+     *
+     *  This model provides means for simulating the following propagation
+     *  phenomena in the presence of buildings: 
+     *
+     *   - shadowing (indoor, outdoor)
+     *   - external wall penetration loss
+     *   - internal wall penetration loss
+     *  
+     *  The distance-dependent component of propagation loss is deferred
+     *  to derived classes which are expected to implement the GetLoss method.
+     *  
+     *  \warning This model works only when MobilityBuildingInfo is aggreegated
+     *  to the mobility model
+     *
+     */
 
-class BuildingsPropagationLossModel : public PropagationLossModel
-{
+    class BuildingsPropagationLossModel : public PropagationLossModel {
+    public:
+        static TypeId GetTypeId(void);
 
-public:
-  static TypeId GetTypeId (void);
+        BuildingsPropagationLossModel();
+        /**
+         * \param a the mobility model of the source
+         * \param b the mobility model of the destination
+         * \returns the propagation loss (in dBm)
+         */
+        virtual double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const = 0;
 
-  BuildingsPropagationLossModel ();
-  /**
-   * \param a the mobility model of the source
-   * \param b the mobility model of the destination
-   * \returns the propagation loss (in dBm)
-   */
-  virtual double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const = 0;
+        // inherited from PropagationLossModel
+        virtual double DoCalcRxPower(double txPowerDbm, Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  // inherited from PropagationLossModel
-  virtual double DoCalcRxPower (double txPowerDbm, Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+    protected:
+        double ExternalWallLoss(Ptr<MobilityBuildingInfo> a) const;
+        double HeightLoss(Ptr<MobilityBuildingInfo> n) const;
+        double InternalWallsLoss(Ptr<MobilityBuildingInfo> a, Ptr<MobilityBuildingInfo> b) const;
 
-protected:
-  double ExternalWallLoss (Ptr<MobilityBuildingInfo> a) const;
-  double HeightLoss (Ptr<MobilityBuildingInfo> n) const;
-  double InternalWallsLoss (Ptr<MobilityBuildingInfo> a, Ptr<MobilityBuildingInfo> b) const;
-  
-  double GetShadowing (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        double GetShadowing(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  double m_lossInternalWall; // in meters
+        double m_lossInternalWall; // in meters
 
-  
-  class ShadowingLoss
-  {
-  public:
-    ShadowingLoss ();
-    ShadowingLoss (double shadowingValue, Ptr<MobilityModel> receiver);
-    double GetLoss () const;
-    Ptr<MobilityModel> GetReceiver (void) const;
-  protected:
-    double m_shadowingValue;
-    Ptr<MobilityModel> m_receiver;
-  };
+        class ShadowingLoss {
+        public:
+            ShadowingLoss();
+            ShadowingLoss(double shadowingValue, Ptr<MobilityModel> receiver);
+            double GetLoss() const;
+            Ptr<MobilityModel> GetReceiver(void) const;
+        protected:
+            double m_shadowingValue;
+            Ptr<MobilityModel> m_receiver;
+        };
 
-  mutable std::map<Ptr<MobilityModel>,  std::map<Ptr<MobilityModel>, ShadowingLoss> > m_shadowingLossMap;
-  double EvaluateSigma (Ptr<MobilityBuildingInfo> a, Ptr<MobilityBuildingInfo> b) const;
+        mutable std::map<Ptr<MobilityModel>, std::map<Ptr<MobilityModel>, ShadowingLoss> > m_shadowingLossMap;
+        double EvaluateSigma(Ptr<MobilityBuildingInfo> a, Ptr<MobilityBuildingInfo> b) const;
 
 
-  double m_shadowingSigmaExtWalls;
-  double m_shadowingSigmaOutdoor;
-  double m_shadowingSigmaIndoor;
-  Ptr<NormalRandomVariable> m_randVariable;
+        double m_shadowingSigmaExtWalls;
+        double m_shadowingSigmaOutdoor;
+        double m_shadowingSigmaIndoor;
+        Ptr<NormalRandomVariable> m_randVariable;
 
-  virtual int64_t DoAssignStreams (int64_t stream);
-};
+        virtual int64_t DoAssignStreams(int64_t stream);
+    };
 
 }
 

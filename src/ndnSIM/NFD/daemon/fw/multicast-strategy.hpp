@@ -29,24 +29,23 @@
 #include "strategy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief a forwarding strategy that forwards Interest to all FIB nexthops
- */
-class MulticastStrategy : public Strategy
-{
-public:
-  MulticastStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        /** \brief a forwarding strategy that forwards Interest to all FIB nexthops
+         */
+        class MulticastStrategy : public Strategy {
+        public:
+            MulticastStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-public:
-  static const Name STRATEGY_NAME;
-};
+        public:
+            static const Name STRATEGY_NAME;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_MULTICAST_STRATEGY_HPP

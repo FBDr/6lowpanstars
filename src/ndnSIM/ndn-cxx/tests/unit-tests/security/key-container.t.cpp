@@ -27,53 +27,52 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecurityKeyContainer)
+            BOOST_AUTO_TEST_SUITE(SecurityKeyContainer)
 
-BOOST_FIXTURE_TEST_CASE(TestKeyContainer, PibDataFixture)
-{
-  auto pibImpl = make_shared<PibMemory>();
-  Pib pib("pib-memory", "", pibImpl);
+            BOOST_FIXTURE_TEST_CASE(TestKeyContainer, PibDataFixture) {
+                auto pibImpl = make_shared<PibMemory>();
+                Pib pib("pib-memory", "", pibImpl);
 
-  Identity identity1 = pib.addIdentity(id1);
+                Identity identity1 = pib.addIdentity(id1);
 
-  Key key11 = identity1.addKey(id1Key1, id1Key1Name.get(-1));
-  Key key12 = identity1.addKey(id1Key2, id1Key2Name.get(-1));
+                Key key11 = identity1.addKey(id1Key1, id1Key1Name.get(-1));
+                Key key12 = identity1.addKey(id1Key2, id1Key2Name.get(-1));
 
-  KeyContainer container = identity1.getKeys();
-  BOOST_CHECK_EQUAL(container.size(), 2);
-  BOOST_CHECK(container.find(id1Key1Name.get(-1)) != container.end());
-  BOOST_CHECK(container.find(id1Key2Name.get(-1)) != container.end());
+                KeyContainer container = identity1.getKeys();
+                BOOST_CHECK_EQUAL(container.size(), 2);
+                BOOST_CHECK(container.find(id1Key1Name.get(-1)) != container.end());
+                BOOST_CHECK(container.find(id1Key2Name.get(-1)) != container.end());
 
-  std::set<name::Component> keyNames;
-  keyNames.insert(id1Key1Name.get(-1));
-  keyNames.insert(id1Key2Name.get(-1));
+                std::set<name::Component> keyNames;
+                keyNames.insert(id1Key1Name.get(-1));
+                keyNames.insert(id1Key2Name.get(-1));
 
-  KeyContainer::const_iterator it = container.begin();
-  std::set<name::Component>::const_iterator testIt = keyNames.begin();
-  BOOST_CHECK_EQUAL((*it).getKeyId(), *testIt);
-  it++;
-  testIt++;
-  BOOST_CHECK_EQUAL((*it).getKeyId(), *testIt);
-  ++it;
-  testIt++;
-  BOOST_CHECK(it == container.end());
+                KeyContainer::const_iterator it = container.begin();
+                std::set<name::Component>::const_iterator testIt = keyNames.begin();
+                BOOST_CHECK_EQUAL((*it).getKeyId(), *testIt);
+                it++;
+                testIt++;
+                BOOST_CHECK_EQUAL((*it).getKeyId(), *testIt);
+                ++it;
+                testIt++;
+                BOOST_CHECK(it == container.end());
 
-  size_t count = 0;
-  testIt = keyNames.begin();
-  for (const auto& key : container) {
-    BOOST_CHECK_EQUAL(key.getIdentity(), id1);
-    BOOST_CHECK_EQUAL(key.getKeyId(), *testIt);
-    testIt++;
-    count++;
-  }
-  BOOST_CHECK_EQUAL(count, 2);
-}
+                size_t count = 0;
+                testIt = keyNames.begin();
+                for (const auto& key : container) {
+                    BOOST_CHECK_EQUAL(key.getIdentity(), id1);
+                    BOOST_CHECK_EQUAL(key.getKeyId(), *testIt);
+                    testIt++;
+                    count++;
+                }
+                BOOST_CHECK_EQUAL(count, 2);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

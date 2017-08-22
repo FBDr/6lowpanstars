@@ -24,47 +24,44 @@
 #include "global-route-manager.h"
 #include "global-route-manager-impl.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("GlobalRouteManager");
-
-// ---------------------------------------------------------------------------
-//
-// GlobalRouteManager Implementation
-//
-// ---------------------------------------------------------------------------
-
-void
-GlobalRouteManager::DeleteGlobalRoutes ()
+namespace ns3
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-  DeleteGlobalRoutes ();
-}
 
-void
-GlobalRouteManager::BuildGlobalRoutingDatabase (void) 
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-  BuildGlobalRoutingDatabase ();
-}
+    NS_LOG_COMPONENT_DEFINE("GlobalRouteManager");
 
-void
-GlobalRouteManager::InitializeRoutes (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-  InitializeRoutes ();
-}
+    // ---------------------------------------------------------------------------
+    //
+    // GlobalRouteManager Implementation
+    //
+    // ---------------------------------------------------------------------------
 
-uint32_t
-GlobalRouteManager::AllocateRouterId (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  static uint32_t routerId = 0;
-  return routerId++;
-}
+    void
+    GlobalRouteManager::DeleteGlobalRoutes() {
+        NS_LOG_FUNCTION_NOARGS();
+        SimulationSingleton<GlobalRouteManagerImpl>::Get()->
+                DeleteGlobalRoutes();
+    }
+
+    void
+    GlobalRouteManager::BuildGlobalRoutingDatabase(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        SimulationSingleton<GlobalRouteManagerImpl>::Get()->
+                BuildGlobalRoutingDatabase();
+    }
+
+    void
+    GlobalRouteManager::InitializeRoutes(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        SimulationSingleton<GlobalRouteManagerImpl>::Get()->
+                InitializeRoutes();
+    }
+
+    uint32_t
+    GlobalRouteManager::AllocateRouterId(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        static uint32_t routerId = 0;
+        return routerId++;
+    }
 
 
 } // namespace ns3

@@ -30,53 +30,51 @@
 
 namespace nfd {
 
-/**
- * \brief implements the Mean-Deviation RTT estimator
- *
- * reference: ns3::RttMeanDeviation
- *
- * This RttEstimator algorithm is designed for TCP, which is a continuous stream.
- * NDN Interest-Data traffic is not always a continuous stream,
- * so NDN may need a different RttEstimator.
- * The design of a more suitable RttEstimator is a research question.
- */
-class RttEstimator
-{
-public:
-  typedef time::microseconds Duration;
+    /**
+     * \brief implements the Mean-Deviation RTT estimator
+     *
+     * reference: ns3::RttMeanDeviation
+     *
+     * This RttEstimator algorithm is designed for TCP, which is a continuous stream.
+     * NDN Interest-Data traffic is not always a continuous stream,
+     * so NDN may need a different RttEstimator.
+     * The design of a more suitable RttEstimator is a research question.
+     */
+    class RttEstimator {
+    public:
+        typedef time::microseconds Duration;
 
-  static Duration
-  getInitialRtt(void)
-  {
-    return time::seconds(1);
-  }
+        static Duration
+        getInitialRtt(void) {
+            return time::seconds(1);
+        }
 
-  RttEstimator(uint16_t maxMultiplier = 16,
-               Duration minRto = time::milliseconds(1),
-               double gain = 0.1);
+        RttEstimator(uint16_t maxMultiplier = 16,
+                Duration minRto = time::milliseconds(1),
+                double gain = 0.1);
 
-  void
-  addMeasurement(Duration measure);
+        void
+        addMeasurement(Duration measure);
 
-  void
-  incrementMultiplier();
+        void
+        incrementMultiplier();
 
-  void
-  doubleMultiplier();
+        void
+        doubleMultiplier();
 
-  Duration
-  computeRto() const;
+        Duration
+        computeRto() const;
 
-private:
-  uint16_t m_maxMultiplier;
-  double m_minRto;
+    private:
+        uint16_t m_maxMultiplier;
+        double m_minRto;
 
-  double m_rtt;
-  double m_gain;
-  double m_variance;
-  uint16_t m_multiplier;
-  uint32_t m_nSamples;
-};
+        double m_rtt;
+        double m_gain;
+        double m_variance;
+        uint16_t m_multiplier;
+        uint32_t m_nSamples;
+    };
 
 } // namespace nfd
 

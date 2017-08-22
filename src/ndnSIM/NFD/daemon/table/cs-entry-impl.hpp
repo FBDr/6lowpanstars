@@ -29,49 +29,48 @@
 #include "cs-entry.hpp"
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-/** \brief an Entry in ContentStore implementation
- *
- *  An Entry is either a stored Entry which contains a Data packet and related attributes,
- *  or a query Entry which contains a Name that is LessComparable to other stored/query Entry
- *  and is used to lookup a container of entries.
- *
- *  \note This type is internal to this specific ContentStore implementation.
- */
-class EntryImpl : public Entry
-{
-public:
-  /** \brief construct Entry for query
-   *  \note Name is implicitly convertible to Entry, so that Name can be passed to
-   *        lookup functions on a container of Entry
-   */
-  EntryImpl(const Name& name);
+        /** \brief an Entry in ContentStore implementation
+         *
+         *  An Entry is either a stored Entry which contains a Data packet and related attributes,
+         *  or a query Entry which contains a Name that is LessComparable to other stored/query Entry
+         *  and is used to lookup a container of entries.
+         *
+         *  \note This type is internal to this specific ContentStore implementation.
+         */
+        class EntryImpl : public Entry {
+        public:
+            /** \brief construct Entry for query
+             *  \note Name is implicitly convertible to Entry, so that Name can be passed to
+             *        lookup functions on a container of Entry
+             */
+            EntryImpl(const Name& name);
 
-  /** \brief construct Entry for storage
-   */
-  EntryImpl(shared_ptr<const Data> data, bool isUnsolicited);
+            /** \brief construct Entry for storage
+             */
+            EntryImpl(shared_ptr<const Data> data, bool isUnsolicited);
 
-  /** \return true if entry can become stale, false if entry is never stale
-   */
-  bool
-  canStale() const;
+            /** \return true if entry can become stale, false if entry is never stale
+             */
+            bool
+            canStale() const;
 
-  void
-  unsetUnsolicited();
+            void
+            unsetUnsolicited();
 
-  bool
-  operator<(const EntryImpl& other) const;
+            bool
+            operator<(const EntryImpl& other) const;
 
-private:
-  bool
-  isQuery() const;
+        private:
+            bool
+            isQuery() const;
 
-private:
-  Name m_queryName;
-};
+        private:
+            Name m_queryName;
+        };
 
-} // namespace cs
+    } // namespace cs
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_CS_ENTRY_IMPL_HPP

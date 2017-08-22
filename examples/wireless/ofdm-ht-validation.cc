@@ -26,53 +26,50 @@
 
 using namespace ns3;
 
-int main (int argc, char *argv[])
-{
-  uint32_t FrameSize = 2000;
-  std::ofstream yansfile ("yans-frame-success-rate-n.plt");
-  std::ofstream nistfile ("nist-frame-success-rate-n.plt");
-  std::vector <std::string> modes;
+int main(int argc, char *argv[]) {
+    uint32_t FrameSize = 2000;
+    std::ofstream yansfile("yans-frame-success-rate-n.plt");
+    std::ofstream nistfile("nist-frame-success-rate-n.plt");
+    std::vector <std::string> modes;
 
-  modes.push_back ("OfdmRate6_5MbpsBW20MHz");
-  modes.push_back ("OfdmRate13MbpsBW20MHz");
-  modes.push_back ("OfdmRate19_5MbpsBW20MHz");
-  modes.push_back ("OfdmRate26MbpsBW20MHz");
-  modes.push_back ("OfdmRate39MbpsBW20MHz");
-  modes.push_back ("OfdmRate52MbpsBW20MHz");
-  modes.push_back ("OfdmRate58_5MbpsBW20MHz");
-  modes.push_back ("OfdmRate65MbpsBW20MHz");
+    modes.push_back("OfdmRate6_5MbpsBW20MHz");
+    modes.push_back("OfdmRate13MbpsBW20MHz");
+    modes.push_back("OfdmRate19_5MbpsBW20MHz");
+    modes.push_back("OfdmRate26MbpsBW20MHz");
+    modes.push_back("OfdmRate39MbpsBW20MHz");
+    modes.push_back("OfdmRate52MbpsBW20MHz");
+    modes.push_back("OfdmRate58_5MbpsBW20MHz");
+    modes.push_back("OfdmRate65MbpsBW20MHz");
 
-  CommandLine cmd;
-  cmd.AddValue ("FrameSize", "The frame size", FrameSize);
-  cmd.Parse (argc, argv);
+    CommandLine cmd;
+    cmd.AddValue("FrameSize", "The frame size", FrameSize);
+    cmd.Parse(argc, argv);
 
-  Gnuplot yansplot = Gnuplot ("yans-frame-success-rate-n.eps");
-  Gnuplot nistplot = Gnuplot ("nist-frame-success-rate-n.eps");
+    Gnuplot yansplot = Gnuplot("yans-frame-success-rate-n.eps");
+    Gnuplot nistplot = Gnuplot("nist-frame-success-rate-n.eps");
 
-  Ptr <YansErrorRateModel> yans = CreateObject<YansErrorRateModel> ();
-  Ptr <NistErrorRateModel> nist = CreateObject<NistErrorRateModel> ();
+    Ptr <YansErrorRateModel> yans = CreateObject<YansErrorRateModel> ();
+    Ptr <NistErrorRateModel> nist = CreateObject<NistErrorRateModel> ();
 
-  for (uint32_t i = 0; i < modes.size (); i++)
-    {
-      std::cout << modes[i] << std::endl;
-      Gnuplot2dDataset yansdataset (modes[i]);
-      Gnuplot2dDataset nistdataset (modes[i]);
+    for (uint32_t i = 0; i < modes.size(); i++) {
+        std::cout << modes[i] << std::endl;
+        Gnuplot2dDataset yansdataset(modes[i]);
+        Gnuplot2dDataset nistdataset(modes[i]);
 
-      for (double snr = -5.0; snr <= 30.0; snr += 0.1)
-        {
-          double ps = yans->GetChunkSuccessRate (WifiMode (modes[i]), std::pow (10.0,snr / 10.0), FrameSize * 8);
-          yansdataset.Add (snr, ps);
-          ps = nist->GetChunkSuccessRate (WifiMode (modes[i]), std::pow (10.0,snr / 10.0), FrameSize * 8);
-          nistdataset.Add (snr, ps);
+        for (double snr = -5.0; snr <= 30.0; snr += 0.1) {
+            double ps = yans->GetChunkSuccessRate(WifiMode(modes[i]), std::pow(10.0, snr / 10.0), FrameSize * 8);
+            yansdataset.Add(snr, ps);
+            ps = nist->GetChunkSuccessRate(WifiMode(modes[i]), std::pow(10.0, snr / 10.0), FrameSize * 8);
+            nistdataset.Add(snr, ps);
         }
 
-      yansplot.AddDataset (yansdataset);
-      nistplot.AddDataset (nistdataset);
+        yansplot.AddDataset(yansdataset);
+        nistplot.AddDataset(nistdataset);
     }
 
-  yansplot.SetTerminal ("postscript eps color enh \"Times-BoldItalic\"");
-  yansplot.SetLegend ("SNR(dB)", "Frame Success Rate");
-  yansplot.SetExtra  ("set xrange [-5:30]\n\
+    yansplot.SetTerminal("postscript eps color enh \"Times-BoldItalic\"");
+    yansplot.SetLegend("SNR(dB)", "Frame Success Rate");
+    yansplot.SetExtra("set xrange [-5:30]\n\
 set yrange [0:1.2]\n\
 set style line 1 linewidth 5\n\
 set style line 2 linewidth 5\n\
@@ -82,13 +79,13 @@ set style line 5 linewidth 5\n\
 set style line 6 linewidth 5\n\
 set style line 7 linewidth 5\n\
 set style line 8 linewidth 5\n\
-set style increment user"                                                                                                                                                                                                                                                                                                                                   );
-  yansplot.GenerateOutput (yansfile);
-  yansfile.close ();
+set style increment user");
+    yansplot.GenerateOutput(yansfile);
+    yansfile.close();
 
-  nistplot.SetTerminal ("postscript eps color enh \"Times-BoldItalic\"");
-  nistplot.SetLegend ("SNR(dB)", "Frame Success Rate");
-  nistplot.SetExtra  ("set xrange [-5:30]\n\
+    nistplot.SetTerminal("postscript eps color enh \"Times-BoldItalic\"");
+    nistplot.SetLegend("SNR(dB)", "Frame Success Rate");
+    nistplot.SetExtra("set xrange [-5:30]\n\
 set yrange [0:1.2]\n\
 set style line 1 linewidth 5\n\
 set style line 2 linewidth 5\n\
@@ -98,9 +95,9 @@ set style line 5 linewidth 5\n\
 set style line 6 linewidth 5\n\
 set style line 7 linewidth 5\n\
 set style line 8 linewidth 5\n\
-set style increment user"                                                                                                                                                                                                                                                                                                                                   );
+set style increment user");
 
-  nistplot.GenerateOutput (nistfile);
-  nistfile.close ();
+    nistplot.GenerateOutput(nistfile);
+    nistfile.close();
 }
 

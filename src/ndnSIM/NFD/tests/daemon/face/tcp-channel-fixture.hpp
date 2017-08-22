@@ -31,40 +31,39 @@
 #include "channel-fixture.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class TcpChannelFixture : public ChannelFixture<TcpChannel, tcp::Endpoint>
-{
-protected:
-  virtual unique_ptr<TcpChannel>
-  makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0) final
-  {
-    if (port == 0)
-      port = getNextPort();
+        class TcpChannelFixture : public ChannelFixture<TcpChannel, tcp::Endpoint> {
+        protected:
 
-    return make_unique<TcpChannel>(tcp::Endpoint(addr, port));
-  }
+            virtual unique_ptr<TcpChannel>
+            makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0) final {
+                if (port == 0)
+                    port = getNextPort();
 
-  virtual void
-  connect(TcpChannel& channel) final
-  {
-    g_io.post([&] {
-      channel.connect(listenerEp, false,
-        [this] (const shared_ptr<Face>& newFace) {
-          BOOST_REQUIRE(newFace != nullptr);
-          connectFaceClosedSignal(*newFace, [this] { limitedIo.afterOp(); });
-          clientFaces.push_back(newFace);
-          limitedIo.afterOp();
-        },
-        ChannelFixture::unexpectedFailure);
-    });
-  }
+                return make_unique<TcpChannel>(tcp::Endpoint(addr, port));
+            }
 
-protected:
-  std::vector<shared_ptr<Face>> clientFaces;
-};
+            virtual void
+            connect(TcpChannel& channel) final {
+                g_io.post([&] {
+                    channel.connect(listenerEp, false,
+                            [this] (const shared_ptr<Face>& newFace) {
+                                BOOST_REQUIRE(newFace != nullptr);
+                                connectFaceClosedSignal(*newFace, [this] {
+                                    limitedIo.afterOp(); });
+                                clientFaces.push_back(newFace);
+                                limitedIo.afterOp();
+                            },
+                    ChannelFixture::unexpectedFailure);
+                });
+            }
 
-} // namespace tests
+        protected:
+            std::vector<shared_ptr<Face>> clientFaces;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_TCP_CHANNEL_FIXTURE_HPP

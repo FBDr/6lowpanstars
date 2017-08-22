@@ -31,82 +31,75 @@
 #include "nack-header.hpp"
 
 namespace ndn {
-namespace lp {
+    namespace lp {
 
-/** \brief represents a Network Nack
- *
- *  This type binds a NackHeader and an Interest, and is intended for use in network layer.
- */
-class Nack : public TagHost
-{
-public:
-  Nack() = default;
+        /** \brief represents a Network Nack
+         *
+         *  This type binds a NackHeader and an Interest, and is intended for use in network layer.
+         */
+        class Nack : public TagHost {
+        public:
+            Nack() = default;
 
-  explicit
-  Nack(const Interest& interest);
+            explicit
+            Nack(const Interest& interest);
 
-  explicit
-  Nack(Interest&& interest);
+            explicit
+            Nack(Interest&& interest);
 
-public: // getter/setter
-  const Interest&
-  getInterest() const
-  {
-    return m_interest;
-  }
+        public: // getter/setter
 
-  Interest&
-  getInterest()
-  {
-    return m_interest;
-  }
+            const Interest&
+            getInterest() const {
+                return m_interest;
+            }
 
-  const NackHeader&
-  getHeader() const
-  {
-    return m_header;
-  }
+            Interest&
+            getInterest() {
+                return m_interest;
+            }
 
-  NackHeader&
-  getHeader()
-  {
-    return m_header;
-  }
+            const NackHeader&
+            getHeader() const {
+                return m_header;
+            }
 
-  Nack&
-  setHeader(const NackHeader& header)
-  {
-    m_header = header;
-    return *this;
-  }
+            NackHeader&
+            getHeader() {
+                return m_header;
+            }
 
-  Nack&
-  setHeader(NackHeader&& header)
-  {
-    m_header = header;
-    return *this;
-  }
+            Nack&
+            setHeader(const NackHeader& header) {
+                m_header = header;
+                return *this;
+            }
 
-public: // NackHeader proxy
-  NackReason
-  getReason() const
-  {
-    return m_header.getReason();
-  }
+            Nack&
+            setHeader(NackHeader&& header) {
+                m_header = header;
+                return *this;
+            }
 
-  Nack&
-  setReason(NackReason reason)
-  {
-    m_header.setReason(reason);
-    return *this;
-  }
+        public: // NackHeader proxy
 
-private:
-  Interest m_interest;
-  NackHeader m_header;
-};
+            NackReason
+            getReason() const {
+                return m_header.getReason();
+            }
 
-} // namespace lp
+            Nack&
+            setReason(NackReason reason) {
+                m_header.setReason(reason);
+                return *this;
+            }
+
+        private:
+            Interest m_interest;
+            NackHeader m_header;
+        };
+
+    } // namespace lp
 } // namespace ndn
 
 #endif // NDN_CXX_LP_NACK_HPP

@@ -25,29 +25,27 @@
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-
-HtWifiMacHelper::HtWifiMacHelper ()
+namespace ns3
 {
-}
 
-HtWifiMacHelper::~HtWifiMacHelper ()
-{
-}
+    HtWifiMacHelper::HtWifiMacHelper() {
+    }
 
-HtWifiMacHelper
-HtWifiMacHelper::Default (void)
-{
-  HtWifiMacHelper helper;
+    HtWifiMacHelper::~HtWifiMacHelper() {
+    }
 
-  //We're making Ht-enabled Wi-Fi MACs here, so we set the necessary
-  //attribute. I've carefully positioned this here so that someone
-  //who knows what they're doing can override with explicit attributes.
-  helper.SetType ("ns3::StaWifiMac",
-                  "QosSupported", BooleanValue (true),
-                  "HtSupported", BooleanValue (true));
+    HtWifiMacHelper
+    HtWifiMacHelper::Default(void) {
+        HtWifiMacHelper helper;
 
-  return helper;
-}
+        //We're making Ht-enabled Wi-Fi MACs here, so we set the necessary
+        //attribute. I've carefully positioned this here so that someone
+        //who knows what they're doing can override with explicit attributes.
+        helper.SetType("ns3::StaWifiMac",
+                "QosSupported", BooleanValue(true),
+                "HtSupported", BooleanValue(true));
+
+        return helper;
+    }
 
 } //namespace ns3

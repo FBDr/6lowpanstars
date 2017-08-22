@@ -25,44 +25,43 @@
 
 namespace ns3 {
 
-class TcpL4Protocol;
+    class TcpL4Protocol;
 
-/**
- * \ingroup internet
- * \defgroup tcp Tcp
- *
- * Transmission Control Protocol
- *
- * See \RFC{793} and others.
- */
+    /**
+     * \ingroup internet
+     * \defgroup tcp Tcp
+     *
+     * Transmission Control Protocol
+     *
+     * See \RFC{793} and others.
+     */
 
-/**
- * \ingroup tcp
- *
- * \brief socket factory implementation for native ns-3 TCP
- *
- *
- * This class serves to create sockets of the TcpSocketBase type.
- */
-class TcpSocketFactoryImpl : public TcpSocketFactory
-{
-public:
-  TcpSocketFactoryImpl ();
-  virtual ~TcpSocketFactoryImpl ();
+    /**
+     * \ingroup tcp
+     *
+     * \brief socket factory implementation for native ns-3 TCP
+     *
+     *
+     * This class serves to create sockets of the TcpSocketBase type.
+     */
+    class TcpSocketFactoryImpl : public TcpSocketFactory {
+    public:
+        TcpSocketFactoryImpl();
+        virtual ~TcpSocketFactoryImpl();
 
-  /**
-   * \brief Set the associated TCP L4 protocol.
-   * \param tcp the TCP L4 protocol
-   */
-  void SetTcp (Ptr<TcpL4Protocol> tcp);
+        /**
+         * \brief Set the associated TCP L4 protocol.
+         * \param tcp the TCP L4 protocol
+         */
+        void SetTcp(Ptr<TcpL4Protocol> tcp);
 
-  virtual Ptr<Socket> CreateSocket (void);
+        virtual Ptr<Socket> CreateSocket(void);
 
-protected:
-  virtual void DoDispose (void);
-private:
-  Ptr<TcpL4Protocol> m_tcp; //!< the associated TCP L4 protocol
-};
+    protected:
+        virtual void DoDispose(void);
+    private:
+        Ptr<TcpL4Protocol> m_tcp; //!< the associated TCP L4 protocol
+    };
 
 } // namespace ns3
 

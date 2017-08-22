@@ -31,104 +31,101 @@
 #include "../util/regex.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class ValidatorRegex : public Validator
-{
-public:
-  class Error : public Validator::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Validator::Error(what)
-    {
-    }
-  };
+        class ValidatorRegex : public Validator {
+        public:
 
-  /**
-   * @note  When both certificate cache and face are not supplied, no cache will be used.
-   *        However, if only face is supplied, a default cache will be created and used.
-   */
-  explicit
-  ValidatorRegex(Face* face = nullptr,
-                 shared_ptr<CertificateCache> certificateCache = DEFAULT_CERTIFICATE_CACHE,
-                 const int stepLimit = 3);
+            class Error : public Validator::Error {
+            public:
 
-  /// @deprecated Use the constructor taking Face* as parameter.
-  explicit
-  ValidatorRegex(Face& face,
-                 shared_ptr<CertificateCache> certificateCache = DEFAULT_CERTIFICATE_CACHE,
-                 const int stepLimit = 3);
+                explicit
+                Error(const std::string& what)
+                : Validator::Error(what) {
+                }
+            };
 
-  virtual
-  ~ValidatorRegex()
-  {
-  }
+            /**
+             * @note  When both certificate cache and face are not supplied, no cache will be used.
+             *        However, if only face is supplied, a default cache will be created and used.
+             */
+            explicit
+            ValidatorRegex(Face* face = nullptr,
+                    shared_ptr<CertificateCache> certificateCache = DEFAULT_CERTIFICATE_CACHE,
+                    const int stepLimit = 3);
 
-  /**
-   * @brief Add a rule for data verification.
-   *
-   * @param rule The verification rule
-   */
-  void
-  addDataVerificationRule(shared_ptr<SecRuleRelative> rule);
+            /// @deprecated Use the constructor taking Face* as parameter.
+            explicit
+            ValidatorRegex(Face& face,
+                    shared_ptr<CertificateCache> certificateCache = DEFAULT_CERTIFICATE_CACHE,
+                    const int stepLimit = 3);
 
-  /**
-   * @brief Add a trust anchor
-   *
-   * @param certificate The trust anchor
-   */
-  void
-  addTrustAnchor(shared_ptr<v1::IdentityCertificate> certificate);
+            virtual
+            ~ValidatorRegex() {
+            }
 
-protected:
-  virtual void
-  checkPolicy(const Data& data,
-              int nSteps,
-              const OnDataValidated& onValidated,
-              const OnDataValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest> >& nextSteps);
+            /**
+             * @brief Add a rule for data verification.
+             *
+             * @param rule The verification rule
+             */
+            void
+            addDataVerificationRule(shared_ptr<SecRuleRelative> rule);
 
-  virtual void
-  checkPolicy(const Interest& interest,
-              int nSteps,
-              const OnInterestValidated& onValidated,
-              const OnInterestValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest> >& nextSteps)
-  {
-    onValidationFailed(interest.shared_from_this(), "No policy for signed interest checking");
-  }
+            /**
+             * @brief Add a trust anchor
+             *
+             * @param certificate The trust anchor
+             */
+            void
+            addTrustAnchor(shared_ptr<v1::IdentityCertificate> certificate);
 
-  void
-  onCertificateValidated(const shared_ptr<const Data>& signCertificate,
-                         const shared_ptr<const Data>& data,
-                         const OnDataValidated& onValidated,
-                         const OnDataValidationFailed& onValidationFailed);
+        protected:
+            virtual void
+            checkPolicy(const Data& data,
+                    int nSteps,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest> >& nextSteps);
 
-  void
-  onCertificateValidationFailed(const shared_ptr<const Data>& signCertificate,
-                                const std::string& failureInfo,
-                                const shared_ptr<const Data>& data,
-                                const OnDataValidationFailed& onValidationFailed);
+            virtual void
+            checkPolicy(const Interest& interest,
+                    int nSteps,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest> >& nextSteps) {
+                onValidationFailed(interest.shared_from_this(), "No policy for signed interest checking");
+            }
 
-public:
-  static const shared_ptr<CertificateCache> DEFAULT_CERTIFICATE_CACHE;
+            void
+            onCertificateValidated(const shared_ptr<const Data>& signCertificate,
+                    const shared_ptr<const Data>& data,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed);
 
-protected:
-  typedef std::vector< shared_ptr<SecRuleRelative> > RuleList;
-  typedef std::vector< shared_ptr<Regex> > RegexList;
+            void
+            onCertificateValidationFailed(const shared_ptr<const Data>& signCertificate,
+                    const std::string& failureInfo,
+                    const shared_ptr<const Data>& data,
+                    const OnDataValidationFailed& onValidationFailed);
 
-  int m_stepLimit;
-  shared_ptr<CertificateCache> m_certificateCache;
-  RuleList m_mustFailVerify;
-  RuleList m_verifyPolicies;
-  std::map<Name, shared_ptr<v1::IdentityCertificate> > m_trustAnchors;
-};
+        public:
+            static const shared_ptr<CertificateCache> DEFAULT_CERTIFICATE_CACHE;
 
-} // namespace security
+        protected:
+            typedef std::vector< shared_ptr<SecRuleRelative> > RuleList;
+            typedef std::vector< shared_ptr<Regex> > RegexList;
 
-using security::ValidatorRegex;
+            int m_stepLimit;
+            shared_ptr<CertificateCache> m_certificateCache;
+            RuleList m_mustFailVerify;
+            RuleList m_verifyPolicies;
+            std::map<Name, shared_ptr<v1::IdentityCertificate> > m_trustAnchors;
+        };
+
+    } // namespace security
+
+    using security::ValidatorRegex;
 
 } // namespace ndn
 

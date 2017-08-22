@@ -32,64 +32,63 @@
 
 namespace ns3 {
 
-class BaseStationNetDevice;
-class GenericMacHeader;
-class WimaxConnection;
-class Cid;
+    class BaseStationNetDevice;
+    class GenericMacHeader;
+    class WimaxConnection;
+    class Cid;
 
-/**
- * \ingroup wimax
- */
-class BSSchedulerSimple : public BSScheduler
-{
-public:
-  BSSchedulerSimple ();
-  BSSchedulerSimple (Ptr<BaseStationNetDevice> bs);
-  ~BSSchedulerSimple (void);
+    /**
+     * \ingroup wimax
+     */
+    class BSSchedulerSimple : public BSScheduler {
+    public:
+        BSSchedulerSimple();
+        BSSchedulerSimple(Ptr<BaseStationNetDevice> bs);
+        ~BSSchedulerSimple(void);
 
-  static TypeId GetTypeId (void);
+        static TypeId GetTypeId(void);
 
-  /*
-   * \brief This function returns all the downlink bursts scheduled for the next
-   * downlink sub-frame
-   * \returns  all the downlink bursts scheduled for the next downlink sub-frame
-   */
-  std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > >*
-  GetDownlinkBursts (void) const;
-  /*
-   * \brief This function adds a downlink burst to the list of downlink bursts
-   * scheduled for the next downlink sub-frame
-   * \param connection a pointer to connection in wich the burst will be sent
-   * \param diuc downlink iuc
-   * \param modulationType the modulation type of the burst
-   * \param burst the downlink burst to add to the downlink sub frame
-   */
-  void AddDownlinkBurst (Ptr<const WimaxConnection> connection, uint8_t diuc,
-                         WimaxPhy::ModulationType modulationType, Ptr<PacketBurst> burst);
+        /*
+         * \brief This function returns all the downlink bursts scheduled for the next
+         * downlink sub-frame
+         * \returns  all the downlink bursts scheduled for the next downlink sub-frame
+         */
+        std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > >*
+        GetDownlinkBursts(void) const;
+        /*
+         * \brief This function adds a downlink burst to the list of downlink bursts
+         * scheduled for the next downlink sub-frame
+         * \param connection a pointer to connection in wich the burst will be sent
+         * \param diuc downlink iuc
+         * \param modulationType the modulation type of the burst
+         * \param burst the downlink burst to add to the downlink sub frame
+         */
+        void AddDownlinkBurst(Ptr<const WimaxConnection> connection, uint8_t diuc,
+                WimaxPhy::ModulationType modulationType, Ptr<PacketBurst> burst);
 
-  /*
-   * \brief the scheduling function for the downlink subframe.
-   */
-  void Schedule (void);
-  /*
-   * \brief Selects a connection from the list of connections having packets to be sent .
-   * \param connection will point to a connection that have packets to be sent
-   * \returns false if no connection has packets to be sent, true otherwise
-   */
-  bool SelectConnection (Ptr<WimaxConnection> &connection);
-  /*
-   * \brief Creates a downlink UGS burst
-   * \param serviceFlow the service flow of the burst
-   * \param modulationType the modulation type to be used for the burst
-   * \param availableSymbols maximum number of OFDM symbols to be used by the burst
-   * \returns a Burst (list of packets)
-   */
-  Ptr<PacketBurst> CreateUgsBurst (ServiceFlow *serviceFlow,
-                                   WimaxPhy::ModulationType modulationType, uint32_t availableSymbols);
+        /*
+         * \brief the scheduling function for the downlink subframe.
+         */
+        void Schedule(void);
+        /*
+         * \brief Selects a connection from the list of connections having packets to be sent .
+         * \param connection will point to a connection that have packets to be sent
+         * \returns false if no connection has packets to be sent, true otherwise
+         */
+        bool SelectConnection(Ptr<WimaxConnection> &connection);
+        /*
+         * \brief Creates a downlink UGS burst
+         * \param serviceFlow the service flow of the burst
+         * \param modulationType the modulation type to be used for the burst
+         * \param availableSymbols maximum number of OFDM symbols to be used by the burst
+         * \returns a Burst (list of packets)
+         */
+        Ptr<PacketBurst> CreateUgsBurst(ServiceFlow *serviceFlow,
+                WimaxPhy::ModulationType modulationType, uint32_t availableSymbols);
 
-private:
-  std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > *m_downlinkBursts;
-};
+    private:
+        std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > *m_downlinkBursts;
+    };
 
 } // namespace ns3
 

@@ -26,32 +26,31 @@
 
 namespace ndn {
 
-/**
- * represents a Sha256WithEcdsa signature.
- */
-class SignatureSha256WithEcdsa : public Signature
-{
-public:
-  class Error : public Signature::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Signature::Error(what)
-    {
-    }
-  };
+    /**
+     * represents a Sha256WithEcdsa signature.
+     */
+    class SignatureSha256WithEcdsa : public Signature {
+    public:
 
-  explicit
-  SignatureSha256WithEcdsa(const KeyLocator& keyLocator = KeyLocator());
+        class Error : public Signature::Error {
+        public:
 
-  explicit
-  SignatureSha256WithEcdsa(const Signature& signature);
+            explicit
+            Error(const std::string& what)
+            : Signature::Error(what) {
+            }
+        };
 
-private:
-  void
-  unsetKeyLocator();
-};
+        explicit
+        SignatureSha256WithEcdsa(const KeyLocator& keyLocator = KeyLocator());
+
+        explicit
+        SignatureSha256WithEcdsa(const Signature& signature);
+
+    private:
+        void
+        unsetKeyLocator();
+    };
 
 } // namespace ndn
 

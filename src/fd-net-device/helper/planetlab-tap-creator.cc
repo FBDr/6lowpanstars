@@ -58,38 +58,36 @@ using namespace ns3;
  *
  */
 int
-ReceiveVifFd (int fd, char *vif_name)
-{
-  struct msghdr msg;
-  struct iovec iov;
-  int rv;
-  size_t ccmsg[CMSG_SPACE (sizeof(int)) / sizeof(size_t)];
-  struct cmsghdr *cmsg;
+ReceiveVifFd(int fd, char *vif_name) {
+    struct msghdr msg;
+    struct iovec iov;
+    int rv;
+    size_t ccmsg[CMSG_SPACE(sizeof (int)) / sizeof (size_t)];
+    struct cmsghdr *cmsg;
 
-  /* Use IOV to read interface name */
-  iov.iov_base = vif_name;
-  iov.iov_len = IFNAMSIZ;
+    /* Use IOV to read interface name */
+    iov.iov_base = vif_name;
+    iov.iov_len = IFNAMSIZ;
 
-  msg.msg_name = 0;
-  msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  /* old BSD implementations should use msg_accrights instead of
-   * msg_control; the interface is different. */
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof(ccmsg);
+    msg.msg_name = 0;
+    msg.msg_namelen = 0;
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    /* old BSD implementations should use msg_accrights instead of
+     * msg_control; the interface is different. */
+    msg.msg_control = ccmsg;
+    msg.msg_controllen = sizeof (ccmsg);
 
-  while (((rv = recvmsg (fd, &msg, 0)) == -1) && errno == EINTR)
-    {
+    while (((rv = recvmsg(fd, &msg, 0)) == -1) && errno == EINTR) {
     }
-  ABORT_IF (rv == -1, "Could not receive fd from Vsys", 0);
-  ABORT_IF (!rv, "Could not receive fd from Vsys (EOF)", 0);
+    ABORT_IF(rv == -1, "Could not receive fd from Vsys", 0);
+    ABORT_IF(!rv, "Could not receive fd from Vsys (EOF)", 0);
 
-  cmsg = CMSG_FIRSTHDR (&msg);
-  ABORT_IF (!cmsg->cmsg_type == SCM_RIGHTS, "got control message of unknown type" << cmsg->cmsg_type, 0);
+    cmsg = CMSG_FIRSTHDR(&msg);
+    ABORT_IF(!cmsg->cmsg_type == SCM_RIGHTS, "got control message of unknown type" << cmsg->cmsg_type, 0);
 
-  int* retfd  = (int*)CMSG_DATA (cmsg);
-  return *retfd;
+    int* retfd = (int*) CMSG_DATA(cmsg);
+    return *retfd;
 }
 
 /**
@@ -102,30 +100,29 @@ ReceiveVifFd (int fd, char *vif_name)
  *
  */
 int
-TunAlloc (int iftype, char *if_name)
-{
-  int control_fd;
-  struct sockaddr_un addr;
-  int ret;
+TunAlloc(int iftype, char *if_name) {
+    int control_fd;
+    struct sockaddr_un addr;
+    int ret;
 
-  control_fd = socket (AF_UNIX, SOCK_STREAM, 0);
-  ABORT_IF (control_fd == -1, "Could not create UNIX socket", 0);
+    control_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    ABORT_IF(control_fd == -1, "Could not create UNIX socket", 0);
 
-  memset (&addr, 0, sizeof(struct sockaddr_un));
+    memset(&addr, 0, sizeof (struct sockaddr_un));
 
-  /* Clear structure */
-  addr.sun_family = AF_UNIX;
-  strncpy (addr.sun_path, VSYS_TUNTAP, sizeof(addr.sun_path) - 1);
+    /* Clear structure */
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, VSYS_TUNTAP, sizeof (addr.sun_path) - 1);
 
-  ret = connect (control_fd, (struct sockaddr *) &addr,
-                 sizeof(struct sockaddr_un));
-  ABORT_IF (ret == -1, "Could not connect to Vsys control socket", 0);
+    ret = connect(control_fd, (struct sockaddr *) &addr,
+            sizeof (struct sockaddr_un));
+    ABORT_IF(ret == -1, "Could not connect to Vsys control socket", 0);
 
-  /* passing type param */
-  ret = send (control_fd, &iftype, sizeof(iftype), 0);
-  ABORT_IF (ret != sizeof(iftype), "Could not send paramater to Vsys control socket", 0);
+    /* passing type param */
+    ret = send(control_fd, &iftype, sizeof (iftype), 0);
+    ABORT_IF(ret != sizeof (iftype), "Could not send paramater to Vsys control socket", 0);
 
-  return ReceiveVifFd (control_fd, if_name);
+    return ReceiveVifFd(control_fd, if_name);
 
 }
 
@@ -137,98 +134,92 @@ TunAlloc (int iftype, char *if_name)
  *
  */
 void
-SetTunUp (const char *ip, const char *prefix, const char *if_name)
-{
-  FILE *in;
-  FILE *out;
-  char errbuff[4096];
+SetTunUp(const char *ip, const char *prefix, const char *if_name) {
+    FILE *in;
+    FILE *out;
+    char errbuff[4096];
 
-  memset(errbuff, 0, 4096);
+    memset(errbuff, 0, 4096);
 
-  in = fopen (VSYS_VIFUP_IN, "a");
+    in = fopen(VSYS_VIFUP_IN, "a");
 
-  if (in == NULL)
-    {
-      ABORT_IF (in == NULL, "Failed to open " << VSYS_VIFUP_IN, 0);
+    if (in == NULL) {
+        ABORT_IF(in == NULL, "Failed to open " << VSYS_VIFUP_IN, 0);
     }
 
-  out = fopen (VSYS_VIFUP_OUT, "r");
+    out = fopen(VSYS_VIFUP_OUT, "r");
 
-  if (out == NULL)
-    {
-      ABORT_IF (out == NULL, "Failed to open " << VSYS_VIFUP_OUT, 0);
+    if (out == NULL) {
+        ABORT_IF(out == NULL, "Failed to open " << VSYS_VIFUP_OUT, 0);
     }
 
-  // send input to process
-  fprintf (in, "%s\n%s\n%s\nsnat=1\n", if_name, ip, prefix);
+    // send input to process
+    fprintf(in, "%s\n%s\n%s\nsnat=1\n", if_name, ip, prefix);
 
-  // close pipe to indicate end parameter passing and flush the fifo
-  fclose (in);
+    // close pipe to indicate end parameter passing and flush the fifo
+    fclose(in);
 
-  fread((void*)errbuff, 4096, 1, out);
- 
-  // the error buffer will not be empty if we read an error
-  ABORT_IF (strcmp(errbuff, "") != 0, errbuff, 0);
+    fread((void*) errbuff, 4096, 1, out);
 
-  fclose (out);
+    // the error buffer will not be empty if we read an error
+    ABORT_IF(strcmp(errbuff, "") != 0, errbuff, 0);
+
+    fclose(out);
 }
 
 int
-main (int argc, char *argv[])
-{
-  int c;
-  char *ip = NULL;
-  char *prefix = NULL;
-  char *path = NULL;
-  int iftype = IFF_TUN;
-  char if_name[4096];
+main(int argc, char *argv[]) {
+    int c;
+    char *ip = NULL;
+    char *prefix = NULL;
+    char *path = NULL;
+    int iftype = IFF_TUN;
+    char if_name[4096];
 
-  memset(if_name, 0, 4096);
-  opterr = 0;
+    memset(if_name, 0, 4096);
+    opterr = 0;
 
-  while ((c = getopt (argc, argv, "vi:n:tp:")) != -1)
-    {
-      switch (c)
-        {
-        case 'i':
-          ip = optarg;            // ip address of the new device
-          break;
-        case 'n':
-          prefix = optarg;        // prefix for the new device
-          break;
-        case 't':
-          iftype = IFF_TAP;       // mode for the device (TAP or TUN)
-          break;
-        case 'p':
-          path = optarg;          // path back to the tap bridge
-          break;
-        case 'v':
-          gVerbose = true;
-          break;
+    while ((c = getopt(argc, argv, "vi:n:tp:")) != -1) {
+        switch (c) {
+            case 'i':
+                ip = optarg; // ip address of the new device
+                break;
+            case 'n':
+                prefix = optarg; // prefix for the new device
+                break;
+            case 't':
+                iftype = IFF_TAP; // mode for the device (TAP or TUN)
+                break;
+            case 'p':
+                path = optarg; // path back to the tap bridge
+                break;
+            case 'v':
+                gVerbose = true;
+                break;
         }
     }
 
-  ABORT_IF (ip == NULL, "IP Address is a required argument", 0);
-  LOG ("Provided IP Address is \"" << ip << "\"");
+    ABORT_IF(ip == NULL, "IP Address is a required argument", 0);
+    LOG("Provided IP Address is \"" << ip << "\"");
 
-  ABORT_IF (prefix == NULL, "Prefix is a required argument", 0);
-  LOG ("Provided prefix \"" << prefix << "\"");
+    ABORT_IF(prefix == NULL, "Prefix is a required argument", 0);
+    LOG("Provided prefix \"" << prefix << "\"");
 
-  ABORT_IF (path == NULL, "path is a required argument", 0);
-  LOG ("Provided path is \"" << path << "\"");
+    ABORT_IF(path == NULL, "path is a required argument", 0);
+    LOG("Provided path is \"" << path << "\"");
 
-  LOG ("Creating Tap");
-  // allocate a TAP device in planetLab
-  int fd = TunAlloc (iftype, if_name);
-  ABORT_IF (fd == -1, "main(): Unable to create tap device", 1);
+    LOG("Creating Tap");
+    // allocate a TAP device in planetLab
+    int fd = TunAlloc(iftype, if_name);
+    ABORT_IF(fd == -1, "main(): Unable to create tap device", 1);
 
-  // set the TAP interface up
-  SetTunUp (ip, prefix, (const char*)if_name);
+    // set the TAP interface up
+    SetTunUp(ip, prefix, (const char*) if_name);
 
-  //
-  // Send the socket back to the tap net device so it can go about its business
-  //
-  SendSocket (path, fd, PLANETLAB_MAGIC);
+    //
+    // Send the socket back to the tap net device so it can go about its business
+    //
+    SendSocket(path, fd, PLANETLAB_MAGIC);
 
-  return 0;
+    return 0;
 }

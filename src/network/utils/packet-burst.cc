@@ -24,111 +24,97 @@
 #include "packet-burst.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PacketBurst");
-
-NS_OBJECT_ENSURE_REGISTERED (PacketBurst);
-
-TypeId
-PacketBurst::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PacketBurst")
-    .SetParent<Object> ()
-    .SetGroupName("Network")
-    .AddConstructor<PacketBurst> ()
-  ;
-  return tid;
-}
 
-PacketBurst::PacketBurst (void)
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("PacketBurst");
 
-PacketBurst::~PacketBurst (void)
-{
-  NS_LOG_FUNCTION (this);
-  for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin (); iter
-       != m_packets.end (); ++iter)
-    {
-      (*iter)->Unref ();
+    NS_OBJECT_ENSURE_REGISTERED(PacketBurst);
 
+    TypeId
+    PacketBurst::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PacketBurst")
+                .SetParent<Object> ()
+                .SetGroupName("Network")
+                .AddConstructor<PacketBurst> ()
+                ;
+        return tid;
     }
-}
 
-void
-PacketBurst::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_packets.clear ();
-}
-
-Ptr<PacketBurst> PacketBurst::Copy (void) const
-{
-  NS_LOG_FUNCTION (this);
-  Ptr<PacketBurst> burst = Create<PacketBurst> ();
-
-  for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin (); iter
-       != m_packets.end (); ++iter)
-    {
-      Ptr<Packet> packet = (*iter)->Copy ();
-      burst->AddPacket (packet);
+    PacketBurst::PacketBurst(void) {
+        NS_LOG_FUNCTION(this);
     }
-  return burst;
-}
 
-void
-PacketBurst::AddPacket (Ptr<Packet> packet)
-{
-  NS_LOG_FUNCTION (this << packet);
-  if (packet)
-    {
-      m_packets.push_back (packet);
+    PacketBurst::~PacketBurst(void) {
+        NS_LOG_FUNCTION(this);
+        for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin(); iter
+                != m_packets.end(); ++iter) {
+            (*iter)->Unref();
+
+        }
     }
-}
 
-std::list<Ptr<Packet> >
-PacketBurst::GetPackets (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_packets;
-}
-
-uint32_t
-PacketBurst::GetNPackets (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_packets.size ();
-}
-
-uint32_t
-PacketBurst::GetSize (void) const
-{
-  NS_LOG_FUNCTION (this);
-  uint32_t size = 0;
-  for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin (); iter
-       != m_packets.end (); ++iter)
-    {
-      Ptr<Packet> packet = *iter;
-      size += packet->GetSize ();
+    void
+    PacketBurst::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        m_packets.clear();
     }
-  return size;
-}
 
-std::list<Ptr<Packet> >::const_iterator
-PacketBurst::Begin (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_packets.begin ();
-}
+    Ptr<PacketBurst> PacketBurst::Copy(void) const {
+        NS_LOG_FUNCTION(this);
+        Ptr<PacketBurst> burst = Create<PacketBurst> ();
 
-std::list<Ptr<Packet> >::const_iterator
-PacketBurst::End (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_packets.end ();
-}
+        for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin(); iter
+                != m_packets.end(); ++iter) {
+            Ptr<Packet> packet = (*iter)->Copy();
+            burst->AddPacket(packet);
+        }
+        return burst;
+    }
+
+    void
+    PacketBurst::AddPacket(Ptr<Packet> packet) {
+        NS_LOG_FUNCTION(this << packet);
+        if (packet) {
+            m_packets.push_back(packet);
+        }
+    }
+
+    std::list<Ptr<Packet> >
+            PacketBurst::GetPackets(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_packets;
+    }
+
+    uint32_t
+    PacketBurst::GetNPackets(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_packets.size();
+    }
+
+    uint32_t
+    PacketBurst::GetSize(void) const {
+        NS_LOG_FUNCTION(this);
+        uint32_t size = 0;
+        for (std::list<Ptr<Packet> >::const_iterator iter = m_packets.begin(); iter
+                != m_packets.end(); ++iter) {
+            Ptr<Packet> packet = *iter;
+            size += packet->GetSize();
+        }
+        return size;
+    }
+
+    std::list<Ptr<Packet> >::const_iterator
+    PacketBurst::Begin(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_packets.begin();
+    }
+
+    std::list<Ptr<Packet> >::const_iterator
+    PacketBurst::End(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_packets.end();
+    }
 
 
 } // namespace ns3

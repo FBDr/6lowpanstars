@@ -25,49 +25,48 @@
 
 namespace ns3 {
 
-/**
- * \brief implement the CARA rate control algorithm
- * \ingroup wifi
- *
- * Implement the CARA algorithm from:
- * J. Kim, S. Kim, S. Choi, and D. Qiao.
- * "CARA: Collision-Aware Rate Adaptation for IEEE 802.11 WLANs."
- *
- * Originally implemented by Federico Maguolo for a very early
- * prototype version of ns-3.
- */
-class CaraWifiManager : public WifiRemoteStationManager
-{
-public:
-  static TypeId GetTypeId (void);
-  CaraWifiManager ();
-  virtual ~CaraWifiManager ();
+    /**
+     * \brief implement the CARA rate control algorithm
+     * \ingroup wifi
+     *
+     * Implement the CARA algorithm from:
+     * J. Kim, S. Kim, S. Choi, and D. Qiao.
+     * "CARA: Collision-Aware Rate Adaptation for IEEE 802.11 WLANs."
+     *
+     * Originally implemented by Federico Maguolo for a very early
+     * prototype version of ns-3.
+     */
+    class CaraWifiManager : public WifiRemoteStationManager {
+    public:
+        static TypeId GetTypeId(void);
+        CaraWifiManager();
+        virtual ~CaraWifiManager();
 
 
-private:
-  //overriden from base class
-  virtual WifiRemoteStation * DoCreateStation (void) const;
-  virtual void DoReportRxOk (WifiRemoteStation *station,
-                             double rxSnr, WifiMode txMode);
-  virtual void DoReportRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportDataFailed (WifiRemoteStation *station);
-  virtual void DoReportRtsOk (WifiRemoteStation *station,
-                              double ctsSnr, WifiMode ctsMode, double rtsSnr);
-  virtual void DoReportDataOk (WifiRemoteStation *station,
-                               double ackSnr, WifiMode ackMode, double dataSnr);
-  virtual void DoReportFinalRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportFinalDataFailed (WifiRemoteStation *station);
-  virtual WifiTxVector DoGetDataTxVector (WifiRemoteStation *station, uint32_t size);
-  virtual WifiTxVector DoGetRtsTxVector (WifiRemoteStation *station);
-  virtual bool DoNeedRts (WifiRemoteStation *station,
-                          Ptr<const Packet> packet, bool normally);
-  virtual bool IsLowLatency (void) const;
+    private:
+        //overriden from base class
+        virtual WifiRemoteStation * DoCreateStation(void) const;
+        virtual void DoReportRxOk(WifiRemoteStation *station,
+                double rxSnr, WifiMode txMode);
+        virtual void DoReportRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportDataFailed(WifiRemoteStation *station);
+        virtual void DoReportRtsOk(WifiRemoteStation *station,
+                double ctsSnr, WifiMode ctsMode, double rtsSnr);
+        virtual void DoReportDataOk(WifiRemoteStation *station,
+                double ackSnr, WifiMode ackMode, double dataSnr);
+        virtual void DoReportFinalRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportFinalDataFailed(WifiRemoteStation *station);
+        virtual WifiTxVector DoGetDataTxVector(WifiRemoteStation *station, uint32_t size);
+        virtual WifiTxVector DoGetRtsTxVector(WifiRemoteStation *station);
+        virtual bool DoNeedRts(WifiRemoteStation *station,
+                Ptr<const Packet> packet, bool normally);
+        virtual bool IsLowLatency(void) const;
 
-  uint32_t m_timerTimeout;
-  uint32_t m_successThreshold;
-  uint32_t m_failureThreshold;
-  uint32_t m_probeThreshold;
-};
+        uint32_t m_timerTimeout;
+        uint32_t m_successThreshold;
+        uint32_t m_failureThreshold;
+        uint32_t m_probeThreshold;
+    };
 
 } //namespace ns3
 

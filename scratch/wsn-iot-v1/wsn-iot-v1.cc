@@ -194,7 +194,7 @@ namespace ns3
         }
 
         LrWpanHelper lrWpanHelper[node_head];
-        
+
         for (int jdx = 0; jdx < node_head; jdx++) {
             CSMADevice[jdx] = csma.Install(border_backhaul[jdx]);
             LrWpanDevice[jdx] = lrWpanHelper[jdx].InstallIoT(iot[jdx], node_periph, node_head, useContiki, node_periph);
@@ -206,11 +206,11 @@ namespace ns3
 
         //Energy framework
 
-        int size = node_head*node_periph +1 ; 
+        int size = node_head * node_periph + 1;
         Ptr<LrWpanRadioEnergyModel> em[size];
         Ptr<BasicEnergySource> es[size];
         Ptr<LrWpanContikiMac> mac[size]; //Change Mac
-        
+
         int endN = 0;
         for (int jdx = 0; jdx < node_head; jdx++) {
             for (int idx = 0; idx < node_periph; idx++) {
@@ -227,7 +227,7 @@ namespace ns3
                 Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
                 em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
                 es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
-      
+
                 //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
                 //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));

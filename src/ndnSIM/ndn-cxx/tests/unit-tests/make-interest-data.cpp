@@ -23,58 +23,52 @@
 #include "security/signature-sha256-with-rsa.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-shared_ptr<Interest>
-makeInterest(const Name& name, uint32_t nonce)
-{
-  auto interest = make_shared<Interest>(name);
-  if (nonce != 0) {
-    interest->setNonce(nonce);
-  }
-  return interest;
-}
+        shared_ptr<Interest>
+        makeInterest(const Name& name, uint32_t nonce) {
+            auto interest = make_shared<Interest>(name);
+            if (nonce != 0) {
+                interest->setNonce(nonce);
+            }
+            return interest;
+        }
 
-shared_ptr<Data>
-makeData(const Name& name)
-{
-  auto data = make_shared<Data>(name);
-  return signData(data);
-}
+        shared_ptr<Data>
+        makeData(const Name& name) {
+            auto data = make_shared<Data>(name);
+            return signData(data);
+        }
 
-Data&
-signData(Data& data)
-{
-  ndn::SignatureSha256WithRsa fakeSignature;
-  fakeSignature.setValue(ndn::encoding::makeEmptyBlock(tlv::SignatureValue));
-  data.setSignature(fakeSignature);
-  data.wireEncode();
-  return data;
-}
+        Data&
+        signData(Data& data) {
+            ndn::SignatureSha256WithRsa fakeSignature;
+            fakeSignature.setValue(ndn::encoding::makeEmptyBlock(tlv::SignatureValue));
+            data.setSignature(fakeSignature);
+            data.wireEncode();
+            return data;
+        }
 
-shared_ptr<Link>
-makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations)
-{
-  auto link = make_shared<Link>(name, delegations);
-  signData(link);
-  return link;
-}
+        shared_ptr<Link>
+        makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations) {
+            auto link = make_shared<Link>(name, delegations);
+            signData(link);
+            return link;
+        }
 
-lp::Nack
-makeNack(const Interest& interest, lp::NackReason reason)
-{
-  lp::Nack nack(interest);
-  nack.setReason(reason);
-  return nack;
-}
+        lp::Nack
+        makeNack(const Interest& interest, lp::NackReason reason) {
+            lp::Nack nack(interest);
+            nack.setReason(reason);
+            return nack;
+        }
 
-lp::Nack
-makeNack(const Name& name, uint32_t nonce, lp::NackReason reason)
-{
-  Interest interest(name);
-  interest.setNonce(nonce);
-  return makeNack(interest, reason);
-}
+        lp::Nack
+        makeNack(const Name& name, uint32_t nonce, lp::NackReason reason) {
+            Interest interest(name);
+            interest.setNonce(nonce);
+            return makeNack(interest, reason);
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

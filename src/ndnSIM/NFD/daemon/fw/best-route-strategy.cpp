@@ -27,39 +27,37 @@
 #include "algorithm.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const Name BestRouteStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/best-route/%FD%01");
-NFD_REGISTER_STRATEGY(BestRouteStrategy);
+        const Name BestRouteStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/best-route/%FD%01");
+        NFD_REGISTER_STRATEGY(BestRouteStrategy);
 
-BestRouteStrategy::BestRouteStrategy(Forwarder& forwarder, const Name& name)
-  : Strategy(forwarder, name)
-{
-}
+        BestRouteStrategy::BestRouteStrategy(Forwarder& forwarder, const Name& name)
+        : Strategy(forwarder, name) {
+        }
 
-void
-BestRouteStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
-                                        const shared_ptr<pit::Entry>& pitEntry)
-{
-  if (hasPendingOutRecords(*pitEntry)) {
-    // not a new Interest, don't forward
-    return;
-  }
+        void
+        BestRouteStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+                const shared_ptr<pit::Entry>& pitEntry) {
+            if (hasPendingOutRecords(*pitEntry)) {
+                // not a new Interest, don't forward
+                return;
+            }
 
-  const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
-  const fib::NextHopList& nexthops = fibEntry.getNextHops();
+            const fib::Entry& fibEntry = this->lookupFib(*pitEntry);
+            const fib::NextHopList& nexthops = fibEntry.getNextHops();
 
-  for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
-    Face& outFace = it->getFace();
-    if (!wouldViolateScope(inFace, interest, outFace) &&
-        canForwardToLegacy(*pitEntry, outFace)) {
-      this->sendInterest(pitEntry, outFace, interest);
-      return;
-    }
-  }
+            for (fib::NextHopList::const_iterator it = nexthops.begin(); it != nexthops.end(); ++it) {
+                Face& outFace = it->getFace();
+                if (!wouldViolateScope(inFace, interest, outFace) &&
+                        canForwardToLegacy(*pitEntry, outFace)) {
+                    this->sendInterest(pitEntry, outFace, interest);
+                    return;
+                }
+            }
 
-  this->rejectPendingInterest(pitEntry);
-}
+            this->rejectPendingInterest(pitEntry);
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

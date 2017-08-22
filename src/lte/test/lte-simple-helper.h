@@ -33,119 +33,120 @@
 
 namespace ns3 {
 
-class LteTestRrc;
-class LteTestMac;
+    class LteTestRrc;
+    class LteTestMac;
 
-/**
- * Creation and configuration of LTE entities
- *
- */
-class LteSimpleHelper : public Object
-{
-public:
-  LteSimpleHelper (void);
-  virtual ~LteSimpleHelper (void);
+    /**
+     * Creation and configuration of LTE entities
+     *
+     */
+    class LteSimpleHelper : public Object {
+    public:
+        LteSimpleHelper(void);
+        virtual ~LteSimpleHelper(void);
 
-  static TypeId GetTypeId (void);
-  virtual void DoDispose (void);
-
-
-  /**
-   * create a set of eNB devices
-   *
-   * \param c the node container where the devices are to be installed
-   *
-   * \return the NetDeviceContainer with the newly created devices
-   */
-  NetDeviceContainer InstallEnbDevice (NodeContainer c);
-
-  /**
-   * create a set of UE devices
-   *
-   * \param c the node container where the devices are to be installed
-   *
-   * \return the NetDeviceContainer with the newly created devices
-   */
-  NetDeviceContainer InstallUeDevice (NodeContainer c);
+        static TypeId GetTypeId(void);
+        virtual void DoDispose(void);
 
 
-  /**
-   * Enables logging for all components of the LENA architecture
-   *
-   */
-  void EnableLogComponents (void);
+        /**
+         * create a set of eNB devices
+         *
+         * \param c the node container where the devices are to be installed
+         *
+         * \return the NetDeviceContainer with the newly created devices
+         */
+        NetDeviceContainer InstallEnbDevice(NodeContainer c);
 
-  /**
-   * Enables trace sinks for MAC, RLC and PDCP
-   */
-  void EnableTraces (void);
-
-
-  /**
-   * Enable trace sinks for RLC layer
-   */
-  void EnableRlcTraces (void);
-
-  /**
-   * Enable trace sinks for DL RLC layer
-   */
-  void EnableDlRlcTraces (void);
-
-  /**
-   * Enable trace sinks for UL RLC layer
-   */
-  void EnableUlRlcTraces (void);
+        /**
+         * create a set of UE devices
+         *
+         * \param c the node container where the devices are to be installed
+         *
+         * \return the NetDeviceContainer with the newly created devices
+         */
+        NetDeviceContainer InstallUeDevice(NodeContainer c);
 
 
-  /**
-   * Enable trace sinks for PDCP layer
-   */
-  void EnablePdcpTraces (void);
+        /**
+         * Enables logging for all components of the LENA architecture
+         *
+         */
+        void EnableLogComponents(void);
 
-  /**
-   * Enable trace sinks for DL PDCP layer
-   */
-  void EnableDlPdcpTraces (void);
-
-  /**
-   * Enable trace sinks for UL PDCP layer
-   */
-  void EnableUlPdcpTraces (void);
+        /**
+         * Enables trace sinks for MAC, RLC and PDCP
+         */
+        void EnableTraces(void);
 
 
-protected:
-  // inherited from Object
-  virtual void DoInitialize (void);
+        /**
+         * Enable trace sinks for RLC layer
+         */
+        void EnableRlcTraces(void);
 
-private:
-  Ptr<NetDevice> InstallSingleEnbDevice (Ptr<Node> n);
-  Ptr<NetDevice> InstallSingleUeDevice (Ptr<Node> n);
+        /**
+         * Enable trace sinks for DL RLC layer
+         */
+        void EnableDlRlcTraces(void);
 
-  Ptr<SimpleChannel> m_phyChannel;
+        /**
+         * Enable trace sinks for UL RLC layer
+         */
+        void EnableUlRlcTraces(void);
 
-public:
 
-  Ptr<LteTestRrc> m_enbRrc;
-  Ptr<LteTestRrc> m_ueRrc;
+        /**
+         * Enable trace sinks for PDCP layer
+         */
+        void EnablePdcpTraces(void);
 
-  Ptr<LteTestMac> m_enbMac;
-  Ptr<LteTestMac> m_ueMac;
+        /**
+         * Enable trace sinks for DL PDCP layer
+         */
+        void EnableDlPdcpTraces(void);
 
-private:
+        /**
+         * Enable trace sinks for UL PDCP layer
+         */
+        void EnableUlPdcpTraces(void);
 
-  Ptr<LtePdcp>    m_enbPdcp;
-  Ptr<LteRlc>     m_enbRlc;
 
-  Ptr<LtePdcp>    m_uePdcp;
-  Ptr<LteRlc>     m_ueRlc;
+    protected:
+        // inherited from Object
+        virtual void DoInitialize(void);
 
-  ObjectFactory   m_enbDeviceFactory;
-  ObjectFactory   m_ueDeviceFactory;
+    private:
+        Ptr<NetDevice> InstallSingleEnbDevice(Ptr<Node> n);
+        Ptr<NetDevice> InstallSingleUeDevice(Ptr<Node> n);
 
-  enum LteRlcEntityType_t {RLC_UM = 1,
-                           RLC_AM = 2 } m_lteRlcEntityType;
+        Ptr<SimpleChannel> m_phyChannel;
 
-};
+    public:
+
+        Ptr<LteTestRrc> m_enbRrc;
+        Ptr<LteTestRrc> m_ueRrc;
+
+        Ptr<LteTestMac> m_enbMac;
+        Ptr<LteTestMac> m_ueMac;
+
+    private:
+
+        Ptr<LtePdcp> m_enbPdcp;
+        Ptr<LteRlc> m_enbRlc;
+
+        Ptr<LtePdcp> m_uePdcp;
+        Ptr<LteRlc> m_ueRlc;
+
+        ObjectFactory m_enbDeviceFactory;
+        ObjectFactory m_ueDeviceFactory;
+
+        enum LteRlcEntityType_t {
+            RLC_UM = 1,
+            RLC_AM = 2
+        } m_lteRlcEntityType;
+
+    };
 
 
 } // namespace ns3

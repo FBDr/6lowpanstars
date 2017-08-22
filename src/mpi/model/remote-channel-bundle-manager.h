@@ -28,79 +28,75 @@
 
 namespace ns3 {
 
-class RemoteChannelBundle;
+    class RemoteChannelBundle;
 
-/*
- * \ingroup mpi
- * 
- * \brief Singleton for managing the RemoteChannelBundles for each process.
- *
- * Manages collective tasks associated with the bundle collection.
- */
-class RemoteChannelBundleManager
-{
+    /*
+     * \ingroup mpi
+     * 
+     * \brief Singleton for managing the RemoteChannelBundles for each process.
+     *
+     * Manages collective tasks associated with the bundle collection.
+     */
+    class RemoteChannelBundleManager {
+    public:
+        /**
+         * \return remote channel bundle for specified SystemId.
+         */
+        static Ptr<RemoteChannelBundle> Find(uint32_t systemId);
 
-public:
-  /**
-   * \return remote channel bundle for specified SystemId.
-   */
-  static Ptr<RemoteChannelBundle> Find (uint32_t systemId);
+        /**
+         * Add RemoteChannelBundle from this task to MPI task on other side of the link.
+         * Can not be invoked after InitializeNullMessageEvents has been invoked.
+         */
+        static Ptr<RemoteChannelBundle> Add(uint32_t systemId);
 
-  /**
-   * Add RemoteChannelBundle from this task to MPI task on other side of the link.
-   * Can not be invoked after InitializeNullMessageEvents has been invoked.
-   */
-  static Ptr<RemoteChannelBundle> Add (uint32_t systemId);
+        /**
+         * \return number of remote channel bundles
+         * 
+         */
+        static uint32_t Size(void);
 
-  /**
-   * \return number of remote channel bundles
-   * 
-   */
-  static uint32_t Size (void);
+        /**
+         * Setup initial Null Message events for every RemoteChannelBundle.
+         * All RemoteChannelBundles should be added before this method is invoked.
+         */
+        static void InitializeNullMessageEvents(void);
 
-  /**
-   * Setup initial Null Message events for every RemoteChannelBundle.
-   * All RemoteChannelBundles should be added before this method is invoked.
-   */
-  static void InitializeNullMessageEvents (void);
+        /**
+         * \return safe time across all remote channels.
+         */
+        static Time GetSafeTime(void);
 
-  /**
-   * \return safe time across all remote channels.
-   */
-  static Time GetSafeTime (void);
+        /**
+         * Destroy the singleton.
+         */
+        static void Destroy(void);
 
-  /**
-   * Destroy the singleton.
-   */
-  static void Destroy (void);
+    private:
 
-private:
+        /**
+         * Private ctor to prevent creation outside of singleton pattern.
+         */
+        RemoteChannelBundleManager() {
+        }
 
-  /**
-   * Private ctor to prevent creation outside of singleton pattern.
-   */
-  RemoteChannelBundleManager ()
-  {
-  }
+        ~RemoteChannelBundleManager() {
+        }
 
-  ~RemoteChannelBundleManager ()
-  {
-  }
+        /*
+         * Container for all remote channel bundles for this task.
+         *
+         * Would be more efficient to use unordered_map when C++11 is adopted for NS3.
+         */
+        typedef std::map<uint32_t, Ptr<RemoteChannelBundle> > RemoteChannelMap;
+        static RemoteChannelMap g_remoteChannelBundles;
 
-  /*
-   * Container for all remote channel bundles for this task.
-   *
-   * Would be more efficient to use unordered_map when C++11 is adopted for NS3.
-   */
-  typedef std::map<uint32_t, Ptr<RemoteChannelBundle> > RemoteChannelMap;
-  static RemoteChannelMap g_remoteChannelBundles;
-
-  /*
-   * Protect manager class from being initialized twice or incorrect
-   * ordering of method calls.
-   */
-  static bool g_initialized;
-};
+        /*
+         * Protect manager class from being initialized twice or incorrect
+         * ordering of method calls.
+         */
+        static bool g_initialized;
+    };
 
 } // namespace ns3
 

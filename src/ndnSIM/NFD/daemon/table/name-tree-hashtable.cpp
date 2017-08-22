@@ -28,252 +28,232 @@
 #include "core/city-hash.hpp"
 
 namespace nfd {
-namespace name_tree {
+    namespace name_tree {
 
-NFD_LOG_INIT("NameTreeHashtable");
+        NFD_LOG_INIT("NameTreeHashtable");
 
-class Hash32
-{
-public:
-  static HashValue
-  compute(const void* buffer, size_t length)
-  {
-    return static_cast<HashValue>(CityHash32(reinterpret_cast<const char*>(buffer), length));
-  }
-};
+        class Hash32 {
+        public:
 
-class Hash64
-{
-public:
-  static HashValue
-  compute(const void* buffer, size_t length)
-  {
-    return static_cast<HashValue>(CityHash64(reinterpret_cast<const char*>(buffer), length));
-  }
-};
+            static HashValue
+            compute(const void* buffer, size_t length) {
+                return static_cast<HashValue> (CityHash32(reinterpret_cast<const char*> (buffer), length));
+            }
+        };
 
-/** \brief a type with compute static method to compute hash value from a raw buffer
- */
-typedef std::conditional<(sizeof(HashValue) > 4), Hash64, Hash32>::type HashFunc;
+        class Hash64 {
+        public:
 
-HashValue
-computeHash(const Name& name, ssize_t prefixLen)
-{
-  name.wireEncode(); // ensure wire buffer exists
+            static HashValue
+            compute(const void* buffer, size_t length) {
+                return static_cast<HashValue> (CityHash64(reinterpret_cast<const char*> (buffer), length));
+            }
+        };
 
-  HashValue h = 0;
-  for (size_t i = 0, last = prefixLen < 0 ? name.size() : prefixLen; i < last; ++i) {
-    const name::Component& comp = name[i];
-    h ^= HashFunc::compute(comp.wire(), comp.size());
-  }
-  return h;
-}
+        /** \brief a type with compute static method to compute hash value from a raw buffer
+         */
+        typedef std::conditional<(sizeof (HashValue) > 4), Hash64, Hash32>::type HashFunc;
 
-HashSequence
-computeHashes(const Name& name)
-{
-  name.wireEncode(); // ensure wire buffer exists
+        HashValue
+        computeHash(const Name& name, ssize_t prefixLen) {
+            name.wireEncode(); // ensure wire buffer exists
 
-  HashSequence seq;
-  seq.reserve(name.size() + 1);
+            HashValue h = 0;
+            for (size_t i = 0, last = prefixLen < 0 ? name.size() : prefixLen; i < last; ++i) {
+                const name::Component& comp = name[i];
+                h ^= HashFunc::compute(comp.wire(), comp.size());
+            }
+            return h;
+        }
 
-  HashValue h = 0;
-  seq.push_back(h);
+        HashSequence
+        computeHashes(const Name& name) {
+            name.wireEncode(); // ensure wire buffer exists
 
-  for (const name::Component& comp : name) {
-    h ^= HashFunc::compute(comp.wire(), comp.size());
-    seq.push_back(h);
-  }
-  return seq;
-}
+            HashSequence seq;
+            seq.reserve(name.size() + 1);
 
-Node::Node(HashValue h, const Name& name)
-  : hash(h)
-  , prev(nullptr)
-  , next(nullptr)
-  , entry(name, this)
-{
-}
+            HashValue h = 0;
+            seq.push_back(h);
 
-Node::~Node()
-{
-  BOOST_ASSERT(prev == nullptr);
-  BOOST_ASSERT(next == nullptr);
-}
+            for (const name::Component& comp : name) {
+                h ^= HashFunc::compute(comp.wire(), comp.size());
+                seq.push_back(h);
+            }
+            return seq;
+        }
 
-Node*
-getNode(const Entry& entry)
-{
-  return entry.m_node;
-}
+        Node::Node(HashValue h, const Name& name)
+        : hash(h)
+        , prev(nullptr)
+        , next(nullptr)
+        , entry(name, this) {
+        }
 
-HashtableOptions::HashtableOptions(size_t size)
-  : initialSize(size)
-  , minSize(size)
-{
-}
+        Node::~Node() {
+            BOOST_ASSERT(prev == nullptr);
+            BOOST_ASSERT(next == nullptr);
+        }
 
-Hashtable::Hashtable(const Options& options)
-  : m_options(options)
-  , m_size(0)
-{
-  BOOST_ASSERT(m_options.minSize > 0);
-  BOOST_ASSERT(m_options.initialSize >= m_options.minSize);
-  BOOST_ASSERT(m_options.expandLoadFactor > 0.0);
-  BOOST_ASSERT(m_options.expandLoadFactor <= 1.0);
-  BOOST_ASSERT(m_options.expandFactor > 1.0);
-  BOOST_ASSERT(m_options.shrinkLoadFactor >= 0.0);
-  BOOST_ASSERT(m_options.shrinkLoadFactor < 1.0);
-  BOOST_ASSERT(m_options.shrinkFactor > 0.0);
-  BOOST_ASSERT(m_options.shrinkFactor < 1.0);
+        Node*
+        getNode(const Entry& entry) {
+            return entry.m_node;
+        }
 
-  m_buckets.resize(options.initialSize);
-  this->computeThresholds();
-}
+        HashtableOptions::HashtableOptions(size_t size)
+        : initialSize(size)
+        , minSize(size) {
+        }
 
-Hashtable::~Hashtable()
-{
-  for (size_t i = 0; i < m_buckets.size(); ++i) {
-    foreachNode(m_buckets[i], [] (Node* node) {
-      node->prev = node->next = nullptr;
-      delete node;
-    });
-  }
-}
+        Hashtable::Hashtable(const Options& options)
+        : m_options(options)
+        , m_size(0) {
+            BOOST_ASSERT(m_options.minSize > 0);
+            BOOST_ASSERT(m_options.initialSize >= m_options.minSize);
+            BOOST_ASSERT(m_options.expandLoadFactor > 0.0);
+            BOOST_ASSERT(m_options.expandLoadFactor <= 1.0);
+            BOOST_ASSERT(m_options.expandFactor > 1.0);
+            BOOST_ASSERT(m_options.shrinkLoadFactor >= 0.0);
+            BOOST_ASSERT(m_options.shrinkLoadFactor < 1.0);
+            BOOST_ASSERT(m_options.shrinkFactor > 0.0);
+            BOOST_ASSERT(m_options.shrinkFactor < 1.0);
 
-void
-Hashtable::attach(size_t bucket, Node* node)
-{
-  node->prev = nullptr;
-  node->next = m_buckets[bucket];
+            m_buckets.resize(options.initialSize);
+            this->computeThresholds();
+        }
 
-  if (node->next != nullptr) {
-    BOOST_ASSERT(node->next->prev == nullptr);
-    node->next->prev = node;
-  }
+        Hashtable::~Hashtable() {
+            for (size_t i = 0; i < m_buckets.size(); ++i) {
+                foreachNode(m_buckets[i], [] (Node * node) {
+                    node->prev = node->next = nullptr;
+                    delete node;
+                });
+            }
+        }
 
-  m_buckets[bucket] = node;
-}
+        void
+        Hashtable::attach(size_t bucket, Node* node) {
+            node->prev = nullptr;
+            node->next = m_buckets[bucket];
 
-void
-Hashtable::detach(size_t bucket, Node* node)
-{
-  if (node->prev != nullptr) {
-    BOOST_ASSERT(node->prev->next == node);
-    node->prev->next = node->next;
-  }
-  else {
-    BOOST_ASSERT(m_buckets[bucket] == node);
-    m_buckets[bucket] = node->next;
-  }
+            if (node->next != nullptr) {
+                BOOST_ASSERT(node->next->prev == nullptr);
+                node->next->prev = node;
+            }
 
-  if (node->next != nullptr) {
-    BOOST_ASSERT(node->next->prev == node);
-    node->next->prev = node->prev;
-  }
+            m_buckets[bucket] = node;
+        }
 
-  node->prev = node->next = nullptr;
-}
+        void
+        Hashtable::detach(size_t bucket, Node* node) {
+            if (node->prev != nullptr) {
+                BOOST_ASSERT(node->prev->next == node);
+                node->prev->next = node->next;
+            } else {
+                BOOST_ASSERT(m_buckets[bucket] == node);
+                m_buckets[bucket] = node->next;
+            }
 
-std::pair<const Node*, bool>
-Hashtable::findOrInsert(const Name& name, size_t prefixLen, HashValue h, bool allowInsert)
-{
-  size_t bucket = this->computeBucketIndex(h);
+            if (node->next != nullptr) {
+                BOOST_ASSERT(node->next->prev == node);
+                node->next->prev = node->prev;
+            }
 
-  for (const Node* node = m_buckets[bucket]; node != nullptr; node = node->next) {
-    if (node->hash == h && name.compare(0, prefixLen, node->entry.getName()) == 0) {
-      NFD_LOG_TRACE("found " << name.getPrefix(prefixLen) << " hash=" << h << " bucket=" << bucket);
-      return {node, false};
-    }
-  }
+            node->prev = node->next = nullptr;
+        }
 
-  if (!allowInsert) {
-    NFD_LOG_TRACE("not-found " << name.getPrefix(prefixLen) << " hash=" << h << " bucket=" << bucket);
-    return {nullptr, false};
-  }
+        std::pair<const Node*, bool>
+        Hashtable::findOrInsert(const Name& name, size_t prefixLen, HashValue h, bool allowInsert) {
+            size_t bucket = this->computeBucketIndex(h);
 
-  Node* node = new Node(h, name.getPrefix(prefixLen));
-  this->attach(bucket, node);
-  NFD_LOG_TRACE("insert " << node->entry.getName() << " hash=" << h << " bucket=" << bucket);
-  ++m_size;
+            for (const Node* node = m_buckets[bucket]; node != nullptr; node = node->next) {
+                if (node->hash == h && name.compare(0, prefixLen, node->entry.getName()) == 0) {
+                    NFD_LOG_TRACE("found " << name.getPrefix(prefixLen) << " hash=" << h << " bucket=" << bucket);
+                    return {node, false};
+                }
+            }
 
-  if (m_size > m_expandThreshold) {
-    this->resize(static_cast<size_t>(m_options.expandFactor * this->getNBuckets()));
-  }
+            if (!allowInsert) {
+                NFD_LOG_TRACE("not-found " << name.getPrefix(prefixLen) << " hash=" << h << " bucket=" << bucket);
+                return {nullptr, false};
+            }
 
-  return {node, true};
-}
+            Node* node = new Node(h, name.getPrefix(prefixLen));
+            this->attach(bucket, node);
+            NFD_LOG_TRACE("insert " << node->entry.getName() << " hash=" << h << " bucket=" << bucket);
+            ++m_size;
 
-const Node*
-Hashtable::find(const Name& name, size_t prefixLen) const
-{
-  HashValue h = computeHash(name, prefixLen);
-  return const_cast<Hashtable*>(this)->findOrInsert(name, prefixLen, h, false).first;
-}
+            if (m_size > m_expandThreshold) {
+                this->resize(static_cast<size_t> (m_options.expandFactor * this->getNBuckets()));
+            }
 
-const Node*
-Hashtable::find(const Name& name, size_t prefixLen, const HashSequence& hashes) const
-{
-  BOOST_ASSERT(hashes.at(prefixLen) == computeHash(name, prefixLen));
-  return const_cast<Hashtable*>(this)->findOrInsert(name, prefixLen, hashes[prefixLen], false).first;
-}
+            return {node, true};
+        }
 
-std::pair<const Node*, bool>
-Hashtable::insert(const Name& name, size_t prefixLen, const HashSequence& hashes)
-{
-  BOOST_ASSERT(hashes.at(prefixLen) == computeHash(name, prefixLen));
-  return this->findOrInsert(name, prefixLen, hashes[prefixLen], true);
-}
+        const Node*
+        Hashtable::find(const Name& name, size_t prefixLen) const {
+            HashValue h = computeHash(name, prefixLen);
+            return const_cast<Hashtable*> (this)->findOrInsert(name, prefixLen, h, false).first;
+        }
 
-void
-Hashtable::erase(Node* node)
-{
-  BOOST_ASSERT(node != nullptr);
-  BOOST_ASSERT(node->entry.getParent() == nullptr);
+        const Node*
+        Hashtable::find(const Name& name, size_t prefixLen, const HashSequence& hashes) const {
+            BOOST_ASSERT(hashes.at(prefixLen) == computeHash(name, prefixLen));
+            return const_cast<Hashtable*> (this)->findOrInsert(name, prefixLen, hashes[prefixLen], false).first;
+        }
 
-  size_t bucket = this->computeBucketIndex(node->hash);
-  NFD_LOG_TRACE("erase " << node->entry.getName() << " hash=" << node->hash << " bucket=" << bucket);
+        std::pair<const Node*, bool>
+        Hashtable::insert(const Name& name, size_t prefixLen, const HashSequence& hashes) {
+            BOOST_ASSERT(hashes.at(prefixLen) == computeHash(name, prefixLen));
+            return this->findOrInsert(name, prefixLen, hashes[prefixLen], true);
+        }
 
-  this->detach(bucket, node);
-  delete node;
-  --m_size;
+        void
+        Hashtable::erase(Node* node) {
+            BOOST_ASSERT(node != nullptr);
+            BOOST_ASSERT(node->entry.getParent() == nullptr);
 
-  if (m_size < m_shrinkThreshold) {
-    size_t newNBuckets = std::max(m_options.minSize,
-      static_cast<size_t>(m_options.shrinkFactor * this->getNBuckets()));
-    this->resize(newNBuckets);
-  }
-}
+            size_t bucket = this->computeBucketIndex(node->hash);
+            NFD_LOG_TRACE("erase " << node->entry.getName() << " hash=" << node->hash << " bucket=" << bucket);
 
-void
-Hashtable::computeThresholds()
-{
-  m_expandThreshold = static_cast<size_t>(m_options.expandLoadFactor * this->getNBuckets());
-  m_shrinkThreshold = static_cast<size_t>(m_options.shrinkLoadFactor * this->getNBuckets());
-  NFD_LOG_TRACE("thresholds expand=" << m_expandThreshold << " shrink=" << m_shrinkThreshold);
-}
+            this->detach(bucket, node);
+            delete node;
+            --m_size;
 
-void
-Hashtable::resize(size_t newNBuckets)
-{
-  if (this->getNBuckets() == newNBuckets) {
-    return;
-  }
-  NFD_LOG_DEBUG("resize from=" << this->getNBuckets() << " to=" << newNBuckets);
+            if (m_size < m_shrinkThreshold) {
+                size_t newNBuckets = std::max(m_options.minSize,
+                        static_cast<size_t> (m_options.shrinkFactor * this->getNBuckets()));
+                this->resize(newNBuckets);
+            }
+        }
 
-  std::vector<Node*> oldBuckets;
-  oldBuckets.swap(m_buckets);
-  m_buckets.resize(newNBuckets);
+        void
+        Hashtable::computeThresholds() {
+            m_expandThreshold = static_cast<size_t> (m_options.expandLoadFactor * this->getNBuckets());
+            m_shrinkThreshold = static_cast<size_t> (m_options.shrinkLoadFactor * this->getNBuckets());
+            NFD_LOG_TRACE("thresholds expand=" << m_expandThreshold << " shrink=" << m_shrinkThreshold);
+        }
 
-  for (Node* head : oldBuckets) {
-    foreachNode(head, [this] (Node* node) {
-      size_t bucket = this->computeBucketIndex(node->hash);
-      this->attach(bucket, node);
-    });
-  }
+        void
+        Hashtable::resize(size_t newNBuckets) {
+            if (this->getNBuckets() == newNBuckets) {
+                return;
+            }
+            NFD_LOG_DEBUG("resize from=" << this->getNBuckets() << " to=" << newNBuckets);
 
-  this->computeThresholds();
-}
+            std::vector<Node*> oldBuckets;
+            oldBuckets.swap(m_buckets);
+            m_buckets.resize(newNBuckets);
 
-} // namespace name_tree
+            for (Node* head : oldBuckets) {
+                foreachNode(head, [this] (Node * node) {
+                    size_t bucket = this->computeBucketIndex(node->hash);
+                    this->attach(bucket, node);
+                });
+            }
+
+            this->computeThresholds();
+        }
+
+    } // namespace name_tree
 } // namespace nfd

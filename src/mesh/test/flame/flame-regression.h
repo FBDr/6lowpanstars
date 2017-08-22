@@ -25,6 +25,7 @@
 #include "ns3/pcap-file.h"
 
 using namespace ns3;
+
 /**
  * \ingroup flame
  * \brief FLAME protocol regression test of three stations:
@@ -53,57 +54,56 @@ using namespace ns3;
  *             broadcast, and PATH_UPDATE is sent
  * \endverbatim
  */
-class FlameRegressionTest : public TestCase
-{
+class FlameRegressionTest : public TestCase {
 public:
-  FlameRegressionTest ();
-  virtual ~FlameRegressionTest();
+    FlameRegressionTest();
+    virtual ~FlameRegressionTest();
 
-  virtual void DoRun ();
-  void CheckResults ();
+    virtual void DoRun();
+    void CheckResults();
 
 private:
-  /// \internal It is important to have pointers here
-  NodeContainer * m_nodes;
-  /// Simulation time
-  Time m_time;
-  /// Needed to install applications
-  Ipv4InterfaceContainer m_interfaces;
+    /// \internal It is important to have pointers here
+    NodeContainer * m_nodes;
+    /// Simulation time
+    Time m_time;
+    /// Needed to install applications
+    Ipv4InterfaceContainer m_interfaces;
 
-  void CreateNodes ();
-  void CreateDevices ();
-  void InstallApplications ();
+    void CreateNodes();
+    void CreateDevices();
+    void InstallApplications();
 
-  /// Server-side socket
-  Ptr<Socket> m_serverSocket;
-  /// Client-side socket
-  Ptr<Socket> m_clientSocket;
+    /// Server-side socket
+    Ptr<Socket> m_serverSocket;
+    /// Client-side socket
+    Ptr<Socket> m_clientSocket;
 
-  // sent packets counter
-  uint32_t m_sentPktsCounter;
+    // sent packets counter
+    uint32_t m_sentPktsCounter;
 
-  /**
-   * Send data
-   * \param socket the sending socket
-   */
-  void SendData (Ptr<Socket> socket);
+    /**
+     * Send data
+     * \param socket the sending socket
+     */
+    void SendData(Ptr<Socket> socket);
 
-  /**
-   * \brief Handle a packet reception.
-   *
-   * This function is called by lower layers.
-   *
-   * \param socket the socket the packet was received to.
-   */
-  void HandleReadServer (Ptr<Socket> socket);
+    /**
+     * \brief Handle a packet reception.
+     *
+     * This function is called by lower layers.
+     *
+     * \param socket the socket the packet was received to.
+     */
+    void HandleReadServer(Ptr<Socket> socket);
 
-  /**
-   * \brief Handle a packet reception.
-   *
-   * This function is called by lower layers.
-   *
-   * \param socket the socket the packet was received to.
-   */
-  void HandleReadClient (Ptr<Socket> socket);
+    /**
+     * \brief Handle a packet reception.
+     *
+     * This function is called by lower layers.
+     *
+     * \param socket the socket the packet was received to.
+     */
+    void HandleReadClient(Ptr<Socket> socket);
 };
 

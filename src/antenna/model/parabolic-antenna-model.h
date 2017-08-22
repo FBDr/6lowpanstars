@@ -27,46 +27,45 @@
 
 namespace ns3 {
 
-/**
- * 
- * \brief  Antenna model based on a parabolic approximation of the main lobe radiation pattern.
- *
- * This class implements the parabolic model as described in some 3GPP document, e.g., R4-092042
- *
- * A similar model appears in 
- *
- * George Calcev and Matt Dillon, "Antenna Tilt Control in CDMA Networks"
- * in Proc. of the 2nd Annual International Wireless Internet Conference (WICON), 2006
- *
- * though the latter addresses also the elevation plane, which the present model doesn't.
- *
- *
- */
-class ParabolicAntennaModel : public AntennaModel
-{
-public:
+    /**
+     * 
+     * \brief  Antenna model based on a parabolic approximation of the main lobe radiation pattern.
+     *
+     * This class implements the parabolic model as described in some 3GPP document, e.g., R4-092042
+     *
+     * A similar model appears in 
+     *
+     * George Calcev and Matt Dillon, "Antenna Tilt Control in CDMA Networks"
+     * in Proc. of the 2nd Annual International Wireless Internet Conference (WICON), 2006
+     *
+     * though the latter addresses also the elevation plane, which the present model doesn't.
+     *
+     *
+     */
+    class ParabolicAntennaModel : public AntennaModel {
+    public:
 
-  // inherited from Object
-  static TypeId GetTypeId ();
+        // inherited from Object
+        static TypeId GetTypeId();
 
-  // inherited from AntennaModel
-  virtual double GetGainDb (Angles a);
+        // inherited from AntennaModel
+        virtual double GetGainDb(Angles a);
 
 
-  // attribute getters/setters
-  void SetBeamwidth (double beamwidthDegrees);
-  double GetBeamwidth () const;
-  void SetOrientation (double orientationDegrees);
-  double GetOrientation () const;
+        // attribute getters/setters
+        void SetBeamwidth(double beamwidthDegrees);
+        double GetBeamwidth() const;
+        void SetOrientation(double orientationDegrees);
+        double GetOrientation() const;
 
-private:
+    private:
 
-  double m_beamwidthRadians;
+        double m_beamwidthRadians;
 
-  double m_orientationRadians;
+        double m_orientationRadians;
 
-  double m_maxAttenuation;
-};
+        double m_maxAttenuation;
+    };
 
 
 

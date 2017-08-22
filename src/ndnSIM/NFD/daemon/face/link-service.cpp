@@ -27,112 +27,101 @@
 #include "face.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-NFD_LOG_INIT("LinkService");
+        NFD_LOG_INIT("LinkService");
 
-LinkService::LinkService()
-  : m_face(nullptr)
-  , m_transport(nullptr)
-{
-}
+        LinkService::LinkService()
+        : m_face(nullptr)
+        , m_transport(nullptr) {
+        }
 
-LinkService::~LinkService()
-{
-}
+        LinkService::~LinkService() {
+        }
 
-void
-LinkService::setFaceAndTransport(Face& face, Transport& transport)
-{
-  BOOST_ASSERT(m_face == nullptr);
-  BOOST_ASSERT(m_transport == nullptr);
+        void
+        LinkService::setFaceAndTransport(Face& face, Transport& transport) {
+            BOOST_ASSERT(m_face == nullptr);
+            BOOST_ASSERT(m_transport == nullptr);
 
-  m_face = &face;
-  m_transport = &transport;
-}
+            m_face = &face;
+            m_transport = &transport;
+        }
 
-void
-LinkService::sendInterest(const Interest& interest)
-{
-  BOOST_ASSERT(m_transport != nullptr);
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::sendInterest(const Interest& interest) {
+            BOOST_ASSERT(m_transport != nullptr);
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nOutInterests;
+            ++this->nOutInterests;
 
-  doSendInterest(interest);
+            doSendInterest(interest);
 
-  afterSendInterest(interest);
-}
+            afterSendInterest(interest);
+        }
 
-void
-LinkService::sendData(const Data& data)
-{
-  BOOST_ASSERT(m_transport != nullptr);
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::sendData(const Data& data) {
+            BOOST_ASSERT(m_transport != nullptr);
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nOutData;
+            ++this->nOutData;
 
-  doSendData(data);
+            doSendData(data);
 
-  afterSendData(data);
-}
+            afterSendData(data);
+        }
 
-void
-LinkService::sendNack(const ndn::lp::Nack& nack)
-{
-  BOOST_ASSERT(m_transport != nullptr);
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::sendNack(const ndn::lp::Nack& nack) {
+            BOOST_ASSERT(m_transport != nullptr);
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nOutNacks;
+            ++this->nOutNacks;
 
-  doSendNack(nack);
+            doSendNack(nack);
 
-  afterSendNack(nack);
-}
+            afterSendNack(nack);
+        }
 
-void
-LinkService::receiveInterest(const Interest& interest)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::receiveInterest(const Interest& interest) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nInInterests;
+            ++this->nInInterests;
 
-  afterReceiveInterest(interest);
-}
+            afterReceiveInterest(interest);
+        }
 
-void
-LinkService::receiveData(const Data& data)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::receiveData(const Data& data) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nInData;
+            ++this->nInData;
 
-  afterReceiveData(data);
-}
+            afterReceiveData(data);
+        }
 
-void
-LinkService::receiveNack(const ndn::lp::Nack& nack)
-{
-  NFD_LOG_FACE_TRACE(__func__);
+        void
+        LinkService::receiveNack(const ndn::lp::Nack& nack) {
+            NFD_LOG_FACE_TRACE(__func__);
 
-  ++this->nInNacks;
+            ++this->nInNacks;
 
-  afterReceiveNack(nack);
-}
+            afterReceiveNack(nack);
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const FaceLogHelper<LinkService>& flh)
-{
-  const Face* face = flh.obj.getFace();
-  if (face == nullptr) {
-    os << "[id=0,local=unknown,remote=unknown] ";
-  }
-  else {
-    os << "[id=" << face->getId() << ",local=" << face->getLocalUri()
-       << ",remote=" << face->getRemoteUri() << "] ";
-  }
-  return os;
-}
+        std::ostream&
+        operator<<(std::ostream& os, const FaceLogHelper<LinkService>& flh) {
+            const Face* face = flh.obj.getFace();
+            if (face == nullptr) {
+                os << "[id=0,local=unknown,remote=unknown] ";
+            } else {
+                os << "[id=" << face->getId() << ",local=" << face->getLocalUri()
+                        << ",remote=" << face->getRemoteUri() << "] ";
+            }
+            return os;
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

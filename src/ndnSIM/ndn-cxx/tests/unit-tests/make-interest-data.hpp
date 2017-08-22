@@ -28,84 +28,81 @@
 #include "lp/nack.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-/** \brief create an Interest
- *  \param name Interest name
- *  \param nonce if non-zero, set Nonce to this value
- *               (useful for creating Nack with same Nonce)
- */
-shared_ptr<Interest>
-makeInterest(const Name& name, uint32_t nonce = 0);
+        /** \brief create an Interest
+         *  \param name Interest name
+         *  \param nonce if non-zero, set Nonce to this value
+         *               (useful for creating Nack with same Nonce)
+         */
+        shared_ptr<Interest>
+        makeInterest(const Name& name, uint32_t nonce = 0);
 
-/** \brief create a Data with fake signature
- *  \note Data may be modified afterwards without losing the fake signature.
- *        If a real signature is desired, sign again with KeyChain.
- */
-shared_ptr<Data>
-makeData(const Name& name);
+        /** \brief create a Data with fake signature
+         *  \note Data may be modified afterwards without losing the fake signature.
+         *        If a real signature is desired, sign again with KeyChain.
+         */
+        shared_ptr<Data>
+        makeData(const Name& name);
 
-/** \brief add a fake signature to Data
- */
-Data&
-signData(Data& data);
+        /** \brief add a fake signature to Data
+         */
+        Data&
+        signData(Data& data);
 
-/** \brief add a fake signature to Data
- */
-inline shared_ptr<Data>
-signData(shared_ptr<Data> data)
-{
-  signData(*data);
-  return data;
-}
+        /** \brief add a fake signature to Data
+         */
+        inline shared_ptr<Data>
+        signData(shared_ptr<Data> data) {
+            signData(*data);
+            return data;
+        }
 
-/** \brief create a Link object with fake signature
- *  \note Link may be modified afterwards without losing the fake signature.
- *        If a real signature is desired, sign again with KeyChain.
- */
-shared_ptr<Link>
-makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations);
+        /** \brief create a Link object with fake signature
+         *  \note Link may be modified afterwards without losing the fake signature.
+         *        If a real signature is desired, sign again with KeyChain.
+         */
+        shared_ptr<Link>
+        makeLink(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> delegations);
 
-/** \brief create a Nack
- *  \param interest Interest
- *  \param reason Nack reason
- */
-lp::Nack
-makeNack(const Interest& interest, lp::NackReason reason);
+        /** \brief create a Nack
+         *  \param interest Interest
+         *  \param reason Nack reason
+         */
+        lp::Nack
+        makeNack(const Interest& interest, lp::NackReason reason);
 
-/** \brief create a Nack
- *  \param name Interest name
- *  \param nonce Interest nonce
- *  \param reason Nack reason
- */
-lp::Nack
-makeNack(const Name& name, uint32_t nonce, lp::NackReason reason);
+        /** \brief create a Nack
+         *  \param name Interest name
+         *  \param nonce Interest nonce
+         *  \param reason Nack reason
+         */
+        lp::Nack
+        makeNack(const Name& name, uint32_t nonce, lp::NackReason reason);
 
-/** \brief replace a name component
- *  \param[inout] name name
- *  \param index name component index
- *  \param a arguments to name::Component constructor
- */
-template<typename...A>
-void
-setNameComponent(Name& name, ssize_t index, const A& ...a)
-{
-  Name name2 = name.getPrefix(index);
-  name2.append(name::Component(a...));
-  name2.append(name.getSubName(name2.size()));
-  name = name2;
-}
+        /** \brief replace a name component
+         *  \param[inout] name name
+         *  \param index name component index
+         *  \param a arguments to name::Component constructor
+         */
+        template<typename...A>
+        void
+        setNameComponent(Name& name, ssize_t index, const A& ...a) {
+            Name name2 = name.getPrefix(index);
+            name2.append(name::Component(a...));
+            name2.append(name.getSubName(name2.size()));
+            name = name2;
+        }
 
-template<typename PKT, typename...A>
-void
-setNameComponent(PKT& pkt, ssize_t index, const A& ...a)
-{
-  Name name = pkt.getName();
-  setNameComponent(name, index, a...);
-  pkt.setName(name);
-}
+        template<typename PKT, typename...A>
+        void
+        setNameComponent(PKT& pkt, ssize_t index, const A& ...a) {
+            Name name = pkt.getName();
+            setNameComponent(name, index, a...);
+            pkt.setName(name);
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn
 
 #endif // NDN_TESTS_UNIT_TESTS_MAKE_INTEREST_DATA_HPP

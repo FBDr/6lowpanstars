@@ -20,9 +20,9 @@
 #include "ndn-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-ATTRIBUTE_HELPER_CPP(Name);
+        ATTRIBUTE_HELPER_CPP(Name);
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

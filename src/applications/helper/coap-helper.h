@@ -93,7 +93,7 @@ namespace ns3 {
          */
 
 
-        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address> &bucket);
+        void SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket);
 
 
     private:
@@ -214,7 +214,7 @@ namespace ns3 {
          * \returns the applications created, one application per input node.
          */
         ApplicationContainer Install(NodeContainer c) const;
-        
+
         /**
          * Pass the needed IPv6AdressVector to the client application.
          *
@@ -223,7 +223,7 @@ namespace ns3 {
          * 
          */
 
-        void SetIPv6Bucket (Ptr<Application> app, std::vector<Ipv6Address>& bucket);
+        void SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address>& bucket);
 
     private:
         /**

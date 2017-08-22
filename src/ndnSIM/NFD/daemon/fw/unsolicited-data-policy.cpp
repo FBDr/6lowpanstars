@@ -26,72 +26,65 @@
 #include "unsolicited-data-policy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-std::ostream&
-operator<<(std::ostream& os, UnsolicitedDataDecision d)
-{
-  switch (d) {
-    case UnsolicitedDataDecision::DROP:
-      return os << "drop";
-    case UnsolicitedDataDecision::CACHE:
-      return os << "cache";
-  }
-  return os << static_cast<int>(d);
-}
+        std::ostream&
+        operator<<(std::ostream& os, UnsolicitedDataDecision d) {
+            switch (d) {
+                case UnsolicitedDataDecision::DROP:
+                    return os << "drop";
+                case UnsolicitedDataDecision::CACHE:
+                    return os << "cache";
+            }
+            return os << static_cast<int> (d);
+        }
 
-UnsolicitedDataPolicy::Registry&
-UnsolicitedDataPolicy::getRegistry()
-{
-  static Registry registry;
-  return registry;
-}
+        UnsolicitedDataPolicy::Registry&
+        UnsolicitedDataPolicy::getRegistry() {
+            static Registry registry;
+            return registry;
+        }
 
-unique_ptr<UnsolicitedDataPolicy>
-UnsolicitedDataPolicy::create(const std::string& key)
-{
-  Registry& registry = getRegistry();
-  auto i = registry.find(key);
-  return i == registry.end() ? nullptr : i->second();
-}
+        unique_ptr<UnsolicitedDataPolicy>
+        UnsolicitedDataPolicy::create(const std::string& key) {
+            Registry& registry = getRegistry();
+            auto i = registry.find(key);
+            return i == registry.end() ? nullptr : i->second();
+        }
 
-NFD_REGISTER_UNSOLICITED_DATA_POLICY(DropAllUnsolicitedDataPolicy, "drop-all");
+        NFD_REGISTER_UNSOLICITED_DATA_POLICY(DropAllUnsolicitedDataPolicy, "drop-all");
 
-UnsolicitedDataDecision
-DropAllUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const
-{
-  return UnsolicitedDataDecision::DROP;
-}
+        UnsolicitedDataDecision
+        DropAllUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const {
+            return UnsolicitedDataDecision::DROP;
+        }
 
-NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitLocalUnsolicitedDataPolicy, "admit-local");
+        NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitLocalUnsolicitedDataPolicy, "admit-local");
 
-UnsolicitedDataDecision
-AdmitLocalUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const
-{
-  if (inFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
-    return UnsolicitedDataDecision::CACHE;
-  }
-  return UnsolicitedDataDecision::DROP;
-}
+        UnsolicitedDataDecision
+        AdmitLocalUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const {
+            if (inFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
+                return UnsolicitedDataDecision::CACHE;
+            }
+            return UnsolicitedDataDecision::DROP;
+        }
 
-NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitNetworkUnsolicitedDataPolicy, "admit-network");
+        NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitNetworkUnsolicitedDataPolicy, "admit-network");
 
-UnsolicitedDataDecision
-AdmitNetworkUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const
-{
-  if (inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL) {
-    return UnsolicitedDataDecision::CACHE;
-  }
-  return UnsolicitedDataDecision::DROP;
-}
+        UnsolicitedDataDecision
+        AdmitNetworkUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const {
+            if (inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL) {
+                return UnsolicitedDataDecision::CACHE;
+            }
+            return UnsolicitedDataDecision::DROP;
+        }
 
-NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitAllUnsolicitedDataPolicy, "admit-all");
+        NFD_REGISTER_UNSOLICITED_DATA_POLICY(AdmitAllUnsolicitedDataPolicy, "admit-all");
 
-UnsolicitedDataDecision
-AdmitAllUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const
-{
-  return UnsolicitedDataDecision::CACHE;
-}
+        UnsolicitedDataDecision
+        AdmitAllUnsolicitedDataPolicy::decide(const Face& inFace, const Data& data) const {
+            return UnsolicitedDataDecision::CACHE;
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

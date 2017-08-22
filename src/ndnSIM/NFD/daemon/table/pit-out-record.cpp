@@ -26,23 +26,21 @@
 #include "pit-out-record.hpp"
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-OutRecord::OutRecord(Face& face)
-  : FaceRecord(face)
-{
-}
+        OutRecord::OutRecord(Face& face)
+        : FaceRecord(face) {
+        }
 
-bool
-OutRecord::setIncomingNack(const lp::Nack& nack)
-{
-  if (nack.getInterest().getNonce() != this->getLastNonce()) {
-    return false;
-  }
+        bool
+        OutRecord::setIncomingNack(const lp::Nack& nack) {
+            if (nack.getInterest().getNonce() != this->getLastNonce()) {
+                return false;
+            }
 
-  m_incomingNack.reset(new lp::NackHeader(nack.getHeader()));
-  return true;
-}
+            m_incomingNack.reset(new lp::NackHeader(nack.getHeader()));
+            return true;
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd

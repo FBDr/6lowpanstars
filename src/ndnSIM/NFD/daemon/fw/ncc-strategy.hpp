@@ -29,116 +29,114 @@
 #include "strategy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief a forwarding strategy similar to CCNx 0.7.2
- */
-class NccStrategy : public Strategy
-{
-public:
-  explicit
-  NccStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        /** \brief a forwarding strategy similar to CCNx 0.7.2
+         */
+        class NccStrategy : public Strategy {
+        public:
+            explicit
+            NccStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-  virtual void
-  beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
-                        const Face& inFace, const Data& data) override;
+            virtual void
+            beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                    const Face& inFace, const Data& data) override;
 
 PUBLIC_WITH_TESTS_ELSE_PROTECTED:
-  /// StrategyInfo on measurements::Entry
-  class MeasurementsEntryInfo : public StrategyInfo
-  {
-  public:
-    static constexpr int
-    getTypeId()
-    {
-      return 1000;
-    }
+            /// StrategyInfo on measurements::Entry
+            class MeasurementsEntryInfo : public StrategyInfo {
+            public:
 
-    MeasurementsEntryInfo();
+                static constexpr int
+                getTypeId() {
+                    return 1000;
+                }
 
-    void
-    inheritFrom(const MeasurementsEntryInfo& other);
+                MeasurementsEntryInfo();
 
-    shared_ptr<Face>
-    getBestFace();
+                void
+                inheritFrom(const MeasurementsEntryInfo& other);
 
-    void
-    updateBestFace(const Face& face);
+                shared_ptr<Face>
+                getBestFace();
 
-    void
-    adjustPredictUp();
+                void
+                updateBestFace(const Face& face);
 
-  private:
-    void
-    adjustPredictDown();
+                void
+                adjustPredictUp();
 
-    void
-    ageBestFace();
+            private:
+                void
+                adjustPredictDown();
 
-  public:
-    weak_ptr<Face> bestFace;
-    weak_ptr<Face> previousFace;
-    time::microseconds prediction;
+                void
+                ageBestFace();
 
-    static const time::microseconds INITIAL_PREDICTION;
-    static const time::microseconds MIN_PREDICTION;
-    static const int ADJUST_PREDICT_DOWN_SHIFT = 7;
-    static const time::microseconds MAX_PREDICTION;
-    static const int ADJUST_PREDICT_UP_SHIFT = 3;
-  };
+            public:
+                weak_ptr<Face> bestFace;
+                weak_ptr<Face> previousFace;
+                time::microseconds prediction;
 
-  /// StrategyInfo on pit::Entry
-  class PitEntryInfo : public StrategyInfo
-  {
-  public:
-    static constexpr int
-    getTypeId()
-    {
-      return 1001;
-    }
+                static const time::microseconds INITIAL_PREDICTION;
+                static const time::microseconds MIN_PREDICTION;
+                static const int ADJUST_PREDICT_DOWN_SHIFT = 7;
+                static const time::microseconds MAX_PREDICTION;
+                static const int ADJUST_PREDICT_UP_SHIFT = 3;
+            };
 
-    virtual
-    ~PitEntryInfo() override;
+            /// StrategyInfo on pit::Entry
 
-  public:
-    /// timer that expires when best face does not respond within predicted time
-    scheduler::EventId bestFaceTimeout;
-    /// timer for propagating to another face
-    scheduler::EventId propagateTimer;
-    /// maximum interval between forwarding to two nexthops except best and previous
-    time::microseconds maxInterval;
-  };
+            class PitEntryInfo : public StrategyInfo {
+            public:
 
-protected:
-  MeasurementsEntryInfo&
-  getMeasurementsEntryInfo(measurements::Entry* entry);
+                static constexpr int
+                getTypeId() {
+                    return 1001;
+                }
 
-  MeasurementsEntryInfo&
-  getMeasurementsEntryInfo(const shared_ptr<pit::Entry>& entry);
+                virtual
+                ~PitEntryInfo() override;
 
-  /// propagate to another upstream
-  void
-  doPropagate(FaceId inFaceId, weak_ptr<pit::Entry> pitEntryWeak);
+            public:
+                /// timer that expires when best face does not respond within predicted time
+                scheduler::EventId bestFaceTimeout;
+                /// timer for propagating to another face
+                scheduler::EventId propagateTimer;
+                /// maximum interval between forwarding to two nexthops except best and previous
+                time::microseconds maxInterval;
+            };
 
-  /// best face did not reply within prediction
-  void
-  timeoutOnBestFace(weak_ptr<pit::Entry> pitEntryWeak);
+        protected:
+            MeasurementsEntryInfo&
+            getMeasurementsEntryInfo(measurements::Entry* entry);
 
-public:
-  static const Name STRATEGY_NAME;
+            MeasurementsEntryInfo&
+            getMeasurementsEntryInfo(const shared_ptr<pit::Entry>& entry);
 
-protected:
-  static const time::microseconds DEFER_FIRST_WITHOUT_BEST_FACE;
-  static const time::microseconds DEFER_RANGE_WITHOUT_BEST_FACE;
-  static const int UPDATE_MEASUREMENTS_N_LEVELS = 2;
-  static const time::nanoseconds MEASUREMENTS_LIFETIME;
-};
+            /// propagate to another upstream
+            void
+            doPropagate(FaceId inFaceId, weak_ptr<pit::Entry> pitEntryWeak);
 
-} // namespace fw
+            /// best face did not reply within prediction
+            void
+            timeoutOnBestFace(weak_ptr<pit::Entry> pitEntryWeak);
+
+        public:
+            static const Name STRATEGY_NAME;
+
+        protected:
+            static const time::microseconds DEFER_FIRST_WITHOUT_BEST_FACE;
+            static const time::microseconds DEFER_RANGE_WITHOUT_BEST_FACE;
+            static const int UPDATE_MEASUREMENTS_N_LEVELS = 2;
+            static const time::nanoseconds MEASUREMENTS_LIFETIME;
+        };
+
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_NCC_STRATEGY_HPP

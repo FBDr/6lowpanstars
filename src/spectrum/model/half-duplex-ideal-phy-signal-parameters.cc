@@ -23,27 +23,25 @@
 #include "half-duplex-ideal-phy-signal-parameters.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("HalfDuplexIdealPhySignalParameters");
-
-HalfDuplexIdealPhySignalParameters::HalfDuplexIdealPhySignalParameters ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-HalfDuplexIdealPhySignalParameters::HalfDuplexIdealPhySignalParameters (const HalfDuplexIdealPhySignalParameters& p)
-  : SpectrumSignalParameters (p)
-{
-  NS_LOG_FUNCTION (this << &p);
-  data = p.data->Copy ();
-}
+    NS_LOG_COMPONENT_DEFINE("HalfDuplexIdealPhySignalParameters");
 
-Ptr<SpectrumSignalParameters>
-HalfDuplexIdealPhySignalParameters::Copy ()
-{
-  NS_LOG_FUNCTION (this);
-  return Create<HalfDuplexIdealPhySignalParameters> (*this);
-}
+    HalfDuplexIdealPhySignalParameters::HalfDuplexIdealPhySignalParameters() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    HalfDuplexIdealPhySignalParameters::HalfDuplexIdealPhySignalParameters(const HalfDuplexIdealPhySignalParameters & p)
+            : SpectrumSignalParameters(p) {
+        NS_LOG_FUNCTION(this << &p);
+        data = p.data->Copy();
+    }
+
+    Ptr<SpectrumSignalParameters>
+            HalfDuplexIdealPhySignalParameters::Copy() {
+        NS_LOG_FUNCTION(this);
+        return Create<HalfDuplexIdealPhySignalParameters> (*this);
+    }
 
 } // namespace ns3

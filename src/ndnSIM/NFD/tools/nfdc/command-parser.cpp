@@ -28,113 +28,106 @@
 #include <ndn-cxx/util/logger.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-NDN_LOG_INIT(nfdc.CommandParser);
+            NDN_LOG_INIT(nfdc.CommandParser);
 
-static_assert(std::is_same<std::underlying_type<AvailableIn>::type,
-                           std::underlying_type<ParseMode>::type>::value,
-              "AvailableIn and ParseMode must be declared with same underlying type");
+            static_assert(std::is_same<std::underlying_type<AvailableIn>::type,
+                    std::underlying_type<ParseMode>::type>::value,
+                    "AvailableIn and ParseMode must be declared with same underlying type");
 
-std::ostream&
-operator<<(std::ostream& os, AvailableIn modes)
-{
-  text::Separator sep("|");
-  if ((modes & AVAILABLE_IN_ONE_SHOT) != 0) {
-    os << sep << "one-shot";
-  }
-  if ((modes & AVAILABLE_IN_BATCH) != 0) {
-    os << sep << "batch";
-  }
-  if ((modes & AVAILABLE_IN_HELP) == 0) {
-    os << sep << "hidden";
-  }
+            std::ostream&
+            operator<<(std::ostream& os, AvailableIn modes) {
+                text::Separator sep("|");
+                if ((modes & AVAILABLE_IN_ONE_SHOT) != 0) {
+                    os << sep << "one-shot";
+                }
+                if ((modes & AVAILABLE_IN_BATCH) != 0) {
+                    os << sep << "batch";
+                }
+                if ((modes & AVAILABLE_IN_HELP) == 0) {
+                    os << sep << "hidden";
+                }
 
-  if (sep.getCount() == 0) {
-    os << "none";
-  }
-  return os;
-}
+                if (sep.getCount() == 0) {
+                    os << "none";
+                }
+                return os;
+            }
 
-std::ostream&
-operator<<(std::ostream& os, ParseMode mode)
-{
-  switch (mode) {
-    case ParseMode::ONE_SHOT:
-      return os << "one-shot";
-    case ParseMode::BATCH:
-      return os << "batch";
-  }
-  return os << static_cast<int>(mode);
-}
+            std::ostream&
+            operator<<(std::ostream& os, ParseMode mode) {
+                switch (mode) {
+                    case ParseMode::ONE_SHOT:
+                        return os << "one-shot";
+                    case ParseMode::BATCH:
+                        return os << "batch";
+                }
+                return os << static_cast<int> (mode);
+            }
 
-CommandParser&
-CommandParser::addCommand(const CommandDefinition& def, const ExecuteCommand& execute,
-                          std::underlying_type<AvailableIn>::type modes)
-{
-  BOOST_ASSERT(modes != AVAILABLE_IN_NONE);
-  m_commands[{def.getNoun(), def.getVerb()}].reset(
-    new Command{def, execute, static_cast<AvailableIn>(modes)});
+            CommandParser&
+            CommandParser::addCommand(const CommandDefinition& def, const ExecuteCommand& execute,
+                    std::underlying_type<AvailableIn>::type modes) {
+                BOOST_ASSERT(modes != AVAILABLE_IN_NONE);
+                m_commands[{def.getNoun(), def.getVerb()}].reset(
+                        new Command{def, execute, static_cast<AvailableIn> (modes)});
 
-  if ((modes & AVAILABLE_IN_HELP) != 0) {
-    m_commandOrder.push_back(m_commands.find({def.getNoun(), def.getVerb()}));
-  }
+                if ((modes & AVAILABLE_IN_HELP) != 0) {
+                    m_commandOrder.push_back(m_commands.find({def.getNoun(), def.getVerb()}));
+                }
 
-  return *this;
-}
+                return *this;
+            }
 
-CommandParser&
-CommandParser::addAlias(const std::string& noun, const std::string& verb, const std::string& verb2)
-{
-  m_commands[{noun, verb2}] = m_commands.at({noun, verb});
-  return *this;
-}
+            CommandParser&
+            CommandParser::addAlias(const std::string& noun, const std::string& verb, const std::string& verb2) {
+                m_commands[{noun, verb2}] = m_commands.at({noun, verb});
+                return *this;
+            }
 
-std::vector<const CommandDefinition*>
-CommandParser::listCommands(const std::string& noun, ParseMode mode) const
-{
-  std::vector<const CommandDefinition*> results;
-  for (CommandContainer::const_iterator i : m_commandOrder) {
-    const Command& command = *i->second;
-    if ((command.modes & static_cast<AvailableIn>(mode)) != 0 &&
-        (noun.empty() || noun == command.def.getNoun())) {
-      results.push_back(&command.def);
-    }
-  }
-  return results;
-}
+            std::vector<const CommandDefinition*>
+            CommandParser::listCommands(const std::string& noun, ParseMode mode) const {
+                std::vector<const CommandDefinition*> results;
+                for (CommandContainer::const_iterator i : m_commandOrder) {
+                    const Command& command = *i->second;
+                    if ((command.modes & static_cast<AvailableIn> (mode)) != 0 &&
+                            (noun.empty() || noun == command.def.getNoun())) {
+                        results.push_back(&command.def);
+                    }
+                }
+                return results;
+            }
 
-std::tuple<std::string, std::string, CommandArguments, ExecuteCommand>
-CommandParser::parse(const std::vector<std::string>& tokens, ParseMode mode) const
-{
-  BOOST_ASSERT(mode == ParseMode::ONE_SHOT);
+            std::tuple<std::string, std::string, CommandArguments, ExecuteCommand>
+            CommandParser::parse(const std::vector<std::string>& tokens, ParseMode mode) const {
+                BOOST_ASSERT(mode == ParseMode::ONE_SHOT);
 
-  const std::string& noun = tokens.size() > 0 ? tokens[0] : "";
-  const std::string& verb = tokens.size() > 1 ? tokens[1] : "";
-  size_t nameLen = std::min<size_t>(2, tokens.size());
+                const std::string& noun = tokens.size() > 0 ? tokens[0] : "";
+                const std::string& verb = tokens.size() > 1 ? tokens[1] : "";
+                size_t nameLen = std::min<size_t>(2, tokens.size());
 
-  auto i = m_commands.find({noun, verb});
-  if (i == m_commands.end()) {
-    if (verb.empty()) {
-      i = m_commands.find({noun, "list"});
-    }
-    else {
-      // help, exit, quit, legacy nfdc commands
-      i = m_commands.find({noun, ""});
-    }
-    nameLen = std::min<size_t>(1, tokens.size());
-  }
-  if (i == m_commands.end() || (i->second->modes & static_cast<AvailableIn>(mode)) == 0) {
-    BOOST_THROW_EXCEPTION(Error("no such command: " + noun + " " + verb));
-  }
+                auto i = m_commands.find({noun, verb});
+                if (i == m_commands.end()) {
+                    if (verb.empty()) {
+                        i = m_commands.find({noun, "list"});
+                    } else {
+                        // help, exit, quit, legacy nfdc commands
+                        i = m_commands.find({noun, ""});
+                    }
+                    nameLen = std::min<size_t>(1, tokens.size());
+                }
+                if (i == m_commands.end() || (i->second->modes & static_cast<AvailableIn> (mode)) == 0) {
+                    BOOST_THROW_EXCEPTION(Error("no such command: " + noun + " " + verb));
+                }
 
-  const CommandDefinition& def = i->second->def;
-  NDN_LOG_TRACE("found command " << def.getNoun() << " " << def.getVerb());
+                const CommandDefinition& def = i->second->def;
+                NDN_LOG_TRACE("found command " << def.getNoun() << " " << def.getVerb());
 
-  return std::make_tuple(def.getNoun(), def.getVerb(), def.parse(tokens, nameLen), i->second->execute);
-}
+                return std::make_tuple(def.getNoun(), def.getVerb(), def.parse(tokens, nameLen), i->second->execute);
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

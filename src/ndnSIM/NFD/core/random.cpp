@@ -28,15 +28,14 @@
 
 namespace nfd {
 
-std::mt19937&
-getGlobalRng()
-{
-  static boost::thread_specific_ptr<std::mt19937> rng;
-  if (rng.get() == nullptr) {
-    std::random_device rd;
-    rng.reset(new std::mt19937(rd()));
-  }
-  return *rng;
-}
+    std::mt19937&
+    getGlobalRng() {
+        static boost::thread_specific_ptr<std::mt19937> rng;
+        if (rng.get() == nullptr) {
+            std::random_device rd;
+            rng.reset(new std::mt19937(rd()));
+        }
+        return *rng;
+    }
 
 } // namespace nfd

@@ -34,95 +34,90 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
-namespace ip = boost::asio::ip;
-using ip::tcp;
+            using namespace nfd::tests;
+            namespace ip = boost::asio::ip;
+            using ip::tcp;
 
-class TcpTransportFixture : public BaseFixture
-{
-protected:
-  TcpTransportFixture()
-    : transport(nullptr)
-    , remoteSocket(g_io)
-    , receivedPackets(nullptr)
-    , acceptor(g_io)
-  {
-  }
+            class TcpTransportFixture : public BaseFixture {
+            protected:
 
-  void
-  startAccept(const tcp::endpoint& remoteEp)
-  {
-    BOOST_REQUIRE(!acceptor.is_open());
-    acceptor.open(remoteEp.protocol());
-    acceptor.set_option(tcp::acceptor::reuse_address(true));
-    acceptor.bind(remoteEp);
-    acceptor.listen(1);
-    acceptor.async_accept(remoteSocket, [this] (const boost::system::error_code& error) {
-      BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-      limitedIo.afterOp();
-    });
-  }
+                TcpTransportFixture()
+                : transport(nullptr)
+                , remoteSocket(g_io)
+                , receivedPackets(nullptr)
+                , acceptor(g_io) {
+                }
 
-  void
-  stopAccept()
-  {
-    BOOST_REQUIRE(acceptor.is_open());
-    acceptor.close();
-  }
+                void
+                startAccept(const tcp::endpoint& remoteEp) {
+                    BOOST_REQUIRE(!acceptor.is_open());
+                    acceptor.open(remoteEp.protocol());
+                    acceptor.set_option(tcp::acceptor::reuse_address(true));
+                    acceptor.bind(remoteEp);
+                    acceptor.listen(1);
+                    acceptor.async_accept(remoteSocket, [this] (const boost::system::error_code & error) {
+                        BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                        limitedIo.afterOp();
+                    });
+                }
 
-  void
-  initialize(ip::address address = ip::address_v4::loopback(),
-             ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT)
-  {
-    tcp::endpoint remoteEp(address, 7070);
-    startAccept(remoteEp);
+                void
+                stopAccept() {
+                    BOOST_REQUIRE(acceptor.is_open());
+                    acceptor.close();
+                }
 
-    tcp::socket sock(g_io);
-    sock.async_connect(remoteEp, [this] (const boost::system::error_code& error) {
-      BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-      limitedIo.afterOp();
-    });
+                void
+                initialize(ip::address address = ip::address_v4::loopback(),
+                        ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT) {
+                    tcp::endpoint remoteEp(address, 7070);
+                    startAccept(remoteEp);
 
-    BOOST_REQUIRE_EQUAL(limitedIo.run(2, time::seconds(1)), LimitedIo::EXCEED_OPS);
+                    tcp::socket sock(g_io);
+                    sock.async_connect(remoteEp, [this] (const boost::system::error_code & error) {
+                        BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                        limitedIo.afterOp();
+                    });
 
-    localEp = sock.local_endpoint();
-    face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
-                             make_unique<TcpTransport>(std::move(sock), persistency));
-    transport = static_cast<TcpTransport*>(face->getTransport());
-    receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
+                    BOOST_REQUIRE_EQUAL(limitedIo.run(2, time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
-  }
+                    localEp = sock.local_endpoint();
+                    face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
+                            make_unique<TcpTransport>(std::move(sock), persistency));
+                    transport = static_cast<TcpTransport*> (face->getTransport());
+                    receivedPackets = &static_cast<DummyReceiveLinkService*> (face->getLinkService())->receivedPackets;
 
-  void
-  remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true)
-  {
-    boost::asio::async_write(remoteSocket, boost::asio::buffer(buf),
-      [needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-      });
-    limitedIo.defer(time::seconds(1));
-  }
+                    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
+                }
 
-protected:
-  LimitedIo limitedIo;
-  TcpTransport* transport;
-  tcp::endpoint localEp;
-  tcp::socket remoteSocket;
-  std::vector<Transport::Packet>* receivedPackets;
+                void
+                remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true) {
+                    boost::asio::async_write(remoteSocket, boost::asio::buffer(buf),
+                            [needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                            });
+                    limitedIo.defer(time::seconds(1));
+                }
 
-private:
-  tcp::acceptor acceptor;
-  unique_ptr<Face> face;
-};
+            protected:
+                LimitedIo limitedIo;
+                TcpTransport* transport;
+                tcp::endpoint localEp;
+                tcp::socket remoteSocket;
+                std::vector<Transport::Packet>* receivedPackets;
 
-} // namespace tests
-} // namespace face
+            private:
+                tcp::acceptor acceptor;
+                unique_ptr<Face> face;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_TCP_TRANSPORT_FIXTURE_HPP

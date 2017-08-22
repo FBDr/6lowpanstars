@@ -25,7 +25,7 @@
 #include <vector>
 
 namespace ns3 {
-typedef std::vector<bool> bvec;
+    typedef std::vector<bool> bvec;
 }
 
 #endif /* BVEC_H */

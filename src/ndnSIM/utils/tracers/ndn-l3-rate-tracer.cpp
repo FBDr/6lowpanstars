@@ -258,148 +258,138 @@ const double alpha = 0.8;
   os << printName << "\t" << STATS(2).fieldName << "\t" << STATS(3).fieldName << "\t"              \
      << STATS(0).fieldName << "\t" << STATS(1).fieldName / 1024.0 << "\n";
 
-void
-L3RateTracer::Print(std::ostream& os) const
-{
-  Time time = Simulator::Now();
+        void
+        L3RateTracer::Print(std::ostream& os) const {
+            Time time = Simulator::Now();
 
-  for (auto& stats : m_stats) {
-    if (stats.first == nfd::face::INVALID_FACEID)
-      continue;
+            for (auto& stats : m_stats) {
+                if (stats.first == nfd::face::INVALID_FACEID)
+                    continue;
 
-    PRINTER("InInterests", m_inInterests);
-    PRINTER("OutInterests", m_outInterests);
+                PRINTER("InInterests", m_inInterests);
+                PRINTER("OutInterests", m_outInterests);
 
-    PRINTER("InData", m_inData);
-    PRINTER("OutData", m_outData);
+                PRINTER("InData", m_inData);
+                PRINTER("OutData", m_outData);
 
-    PRINTER("InNacks", m_inNack);
-    PRINTER("OutNacks", m_outNack);
+                PRINTER("InNacks", m_inNack);
+                PRINTER("OutNacks", m_outNack);
 
-    PRINTER("InSatisfiedInterests", m_satisfiedInterests);
-    PRINTER("InTimedOutInterests", m_timedOutInterests);
+                PRINTER("InSatisfiedInterests", m_satisfiedInterests);
+                PRINTER("InTimedOutInterests", m_timedOutInterests);
 
-    PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
-    PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
-  }
+                PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
+                PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
+            }
 
-  {
-    auto i = m_stats.find(nfd::face::INVALID_FACEID);
-    if (i != m_stats.end()) {
-      auto& stats = *i;
-      PRINTER("SatisfiedInterests", m_satisfiedInterests);
-      PRINTER("TimedOutInterests", m_timedOutInterests);
-    }
-  }
-}
+            {
+                auto i = m_stats.find(nfd::face::INVALID_FACEID);
+                if (i != m_stats.end()) {
+                    auto& stats = *i;
+                    PRINTER("SatisfiedInterests", m_satisfiedInterests);
+                    PRINTER("TimedOutInterests", m_timedOutInterests);
+                }
+            }
+        }
 
-void
-L3RateTracer::OutInterests(const Interest& interest, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_outInterests++;
-  if (interest.hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_outInterests +=
-      interest.wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::OutInterests(const Interest& interest, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_outInterests++;
+            if (interest.hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_outInterests +=
+                        interest.wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::InInterests(const Interest& interest, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_inInterests++;
-  if (interest.hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_inInterests +=
-      interest.wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::InInterests(const Interest& interest, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_inInterests++;
+            if (interest.hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_inInterests +=
+                        interest.wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::OutData(const Data& data, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_outData++;
-  if (data.hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_outData +=
-      data.wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::OutData(const Data& data, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_outData++;
+            if (data.hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_outData +=
+                        data.wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::InData(const Data& data, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_inData++;
-  if (data.hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_inData +=
-      data.wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::InData(const Data& data, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_inData++;
+            if (data.hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_inData +=
+                        data.wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::OutNack(const lp::Nack& nack, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_outNack++;
-  if (nack.getInterest().hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_outNack +=
-      nack.getInterest().wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::OutNack(const lp::Nack& nack, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_outNack++;
+            if (nack.getInterest().hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_outNack +=
+                        nack.getInterest().wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::InNack(const lp::Nack& nack, const Face& face)
-{
-  AddInfo(face);
-  std::get<0>(m_stats[face.getId()]).m_inNack++;
-  if (nack.getInterest().hasWire()) {
-    std::get<1>(m_stats[face.getId()]).m_inNack +=
-      nack.getInterest().wireEncode().size();
-  }
-}
+        void
+        L3RateTracer::InNack(const lp::Nack& nack, const Face& face) {
+            AddInfo(face);
+            std::get<0>(m_stats[face.getId()]).m_inNack++;
+            if (nack.getInterest().hasWire()) {
+                std::get<1>(m_stats[face.getId()]).m_inNack +=
+                        nack.getInterest().wireEncode().size();
+            }
+        }
 
-void
-L3RateTracer::SatisfiedInterests(const nfd::pit::Entry& entry, const Face&, const Data&)
-{
-  std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_satisfiedInterests++;
-  // no "size" stats
+        void
+        L3RateTracer::SatisfiedInterests(const nfd::pit::Entry& entry, const Face&, const Data&) {
+            std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_satisfiedInterests++;
+            // no "size" stats
 
-  for (const auto& in : entry.getInRecords()) {
-    AddInfo(in.getFace());
-    std::get<0>(m_stats[(in.getFace()).getId()]).m_satisfiedInterests ++;
-  }
+            for (const auto& in : entry.getInRecords()) {
+                AddInfo(in.getFace());
+                std::get<0>(m_stats[(in.getFace()).getId()]).m_satisfiedInterests++;
+            }
 
-  for (const auto& out : entry.getOutRecords()) {
-    AddInfo(out.getFace());
-    std::get<0>(m_stats[(out.getFace()).getId()]).m_outSatisfiedInterests ++;
-  }
-}
+            for (const auto& out : entry.getOutRecords()) {
+                AddInfo(out.getFace());
+                std::get<0>(m_stats[(out.getFace()).getId()]).m_outSatisfiedInterests++;
+            }
+        }
 
-void
-L3RateTracer::TimedOutInterests(const nfd::pit::Entry& entry)
-{
-  std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_timedOutInterests++;
-  // no "size" stats
+        void
+        L3RateTracer::TimedOutInterests(const nfd::pit::Entry& entry) {
+            std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_timedOutInterests++;
+            // no "size" stats
 
-  for (const auto& in : entry.getInRecords()) {
-    AddInfo(in.getFace());
-    std::get<0>(m_stats[(in.getFace()).getId()]).m_timedOutInterests++;
-  }
+            for (const auto& in : entry.getInRecords()) {
+                AddInfo(in.getFace());
+                std::get<0>(m_stats[(in.getFace()).getId()]).m_timedOutInterests++;
+            }
 
-  for (const auto& out : entry.getOutRecords()) {
-    AddInfo(out.getFace());
-    std::get<0>(m_stats[(out.getFace()).getId()]).m_outTimedOutInterests++;
-  }
-}
+            for (const auto& out : entry.getOutRecords()) {
+                AddInfo(out.getFace());
+                std::get<0>(m_stats[(out.getFace()).getId()]).m_outTimedOutInterests++;
+            }
+        }
 
-void
-L3RateTracer::AddInfo(const Face& face)
-{
-  if (m_faceInfos.find(face.getId()) == m_faceInfos.end()) {
-    m_faceInfos.insert(make_pair(face.getId(), boost::lexical_cast<std::string>(face.getLocalUri())));
-  }
-}
+        void
+        L3RateTracer::AddInfo(const Face& face) {
+            if (m_faceInfos.find(face.getId()) == m_faceInfos.end()) {
+                m_faceInfos.insert(make_pair(face.getId(), boost::lexical_cast<std::string>(face.getLocalUri())));
+            }
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

@@ -34,207 +34,193 @@ using namespace ns3;
 
 class AbstractAnimationInterfaceTestCase : public TestCase
 {
-public:
-  /**
-   * \brief Constructor.
-   */
-  AbstractAnimationInterfaceTestCase (std::string name);
-  /**
-   * \brief Destructor.
-   */
-  virtual
-  ~AbstractAnimationInterfaceTestCase ();
-  /**
-   * \brief Run unit tests for this class.
-   * \return false if all tests have passed, false otherwise
-   */
-  virtual void
-  DoRun (void);
+    public :
+    /**
+     * \brief Constructor.
+     */
+    AbstractAnimationInterfaceTestCase(std::string name);
+    /**
+     * \brief Destructor.
+     */
+    virtual
+    ~AbstractAnimationInterfaceTestCase();
+    /**
+     * \brief Run unit tests for this class.
+     * \return false if all tests have passed, false otherwise
+     */
+    virtual void
+    DoRun(void);
 
 protected:
 
-  NodeContainer m_nodes;
-  AnimationInterface* m_anim;
+    NodeContainer m_nodes;
+    AnimationInterface* m_anim;
 
 private:
 
-  virtual void
-  PrepareNetwork () = 0;
+    virtual void
+    PrepareNetwork() = 0;
 
-  virtual void
-  CheckLogic () = 0;
+    virtual void
+    CheckLogic() = 0;
 
-  virtual void
-  CheckFileExistence ();
+    virtual void
+    CheckFileExistence();
 
-  const char* m_traceFileName;
-};
+    const char* m_traceFileName;};
 
-AbstractAnimationInterfaceTestCase::AbstractAnimationInterfaceTestCase (std::string name) :
-  TestCase (name), m_anim (NULL), m_traceFileName ("netanim-test.xml")
-{
+AbstractAnimationInterfaceTestCase::AbstractAnimationInterfaceTestCase(std::string name) :
+TestCase(name), m_anim(NULL), m_traceFileName("netanim-test.xml") {
 }
 
-AbstractAnimationInterfaceTestCase::~AbstractAnimationInterfaceTestCase ()
-{
-  delete m_anim;
+AbstractAnimationInterfaceTestCase::~AbstractAnimationInterfaceTestCase() {
+    delete m_anim;
 }
 
 void
-AbstractAnimationInterfaceTestCase::DoRun (void)
-{
-  PrepareNetwork ();
+AbstractAnimationInterfaceTestCase::DoRun(void) {
+    PrepareNetwork();
 
-  m_anim = new AnimationInterface (m_traceFileName);
+    m_anim = new AnimationInterface(m_traceFileName);
 
-  Simulator::Run ();
-  CheckLogic ();
-  CheckFileExistence ();
-  Simulator::Destroy ();
+    Simulator::Run();
+    CheckLogic();
+    CheckFileExistence();
+    Simulator::Destroy();
 }
 
 void
-AbstractAnimationInterfaceTestCase::CheckFileExistence ()
-{
-  FILE * fp = fopen (m_traceFileName, "r");
-  NS_TEST_ASSERT_MSG_NE (fp, 0, "Trace file was not created");
-  fclose (fp);
-  unlink (m_traceFileName);
+AbstractAnimationInterfaceTestCase::CheckFileExistence() {
+    FILE * fp = fopen(m_traceFileName, "r");
+    NS_TEST_ASSERT_MSG_NE(fp, 0, "Trace file was not created");
+    fclose(fp);
+    unlink(m_traceFileName);
 }
 
 class AnimationInterfaceTestCase : public AbstractAnimationInterfaceTestCase
 {
-public:
-  /**
-   * \brief Constructor.
-   */
-  AnimationInterfaceTestCase ();
+    public :
+    /**
+     * \brief Constructor.
+     */
+    AnimationInterfaceTestCase();
 
 private:
 
-  virtual void
-  PrepareNetwork ();
+    virtual void
+    PrepareNetwork();
 
-  virtual void
-  CheckLogic ();
-
+    virtual void
+    CheckLogic();
 };
 
-AnimationInterfaceTestCase::AnimationInterfaceTestCase () :
-  AbstractAnimationInterfaceTestCase ("Verify AnimationInterface")
-{
+AnimationInterfaceTestCase::AnimationInterfaceTestCase() :
+AbstractAnimationInterfaceTestCase("Verify AnimationInterface") {
 }
 
 void
-AnimationInterfaceTestCase::PrepareNetwork (void)
-{
-  m_nodes.Create (2);
-  AnimationInterface::SetConstantPosition (m_nodes.Get (0), 0 , 10);
-  AnimationInterface::SetConstantPosition (m_nodes.Get (1), 1 , 10);
+AnimationInterfaceTestCase::PrepareNetwork(void) {
+    m_nodes.Create(2);
+    AnimationInterface::SetConstantPosition(m_nodes.Get(0), 0, 10);
+    AnimationInterface::SetConstantPosition(m_nodes.Get(1), 1, 10);
 
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+    PointToPointHelper pointToPoint;
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (m_nodes);
+    NetDeviceContainer devices;
+    devices = pointToPoint.Install(m_nodes);
 
-  InternetStackHelper stack;
-  stack.Install (m_nodes);
+    InternetStackHelper stack;
+    stack.Install(m_nodes);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.0");
+    Ipv4AddressHelper address;
+    address.SetBase("10.1.1.0", "255.255.255.0");
 
-  Ipv4InterfaceContainer interfaces = address.Assign (devices);
+    Ipv4InterfaceContainer interfaces = address.Assign(devices);
 
-  UdpEchoServerHelper echoServer (9);
+    UdpEchoServerHelper echoServer(9);
 
-  ApplicationContainer serverApps = echoServer.Install (m_nodes.Get (1));
-  serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (10.0));
+    ApplicationContainer serverApps = echoServer.Install(m_nodes.Get(1));
+    serverApps.Start(Seconds(1.0));
+    serverApps.Stop(Seconds(10.0));
 
-  UdpEchoClientHelper echoClient (interfaces.GetAddress (1), 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (100));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+    UdpEchoClientHelper echoClient(interfaces.GetAddress(1), 9);
+    echoClient.SetAttribute("MaxPackets", UintegerValue(100));
+    echoClient.SetAttribute("Interval", TimeValue(Seconds(1.0)));
+    echoClient.SetAttribute("PacketSize", UintegerValue(1024));
 
-  ApplicationContainer clientApps = echoClient.Install (m_nodes.Get (0));
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+    ApplicationContainer clientApps = echoClient.Install(m_nodes.Get(0));
+    clientApps.Start(Seconds(2.0));
+    clientApps.Stop(Seconds(10.0));
 }
 
 void
-AnimationInterfaceTestCase::CheckLogic (void)
-{
-  NS_TEST_ASSERT_MSG_EQ (m_anim->GetTracePktCount (), 16, "Expected 16 packets traced");
+AnimationInterfaceTestCase::CheckLogic(void) {
+    NS_TEST_ASSERT_MSG_EQ(m_anim->GetTracePktCount(), 16, "Expected 16 packets traced");
 }
 
 class AnimationRemainingEnergyTestCase : public AbstractAnimationInterfaceTestCase
 {
-public:
-  /**
-   * \brief Constructor.
-   */
-  AnimationRemainingEnergyTestCase ();
+    public :
+    /**
+     * \brief Constructor.
+     */
+    AnimationRemainingEnergyTestCase();
 
 private:
 
-  virtual void
-  PrepareNetwork ();
+    virtual void
+    PrepareNetwork();
 
-  virtual void
-  CheckLogic ();
+    virtual void
+    CheckLogic();
 
-  Ptr<BasicEnergySource> m_energySource;
-  Ptr<SimpleDeviceEnergyModel> m_energyModel;
-  const double m_initialEnergy;
-};
+    Ptr<BasicEnergySource> m_energySource;
+    Ptr<SimpleDeviceEnergyModel> m_energyModel;
+    const double m_initialEnergy;};
 
-AnimationRemainingEnergyTestCase::AnimationRemainingEnergyTestCase () :
-  AbstractAnimationInterfaceTestCase ("Verify Remaining energy tracing"),
-  m_initialEnergy (100)
-{
+AnimationRemainingEnergyTestCase::AnimationRemainingEnergyTestCase() :
+AbstractAnimationInterfaceTestCase("Verify Remaining energy tracing"),
+m_initialEnergy(100) {
 }
 
 void
-AnimationRemainingEnergyTestCase::PrepareNetwork (void)
-{
-  m_energySource = CreateObject<BasicEnergySource>();
-  m_energyModel = CreateObject<SimpleDeviceEnergyModel>();
+AnimationRemainingEnergyTestCase::PrepareNetwork(void) {
+    m_energySource = CreateObject<BasicEnergySource>();
+    m_energyModel = CreateObject<SimpleDeviceEnergyModel>();
 
-  m_energySource->SetInitialEnergy (m_initialEnergy);
-  m_energyModel->SetEnergySource (m_energySource);
-  m_energySource->AppendDeviceEnergyModel (m_energyModel);
-  m_energyModel->SetCurrentA (20);
+    m_energySource->SetInitialEnergy(m_initialEnergy);
+    m_energyModel->SetEnergySource(m_energySource);
+    m_energySource->AppendDeviceEnergyModel(m_energyModel);
+    m_energyModel->SetCurrentA(20);
 
-  m_nodes.Create (1);
-  AnimationInterface::SetConstantPosition (m_nodes.Get (0), 0 , 10);
+    m_nodes.Create(1);
+    AnimationInterface::SetConstantPosition(m_nodes.Get(0), 0, 10);
 
-  // aggregate energy source to node
-  m_nodes.Get (0)->AggregateObject (m_energySource);
-  // once node's energy will be depleted according to the model
-  Simulator::Stop (Seconds (2));
+    // aggregate energy source to node
+    m_nodes.Get(0)->AggregateObject(m_energySource);
+    // once node's energy will be depleted according to the model
+    Simulator::Stop(Seconds(2));
 }
 
 void
-AnimationRemainingEnergyTestCase::CheckLogic (void)
-{
-  const double remainingEnergy = m_energySource->GetRemainingEnergy ();
+AnimationRemainingEnergyTestCase::CheckLogic(void) {
+    const double remainingEnergy = m_energySource->GetRemainingEnergy();
 
-  NS_TEST_ASSERT_MSG_EQ ((remainingEnergy < m_initialEnergy), true, "Energy hasn't depleted!");
-  NS_TEST_ASSERT_MSG_EQ_TOL (m_anim->GetNodeEnergyFraction (m_nodes.Get (0)),
-                            remainingEnergy / m_initialEnergy,
-                            1.0e-13,
-                            "Wrong remaining energy value was traced");
+    NS_TEST_ASSERT_MSG_EQ((remainingEnergy < m_initialEnergy), true, "Energy hasn't depleted!");
+    NS_TEST_ASSERT_MSG_EQ_TOL(m_anim->GetNodeEnergyFraction(m_nodes.Get(0)),
+            remainingEnergy / m_initialEnergy,
+            1.0e-13,
+            "Wrong remaining energy value was traced");
 }
 
 static class AnimationInterfaceTestSuite : public TestSuite
 {
-public:
-  AnimationInterfaceTestSuite () :
-    TestSuite ("animation-interface", UNIT)
-  {
-    AddTestCase (new AnimationInterfaceTestCase (), TestCase::QUICK);
-    AddTestCase (new AnimationRemainingEnergyTestCase (), TestCase::QUICK);
-  }
-} g_animationInterfaceTestSuite;
+    public :
+    AnimationInterfaceTestSuite() :
+    TestSuite("animation-interface", UNIT)
+    {
+        AddTestCase(new AnimationInterfaceTestCase(), TestCase::QUICK);
+        AddTestCase(new AnimationRemainingEnergyTestCase(), TestCase::QUICK);
+    }} g_animationInterfaceTestSuite;

@@ -29,131 +29,125 @@
 #include <boost/mpl/vector.hpp>
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_AUTO_TEST_SUITE(TestDatagramTransport)
+            BOOST_AUTO_TEST_SUITE(Face)
+            BOOST_AUTO_TEST_SUITE(TestDatagramTransport)
 
-typedef boost::mpl::vector<UnicastUdpTransportFixture,
-                           MulticastUdpTransportFixture
-                           > DatagramTransportFixtures;
+            typedef boost::mpl::vector<UnicastUdpTransportFixture,
+            MulticastUdpTransportFixture
+            > DatagramTransportFixtures;
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(Send, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(Send, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  auto block1 = ndn::encoding::makeStringBlock(300, "hello");
-  this->transport->send(Transport::Packet{Block{block1}}); // make a copy of the block
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nOutPackets, 1);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nOutBytes, block1.size());
+                auto block1 = ndn::encoding::makeStringBlock(300, "hello");
+                this->transport->send(Transport::Packet{Block
+                    {block1}}); // make a copy of the block
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nOutPackets, 1);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nOutBytes, block1.size());
 
-  std::vector<uint8_t> readBuf(block1.size());
-  this->remoteRead(readBuf);
+                std::vector<uint8_t> readBuf(block1.size());
+                this->remoteRead(readBuf);
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(readBuf.begin(), readBuf.end(), block1.begin(), block1.end());
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
-}
+                BOOST_CHECK_EQUAL_COLLECTIONS(readBuf.begin(), readBuf.end(), block1.begin(), block1.end());
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+            }
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveNormal, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveNormal, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  Block pkt = ndn::encoding::makeStringBlock(300, "hello");
-  ndn::Buffer buf(pkt.begin(), pkt.end());
-  this->remoteWrite(buf);
+                Block pkt = ndn::encoding::makeStringBlock(300, "hello");
+                ndn::Buffer buf(pkt.begin(), pkt.end());
+                this->remoteWrite(buf);
 
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, pkt.size());
-  BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
-}
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, pkt.size());
+                BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+            }
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveIncomplete, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveIncomplete, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  std::vector<uint8_t> buf{
-    0x05, 0x03, 0x00, 0x01,
-  };
-  this->remoteWrite(buf);
+                std::vector<uint8_t> buf{
+                    0x05, 0x03, 0x00, 0x01,};
+                this->remoteWrite(buf);
 
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 0);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, 0);
-  BOOST_CHECK_EQUAL(this->receivedPackets->size(), 0);
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
-}
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 0);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, 0);
+                BOOST_CHECK_EQUAL(this->receivedPackets->size(), 0);
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+            }
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveTrailingGarbage, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveTrailingGarbage, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
-  Block pkt2 = ndn::encoding::makeStringBlock(301, "world");
-  ndn::Buffer buf(pkt1.size() + pkt2.size());
-  std::copy(pkt1.begin(), pkt1.end(), buf.buf());
-  std::copy(pkt2.begin(), pkt2.end(), buf.buf() + pkt1.size());
+                Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
+                Block pkt2 = ndn::encoding::makeStringBlock(301, "world");
+                ndn::Buffer buf(pkt1.size() + pkt2.size());
+                std::copy(pkt1.begin(), pkt1.end(), buf.buf());
+                std::copy(pkt2.begin(), pkt2.end(), buf.buf() + pkt1.size());
 
-  this->remoteWrite(buf);
+                this->remoteWrite(buf);
 
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 0);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, 0);
-  BOOST_CHECK_EQUAL(this->receivedPackets->size(), 0);
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
-}
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 0);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, 0);
+                BOOST_CHECK_EQUAL(this->receivedPackets->size(), 0);
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+            }
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveTooLarge, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(ReceiveTooLarge, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  std::vector<uint8_t> bytes(ndn::MAX_NDN_PACKET_SIZE, 0);
-  Block pkt1 = ndn::encoding::makeBinaryBlock(300, bytes.data(), bytes.size() - 6);
-  ndn::Buffer buf1(pkt1.begin(), pkt1.end());
-  BOOST_REQUIRE_EQUAL(buf1.size(), ndn::MAX_NDN_PACKET_SIZE);
+                std::vector<uint8_t> bytes(ndn::MAX_NDN_PACKET_SIZE, 0);
+                Block pkt1 = ndn::encoding::makeBinaryBlock(300, bytes.data(), bytes.size() - 6);
+                ndn::Buffer buf1(pkt1.begin(), pkt1.end());
+                BOOST_REQUIRE_EQUAL(buf1.size(), ndn::MAX_NDN_PACKET_SIZE);
 
-  Block pkt2 = ndn::encoding::makeBinaryBlock(301, bytes.data(), bytes.size());
-  ndn::Buffer buf2(pkt2.begin(), pkt2.end());
-  BOOST_REQUIRE_GT(buf2.size(), ndn::MAX_NDN_PACKET_SIZE);
+                Block pkt2 = ndn::encoding::makeBinaryBlock(301, bytes.data(), bytes.size());
+                ndn::Buffer buf2(pkt2.begin(), pkt2.end());
+                BOOST_REQUIRE_GT(buf2.size(), ndn::MAX_NDN_PACKET_SIZE);
 
-  this->remoteWrite(buf1); // this should succeed
+                this->remoteWrite(buf1); // this should succeed
 
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, buf1.size());
-  BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, buf1.size());
+                BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
 
-  this->remoteWrite(buf2, false); // this should fail
+                this->remoteWrite(buf2, false); // this should fail
 
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
-  BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, buf1.size());
-  BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
-}
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInPackets, 1);
+                BOOST_CHECK_EQUAL(this->transport->getCounters().nInBytes, buf1.size());
+                BOOST_CHECK_EQUAL(this->receivedPackets->size(), 1);
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::UP);
+            }
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(Close, T, DatagramTransportFixtures, T)
-{
-  SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
-  this->initialize(this->defaultAddr);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(Close, T, DatagramTransportFixtures, T) {
+                SKIP_IF_IP_UNAVAILABLE(this->defaultAddr);
+                this->initialize(this->defaultAddr);
 
-  this->transport->close();
-  BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::CLOSING);
+                this->transport->close();
+                BOOST_CHECK_EQUAL(this->transport->getState(), TransportState::CLOSING);
 
-  this->transport->afterStateChange.connectSingleShot([this] (TransportState oldState, TransportState newState) {
-    BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
-    BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
-    this->limitedIo.afterOp();
-  });
-  BOOST_REQUIRE_EQUAL(this->limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
-}
+                this->transport->afterStateChange.connectSingleShot([this] (TransportState oldState, TransportState newState) {
+                    BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
+                    BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
+                    this->limitedIo.afterOp();
+                });
+                BOOST_REQUIRE_EQUAL(this->limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestDatagramTransport
-BOOST_AUTO_TEST_SUITE_END() // Face
+            BOOST_AUTO_TEST_SUITE_END() // TestDatagramTransport
+            BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

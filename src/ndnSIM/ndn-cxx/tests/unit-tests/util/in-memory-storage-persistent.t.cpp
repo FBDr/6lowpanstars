@@ -26,45 +26,43 @@
 #include "../make-interest-data.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-using namespace ndn::tests;
+            using namespace ndn::tests;
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_AUTO_TEST_SUITE(TestInMemoryStorage)
-BOOST_AUTO_TEST_SUITE(Persistent)
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_AUTO_TEST_SUITE(TestInMemoryStorage)
+            BOOST_AUTO_TEST_SUITE(Persistent)
 
-BOOST_AUTO_TEST_CASE(GetLimit)
-{
-  InMemoryStoragePersistent ims;
+            BOOST_AUTO_TEST_CASE(GetLimit) {
+                InMemoryStoragePersistent ims;
 
-  BOOST_CHECK_EQUAL(ims.getLimit(), -1);
-}
+                BOOST_CHECK_EQUAL(ims.getLimit(), -1);
+            }
 
-BOOST_AUTO_TEST_CASE(InsertAndDouble)
-{
-  InMemoryStoragePersistent ims;
+            BOOST_AUTO_TEST_CASE(InsertAndDouble) {
+                InMemoryStoragePersistent ims;
 
-  for(int i = 0; i < 11; i++) {
-    std::ostringstream convert;
-    convert << i;
-    Name name("/" + convert.str());
-    shared_ptr<Data> data = makeData(name);
-    data->setFreshnessPeriod(time::milliseconds(5000));
-    signData(data);
-    ims.insert(*data);
-  }
+                for (int i = 0; i < 11; i++) {
+                    std::ostringstream convert;
+                    convert << i;
+                    Name name("/" + convert.str());
+                    shared_ptr<Data> data = makeData(name);
+                    data->setFreshnessPeriod(time::milliseconds(5000));
+                    signData(data);
+                    ims.insert(*data);
+                }
 
-  BOOST_CHECK_EQUAL(ims.size(), 11);
+                BOOST_CHECK_EQUAL(ims.size(), 11);
 
-  BOOST_CHECK_EQUAL(ims.getCapacity(), 20);
-}
+                BOOST_CHECK_EQUAL(ims.getCapacity(), 20);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // Persistent
-BOOST_AUTO_TEST_SUITE_END() // TestInMemoryStorage
-BOOST_AUTO_TEST_SUITE_END() // Util
+            BOOST_AUTO_TEST_SUITE_END() // Persistent
+            BOOST_AUTO_TEST_SUITE_END() // TestInMemoryStorage
+            BOOST_AUTO_TEST_SUITE_END() // Util
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

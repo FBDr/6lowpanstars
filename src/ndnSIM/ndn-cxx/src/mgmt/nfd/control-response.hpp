@@ -25,11 +25,11 @@
 #include "../dispatcher.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-typedef ndn::mgmt::ControlResponse ControlResponse;
+        typedef ndn::mgmt::ControlResponse ControlResponse;
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MANAGEMENT_CONTROL_RESPONSE_HPP

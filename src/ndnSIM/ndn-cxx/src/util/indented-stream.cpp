@@ -28,43 +28,39 @@
 #include <boost/algorithm/string/classification.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-IndentedStream::IndentedStream(std::ostream& os, const std::string& indent)
-  : std::ostream(&m_buffer)
-  , m_buffer(os, indent)
-{
-}
+        IndentedStream::IndentedStream(std::ostream& os, const std::string& indent)
+        : std::ostream(&m_buffer)
+        , m_buffer(os, indent) {
+        }
 
-IndentedStream::~IndentedStream()
-{
-  flush();
-}
+        IndentedStream::~IndentedStream() {
+            flush();
+        }
 
-IndentedStream::StreamBuf::StreamBuf(std::ostream& os, const std::string& indent)
-  : m_output(os)
-  , m_indent(indent)
-{
-}
+        IndentedStream::StreamBuf::StreamBuf(std::ostream& os, const std::string& indent)
+        : m_output(os)
+        , m_indent(indent) {
+        }
 
-int
-IndentedStream::StreamBuf::sync()
-{
-  typedef boost::iterator_range<std::string::const_iterator> StringView;
+        int
+        IndentedStream::StreamBuf::sync() {
+            typedef boost::iterator_range<std::string::const_iterator> StringView;
 
-  const std::string& output = str();
-  std::vector<StringView> splitOutput;
-  boost::split(splitOutput, output, boost::is_any_of("\n"));
+            const std::string& output = str();
+            std::vector<StringView> splitOutput;
+            boost::split(splitOutput, output, boost::is_any_of("\n"));
 
-  if (!splitOutput.empty() && splitOutput.back().empty()) {
-    splitOutput.pop_back();
-  }
-  for (const StringView& line : splitOutput) {
-    m_output << m_indent << line << "\n";
-  }
-  str(std::string());
-  return 0; // success
-}
+            if (!splitOutput.empty() && splitOutput.back().empty()) {
+                splitOutput.pop_back();
+            }
+            for (const StringView& line : splitOutput) {
+                m_output << m_indent << line << "\n";
+            }
+            str(std::string());
+            return 0; // success
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

@@ -29,57 +29,51 @@
 
 using namespace ns3;
 
-
 /**
-* This system test program creates different test cases with a single eNB and 
-* several UEs, all having the same Radio Bearer specification. In each test 
-* case, the UEs see the same SINR from the eNB; different test cases are 
-* implemented obtained by using different SINR values and different numbers of 
-* UEs. The test consists on checking that the obtained throughput performance 
-* is equal among users is consistent with the definition of token bank fair  
-* queue scheduling
-*/
-class LenaTdTbfqFfMacSchedulerTestCase1 : public TestCase
-{
+ * This system test program creates different test cases with a single eNB and 
+ * several UEs, all having the same Radio Bearer specification. In each test 
+ * case, the UEs see the same SINR from the eNB; different test cases are 
+ * implemented obtained by using different SINR values and different numbers of 
+ * UEs. The test consists on checking that the obtained throughput performance 
+ * is equal among users is consistent with the definition of token bank fair  
+ * queue scheduling
+ */
+class LenaTdTbfqFfMacSchedulerTestCase1 : public TestCase {
 public:
-  LenaTdTbfqFfMacSchedulerTestCase1 (uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl, uint16_t packetSize, uint16_t interval, bool  errorModelEnabled);
-  virtual ~LenaTdTbfqFfMacSchedulerTestCase1 ();
+    LenaTdTbfqFfMacSchedulerTestCase1(uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl, uint16_t packetSize, uint16_t interval, bool errorModelEnabled);
+    virtual ~LenaTdTbfqFfMacSchedulerTestCase1();
 
 private:
-  static std::string BuildNameString (uint16_t nUser, uint16_t dist);
-  virtual void DoRun (void);
-  uint16_t m_nUser;
-  uint16_t m_dist;
-  uint16_t m_packetSize;  // byte
-  uint16_t m_interval;    // ms
-  double m_thrRefDl;
-  double m_thrRefUl;
-  bool m_errorModelEnabled;
+    static std::string BuildNameString(uint16_t nUser, uint16_t dist);
+    virtual void DoRun(void);
+    uint16_t m_nUser;
+    uint16_t m_dist;
+    uint16_t m_packetSize; // byte
+    uint16_t m_interval; // ms
+    double m_thrRefDl;
+    double m_thrRefUl;
+    bool m_errorModelEnabled;
 };
 
-
-class LenaTdTbfqFfMacSchedulerTestCase2 : public TestCase
-{
+class LenaTdTbfqFfMacSchedulerTestCase2 : public TestCase {
 public:
-  LenaTdTbfqFfMacSchedulerTestCase2 (std::vector<uint16_t> dist, std::vector<uint32_t> estThrTdTbfqDl, std::vector<uint16_t> packetSize, uint16_t interval, bool  errorModelEnabled);
-  virtual ~LenaTdTbfqFfMacSchedulerTestCase2 ();
+    LenaTdTbfqFfMacSchedulerTestCase2(std::vector<uint16_t> dist, std::vector<uint32_t> estThrTdTbfqDl, std::vector<uint16_t> packetSize, uint16_t interval, bool errorModelEnabled);
+    virtual ~LenaTdTbfqFfMacSchedulerTestCase2();
 
 private:
-  static std::string BuildNameString (uint16_t nUser, std::vector<uint16_t> dist);
-  virtual void DoRun (void);
-  uint16_t m_nUser;
-  std::vector<uint16_t> m_dist;
-  std::vector<uint16_t> m_packetSize;  // byte
-  uint16_t m_interval;    // ms
-  std::vector<uint32_t> m_estThrTdTbfqDl;
-  bool m_errorModelEnabled;
+    static std::string BuildNameString(uint16_t nUser, std::vector<uint16_t> dist);
+    virtual void DoRun(void);
+    uint16_t m_nUser;
+    std::vector<uint16_t> m_dist;
+    std::vector<uint16_t> m_packetSize; // byte
+    uint16_t m_interval; // ms
+    std::vector<uint32_t> m_estThrTdTbfqDl;
+    bool m_errorModelEnabled;
 };
 
-
-class LenaTestTdTbfqFfMacSchedulerSuite : public TestSuite
-{
+class LenaTestTdTbfqFfMacSchedulerSuite : public TestSuite {
 public:
-  LenaTestTdTbfqFfMacSchedulerSuite ();
+    LenaTestTdTbfqFfMacSchedulerSuite();
 };
 
 #endif /* LENA_TEST_TDTBFQ_FF_MAC_SCHEDULER_H */

@@ -27,22 +27,21 @@
 
 namespace ns3 {
 
-/**
- * \brief Isotropic antenna model
- * 
- * This is the simplest antenna model. The gain of this antenna is unitary (=0dB) in all directions.
- */
-class IsotropicAntennaModel : public AntennaModel
-{
-public:
+    /**
+     * \brief Isotropic antenna model
+     * 
+     * This is the simplest antenna model. The gain of this antenna is unitary (=0dB) in all directions.
+     */
+    class IsotropicAntennaModel : public AntennaModel {
+    public:
 
-  IsotropicAntennaModel ();
-  // inherited from Object
-  static TypeId GetTypeId ();
+        IsotropicAntennaModel();
+        // inherited from Object
+        static TypeId GetTypeId();
 
-  // inherited from AntennaModel
-  virtual double GetGainDb (Angles a);
-};
+        // inherited from AntennaModel
+        virtual double GetGainDb(Angles a);
+    };
 
 
 

@@ -29,27 +29,26 @@
 
 namespace nfd {
 
-namespace detail {
+    namespace detail {
 
-/**
- * @brief Simulator-based IO that implements a few interfaces from boost::asio::io_service
- */
-class SimulatorIo
-{
-public:
-  void
-  post(const std::function<void()>& callback);
+        /**
+         * @brief Simulator-based IO that implements a few interfaces from boost::asio::io_service
+         */
+        class SimulatorIo {
+        public:
+            void
+            post(const std::function<void()>& callback);
 
-  void
-  dispatch(const std::function<void()>& callback);
-};
+            void
+            dispatch(const std::function<void()>& callback);
+        };
 
-} // namespace detail
+    } // namespace detail
 
-/** \return Simulator-based IO object
- */
-detail::SimulatorIo&
-getGlobalIoService();
+    /** \return Simulator-based IO object
+     */
+    detail::SimulatorIo&
+    getGlobalIoService();
 
 } // namespace nfd
 

@@ -27,43 +27,42 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- *
- *
- */
-class AdhocWifiMac : public RegularWifiMac
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup wifi
+     *
+     *
+     */
+    class AdhocWifiMac : public RegularWifiMac {
+    public:
+        static TypeId GetTypeId(void);
 
-  AdhocWifiMac ();
-  virtual ~AdhocWifiMac ();
+        AdhocWifiMac();
+        virtual ~AdhocWifiMac();
 
-  /**
-   * \param address the current address of this MAC layer.
-   */
-  virtual void SetAddress (Mac48Address address);
+        /**
+         * \param address the current address of this MAC layer.
+         */
+        virtual void SetAddress(Mac48Address address);
 
-  /**
-   * \param linkUp the callback to invoke when the link becomes up.
-   */
-  virtual void SetLinkUpCallback (Callback<void> linkUp);
+        /**
+         * \param linkUp the callback to invoke when the link becomes up.
+         */
+        virtual void SetLinkUpCallback(Callback<void> linkUp);
 
-  /**
-   * \param packet the packet to send.
-   * \param to the address to which the packet should be sent.
-   *
-   * The packet should be enqueued in a tx queue, and should be
-   * dequeued as soon as the channel access function determines that
-   * access is granted to this MAC.
-   */
-  virtual void Enqueue (Ptr<const Packet> packet, Mac48Address to);
+        /**
+         * \param packet the packet to send.
+         * \param to the address to which the packet should be sent.
+         *
+         * The packet should be enqueued in a tx queue, and should be
+         * dequeued as soon as the channel access function determines that
+         * access is granted to this MAC.
+         */
+        virtual void Enqueue(Ptr<const Packet> packet, Mac48Address to);
 
 
-private:
-  virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);
-};
+    private:
+        virtual void Receive(Ptr<Packet> packet, const WifiMacHeader *hdr);
+    };
 
 } //namespace ns3
 

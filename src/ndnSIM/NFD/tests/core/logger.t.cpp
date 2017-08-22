@@ -31,960 +31,915 @@
 #include <boost/algorithm/string/split.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TestLogger, BaseFixture)
+        BOOST_FIXTURE_TEST_SUITE(TestLogger, BaseFixture)
 
-class LoggerFixture : protected BaseFixture
-{
-public:
-  LoggerFixture()
-    : m_savedBuf(std::clog.rdbuf())
-    , m_savedLevel(LoggerFactory::getInstance().getDefaultLevel())
-  {
-    std::clog.rdbuf(m_buffer.rdbuf());
-  }
+        class LoggerFixture : protected BaseFixture {
+        public:
 
-  ~LoggerFixture()
-  {
-    std::clog.rdbuf(m_savedBuf);
-    LoggerFactory::getInstance().setDefaultLevel(m_savedLevel);
-  }
+            LoggerFixture()
+            : m_savedBuf(std::clog.rdbuf())
+            , m_savedLevel(LoggerFactory::getInstance().getDefaultLevel()) {
+                std::clog.rdbuf(m_buffer.rdbuf());
+            }
 
-  std::stringstream m_buffer;
-  std::streambuf* m_savedBuf;
-  LogLevel m_savedLevel;
+            ~LoggerFixture() {
+                std::clog.rdbuf(m_savedBuf);
+                LoggerFactory::getInstance().setDefaultLevel(m_savedLevel);
+            }
 
-};
+            std::stringstream m_buffer;
+            std::streambuf* m_savedBuf;
+            LogLevel m_savedLevel;
 
-BOOST_FIXTURE_TEST_CASE(Basic, LoggerFixture)
-{
-  using namespace ndn::time;
-  using std::string;
+        };
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+        BOOST_FIXTURE_TEST_CASE(Basic, LoggerFixture) {
+            using namespace ndn::time;
+            using std::string;
 
-  NFD_LOG_INIT("BasicTests");
-  g_logger.setLogLevel(LOG_ALL);
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  const string EXPECTED[] =
-    {
-      "TRACE:",   "[BasicTests]", "trace-message-JHGFDSR^1\n",
-      "DEBUG:",   "[BasicTests]", "debug-message-IGg2474fdksd-fo-151617\n",
-      "WARNING:", "[BasicTests]", "warning-message-XXXhdhd111x\n",
-      "INFO:",    "[BasicTests]", "info-message-Jjxjshj13\n",
-      "ERROR:",   "[BasicTests]", "error-message-!#$&^%$#@\n",
-      "FATAL:",   "[BasicTests]", "fatal-message-JJSjaamcng\n",
-    };
+            NFD_LOG_INIT("BasicTests");
+            g_logger.setLogLevel(LOG_ALL);
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(string);
+            const string EXPECTED[] ={
+                "TRACE:", "[BasicTests]", "trace-message-JHGFDSR^1\n",
+                "DEBUG:", "[BasicTests]", "debug-message-IGg2474fdksd-fo-151617\n",
+                "WARNING:", "[BasicTests]", "warning-message-XXXhdhd111x\n",
+                "INFO:", "[BasicTests]", "info-message-Jjxjshj13\n",
+                "ERROR:", "[BasicTests]", "error-message-!#$&^%$#@\n",
+                "FATAL:", "[BasicTests]", "fatal-message-JJSjaamcng\n",
+            };
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (string);
 
-  NFD_LOG_TRACE("trace-message-JHGFDSR^1");
-  NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
-  NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 <<"x");
-  NFD_LOG_INFO("info-message-Jjxjshj13");
-  NFD_LOG_ERROR("error-message-!#$&^%$#@");
-  NFD_LOG_FATAL("fatal-message-JJSjaamcng");
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            NFD_LOG_TRACE("trace-message-JHGFDSR^1");
+            NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
+            NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+            NFD_LOG_INFO("info-message-Jjxjshj13");
+            NFD_LOG_ERROR("error-message-!#$&^%$#@");
+            NFD_LOG_FATAL("fatal-message-JJSjaamcng");
 
-  LoggerFactory::getInstance().flushBackend();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  const string buffer = m_buffer.str();
+            LoggerFactory::getInstance().flushBackend();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            const string buffer = m_buffer.str();
 
-  // std::cout << components.size() << " for " << moduleName  << std::endl;
-  // for (size_t i = 0; i < components.size(); ++i)
-  //   {
-  //     std::cout << "-> " << components[i] << std::endl;
-  //   }
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
+            // std::cout << components.size() << " for " << moduleName  << std::endl;
+            // for (size_t i = 0; i < components.size(); ++i)
+            //   {
+            //     std::cout << "-> " << components[i] << std::endl;
+            //   }
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // std::cout << "message = " << message << std::endl;
+                const string& message = *componentIter;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
+                // std::cout << "message = " << message << std::endl;
 
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
 
+        }
 
-BOOST_FIXTURE_TEST_CASE(ConfigureFactory, LoggerFixture)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(ConfigureFactory, LoggerFixture) {
+            using namespace ndn::time;
+            using std::string;
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  NFD_LOG_INIT("ConfigureFactoryTests");
+            NFD_LOG_INIT("ConfigureFactoryTests");
 
-  const string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level INFO\n"
-    "}\n";
+            const string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level INFO\n"
+                    "}\n";
 
-  LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
+            LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  config.parse(LOG_CONFIG, false, "LOG_CONFIG");
+            config.parse(LOG_CONFIG, false, "LOG_CONFIG");
 
-  BOOST_REQUIRE_EQUAL(LoggerFactory::getInstance().getDefaultLevel(), LOG_INFO);
+            BOOST_REQUIRE_EQUAL(LoggerFactory::getInstance().getDefaultLevel(), LOG_INFO);
 
-  const std::string EXPECTED[] =
-    {
-      "WARNING:", "[ConfigureFactoryTests]", "warning-message-XXXhdhd111x\n",
-      "INFO:",    "[ConfigureFactoryTests]", "info-message-Jjxjshj13\n",
-      "ERROR:",   "[ConfigureFactoryTests]", "error-message-!#$&^%$#@\n",
-      "FATAL:",   "[ConfigureFactoryTests]", "fatal-message-JJSjaamcng\n",
-    };
+            const std::string EXPECTED[] ={
+                "WARNING:", "[ConfigureFactoryTests]", "warning-message-XXXhdhd111x\n",
+                "INFO:", "[ConfigureFactoryTests]", "info-message-Jjxjshj13\n",
+                "ERROR:", "[ConfigureFactoryTests]", "error-message-!#$&^%$#@\n",
+                "FATAL:", "[ConfigureFactoryTests]", "fatal-message-JJSjaamcng\n",
+            };
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(std::string);
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (std::string);
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  NFD_LOG_TRACE("trace-message-JHGFDSR^1");
-  NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
-  NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 <<"x");
-  NFD_LOG_INFO("info-message-Jjxjshj13");
-  NFD_LOG_ERROR("error-message-!#$&^%$#@");
-  NFD_LOG_FATAL("fatal-message-JJSjaamcng");
+            NFD_LOG_TRACE("trace-message-JHGFDSR^1");
+            NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
+            NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+            NFD_LOG_INFO("info-message-Jjxjshj13");
+            NFD_LOG_ERROR("error-message-!#$&^%$#@");
+            NFD_LOG_FATAL("fatal-message-JJSjaamcng");
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // std::cout << components.size() << " for " << moduleName  << std::endl;
-  // for (size_t i = 0; i < components.size(); ++i)
-  //   {
-  //     std::cout << "-> " << components[i] << std::endl;
-  //   }
+            // std::cout << components.size() << " for " << moduleName  << std::endl;
+            // for (size_t i = 0; i < components.size(); ++i)
+            //   {
+            //     std::cout << "-> " << components[i] << std::endl;
+            //   }
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 4 + 1);
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 4 + 1);
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                const string& message = *componentIter;
 
-      // std::cout << "message = " << message << std::endl;
+                // std::cout << "message = " << message << std::endl;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
-BOOST_FIXTURE_TEST_CASE(TestNumberLevel, LoggerFixture)
-{
-  const std::string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level 2\n" // equivalent of WARN
-    "}\n";
+        BOOST_FIXTURE_TEST_CASE(TestNumberLevel, LoggerFixture) {
+            const std::string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level 2\n" // equivalent of WARN
+                    "}\n";
 
-  LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
+            LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  config.parse(LOG_CONFIG, false, "LOG_CONFIG");
+            config.parse(LOG_CONFIG, false, "LOG_CONFIG");
 
-  BOOST_REQUIRE_EQUAL(LoggerFactory::getInstance().getDefaultLevel(), LOG_WARN);
-}
+            BOOST_REQUIRE_EQUAL(LoggerFactory::getInstance().getDefaultLevel(), LOG_WARN);
+        }
 
-static void
-testModuleBPrint()
-{
-  NFD_LOG_INIT("TestModuleB");
-  NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
-}
+        static void
+        testModuleBPrint() {
+            NFD_LOG_INIT("TestModuleB");
+            NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
+        }
 
-BOOST_FIXTURE_TEST_CASE(LimitModules, LoggerFixture)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(LimitModules, LoggerFixture) {
+            using namespace ndn::time;
+            using std::string;
 
-  NFD_LOG_INIT("TestModuleA");
+            NFD_LOG_INIT("TestModuleA");
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  const std::string EXPECTED[] =
-    {
-      "WARNING:", "[TestModuleA]", "warning-message-XXXhdhd111x\n",
-    };
+            const std::string EXPECTED[] ={
+                "WARNING:", "[TestModuleA]", "warning-message-XXXhdhd111x\n",
+            };
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(std::string);
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (std::string);
 
-  const std::string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level WARN\n"
-    "}\n";
+            const std::string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level WARN\n"
+                    "}\n";
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  config.parse(LOG_CONFIG, false, "LOG_CONFIG");
+            config.parse(LOG_CONFIG, false, "LOG_CONFIG");
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  // this should print
-  NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+            // this should print
+            NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
 
-  // this should not because it's level is < WARN
-  testModuleBPrint();
+            // this should not because it's level is < WARN
+            testModuleBPrint();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 1 + 1);
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 1 + 1);
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                const string& message = *componentIter;
 
-      // std::cout << "message = " << message << std::endl;
+                // std::cout << "message = " << message << std::endl;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
-BOOST_FIXTURE_TEST_CASE(ExplicitlySetModule, LoggerFixture)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(ExplicitlySetModule, LoggerFixture) {
+            using namespace ndn::time;
+            using std::string;
 
-  NFD_LOG_INIT("TestModuleA");
+            NFD_LOG_INIT("TestModuleA");
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  const std::string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level WARN\n"
-    "  TestModuleB DEBUG\n"
-    "}\n";
+            const std::string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level WARN\n"
+                    "  TestModuleB DEBUG\n"
+                    "}\n";
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  config.parse(LOG_CONFIG, false, "LOG_CONFIG");
+            config.parse(LOG_CONFIG, false, "LOG_CONFIG");
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
- // this should print
-  NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+            // this should print
+            NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
 
-  // this too because its level is explicitly set to DEBUG
-  testModuleBPrint();
+            // this too because its level is explicitly set to DEBUG
+            testModuleBPrint();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  const std::string EXPECTED[] =
-    {
-      "WARNING:", "[TestModuleA]", "warning-message-XXXhdhd111x\n",
-      "DEBUG:",   "[TestModuleB]", "debug-message-IGg2474fdksd-fo-151617\n",
-    };
+            const std::string EXPECTED[] ={
+                "WARNING:", "[TestModuleA]", "warning-message-XXXhdhd111x\n",
+                "DEBUG:", "[TestModuleB]", "debug-message-IGg2474fdksd-fo-151617\n",
+            };
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(std::string);
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (std::string);
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // for (size_t i = 0; i < components.size(); ++i)
-  //   {
-  //     std::cout << "-> " << components[i] << std::endl;
-  //   }
+            // for (size_t i = 0; i < components.size(); ++i)
+            //   {
+            //     std::cout << "-> " << components[i] << std::endl;
+            //   }
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 2 + 1);
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 2 + 1);
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                const string& message = *componentIter;
 
-      // std::cout << "message = " << message << std::endl;
+                // std::cout << "message = " << message << std::endl;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
-BOOST_FIXTURE_TEST_CASE(UnknownModule, LoggerFixture)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(UnknownModule, LoggerFixture) {
+            using namespace ndn::time;
+            using std::string;
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  const std::string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level DEBUG\n"
-    "  TestMadeUpModule INFO\n"
-    "}\n";
+            const std::string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level DEBUG\n"
+                    "  TestMadeUpModule INFO\n"
+                    "}\n";
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setDefaultLevel(LOG_ALL);
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  const std::string EXPECTED = "DEBUG: [LoggerFactory] "
-    "Failed to configure logging level for module \"TestMadeUpModule\" (module not found)\n";
+            const std::string EXPECTED = "DEBUG: [LoggerFactory] "
+                    "Failed to configure logging level for module \"TestMadeUpModule\" (module not found)\n";
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  config.parse(LOG_CONFIG, false, "LOG_CONFIG");
+            config.parse(LOG_CONFIG, false, "LOG_CONFIG");
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  const size_t firstSpace = buffer.find(" ");
-  BOOST_REQUIRE(firstSpace != string::npos);
+            const size_t firstSpace = buffer.find(" ");
+            BOOST_REQUIRE(firstSpace != string::npos);
 
-  const string timestamp = buffer.substr(0, firstSpace);
-  const string message = buffer.substr(firstSpace + 1);
+            const string timestamp = buffer.substr(0, firstSpace);
+            const string message = buffer.substr(firstSpace + 1);
 
-  size_t timeDelimiterPosition = timestamp.find(".");
+            size_t timeDelimiterPosition = timestamp.find(".");
 
-  BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+            BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-  string secondsString = timestamp.substr(0, timeDelimiterPosition);
-  string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+            string secondsString = timestamp.substr(0, timeDelimiterPosition);
+            string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-  microseconds::rep extractedTime =
-    ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-    boost::lexical_cast<microseconds::rep>(usecondsString);
+            microseconds::rep extractedTime =
+                    ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                    boost::lexical_cast<microseconds::rep>(usecondsString);
 
-  // std::cout << "before=" << before
-  //           << " extracted=" << extractedTime
-  //           << " after=" << after << std::endl;
+            // std::cout << "before=" << before
+            //           << " extracted=" << extractedTime
+            //           << " after=" << after << std::endl;
 
-  BOOST_CHECK_LE(before, extractedTime);
-  BOOST_CHECK_LE(extractedTime, after);
+            BOOST_CHECK_LE(before, extractedTime);
+            BOOST_CHECK_LE(extractedTime, after);
 
-  BOOST_CHECK_EQUAL(message, EXPECTED);
-}
+            BOOST_CHECK_EQUAL(message, EXPECTED);
+        }
 
-static bool
-checkError(const LoggerFactory::Error& error, const std::string& expected)
-{
-  return error.what() == expected;
-}
+        static bool
+        checkError(const LoggerFactory::Error& error, const std::string& expected) {
+            return error.what() == expected;
+        }
 
-BOOST_FIXTURE_TEST_CASE(UnknownLevelString, LoggerFixture)
-{
-  const std::string LOG_CONFIG =
-    "log\n"
-    "{\n"
-    "  default_level TestMadeUpLevel\n"
-    "}\n";
+        BOOST_FIXTURE_TEST_CASE(UnknownLevelString, LoggerFixture) {
+            const std::string LOG_CONFIG =
+                    "log\n"
+                    "{\n"
+                    "  default_level TestMadeUpLevel\n"
+                    "}\n";
 
-  ConfigFile config;
-  LoggerFactory::getInstance().setConfigFile(config);
+            ConfigFile config;
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  BOOST_REQUIRE_EXCEPTION(config.parse(LOG_CONFIG, false, "LOG_CONFIG"),
-                          LoggerFactory::Error,
-                          bind(&checkError,
-                               _1,
-                               "Unsupported logging level \"TestMadeUpLevel\""));
-}
+            BOOST_REQUIRE_EXCEPTION(config.parse(LOG_CONFIG, false, "LOG_CONFIG"),
+                    LoggerFactory::Error,
+                    bind(&checkError,
+                    _1,
+                    "Unsupported logging level \"TestMadeUpLevel\""));
+        }
 
-class InClassLogger : public LoggerFixture
-{
-public:
+        class InClassLogger : public LoggerFixture {
+        public:
 
-  InClassLogger()
-  {
-    g_logger.setLogLevel(LOG_ALL);
-  }
+            InClassLogger() {
+                g_logger.setLogLevel(LOG_ALL);
+            }
 
-  void
-  writeLogs()
-  {
-    NFD_LOG_TRACE("trace-message-JHGFDSR^1");
-    NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
-    NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 <<"x");
-    NFD_LOG_INFO("info-message-Jjxjshj13");
-    NFD_LOG_ERROR("error-message-!#$&^%$#@");
-    NFD_LOG_FATAL("fatal-message-JJSjaamcng");
-  }
+            void
+            writeLogs() {
+                NFD_LOG_TRACE("trace-message-JHGFDSR^1");
+                NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
+                NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+                NFD_LOG_INFO("info-message-Jjxjshj13");
+                NFD_LOG_ERROR("error-message-!#$&^%$#@");
+                NFD_LOG_FATAL("fatal-message-JJSjaamcng");
+            }
 
-private:
-  NFD_LOG_INCLASS_DECLARE();
-};
+        private:
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-NFD_LOG_INCLASS_DEFINE(InClassLogger, "InClassLogger");
+        NFD_LOG_INCLASS_DEFINE(InClassLogger, "InClassLogger");
 
-BOOST_FIXTURE_TEST_CASE(InClass, InClassLogger)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(InClass, InClassLogger) {
+            using namespace ndn::time;
+            using std::string;
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  writeLogs();
+            writeLogs();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  const string EXPECTED[] =
-    {
-      "TRACE:",   "[InClassLogger]", "trace-message-JHGFDSR^1\n",
-      "DEBUG:",   "[InClassLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
-      "WARNING:", "[InClassLogger]", "warning-message-XXXhdhd111x\n",
-      "INFO:",    "[InClassLogger]", "info-message-Jjxjshj13\n",
-      "ERROR:",   "[InClassLogger]", "error-message-!#$&^%$#@\n",
-      "FATAL:",   "[InClassLogger]", "fatal-message-JJSjaamcng\n",
-    };
+            const string EXPECTED[] ={
+                "TRACE:", "[InClassLogger]", "trace-message-JHGFDSR^1\n",
+                "DEBUG:", "[InClassLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
+                "WARNING:", "[InClassLogger]", "warning-message-XXXhdhd111x\n",
+                "INFO:", "[InClassLogger]", "info-message-Jjxjshj13\n",
+                "ERROR:", "[InClassLogger]", "error-message-!#$&^%$#@\n",
+                "FATAL:", "[InClassLogger]", "fatal-message-JJSjaamcng\n",
+            };
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(string);
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (string);
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                const string& message = *componentIter;
 
-      // std::cout << "message = " << message << std::endl;
+                // std::cout << "message = " << message << std::endl;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
+        template<class T>
+        class InClassTemplateLogger : public LoggerFixture {
+        public:
 
-template<class T>
-class InClassTemplateLogger : public LoggerFixture
-{
-public:
-  InClassTemplateLogger()
-  {
-    g_logger.setLogLevel(LOG_ALL);
-  }
+            InClassTemplateLogger() {
+                g_logger.setLogLevel(LOG_ALL);
+            }
 
-  void
-  writeLogs()
-  {
-    NFD_LOG_TRACE("trace-message-JHGFDSR^1");
-    NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
-    NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 <<"x");
-    NFD_LOG_INFO("info-message-Jjxjshj13");
-    NFD_LOG_ERROR("error-message-!#$&^%$#@");
-    NFD_LOG_FATAL("fatal-message-JJSjaamcng");
-  }
+            void
+            writeLogs() {
+                NFD_LOG_TRACE("trace-message-JHGFDSR^1");
+                NFD_LOG_DEBUG("debug-message-IGg2474fdksd-fo-" << 15 << 16 << 17);
+                NFD_LOG_WARN("warning-message-XXXhdhd11" << 1 << "x");
+                NFD_LOG_INFO("info-message-Jjxjshj13");
+                NFD_LOG_ERROR("error-message-!#$&^%$#@");
+                NFD_LOG_FATAL("fatal-message-JJSjaamcng");
+            }
 
-private:
-  NFD_LOG_INCLASS_DECLARE();
-};
+        private:
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-NFD_LOG_INCLASS_TEMPLATE_DEFINE(InClassTemplateLogger, "GenericInClassTemplateLogger");
-NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(InClassTemplateLogger, int, "IntInClassLogger");
+        NFD_LOG_INCLASS_TEMPLATE_DEFINE(InClassTemplateLogger, "GenericInClassTemplateLogger");
+        NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(InClassTemplateLogger, int, "IntInClassLogger");
 
-BOOST_FIXTURE_TEST_CASE(GenericInTemplatedClass, InClassTemplateLogger<bool>)
-{
-  using namespace ndn::time;
-  using std::string;
+        BOOST_FIXTURE_TEST_CASE(GenericInTemplatedClass, InClassTemplateLogger<bool>) {
+            using namespace ndn::time;
+            using std::string;
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  writeLogs();
+            writeLogs();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  const string EXPECTED[] =
-    {
-      "TRACE:",   "[GenericInClassTemplateLogger]", "trace-message-JHGFDSR^1\n",
-      "DEBUG:",   "[GenericInClassTemplateLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
-      "WARNING:", "[GenericInClassTemplateLogger]", "warning-message-XXXhdhd111x\n",
-      "INFO:",    "[GenericInClassTemplateLogger]", "info-message-Jjxjshj13\n",
-      "ERROR:",   "[GenericInClassTemplateLogger]", "error-message-!#$&^%$#@\n",
-      "FATAL:",   "[GenericInClassTemplateLogger]", "fatal-message-JJSjaamcng\n",
-    };
+            const string EXPECTED[] ={
+                "TRACE:", "[GenericInClassTemplateLogger]", "trace-message-JHGFDSR^1\n",
+                "DEBUG:", "[GenericInClassTemplateLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
+                "WARNING:", "[GenericInClassTemplateLogger]", "warning-message-XXXhdhd111x\n",
+                "INFO:", "[GenericInClassTemplateLogger]", "info-message-Jjxjshj13\n",
+                "ERROR:", "[GenericInClassTemplateLogger]", "error-message-!#$&^%$#@\n",
+                "FATAL:", "[GenericInClassTemplateLogger]", "fatal-message-JJSjaamcng\n",
+            };
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(string);
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (string);
 
-  LoggerFactory::getInstance().flushBackend();
+            LoggerFactory::getInstance().flushBackend();
 
-  const string buffer = m_buffer.str();
+            const string buffer = m_buffer.str();
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      // std::cout << "before=" << before
-      //           << " extracted=" << extractedTime
-      //           << " after=" << after << std::endl;
+                // std::cout << "before=" << before
+                //           << " extracted=" << extractedTime
+                //           << " after=" << after << std::endl;
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      const string& message = *componentIter;
+                const string& message = *componentIter;
 
-      // std::cout << "message = " << message << std::endl;
+                // std::cout << "message = " << message << std::endl;
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
+        BOOST_FIXTURE_TEST_CASE(SpecializedInTemplatedClass, InClassTemplateLogger<int>) {
+            using namespace ndn::time;
+            using std::string;
 
-BOOST_FIXTURE_TEST_CASE(SpecializedInTemplatedClass, InClassTemplateLogger<int>)
-{
-  using namespace ndn::time;
-  using std::string;
+            const ndn::time::microseconds::rep ONE_SECOND = 1000000;
 
-  const ndn::time::microseconds::rep ONE_SECOND = 1000000;
+            microseconds::rep before =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  microseconds::rep before =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            writeLogs();
 
-  writeLogs();
+            microseconds::rep after =
+                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 
-  microseconds::rep after =
-    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+            const string EXPECTED[] ={
+                "TRACE:", "[IntInClassLogger]", "trace-message-JHGFDSR^1\n",
+                "DEBUG:", "[IntInClassLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
+                "WARNING:", "[IntInClassLogger]", "warning-message-XXXhdhd111x\n",
+                "INFO:", "[IntInClassLogger]", "info-message-Jjxjshj13\n",
+                "ERROR:", "[IntInClassLogger]", "error-message-!#$&^%$#@\n",
+                "FATAL:", "[IntInClassLogger]", "fatal-message-JJSjaamcng\n",
+            };
 
-  const string EXPECTED[] =
-    {
-      "TRACE:",   "[IntInClassLogger]", "trace-message-JHGFDSR^1\n",
-      "DEBUG:",   "[IntInClassLogger]", "debug-message-IGg2474fdksd-fo-151617\n",
-      "WARNING:", "[IntInClassLogger]", "warning-message-XXXhdhd111x\n",
-      "INFO:",    "[IntInClassLogger]", "info-message-Jjxjshj13\n",
-      "ERROR:",   "[IntInClassLogger]", "error-message-!#$&^%$#@\n",
-      "FATAL:",   "[IntInClassLogger]", "fatal-message-JJSjaamcng\n",
-    };
+            const size_t N_EXPECTED = sizeof (EXPECTED) / sizeof (string);
 
-  const size_t N_EXPECTED = sizeof(EXPECTED) / sizeof(string);
+            LoggerFactory::getInstance().flushBackend();
 
-  LoggerFactory::getInstance().flushBackend();
+            const string buffer = m_buffer.str();
 
-  const string buffer = m_buffer.str();
+            std::vector<string> components;
+            boost::split(components, buffer, boost::is_any_of(" ,\n"));
 
-  std::vector<string> components;
-  boost::split(components, buffer, boost::is_any_of(" ,\n"));
+            // expected + number of timestamps (one per log statement) + trailing newline of last statement
+            BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
 
-  // expected + number of timestamps (one per log statement) + trailing newline of last statement
-  BOOST_REQUIRE_EQUAL(components.size(), N_EXPECTED + 6 + 1);
+            std::vector<std::string>::const_iterator componentIter = components.begin();
+            for (size_t i = 0; i < N_EXPECTED; ++i) {
+                // timestamp LOG_LEVEL: [ModuleName] message\n
 
-  std::vector<std::string>::const_iterator componentIter = components.begin();
-  for (size_t i = 0; i < N_EXPECTED; ++i)
-    {
-      // timestamp LOG_LEVEL: [ModuleName] message\n
+                const string& timestamp = *componentIter;
+                // std::cout << "timestamp = " << timestamp << std::endl;
+                ++componentIter;
 
-      const string& timestamp = *componentIter;
-      // std::cout << "timestamp = " << timestamp << std::endl;
-      ++componentIter;
+                size_t timeDelimiterPosition = timestamp.find(".");
 
-      size_t timeDelimiterPosition = timestamp.find(".");
+                BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
 
-      BOOST_REQUIRE_NE(string::npos, timeDelimiterPosition);
+                string secondsString = timestamp.substr(0, timeDelimiterPosition);
+                string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
 
-      string secondsString = timestamp.substr(0, timeDelimiterPosition);
-      string usecondsString = timestamp.substr(timeDelimiterPosition + 1);
+                microseconds::rep extractedTime =
+                        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
+                        boost::lexical_cast<microseconds::rep>(usecondsString);
 
-      microseconds::rep extractedTime =
-        ONE_SECOND * boost::lexical_cast<microseconds::rep>(secondsString) +
-        boost::lexical_cast<microseconds::rep>(usecondsString);
+                // std::cout << "before=" << before << " extracted=" << extractedTime << " after=" << after << std::endl;
 
-      // std::cout << "before=" << before << " extracted=" << extractedTime << " after=" << after << std::endl;
+                BOOST_CHECK_LE(before, extractedTime);
+                BOOST_CHECK_LE(extractedTime, after);
 
-      BOOST_CHECK_LE(before, extractedTime);
-      BOOST_CHECK_LE(extractedTime, after);
+                // LOG_LEVEL:
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // LOG_LEVEL:
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                // [ModuleName]
+                BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
+                ++componentIter;
+                ++i;
 
-      // [ModuleName]
-      BOOST_CHECK_EQUAL(*componentIter, EXPECTED[i]);
-      ++componentIter;
-      ++i;
+                const string& message = *componentIter;
 
-      const string& message = *componentIter;
+                // std::cout << "message = " << message << std::endl;
 
-      // std::cout << "message = " << message << std::endl;
+                // add back the newline that we split on
+                BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
+                ++componentIter;
+            }
+        }
 
-      // add back the newline that we split on
-      BOOST_CHECK_EQUAL(message + "\n", EXPECTED[i]);
-      ++componentIter;
-    }
-}
+        BOOST_FIXTURE_TEST_CASE(LoggerFactoryListModules, LoggerFixture) {
+            std::set<std::string> testCaseLoggers{"LoggerFactoryListModules1", "LoggerFactoryListModules2"};
 
-BOOST_FIXTURE_TEST_CASE(LoggerFactoryListModules, LoggerFixture)
-{
-  std::set<std::string> testCaseLoggers{"LoggerFactoryListModules1", "LoggerFactoryListModules2"};
+            for (const auto& name : testCaseLoggers) {
+                LoggerFactory::create(name);
+            }
 
-  for (const auto& name : testCaseLoggers) {
-    LoggerFactory::create(name);
-  }
+            auto&& modules = LoggerFactory::getInstance().getModules();
+            BOOST_CHECK_GE(modules.size(), 2);
 
-  auto&& modules = LoggerFactory::getInstance().getModules();
-  BOOST_CHECK_GE(modules.size(), 2);
+            for (const auto& name : modules) {
+                testCaseLoggers.erase(name);
+            }
 
-  for (const auto& name : modules) {
-    testCaseLoggers.erase(name);
-  }
+            BOOST_CHECK_EQUAL(testCaseLoggers.size(), 0);
+        }
 
-  BOOST_CHECK_EQUAL(testCaseLoggers.size(), 0);
-}
+        BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE_END()
-
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 // Testing compilation of the logger outside ::nfd namespace
 
 namespace test_logger { // another root namespace
 
-void
-Test1()
-{
-  NFD_LOG_INIT("Test");
+    void
+    Test1() {
+        NFD_LOG_INIT("Test");
 
-  NFD_LOG_TRACE("Trace");
-  NFD_LOG_DEBUG("Debug");
-  NFD_LOG_INFO("Info");
-  NFD_LOG_WARN("Warn");
-  NFD_LOG_ERROR("Error");
-  NFD_LOG_FATAL("Fatal");
-}
+        NFD_LOG_TRACE("Trace");
+        NFD_LOG_DEBUG("Debug");
+        NFD_LOG_INFO("Info");
+        NFD_LOG_WARN("Warn");
+        NFD_LOG_ERROR("Error");
+        NFD_LOG_FATAL("Fatal");
+    }
 
-class Test2
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+    class Test2 {
+        NFD_LOG_INCLASS_DECLARE();
+    };
 
-NFD_LOG_INCLASS_DEFINE(Test2, "Test2");
+    NFD_LOG_INCLASS_DEFINE(Test2, "Test2");
 
-template<class T>
-class Test3
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+    template<class T>
+    class Test3 {
+        NFD_LOG_INCLASS_DECLARE();
+    };
 
-NFD_LOG_INCLASS_TEMPLATE_DEFINE(Test3, "Test3");
+    NFD_LOG_INCLASS_TEMPLATE_DEFINE(Test3, "Test3");
 
-NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(Test3, int, "Test3Int");
+    NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(Test3, int, "Test3Int");
 
-template<class X, class Y>
-class Test4
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+    template<class X, class Y>
+    class Test4 {
+        NFD_LOG_INCLASS_DECLARE();
+    };
 
-NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(Test4, int, int, "Test4IntInt");
+    NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(Test4, int, int, "Test4IntInt");
 
-namespace nfd { // nested nfd namespace, different from ::nfd
+    namespace nfd { // nested nfd namespace, different from ::nfd
 
-void
-Test1()
-{
-  NFD_LOG_INIT("Test");
+        void
+        Test1() {
+            NFD_LOG_INIT("Test");
 
-  NFD_LOG_TRACE("Trace");
-  NFD_LOG_DEBUG("Debug");
-  NFD_LOG_INFO("Info");
-  NFD_LOG_WARN("Warn");
-  NFD_LOG_ERROR("Error");
-  NFD_LOG_FATAL("Fatal");
-}
+            NFD_LOG_TRACE("Trace");
+            NFD_LOG_DEBUG("Debug");
+            NFD_LOG_INFO("Info");
+            NFD_LOG_WARN("Warn");
+            NFD_LOG_ERROR("Error");
+            NFD_LOG_FATAL("Fatal");
+        }
 
-class Test2
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+        class Test2 {
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-NFD_LOG_INCLASS_DEFINE(Test2, "Test2");
+        NFD_LOG_INCLASS_DEFINE(Test2, "Test2");
 
-template<class T>
-class Test3
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+        template<class T>
+        class Test3 {
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-NFD_LOG_INCLASS_TEMPLATE_DEFINE(Test3, "Test3");
+        NFD_LOG_INCLASS_TEMPLATE_DEFINE(Test3, "Test3");
 
-NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(Test3, int, "Test3Int");
+        NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(Test3, int, "Test3Int");
 
-template<class X, class Y>
-class Test4
-{
-  NFD_LOG_INCLASS_DECLARE();
-};
+        template<class X, class Y>
+        class Test4 {
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(Test4, int, int, "Test4IntInt");
+        NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE(Test4, int, int, "Test4IntInt");
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace test_logger

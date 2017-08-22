@@ -23,40 +23,36 @@ using namespace ns3;
 
 class TypeTraitsTestCase : public TestCase
 {
-public:
-  TypeTraitsTestCase ();
-  virtual ~TypeTraitsTestCase () {}
+    public :
+    TypeTraitsTestCase();
+    virtual ~TypeTraitsTestCase()
+    {}
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-TypeTraitsTestCase::TypeTraitsTestCase (void)
-  : TestCase ("Check type traits")
-{
+TypeTraitsTestCase::TypeTraitsTestCase(void)
+: TestCase("Check type traits") {
 }
 
 void
-TypeTraitsTestCase::DoRun (void)
-{
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (void)>::IsPointerToMember, 1, "Check");
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (void) const>::IsPointerToMember, 1, "Check");
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (int)>::IsPointerToMember, 1, "Check");
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (int) const>::IsPointerToMember, 1, "Check");
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (void) const>::PointerToMemberTraits::nArgs, 0, "Check");
-  NS_TEST_ASSERT_MSG_EQ (TypeTraits<void (TypeTraitsTestCase::*) (int) const>::PointerToMemberTraits::nArgs, 1, "Check");
+TypeTraitsTestCase::DoRun(void) {
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (void) >::IsPointerToMember, 1, "Check");
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (void) const>::IsPointerToMember, 1, "Check");
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (int) >::IsPointerToMember, 1, "Check");
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (int) const>::IsPointerToMember, 1, "Check");
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (void) const>::PointerToMemberTraits::nArgs, 0, "Check");
+    NS_TEST_ASSERT_MSG_EQ(TypeTraits<void (TypeTraitsTestCase::*) (int) const>::PointerToMemberTraits::nArgs, 1, "Check");
 }
 
 class TypeTraitsTestSuite : public TestSuite
 {
-public:
-  TypeTraitsTestSuite ();
-};
+    public :
+    TypeTraitsTestSuite();};
 
-TypeTraitsTestSuite::TypeTraitsTestSuite ()
-  : TestSuite ("type-traits", UNIT)
-{
-  AddTestCase (new TypeTraitsTestCase, TestCase::QUICK);
+TypeTraitsTestSuite::TypeTraitsTestSuite()
+: TestSuite("type-traits", UNIT) {
+    AddTestCase(new TypeTraitsTestCase, TestCase::QUICK);
 }
 
 static TypeTraitsTestSuite typeTraitsTestSuite;

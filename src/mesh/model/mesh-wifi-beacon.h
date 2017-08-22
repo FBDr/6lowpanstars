@@ -29,46 +29,48 @@
 
 namespace ns3 {
 
-/**
- * \brief Beacon is beacon header + list of arbitrary information elements
- *
- * It is supposed that distinct mesh protocols can use beacons to transport
- * their own information elements.
- */
-class MeshWifiBeacon
-{
-public:
-  /**
-   * C-tor
-   *
-   * \param ssid is SSID for beacon header
-   * \param rates is a set of supported rates
-   * \param us beacon interval in microseconds
-   */
-  MeshWifiBeacon (Ssid ssid, SupportedRates rates, uint64_t us);
-  /// Read standard Wifi beacon header
-  MgtBeaconHeader BeaconHeader () const { return m_header; }
-  /// Add information element
-  void AddInformationElement (Ptr<WifiInformationElement> ie);
+    /**
+     * \brief Beacon is beacon header + list of arbitrary information elements
+     *
+     * It is supposed that distinct mesh protocols can use beacons to transport
+     * their own information elements.
+     */
+    class MeshWifiBeacon {
+    public:
+        /**
+         * C-tor
+         *
+         * \param ssid is SSID for beacon header
+         * \param rates is a set of supported rates
+         * \param us beacon interval in microseconds
+         */
+        MeshWifiBeacon(Ssid ssid, SupportedRates rates, uint64_t us);
+        /// Read standard Wifi beacon header
 
-  /**
-   * Create wifi header for beacon frame.
-   *
-   * \param address is sender address
-   * \param mpAddress is mesh point address
-   */
-  WifiMacHeader CreateHeader (Mac48Address address, Mac48Address mpAddress);
-  /// Returns a beacon interval of wifi beacon
-  Time GetBeaconInterval () const;
-  /// Create frame = { beacon header + all information elements sorted by ElementId () }
-  Ptr<Packet> CreatePacket ();
+        MgtBeaconHeader BeaconHeader() const {
+            return m_header;
+        }
+        /// Add information element
+        void AddInformationElement(Ptr<WifiInformationElement> ie);
 
-private:
-  /// Beacon header
-  MgtBeaconHeader m_header;
-  /// List of information elements added
-  MeshInformationElementVector m_elements;
-};
+        /**
+         * Create wifi header for beacon frame.
+         *
+         * \param address is sender address
+         * \param mpAddress is mesh point address
+         */
+        WifiMacHeader CreateHeader(Mac48Address address, Mac48Address mpAddress);
+        /// Returns a beacon interval of wifi beacon
+        Time GetBeaconInterval() const;
+        /// Create frame = { beacon header + all information elements sorted by ElementId () }
+        Ptr<Packet> CreatePacket();
+
+    private:
+        /// Beacon header
+        MgtBeaconHeader m_header;
+        /// List of information elements added
+        MeshInformationElementVector m_elements;
+    };
 
 }
 

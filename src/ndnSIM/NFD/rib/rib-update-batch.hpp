@@ -30,47 +30,45 @@
 #include "rib-update.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-typedef std::list<RibUpdate> RibUpdateList;
+        typedef std::list<RibUpdate> RibUpdateList;
 
-/** \brief represents a collection of RibUpdates to be applied to a single FaceId
- */
-class RibUpdateBatch
-{
-public:
-  typedef RibUpdateList::const_iterator const_iterator;
+        /** \brief represents a collection of RibUpdates to be applied to a single FaceId
+         */
+        class RibUpdateBatch {
+        public:
+            typedef RibUpdateList::const_iterator const_iterator;
 
-  explicit
-  RibUpdateBatch(uint64_t faceId);
+            explicit
+            RibUpdateBatch(uint64_t faceId);
 
-  uint64_t
-  getFaceId() const;
+            uint64_t
+            getFaceId() const;
 
-  void
-  add(const RibUpdate& update);
+            void
+            add(const RibUpdate& update);
 
-  const_iterator
-  begin() const;
+            const_iterator
+            begin() const;
 
-  const_iterator
-  end() const;
+            const_iterator
+            end() const;
 
-  size_t
-  size() const;
+            size_t
+            size() const;
 
-private:
-  uint64_t m_faceId;
-  RibUpdateList m_updates;
-};
+        private:
+            uint64_t m_faceId;
+            RibUpdateList m_updates;
+        };
 
-inline uint64_t
-RibUpdateBatch::getFaceId() const
-{
-  return m_faceId;
-}
+        inline uint64_t
+        RibUpdateBatch::getFaceId() const {
+            return m_faceId;
+        }
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_RIB_UPDATE_BATCH_HPP

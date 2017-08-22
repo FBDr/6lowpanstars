@@ -26,38 +26,35 @@
 #include "guess-from-identity-name.hpp"
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-GuessFromIdentityName::GuessFromIdentityName(Face& face, KeyChain& keyChain,
-                                             const NextStageCallback& nextStageOnFailure)
-  : BaseDns(face, keyChain, nextStageOnFailure)
-{
-}
+            GuessFromIdentityName::GuessFromIdentityName(Face& face, KeyChain& keyChain,
+                    const NextStageCallback& nextStageOnFailure)
+            : BaseDns(face, keyChain, nextStageOnFailure) {
+            }
 
-void
-GuessFromIdentityName::start()
-{
-  std::cerr << "Trying to find home router based on the default identity name..." << std::endl;
+            void
+            GuessFromIdentityName::start() {
+                std::cerr << "Trying to find home router based on the default identity name..." << std::endl;
 
-  Name identity = m_keyChain.getDefaultIdentity();
+                Name identity = m_keyChain.getDefaultIdentity();
 
-  std::ostringstream serverName;
-  for (auto i = identity.rbegin(); i != identity.rend(); ++i) {
-    serverName << i->toUri() << ".";
-  }
-  serverName << "_homehub._autoconf.named-data.net";
+                std::ostringstream serverName;
+                for (auto i = identity.rbegin(); i != identity.rend(); ++i) {
+                    serverName << i->toUri() << ".";
+                }
+                serverName << "_homehub._autoconf.named-data.net";
 
-  try {
-    std::string hubUri = BaseDns::querySrvRr(serverName.str());
-    this->connectToHub(hubUri);
-  }
-  catch (const BaseDns::Error& e) {
-    m_nextStageOnFailure(std::string("Failed to find a home router based on the default identity "
-                                     "name (") + e.what() + ")");
-  }
-}
+                try {
+                    std::string hubUri = BaseDns::querySrvRr(serverName.str());
+                    this->connectToHub(hubUri);
+                } catch (const BaseDns::Error& e) {
+                    m_nextStageOnFailure(std::string("Failed to find a home router based on the default identity "
+                            "name (") + e.what() + ")");
+                }
+            }
 
-} // namespace autoconfig
-} // namespace tools
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn

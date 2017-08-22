@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     RngSeedManager::SetSeed(1);
     RngSeedManager::SetRun(rngfeed);
-    
+
     //ICMPv6 redirects do not optimise routes in single router case.
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
 
@@ -196,7 +196,7 @@ int main(int argc, char **argv) {
         i_6lowpan[jdx].SetForwarding(node_periph, true);
         //i_csma[jdx].SetDefaultRouteInAllNodes(1);
         //i_csma[jdx].SetDefaultRouteInAllNodes(0);
-        i_csma[jdx].SetForwarding(0, true); 
+        i_csma[jdx].SetForwarding(0, true);
         i_csma[jdx].SetForwarding(1, true);
 
     }

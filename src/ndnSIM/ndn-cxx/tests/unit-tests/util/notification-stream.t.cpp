@@ -33,44 +33,43 @@
 #include "../identity-management-time-fixture.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(UtilNotificationStream, ndn::tests::IdentityManagementTimeFixture)
+            BOOST_FIXTURE_TEST_SUITE(UtilNotificationStream, ndn::tests::IdentityManagementTimeFixture)
 
-BOOST_AUTO_TEST_CASE(Post)
-{
-  DummyClientFace face(io, m_keyChain);
-  util::NotificationStream<SimpleNotification> notificationStream(face,
-    "/localhost/nfd/NotificationStreamTest", m_keyChain);
+            BOOST_AUTO_TEST_CASE(Post) {
+                DummyClientFace face(io, m_keyChain);
+                util::NotificationStream<SimpleNotification> notificationStream(face,
+                        "/localhost/nfd/NotificationStreamTest", m_keyChain);
 
-  SimpleNotification event1("msg1");
-  notificationStream.postNotification(event1);
+                SimpleNotification event1("msg1");
+                notificationStream.postNotification(event1);
 
-  advanceClocks(time::milliseconds(1));
+                advanceClocks(time::milliseconds(1));
 
-  BOOST_REQUIRE_EQUAL(face.sentData.size(), 1);
-  BOOST_CHECK_EQUAL(face.sentData[0].getName(),
-                    "/localhost/nfd/NotificationStreamTest/%FE%00");
-  SimpleNotification decoded1;
-  BOOST_CHECK_NO_THROW(decoded1.wireDecode(face.sentData[0].getContent().blockFromValue()));
-  BOOST_CHECK_EQUAL(decoded1.getMessage(), "msg1");
+                BOOST_REQUIRE_EQUAL(face.sentData.size(), 1);
+                BOOST_CHECK_EQUAL(face.sentData[0].getName(),
+                        "/localhost/nfd/NotificationStreamTest/%FE%00");
+                SimpleNotification decoded1;
+                BOOST_CHECK_NO_THROW(decoded1.wireDecode(face.sentData[0].getContent().blockFromValue()));
+                BOOST_CHECK_EQUAL(decoded1.getMessage(), "msg1");
 
-  SimpleNotification event2("msg2");
-  notificationStream.postNotification(event2);
+                SimpleNotification event2("msg2");
+                notificationStream.postNotification(event2);
 
-  advanceClocks(time::milliseconds(1));
+                advanceClocks(time::milliseconds(1));
 
-  BOOST_REQUIRE_EQUAL(face.sentData.size(), 2);
-  BOOST_CHECK_EQUAL(face.sentData[1].getName(),
-                    "/localhost/nfd/NotificationStreamTest/%FE%01");
-  SimpleNotification decoded2;
-  BOOST_CHECK_NO_THROW(decoded2.wireDecode(face.sentData[1].getContent().blockFromValue()));
-  BOOST_CHECK_EQUAL(decoded2.getMessage(), "msg2");
-}
+                BOOST_REQUIRE_EQUAL(face.sentData.size(), 2);
+                BOOST_CHECK_EQUAL(face.sentData[1].getName(),
+                        "/localhost/nfd/NotificationStreamTest/%FE%01");
+                SimpleNotification decoded2;
+                BOOST_CHECK_NO_THROW(decoded2.wireDecode(face.sentData[1].getContent().blockFromValue()));
+                BOOST_CHECK_EQUAL(decoded2.getMessage(), "msg2");
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

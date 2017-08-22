@@ -26,31 +26,29 @@
 #include "face.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-Face::Face(unique_ptr<LinkService> service, unique_ptr<Transport> transport)
-  : afterReceiveInterest(service->afterReceiveInterest)
-  , afterReceiveData(service->afterReceiveData)
-  , afterReceiveNack(service->afterReceiveNack)
-  , afterStateChange(transport->afterStateChange)
-  , m_id(INVALID_FACEID)
-  , m_service(std::move(service))
-  , m_transport(std::move(transport))
-  , m_counters(m_service->getCounters(), m_transport->getCounters())
-  , m_metric(0)
-{
-  m_service->setFaceAndTransport(*this, *m_transport);
-  m_transport->setFaceAndLinkService(*this, *m_service);
-}
+        Face::Face(unique_ptr<LinkService> service, unique_ptr<Transport> transport)
+        : afterReceiveInterest(service->afterReceiveInterest)
+        , afterReceiveData(service->afterReceiveData)
+        , afterReceiveNack(service->afterReceiveNack)
+        , afterStateChange(transport->afterStateChange)
+        , m_id(INVALID_FACEID)
+        , m_service(std::move(service))
+        , m_transport(std::move(transport))
+        , m_counters(m_service->getCounters(), m_transport->getCounters())
+        , m_metric(0) {
+            m_service->setFaceAndTransport(*this, *m_transport);
+            m_transport->setFaceAndLinkService(*this, *m_service);
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const FaceLogHelper<Face>& flh)
-{
-  const Face& face = flh.obj;
-  os << "[id=" << face.getId() << ",local=" << face.getLocalUri() <<
-        ",remote=" << face.getRemoteUri() << "] ";
-  return os;
-}
+        std::ostream&
+        operator<<(std::ostream& os, const FaceLogHelper<Face>& flh) {
+            const Face& face = flh.obj;
+            os << "[id=" << face.getId() << ",local=" << face.getLocalUri() <<
+                    ",remote=" << face.getRemoteUri() << "] ";
+            return os;
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

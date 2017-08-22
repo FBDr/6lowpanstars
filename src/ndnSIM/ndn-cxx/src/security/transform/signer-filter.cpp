@@ -24,87 +24,81 @@
 #include "../detail/openssl.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class SignerFilter::Impl
-{
-public:
-  Impl(const PrivateKey& key)
-    : m_key(key)
-    , m_md(BIO_new(BIO_f_md()))
-    , m_sink(BIO_new(BIO_s_null()))
-  {
-    BIO_push(m_md, m_sink);
-  }
+            class SignerFilter::Impl {
+            public:
 
-  ~Impl()
-  {
-    BIO_free_all(m_md);
-  }
+                Impl(const PrivateKey& key)
+                : m_key(key)
+                , m_md(BIO_new(BIO_f_md()))
+                , m_sink(BIO_new(BIO_s_null())) {
+                    BIO_push(m_md, m_sink);
+                }
 
-public:
-  const PrivateKey& m_key;
+                ~Impl() {
+                    BIO_free_all(m_md);
+                }
 
-  BIO* m_md;
-  BIO* m_sink;
-};
+            public:
+                const PrivateKey& m_key;
 
-SignerFilter::SignerFilter(DigestAlgorithm algo, const PrivateKey& key)
-  : m_impl(new Impl(key))
-{
-  switch (algo) {
-    case DigestAlgorithm::SHA256: {
-      if (!BIO_set_md(m_impl->m_md, EVP_sha256()))
-        BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest"));
-      break;
-    }
+                BIO* m_md;
+                BIO* m_sink;
+            };
 
-    default:
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Digest algorithm is not supported"));
-  }
-}
+            SignerFilter::SignerFilter(DigestAlgorithm algo, const PrivateKey& key)
+            : m_impl(new Impl(key)) {
+                switch (algo) {
+                    case DigestAlgorithm::SHA256:
+                    {
+                        if (!BIO_set_md(m_impl->m_md, EVP_sha256()))
+                            BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest"));
+                        break;
+                    }
 
-size_t
-SignerFilter::convert(const uint8_t* buf, size_t size)
-{
-  int wLen = BIO_write(m_impl->m_md, buf, size);
+                    default:
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Digest algorithm is not supported"));
+                }
+            }
 
-  if (wLen <= 0) { // fail to write data
-    if (!BIO_should_retry(m_impl->m_md)) {
-      // we haven't written everything but some error happens, and we cannot retry
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
-    }
-    return 0;
-  }
-  else { // update number of bytes written
-    return wLen;
-  }
-}
+            size_t
+            SignerFilter::convert(const uint8_t* buf, size_t size) {
+                int wLen = BIO_write(m_impl->m_md, buf, size);
 
-void
-SignerFilter::finalize()
-{
-  EVP_PKEY* key = reinterpret_cast<EVP_PKEY*>(m_impl->m_key.getEvpPkey());
-  auto buffer = make_unique<OBuffer>(EVP_PKEY_size(key));
-  unsigned int sigLen = 0;
+                if (wLen <= 0) { // fail to write data
+                    if (!BIO_should_retry(m_impl->m_md)) {
+                        // we haven't written everything but some error happens, and we cannot retry
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
+                    }
+                    return 0;
+                } else { // update number of bytes written
+                    return wLen;
+                }
+            }
 
-  EVP_MD_CTX* ctx = nullptr;
-  BIO_get_md_ctx(m_impl->m_md, &ctx);
-  EVP_SignFinal(ctx, &(*buffer)[0], &sigLen, key); // should be ok, enough space is allocated in buffer
+            void
+            SignerFilter::finalize() {
+                EVP_PKEY* key = reinterpret_cast<EVP_PKEY*> (m_impl->m_key.getEvpPkey());
+                auto buffer = make_unique<OBuffer>(EVP_PKEY_size(key));
+                unsigned int sigLen = 0;
 
-  buffer->erase(buffer->begin() + sigLen, buffer->end());
-  setOutputBuffer(std::move(buffer));
+                EVP_MD_CTX* ctx = nullptr;
+                BIO_get_md_ctx(m_impl->m_md, &ctx);
+                EVP_SignFinal(ctx, &(*buffer)[0], &sigLen, key); // should be ok, enough space is allocated in buffer
 
-  flushAllOutput();
-}
+                buffer->erase(buffer->begin() + sigLen, buffer->end());
+                setOutputBuffer(std::move(buffer));
 
-unique_ptr<Transform>
-signerFilter(DigestAlgorithm algo, const PrivateKey& key)
-{
-  return make_unique<SignerFilter>(algo, key);
-}
+                flushAllOutput();
+            }
 
-} // namespace transform
-} // namespace security
+            unique_ptr<Transform>
+            signerFilter(DigestAlgorithm algo, const PrivateKey& key) {
+                return make_unique<SignerFilter>(algo, key);
+            }
+
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

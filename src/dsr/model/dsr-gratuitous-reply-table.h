@@ -39,76 +39,75 @@
 #include <vector>
 
 namespace ns3 {
-namespace dsr {
-/*
- * The gratuitous table entries, it maintains the already sent gratuitous route reply entries.
- * When the node "promiscuously" received a packet destined for other nodes, and inferred a shorter
- * route for the data packet, it will construct a route reply and send back to the source
- */
-struct GraReplyEntry
-{
-  Ipv4Address m_replyTo;
-  Ipv4Address m_hearFrom;
-  Time m_gratReplyHoldoff;
+    namespace dsr {
 
-  GraReplyEntry (Ipv4Address t, Ipv4Address f, Time h)
-    : m_replyTo (t),
-      m_hearFrom (f),
-      m_gratReplyHoldoff (h)
-  {
-  }
-};
-/**
- * \ingroup dsr
- * \brief maintain the gratuitous reply
- */
-class GraReply  : public Object
-{
-public:
+        /*
+         * The gratuitous table entries, it maintains the already sent gratuitous route reply entries.
+         * When the node "promiscuously" received a packet destined for other nodes, and inferred a shorter
+         * route for the data packet, it will construct a route reply and send back to the source
+         */
+        struct GraReplyEntry {
+            Ipv4Address m_replyTo;
+            Ipv4Address m_hearFrom;
+            Time m_gratReplyHoldoff;
 
-  static TypeId GetTypeId ();
+            GraReplyEntry(Ipv4Address t, Ipv4Address f, Time h)
+            : m_replyTo(t),
+            m_hearFrom(f),
+            m_gratReplyHoldoff(h) {
+            }
+        };
 
-  GraReply ();
-  virtual ~GraReply ();
+        /**
+         * \ingroup dsr
+         * \brief maintain the gratuitous reply
+         */
+        class GraReply : public Object {
+        public:
 
-  /// Set the gratuitous reply table size
-  void SetGraTableSize (uint32_t g)
-  {
-    GraReplyTableSize = g;
-  }
-  /// Get the gratuitous reply table size
-  uint32_t GetGraTableSize () const
-  {
-    return GraReplyTableSize;
-  }
-  /// Add a new gratuitous reply entry
-  bool AddEntry (GraReplyEntry & graTableEntry);
-  /// Update the route entry if found, create a new one if not
-  bool FindAndUpdate (Ipv4Address replyTo, Ipv4Address replyFrom, Time gratReplyHoldoff);
-  /// Remove all expired entries
-  void Purge ();
-  /// Remove all entries
-  void Clear ()
-  {
-    m_graReply.clear ();
-  }
+            static TypeId GetTypeId();
 
-private:
-  /// Vector of entries
-  std::vector<GraReplyEntry> m_graReply;
-  /// The max # of gratuitous reply entries to hold
-  uint32_t GraReplyTableSize;
+            GraReply();
+            virtual ~GraReply();
 
-  /// Check if the entry is expired or not
-  struct IsExpired
-  {
-    bool operator() (const struct GraReplyEntry & b) const
-    {
-      return (b.m_gratReplyHoldoff < Simulator::Now ());
-    }
-  };
-};
-}  // namespace dsr
-}  // namespace ns3
+            /// Set the gratuitous reply table size
+
+            void SetGraTableSize(uint32_t g) {
+                GraReplyTableSize = g;
+            }
+            /// Get the gratuitous reply table size
+
+            uint32_t GetGraTableSize() const {
+                return GraReplyTableSize;
+            }
+            /// Add a new gratuitous reply entry
+            bool AddEntry(GraReplyEntry & graTableEntry);
+            /// Update the route entry if found, create a new one if not
+            bool FindAndUpdate(Ipv4Address replyTo, Ipv4Address replyFrom, Time gratReplyHoldoff);
+            /// Remove all expired entries
+            void Purge();
+            /// Remove all entries
+
+            void Clear() {
+                m_graReply.clear();
+            }
+
+        private:
+            /// Vector of entries
+            std::vector<GraReplyEntry> m_graReply;
+            /// The max # of gratuitous reply entries to hold
+            uint32_t GraReplyTableSize;
+
+            /// Check if the entry is expired or not
+
+            struct IsExpired {
+
+                bool operator()(const struct GraReplyEntry & b) const {
+                    return (b.m_gratReplyHoldoff < Simulator::Now());
+                }
+            };
+        };
+    } // namespace dsr
+} // namespace ns3
 
 #endif /* DSR_GRATUITOUS_REPLY_TABLE_H */

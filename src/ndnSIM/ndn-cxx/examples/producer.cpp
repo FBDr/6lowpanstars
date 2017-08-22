@@ -30,79 +30,74 @@
 
 // Enclosing code in ndn simplifies coding (can also use `using namespace ndn`)
 namespace ndn {
-// Additional nested namespace could be used to prevent/limit name contentions
-namespace examples {
+    // Additional nested namespace could be used to prevent/limit name contentions
+    namespace examples {
 
-class Producer : noncopyable
-{
-public:
-  void
-  run()
-  {
-    m_face.setInterestFilter("/example/testApp",
-                             bind(&Producer::onInterest, this, _1, _2),
-                             RegisterPrefixSuccessCallback(),
-                             bind(&Producer::onRegisterFailed, this, _1, _2));
-    m_face.processEvents();
-  }
+        class Producer : noncopyable {
+        public:
 
-private:
-  void
-  onInterest(const InterestFilter& filter, const Interest& interest)
-  {
-    std::cout << "<< I: " << interest << std::endl;
+            void
+            run() {
+                m_face.setInterestFilter("/example/testApp",
+                        bind(&Producer::onInterest, this, _1, _2),
+                        RegisterPrefixSuccessCallback(),
+                        bind(&Producer::onRegisterFailed, this, _1, _2));
+                m_face.processEvents();
+            }
 
-    // Create new name, based on Interest's name
-    Name dataName(interest.getName());
-    dataName
-      .append("testApp") // add "testApp" component to Interest name
-      .appendVersion();  // add "version" component (current UNIX timestamp in milliseconds)
+        private:
 
-    static const std::string content = "HELLO KITTY";
+            void
+            onInterest(const InterestFilter& filter, const Interest& interest) {
+                std::cout << "<< I: " << interest << std::endl;
 
-    // Create Data packet
-    shared_ptr<Data> data = make_shared<Data>();
-    data->setName(dataName);
-    data->setFreshnessPeriod(time::seconds(10));
-    data->setContent(reinterpret_cast<const uint8_t*>(content.c_str()), content.size());
+                // Create new name, based on Interest's name
+                Name dataName(interest.getName());
+                dataName
+                        .append("testApp") // add "testApp" component to Interest name
+                        .appendVersion(); // add "version" component (current UNIX timestamp in milliseconds)
 
-    // Sign Data packet with default identity
-    m_keyChain.sign(*data);
-    // m_keyChain.sign(data, <identityName>);
-    // m_keyChain.sign(data, <certificate>);
+                static const std::string content = "HELLO KITTY";
 
-    // Return Data packet to the requester
-    std::cout << ">> D: " << *data << std::endl;
-    m_face.put(*data);
-  }
+                // Create Data packet
+                shared_ptr<Data> data = make_shared<Data>();
+                data->setName(dataName);
+                data->setFreshnessPeriod(time::seconds(10));
+                data->setContent(reinterpret_cast<const uint8_t*> (content.c_str()), content.size());
 
+                // Sign Data packet with default identity
+                m_keyChain.sign(*data);
+                // m_keyChain.sign(data, <identityName>);
+                // m_keyChain.sign(data, <certificate>);
 
-  void
-  onRegisterFailed(const Name& prefix, const std::string& reason)
-  {
-    std::cerr << "ERROR: Failed to register prefix \""
-              << prefix << "\" in local hub's daemon (" << reason << ")"
-              << std::endl;
-    m_face.shutdown();
-  }
+                // Return Data packet to the requester
+                std::cout << ">> D: " << *data << std::endl;
+                m_face.put(*data);
+            }
 
-private:
-  Face m_face;
-  KeyChain m_keyChain;
-};
+            void
+            onRegisterFailed(const Name& prefix, const std::string& reason) {
+                std::cerr << "ERROR: Failed to register prefix \""
+                        << prefix << "\" in local hub's daemon (" << reason << ")"
+                        << std::endl;
+                m_face.shutdown();
+            }
 
-} // namespace examples
+        private:
+            Face m_face;
+            KeyChain m_keyChain;
+        };
+
+    } // namespace examples
 } // namespace ndn
 
 int
-main(int argc, char** argv)
-{
-  ndn::examples::Producer producer;
-  try {
-    producer.run();
-  }
-  catch (const std::exception& e) {
-    std::cerr << "ERROR: " << e.what() << std::endl;
-  }
-  return 0;
+main(int argc, char** argv) {
+    ndn::examples::Producer producer;
+    try {
+        producer.run();
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+    }
+    return 0;
 }

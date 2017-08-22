@@ -27,14 +27,12 @@
 #include <boost/bind.hpp>
 
 void
-placeholders2TestFunction(int i)
-{
+placeholders2TestFunction(int i) {
 }
 
 int
-placeholders2TestMain()
-{
-  auto f = boost::bind(&placeholders2TestFunction, _1);
-  f(1);
-  return 0;
+placeholders2TestMain() {
+    auto f = boost::bind(&placeholders2TestFunction, _1);
+    f(1);
+    return 0;
 }

@@ -38,155 +38,128 @@
 #define NS_LOG_APPEND_CONTEXT                                   \
   std::clog << "[address " << m_shortAddress << "] ";
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("LrWpanNullMac");
-
-NS_OBJECT_ENSURE_REGISTERED (LrWpanNullMac);
-
-TypeId
-LrWpanNullMac::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::LrWpanNullMac")
-    .SetParent<LrWpanMac> ()
-    .SetGroupName ("LrWpan")
-    .AddConstructor<LrWpanNullMac> ()
-  ;
-  return tid;
-}
 
-LrWpanNullMac::LrWpanNullMac ()
-{
-  // First set the state to a known value, call ChangeMacState to fire trace source.
-  m_lrWpanMacState = MAC_IDLE;
-  ChangeMacState (MAC_IDLE);
+    NS_LOG_COMPONENT_DEFINE("LrWpanNullMac");
 
-  m_macRxOnWhenIdle = true;
-  m_qSize = 0;
-  m_macPanId = 0;
-  m_associationStatus = ASSOCIATED;
-  m_selfExt = Mac64Address::Allocate ();
-  m_macPromiscuousMode = false;
-  m_macMaxFrameRetries = 3;
-  m_retransmission = 0;
-  m_numCsmacaRetry = 0;
-  m_txPkt = 0;
+    NS_OBJECT_ENSURE_REGISTERED(LrWpanNullMac);
 
-  Ptr<UniformRandomVariable> uniformVar = CreateObject<UniformRandomVariable> ();
-  uniformVar->SetAttribute ("Min", DoubleValue (0.0));
-  uniformVar->SetAttribute ("Max", DoubleValue (255.0));
-  m_macDsn = SequenceNumber8 (uniformVar->GetValue ());
-  m_shortAddress = Mac16Address ("00:00");
-}
-
-LrWpanNullMac::~LrWpanNullMac ()
-{
-}
-
-void
-LrWpanNullMac::DoInitialize ()
-{
-  if (m_macRxOnWhenIdle)
-    {
-      m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
-    }
-  else
-    {
-      m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_TRX_OFF);
+    TypeId
+    LrWpanNullMac::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::LrWpanNullMac")
+                .SetParent<LrWpanMac> ()
+                .SetGroupName("LrWpan")
+                .AddConstructor<LrWpanNullMac> ()
+                ;
+        return tid;
     }
 
-  LrWpanMac::DoInitialize ();
-}
+    LrWpanNullMac::LrWpanNullMac() {
+        // First set the state to a known value, call ChangeMacState to fire trace source.
+        m_lrWpanMacState = MAC_IDLE;
+        ChangeMacState(MAC_IDLE);
 
-void
-LrWpanNullMac::DoDispose ()
-{
-  LrWpanMac::DoDispose ();
-}
+        m_macRxOnWhenIdle = true;
+        m_qSize = 0;
+        m_macPanId = 0;
+        m_associationStatus = ASSOCIATED;
+        m_selfExt = Mac64Address::Allocate();
+        m_macPromiscuousMode = false;
+        m_macMaxFrameRetries = 3;
+        m_retransmission = 0;
+        m_numCsmacaRetry = 0;
+        m_txPkt = 0;
 
-bool
-LrWpanNullMac::GetRxOnWhenIdle ()
-{
-  return m_macRxOnWhenIdle;
-}
-
-void
-LrWpanNullMac::SetRxOnWhenIdle (bool rxOnWhenIdle)
-{
-  NS_LOG_FUNCTION (this << rxOnWhenIdle);
-  m_macRxOnWhenIdle = rxOnWhenIdle;
-
-  if (m_lrWpanMacState == MAC_IDLE)
-    {
-      if (m_macRxOnWhenIdle)
-        {
-          m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
-        }
-      else
-        {
-          m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_TRX_OFF);
-        }
+        Ptr<UniformRandomVariable> uniformVar = CreateObject<UniformRandomVariable> ();
+        uniformVar->SetAttribute("Min", DoubleValue(0.0));
+        uniformVar->SetAttribute("Max", DoubleValue(255.0));
+        m_macDsn = SequenceNumber8(uniformVar->GetValue());
+        m_shortAddress = Mac16Address("00:00");
     }
-}
 
-void
-LrWpanNullMac::SetLrWpanMacState (LrWpanMacState macState)
-{
-  NS_LOG_FUNCTION (this << "mac state = " << macState);
+    LrWpanNullMac::~LrWpanNullMac() {
+    }
 
-  McpsDataConfirmParams confirmParams;
-
-  if (macState == MAC_IDLE)
-    {
-      ChangeMacState (MAC_IDLE);
-
-      if (m_macRxOnWhenIdle)
-        {
-          m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
-        }
-      else
-        {
-          m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_TRX_OFF);
+    void
+    LrWpanNullMac::DoInitialize() {
+        if (m_macRxOnWhenIdle) {
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
+        } else {
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TRX_OFF);
         }
 
-      CheckQueue ();
+        LrWpanMac::DoInitialize();
     }
-  else if (macState == MAC_ACK_PENDING)
-    {
-      ChangeMacState (MAC_ACK_PENDING);
-      m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
-    }
-  else if (macState == MAC_CSMA)
-    {
-      NS_ASSERT (m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING);
 
-      ChangeMacState (MAC_CSMA);
-      m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
+    void
+    LrWpanNullMac::DoDispose() {
+        LrWpanMac::DoDispose();
     }
-  else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_IDLE)
-    {
-      // Channel is idle, set transmitter to TX_ON
-      ChangeMacState (MAC_SENDING);
-      m_phy->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_TX_ON);
-    }
-  else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_ACCESS_FAILURE)
-    {
-      NS_ASSERT (m_txPkt);
 
-      // cannot find a clear channel, drop the current packet.
-      NS_LOG_DEBUG ( this << " cannot find clear channel");
-      confirmParams.m_msduHandle = m_txQueue.front ()->txQMsduHandle;
-      confirmParams.m_status = IEEE_802_15_4_CHANNEL_ACCESS_FAILURE;
-      m_macTxDropTrace (m_txPkt);
-      if (!m_mcpsDataConfirmCallback.IsNull ())
-        {
-          m_mcpsDataConfirmCallback (confirmParams);
+    bool
+    LrWpanNullMac::GetRxOnWhenIdle() {
+        return m_macRxOnWhenIdle;
+    }
+
+    void
+    LrWpanNullMac::SetRxOnWhenIdle(bool rxOnWhenIdle) {
+        NS_LOG_FUNCTION(this << rxOnWhenIdle);
+        m_macRxOnWhenIdle = rxOnWhenIdle;
+
+        if (m_lrWpanMacState == MAC_IDLE) {
+            if (m_macRxOnWhenIdle) {
+                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
+            } else {
+                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TRX_OFF);
+            }
         }
-      // remove the copy of the packet that was just sent
-      RemoveFirstTxQElement ();
-
-      ChangeMacState (MAC_IDLE);
     }
-}
+
+    void
+    LrWpanNullMac::SetLrWpanMacState(LrWpanMacState macState) {
+        NS_LOG_FUNCTION(this << "mac state = " << macState);
+
+        McpsDataConfirmParams confirmParams;
+
+        if (macState == MAC_IDLE) {
+            ChangeMacState(MAC_IDLE);
+
+            if (m_macRxOnWhenIdle) {
+                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
+            } else {
+                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TRX_OFF);
+            }
+
+            CheckQueue();
+        } else if (macState == MAC_ACK_PENDING) {
+            ChangeMacState(MAC_ACK_PENDING);
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
+        } else if (macState == MAC_CSMA) {
+            NS_ASSERT(m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING);
+
+            ChangeMacState(MAC_CSMA);
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
+        } else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_IDLE) {
+            // Channel is idle, set transmitter to TX_ON
+            ChangeMacState(MAC_SENDING);
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+        } else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_ACCESS_FAILURE) {
+            NS_ASSERT(m_txPkt);
+
+            // cannot find a clear channel, drop the current packet.
+            NS_LOG_DEBUG(this << " cannot find clear channel");
+            confirmParams.m_msduHandle = m_txQueue.front()->txQMsduHandle;
+            confirmParams.m_status = IEEE_802_15_4_CHANNEL_ACCESS_FAILURE;
+            m_macTxDropTrace(m_txPkt);
+            if (!m_mcpsDataConfirmCallback.IsNull()) {
+                m_mcpsDataConfirmCallback(confirmParams);
+            }
+            // remove the copy of the packet that was just sent
+            RemoveFirstTxQElement();
+
+            ChangeMacState(MAC_IDLE);
+        }
+    }
 
 } // namespace ns3

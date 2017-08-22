@@ -59,69 +59,68 @@ using ns3::ndn::StrategyChoiceHelper;
  */
 
 int
-main(int argc, char* argv[])
-{
-  // Setting default parameters for PointToPoint links and channels
-  Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
-  Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("10"));
+main(int argc, char* argv[]) {
+    // Setting default parameters for PointToPoint links and channels
+    Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
+    Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+    Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("10"));
 
-  // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
-  CommandLine cmd;
-  cmd.Parse(argc, argv);
+    // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
+    CommandLine cmd;
+    cmd.Parse(argc, argv);
 
-  // Creating 3x3 topology
-  PointToPointHelper p2p;
-  PointToPointGridHelper grid(3, 3, p2p);
-  grid.BoundingBox(100, 100, 200, 200);
+    // Creating 3x3 topology
+    PointToPointHelper p2p;
+    PointToPointGridHelper grid(3, 3, p2p);
+    grid.BoundingBox(100, 100, 200, 200);
 
-  // Install NDN stack on all nodes
-  StackHelper ndnHelper;
-  ndnHelper.InstallAll();
+    // Install NDN stack on all nodes
+    StackHelper ndnHelper;
+    ndnHelper.InstallAll();
 
-  // Installing global routing interface on all nodes
-  GlobalRoutingHelper ndnGlobalRoutingHelper;
-  ndnGlobalRoutingHelper.InstallAll();
+    // Installing global routing interface on all nodes
+    GlobalRoutingHelper ndnGlobalRoutingHelper;
+    ndnGlobalRoutingHelper.InstallAll();
 
-  // Getting containers for the consumer/producer
-  Ptr<Node> producer = grid.GetNode(2, 2);
-  NodeContainer consumerNodes;
-  consumerNodes.Add(grid.GetNode(0, 0));
+    // Getting containers for the consumer/producer
+    Ptr<Node> producer = grid.GetNode(2, 2);
+    NodeContainer consumerNodes;
+    consumerNodes.Add(grid.GetNode(0, 0));
 
-  // Install NDN applications
-  std::string prefix = "/prefix";
+    // Install NDN applications
+    std::string prefix = "/prefix";
 
-  // Install different forwarding strategies
-  for (int row = 0; row < 3; row++) {
-    for (int column = 0; column < 3; column++) {
-      if (row < 2)
-        StrategyChoiceHelper::Install(grid.GetNode(row, column), "/prefix",
-                                      "/localhost/nfd/strategy/best-route");
-      else
-        StrategyChoiceHelper::Install(grid.GetNode(row, column), "/prefix",
-                                      "/localhost/nfd/strategy/multicast");
+    // Install different forwarding strategies
+    for (int row = 0; row < 3; row++) {
+        for (int column = 0; column < 3; column++) {
+            if (row < 2)
+                StrategyChoiceHelper::Install(grid.GetNode(row, column), "/prefix",
+                    "/localhost/nfd/strategy/best-route");
+            else
+                StrategyChoiceHelper::Install(grid.GetNode(row, column), "/prefix",
+                    "/localhost/nfd/strategy/multicast");
+        }
     }
-  }
 
-  AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetPrefix(prefix);
-  consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
-  consumerHelper.Install(consumerNodes);
+    AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+    consumerHelper.SetPrefix(prefix);
+    consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
+    consumerHelper.Install(consumerNodes);
 
-  AppHelper producerHelper("ns3::ndn::Producer");
-  producerHelper.SetPrefix(prefix);
-  producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-  producerHelper.Install(producer);
+    AppHelper producerHelper("ns3::ndn::Producer");
+    producerHelper.SetPrefix(prefix);
+    producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+    producerHelper.Install(producer);
 
-  // Add /prefix origins to ndn::GlobalRouter
-  ndnGlobalRoutingHelper.AddOrigins(prefix, producer);
+    // Add /prefix origins to ndn::GlobalRouter
+    ndnGlobalRoutingHelper.AddOrigins(prefix, producer);
 
-  // Calculate and install FIBs
-  GlobalRoutingHelper::CalculateRoutes();
+    // Calculate and install FIBs
+    GlobalRoutingHelper::CalculateRoutes();
 
-  Simulator::Stop(Seconds(20.0));
-  Simulator::Run();
-  Simulator::Destroy();
+    Simulator::Stop(Seconds(20.0));
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

@@ -22,55 +22,49 @@
 #include "hex-encode.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-static const char H2CL[16] = {
-  '0', '1', '2', '3', '4', '5', '6', '7',
-  '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-};
+            static const char H2CL[16] = {
+                '0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+            };
 
-static const char H2CU[16] = {
-  '0', '1', '2', '3', '4', '5', '6', '7',
-  '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-};
+            static const char H2CU[16] = {
+                '0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+            };
 
-HexEncode::HexEncode(bool useUpperCase)
-  : m_useUpperCase(useUpperCase)
-{
-}
+            HexEncode::HexEncode(bool useUpperCase)
+            : m_useUpperCase(useUpperCase) {
+            }
 
-size_t
-HexEncode::convert(const uint8_t* data, size_t dataLen)
-{
-  setOutputBuffer(toHex(data, dataLen));
-  return dataLen;
-}
+            size_t
+            HexEncode::convert(const uint8_t* data, size_t dataLen) {
+                setOutputBuffer(toHex(data, dataLen));
+                return dataLen;
+            }
 
-unique_ptr<Transform::OBuffer>
-HexEncode::toHex(const uint8_t* data, size_t dataLen)
-{
-  const char* encodePad = (m_useUpperCase) ? H2CU : H2CL;
+            unique_ptr<Transform::OBuffer>
+            HexEncode::toHex(const uint8_t* data, size_t dataLen) {
+                const char* encodePad = (m_useUpperCase) ? H2CU : H2CL;
 
-  auto encoded = make_unique<OBuffer>(dataLen * 2);
-  uint8_t* buf = &encoded->front();
-  for (size_t i = 0; i < dataLen; i++) {
-    buf[0] = encodePad[((data[i] >> 4) & 0x0F)];
-    buf++;
-    buf[0] = encodePad[(data[i] & 0x0F)];
-    buf++;
-  }
-  return encoded;
-}
+                auto encoded = make_unique<OBuffer>(dataLen * 2);
+                uint8_t* buf = &encoded->front();
+                for (size_t i = 0; i < dataLen; i++) {
+                    buf[0] = encodePad[((data[i] >> 4) & 0x0F)];
+                    buf++;
+                    buf[0] = encodePad[(data[i] & 0x0F)];
+                    buf++;
+                }
+                return encoded;
+            }
 
+            unique_ptr<Transform>
+            hexEncode(bool useUpperCase) {
+                return make_unique<HexEncode>(useUpperCase);
+            }
 
-
-unique_ptr<Transform>
-hexEncode(bool useUpperCase)
-{
-  return make_unique<HexEncode>(useUpperCase);
-}
-
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

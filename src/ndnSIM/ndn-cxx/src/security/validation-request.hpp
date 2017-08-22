@@ -27,70 +27,68 @@
 #include "../interest.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/// @brief Callback to report a successful Interest validation.
-typedef function<void(const shared_ptr<const Interest>&)> OnInterestValidated;
+        /// @brief Callback to report a successful Interest validation.
+        typedef function<void(const shared_ptr<const Interest>&) > OnInterestValidated;
 
-/// @brief Callback to report a failed Interest validation.
-typedef function<void(const shared_ptr<const Interest>&,
-                      const std::string&)> OnInterestValidationFailed;
+        /// @brief Callback to report a failed Interest validation.
+        typedef function<void(const shared_ptr<const Interest>&,
+                const std::string&) > OnInterestValidationFailed;
 
-/// @brief Callback to report a successful Data validation.
-typedef function<void(const shared_ptr<const Data>&)> OnDataValidated;
+        /// @brief Callback to report a successful Data validation.
+        typedef function<void(const shared_ptr<const Data>&) > OnDataValidated;
 
-/// @brief Callback to report a failed Data validation.
-typedef function<void(const shared_ptr<const Data>&,
-                      const std::string&)> OnDataValidationFailed;
+        /// @brief Callback to report a failed Data validation.
+        typedef function<void(const shared_ptr<const Data>&,
+                const std::string&) > OnDataValidationFailed;
 
-/**
- * @brief ValidationRequest contains information related to further validation.
- *
- * During a validation process, validator may not have retrieved the corresponding public
- * key of the signature in a packet. ValidationRequest contains the interest for the
- * certificate that carries the public key and also contains the context for the certificate
- * including how to proceed when the public key is authenticated or not, the number of
- * validation steps that have been performed, and how to handle interest timeout.
- */
-class ValidationRequest
-{
-public:
-  ValidationRequest(const Interest& interest,
+        /**
+         * @brief ValidationRequest contains information related to further validation.
+         *
+         * During a validation process, validator may not have retrieved the corresponding public
+         * key of the signature in a packet. ValidationRequest contains the interest for the
+         * certificate that carries the public key and also contains the context for the certificate
+         * including how to proceed when the public key is authenticated or not, the number of
+         * validation steps that have been performed, and how to handle interest timeout.
+         */
+        class ValidationRequest {
+        public:
+
+            ValidationRequest(const Interest& interest,
                     const OnDataValidated& onDataValidated,
                     const OnDataValidationFailed& onDataValidationFailed,
                     int nRetries, int nSteps)
-    : m_interest(interest)
-    , m_onDataValidated(onDataValidated)
-    , m_onDataValidationFailed(onDataValidationFailed)
-    , m_nRetries(nRetries)
-    , m_nSteps(nSteps)
-  {
-  }
+            : m_interest(interest)
+            , m_onDataValidated(onDataValidated)
+            , m_onDataValidationFailed(onDataValidationFailed)
+            , m_nRetries(nRetries)
+            , m_nSteps(nSteps) {
+            }
 
-  virtual
-  ~ValidationRequest()
-  {
-  }
+            virtual
+            ~ValidationRequest() {
+            }
 
-  /// @brief the Interest for the requested data/certificate.
-  Interest m_interest;
-  /// @brief callback when the retrieved certificate is authenticated.
-  OnDataValidated m_onDataValidated;
-  /// @brief callback when the retrieved certificate cannot be authenticated.
-  OnDataValidationFailed m_onDataValidationFailed;
-  /// @brief the number of retries when the interest times out.
-  int m_nRetries;
-  /// @brief the number of validation steps that have been performed.
-  int m_nSteps;
-};
+            /// @brief the Interest for the requested data/certificate.
+            Interest m_interest;
+            /// @brief callback when the retrieved certificate is authenticated.
+            OnDataValidated m_onDataValidated;
+            /// @brief callback when the retrieved certificate cannot be authenticated.
+            OnDataValidationFailed m_onDataValidationFailed;
+            /// @brief the number of retries when the interest times out.
+            int m_nRetries;
+            /// @brief the number of validation steps that have been performed.
+            int m_nSteps;
+        };
 
-} // namespace security
+    } // namespace security
 
-using security::ValidationRequest;
-using security::OnInterestValidated;
-using security::OnInterestValidationFailed;
-using security::OnDataValidated;
-using security::OnDataValidationFailed;
+    using security::ValidationRequest;
+    using security::OnInterestValidated;
+    using security::OnInterestValidationFailed;
+    using security::OnDataValidated;
+    using security::OnDataValidationFailed;
 
 } // namespace ndn
 

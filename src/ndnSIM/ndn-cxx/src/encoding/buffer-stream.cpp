@@ -22,39 +22,34 @@
 #include "buffer-stream.hpp"
 
 namespace ndn {
-namespace detail {
+    namespace detail {
 
-BufferAppendDevice::BufferAppendDevice(Buffer& container)
-  : m_container(container)
-{
-}
+        BufferAppendDevice::BufferAppendDevice(Buffer& container)
+        : m_container(container) {
+        }
 
-std::streamsize
-BufferAppendDevice::write(const char_type* s, std::streamsize n)
-{
-  m_container.insert(m_container.end(), s, s + n);
-  return n;
-}
+        std::streamsize
+        BufferAppendDevice::write(const char_type* s, std::streamsize n) {
+            m_container.insert(m_container.end(), s, s + n);
+            return n;
+        }
 
-} // namespace detail
+    } // namespace detail
 
-OBufferStream::OBufferStream()
-  : m_buffer(make_shared<Buffer>())
-  , m_device(*m_buffer)
-{
-  open(m_device);
-}
+    OBufferStream::OBufferStream()
+    : m_buffer(make_shared<Buffer>())
+    , m_device(*m_buffer) {
+        open(m_device);
+    }
 
-OBufferStream::~OBufferStream()
-{
-  close();
-}
+    OBufferStream::~OBufferStream() {
+        close();
+    }
 
-shared_ptr<Buffer>
-OBufferStream::buf()
-{
-  flush();
-  return m_buffer;
-}
+    shared_ptr<Buffer>
+    OBufferStream::buf() {
+        flush();
+        return m_buffer;
+    }
 
 } // namespace ndn

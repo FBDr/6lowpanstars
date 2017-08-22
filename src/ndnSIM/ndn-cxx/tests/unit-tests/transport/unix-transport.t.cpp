@@ -25,40 +25,36 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TransportUnixTransport, TransportFixture)
+        BOOST_FIXTURE_TEST_SUITE(TransportUnixTransport, TransportFixture)
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOk)
-{
-  BOOST_CHECK_EQUAL(UnixTransport::getSocketNameFromUri("unix:///tmp/test/nfd.sock"), "/tmp/test/nfd.sock");
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOk) {
+            BOOST_CHECK_EQUAL(UnixTransport::getSocketNameFromUri("unix:///tmp/test/nfd.sock"), "/tmp/test/nfd.sock");
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOkOmittedSocketOmittedProtocol)
-{
-  BOOST_CHECK_EQUAL(UnixTransport::getSocketNameFromUri(""), "/var/run/nfd.sock");
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOkOmittedSocketOmittedProtocol) {
+            BOOST_CHECK_EQUAL(UnixTransport::getSocketNameFromUri(""), "/var/run/nfd.sock");
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketNameBadWrongTransport)
-{
-  BOOST_CHECK_EXCEPTION(UnixTransport::getSocketNameFromUri("tcp://"),
-                        Transport::Error,
-                        [] (const Transport::Error& error) {
-                          return error.what() == std::string("Cannot create UnixTransport "
-                                                             "from \"tcp\" URI");
-                        });
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketNameBadWrongTransport) {
+            BOOST_CHECK_EXCEPTION(UnixTransport::getSocketNameFromUri("tcp://"),
+                    Transport::Error,
+                    [] (const Transport::Error & error) {
+                        return error.what() == std::string("Cannot create UnixTransport "
+                                "from \"tcp\" URI");
+                    });
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketNameBadMalformedUri)
-{
-  BOOST_CHECK_EXCEPTION(UnixTransport::getSocketNameFromUri("unix"),
-                        Transport::Error,
-                        [] (const Transport::Error& error) {
-                          return error.what() == std::string("Malformed URI: unix");
-                        });
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketNameBadMalformedUri) {
+            BOOST_CHECK_EXCEPTION(UnixTransport::getSocketNameFromUri("unix"),
+                    Transport::Error,
+                    [] (const Transport::Error & error) {
+                        return error.what() == std::string("Malformed URI: unix");
+                    });
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

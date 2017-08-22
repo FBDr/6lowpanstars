@@ -30,106 +30,103 @@
 #include "core/scheduler.hpp"
 
 namespace nfd {
-namespace cs {
-namespace priority_fifo {
+    namespace cs {
+        namespace priority_fifo {
 
-typedef std::list<iterator> Queue;
-typedef Queue::iterator QueueIt;
+            typedef std::list<iterator> Queue;
+            typedef Queue::iterator QueueIt;
 
-enum QueueType {
-  QUEUE_UNSOLICITED,
-  QUEUE_STALE,
-  QUEUE_FIFO,
-  QUEUE_MAX
-};
+            enum QueueType {
+                QUEUE_UNSOLICITED,
+                QUEUE_STALE,
+                QUEUE_FIFO,
+                QUEUE_MAX
+            };
 
-struct EntryInfo
-{
-  QueueType queueType;
-  QueueIt queueIt;
-  scheduler::EventId moveStaleEventId;
-};
+            struct EntryInfo {
+                QueueType queueType;
+                QueueIt queueIt;
+                scheduler::EventId moveStaleEventId;
+            };
 
-struct EntryItComparator
-{
-  bool
-  operator()(const iterator& a, const iterator& b) const
-  {
-    return *a < *b;
-  }
-};
+            struct EntryItComparator {
 
-typedef std::map<iterator, EntryInfo*, EntryItComparator> EntryInfoMapFifo;
+                bool
+                operator()(const iterator& a, const iterator& b) const {
+                    return *a < *b;
+                }
+            };
 
-/** \brief Priority Fifo cs replacement policy
- *
- * The entries that get removed first are unsolicited Data packets,
- * which are the Data packets that got cached opportunistically without preceding
- * forwarding of the corresponding Interest packet.
- * Next, the Data packets with expired freshness are removed.
- * Last, the Data packets are removed from the Content Store on a pure FIFO basis.
- */
-class PriorityFifoPolicy : public Policy
-{
-public:
-  PriorityFifoPolicy();
+            typedef std::map<iterator, EntryInfo*, EntryItComparator> EntryInfoMapFifo;
 
-  virtual
-  ~PriorityFifoPolicy();
+            /** \brief Priority Fifo cs replacement policy
+             *
+             * The entries that get removed first are unsolicited Data packets,
+             * which are the Data packets that got cached opportunistically without preceding
+             * forwarding of the corresponding Interest packet.
+             * Next, the Data packets with expired freshness are removed.
+             * Last, the Data packets are removed from the Content Store on a pure FIFO basis.
+             */
+            class PriorityFifoPolicy : public Policy {
+            public:
+                PriorityFifoPolicy();
 
-public:
-  static const std::string POLICY_NAME;
+                virtual
+                ~PriorityFifoPolicy();
 
-private:
-  virtual void
-  doAfterInsert(iterator i) override;
+            public:
+                static const std::string POLICY_NAME;
 
-  virtual void
-  doAfterRefresh(iterator i) override;
+            private:
+                virtual void
+                doAfterInsert(iterator i) override;
 
-  virtual void
-  doBeforeErase(iterator i) override;
+                virtual void
+                doAfterRefresh(iterator i) override;
 
-  virtual void
-  doBeforeUse(iterator i) override;
+                virtual void
+                doBeforeErase(iterator i) override;
 
-  virtual void
-  evictEntries() override;
+                virtual void
+                doBeforeUse(iterator i) override;
 
-private:
-  /** \brief evicts one entry
-   *  \pre CS is not empty
-   */
-  void
-  evictOne();
+                virtual void
+                evictEntries() override;
 
-  /** \brief attaches the entry to an appropriate queue
-   *  \pre the entry is not in any queue
-   */
-  void
-  attachQueue(iterator i);
+            private:
+                /** \brief evicts one entry
+                 *  \pre CS is not empty
+                 */
+                void
+                evictOne();
 
-  /** \brief detaches the entry from its current queue
-   *  \post the entry is not in any queue
-   */
-  void
-  detachQueue(iterator i);
+                /** \brief attaches the entry to an appropriate queue
+                 *  \pre the entry is not in any queue
+                 */
+                void
+                attachQueue(iterator i);
 
-  /** \brief moves an entry from FIFO queue to STALE queue
-   */
-  void
-  moveToStaleQueue(iterator i);
+                /** \brief detaches the entry from its current queue
+                 *  \post the entry is not in any queue
+                 */
+                void
+                detachQueue(iterator i);
 
-private:
-  Queue m_queues[QUEUE_MAX];
-  EntryInfoMapFifo m_entryInfoMap;
-};
+                /** \brief moves an entry from FIFO queue to STALE queue
+                 */
+                void
+                moveToStaleQueue(iterator i);
 
-} // namespace priority_fifo
+            private:
+                Queue m_queues[QUEUE_MAX];
+                EntryInfoMapFifo m_entryInfoMap;
+            };
 
-using priority_fifo::PriorityFifoPolicy;
+        } // namespace priority_fifo
 
-} // namespace cs
+        using priority_fifo::PriorityFifoPolicy;
+
+    } // namespace cs
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_CS_POLICY_FIFO_HPP

@@ -38,7 +38,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("Ns3SocketTest");
+NS_LOG_COMPONENT_DEFINE("Ns3SocketTest");
 
 // ===========================================================================
 // Tests of TCP implementations from the application/socket perspective
@@ -47,232 +47,220 @@ NS_LOG_COMPONENT_DEFINE ("Ns3SocketTest");
 //
 class Ns3TcpSocketTestCase1 : public TestCase
 {
-public:
-  Ns3TcpSocketTestCase1 ();
-  virtual ~Ns3TcpSocketTestCase1 () {}
+    public :
+    Ns3TcpSocketTestCase1();
+    virtual ~Ns3TcpSocketTestCase1()
+    {}
 
 private:
-  virtual void DoRun (void);
-  bool m_writeResults;
+    virtual void DoRun(void);
+    bool m_writeResults;
 
-  void SinkRx (std::string path, Ptr<const Packet> p, const Address &address);
+    void SinkRx(std::string path, Ptr<const Packet> p, const Address & address);
 
-  TestVectors<uint32_t> m_inputs;
-  TestVectors<uint32_t> m_responses;
-};
+    TestVectors<uint32_t> m_inputs;
+    TestVectors<uint32_t> m_responses;};
 
-Ns3TcpSocketTestCase1::Ns3TcpSocketTestCase1 ()
-  : TestCase ("Check that ns-3 TCP successfully transfers an application data write of various sizes (point-to-point)"),
-    m_writeResults (false)
-{
-}
-
-void 
-Ns3TcpSocketTestCase1::SinkRx (std::string path, Ptr<const Packet> p, const Address &address)
-{
-  m_responses.Add (p->GetSize ());
+Ns3TcpSocketTestCase1::Ns3TcpSocketTestCase1()
+: TestCase("Check that ns-3 TCP successfully transfers an application data write of various sizes (point-to-point)"),
+m_writeResults(false) {
 }
 
 void
-Ns3TcpSocketTestCase1::DoRun (void)
-{
-  uint16_t sinkPort = 50000;
-  double sinkStopTime = 40;  // sec; will trigger Socket::Close
-  double writerStopTime = 30;  // sec; will trigger Socket::Close
-  double simStopTime = 60;  // sec
-  Time sinkStopTimeObj = Seconds (sinkStopTime);
-  Time writerStopTimeObj = Seconds (writerStopTime);
-  Time simStopTimeObj= Seconds (simStopTime);
+Ns3TcpSocketTestCase1::SinkRx(std::string path, Ptr<const Packet> p, const Address &address) {
+    m_responses.Add(p->GetSize());
+}
 
-  Ptr<Node> n0 = CreateObject<Node> ();
-  Ptr<Node> n1 = CreateObject<Node> ();
+void
+Ns3TcpSocketTestCase1::DoRun(void) {
+    uint16_t sinkPort = 50000;
+    double sinkStopTime = 40; // sec; will trigger Socket::Close
+    double writerStopTime = 30; // sec; will trigger Socket::Close
+    double simStopTime = 60; // sec
+    Time sinkStopTimeObj = Seconds(sinkStopTime);
+    Time writerStopTimeObj = Seconds(writerStopTime);
+    Time simStopTimeObj = Seconds(simStopTime);
 
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+    Ptr<Node> n0 = CreateObject<Node> ();
+    Ptr<Node> n1 = CreateObject<Node> ();
 
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (n0, n1);
+    PointToPointHelper pointToPoint;
+    pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    pointToPoint.SetChannelAttribute("Delay", StringValue("2ms"));
 
-  InternetStackHelper internet;
-  internet.InstallAll ();
+    NetDeviceContainer devices;
+    devices = pointToPoint.Install(n0, n1);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.252");
-  Ipv4InterfaceContainer ifContainer = address.Assign (devices);
+    InternetStackHelper internet;
+    internet.InstallAll();
 
-  Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
-  Address sinkAddress (InetSocketAddress (ifContainer.GetAddress (1), sinkPort));
-  socketWriter->Setup (n0, sinkAddress);
-  n0->AddApplication (socketWriter);
-  socketWriter->SetStartTime (Seconds (0.));
-  socketWriter->SetStopTime (writerStopTimeObj);
+    Ipv4AddressHelper address;
+    address.SetBase("10.1.1.0", "255.255.255.252");
+    Ipv4InterfaceContainer ifContainer = address.Assign(devices);
 
-  PacketSinkHelper sink ("ns3::TcpSocketFactory",
-                         InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer apps = sink.Install (n1);
-  // Start the sink application at time zero, and stop it at sinkStopTime
-  apps.Start (Seconds (0.0));
-  apps.Stop (sinkStopTimeObj);
+    Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
+    Address sinkAddress(InetSocketAddress(ifContainer.GetAddress(1), sinkPort));
+    socketWriter->Setup(n0, sinkAddress);
+    n0->AddApplication(socketWriter);
+    socketWriter->SetStartTime(Seconds(0.));
+    socketWriter->SetStopTime(writerStopTimeObj);
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
-                   MakeCallback (&Ns3TcpSocketTestCase1::SinkRx, this));
+    PacketSinkHelper sink("ns3::TcpSocketFactory",
+            InetSocketAddress(Ipv4Address::GetAny(), sinkPort));
+    ApplicationContainer apps = sink.Install(n1);
+    // Start the sink application at time zero, and stop it at sinkStopTime
+    apps.Start(Seconds(0.0));
+    apps.Stop(sinkStopTimeObj);
 
-  Simulator::Schedule (Seconds (2), &SocketWriter::Connect, socketWriter);
-  // Send 1, 10, 100, 1000 bytes
-  Simulator::Schedule (Seconds (10), &SocketWriter::Write, socketWriter, 1);
-  m_inputs.Add (1);
-  Simulator::Schedule (Seconds (12), &SocketWriter::Write, socketWriter, 10);
-  m_inputs.Add (10);
-  Simulator::Schedule (Seconds (14), &SocketWriter::Write, socketWriter, 100);
-  m_inputs.Add (100);
-  Simulator::Schedule (Seconds (16), &SocketWriter::Write, socketWriter, 1000);
-  m_inputs.Add (536);
-  m_inputs.Add (464);  // ns-3 TCP default segment size of 536
-  Simulator::Schedule (writerStopTimeObj, &SocketWriter::Close, socketWriter);
+    Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
+            MakeCallback(&Ns3TcpSocketTestCase1::SinkRx, this));
 
-  if (m_writeResults)
-    {
-      pointToPoint.EnablePcapAll ("tcp-socket-test-case-1");
+    Simulator::Schedule(Seconds(2), &SocketWriter::Connect, socketWriter);
+    // Send 1, 10, 100, 1000 bytes
+    Simulator::Schedule(Seconds(10), &SocketWriter::Write, socketWriter, 1);
+    m_inputs.Add(1);
+    Simulator::Schedule(Seconds(12), &SocketWriter::Write, socketWriter, 10);
+    m_inputs.Add(10);
+    Simulator::Schedule(Seconds(14), &SocketWriter::Write, socketWriter, 100);
+    m_inputs.Add(100);
+    Simulator::Schedule(Seconds(16), &SocketWriter::Write, socketWriter, 1000);
+    m_inputs.Add(536);
+    m_inputs.Add(464); // ns-3 TCP default segment size of 536
+    Simulator::Schedule(writerStopTimeObj, &SocketWriter::Close, socketWriter);
+
+    if (m_writeResults) {
+        pointToPoint.EnablePcapAll("tcp-socket-test-case-1");
     }
 
-  Simulator::Stop (simStopTimeObj);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(simStopTimeObj);
+    Simulator::Run();
+    Simulator::Destroy();
 
-  // Compare inputs and outputs
-  NS_TEST_ASSERT_MSG_EQ (m_inputs.GetN (), m_responses.GetN (), "Incorrect number of expected receive events");
-  for (uint32_t i = 0; i < m_responses.GetN (); i++)
-    {
-      uint32_t in = m_inputs.Get (i);
-      uint32_t out = m_responses.Get (i);
-      NS_TEST_ASSERT_MSG_EQ (in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
+    // Compare inputs and outputs
+    NS_TEST_ASSERT_MSG_EQ(m_inputs.GetN(), m_responses.GetN(), "Incorrect number of expected receive events");
+    for (uint32_t i = 0; i < m_responses.GetN(); i++) {
+        uint32_t in = m_inputs.Get(i);
+        uint32_t out = m_responses.Get(i);
+        NS_TEST_ASSERT_MSG_EQ(in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
     }
 }
 
 class Ns3TcpSocketTestCase2 : public TestCase
 {
-public:
-  Ns3TcpSocketTestCase2 ();
-  virtual ~Ns3TcpSocketTestCase2 () {}
+    public :
+    Ns3TcpSocketTestCase2();
+    virtual ~Ns3TcpSocketTestCase2()
+    {}
 
 private:
-  virtual void DoRun (void);
-  bool m_writeResults;
+    virtual void DoRun(void);
+    bool m_writeResults;
 
-  void SinkRx (std::string path, Ptr<const Packet> p, const Address &address);
+    void SinkRx(std::string path, Ptr<const Packet> p, const Address & address);
 
-  TestVectors<uint32_t> m_inputs;
-  TestVectors<uint32_t> m_responses;
-};
+    TestVectors<uint32_t> m_inputs;
+    TestVectors<uint32_t> m_responses;};
 
-Ns3TcpSocketTestCase2::Ns3TcpSocketTestCase2 ()
-  : TestCase ("Check to see that ns-3 TCP successfully transfers an application data write of various sizes (CSMA)"),
-    m_writeResults (false)
-{
-}
-
-void 
-Ns3TcpSocketTestCase2::SinkRx (std::string path, Ptr<const Packet> p, const Address &address)
-{
-  m_responses.Add (p->GetSize ());
+Ns3TcpSocketTestCase2::Ns3TcpSocketTestCase2()
+: TestCase("Check to see that ns-3 TCP successfully transfers an application data write of various sizes (CSMA)"),
+m_writeResults(false) {
 }
 
 void
-Ns3TcpSocketTestCase2::DoRun (void)
-{
-  uint16_t sinkPort = 50000;
-  double sinkStopTime = 40;  // sec; will trigger Socket::Close
-  double writerStopTime = 30;  // sec; will trigger Socket::Close
-  double simStopTime = 60;  // sec
-  Time sinkStopTimeObj = Seconds (sinkStopTime);
-  Time writerStopTimeObj = Seconds (writerStopTime);
-  Time simStopTimeObj= Seconds (simStopTime);
+Ns3TcpSocketTestCase2::SinkRx(std::string path, Ptr<const Packet> p, const Address &address) {
+    m_responses.Add(p->GetSize());
+}
 
-  Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (1000));
+void
+Ns3TcpSocketTestCase2::DoRun(void) {
+    uint16_t sinkPort = 50000;
+    double sinkStopTime = 40; // sec; will trigger Socket::Close
+    double writerStopTime = 30; // sec; will trigger Socket::Close
+    double simStopTime = 60; // sec
+    Time sinkStopTimeObj = Seconds(sinkStopTime);
+    Time writerStopTimeObj = Seconds(writerStopTime);
+    Time simStopTimeObj = Seconds(simStopTime);
 
-  NodeContainer nodes;
-  nodes.Create (2);
-  Ptr<Node> n0 = nodes.Get (0);
-  Ptr<Node> n1 = nodes.Get (1);
+    Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(1000));
 
-  CsmaHelper csma;
-  csma.SetChannelAttribute ("DataRate", StringValue ("5Mbps"));
-  csma.SetChannelAttribute ("Delay", StringValue ("2ms"));
+    NodeContainer nodes;
+    nodes.Create(2);
+    Ptr<Node> n0 = nodes.Get(0);
+    Ptr<Node> n1 = nodes.Get(1);
 
-  NetDeviceContainer devices;
-  devices = csma.Install (nodes);
+    CsmaHelper csma;
+    csma.SetChannelAttribute("DataRate", StringValue("5Mbps"));
+    csma.SetChannelAttribute("Delay", StringValue("2ms"));
 
-  InternetStackHelper internet;
-  internet.InstallAll ();
+    NetDeviceContainer devices;
+    devices = csma.Install(nodes);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.252");
-  Ipv4InterfaceContainer ifContainer = address.Assign (devices);
+    InternetStackHelper internet;
+    internet.InstallAll();
 
-  Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
-  Address sinkAddress (InetSocketAddress (ifContainer.GetAddress (1), sinkPort));
-  socketWriter->Setup (n0, sinkAddress);
-  n0->AddApplication (socketWriter);
-  socketWriter->SetStartTime (Seconds (0.));
-  socketWriter->SetStopTime (writerStopTimeObj);
+    Ipv4AddressHelper address;
+    address.SetBase("10.1.1.0", "255.255.255.252");
+    Ipv4InterfaceContainer ifContainer = address.Assign(devices);
 
-  PacketSinkHelper sink ("ns3::TcpSocketFactory",
-                         InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer apps = sink.Install (n1);
-  // Start the sink application at time zero, and stop it at sinkStopTime
-  apps.Start (Seconds (0.0));
-  apps.Stop (sinkStopTimeObj);
+    Ptr<SocketWriter> socketWriter = CreateObject<SocketWriter> ();
+    Address sinkAddress(InetSocketAddress(ifContainer.GetAddress(1), sinkPort));
+    socketWriter->Setup(n0, sinkAddress);
+    n0->AddApplication(socketWriter);
+    socketWriter->SetStartTime(Seconds(0.));
+    socketWriter->SetStopTime(writerStopTimeObj);
 
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
-                   MakeCallback (&Ns3TcpSocketTestCase2::SinkRx, this));
+    PacketSinkHelper sink("ns3::TcpSocketFactory",
+            InetSocketAddress(Ipv4Address::GetAny(), sinkPort));
+    ApplicationContainer apps = sink.Install(n1);
+    // Start the sink application at time zero, and stop it at sinkStopTime
+    apps.Start(Seconds(0.0));
+    apps.Stop(sinkStopTimeObj);
 
-  Simulator::Schedule (Seconds (2), &SocketWriter::Connect, socketWriter);
-  // Send 1, 10, 100, 1000 bytes
-  // PointToPoint default MTU is 576 bytes, which leaves 536 bytes for TCP
-  Simulator::Schedule (Seconds (10), &SocketWriter::Write, socketWriter, 1);
-  m_inputs.Add (1);
-  Simulator::Schedule (Seconds (12), &SocketWriter::Write, socketWriter, 10);
-  m_inputs.Add (10);
-  Simulator::Schedule (Seconds (14), &SocketWriter::Write, socketWriter, 100);
-  m_inputs.Add (100);
-  Simulator::Schedule (Seconds (16), &SocketWriter::Write, socketWriter, 1000);
-  m_inputs.Add (1000);
-  // Next packet will fragment
-  Simulator::Schedule (Seconds (16), &SocketWriter::Write, socketWriter, 1001);
-  m_inputs.Add (1000);
-  m_inputs.Add (1);
-  Simulator::Schedule (writerStopTimeObj, &SocketWriter::Close, socketWriter);
+    Config::Connect("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx",
+            MakeCallback(&Ns3TcpSocketTestCase2::SinkRx, this));
 
-  if (m_writeResults)
-    {
-      csma.EnablePcapAll ("tcp-socket-test-case-2", false);
+    Simulator::Schedule(Seconds(2), &SocketWriter::Connect, socketWriter);
+    // Send 1, 10, 100, 1000 bytes
+    // PointToPoint default MTU is 576 bytes, which leaves 536 bytes for TCP
+    Simulator::Schedule(Seconds(10), &SocketWriter::Write, socketWriter, 1);
+    m_inputs.Add(1);
+    Simulator::Schedule(Seconds(12), &SocketWriter::Write, socketWriter, 10);
+    m_inputs.Add(10);
+    Simulator::Schedule(Seconds(14), &SocketWriter::Write, socketWriter, 100);
+    m_inputs.Add(100);
+    Simulator::Schedule(Seconds(16), &SocketWriter::Write, socketWriter, 1000);
+    m_inputs.Add(1000);
+    // Next packet will fragment
+    Simulator::Schedule(Seconds(16), &SocketWriter::Write, socketWriter, 1001);
+    m_inputs.Add(1000);
+    m_inputs.Add(1);
+    Simulator::Schedule(writerStopTimeObj, &SocketWriter::Close, socketWriter);
+
+    if (m_writeResults) {
+        csma.EnablePcapAll("tcp-socket-test-case-2", false);
     }
-  Simulator::Stop (simStopTimeObj);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(simStopTimeObj);
+    Simulator::Run();
+    Simulator::Destroy();
 
-  // Compare inputs and outputs
-  NS_TEST_ASSERT_MSG_EQ (m_inputs.GetN (), m_responses.GetN (), "Incorrect number of expected receive events");
-  for (uint32_t i = 0; i < m_responses.GetN (); i++)
-    {
-      uint32_t in = m_inputs.Get (i);
-      uint32_t out = m_responses.Get (i);
-      NS_TEST_ASSERT_MSG_EQ (in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
+    // Compare inputs and outputs
+    NS_TEST_ASSERT_MSG_EQ(m_inputs.GetN(), m_responses.GetN(), "Incorrect number of expected receive events");
+    for (uint32_t i = 0; i < m_responses.GetN(); i++) {
+        uint32_t in = m_inputs.Get(i);
+        uint32_t out = m_responses.Get(i);
+        NS_TEST_ASSERT_MSG_EQ(in, out, "Mismatch:  expected " << in << " bytes, got " << out << " bytes");
     }
 }
 
 class Ns3TcpSocketTestSuite : public TestSuite
 {
-public:
-  Ns3TcpSocketTestSuite ();
-};
+    public :
+    Ns3TcpSocketTestSuite();};
 
-Ns3TcpSocketTestSuite::Ns3TcpSocketTestSuite ()
-  : TestSuite ("ns3-tcp-socket", SYSTEM)
-{
-  AddTestCase (new Ns3TcpSocketTestCase1, TestCase::QUICK);
-  AddTestCase (new Ns3TcpSocketTestCase2, TestCase::QUICK);
+Ns3TcpSocketTestSuite::Ns3TcpSocketTestSuite()
+: TestSuite("ns3-tcp-socket", SYSTEM) {
+    AddTestCase(new Ns3TcpSocketTestCase1, TestCase::QUICK);
+    AddTestCase(new Ns3TcpSocketTestCase2, TestCase::QUICK);
 }
 
 static Ns3TcpSocketTestSuite ns3TcpSocketTestSuite;

@@ -33,56 +33,49 @@ using namespace ns3;
 
 class ManyUniformRandomVariablesOneGetValueCallTestCase : public TestCase
 {
-public:
-  ManyUniformRandomVariablesOneGetValueCallTestCase ();
-  virtual ~ManyUniformRandomVariablesOneGetValueCallTestCase ();
+    public :
+    ManyUniformRandomVariablesOneGetValueCallTestCase();
+    virtual ~ManyUniformRandomVariablesOneGetValueCallTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-ManyUniformRandomVariablesOneGetValueCallTestCase::ManyUniformRandomVariablesOneGetValueCallTestCase ()
-  : TestCase ("Many Uniform Random Variables with One GetValue() Call")
-{
+ManyUniformRandomVariablesOneGetValueCallTestCase::ManyUniformRandomVariablesOneGetValueCallTestCase()
+: TestCase("Many Uniform Random Variables with One GetValue() Call") {
 }
 
-ManyUniformRandomVariablesOneGetValueCallTestCase::~ManyUniformRandomVariablesOneGetValueCallTestCase ()
-{
+ManyUniformRandomVariablesOneGetValueCallTestCase::~ManyUniformRandomVariablesOneGetValueCallTestCase() {
 }
 
 void
-ManyUniformRandomVariablesOneGetValueCallTestCase::DoRun (void)
-{
-  double min = 0.0;
-  double max = 10.0;
+ManyUniformRandomVariablesOneGetValueCallTestCase::DoRun(void) {
+    double min = 0.0;
+    double max = 10.0;
 
-  Config::SetDefault ("ns3::UniformRandomVariable::Min", DoubleValue (min));
-  Config::SetDefault ("ns3::UniformRandomVariable::Max", DoubleValue (max));
+    Config::SetDefault("ns3::UniformRandomVariable::Min", DoubleValue(min));
+    Config::SetDefault("ns3::UniformRandomVariable::Max", DoubleValue(max));
 
-  // Get 1 value from many uniform random number generators.
-  double value;
-  int count = 1000000;
-  std::vector< Ptr<UniformRandomVariable> > uniformStreamVector (count);
-  for (int i = 0; i < count; i++)
-    {
-      uniformStreamVector.push_back (CreateObject<UniformRandomVariable> ());
-      value = uniformStreamVector.back ()->GetValue ();
+    // Get 1 value from many uniform random number generators.
+    double value;
+    int count = 1000000;
+    std::vector< Ptr<UniformRandomVariable> > uniformStreamVector(count);
+    for (int i = 0; i < count; i++) {
+        uniformStreamVector.push_back(CreateObject<UniformRandomVariable> ());
+        value = uniformStreamVector.back()->GetValue();
 
-      NS_TEST_ASSERT_MSG_GT (value, min, "Value less than minimum.");
-      NS_TEST_ASSERT_MSG_LT (value, max, "Value greater than maximum.");
+        NS_TEST_ASSERT_MSG_GT(value, min, "Value less than minimum.");
+        NS_TEST_ASSERT_MSG_LT(value, max, "Value greater than maximum.");
     }
 }
 
 class ManyUniformRandomVariablesOneGetValueCallTestSuite : public TestSuite
 {
-public:
-  ManyUniformRandomVariablesOneGetValueCallTestSuite ();
-};
+    public :
+    ManyUniformRandomVariablesOneGetValueCallTestSuite();};
 
-ManyUniformRandomVariablesOneGetValueCallTestSuite::ManyUniformRandomVariablesOneGetValueCallTestSuite ()
-  : TestSuite ("many-uniform-random-variables-one-get-value-call", PERFORMANCE)
-{
-  AddTestCase (new ManyUniformRandomVariablesOneGetValueCallTestCase, TestCase::QUICK);
+ManyUniformRandomVariablesOneGetValueCallTestSuite::ManyUniformRandomVariablesOneGetValueCallTestSuite()
+: TestSuite("many-uniform-random-variables-one-get-value-call", PERFORMANCE) {
+    AddTestCase(new ManyUniformRandomVariablesOneGetValueCallTestCase, TestCase::QUICK);
 }
 
 static ManyUniformRandomVariablesOneGetValueCallTestSuite manyUniformRandomVariablesOneGetValueCallTestSuite;

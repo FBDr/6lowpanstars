@@ -24,144 +24,125 @@
 #include "ns3/names.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("EnergyHarvesterContainer");
-
-NS_OBJECT_ENSURE_REGISTERED (EnergyHarvesterContainer);
-
-TypeId
-EnergyHarvesterContainer::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::EnergyHarvesterContainer")
-    .SetParent<Object> ()
-    .SetGroupName ("Energy")
-    .AddConstructor<EnergyHarvesterContainer> ()
-  ;
-  return tid;
-}
 
-EnergyHarvesterContainer::EnergyHarvesterContainer ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("EnergyHarvesterContainer");
 
-EnergyHarvesterContainer::~EnergyHarvesterContainer ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(EnergyHarvesterContainer);
 
-EnergyHarvesterContainer::EnergyHarvesterContainer (Ptr<EnergyHarvester> harvester)
-{
-  NS_LOG_FUNCTION (this << harvester);
-  NS_ASSERT (harvester != 0);
-  m_harvesters.push_back (harvester);
-}
+    TypeId
+    EnergyHarvesterContainer::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::EnergyHarvesterContainer")
+                .SetParent<Object> ()
+                .SetGroupName("Energy")
+                .AddConstructor<EnergyHarvesterContainer> ()
+                ;
+        return tid;
+    }
 
-EnergyHarvesterContainer::EnergyHarvesterContainer (std::string harvesterName)
-{
-  NS_LOG_FUNCTION (this << harvesterName);
-  Ptr<EnergyHarvester> harvester = Names::Find<EnergyHarvester> (harvesterName);
-  NS_ASSERT (harvester != 0);
-  m_harvesters.push_back (harvester);
-}
+    EnergyHarvesterContainer::EnergyHarvesterContainer() {
+        NS_LOG_FUNCTION(this);
+    }
 
-EnergyHarvesterContainer::EnergyHarvesterContainer (const EnergyHarvesterContainer &a,
-                                                    const EnergyHarvesterContainer &b)
-{
-  NS_LOG_FUNCTION (this << &a << &b);
-  *this = a;
-  Add (b);
-}
+    EnergyHarvesterContainer::~EnergyHarvesterContainer() {
+        NS_LOG_FUNCTION(this);
+    }
 
-EnergyHarvesterContainer::Iterator
-EnergyHarvesterContainer::Begin (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_harvesters.begin ();
-}
+    EnergyHarvesterContainer::EnergyHarvesterContainer(Ptr<EnergyHarvester> harvester) {
+        NS_LOG_FUNCTION(this << harvester);
+        NS_ASSERT(harvester != 0);
+        m_harvesters.push_back(harvester);
+    }
 
-EnergyHarvesterContainer::Iterator
-EnergyHarvesterContainer::End (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_harvesters.end ();
-}
+    EnergyHarvesterContainer::EnergyHarvesterContainer(std::string harvesterName) {
+        NS_LOG_FUNCTION(this << harvesterName);
+        Ptr<EnergyHarvester> harvester = Names::Find<EnergyHarvester> (harvesterName);
+        NS_ASSERT(harvester != 0);
+        m_harvesters.push_back(harvester);
+    }
 
-uint32_t
-EnergyHarvesterContainer::GetN (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_harvesters.size ();
-}
+    EnergyHarvesterContainer::EnergyHarvesterContainer(const EnergyHarvesterContainer &a,
+            const EnergyHarvesterContainer & b) {
+        NS_LOG_FUNCTION(this << &a << &b);
+        *this = a;
+        Add(b);
+    }
 
-Ptr<EnergyHarvester>
-EnergyHarvesterContainer::Get (uint32_t i) const
-{
-  NS_LOG_FUNCTION (this << i);
-  return m_harvesters[i];
-}
+    EnergyHarvesterContainer::Iterator
+    EnergyHarvesterContainer::Begin(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_harvesters.begin();
+    }
 
-void
-EnergyHarvesterContainer::Add (EnergyHarvesterContainer container)
-{
-  NS_LOG_FUNCTION (this << &container);
-  for (Iterator i = container.Begin (); i != container.End (); i++)
-  {
-      m_harvesters.push_back (*i);
-  }
-}
+    EnergyHarvesterContainer::Iterator
+    EnergyHarvesterContainer::End(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_harvesters.end();
+    }
 
-void
-EnergyHarvesterContainer::Add (Ptr<EnergyHarvester> harvester)
-{
-  NS_LOG_FUNCTION (this << harvester);
-  NS_ASSERT (harvester != 0);
-  m_harvesters.push_back (harvester);
-}
+    uint32_t
+    EnergyHarvesterContainer::GetN(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_harvesters.size();
+    }
 
-void
-EnergyHarvesterContainer::Add (std::string harvesterName)
-{
-  NS_LOG_FUNCTION (this << harvesterName);
-  Ptr<EnergyHarvester> harvester = Names::Find<EnergyHarvester> (harvesterName);
-  NS_ASSERT (harvester != 0);
-  m_harvesters.push_back (harvester);
-}
+    Ptr<EnergyHarvester>
+            EnergyHarvesterContainer::Get(uint32_t i) const {
+        NS_LOG_FUNCTION(this << i);
+        return m_harvesters[i];
+    }
 
-void
-EnergyHarvesterContainer::Clear (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_harvesters.clear ();
-}
+    void
+    EnergyHarvesterContainer::Add(EnergyHarvesterContainer container) {
+        NS_LOG_FUNCTION(this << &container);
+        for (Iterator i = container.Begin(); i != container.End(); i++) {
+            m_harvesters.push_back(*i);
+        }
+    }
 
+    void
+    EnergyHarvesterContainer::Add(Ptr<EnergyHarvester> harvester) {
+        NS_LOG_FUNCTION(this << harvester);
+        NS_ASSERT(harvester != 0);
+        m_harvesters.push_back(harvester);
+    }
 
-/*
- * Private functions start here.
- */
+    void
+    EnergyHarvesterContainer::Add(std::string harvesterName) {
+        NS_LOG_FUNCTION(this << harvesterName);
+        Ptr<EnergyHarvester> harvester = Names::Find<EnergyHarvester> (harvesterName);
+        NS_ASSERT(harvester != 0);
+        m_harvesters.push_back(harvester);
+    }
 
-void
-EnergyHarvesterContainer::DoDispose (void)
-{
-  // call Object::Dispose for all EnergyHarvester objects
-  for (std::vector< Ptr<EnergyHarvester> >::iterator i = m_harvesters.begin ();
-       i != m_harvesters.end (); i++)
-  {
-      (*i)->Dispose ();
-  }
-  m_harvesters.clear ();
-}
+    void
+    EnergyHarvesterContainer::Clear(void) {
+        NS_LOG_FUNCTION(this);
+        m_harvesters.clear();
+    }
 
-void
-EnergyHarvesterContainer::DoInitialize (void)
-{
-  // call Object::Initialize for all EnergyHarvester objects
-  for (std::vector< Ptr<EnergyHarvester> >::iterator i = m_harvesters.begin ();
-       i != m_harvesters.end (); i++)
-  {
-      (*i)->Initialize ();
-  }
-}
+    /*
+     * Private functions start here.
+     */
+
+    void
+    EnergyHarvesterContainer::DoDispose(void) {
+        // call Object::Dispose for all EnergyHarvester objects
+        for (std::vector< Ptr<EnergyHarvester> >::iterator i = m_harvesters.begin();
+                i != m_harvesters.end(); i++) {
+            (*i)->Dispose();
+        }
+        m_harvesters.clear();
+    }
+
+    void
+    EnergyHarvesterContainer::DoInitialize(void) {
+        // call Object::Initialize for all EnergyHarvester objects
+        for (std::vector< Ptr<EnergyHarvester> >::iterator i = m_harvesters.begin();
+                i != m_harvesters.end(); i++) {
+            (*i)->Initialize();
+        }
+    }
 
 } // namespace ns3

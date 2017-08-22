@@ -25,221 +25,198 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/simulator.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("BasicEnergySource");
-
-NS_OBJECT_ENSURE_REGISTERED (BasicEnergySource);
-
-TypeId
-BasicEnergySource::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::BasicEnergySource")
-    .SetParent<EnergySource> ()
-    .SetGroupName ("Energy")
-    .AddConstructor<BasicEnergySource> ()
-    .AddAttribute ("BasicEnergySourceInitialEnergyJ",
-                   "Initial energy stored in basic energy source.",
-                   DoubleValue (10),  // in Joules
-                   MakeDoubleAccessor (&BasicEnergySource::SetInitialEnergy,
-                                       &BasicEnergySource::GetInitialEnergy),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BasicEnergySupplyVoltageV",
-                   "Initial supply voltage for basic energy source.",
-                   DoubleValue (3.0), // in Volts
-                   MakeDoubleAccessor (&BasicEnergySource::SetSupplyVoltage,
-                                       &BasicEnergySource::GetSupplyVoltage),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BasicEnergyLowBatteryThreshold",
-                   "Low battery threshold for basic energy source.",
-                   DoubleValue (0.10), // as a fraction of the initial energy
-                   MakeDoubleAccessor (&BasicEnergySource::m_lowBatteryTh),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BasicEnergyHighBatteryThreshold",
-                   "High battery threshold for basic energy source.",
-                   DoubleValue (0.15), // as a fraction of the initial energy
-                   MakeDoubleAccessor (&BasicEnergySource::m_highBatteryTh),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("PeriodicEnergyUpdateInterval",
-                   "Time between two consecutive periodic energy updates.",
-                   TimeValue (Seconds (1.0)),
-                   MakeTimeAccessor (&BasicEnergySource::SetEnergyUpdateInterval,
-                                     &BasicEnergySource::GetEnergyUpdateInterval),
-                   MakeTimeChecker ())
-    .AddTraceSource ("RemainingEnergy",
-                     "Remaining energy at BasicEnergySource.",
-                     MakeTraceSourceAccessor (&BasicEnergySource::m_remainingEnergyJ),
-                     "ns3::TracedValue::DoubleCallback")
-  ;
-  return tid;
-}
 
-BasicEnergySource::BasicEnergySource ()
-{
-  NS_LOG_FUNCTION (this);
-  m_lastUpdateTime = Seconds (0.0);
-  m_depleted = false;
-}
+    NS_LOG_COMPONENT_DEFINE("BasicEnergySource");
 
-BasicEnergySource::~BasicEnergySource ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(BasicEnergySource);
 
-void
-BasicEnergySource::SetInitialEnergy (double initialEnergyJ)
-{
-  NS_LOG_FUNCTION (this << initialEnergyJ);
-  NS_ASSERT (initialEnergyJ >= 0);
-  m_initialEnergyJ = initialEnergyJ;
-  m_remainingEnergyJ = m_initialEnergyJ;
-}
-
-void
-BasicEnergySource::SetSupplyVoltage (double supplyVoltageV)
-{
-  NS_LOG_FUNCTION (this << supplyVoltageV);
-  m_supplyVoltageV = supplyVoltageV;
-}
-
-void
-BasicEnergySource::SetEnergyUpdateInterval (Time interval)
-{
-  NS_LOG_FUNCTION (this << interval);
-  m_energyUpdateInterval = interval;
-}
-
-Time
-BasicEnergySource::GetEnergyUpdateInterval (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_energyUpdateInterval;
-}
-
-double
-BasicEnergySource::GetSupplyVoltage (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_supplyVoltageV;
-}
-
-double
-BasicEnergySource::GetInitialEnergy (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_initialEnergyJ;
-}
-
-double
-BasicEnergySource::GetRemainingEnergy (void)
-{
-  NS_LOG_FUNCTION (this);
-  // update energy source to get the latest remaining energy.
-  UpdateEnergySource ();
-  return m_remainingEnergyJ;
-}
-
-double
-BasicEnergySource::GetEnergyFraction (void)
-{
-  NS_LOG_FUNCTION (this);
-  // update energy source to get the latest remaining energy.
-  UpdateEnergySource ();
-  return m_remainingEnergyJ / m_initialEnergyJ;
-}
-
-void
-BasicEnergySource::UpdateEnergySource (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG ("BasicEnergySource:Updating remaining energy.");
-
-  // do not update if simulation has finished
-  if (Simulator::IsFinished ())
-    {
-      return;
+    TypeId
+    BasicEnergySource::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::BasicEnergySource")
+                .SetParent<EnergySource> ()
+                .SetGroupName("Energy")
+                .AddConstructor<BasicEnergySource> ()
+                .AddAttribute("BasicEnergySourceInitialEnergyJ",
+                "Initial energy stored in basic energy source.",
+                DoubleValue(10), // in Joules
+                MakeDoubleAccessor(&BasicEnergySource::SetInitialEnergy,
+                &BasicEnergySource::GetInitialEnergy),
+                MakeDoubleChecker<double> ())
+                .AddAttribute("BasicEnergySupplyVoltageV",
+                "Initial supply voltage for basic energy source.",
+                DoubleValue(3.0), // in Volts
+                MakeDoubleAccessor(&BasicEnergySource::SetSupplyVoltage,
+                &BasicEnergySource::GetSupplyVoltage),
+                MakeDoubleChecker<double> ())
+                .AddAttribute("BasicEnergyLowBatteryThreshold",
+                "Low battery threshold for basic energy source.",
+                DoubleValue(0.10), // as a fraction of the initial energy
+                MakeDoubleAccessor(&BasicEnergySource::m_lowBatteryTh),
+                MakeDoubleChecker<double> ())
+                .AddAttribute("BasicEnergyHighBatteryThreshold",
+                "High battery threshold for basic energy source.",
+                DoubleValue(0.15), // as a fraction of the initial energy
+                MakeDoubleAccessor(&BasicEnergySource::m_highBatteryTh),
+                MakeDoubleChecker<double> ())
+                .AddAttribute("PeriodicEnergyUpdateInterval",
+                "Time between two consecutive periodic energy updates.",
+                TimeValue(Seconds(1.0)),
+                MakeTimeAccessor(&BasicEnergySource::SetEnergyUpdateInterval,
+                &BasicEnergySource::GetEnergyUpdateInterval),
+                MakeTimeChecker())
+                .AddTraceSource("RemainingEnergy",
+                "Remaining energy at BasicEnergySource.",
+                MakeTraceSourceAccessor(&BasicEnergySource::m_remainingEnergyJ),
+                "ns3::TracedValue::DoubleCallback")
+                ;
+        return tid;
     }
 
-  m_energyUpdateEvent.Cancel ();
-
-  CalculateRemainingEnergy ();
-
-  m_lastUpdateTime = Simulator::Now ();
-
-  if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
-    {
-      m_depleted = true;
-      HandleEnergyDrainedEvent ();
+    BasicEnergySource::BasicEnergySource() {
+        NS_LOG_FUNCTION(this);
+        m_lastUpdateTime = Seconds(0.0);
+        m_depleted = false;
     }
 
-  if (m_depleted && m_remainingEnergyJ > m_highBatteryTh * m_initialEnergyJ)
-    {
-      m_depleted = false;
-      HandleEnergyRechargedEvent ();
+    BasicEnergySource::~BasicEnergySource() {
+        NS_LOG_FUNCTION(this);
     }
 
-  m_energyUpdateEvent = Simulator::Schedule (m_energyUpdateInterval,
-                                             &BasicEnergySource::UpdateEnergySource,
-                                             this);
-}
-
-/*
- * Private functions start here.
- */
-
-void
-BasicEnergySource::DoInitialize (void)
-{
-  NS_LOG_FUNCTION (this);
-  UpdateEnergySource ();  // start periodic update
-}
-
-void
-BasicEnergySource::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  BreakDeviceEnergyModelRefCycle ();  // break reference cycle
-}
-
-void
-BasicEnergySource::HandleEnergyDrainedEvent (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG ("BasicEnergySource:Energy depleted!");
-  NotifyEnergyDrained (); // notify DeviceEnergyModel objects
-  if (m_remainingEnergyJ <= 0)
-    {
-      m_remainingEnergyJ = 0; // energy never goes below 0
+    void
+    BasicEnergySource::SetInitialEnergy(double initialEnergyJ) {
+        NS_LOG_FUNCTION(this << initialEnergyJ);
+        NS_ASSERT(initialEnergyJ >= 0);
+        m_initialEnergyJ = initialEnergyJ;
+        m_remainingEnergyJ = m_initialEnergyJ;
     }
-}
 
-void
-BasicEnergySource::HandleEnergyRechargedEvent (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG ("BasicEnergySource:Energy recharged!");
-  NotifyEnergyRecharged (); // notify DeviceEnergyModel objects
-}
+    void
+    BasicEnergySource::SetSupplyVoltage(double supplyVoltageV) {
+        NS_LOG_FUNCTION(this << supplyVoltageV);
+        m_supplyVoltageV = supplyVoltageV;
+    }
 
-void
-BasicEnergySource::CalculateRemainingEnergy (void)
-{
-  NS_LOG_FUNCTION (this);
-  double totalCurrentA = CalculateTotalCurrent ();
-  Time duration = Simulator::Now () - m_lastUpdateTime;
-  NS_ASSERT (duration.GetSeconds () >= 0);
-  // energy = current * voltage * time
-  double energyToDecreaseJ = totalCurrentA * m_supplyVoltageV * duration.GetSeconds ();
-  double remainingEnergyJ = m_remainingEnergyJ - energyToDecreaseJ;
-  if (remainingEnergyJ <= 0)
-    {
-      m_remainingEnergyJ = 0; // energy never goes below 0
+    void
+    BasicEnergySource::SetEnergyUpdateInterval(Time interval) {
+        NS_LOG_FUNCTION(this << interval);
+        m_energyUpdateInterval = interval;
     }
-  else
-    {
-      m_remainingEnergyJ -= energyToDecreaseJ;
+
+    Time
+    BasicEnergySource::GetEnergyUpdateInterval(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_energyUpdateInterval;
     }
-  NS_LOG_DEBUG ("BasicEnergySource:Remaining energy = " << m_remainingEnergyJ);
-}
+
+    double
+    BasicEnergySource::GetSupplyVoltage(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_supplyVoltageV;
+    }
+
+    double
+    BasicEnergySource::GetInitialEnergy(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_initialEnergyJ;
+    }
+
+    double
+    BasicEnergySource::GetRemainingEnergy(void) {
+        NS_LOG_FUNCTION(this);
+        // update energy source to get the latest remaining energy.
+        UpdateEnergySource();
+        return m_remainingEnergyJ;
+    }
+
+    double
+    BasicEnergySource::GetEnergyFraction(void) {
+        NS_LOG_FUNCTION(this);
+        // update energy source to get the latest remaining energy.
+        UpdateEnergySource();
+        return m_remainingEnergyJ / m_initialEnergyJ;
+    }
+
+    void
+    BasicEnergySource::UpdateEnergySource(void) {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_DEBUG("BasicEnergySource:Updating remaining energy.");
+
+        // do not update if simulation has finished
+        if (Simulator::IsFinished()) {
+            return;
+        }
+
+        m_energyUpdateEvent.Cancel();
+
+        CalculateRemainingEnergy();
+
+        m_lastUpdateTime = Simulator::Now();
+
+        if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ) {
+            m_depleted = true;
+            HandleEnergyDrainedEvent();
+        }
+
+        if (m_depleted && m_remainingEnergyJ > m_highBatteryTh * m_initialEnergyJ) {
+            m_depleted = false;
+            HandleEnergyRechargedEvent();
+        }
+
+        m_energyUpdateEvent = Simulator::Schedule(m_energyUpdateInterval,
+                &BasicEnergySource::UpdateEnergySource,
+                this);
+    }
+
+    /*
+     * Private functions start here.
+     */
+
+    void
+    BasicEnergySource::DoInitialize(void) {
+        NS_LOG_FUNCTION(this);
+        UpdateEnergySource(); // start periodic update
+    }
+
+    void
+    BasicEnergySource::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        BreakDeviceEnergyModelRefCycle(); // break reference cycle
+    }
+
+    void
+    BasicEnergySource::HandleEnergyDrainedEvent(void) {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_DEBUG("BasicEnergySource:Energy depleted!");
+        NotifyEnergyDrained(); // notify DeviceEnergyModel objects
+        if (m_remainingEnergyJ <= 0) {
+            m_remainingEnergyJ = 0; // energy never goes below 0
+        }
+    }
+
+    void
+    BasicEnergySource::HandleEnergyRechargedEvent(void) {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_DEBUG("BasicEnergySource:Energy recharged!");
+        NotifyEnergyRecharged(); // notify DeviceEnergyModel objects
+    }
+
+    void
+    BasicEnergySource::CalculateRemainingEnergy(void) {
+        NS_LOG_FUNCTION(this);
+        double totalCurrentA = CalculateTotalCurrent();
+        Time duration = Simulator::Now() - m_lastUpdateTime;
+        NS_ASSERT(duration.GetSeconds() >= 0);
+        // energy = current * voltage * time
+        double energyToDecreaseJ = totalCurrentA * m_supplyVoltageV * duration.GetSeconds();
+        double remainingEnergyJ = m_remainingEnergyJ - energyToDecreaseJ;
+        if (remainingEnergyJ <= 0) {
+            m_remainingEnergyJ = 0; // energy never goes below 0
+        } else {
+            m_remainingEnergyJ -= energyToDecreaseJ;
+        }
+        NS_LOG_DEBUG("BasicEnergySource:Remaining energy = " << m_remainingEnergyJ);
+    }
 
 } // namespace ns3

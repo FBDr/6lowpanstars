@@ -26,28 +26,25 @@
 namespace ndn {
 
 #if NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
-static_assert(std::is_nothrow_move_constructible<Buffer>::value,
-              "Buffer must be MoveConstructible with noexcept");
+    static_assert(std::is_nothrow_move_constructible<Buffer>::value,
+            "Buffer must be MoveConstructible with noexcept");
 #endif // NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
 
 #if NDN_CXX_HAVE_IS_NOTHROW_MOVE_ASSIGNABLE
-static_assert(std::is_nothrow_move_assignable<Buffer>::value,
-              "Buffer must be MoveAssignable with noexcept");
+    static_assert(std::is_nothrow_move_assignable<Buffer>::value,
+            "Buffer must be MoveAssignable with noexcept");
 #endif // NDN_CXX_HAVE_IS_NOTHROW_MOVE_ASSIGNABLE
 
-Buffer::Buffer()
-{
-}
+    Buffer::Buffer() {
+    }
 
-Buffer::Buffer(size_t size)
-  : std::vector<uint8_t>(size, 0)
-{
-}
+    Buffer::Buffer(size_t size)
+    : std::vector<uint8_t>(size, 0) {
+    }
 
-Buffer::Buffer(const void* buf, size_t length)
-  : std::vector<uint8_t>(reinterpret_cast<const uint8_t*>(buf),
-                         reinterpret_cast<const uint8_t*>(buf) + length)
-{
-}
+    Buffer::Buffer(const void* buf, size_t length)
+    : std::vector<uint8_t>(reinterpret_cast<const uint8_t*> (buf),
+    reinterpret_cast<const uint8_t*> (buf) + length) {
+    }
 
 } // namespace ndn

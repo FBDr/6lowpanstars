@@ -34,45 +34,44 @@
 
 namespace ns3 {
 
-class EventImpl;
+    class EventImpl;
 
-/**
- * \ingroup scheduler
- * \brief a std::list event scheduler
- *
- * This class implements an event scheduler using an std::list
- * data structure, that is, a double linked-list.
- */
-class ListScheduler : public Scheduler
-{
-public:
-  /**
-   *  Register this type.
-   *  \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup scheduler
+     * \brief a std::list event scheduler
+     *
+     * This class implements an event scheduler using an std::list
+     * data structure, that is, a double linked-list.
+     */
+    class ListScheduler : public Scheduler {
+    public:
+        /**
+         *  Register this type.
+         *  \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  /** Constructor. */
-  ListScheduler ();
-  /** Destructor. */
-  virtual ~ListScheduler ();
+        /** Constructor. */
+        ListScheduler();
+        /** Destructor. */
+        virtual ~ListScheduler();
 
-  // Inherited
-  virtual void Insert (const Scheduler::Event &ev);
-  virtual bool IsEmpty (void) const;
-  virtual Scheduler::Event PeekNext (void) const;
-  virtual Scheduler::Event RemoveNext (void);
-  virtual void Remove (const Scheduler::Event &ev);
+        // Inherited
+        virtual void Insert(const Scheduler::Event &ev);
+        virtual bool IsEmpty(void) const;
+        virtual Scheduler::Event PeekNext(void) const;
+        virtual Scheduler::Event RemoveNext(void);
+        virtual void Remove(const Scheduler::Event &ev);
 
-private:
-  /** Event list type: a simple list of Events. */
-  typedef std::list<Scheduler::Event> Events;
-  /** Events iterator. */
-  typedef std::list<Scheduler::Event>::iterator EventsI;
+    private:
+        /** Event list type: a simple list of Events. */
+        typedef std::list<Scheduler::Event> Events;
+        /** Events iterator. */
+        typedef std::list<Scheduler::Event>::iterator EventsI;
 
-  /** The event list. */
-  Events m_events;
-};
+        /** The event list. */
+        Events m_events;
+    };
 
 } // namespace ns3
 

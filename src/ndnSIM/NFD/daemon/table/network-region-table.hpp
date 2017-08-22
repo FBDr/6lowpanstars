@@ -30,28 +30,27 @@
 
 namespace nfd {
 
-/** \brief stores a collection of producer region names
- *
- *  This table is used in forwarding to process Interests with Link objects.
- *
- *  NetworkRegionTable exposes a set-like API, including methods `insert`, `clear`,
- *  `find`, `size`, `begin`, and `end`.
- */
-class NetworkRegionTable : public std::set<Name>
-{
-public:
-  /** \brief determines whether an Interest has reached a producer region
-   *  \param link the Link object on an Interest
-   *  \retval true the Interest has reached a producer region
-   *  \retval false the Interest has not reached a producer region
-   *
-   *  If any delegation names in the Link object is a prefix of any region name,
-   *  the Interest has reached the producer region and should be forwarded according to ‎its Name;
-   *  otherwise, the Interest should be forwarded according to the delegations.
-   */
-  bool
-  isInProducerRegion(const Link& link) const;
-};
+    /** \brief stores a collection of producer region names
+     *
+     *  This table is used in forwarding to process Interests with Link objects.
+     *
+     *  NetworkRegionTable exposes a set-like API, including methods `insert`, `clear`,
+     *  `find`, `size`, `begin`, and `end`.
+     */
+    class NetworkRegionTable : public std::set<Name> {
+    public:
+        /** \brief determines whether an Interest has reached a producer region
+         *  \param link the Link object on an Interest
+         *  \retval true the Interest has reached a producer region
+         *  \retval false the Interest has not reached a producer region
+         *
+         *  If any delegation names in the Link object is a prefix of any region name,
+         *  the Interest has reached the producer region and should be forwarded according to ‎its Name;
+         *  otherwise, the Interest should be forwarded according to the delegations.
+         */
+        bool
+        isInProducerRegion(const Link& link) const;
+    };
 
 } // namespace nfd
 

@@ -31,32 +31,31 @@
 #include <ndn-cxx/security/key-chain.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-using ndn::Face;
-using ndn::KeyChain;
+            using ndn::Face;
+            using ndn::KeyChain;
 
-/** \brief context for command execution
- */
-struct ExecuteContext
-{
-  const std::string& noun;
-  const std::string& verb;
-  const CommandArguments& args;
+            /** \brief context for command execution
+             */
+            struct ExecuteContext {
+                const std::string& noun;
+                const std::string& verb;
+                const CommandArguments& args;
 
-  Face& face;
-  KeyChain& keyChain;
-  ///\todo validator
-};
+                Face& face;
+                KeyChain& keyChain;
+                ///\todo validator
+            };
 
-/** \brief a function to execute a command
- *  \return exit code
- */
-typedef std::function<int(ExecuteContext& ctx)> ExecuteCommand;
+            /** \brief a function to execute a command
+             *  \return exit code
+             */
+            typedef std::function<int(ExecuteContext& ctx) > ExecuteCommand;
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_EXECUTE_COMMAND_HPP

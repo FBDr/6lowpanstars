@@ -24,56 +24,61 @@
 #include "ns3/mesh-wifi-interface-mac.h"
 
 namespace ns3 {
-namespace flame {
-class FlameProtocol;
-/**
- * \ingroup flame
- *
- * \brief Interface MAC plugin FLAME routing protocol
- */
-class FlameProtocolMac : public MeshWifiInterfaceMacPlugin
-{
-public:
-  FlameProtocolMac (Ptr<FlameProtocol>);
-  ~FlameProtocolMac ();
-  
-  // Inherited from MAC plugin
-  void SetParent (Ptr<MeshWifiInterfaceMac> parent);
-  bool Receive (Ptr<Packet> packet, const WifiMacHeader & header);
-  bool UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & header, Mac48Address from, Mac48Address to);
-  /// Update beacon is empty, because HWMP does not know anything about beacons
-  void UpdateBeacon (MeshWifiBeacon & beacon) const {};
-  /// AssignStreams is empty, because this model doesn't use random variables
-  int64_t AssignStreams (int64_t stream) { return 0; }
+    namespace flame {
+        class FlameProtocol;
 
-  uint16_t GetChannelId () const;
-  /// Report statistics
-  void Report (std::ostream &) const;
-  void ResetStats ();
+        /**
+         * \ingroup flame
+         *
+         * \brief Interface MAC plugin FLAME routing protocol
+         */
+        class FlameProtocolMac : public MeshWifiInterfaceMacPlugin {
+        public:
+            FlameProtocolMac(Ptr<FlameProtocol>);
+            ~FlameProtocolMac();
 
-private:
-  
-  // MeshPointDevice parameters:
-  Ptr<FlameProtocol> m_protocol;
-  Ptr<MeshWifiInterfaceMac> m_parent;
-  ///\name Statistics:
-  ///\{
-  struct Statistics
-  {
-    uint16_t txUnicast;
-    uint16_t txBroadcast;
-    uint32_t txBytes;
-    uint16_t rxUnicast;
-    uint16_t rxBroadcast;
-    uint32_t rxBytes;
+            // Inherited from MAC plugin
+            void SetParent(Ptr<MeshWifiInterfaceMac> parent);
+            bool Receive(Ptr<Packet> packet, const WifiMacHeader & header);
+            bool UpdateOutcomingFrame(Ptr<Packet> packet, WifiMacHeader & header, Mac48Address from, Mac48Address to);
+            /// Update beacon is empty, because HWMP does not know anything about beacons
 
-    void Print (std::ostream & os) const;
-    Statistics ();
-  };
-  Statistics m_stats;
-  ///\}
+            void UpdateBeacon(MeshWifiBeacon & beacon) const {
+            };
+            /// AssignStreams is empty, because this model doesn't use random variables
 
-};
-} // namespace flame
+            int64_t AssignStreams(int64_t stream) {
+                return 0;
+            }
+
+            uint16_t GetChannelId() const;
+            /// Report statistics
+            void Report(std::ostream &) const;
+            void ResetStats();
+
+        private:
+
+            // MeshPointDevice parameters:
+            Ptr<FlameProtocol> m_protocol;
+            Ptr<MeshWifiInterfaceMac> m_parent;
+            ///\name Statistics:
+            ///\{
+
+            struct Statistics {
+                uint16_t txUnicast;
+                uint16_t txBroadcast;
+                uint32_t txBytes;
+                uint16_t rxUnicast;
+                uint16_t rxBroadcast;
+                uint32_t rxBytes;
+
+                void Print(std::ostream & os) const;
+                Statistics();
+            };
+            Statistics m_stats;
+            ///\}
+
+        };
+    } // namespace flame
 } // namespace ns3
 #endif /* FLAME_PROTOCOL_MAC_H */

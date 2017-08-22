@@ -24,52 +24,45 @@
 
 namespace ndn {
 
-InterestFilter::InterestFilter(const Name& prefix)
-  : m_prefix(prefix)
-{
-}
+    InterestFilter::InterestFilter(const Name& prefix)
+    : m_prefix(prefix) {
+    }
 
-InterestFilter::InterestFilter(const char* prefixUri)
-  : m_prefix(prefixUri)
-{
-}
+    InterestFilter::InterestFilter(const char* prefixUri)
+    : m_prefix(prefixUri) {
+    }
 
-InterestFilter::InterestFilter(const std::string& prefixUri)
-  : m_prefix(prefixUri)
-{
-}
+    InterestFilter::InterestFilter(const std::string& prefixUri)
+    : m_prefix(prefixUri) {
+    }
 
-InterestFilter::InterestFilter(const Name& prefix, const std::string& regexFilter)
-  : m_prefix(prefix)
-  , m_regexFilter(make_shared<RegexPatternListMatcher>(regexFilter, nullptr))
-{
-}
+    InterestFilter::InterestFilter(const Name& prefix, const std::string& regexFilter)
+    : m_prefix(prefix)
+    , m_regexFilter(make_shared<RegexPatternListMatcher>(regexFilter, nullptr)) {
+    }
 
-InterestFilter::operator const Name&() const
-{
-  if (hasRegexFilter()) {
-    BOOST_THROW_EXCEPTION(Error("Please update InterestCallback to accept const InterestFilter&"
-                                " (non-trivial InterestFilter is being used)"));
-  }
-  return m_prefix;
-}
+    InterestFilter::operator const Name&() const {
+        if (hasRegexFilter()) {
+            BOOST_THROW_EXCEPTION(Error("Please update InterestCallback to accept const InterestFilter&"
+                    " (non-trivial InterestFilter is being used)"));
+        }
+        return m_prefix;
+    }
 
-bool
-InterestFilter::doesMatch(const Name& name) const
-{
-  return m_prefix.isPrefixOf(name) &&
-         (!hasRegexFilter() ||
-          m_regexFilter->match(name, m_prefix.size(), name.size() - m_prefix.size()));
-}
+    bool
+    InterestFilter::doesMatch(const Name& name) const {
+        return m_prefix.isPrefixOf(name) &&
+                (!hasRegexFilter() ||
+                m_regexFilter->match(name, m_prefix.size(), name.size() - m_prefix.size()));
+    }
 
-std::ostream&
-operator<<(std::ostream& os, const InterestFilter& filter)
-{
-  os << filter.getPrefix();
-  if (filter.hasRegexFilter()) {
-    os << "?regex=" << filter.getRegexFilter();
-  }
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, const InterestFilter& filter) {
+        os << filter.getPrefix();
+        if (filter.hasRegexFilter()) {
+            os << "?regex=" << filter.getRegexFilter();
+        }
+        return os;
+    }
 
 } // namespace ndn

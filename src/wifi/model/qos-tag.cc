@@ -22,80 +22,71 @@
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (QosTag);
-
-TypeId
-QosTag::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::QosTag")
-    .SetParent<Tag> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<QosTag> ()
-    .AddAttribute ("tid", "The tid that indicates AC which packet belongs",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&QosTag::GetTid),
-                   MakeUintegerChecker<uint8_t> ())
-  ;
-  return tid;
-}
 
-TypeId
-QosTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(QosTag);
 
-QosTag::QosTag ()
-  : m_tid (0)
-{
-}
-QosTag::QosTag (uint8_t tid)
-  : m_tid (tid)
-{
-}
+    TypeId
+    QosTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::QosTag")
+                .SetParent<Tag> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<QosTag> ()
+                .AddAttribute("tid", "The tid that indicates AC which packet belongs",
+                UintegerValue(0),
+                MakeUintegerAccessor(&QosTag::GetTid),
+                MakeUintegerChecker<uint8_t> ())
+                ;
+        return tid;
+    }
 
-void
-QosTag::SetTid (uint8_t tid)
-{
-  m_tid = tid;
-}
+    TypeId
+    QosTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-QosTag::SetUserPriority (UserPriority up)
-{
-  m_tid = up;
-}
+    QosTag::QosTag()
+            : m_tid(0) {
+    }
 
-uint32_t
-QosTag::GetSerializedSize (void) const
-{
-  return 1;
-}
+    QosTag::QosTag(uint8_t tid)
+            : m_tid(tid) {
+    }
 
-void
-QosTag::Serialize (TagBuffer i) const
-{
-  i.WriteU8 (m_tid);
-}
+    void
+    QosTag::SetTid(uint8_t tid) {
+        m_tid = tid;
+    }
 
-void
-QosTag::Deserialize (TagBuffer i)
-{
-  m_tid = (UserPriority) i.ReadU8 ();
-}
+    void
+    QosTag::SetUserPriority(UserPriority up) {
+        m_tid = up;
+    }
 
-uint8_t
-QosTag::GetTid () const
-{
-  return m_tid;
-}
+    uint32_t
+    QosTag::GetSerializedSize(void) const {
+        return 1;
+    }
 
-void
-QosTag::Print (std::ostream &os) const
-{
-  os << "Tid=" << m_tid;
-}
+    void
+    QosTag::Serialize(TagBuffer i) const {
+        i.WriteU8(m_tid);
+    }
+
+    void
+    QosTag::Deserialize(TagBuffer i) {
+        m_tid = (UserPriority) i.ReadU8();
+    }
+
+    uint8_t
+    QosTag::GetTid() const {
+        return m_tid;
+    }
+
+    void
+    QosTag::Print(std::ostream & os) const {
+        os << "Tid=" << m_tid;
+    }
 
 } // namespace ns3

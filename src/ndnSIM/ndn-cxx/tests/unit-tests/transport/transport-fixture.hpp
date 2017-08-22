@@ -27,21 +27,19 @@
 
 namespace ndn {
 
-class TransportFixture : public util::TestHomeEnvironmentFixture
-{
-public:
+    class TransportFixture : public util::TestHomeEnvironmentFixture {
+    public:
 
-  void
-  initializeConfig(const char* path)
-  {
-    setenv("TEST_HOME", path, 1);
-    m_config.reset(new ConfigFile);
-  }
+        void
+        initializeConfig(const char* path) {
+            setenv("TEST_HOME", path, 1);
+            m_config.reset(new ConfigFile);
+        }
 
-protected:
-  std::string m_HOME;
-  unique_ptr<ConfigFile> m_config;
-};
+    protected:
+        std::string m_HOME;
+        unique_ptr<ConfigFile> m_config;
+    };
 
 } // namespace ndn
 

@@ -32,119 +32,117 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mpi
- * 
- * \brief Collection of NS3 channels between local and remote nodes.
- * 
- * An instance exists for each remote system that the local system is
- * in communication with.  These are created and managed by the
- * RemoteChannelBundleManager class.  Stores time information for each
- * bundle.
- */
-class RemoteChannelBundle : public Object
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup mpi
+     * 
+     * \brief Collection of NS3 channels between local and remote nodes.
+     * 
+     * An instance exists for each remote system that the local system is
+     * in communication with.  These are created and managed by the
+     * RemoteChannelBundleManager class.  Stores time information for each
+     * bundle.
+     */
+    class RemoteChannelBundle : public Object {
+    public:
+        static TypeId GetTypeId(void);
 
-  RemoteChannelBundle ();
+        RemoteChannelBundle();
 
-  RemoteChannelBundle (const uint32_t remoteSystemId);
+        RemoteChannelBundle(const uint32_t remoteSystemId);
 
-  ~RemoteChannelBundle ()
-  {
-  }
+        ~RemoteChannelBundle() {
+        }
 
-  /**
-   * \param channel to add to the bundle
-   * \param delay time for the channel (usually the latency)
-   */
-  void AddChannel (Ptr<Channel> channel, Time delay);
+        /**
+         * \param channel to add to the bundle
+         * \param delay time for the channel (usually the latency)
+         */
+        void AddChannel(Ptr<Channel> channel, Time delay);
 
-  /**
-   * \return SystemID for remote side of this bundle
-   */
-  uint32_t GetSystemId () const;
+        /**
+         * \return SystemID for remote side of this bundle
+         */
+        uint32_t GetSystemId() const;
 
-  /**
-   * \return guarantee time
-   */
-  Time GetGuaranteeTime (void) const;
+        /**
+         * \return guarantee time
+         */
+        Time GetGuaranteeTime(void) const;
 
-  /**
-   * \param guarantee time
-   *
-   * Set the guarantee time for the bundle.  This should be called
-   * after a packet or Null Message received.
-   */
-  void SetGuaranteeTime (Time time);
+        /**
+         * \param guarantee time
+         *
+         * Set the guarantee time for the bundle.  This should be called
+         * after a packet or Null Message received.
+         */
+        void SetGuaranteeTime(Time time);
 
-  /**
-   * \return the minimum delay along any channel in this bundle
-   */
-  Time GetDelay (void) const;
+        /**
+         * \return the minimum delay along any channel in this bundle
+         */
+        Time GetDelay(void) const;
 
-  /**
-   * Set the event ID of the Null Message send event current scheduled
-   * for this channel.
-   */
-  void SetEventId (EventId id);
+        /**
+         * Set the event ID of the Null Message send event current scheduled
+         * for this channel.
+         */
+        void SetEventId(EventId id);
 
-  /**
-   * \return the event ID of the Null Message send event for this bundle
-   */
-  EventId GetEventId (void) const;
+        /**
+         * \return the event ID of the Null Message send event for this bundle
+         */
+        EventId GetEventId(void) const;
 
-  /**
-   * \return number of NS3 channels in this bundle
-   */
-  int GetSize (void) const;
+        /**
+         * \return number of NS3 channels in this bundle
+         */
+        int GetSize(void) const;
 
-  /**
-   * \param time 
-   *
-   * Send Null Message to the remote task associated with this bundle.
-   * Message will be delivered at current simulation time + the time
-   * passed in.
-   */
-  void Send(Time time);
+        /**
+         * \param time 
+         *
+         * Send Null Message to the remote task associated with this bundle.
+         * Message will be delivered at current simulation time + the time
+         * passed in.
+         */
+        void Send(Time time);
 
-  /**
-   * Output for debugging purposes.
-   */
-  friend std::ostream& operator<< (std::ostream& out, ns3::RemoteChannelBundle& bundle );
+        /**
+         * Output for debugging purposes.
+         */
+        friend std::ostream& operator<<(std::ostream& out, ns3::RemoteChannelBundle& bundle);
 
-private:
-  /*
-   * Remote rank.
-   */
-  uint32_t m_remoteSystemId;
+    private:
+        /*
+         * Remote rank.
+         */
+        uint32_t m_remoteSystemId;
 
-  /*
-   * NS3 Channels that are connected from nodes in this MPI task to remote_rank.
-   *
-   * Would be more efficient to use unordered_map when C++11 is adopted by NS3.
-   */
-  std::map < uint32_t, Ptr < Channel > > m_channels;
+        /*
+         * NS3 Channels that are connected from nodes in this MPI task to remote_rank.
+         *
+         * Would be more efficient to use unordered_map when C++11 is adopted by NS3.
+         */
+        std::map < uint32_t, Ptr < Channel > > m_channels;
 
-  /*
-   * Guarentee time for the incoming Channels from MPI task remote_rank.
-   * No PacketMessage will ever arrive on any incoming channel in this bundle with a
-   * ReceiveTime less than this.  Intialized to StartTime.
-   */
-  Time m_guaranteeTime;
+        /*
+         * Guarentee time for the incoming Channels from MPI task remote_rank.
+         * No PacketMessage will ever arrive on any incoming channel in this bundle with a
+         * ReceiveTime less than this.  Intialized to StartTime.
+         */
+        Time m_guaranteeTime;
 
-  /*
-   * Delay for this Channel bundle.   min link delay over all incoming channels;
-   */
-  Time m_delay;
+        /*
+         * Delay for this Channel bundle.   min link delay over all incoming channels;
+         */
+        Time m_delay;
 
-  /*
-   * Event scheduled to send Null Message for this bundle.
-   */
-  EventId m_nullEventId;
+        /*
+         * Event scheduled to send Null Message for this bundle.
+         */
+        EventId m_nullEventId;
 
-};
+    };
 
 }
 

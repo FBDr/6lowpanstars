@@ -26,41 +26,41 @@
 #include "ns3/object.h"
 
 namespace ns3 {
-/**
- * \ingroup wifi
- * \brief the interface for Wifi's error models
- *
- */
-class ErrorRateModel : public Object
-{
-public:
-  static TypeId GetTypeId (void);
 
-  /**
-   * \param txMode a specific transmission mode
-   * \param ber a target ber
-   *
-   * \return the snr which corresponds to the requested ber
-   */
-  double CalculateSnr (WifiMode txMode, double ber) const;
+    /**
+     * \ingroup wifi
+     * \brief the interface for Wifi's error models
+     *
+     */
+    class ErrorRateModel : public Object {
+    public:
+        static TypeId GetTypeId(void);
 
-  /**
-   * A pure virtual method that must be implemented in the subclass.
-   * This method returns the probability that the given 'chunk' of the
-   * packet will be successfully received by the PHY.
-   *
-   * A chunk can be viewed as a part of a packet with equal SNR.
-   * The probability of successfully receiving the chunk depends on
-   * the mode, the SNR, and the size of the chunk.
-   *
-   * \param mode the Wi-Fi mode the chunk is sent
-   * \param snr the SNR of the chunk
-   * \param nbits the number of bits in this chunk
-   *
-   * \return probability of successfully receiving the chunk
-   */
-  virtual double GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbits) const = 0;
-};
+        /**
+         * \param txMode a specific transmission mode
+         * \param ber a target ber
+         *
+         * \return the snr which corresponds to the requested ber
+         */
+        double CalculateSnr(WifiMode txMode, double ber) const;
+
+        /**
+         * A pure virtual method that must be implemented in the subclass.
+         * This method returns the probability that the given 'chunk' of the
+         * packet will be successfully received by the PHY.
+         *
+         * A chunk can be viewed as a part of a packet with equal SNR.
+         * The probability of successfully receiving the chunk depends on
+         * the mode, the SNR, and the size of the chunk.
+         *
+         * \param mode the Wi-Fi mode the chunk is sent
+         * \param snr the SNR of the chunk
+         * \param nbits the number of bits in this chunk
+         *
+         * \return probability of successfully receiving the chunk
+         */
+        virtual double GetChunkSuccessRate(WifiMode mode, double snr, uint32_t nbits) const = 0;
+    };
 
 } //namespace ns3
 

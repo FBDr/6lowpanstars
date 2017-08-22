@@ -28,75 +28,71 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup spectrum
+     *
+     * \brief spectrum-aware propagation loss model
+     *
+     * Interface for propagation loss models to be adopted when
+     * transmissions are modeled with a power spectral density by means of
+     * the SpectrumValue class.
+     *
+     */
+    class SpectrumPropagationLossModel : public Object {
+    public:
+        SpectrumPropagationLossModel();
+        virtual ~SpectrumPropagationLossModel();
+
+        static TypeId GetTypeId();
 
 
+        /**
+         * used to chain various instances of SpectrumPropagationLossModel
+         *
+         * @param next
+         */
+        void SetNext(Ptr<SpectrumPropagationLossModel> next);
 
-/**
- * \ingroup spectrum
- *
- * \brief spectrum-aware propagation loss model
- *
- * Interface for propagation loss models to be adopted when
- * transmissions are modeled with a power spectral density by means of
- * the SpectrumValue class.
- *
- */
-class SpectrumPropagationLossModel : public Object
-{
-public:
-  SpectrumPropagationLossModel ();
-  virtual ~SpectrumPropagationLossModel ();
+        /**
+         * This method is to be called to calculate
+         *
+         * @param txPsd the SpectrumValue representing the power spectral
+         * density of the transmission. Watt units are to be used for radio
+         * communications, and Pascal units for acoustic communications
+         * (e.g. underwater).
+         *
+         * @param a sender mobility
+         * @param b receiver mobility
+         *
+         * @return set of values vs frequency representing the received
+         * power in the same units used for the txPower parameter.
+         */
+        Ptr<SpectrumValue> CalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+                Ptr<const MobilityModel> a,
+                Ptr<const MobilityModel> b) const;
 
-  static TypeId GetTypeId ();
-
-
-  /**
-   * used to chain various instances of SpectrumPropagationLossModel
-   *
-   * @param next
-   */
-  void SetNext (Ptr<SpectrumPropagationLossModel> next);
-
-  /**
-   * This method is to be called to calculate
-   *
-   * @param txPsd the SpectrumValue representing the power spectral
-   * density of the transmission. Watt units are to be used for radio
-   * communications, and Pascal units for acoustic communications
-   * (e.g. underwater).
-   *
-   * @param a sender mobility
-   * @param b receiver mobility
-   *
-   * @return set of values vs frequency representing the received
-   * power in the same units used for the txPower parameter.
-   */
-  Ptr<SpectrumValue> CalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                 Ptr<const MobilityModel> a,
-                                                 Ptr<const MobilityModel> b) const;
-
-protected:
-  virtual void DoDispose ();
+    protected:
+        virtual void DoDispose();
 
 
-private:
-  /**
-   *
-   *
-   * @param txPsd set of values vs frequency representing the
-   * transmission power. See SpectrumChannel for details.
-   * @param a sender mobility
-   * @param b receiver mobility
-   *
-   * @return set of values vs frequency representing the received
-   * power in the same units used for the txPower parameter.
-   */
-  virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                           Ptr<const MobilityModel> a,
-                                                           Ptr<const MobilityModel> b) const = 0;
+    private:
+        /**
+         *
+         *
+         * @param txPsd set of values vs frequency representing the
+         * transmission power. See SpectrumChannel for details.
+         * @param a sender mobility
+         * @param b receiver mobility
+         *
+         * @return set of values vs frequency representing the received
+         * power in the same units used for the txPower parameter.
+         */
+        virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+                Ptr<const MobilityModel> a,
+                Ptr<const MobilityModel> b) const = 0;
 
-  Ptr<SpectrumPropagationLossModel> m_next;
-};
+        Ptr<SpectrumPropagationLossModel> m_next;
+    };
 
 
 

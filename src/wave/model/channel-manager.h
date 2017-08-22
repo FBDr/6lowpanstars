@@ -24,17 +24,17 @@
 
 namespace ns3 {
 
-/**
- * WAVE channels
- * channel number             |   172   |   174   |   176   |   178   |   180   |   182   |   184   |
- * channel bandwidth          10MHz  10MHz  10MHz  10MHz 10MHz  10MHz  10MHz
- * channel name                      SCH1     SCH2     SCH3     CCH       SCH4     SCH5     SCH6
- * another name                     CH172   CH174   CH176   CH178   CH180  CH182   CH184
- *
- * not support
- * channel 175 : combine channel 174 and 176
- * channel 181 : combine channel 180 and 182
- */
+    /**
+     * WAVE channels
+     * channel number             |   172   |   174   |   176   |   178   |   180   |   182   |   184   |
+     * channel bandwidth          10MHz  10MHz  10MHz  10MHz 10MHz  10MHz  10MHz
+     * channel name                      SCH1     SCH2     SCH3     CCH       SCH4     SCH5     SCH6
+     * another name                     CH172   CH174   CH176   CH178   CH180  CH182   CH184
+     *
+     * not support
+     * channel 175 : combine channel 174 and 176
+     * channel 181 : combine channel 180 and 182
+     */
 #define CH172 172
 #define CH174 174
 #define CH176 176
@@ -51,98 +51,95 @@ namespace ns3 {
 #define SCH5 182
 #define SCH6 184
 
-/**
- * \ingroup wave
- * \brief manage 7 WaveChannels and the tx information such as data rate and txPowerLevel.
- * for transmitting VSA management frames.
- */
-class ChannelManager : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  ChannelManager ();
-  virtual ~ChannelManager ();
+    /**
+     * \ingroup wave
+     * \brief manage 7 WaveChannels and the tx information such as data rate and txPowerLevel.
+     * for transmitting VSA management frames.
+     */
+    class ChannelManager : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        ChannelManager();
+        virtual ~ChannelManager();
 
-  /**
-   * \return the channel number of WAVE CCH.
-   */
-  static uint32_t GetCch (void);
-  /**
-   * \return the channel number set of WAVE SCHs.
-   */
-  static std::vector<uint32_t> GetSchs (void);
-  /**
-    * \return the channel number set of WAVE channels.
-    *
-    * The sequence is CCH, SCH1, SCH2, SCH3, SCH4, SCH5 and SCH6.
-    */
-  static std::vector<uint32_t> GetWaveChannels (void);
-  /**
-   * \return the number of WAVE channels.
-   */
-  static uint32_t GetNumberOfWaveChannels (void);
-  /**
-   * \param channelNumber the specific channel
-   * \return whether channel is valid CCH channel
-   */
-  static bool IsCch (uint32_t channelNumber);
-  /**
-   * \param channelNumber the specific channel
-   * \return whether channel is valid SCH channel
-   */
-  static bool IsSch (uint32_t channelNumber);
-  /**
-   * \param channelNumber the specific channel
-   * \return whether channel is valid WAVE channel
-   */
-  static bool IsWaveChannel (uint32_t channelNumber);
+        /**
+         * \return the channel number of WAVE CCH.
+         */
+        static uint32_t GetCch(void);
+        /**
+         * \return the channel number set of WAVE SCHs.
+         */
+        static std::vector<uint32_t> GetSchs(void);
+        /**
+         * \return the channel number set of WAVE channels.
+         *
+         * The sequence is CCH, SCH1, SCH2, SCH3, SCH4, SCH5 and SCH6.
+         */
+        static std::vector<uint32_t> GetWaveChannels(void);
+        /**
+         * \return the number of WAVE channels.
+         */
+        static uint32_t GetNumberOfWaveChannels(void);
+        /**
+         * \param channelNumber the specific channel
+         * \return whether channel is valid CCH channel
+         */
+        static bool IsCch(uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return whether channel is valid SCH channel
+         */
+        static bool IsSch(uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return whether channel is valid WAVE channel
+         */
+        static bool IsWaveChannel(uint32_t channelNumber);
 
-  /**
-   * \param channelNumber the specific channel
-   * \return the operating class on this channel
-   *
-   * the operating class is unused in the simulation
-   */
-  uint32_t GetOperatingClass (uint32_t channelNumber);
-  /**
-   * \param channelNumber the specific channel
-   * \return the adaptable mode for management frames
-   */
-  bool GetManagementAdaptable (uint32_t channelNumber);
-  /**
-   * \param channelNumber the specific channel
-   * \return the data rate for management frames
-   */
-  WifiMode GetManagementDataRate (uint32_t channelNumber);
-  /**
-   * \param channelNumber the specific channel
-   * \return the tx power level for management frames
-   */
-  uint32_t GetManagementPowerLevel (uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return the operating class on this channel
+         *
+         * the operating class is unused in the simulation
+         */
+        uint32_t GetOperatingClass(uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return the adaptable mode for management frames
+         */
+        bool GetManagementAdaptable(uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return the data rate for management frames
+         */
+        WifiMode GetManagementDataRate(uint32_t channelNumber);
+        /**
+         * \param channelNumber the specific channel
+         * \return the tx power level for management frames
+         */
+        uint32_t GetManagementPowerLevel(uint32_t channelNumber);
 
-private:
-  // 1609.4-2010 Annex H
-  static const uint32_t  DEFAULT_OPERATING_CLASS = 17;
+    private:
+        // 1609.4-2010 Annex H
+        static const uint32_t DEFAULT_OPERATING_CLASS = 17;
 
-  struct WaveChannel
-  {
-    uint32_t channelNumber;
-    uint32_t operatingClass;
-    bool adaptable;
-    WifiMode dataRate;
-    uint32_t txPowerLevel;
+        struct WaveChannel {
+            uint32_t channelNumber;
+            uint32_t operatingClass;
+            bool adaptable;
+            WifiMode dataRate;
+            uint32_t txPowerLevel;
 
-    WaveChannel (uint32_t channel)
-      : channelNumber (channel),
-        operatingClass (DEFAULT_OPERATING_CLASS),
-        adaptable (true),
-        dataRate (WifiMode ("OfdmRate6MbpsBW10MHz")),
-        txPowerLevel (4)
-    {
-    }
-  };
-  std::map<uint32_t, WaveChannel *> m_channels;
-};
+            WaveChannel(uint32_t channel)
+            : channelNumber(channel),
+            operatingClass(DEFAULT_OPERATING_CLASS),
+            adaptable(true),
+            dataRate(WifiMode("OfdmRate6MbpsBW10MHz")),
+            txPowerLevel(4) {
+            }
+        };
+        std::map<uint32_t, WaveChannel *> m_channels;
+    };
 
 }
 #endif /* CHANNEL_MANAGER_H */

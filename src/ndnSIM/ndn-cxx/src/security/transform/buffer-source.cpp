@@ -22,44 +22,40 @@
 #include "buffer-source.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-BufferSource::BufferSource(const uint8_t* buf, size_t size)
-  : m_buf(buf)
-  , m_size(size)
-{
-}
+            BufferSource::BufferSource(const uint8_t* buf, size_t size)
+            : m_buf(buf)
+            , m_size(size) {
+            }
 
-BufferSource::BufferSource(const std::string& string)
-  : m_buf(reinterpret_cast<const uint8_t*>(string.data()))
-  , m_size(string.size())
-{
-}
+            BufferSource::BufferSource(const std::string& string)
+            : m_buf(reinterpret_cast<const uint8_t*> (string.data()))
+            , m_size(string.size()) {
+            }
 
-BufferSource::BufferSource(const Buffer& buffer)
-  : m_buf(buffer.buf())
-  , m_size(buffer.size())
-{
-}
+            BufferSource::BufferSource(const Buffer& buffer)
+            : m_buf(buffer.buf())
+            , m_size(buffer.size()) {
+            }
 
-void
-BufferSource::doPump()
-{
-  BOOST_ASSERT(m_next != nullptr);
+            void
+            BufferSource::doPump() {
+                BOOST_ASSERT(m_next != nullptr);
 
-  const uint8_t* buf = m_buf;
-  size_t size = m_size;
+                const uint8_t* buf = m_buf;
+                size_t size = m_size;
 
-  while (0 < size) {
-    size_t nBytesWritten = m_next->write(buf, size);
-    buf += nBytesWritten;
-    size -= nBytesWritten;
-  }
+                while (0 < size) {
+                    size_t nBytesWritten = m_next->write(buf, size);
+                    buf += nBytesWritten;
+                    size -= nBytesWritten;
+                }
 
-  m_next->end();
-}
+                m_next->end();
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

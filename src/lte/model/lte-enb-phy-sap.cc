@@ -22,17 +22,14 @@
 #include "lte-enb-phy-sap.h"
 
 
-namespace ns3 {
-
-
-LteEnbPhySapProvider::~LteEnbPhySapProvider ()
+namespace ns3
 {
-}
 
+    LteEnbPhySapProvider::~LteEnbPhySapProvider() {
+    }
 
-LteEnbPhySapUser::~LteEnbPhySapUser ()
-{
-}
+    LteEnbPhySapUser::~LteEnbPhySapUser() {
+    }
 
 
 } // namespace ns3

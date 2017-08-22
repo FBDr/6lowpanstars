@@ -32,78 +32,73 @@
 #include <type_traits>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-template<class ChannelT, class EndpointT>
-class ChannelFixture : public BaseFixture
-{
-  static_assert(std::is_base_of<Channel, ChannelT>::value,
-                "ChannelFixture must be instantiated with a type derived from Channel");
+        template<class ChannelT, class EndpointT>
+        class ChannelFixture : public BaseFixture {
+            static_assert(std::is_base_of<Channel, ChannelT>::value,
+                    "ChannelFixture must be instantiated with a type derived from Channel");
 
-public:
-  virtual
-  ~ChannelFixture() = default;
+        public:
+            virtual
+            ~ChannelFixture() = default;
 
-  static void
-  unexpectedFailure(uint32_t status, const std::string& reason)
-  {
-    BOOST_FAIL("No error expected, but got: [" << status << ": " << reason << "]");
-  }
+            static void
+            unexpectedFailure(uint32_t status, const std::string& reason) {
+                BOOST_FAIL("No error expected, but got: [" << status << ": " << reason << "]");
+            }
 
-protected:
-  uint16_t
-  getNextPort()
-  {
-    return m_nextPort++;
-  }
+        protected:
 
-  virtual unique_ptr<ChannelT>
-  makeChannel()
-  {
-    BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
-  }
+            uint16_t
+            getNextPort() {
+                return m_nextPort++;
+            }
 
-  /**
-   * if port == 0, use the port number returned by getNextPort()
-   */
-  virtual unique_ptr<ChannelT>
-  makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0)
-  {
-    BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
-  }
+            virtual unique_ptr<ChannelT>
+            makeChannel() {
+                BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
+            }
 
-  void
-  listen(const boost::asio::ip::address& addr)
-  {
-    listenerEp = EndpointT{addr, 7030};
-    listenerChannel = makeChannel(addr, 7030);
-    listenerChannel->listen(
-      [this] (const shared_ptr<Face>& newFace) {
-        BOOST_REQUIRE(newFace != nullptr);
-        connectFaceClosedSignal(*newFace, [this] { limitedIo.afterOp(); });
-        listenerFaces.push_back(newFace);
-        limitedIo.afterOp();
-      },
-      ChannelFixture::unexpectedFailure);
-  }
+            /**
+             * if port == 0, use the port number returned by getNextPort()
+             */
+            virtual unique_ptr<ChannelT>
+            makeChannel(const boost::asio::ip::address& addr, uint16_t port = 0) {
+                BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
+            }
 
-  virtual void
-  connect(ChannelT&)
-  {
-    BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
-  }
+            void
+            listen(const boost::asio::ip::address& addr) {
+                listenerEp = EndpointT{addr, 7030};
+                listenerChannel = makeChannel(addr, 7030);
+                listenerChannel->listen(
+                        [this] (const shared_ptr<Face>& newFace) {
+                            BOOST_REQUIRE(newFace != nullptr);
+                            connectFaceClosedSignal(*newFace, [this] {
+                                limitedIo.afterOp(); });
+                            listenerFaces.push_back(newFace);
+                            limitedIo.afterOp();
+                        },
+                ChannelFixture::unexpectedFailure);
+            }
 
-protected:
-  LimitedIo limitedIo;
-  EndpointT listenerEp;
-  unique_ptr<ChannelT> listenerChannel;
-  std::vector<shared_ptr<Face>> listenerFaces;
+            virtual void
+            connect(ChannelT&) {
+                BOOST_THROW_EXCEPTION(std::logic_error("unimplemented"));
+            }
 
-private:
-  uint16_t m_nextPort = 7050;
-};
+        protected:
+            LimitedIo limitedIo;
+            EndpointT listenerEp;
+            unique_ptr<ChannelT> listenerChannel;
+            std::vector<shared_ptr<Face>> listenerFaces;
 
-} // namespace tests
+        private:
+            uint16_t m_nextPort = 7050;
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_CHANNEL_FIXTURE_HPP

@@ -24,59 +24,53 @@
 #include "ns3/node.h"
 #include "ns3/names.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SixLowPanHelper");
-
-SixLowPanHelper::SixLowPanHelper ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  m_deviceFactory.SetTypeId ("ns3::SixLowPanNetDevice");
-}
 
-void SixLowPanHelper::SetDeviceAttribute (std::string n1,
-                                          const AttributeValue &v1)
-{
-  NS_LOG_FUNCTION (this);
-  m_deviceFactory.Set (n1, v1);
-}
+    NS_LOG_COMPONENT_DEFINE("SixLowPanHelper");
 
-NetDeviceContainer SixLowPanHelper::Install (const NetDeviceContainer c)
-{
-  NS_LOG_FUNCTION (this);
-
-  NetDeviceContainer devs;
-
-  for (uint32_t i = 0; i < c.GetN (); ++i)
-    {
-      Ptr<NetDevice> device = c.Get (i);
-      NS_ASSERT_MSG (device != 0, "No NetDevice found in the node " << int(i) );
-
-      Ptr<Node> node = device->GetNode ();
-      NS_LOG_LOGIC ("**** Install 6LoWPAN on node " << node->GetId ());
-
-      Ptr<SixLowPanNetDevice> dev = m_deviceFactory.Create<SixLowPanNetDevice> ();
-      devs.Add (dev);
-      node->AddDevice (dev);
-      dev->SetNetDevice (device);
+    SixLowPanHelper::SixLowPanHelper() {
+        NS_LOG_FUNCTION(this);
+        m_deviceFactory.SetTypeId("ns3::SixLowPanNetDevice");
     }
-  return devs;
-}
 
-int64_t SixLowPanHelper::AssignStreams (NetDeviceContainer c, int64_t stream)
-{
-  int64_t currentStream = stream;
-  Ptr<NetDevice> netDevice;
-  for (NetDeviceContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      netDevice = (*i);
-      Ptr<SixLowPanNetDevice> dev = DynamicCast<SixLowPanNetDevice> (netDevice);
-      if (dev)
-        {
-          currentStream += dev->AssignStreams (currentStream);
+    void SixLowPanHelper::SetDeviceAttribute(std::string n1,
+            const AttributeValue & v1) {
+        NS_LOG_FUNCTION(this);
+        m_deviceFactory.Set(n1, v1);
+    }
+
+    NetDeviceContainer SixLowPanHelper::Install(const NetDeviceContainer c) {
+        NS_LOG_FUNCTION(this);
+
+        NetDeviceContainer devs;
+
+        for (uint32_t i = 0; i < c.GetN(); ++i) {
+            Ptr<NetDevice> device = c.Get(i);
+            NS_ASSERT_MSG(device != 0, "No NetDevice found in the node " << int(i));
+
+            Ptr<Node> node = device->GetNode();
+            NS_LOG_LOGIC("**** Install 6LoWPAN on node " << node->GetId());
+
+            Ptr<SixLowPanNetDevice> dev = m_deviceFactory.Create<SixLowPanNetDevice> ();
+            devs.Add(dev);
+            node->AddDevice(dev);
+            dev->SetNetDevice(device);
         }
+        return devs;
     }
-  return (currentStream - stream);
-}
+
+    int64_t SixLowPanHelper::AssignStreams(NetDeviceContainer c, int64_t stream) {
+        int64_t currentStream = stream;
+        Ptr<NetDevice> netDevice;
+        for (NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            netDevice = (*i);
+            Ptr<SixLowPanNetDevice> dev = DynamicCast<SixLowPanNetDevice> (netDevice);
+            if (dev) {
+                currentStream += dev->AssignStreams(currentStream);
+            }
+        }
+        return (currentStream - stream);
+    }
 
 } // namespace ns3

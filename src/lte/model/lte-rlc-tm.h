@@ -29,41 +29,40 @@
 
 namespace ns3 {
 
-/**
- * LTE RLC Transparent Mode (TM), see 3GPP TS 36.322
- */
-class LteRlcTm : public LteRlc
-{
-public:
-  LteRlcTm ();
-  virtual ~LteRlcTm ();
-  static TypeId GetTypeId (void);
-  virtual void DoDispose ();
+    /**
+     * LTE RLC Transparent Mode (TM), see 3GPP TS 36.322
+     */
+    class LteRlcTm : public LteRlc {
+    public:
+        LteRlcTm();
+        virtual ~LteRlcTm();
+        static TypeId GetTypeId(void);
+        virtual void DoDispose();
 
-  /**
-   * RLC SAP
-   */
-  virtual void DoTransmitPdcpPdu (Ptr<Packet> p);
+        /**
+         * RLC SAP
+         */
+        virtual void DoTransmitPdcpPdu(Ptr<Packet> p);
 
-  /**
-   * MAC SAP
-   */
-  virtual void DoNotifyTxOpportunity (uint32_t bytes, uint8_t layer, uint8_t harqId);
-  virtual void DoNotifyHarqDeliveryFailure ();
-  virtual void DoReceivePdu (Ptr<Packet> p);
+        /**
+         * MAC SAP
+         */
+        virtual void DoNotifyTxOpportunity(uint32_t bytes, uint8_t layer, uint8_t harqId);
+        virtual void DoNotifyHarqDeliveryFailure();
+        virtual void DoReceivePdu(Ptr<Packet> p);
 
-private:
-  void ExpireRbsTimer (void);
-  void DoReportBufferStatus ();
+    private:
+        void ExpireRbsTimer(void);
+        void DoReportBufferStatus();
 
-private:
-  uint32_t m_maxTxBufferSize;
-  uint32_t m_txBufferSize;
-  std::vector < Ptr<Packet> > m_txBuffer;       // Transmission buffer
+    private:
+        uint32_t m_maxTxBufferSize;
+        uint32_t m_txBufferSize;
+        std::vector < Ptr<Packet> > m_txBuffer; // Transmission buffer
 
-  EventId m_rbsTimer;
+        EventId m_rbsTimer;
 
-};
+    };
 
 
 } // namespace ns3

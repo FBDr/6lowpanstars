@@ -22,62 +22,54 @@
 #include "signal-scoped-connection.hpp"
 
 namespace ndn {
-namespace util {
-namespace signal {
+    namespace util {
+        namespace signal {
 
 #if NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
-static_assert(std::is_nothrow_move_constructible<ScopedConnection>::value,
-              "ScopedConnection must be MoveConstructible with noexcept");
+            static_assert(std::is_nothrow_move_constructible<ScopedConnection>::value,
+                    "ScopedConnection must be MoveConstructible with noexcept");
 #endif // NDN_CXX_HAVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE
 
-ScopedConnection::ScopedConnection()
-{
-}
+            ScopedConnection::ScopedConnection() {
+            }
 
-ScopedConnection::ScopedConnection(const Connection& connection)
-  : m_connection(connection)
-{
-}
+            ScopedConnection::ScopedConnection(const Connection& connection)
+            : m_connection(connection) {
+            }
 
-ScopedConnection::ScopedConnection(ScopedConnection&& other) noexcept
-  : m_connection(other.m_connection)
-{
-  other.release();
-}
+            ScopedConnection::ScopedConnection(ScopedConnection&& other) noexcept
+            : m_connection(other.m_connection) {
+                other.release();
+            }
 
-ScopedConnection&
-ScopedConnection::operator=(const Connection& connection)
-{
-  if (m_connection != connection) {
-    m_connection.disconnect();
-    m_connection = connection;
-  }
-  return *this;
-}
+            ScopedConnection&
+                    ScopedConnection::operator=(const Connection& connection) {
+                if (m_connection != connection) {
+                    m_connection.disconnect();
+                    m_connection = connection;
+                }
+                return *this;
+            }
 
-ScopedConnection::~ScopedConnection() noexcept
-{
-  m_connection.disconnect();
-}
+            ScopedConnection::~ScopedConnection() noexcept {
+                m_connection.disconnect();
+            }
 
-void
-ScopedConnection::disconnect()
-{
-  m_connection.disconnect();
-}
+            void
+            ScopedConnection::disconnect() {
+                m_connection.disconnect();
+            }
 
-bool
-ScopedConnection::isConnected() const
-{
-  return m_connection.isConnected();
-}
+            bool
+            ScopedConnection::isConnected() const {
+                return m_connection.isConnected();
+            }
 
-void
-ScopedConnection::release()
-{
-  m_connection = {};
-}
+            void
+            ScopedConnection::release() {
+                m_connection = {};
+            }
 
-} // namespace signal
-} // namespace util
+        } // namespace signal
+    } // namespace util
 } // namespace ndn

@@ -20,159 +20,136 @@
 #include "hierarchical-mobility-model.h"
 #include "ns3/pointer.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (HierarchicalMobilityModel);
-
-TypeId 
-HierarchicalMobilityModel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::HierarchicalMobilityModel")
-    .SetParent<MobilityModel> ()
-    .SetGroupName ("Mobility")
-    .AddConstructor<HierarchicalMobilityModel> ()
-    .AddAttribute ("Child", "The child mobility model.",
-                   PointerValue (),
-                   MakePointerAccessor (&HierarchicalMobilityModel::SetChild,
-                                        &HierarchicalMobilityModel::GetChild),
-                   MakePointerChecker<MobilityModel> ())
-    .AddAttribute ("Parent", "The parent mobility model.",
-                   PointerValue (),
-                   MakePointerAccessor (&HierarchicalMobilityModel::SetParent,
-                                        &HierarchicalMobilityModel::GetParent),
-                   MakePointerChecker<MobilityModel> ())
-  ;
-  return tid;
-}
 
-HierarchicalMobilityModel::HierarchicalMobilityModel ()
-  : m_child (0),
-    m_parent (0)
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(HierarchicalMobilityModel);
 
-void
-HierarchicalMobilityModel::SetChild (Ptr<MobilityModel> model)
-{
-  Ptr<MobilityModel> oldChild = m_child;
-  Vector pos;
-  if (m_child)
-    {
-      pos = GetPosition ();
-      m_child->TraceDisconnectWithoutContext ("CourseChange", MakeCallback (&HierarchicalMobilityModel::ChildChanged, this));
+    TypeId
+    HierarchicalMobilityModel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::HierarchicalMobilityModel")
+                .SetParent<MobilityModel> ()
+                .SetGroupName("Mobility")
+                .AddConstructor<HierarchicalMobilityModel> ()
+                .AddAttribute("Child", "The child mobility model.",
+                PointerValue(),
+                MakePointerAccessor(&HierarchicalMobilityModel::SetChild,
+                &HierarchicalMobilityModel::GetChild),
+                MakePointerChecker<MobilityModel> ())
+                .AddAttribute("Parent", "The parent mobility model.",
+                PointerValue(),
+                MakePointerAccessor(&HierarchicalMobilityModel::SetParent,
+                &HierarchicalMobilityModel::GetParent),
+                MakePointerChecker<MobilityModel> ())
+                ;
+        return tid;
     }
-  m_child = model;
-  m_child->TraceConnectWithoutContext ("CourseChange", MakeCallback (&HierarchicalMobilityModel::ChildChanged, this));
 
-  // if we had a child before, then we had a valid position before;
-  // try to preserve the old absolute position.
-  if (oldChild)
-    {
-      SetPosition (pos);
+    HierarchicalMobilityModel::HierarchicalMobilityModel()
+            : m_child(0),
+            m_parent(0) {
     }
-}
 
-void 
-HierarchicalMobilityModel::SetParent (Ptr<MobilityModel> model)
-{
-  Vector pos;
-  if (m_child)
-    {
-      pos = GetPosition ();
-    }
-  if (m_parent)
-    {
-      m_parent->TraceDisconnectWithoutContext ("CourseChange", MakeCallback (&HierarchicalMobilityModel::ParentChanged, this));
-    }
-  m_parent = model;
-  if (m_parent)
-    {
-      m_parent->TraceConnectWithoutContext ("CourseChange", MakeCallback (&HierarchicalMobilityModel::ParentChanged, this));
-    }
-  // try to preserve the old position across parent changes
-  if (m_child)
-    {
-      SetPosition (pos);
-    }
-}
+    void
+    HierarchicalMobilityModel::SetChild(Ptr<MobilityModel> model) {
+        Ptr<MobilityModel> oldChild = m_child;
+        Vector pos;
+        if (m_child) {
+            pos = GetPosition();
+            m_child->TraceDisconnectWithoutContext("CourseChange", MakeCallback(&HierarchicalMobilityModel::ChildChanged, this));
+        }
+        m_child = model;
+        m_child->TraceConnectWithoutContext("CourseChange", MakeCallback(&HierarchicalMobilityModel::ChildChanged, this));
 
+        // if we had a child before, then we had a valid position before;
+        // try to preserve the old absolute position.
+        if (oldChild) {
+            SetPosition(pos);
+        }
+    }
 
-Ptr<MobilityModel> 
-HierarchicalMobilityModel::GetChild (void) const
-{
-  return m_child;
-}
+    void
+    HierarchicalMobilityModel::SetParent(Ptr<MobilityModel> model) {
+        Vector pos;
+        if (m_child) {
+            pos = GetPosition();
+        }
+        if (m_parent) {
+            m_parent->TraceDisconnectWithoutContext("CourseChange", MakeCallback(&HierarchicalMobilityModel::ParentChanged, this));
+        }
+        m_parent = model;
+        if (m_parent) {
+            m_parent->TraceConnectWithoutContext("CourseChange", MakeCallback(&HierarchicalMobilityModel::ParentChanged, this));
+        }
+        // try to preserve the old position across parent changes
+        if (m_child) {
+            SetPosition(pos);
+        }
+    }
 
-Ptr<MobilityModel> 
-HierarchicalMobilityModel::GetParent (void) const
-{
-  return m_parent;
-}
+    Ptr<MobilityModel>
+            HierarchicalMobilityModel::GetChild(void) const {
+        return m_child;
+    }
 
-Vector
-HierarchicalMobilityModel::DoGetPosition (void) const
-{
-  if (!m_parent)
-    {
-      return m_child->GetPosition ();
+    Ptr<MobilityModel>
+            HierarchicalMobilityModel::GetParent(void) const {
+        return m_parent;
     }
-  Vector parentPosition = m_parent->GetPosition ();
-  Vector childPosition = m_child->GetPosition ();
-  return Vector (parentPosition.x + childPosition.x,
-                 parentPosition.y + childPosition.y,
-                 parentPosition.z + childPosition.z);
-}
-void 
-HierarchicalMobilityModel::DoSetPosition (const Vector &position)
-{
-  if (m_child == 0)
-    {
-      return;
+
+    Vector
+    HierarchicalMobilityModel::DoGetPosition(void) const {
+        if (!m_parent) {
+            return m_child->GetPosition();
+        }
+        Vector parentPosition = m_parent->GetPosition();
+        Vector childPosition = m_child->GetPosition();
+        return Vector(parentPosition.x + childPosition.x,
+                parentPosition.y + childPosition.y,
+                parentPosition.z + childPosition.z);
     }
-  // This implementation of DoSetPosition is really an arbitraty choice.
-  // anything else would have been ok.
-  if (m_parent)
-    {
-      Vector parentPosition = m_parent->GetPosition ();
-      Vector childPosition (position.x - parentPosition.x,
-                            position.y - parentPosition.y,
-                            position.z - parentPosition.z);
-      m_child->SetPosition (childPosition);
+
+    void
+    HierarchicalMobilityModel::DoSetPosition(const Vector & position) {
+        if (m_child == 0) {
+            return;
+        }
+        // This implementation of DoSetPosition is really an arbitraty choice.
+        // anything else would have been ok.
+        if (m_parent) {
+            Vector parentPosition = m_parent->GetPosition();
+            Vector childPosition(position.x - parentPosition.x,
+                    position.y - parentPosition.y,
+                    position.z - parentPosition.z);
+            m_child->SetPosition(childPosition);
+        } else {
+            m_child->SetPosition(position);
+        }
     }
-  else
-    {
-      m_child->SetPosition (position);
-    }
-}
-Vector
-HierarchicalMobilityModel::DoGetVelocity (void) const
-{
-  if (m_parent)
-    {
-      Vector parentSpeed = m_parent->GetVelocity ();
-      Vector childSpeed = m_child->GetVelocity ();
-      Vector speed (parentSpeed.x + childSpeed.x,
+
+    Vector
+    HierarchicalMobilityModel::DoGetVelocity(void) const {
+        if (m_parent) {
+            Vector parentSpeed = m_parent->GetVelocity();
+            Vector childSpeed = m_child->GetVelocity();
+            Vector speed(parentSpeed.x + childSpeed.x,
                     parentSpeed.y + childSpeed.y,
                     parentSpeed.z + childSpeed.z);
-      return speed;
+            return speed;
+        } else {
+            return m_child->GetVelocity();
+        }
     }
-  else
-    {
-      return m_child->GetVelocity ();
+
+    void
+    HierarchicalMobilityModel::ParentChanged(Ptr<const MobilityModel> model) {
+        MobilityModel::NotifyCourseChange();
     }
-}
 
-void 
-HierarchicalMobilityModel::ParentChanged (Ptr<const MobilityModel> model)
-{
-  MobilityModel::NotifyCourseChange ();
-}
-
-void 
-HierarchicalMobilityModel::ChildChanged (Ptr<const MobilityModel> model)
-{
-  MobilityModel::NotifyCourseChange ();
-}
+    void
+    HierarchicalMobilityModel::ChildChanged(Ptr<const MobilityModel> model) {
+        MobilityModel::NotifyCourseChange();
+    }
 
 
 

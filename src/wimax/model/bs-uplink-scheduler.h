@@ -30,93 +30,92 @@
 
 namespace ns3 {
 
-class BaseStationNetDevice;
-class SSRecord;
-class ServiceFlow;
-class ServiceFlowRecord;
+    class BaseStationNetDevice;
+    class SSRecord;
+    class ServiceFlow;
+    class ServiceFlowRecord;
 
-/**
- * \ingroup wimax
- * \brief Virtual class for uplink scheduler.
- */
-class UplinkScheduler : public Object
-{
-public:
-  UplinkScheduler (void);
-  UplinkScheduler (Ptr<BaseStationNetDevice> bs);
-  virtual ~UplinkScheduler (void);
+    /**
+     * \ingroup wimax
+     * \brief Virtual class for uplink scheduler.
+     */
+    class UplinkScheduler : public Object {
+    public:
+        UplinkScheduler(void);
+        UplinkScheduler(Ptr<BaseStationNetDevice> bs);
+        virtual ~UplinkScheduler(void);
 
-  static TypeId GetTypeId (void);
+        static TypeId GetTypeId(void);
 
-  virtual uint8_t GetNrIrOppsAllocated (void) const;
-  virtual void SetNrIrOppsAllocated (uint8_t nrIrOppsAllocated);
+        virtual uint8_t GetNrIrOppsAllocated(void) const;
+        virtual void SetNrIrOppsAllocated(uint8_t nrIrOppsAllocated);
 
-  virtual bool GetIsIrIntrvlAllocated (void) const;
-  virtual void SetIsIrIntrvlAllocated (bool isIrIntrvlAllocated);
+        virtual bool GetIsIrIntrvlAllocated(void) const;
+        virtual void SetIsIrIntrvlAllocated(bool isIrIntrvlAllocated);
 
-  virtual bool GetIsInvIrIntrvlAllocated (void) const;
-  virtual void SetIsInvIrIntrvlAllocated (bool isInvIrIntrvlAllocated);
+        virtual bool GetIsInvIrIntrvlAllocated(void) const;
+        virtual void SetIsInvIrIntrvlAllocated(bool isInvIrIntrvlAllocated);
 
-  virtual std::list<OfdmUlMapIe> GetUplinkAllocations (void) const;
+        virtual std::list<OfdmUlMapIe> GetUplinkAllocations(void) const;
 
-  virtual Time GetTimeStampIrInterval (void);
-  virtual void SetTimeStampIrInterval (Time timeStampIrInterval);
+        virtual Time GetTimeStampIrInterval(void);
+        virtual void SetTimeStampIrInterval(Time timeStampIrInterval);
 
-  virtual Time GetDcdTimeStamp (void) const;
-  virtual void SetDcdTimeStamp (Time dcdTimeStamp);
+        virtual Time GetDcdTimeStamp(void) const;
+        virtual void SetDcdTimeStamp(Time dcdTimeStamp);
 
-  virtual Time GetUcdTimeStamp (void) const;
-  virtual void SetUcdTimeStamp (Time ucdTimeStamp);
+        virtual Time GetUcdTimeStamp(void) const;
+        virtual void SetUcdTimeStamp(Time ucdTimeStamp);
 
-  virtual Ptr<BaseStationNetDevice> GetBs (void);
-  virtual void SetBs (Ptr<BaseStationNetDevice> bs);
-  /**
-   * Determines if channel descriptors sent in the current frame are
-   * required to be updated
-   */
-  virtual void GetChannelDescriptorsToUpdate (bool&, bool&, bool&, bool&) = 0;
-  virtual uint32_t CalculateAllocationStartTime (void) = 0;
-  virtual void AddUplinkAllocation (OfdmUlMapIe &ulMapIe,
-                                    const uint32_t &allocationSize,
-                                    uint32_t &symbolsToAllocation,
-                                    uint32_t &availableSymbols) = 0;
-  virtual void Schedule (void) = 0;
-  virtual void ServiceUnsolicitedGrants (const SSRecord *ssRecord,
-                                         enum ServiceFlow::SchedulingType schedulingType,
-                                         OfdmUlMapIe &ulMapIe,
-                                         const WimaxPhy::ModulationType modulationType,
-                                         uint32_t &symbolsToAllocation,
-                                         uint32_t &availableSymbols) = 0;
-  virtual void ServiceBandwidthRequests (const SSRecord *ssRecord,
-                                         enum ServiceFlow::SchedulingType schedulingType,
-                                         OfdmUlMapIe &ulMapIe,
-                                         const WimaxPhy::ModulationType modulationType,
-                                         uint32_t &symbolsToAllocation,
-                                         uint32_t &availableSymbols) = 0;
-  virtual bool ServiceBandwidthRequests (ServiceFlow *serviceFlow,
-                                         enum ServiceFlow::SchedulingType schedulingType,
-                                         OfdmUlMapIe &ulMapIe,
-                                         const WimaxPhy::ModulationType modulationType,
-                                         uint32_t &symbolsToAllocation,
-                                         uint32_t &availableSymbols) = 0;
-  virtual void AllocateInitialRangingInterval (uint32_t &symbolsToAllocation, uint32_t &availableSymbols) = 0;
-  virtual void SetupServiceFlow (SSRecord *ssRecord, ServiceFlow *serviceFlow) = 0;
-  virtual void ProcessBandwidthRequest (const BandwidthRequestHeader &bwRequestHdr) = 0;
+        virtual Ptr<BaseStationNetDevice> GetBs(void);
+        virtual void SetBs(Ptr<BaseStationNetDevice> bs);
+        /**
+         * Determines if channel descriptors sent in the current frame are
+         * required to be updated
+         */
+        virtual void GetChannelDescriptorsToUpdate(bool&, bool&, bool&, bool&) = 0;
+        virtual uint32_t CalculateAllocationStartTime(void) = 0;
+        virtual void AddUplinkAllocation(OfdmUlMapIe &ulMapIe,
+                const uint32_t &allocationSize,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols) = 0;
+        virtual void Schedule(void) = 0;
+        virtual void ServiceUnsolicitedGrants(const SSRecord *ssRecord,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols) = 0;
+        virtual void ServiceBandwidthRequests(const SSRecord *ssRecord,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols) = 0;
+        virtual bool ServiceBandwidthRequests(ServiceFlow *serviceFlow,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols) = 0;
+        virtual void AllocateInitialRangingInterval(uint32_t &symbolsToAllocation, uint32_t &availableSymbols) = 0;
+        virtual void SetupServiceFlow(SSRecord *ssRecord, ServiceFlow *serviceFlow) = 0;
+        virtual void ProcessBandwidthRequest(const BandwidthRequestHeader &bwRequestHdr) = 0;
 
-  virtual void InitOnce (void) = 0;
+        virtual void InitOnce(void) = 0;
 
-  virtual void OnSetRequestedBandwidth (ServiceFlowRecord *sfr) = 0;
+        virtual void OnSetRequestedBandwidth(ServiceFlowRecord *sfr) = 0;
 
-private:
-  Ptr<BaseStationNetDevice> m_bs;
-  std::list<OfdmUlMapIe> m_uplinkAllocations;
-  Time m_timeStampIrInterval;
-  uint8_t m_nrIrOppsAllocated;
-  bool m_isIrIntrvlAllocated;
-  bool m_isInvIrIntrvlAllocated;
-  Time m_dcdTimeStamp;
-  Time m_ucdTimeStamp;
-};
+    private:
+        Ptr<BaseStationNetDevice> m_bs;
+        std::list<OfdmUlMapIe> m_uplinkAllocations;
+        Time m_timeStampIrInterval;
+        uint8_t m_nrIrOppsAllocated;
+        bool m_isIrIntrvlAllocated;
+        bool m_isInvIrIntrvlAllocated;
+        Time m_dcdTimeStamp;
+        Time m_ucdTimeStamp;
+    };
 
 } // namespace ns3
 

@@ -25,22 +25,22 @@
 #include "tlv.hpp"
 
 namespace ndn {
-namespace tlv {
-namespace security {
+    namespace tlv {
+        namespace security {
 
-enum {
-  IdentityPackage    = 128,
-  KeyPackage         = 129,
-  CertificatePackage = 130
-};
+            enum {
+                IdentityPackage = 128,
+                KeyPackage = 129,
+                CertificatePackage = 130
+            };
 
-enum {
-  SafeBag = 128,
-  EncryptedKeyBag = 129
-};
+            enum {
+                SafeBag = 128,
+                EncryptedKeyBag = 129
+            };
 
-} // namespace security
-} // namespace tlv
+        } // namespace security
+    } // namespace tlv
 } // namespace ndn
 
 #endif // NDN_ENCODING_TLV_SECURITY_HPP

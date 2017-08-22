@@ -21,18 +21,18 @@
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (TcpSocketFactory);
-
-TypeId
-TcpSocketFactory::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::TcpSocketFactory")
-    .SetParent<SocketFactory> ()
-    .SetGroupName ("Internet")
-  ;
-  return tid;
-}
+
+    NS_OBJECT_ENSURE_REGISTERED(TcpSocketFactory);
+
+    TypeId
+    TcpSocketFactory::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::TcpSocketFactory")
+                .SetParent<SocketFactory> ()
+                .SetGroupName("Internet")
+                ;
+        return tid;
+    }
 
 } // namespace ns3

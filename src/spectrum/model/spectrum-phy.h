@@ -27,91 +27,89 @@
 
 namespace ns3 {
 
-class PacketBurst;
-class SpectrumChannel;
-class MobilityModel;
-class AntennaModel;
-class SpectrumValue;
-class SpectrumModel;
-class NetDevice;
-struct SpectrumSignalParameters;
+    class PacketBurst;
+    class SpectrumChannel;
+    class MobilityModel;
+    class AntennaModel;
+    class SpectrumValue;
+    class SpectrumModel;
+    class NetDevice;
+    struct SpectrumSignalParameters;
 
-/**
- * \ingroup spectrum
- *
- * Abstract base class for Spectrum-aware PHY layers
- *
- */
-class SpectrumPhy  : public Object
-{
+    /**
+     * \ingroup spectrum
+     *
+     * Abstract base class for Spectrum-aware PHY layers
+     *
+     */
+    class SpectrumPhy : public Object {
+    public:
+        SpectrumPhy();
+        virtual ~SpectrumPhy();
 
-public:
-  SpectrumPhy ();
-  virtual ~SpectrumPhy ();
+        static TypeId GetTypeId(void);
 
-  static TypeId GetTypeId (void);
+        /**
+         * set the associated NetDevice instance
+         *
+         * @param d the NetDevice instance
+         */
+        virtual void SetDevice(Ptr<NetDevice> d) = 0;
 
-  /**
-   * set the associated NetDevice instance
-   *
-   * @param d the NetDevice instance
-   */
-  virtual void SetDevice (Ptr<NetDevice> d) = 0;
+        /**
+         * get the associated NetDevice instance
+         *
+         * @return a Ptr to the associated NetDevice instance
+         */
+        virtual Ptr<NetDevice> GetDevice() const = 0;
 
-  /**
-   * get the associated NetDevice instance
-   *
-   * @return a Ptr to the associated NetDevice instance
-   */
-  virtual Ptr<NetDevice> GetDevice () const = 0;
+        /**
+         * Set the mobility model associated with this device.
+         *
+         * @param m the mobility model
+         */
+        virtual void SetMobility(Ptr<MobilityModel> m) = 0;
 
-  /**
-   * Set the mobility model associated with this device.
-   *
-   * @param m the mobility model
-   */
-  virtual void SetMobility (Ptr<MobilityModel> m) = 0;
+        /**
+         * get the associated MobilityModel instance
+         *
+         * @return a Ptr to the associated MobilityModel instance
+         */
+        virtual Ptr<MobilityModel> GetMobility() = 0;
 
-  /**
-   * get the associated MobilityModel instance
-   *
-   * @return a Ptr to the associated MobilityModel instance
-   */
-  virtual Ptr<MobilityModel> GetMobility () = 0;
+        /**
+         * Set the channel attached to this device.
+         *
+         * @param c the channel
+         */
+        virtual void SetChannel(Ptr<SpectrumChannel> c) = 0;
 
-  /**
-   * Set the channel attached to this device.
-   *
-   * @param c the channel
-   */
-  virtual void SetChannel (Ptr<SpectrumChannel> c) = 0;
+        /**
+         *
+         * @return returns the SpectrumModel that this SpectrumPhy expects to be used
+         * for all SpectrumValues that are passed to StartRx. If 0 is
+         * returned, it means that any model will be accepted.
+         */
+        virtual Ptr<const SpectrumModel> GetRxSpectrumModel() const = 0;
 
-  /**
-   *
-   * @return returns the SpectrumModel that this SpectrumPhy expects to be used
-   * for all SpectrumValues that are passed to StartRx. If 0 is
-   * returned, it means that any model will be accepted.
-   */
-  virtual Ptr<const SpectrumModel> GetRxSpectrumModel () const = 0;
+        /**
+         * get the AntennaModel used by the NetDevice for reception
+         *
+         * @return a Ptr to the AntennaModel used by the NetDevice for reception
+         */
+        virtual Ptr<AntennaModel> GetRxAntenna() = 0;
 
-  /**
-   * get the AntennaModel used by the NetDevice for reception
-   *
-   * @return a Ptr to the AntennaModel used by the NetDevice for reception
-   */
-  virtual Ptr<AntennaModel> GetRxAntenna () = 0;
+        /**
+         * Notify the SpectrumPhy instance of an incoming signal
+         *
+         * @param params the parameters of the signals being received
+         */
+        virtual void StartRx(Ptr<SpectrumSignalParameters> params) = 0;
 
-  /**
-   * Notify the SpectrumPhy instance of an incoming signal
-   *
-   * @param params the parameters of the signals being received
-   */
-  virtual void StartRx (Ptr<SpectrumSignalParameters> params) = 0;
-
-private:
-  SpectrumPhy (SpectrumPhy const &);
-  SpectrumPhy& operator= (SpectrumPhy const &);
-};
+    private:
+        SpectrumPhy(SpectrumPhy const &);
+        SpectrumPhy& operator=(SpectrumPhy const &);
+    };
 
 
 

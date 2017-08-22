@@ -27,39 +27,35 @@
 
 using namespace ns3;
 
-
 /**
  * Test that SINR calculation and MCS selection works fine in a multi-cell interference scenario.
  */
-class LteInterferenceTestSuite : public TestSuite
-{
+class LteInterferenceTestSuite : public TestSuite {
 public:
-  LteInterferenceTestSuite ();
+    LteInterferenceTestSuite();
 };
 
-
-class LteInterferenceTestCase : public TestCase
-{
+class LteInterferenceTestCase : public TestCase {
 public:
-  LteInterferenceTestCase (std::string name, double d1, double d2, double dlSinr, double ulSinr, double dlSe, double ulSe, uint16_t dlMcs, uint16_t ulMcs);
-  virtual ~LteInterferenceTestCase ();
+    LteInterferenceTestCase(std::string name, double d1, double d2, double dlSinr, double ulSinr, double dlSe, double ulSe, uint16_t dlMcs, uint16_t ulMcs);
+    virtual ~LteInterferenceTestCase();
 
-  void DlScheduling (uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
-                     uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2);
+    void DlScheduling(uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
+            uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2);
 
-  void UlScheduling (uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
-                     uint8_t mcs, uint16_t sizeTb);
+    void UlScheduling(uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
+            uint8_t mcs, uint16_t sizeTb);
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 
 
-  double m_d1;
-  double m_d2;
-  double m_expectedDlSinrDb;
-  double m_expectedUlSinrDb;
-  uint16_t m_dlMcs;
-  uint16_t m_ulMcs;
+    double m_d1;
+    double m_d2;
+    double m_expectedDlSinrDb;
+    double m_expectedUlSinrDb;
+    uint16_t m_dlMcs;
+    uint16_t m_ulMcs;
 };
 
 #endif /* LTE_TEST_INTERFERENCE_H */

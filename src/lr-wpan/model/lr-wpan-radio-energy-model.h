@@ -27,188 +27,187 @@
 
 namespace ns3 {
 
-class LrWpanRadioEnergyModel : public DeviceEnergyModel, public LrWpanPhyListener
-{
-public:
-  /**
-   * Callback type for energy depletion handling.
-   */
-  typedef Callback<void> LrWpanRadioEnergyDepletionCallback;
+    class LrWpanRadioEnergyModel : public DeviceEnergyModel, public LrWpanPhyListener {
+    public:
+        /**
+         * Callback type for energy depletion handling.
+         */
+        typedef Callback<void> LrWpanRadioEnergyDepletionCallback;
 
-  /**
-   * Callback type for energy recharged handling.
-   */
-  typedef Callback<void> LrWpanRadioEnergyRechargedCallback;
+        /**
+         * Callback type for energy recharged handling.
+         */
+        typedef Callback<void> LrWpanRadioEnergyRechargedCallback;
 
-  static TypeId GetTypeId (void);
-  LrWpanRadioEnergyModel ();
-  virtual ~LrWpanRadioEnergyModel ();
+        static TypeId GetTypeId(void);
+        LrWpanRadioEnergyModel();
+        virtual ~LrWpanRadioEnergyModel();
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to RX_ON state.
-   *
-   * Implements LrWpanPhyListener::NotifyRx
-   */
-  virtual void NotifyRx (void);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to RX_ON state.
+         *
+         * Implements LrWpanPhyListener::NotifyRx
+         */
+        virtual void NotifyRx(void);
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to BUSY_RX state.
-   *
-   * Implements LrWpanPhyListener::NotifyRxStart
-   */
-  virtual void NotifyRxStart (void);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to BUSY_RX state.
+         *
+         * Implements LrWpanPhyListener::NotifyRxStart
+         */
+        virtual void NotifyRxStart(void);
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to TX_ON state.
-   *
-   * Implements LrWpanPhyListener::NotifyTx
-   */
-  virtual void NotifyTx (void);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to TX_ON state.
+         *
+         * Implements LrWpanPhyListener::NotifyTx
+         */
+        virtual void NotifyTx(void);
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to BUSY_TX state.
-   *
-   * Implements LrWpanPhyListener::NotifyTxStart
-   */
-  virtual void NotifyTxStart (void);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to BUSY_TX state.
+         *
+         * Implements LrWpanPhyListener::NotifyTxStart
+         */
+        virtual void NotifyTxStart(void);
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to TRX_OFF state.
-   *
-   * Implements LrWpanPhyListener::NotifySleep
-   */
-  virtual void NotifySleep (void);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to TRX_OFF state.
+         *
+         * Implements LrWpanPhyListener::NotifySleep
+         */
+        virtual void NotifySleep(void);
 
-  /**
-   * \brief Switches the LrWpanRadioEnergyModel to Transition state.
-   *
-   * \param nextState The state that the Phy is switching to.
-   *
-   * Implements LrWpanPhyListener::NotifyTransition
-   */
-  virtual void NotifyTransition (LrWpanPhyEnumeration nextState);
+        /**
+         * \brief Switches the LrWpanRadioEnergyModel to Transition state.
+         *
+         * \param nextState The state that the Phy is switching to.
+         *
+         * Implements LrWpanPhyListener::NotifyTransition
+         */
+        virtual void NotifyTransition(LrWpanPhyEnumeration nextState);
 
-  /**
-   * \param phy Pointer to PHY layer attached to device.
-   *
-   * Registers the LrWpanRadioEnergyModel as listener to the Phy.
-   */
-  virtual void AttachPhy (Ptr<LrWpanPhy> phy);
+        /**
+         * \param phy Pointer to PHY layer attached to device.
+         *
+         * Registers the LrWpanRadioEnergyModel as listener to the Phy.
+         */
+        virtual void AttachPhy(Ptr<LrWpanPhy> phy);
 
-  /**
-   * \brief Sets pointer to EnergySouce installed on node.
-   *
-   * \param source Pointer to EnergySource installed on node.
-   *
-   * Implements DeviceEnergyModel::SetEnergySource.
-   */
-  virtual void SetEnergySource (Ptr<EnergySource> source);
+        /**
+         * \brief Sets pointer to EnergySouce installed on node.
+         *
+         * \param source Pointer to EnergySource installed on node.
+         *
+         * Implements DeviceEnergyModel::SetEnergySource.
+         */
+        virtual void SetEnergySource(Ptr<EnergySource> source);
 
-  /**
-   * \returns Total energy consumption of the LrWpan device.
-   *
-   * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
-   */
-  virtual double GetTotalEnergyConsumption (void) const;
+        /**
+         * \returns Total energy consumption of the LrWpan device.
+         *
+         * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
+         */
+        virtual double GetTotalEnergyConsumption(void) const;
 
-  // Setter & getters for state power consumption.
-  double GetTxCurrentA (void) const;
-  void SetTxCurrentA (double txCurrentA);
-  double GetRxCurrentA (void) const;
-  void SetRxCurrentA (double rxCurrentA);
-  double GetSleepCurrentA (void) const;
-  void SetSleepCurrentA (double sleepCurrentA);
+        // Setter & getters for state power consumption.
+        double GetTxCurrentA(void) const;
+        void SetTxCurrentA(double txCurrentA);
+        double GetRxCurrentA(void) const;
+        void SetRxCurrentA(double rxCurrentA);
+        double GetSleepCurrentA(void) const;
+        void SetSleepCurrentA(double sleepCurrentA);
 
-  /**
-   * \returns Current state.
-   */
-  LrWpanPhyEnumeration GetCurrentState (void) const;
+        /**
+         * \returns Current state.
+         */
+        LrWpanPhyEnumeration GetCurrentState(void) const;
 
-  /**
-   * \param callback Callback function.
-   *
-   * Sets callback for energy depletion handling.
-   */
-  void SetEnergyDepletionCallback (LrWpanRadioEnergyDepletionCallback callback);
+        /**
+         * \param callback Callback function.
+         *
+         * Sets callback for energy depletion handling.
+         */
+        void SetEnergyDepletionCallback(LrWpanRadioEnergyDepletionCallback callback);
 
-  /**
-   * \param callback Callback function.
-   *
-   * Sets callback for energy recharged handling.
-   */
-  void SetEnergyRechargedCallback (LrWpanRadioEnergyRechargedCallback callback);
+        /**
+         * \param callback Callback function.
+         *
+         * Sets callback for energy recharged handling.
+         */
+        void SetEnergyRechargedCallback(LrWpanRadioEnergyRechargedCallback callback);
 
-  /**
-   * \brief Changes state of the LrWpanRadioEnergyMode.
-   *
-   * \param newState New state the LrWpan radio is in.
-   *
-   * Implements DeviceEnergyModel::ChangeState.
-   */
-  virtual void ChangeState (int newState);
+        /**
+         * \brief Changes state of the LrWpanRadioEnergyMode.
+         *
+         * \param newState New state the LrWpan radio is in.
+         *
+         * Implements DeviceEnergyModel::ChangeState.
+         */
+        virtual void ChangeState(int newState);
 
-  /**
-   * \brief Handles energy depletion.
-   *
-   * Implements DeviceEnergyModel::HandleEnergyDepletion
-   */
-  virtual void HandleEnergyDepletion (void);
+        /**
+         * \brief Handles energy depletion.
+         *
+         * Implements DeviceEnergyModel::HandleEnergyDepletion
+         */
+        virtual void HandleEnergyDepletion(void);
 
-  /**
-   * \brief Handles energy recharged.
-   *
-   * Implements DeviceEnergyModel::HandleEnergyRecharged
-   */
-  virtual void HandleEnergyRecharged (void);
+        /**
+         * \brief Handles energy recharged.
+         *
+         * Implements DeviceEnergyModel::HandleEnergyRecharged
+         */
+        virtual void HandleEnergyRecharged(void);
 
-private:
-  void DoDispose (void);
+    private:
+        void DoDispose(void);
 
-  /**
-   * \returns Current draw of device, at current state.
-   *
-   * Implements DeviceEnergyModel::GetCurrentA.
-   */
-  virtual double DoGetCurrentA (void) const;
+        /**
+         * \returns Current draw of device, at current state.
+         *
+         * Implements DeviceEnergyModel::GetCurrentA.
+         */
+        virtual double DoGetCurrentA(void) const;
 
-  /**
-   * \param state New state the radio device is currently in.
-   *
-   * Sets current state. This function is private so that only the energy model
-   * can change its own state.
-   */
-  void SetLrWpanRadioState (const LrWpanPhyEnumeration state);
+        /**
+         * \param state New state the radio device is currently in.
+         *
+         * Sets current state. This function is private so that only the energy model
+         * can change its own state.
+         */
+        void SetLrWpanRadioState(const LrWpanPhyEnumeration state);
 
-  // The Energy Source and PHY associated with this model
-  Ptr<EnergySource> m_source;
-  Ptr<LrWpanPhy> m_phy;
+        // The Energy Source and PHY associated with this model
+        Ptr<EnergySource> m_source;
+        Ptr<LrWpanPhy> m_phy;
 
-  // Member variables for current draw in different radio modes.
-  double m_txCurrentA;
-  double m_rxCurrentA;
-  double m_sleepCurrentA;
+        // Member variables for current draw in different radio modes.
+        double m_txCurrentA;
+        double m_rxCurrentA;
+        double m_sleepCurrentA;
 
-  /**
-   * Variable to keep track of the total energy consumed.
-   */
-  TracedValue<double> m_totalEnergyConsumption;
+        /**
+         * Variable to keep track of the total energy consumed.
+         */
+        TracedValue<double> m_totalEnergyConsumption;
 
-  // State variables.
-  LrWpanPhyEnumeration m_currentState;  //!< current state the radio is in
-  LrWpanPhyEnumeration m_nextState;  //!< next state after transition
-  Time m_lastUpdateTime;          //!< time stamp of previous energy update
+        // State variables.
+        LrWpanPhyEnumeration m_currentState; //!< current state the radio is in
+        LrWpanPhyEnumeration m_nextState; //!< next state after transition
+        Time m_lastUpdateTime; //!< time stamp of previous energy update
 
-  /**
-   * Energy depletion callback.
-   */
-  LrWpanRadioEnergyDepletionCallback m_energyDepletionCallback;
+        /**
+         * Energy depletion callback.
+         */
+        LrWpanRadioEnergyDepletionCallback m_energyDepletionCallback;
 
-  /**
-   * Energy recharged callback.
-   */
-  LrWpanRadioEnergyRechargedCallback m_energyRechargedCallback;
+        /**
+         * Energy recharged callback.
+         */
+        LrWpanRadioEnergyRechargedCallback m_energyRechargedCallback;
 
-};
+    };
 
 } // namespace ns3
 

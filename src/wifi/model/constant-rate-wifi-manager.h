@@ -26,41 +26,40 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- * \brief use constant rates for data and RTS transmissions
- *
- * This class uses always the same transmission rate for every
- * packet sent.
- */
-class ConstantRateWifiManager : public WifiRemoteStationManager
-{
-public:
-  static TypeId GetTypeId (void);
-  ConstantRateWifiManager ();
-  virtual ~ConstantRateWifiManager ();
+    /**
+     * \ingroup wifi
+     * \brief use constant rates for data and RTS transmissions
+     *
+     * This class uses always the same transmission rate for every
+     * packet sent.
+     */
+    class ConstantRateWifiManager : public WifiRemoteStationManager {
+    public:
+        static TypeId GetTypeId(void);
+        ConstantRateWifiManager();
+        virtual ~ConstantRateWifiManager();
 
 
-private:
-  //overriden from base class
-  virtual WifiRemoteStation* DoCreateStation (void) const;
-  virtual void DoReportRxOk (WifiRemoteStation *station,
-                             double rxSnr, WifiMode txMode);
-  virtual void DoReportRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportDataFailed (WifiRemoteStation *station);
-  virtual void DoReportRtsOk (WifiRemoteStation *station,
-                              double ctsSnr, WifiMode ctsMode, double rtsSnr);
-  virtual void DoReportDataOk (WifiRemoteStation *station,
-                               double ackSnr, WifiMode ackMode, double dataSnr);
-  virtual void DoReportFinalRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportFinalDataFailed (WifiRemoteStation *station);
-  virtual WifiTxVector DoGetDataTxVector (WifiRemoteStation *station, uint32_t size);
-  virtual WifiTxVector DoGetRtsTxVector (WifiRemoteStation *station);
-  virtual bool IsLowLatency (void) const;
+    private:
+        //overriden from base class
+        virtual WifiRemoteStation* DoCreateStation(void) const;
+        virtual void DoReportRxOk(WifiRemoteStation *station,
+                double rxSnr, WifiMode txMode);
+        virtual void DoReportRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportDataFailed(WifiRemoteStation *station);
+        virtual void DoReportRtsOk(WifiRemoteStation *station,
+                double ctsSnr, WifiMode ctsMode, double rtsSnr);
+        virtual void DoReportDataOk(WifiRemoteStation *station,
+                double ackSnr, WifiMode ackMode, double dataSnr);
+        virtual void DoReportFinalRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportFinalDataFailed(WifiRemoteStation *station);
+        virtual WifiTxVector DoGetDataTxVector(WifiRemoteStation *station, uint32_t size);
+        virtual WifiTxVector DoGetRtsTxVector(WifiRemoteStation *station);
+        virtual bool IsLowLatency(void) const;
 
-  WifiMode m_dataMode; //!< Wifi mode for unicast DATA frames
-  WifiMode m_ctlMode;  //!< Wifi mode for RTS frames
-};
+        WifiMode m_dataMode; //!< Wifi mode for unicast DATA frames
+        WifiMode m_ctlMode; //!< Wifi mode for RTS frames
+    };
 
 } //namespace ns3
 

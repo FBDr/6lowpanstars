@@ -34,97 +34,96 @@
 
 namespace ns3 {
 
-/**
- * \ingroup energy
- * BasicEnergyHarvester increases remaining energy stored in an associated
- * Energy Source. The BasicEnergyHarvester implements a simple model in which
- * the amount of power provided by the harvester varies over time according
- * to a customizable generic random variable and time update intervals.
- *
- * Unit of power is chosen as Watt since energy models typically calculate
- * energy as (time in seconds * power in Watt).
- *
- */
-class BasicEnergyHarvester: public EnergyHarvester
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup energy
+     * BasicEnergyHarvester increases remaining energy stored in an associated
+     * Energy Source. The BasicEnergyHarvester implements a simple model in which
+     * the amount of power provided by the harvester varies over time according
+     * to a customizable generic random variable and time update intervals.
+     *
+     * Unit of power is chosen as Watt since energy models typically calculate
+     * energy as (time in seconds * power in Watt).
+     *
+     */
+    class BasicEnergyHarvester : public EnergyHarvester {
+    public:
+        static TypeId GetTypeId(void);
 
-  BasicEnergyHarvester ();
+        BasicEnergyHarvester();
 
-  /**
-   * \param updateInterval Energy harvesting update interval.
-   *
-   * BasicEnergyHarvester constructor function that sets the interval
-   * between each update of the value of the power harvested by this
-   * energy harvester.
-   */
-  BasicEnergyHarvester (Time updateInterval);
+        /**
+         * \param updateInterval Energy harvesting update interval.
+         *
+         * BasicEnergyHarvester constructor function that sets the interval
+         * between each update of the value of the power harvested by this
+         * energy harvester.
+         */
+        BasicEnergyHarvester(Time updateInterval);
 
-  virtual ~BasicEnergyHarvester ();
+        virtual ~BasicEnergyHarvester();
 
-  /**
-   * \param updateInterval Energy harvesting update interval.
-   *
-   * This function sets the interval between each update of the value of the
-   * power harvested by this energy harvester.
-   */
-  void SetHarvestedPowerUpdateInterval (Time updateInterval);
+        /**
+         * \param updateInterval Energy harvesting update interval.
+         *
+         * This function sets the interval between each update of the value of the
+         * power harvested by this energy harvester.
+         */
+        void SetHarvestedPowerUpdateInterval(Time updateInterval);
 
-  /**
-   * \returns The interval between each update of the harvested power.
-   *
-   * This function returns the interval between each update of the value of the
-   * power harvested by this energy harvester.
-   */
-  Time GetHarvestedPowerUpdateInterval (void) const;
+        /**
+         * \returns The interval between each update of the harvested power.
+         *
+         * This function returns the interval between each update of the value of the
+         * power harvested by this energy harvester.
+         */
+        Time GetHarvestedPowerUpdateInterval(void) const;
 
-  /**
-   * \param stream Random variable stream number.
-   * \returns The number of stream indices assigned by this model.
-   *
-   * This function sets the stream number to be used by the random variable that
-   * determines the amount of power that can be harvested by this energy harvester.
-   */
-  int64_t AssignStreams (int64_t stream);
+        /**
+         * \param stream Random variable stream number.
+         * \returns The number of stream indices assigned by this model.
+         *
+         * This function sets the stream number to be used by the random variable that
+         * determines the amount of power that can be harvested by this energy harvester.
+         */
+        int64_t AssignStreams(int64_t stream);
 
-private:
-  /// Defined in ns3::Object
-  void DoInitialize (void);
+    private:
+        /// Defined in ns3::Object
+        void DoInitialize(void);
 
-  /// Defined in ns3::Object
-  void DoDispose (void);
+        /// Defined in ns3::Object
+        void DoDispose(void);
 
-  /**
-   * Calculates harvested Power.
-   */
-  void CalculateHarvestedPower (void);
+        /**
+         * Calculates harvested Power.
+         */
+        void CalculateHarvestedPower(void);
 
-  /**
-   * \returns m_harvestedPower The power currently provided by the Basic Energy Harvester.
-   * Implements DoGetPower defined in EnergyHarvester.
-   */
-  virtual double DoGetPower (void) const;
+        /**
+         * \returns m_harvestedPower The power currently provided by the Basic Energy Harvester.
+         * Implements DoGetPower defined in EnergyHarvester.
+         */
+        virtual double DoGetPower(void) const;
 
-  /**
-   * This function is called every m_energyHarvestingUpdateInterval in order to
-   * update the amount of power that will be provided by the harvester in the
-   * next interval.
-   */
-  void UpdateHarvestedPower (void);
+        /**
+         * This function is called every m_energyHarvestingUpdateInterval in order to
+         * update the amount of power that will be provided by the harvester in the
+         * next interval.
+         */
+        void UpdateHarvestedPower(void);
 
-private:
+    private:
 
-  Ptr<RandomVariableStream> m_harvestablePower; // Random variable for the harvestable power
+        Ptr<RandomVariableStream> m_harvestablePower; // Random variable for the harvestable power
 
-  TracedValue<double> m_harvestedPower;         // current harvested power, in Watt
-  TracedValue<double> m_totalEnergyHarvestedJ;  // total harvested energy, in Joule
+        TracedValue<double> m_harvestedPower; // current harvested power, in Watt
+        TracedValue<double> m_totalEnergyHarvestedJ; // total harvested energy, in Joule
 
-  EventId m_energyHarvestingUpdateEvent;        // energy harvesting event
-  Time m_lastHarvestingUpdateTime;              // last harvesting time
-  Time m_harvestedPowerUpdateInterval;          // harvestable energy update interval
+        EventId m_energyHarvestingUpdateEvent; // energy harvesting event
+        Time m_lastHarvestingUpdateTime; // last harvesting time
+        Time m_harvestedPowerUpdateInterval; // harvestable energy update interval
 
-};
+    };
 
 } // namespace ns3
 

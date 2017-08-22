@@ -31,120 +31,107 @@
 
 namespace nfd {
 
-ConfigFile::ConfigFile(UnknownConfigSectionHandler unknownSectionCallback)
-  : m_unknownSectionCallback(unknownSectionCallback)
-{
-}
-
-void
-ConfigFile::throwErrorOnUnknownSection(const std::string& filename,
-                                       const std::string& sectionName,
-                                       const ConfigSection& section,
-                                       bool isDryRun)
-{
-  std::string msg = "Error processing configuration file ";
-  msg += filename;
-  msg += ": no module subscribed for section \"" + sectionName + "\"";
-
-  BOOST_THROW_EXCEPTION(ConfigFile::Error(msg));
-}
-
-void
-ConfigFile::ignoreUnknownSection(const std::string& filename,
-                                 const std::string& sectionName,
-                                 const ConfigSection& section,
-                                 bool isDryRun)
-{
-  // do nothing
-}
-
-bool
-ConfigFile::parseYesNo(const ConfigSection& node, const std::string& key,
-                       const std::string& sectionName)
-{
-  auto value = node.get_value<std::string>();
-
-  if (value == "yes") {
-    return true;
-  }
-  else if (value == "no") {
-    return false;
-  }
-
-  BOOST_THROW_EXCEPTION(Error("Invalid value \"" + value + "\" for option \"" +
-                              key + "\" in \"" + sectionName + "\" section"));
-}
-
-void
-ConfigFile::addSectionHandler(const std::string& sectionName,
-                              ConfigSectionHandler subscriber)
-{
-  m_subscriptions[sectionName] = subscriber;
-}
-
-void
-ConfigFile::parse(const std::string& filename, bool isDryRun)
-{
-  std::ifstream inputFile(filename);
-  if (!inputFile.good() || !inputFile.is_open()) {
-    BOOST_THROW_EXCEPTION(Error("Failed to read configuration file: " + filename));
-  }
-  parse(inputFile, isDryRun, filename);
-  inputFile.close();
-}
-
-void
-ConfigFile::parse(const std::string& input, bool isDryRun, const std::string& filename)
-{
-  std::istringstream inputStream(input);
-  parse(inputStream, isDryRun, filename);
-}
-
-void
-ConfigFile::parse(std::istream& input, bool isDryRun, const std::string& filename)
-{
-  try {
-    boost::property_tree::read_info(input, m_global);
-  }
-  catch (const boost::property_tree::info_parser_error& error) {
-    std::stringstream msg;
-    msg << "Failed to parse configuration file";
-    msg << " " << filename;
-    msg << " " << error.message() << " line " << error.line();
-    BOOST_THROW_EXCEPTION(Error(msg.str()));
-  }
-
-  process(isDryRun, filename);
-}
-
-void
-ConfigFile::parse(const ConfigSection& config, bool isDryRun, const std::string& filename)
-{
-  m_global = config;
-  process(isDryRun, filename);
-}
-
-void
-ConfigFile::process(bool isDryRun, const std::string& filename) const
-{
-  BOOST_ASSERT(!filename.empty());
-
-  if (m_global.begin() == m_global.end()) {
-    std::string msg = "Error processing configuration file: ";
-    msg += filename;
-    msg += " no data";
-    BOOST_THROW_EXCEPTION(Error(msg));
-  }
-
-  for (const auto& i : m_global) {
-    try {
-      const ConfigSectionHandler& subscriber = m_subscriptions.at(i.first);
-      subscriber(i.second, isDryRun, filename);
+    ConfigFile::ConfigFile(UnknownConfigSectionHandler unknownSectionCallback)
+    : m_unknownSectionCallback(unknownSectionCallback) {
     }
-    catch (const std::out_of_range&) {
-      m_unknownSectionCallback(filename, i.first, i.second, isDryRun);
+
+    void
+    ConfigFile::throwErrorOnUnknownSection(const std::string& filename,
+            const std::string& sectionName,
+            const ConfigSection& section,
+            bool isDryRun) {
+        std::string msg = "Error processing configuration file ";
+        msg += filename;
+        msg += ": no module subscribed for section \"" + sectionName + "\"";
+
+        BOOST_THROW_EXCEPTION(ConfigFile::Error(msg));
     }
-  }
-}
+
+    void
+    ConfigFile::ignoreUnknownSection(const std::string& filename,
+            const std::string& sectionName,
+            const ConfigSection& section,
+            bool isDryRun) {
+        // do nothing
+    }
+
+    bool
+    ConfigFile::parseYesNo(const ConfigSection& node, const std::string& key,
+            const std::string& sectionName) {
+        auto value = node.get_value<std::string>();
+
+        if (value == "yes") {
+            return true;
+        } else if (value == "no") {
+            return false;
+        }
+
+        BOOST_THROW_EXCEPTION(Error("Invalid value \"" + value + "\" for option \"" +
+                key + "\" in \"" + sectionName + "\" section"));
+    }
+
+    void
+    ConfigFile::addSectionHandler(const std::string& sectionName,
+            ConfigSectionHandler subscriber) {
+        m_subscriptions[sectionName] = subscriber;
+    }
+
+    void
+    ConfigFile::parse(const std::string& filename, bool isDryRun) {
+        std::ifstream inputFile(filename);
+        if (!inputFile.good() || !inputFile.is_open()) {
+            BOOST_THROW_EXCEPTION(Error("Failed to read configuration file: " + filename));
+        }
+        parse(inputFile, isDryRun, filename);
+        inputFile.close();
+    }
+
+    void
+    ConfigFile::parse(const std::string& input, bool isDryRun, const std::string& filename) {
+        std::istringstream inputStream(input);
+        parse(inputStream, isDryRun, filename);
+    }
+
+    void
+    ConfigFile::parse(std::istream& input, bool isDryRun, const std::string& filename) {
+        try {
+            boost::property_tree::read_info(input, m_global);
+        } catch (const boost::property_tree::info_parser_error& error) {
+            std::stringstream msg;
+            msg << "Failed to parse configuration file";
+            msg << " " << filename;
+            msg << " " << error.message() << " line " << error.line();
+            BOOST_THROW_EXCEPTION(Error(msg.str()));
+        }
+
+        process(isDryRun, filename);
+    }
+
+    void
+    ConfigFile::parse(const ConfigSection& config, bool isDryRun, const std::string& filename) {
+        m_global = config;
+        process(isDryRun, filename);
+    }
+
+    void
+    ConfigFile::process(bool isDryRun, const std::string& filename) const {
+        BOOST_ASSERT(!filename.empty());
+
+        if (m_global.begin() == m_global.end()) {
+            std::string msg = "Error processing configuration file: ";
+            msg += filename;
+            msg += " no data";
+            BOOST_THROW_EXCEPTION(Error(msg));
+        }
+
+        for (const auto& i : m_global) {
+            try {
+                const ConfigSectionHandler& subscriber = m_subscriptions.at(i.first);
+                subscriber(i.second, isDryRun, filename);
+            } catch (const std::out_of_range&) {
+                m_unknownSectionCallback(filename, i.first, i.second, isDryRun);
+            }
+        }
+    }
 
 } // namespace nfd

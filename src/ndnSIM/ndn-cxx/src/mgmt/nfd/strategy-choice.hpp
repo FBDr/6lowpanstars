@@ -26,68 +26,66 @@
 #include "../../name.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/**
- * @ingroup management
- * @brief represents NFD StrategyChoice dataset
- * @sa http://redmine.named-data.net/projects/nfd/wiki/StrategyChoice#Strategy-Choice-Dataset
- */
-class StrategyChoice
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /**
+         * @ingroup management
+         * @brief represents NFD StrategyChoice dataset
+         * @sa http://redmine.named-data.net/projects/nfd/wiki/StrategyChoice#Strategy-Choice-Dataset
+         */
+        class StrategyChoice {
+        public:
 
-  StrategyChoice();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  StrategyChoice(const Block& payload);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            StrategyChoice();
 
-  const Block&
-  wireEncode() const;
+            explicit
+            StrategyChoice(const Block& payload);
 
-  void
-  wireDecode(const Block& wire);
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // getters & setters
-  const Name&
-  getName() const
-  {
-    return m_name;
-  }
+            const Block&
+            wireEncode() const;
 
-  StrategyChoice&
-  setName(const Name& name);
+            void
+            wireDecode(const Block& wire);
 
-  const Name&
-  getStrategy() const
-  {
-    return m_strategy;
-  }
+        public: // getters & setters
 
-  StrategyChoice&
-  setStrategy(const Name& strategy);
+            const Name&
+            getName() const {
+                return m_name;
+            }
 
-private:
-  Name m_name; // namespace
-  Name m_strategy; // strategy for the namespace
+            StrategyChoice&
+            setName(const Name& name);
 
-  mutable Block m_wire;
-};
+            const Name&
+            getStrategy() const {
+                return m_strategy;
+            }
 
-} // namespace nfd
+            StrategyChoice&
+            setStrategy(const Name& strategy);
+
+        private:
+            Name m_name; // namespace
+            Name m_strategy; // strategy for the namespace
+
+            mutable Block m_wire;
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_STRATEGY_CHOICE_HPP

@@ -22,54 +22,48 @@
 #include "in-memory-storage-lru.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-InMemoryStorageLru::InMemoryStorageLru(size_t limit)
-  : InMemoryStorage(limit)
-{
-}
+        InMemoryStorageLru::InMemoryStorageLru(size_t limit)
+        : InMemoryStorage(limit) {
+        }
 
-InMemoryStorageLru::InMemoryStorageLru(boost::asio::io_service& ioService,
-                                       size_t limit)
-  : InMemoryStorage(ioService, limit)
-{
-}
+        InMemoryStorageLru::InMemoryStorageLru(boost::asio::io_service& ioService,
+                size_t limit)
+        : InMemoryStorage(ioService, limit) {
+        }
 
-void
-InMemoryStorageLru::afterInsert(InMemoryStorageEntry* entry)
-{
-  BOOST_ASSERT(m_cleanupIndex.size() <= size());
-  InMemoryStorageEntry* ptr = entry;
-  m_cleanupIndex.insert(ptr);
-}
+        void
+        InMemoryStorageLru::afterInsert(InMemoryStorageEntry* entry) {
+            BOOST_ASSERT(m_cleanupIndex.size() <= size());
+            InMemoryStorageEntry* ptr = entry;
+            m_cleanupIndex.insert(ptr);
+        }
 
-bool
-InMemoryStorageLru::evictItem()
-{
-  if (!m_cleanupIndex.get<byUsedTime>().empty()) {
-    CleanupIndex::index<byUsedTime>::type::iterator it = m_cleanupIndex.get<byUsedTime>().begin();
-    eraseImpl((*it)->getFullName());
-    m_cleanupIndex.get<byUsedTime>().erase(it);
-    return true;
-  }
+        bool
+        InMemoryStorageLru::evictItem() {
+            if (!m_cleanupIndex.get<byUsedTime>().empty()) {
+                CleanupIndex::index<byUsedTime>::type::iterator it = m_cleanupIndex.get<byUsedTime>().begin();
+                eraseImpl((*it)->getFullName());
+                m_cleanupIndex.get<byUsedTime>().erase(it);
+                return true;
+            }
 
-  return false;
-}
+            return false;
+        }
 
-void
-InMemoryStorageLru::beforeErase(InMemoryStorageEntry* entry)
-{
-  CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
-  if (it != m_cleanupIndex.get<byEntity>().end())
-    m_cleanupIndex.get<byEntity>().erase(it);
-}
+        void
+        InMemoryStorageLru::beforeErase(InMemoryStorageEntry* entry) {
+            CleanupIndex::index<byEntity>::type::iterator it = m_cleanupIndex.get<byEntity>().find(entry);
+            if (it != m_cleanupIndex.get<byEntity>().end())
+                m_cleanupIndex.get<byEntity>().erase(it);
+        }
 
-void
-InMemoryStorageLru::afterAccess(InMemoryStorageEntry* entry)
-{
-  beforeErase(entry);
-  afterInsert(entry);
-}
+        void
+        InMemoryStorageLru::afterAccess(InMemoryStorageEntry* entry) {
+            beforeErase(entry);
+            afterInsert(entry);
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

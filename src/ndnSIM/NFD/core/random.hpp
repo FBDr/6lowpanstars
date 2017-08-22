@@ -41,10 +41,10 @@
 
 namespace nfd {
 
-/** \return the global random number generator instance
- */
-std::mt19937&
-getGlobalRng();
+    /** \return the global random number generator instance
+     */
+    std::mt19937&
+    getGlobalRng();
 
 } // namespace nfd
 

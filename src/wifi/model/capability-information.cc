@@ -21,91 +21,81 @@
 #include "capability-information.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("CapabilityInformation");
-
-CapabilityInformation::CapabilityInformation ()
-  : m_capability (0)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-void
-CapabilityInformation::SetEss (void)
-{
-  NS_LOG_FUNCTION (this);
-  Set (0);
-  Clear (1);
-}
+    NS_LOG_COMPONENT_DEFINE("CapabilityInformation");
 
-void
-CapabilityInformation::SetIbss (void)
-{
-  NS_LOG_FUNCTION (this);
-  Clear (0);
-  Set (1);
-}
+    CapabilityInformation::CapabilityInformation()
+            : m_capability(0) {
+        NS_LOG_FUNCTION(this);
+    }
 
-bool
-CapabilityInformation::IsEss (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Is (0);
-}
+    void
+    CapabilityInformation::SetEss(void) {
+        NS_LOG_FUNCTION(this);
+        Set(0);
+        Clear(1);
+    }
 
-bool
-CapabilityInformation::IsIbss (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Is (1);
-}
+    void
+    CapabilityInformation::SetIbss(void) {
+        NS_LOG_FUNCTION(this);
+        Clear(0);
+        Set(1);
+    }
 
-void
-CapabilityInformation::Set (uint8_t n)
-{
-  NS_LOG_FUNCTION (this << static_cast<uint32_t> (n));
-  uint32_t mask = 1 << n;
-  m_capability |= mask;
-}
+    bool
+    CapabilityInformation::IsEss(void) const {
+        NS_LOG_FUNCTION(this);
+        return Is(0);
+    }
 
-void
-CapabilityInformation::Clear (uint8_t n)
-{
-  NS_LOG_FUNCTION (this << static_cast<uint32_t> (n));
-  uint32_t mask = 1 << n;
-  m_capability &= ~mask;
-}
+    bool
+    CapabilityInformation::IsIbss(void) const {
+        NS_LOG_FUNCTION(this);
+        return Is(1);
+    }
 
-bool
-CapabilityInformation::Is (uint8_t n) const
-{
-  NS_LOG_FUNCTION (this << static_cast<uint32_t> (n));
-  uint32_t mask = 1 << n;
-  return (m_capability & mask) == mask;
-}
+    void
+    CapabilityInformation::Set(uint8_t n) {
+        NS_LOG_FUNCTION(this << static_cast<uint32_t> (n));
+        uint32_t mask = 1 << n;
+        m_capability |= mask;
+    }
 
-uint32_t
-CapabilityInformation::GetSerializedSize (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return 2;
-}
+    void
+    CapabilityInformation::Clear(uint8_t n) {
+        NS_LOG_FUNCTION(this << static_cast<uint32_t> (n));
+        uint32_t mask = 1 << n;
+        m_capability &= ~mask;
+    }
 
-Buffer::Iterator
-CapabilityInformation::Serialize (Buffer::Iterator start) const
-{
-  NS_LOG_FUNCTION (this << &start);
-  start.WriteHtolsbU16 (m_capability);
-  return start;
-}
+    bool
+    CapabilityInformation::Is(uint8_t n) const {
+        NS_LOG_FUNCTION(this << static_cast<uint32_t> (n));
+        uint32_t mask = 1 << n;
+        return (m_capability & mask) == mask;
+    }
 
-Buffer::Iterator
-CapabilityInformation::Deserialize (Buffer::Iterator start)
-{
-  NS_LOG_FUNCTION (this << &start);
-  m_capability = start.ReadLsbtohU16 ();
-  return start;
-}
+    uint32_t
+    CapabilityInformation::GetSerializedSize(void) const {
+        NS_LOG_FUNCTION(this);
+        return 2;
+    }
+
+    Buffer::Iterator
+    CapabilityInformation::Serialize(Buffer::Iterator start) const {
+        NS_LOG_FUNCTION(this << &start);
+        start.WriteHtolsbU16(m_capability);
+        return start;
+    }
+
+    Buffer::Iterator
+    CapabilityInformation::Deserialize(Buffer::Iterator start) {
+        NS_LOG_FUNCTION(this << &start);
+        m_capability = start.ReadLsbtohU16();
+        return start;
+    }
 
 } //namespace ns3

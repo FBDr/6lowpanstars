@@ -28,55 +28,53 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_FIXTURE_TEST_SUITE(TestRttEstimator, BaseFixture)
+        BOOST_AUTO_TEST_SUITE(Fw)
+        BOOST_FIXTURE_TEST_SUITE(TestRttEstimator, BaseFixture)
 
-static inline double
-computeRtoAsFloatSeconds(RttEstimator& rtt)
-{
-  typedef time::duration<double, time::seconds::period> FloatSeconds;
+        static inline double
+        computeRtoAsFloatSeconds(RttEstimator& rtt) {
+            typedef time::duration<double, time::seconds::period> FloatSeconds;
 
-  RttEstimator::Duration rto = rtt.computeRto();
-  return time::duration_cast<FloatSeconds>(rto).count();
-}
+            RttEstimator::Duration rto = rtt.computeRto();
+            return time::duration_cast<FloatSeconds>(rto).count();
+        }
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  RttEstimator rtt;
+        BOOST_AUTO_TEST_CASE(Basic) {
+            RttEstimator rtt;
 
-  for (int i = 0; i < 100; ++i) {
-    rtt.addMeasurement(time::seconds(5));
-  }
-  double rto1 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_CLOSE(rto1, 5.0, 0.1);
+            for (int i = 0; i < 100; ++i) {
+                rtt.addMeasurement(time::seconds(5));
+            }
+            double rto1 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_CLOSE(rto1, 5.0, 0.1);
 
-  rtt.doubleMultiplier();
-  double rto2 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_CLOSE(rto2, 10.0, 0.1);
+            rtt.doubleMultiplier();
+            double rto2 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_CLOSE(rto2, 10.0, 0.1);
 
-  rtt.doubleMultiplier();
-  double rto3 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_CLOSE(rto3, 20.0, 0.1);
+            rtt.doubleMultiplier();
+            double rto3 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_CLOSE(rto3, 20.0, 0.1);
 
-  rtt.addMeasurement(time::seconds(5)); // reset multiplier
-  double rto4 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_CLOSE(rto4, 5.0, 0.1);
+            rtt.addMeasurement(time::seconds(5)); // reset multiplier
+            double rto4 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_CLOSE(rto4, 5.0, 0.1);
 
-  rtt.incrementMultiplier();
-  double rto5 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_CLOSE(rto5, 10.0, 0.1);
+            rtt.incrementMultiplier();
+            double rto5 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_CLOSE(rto5, 10.0, 0.1);
 
-  for (int i = 0; i < 5; ++i) {
-    rtt.addMeasurement(time::seconds(6));
-  } // increased variance
-  double rto6 = computeRtoAsFloatSeconds(rtt);
-  BOOST_CHECK_GT(rto6, rto1);
-}
+            for (int i = 0; i < 5; ++i) {
+                rtt.addMeasurement(time::seconds(6));
+            } // increased variance
+            double rto6 = computeRtoAsFloatSeconds(rtt);
+            BOOST_CHECK_GT(rto6, rto1);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRttEstimator
-BOOST_AUTO_TEST_SUITE_END() // Fw
+        BOOST_AUTO_TEST_SUITE_END() // TestRttEstimator
+        BOOST_AUTO_TEST_SUITE_END() // Fw
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

@@ -27,83 +27,77 @@
 #include <vector>
 
 namespace CryptoPP {
-class BufferedTransformation;
+    class BufferedTransformation;
 } // namespace CryptoPP
 
 namespace ndn {
 
-class Oid
-{
-public:
-  Oid() = default;
+    class Oid {
+    public:
+        Oid() = default;
 
-  explicit
-  Oid(const char* oid);
+        explicit
+        Oid(const char* oid);
 
-  explicit
-  Oid(const std::string& oid);
+        explicit
+        Oid(const std::string& oid);
 
-  explicit
-  Oid(const std::vector<int>& oid)
-    : m_oid(oid)
-  {
-  }
+        explicit
+        Oid(const std::vector<int>& oid)
+        : m_oid(oid) {
+        }
 
-  const std::vector<int>&
-  getIntegerList() const
-  {
-    return m_oid;
-  }
+        const std::vector<int>&
+        getIntegerList() const {
+            return m_oid;
+        }
 
-  void
-  setIntegerList(const std::vector<int>& value)
-  {
-    m_oid = value;
-  }
+        void
+        setIntegerList(const std::vector<int>& value) {
+            m_oid = value;
+        }
 
-  std::string
-  toString() const;
+        std::string
+        toString() const;
 
-  bool
-  operator==(const Oid& oid) const
-  {
-    return equal(oid);
-  }
+        bool
+        operator==(const Oid& oid) const {
+            return equal(oid);
+        }
 
-  bool
-  operator!=(const Oid& oid) const
-  {
-    return !equal(oid);
-  }
+        bool
+        operator!=(const Oid& oid) const {
+            return !equal(oid);
+        }
 
-  void
-  encode(CryptoPP::BufferedTransformation& out) const;
+        void
+        encode(CryptoPP::BufferedTransformation& out) const;
 
-  void
-  decode(CryptoPP::BufferedTransformation& in);
+        void
+        decode(CryptoPP::BufferedTransformation& in);
 
 
-private:
-  bool
-  equal(const Oid& oid) const;
+    private:
+        bool
+        equal(const Oid& oid) const;
 
-private:
-  std::vector<int> m_oid;
-};
+    private:
+        std::vector<int> m_oid;
+    };
 
-/**
- * @deprecated Use Oid type instead
- */
-typedef Oid OID;
+    /**
+     * @deprecated Use Oid type instead
+     */
+    typedef Oid OID;
 
-namespace oid {
-// crypto algorithm
-extern const Oid RSA;
-extern const Oid ECDSA;
+    namespace oid {
+        // crypto algorithm
+        extern const Oid RSA;
+        extern const Oid ECDSA;
 
-// certificate entries
-extern const Oid ATTRIBUTE_NAME;
-} // namespace oid
+        // certificate entries
+        extern const Oid ATTRIBUTE_NAME;
+    } // namespace oid
 
 } // namespace ndn
 

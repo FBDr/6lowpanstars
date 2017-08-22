@@ -26,122 +26,116 @@
 #include "algorithm.hpp"
 
 namespace nfd {
-namespace scope_prefix {
-const Name LOCALHOST("ndn:/localhost");
-const Name LOCALHOP("ndn:/localhop");
-} // namespace scope_prefix
+    namespace scope_prefix {
+        const Name LOCALHOST("ndn:/localhost");
+        const Name LOCALHOP("ndn:/localhop");
+    } // namespace scope_prefix
 
-namespace fw {
+    namespace fw {
 
-bool
-wouldViolateScope(const Face& inFace, const Interest& interest, const Face& outFace)
-{
-  if (outFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
-    // forwarding to a local face is always allowed
-    return false;
-  }
+        bool
+        wouldViolateScope(const Face& inFace, const Interest& interest, const Face& outFace) {
+            if (outFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
+                // forwarding to a local face is always allowed
+                return false;
+            }
 
-  if (scope_prefix::LOCALHOST.isPrefixOf(interest.getName())) {
-    // localhost Interests cannot be forwarded to a non-local face
-    return true;
-  }
+            if (scope_prefix::LOCALHOST.isPrefixOf(interest.getName())) {
+                // localhost Interests cannot be forwarded to a non-local face
+                return true;
+            }
 
-  if (scope_prefix::LOCALHOP.isPrefixOf(interest.getName())) {
-    // localhop Interests can be forwarded to a non-local face only if it comes from a local face
-    return inFace.getScope() != ndn::nfd::FACE_SCOPE_LOCAL;
-  }
+            if (scope_prefix::LOCALHOP.isPrefixOf(interest.getName())) {
+                // localhop Interests can be forwarded to a non-local face only if it comes from a local face
+                return inFace.getScope() != ndn::nfd::FACE_SCOPE_LOCAL;
+            }
 
-  // Interest name is not subject to scope control
-  return false;
-}
+            // Interest name is not subject to scope control
+            return false;
+        }
 
-bool
-violatesScope(const pit::Entry& pitEntry, const Face& outFace)
-{
-  if (outFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
-    return false;
-  }
-  BOOST_ASSERT(outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL);
+        bool
+        violatesScope(const pit::Entry& pitEntry, const Face& outFace) {
+            if (outFace.getScope() == ndn::nfd::FACE_SCOPE_LOCAL) {
+                return false;
+            }
+            BOOST_ASSERT(outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL);
 
-  if (scope_prefix::LOCALHOST.isPrefixOf(pitEntry.getName())) {
-    // face is non-local, violates localhost scope
-    return true;
-  }
+            if (scope_prefix::LOCALHOST.isPrefixOf(pitEntry.getName())) {
+                // face is non-local, violates localhost scope
+                return true;
+            }
 
-  if (scope_prefix::LOCALHOP.isPrefixOf(pitEntry.getName())) {
-    // face is non-local, violates localhop scope unless PIT entry has local in-record
-    return std::none_of(pitEntry.in_begin(), pitEntry.in_end(),
-      [] (const pit::InRecord& inRecord) { return inRecord.getFace().getScope() == ndn::nfd::FACE_SCOPE_LOCAL; });
-  }
+            if (scope_prefix::LOCALHOP.isPrefixOf(pitEntry.getName())) {
+                // face is non-local, violates localhop scope unless PIT entry has local in-record
+                return std::none_of(pitEntry.in_begin(), pitEntry.in_end(),
+                        [] (const pit::InRecord & inRecord) {
+                            return inRecord.getFace().getScope() == ndn::nfd::FACE_SCOPE_LOCAL; });
+            }
 
-  // Name is not subject to scope control
-  return false;
-}
+            // Name is not subject to scope control
+            return false;
+        }
 
-bool
-canForwardToLegacy(const pit::Entry& pitEntry, const Face& face)
-{
-  time::steady_clock::TimePoint now = time::steady_clock::now();
+        bool
+        canForwardToLegacy(const pit::Entry& pitEntry, const Face& face) {
+            time::steady_clock::TimePoint now = time::steady_clock::now();
 
-  bool hasUnexpiredOutRecord = std::any_of(pitEntry.out_begin(), pitEntry.out_end(),
-    [&face, &now] (const pit::OutRecord& outRecord) {
-      return &outRecord.getFace() == &face && outRecord.getExpiry() >= now;
-    });
-  if (hasUnexpiredOutRecord) {
-    return false;
-  }
+            bool hasUnexpiredOutRecord = std::any_of(pitEntry.out_begin(), pitEntry.out_end(),
+                    [&face, &now] (const pit::OutRecord & outRecord) {
+                        return &outRecord.getFace() == &face && outRecord.getExpiry() >= now;
+                    });
+            if (hasUnexpiredOutRecord) {
+                return false;
+            }
 
-  bool hasUnexpiredOtherInRecord = std::any_of(pitEntry.in_begin(), pitEntry.in_end(),
-    [&face, &now] (const pit::InRecord& inRecord) {
-      return &inRecord.getFace() != &face && inRecord.getExpiry() >= now;
-    });
-  if (!hasUnexpiredOtherInRecord) {
-    return false;
-  }
+            bool hasUnexpiredOtherInRecord = std::any_of(pitEntry.in_begin(), pitEntry.in_end(),
+                    [&face, &now] (const pit::InRecord & inRecord) {
+                        return &inRecord.getFace() != &face && inRecord.getExpiry() >= now;
+                    });
+            if (!hasUnexpiredOtherInRecord) {
+                return false;
+            }
 
-  return true;
-}
+            return true;
+        }
 
-int
-findDuplicateNonce(const pit::Entry& pitEntry, uint32_t nonce, const Face& face)
-{
-  int dnw = DUPLICATE_NONCE_NONE;
+        int
+        findDuplicateNonce(const pit::Entry& pitEntry, uint32_t nonce, const Face& face) {
+            int dnw = DUPLICATE_NONCE_NONE;
 
-  for (const pit::InRecord& inRecord : pitEntry.getInRecords()) {
-    if (inRecord.getLastNonce() == nonce) {
-      if (&inRecord.getFace() == &face) {
-        dnw |= DUPLICATE_NONCE_IN_SAME;
-      }
-      else {
-        dnw |= DUPLICATE_NONCE_IN_OTHER;
-      }
-    }
-  }
+            for (const pit::InRecord& inRecord : pitEntry.getInRecords()) {
+                if (inRecord.getLastNonce() == nonce) {
+                    if (&inRecord.getFace() == &face) {
+                        dnw |= DUPLICATE_NONCE_IN_SAME;
+                    } else {
+                        dnw |= DUPLICATE_NONCE_IN_OTHER;
+                    }
+                }
+            }
 
-  for (const pit::OutRecord& outRecord : pitEntry.getOutRecords()) {
-    if (outRecord.getLastNonce() == nonce) {
-      if (&outRecord.getFace() == &face) {
-        dnw |= DUPLICATE_NONCE_OUT_SAME;
-      }
-      else {
-        dnw |= DUPLICATE_NONCE_OUT_OTHER;
-      }
-    }
-  }
+            for (const pit::OutRecord& outRecord : pitEntry.getOutRecords()) {
+                if (outRecord.getLastNonce() == nonce) {
+                    if (&outRecord.getFace() == &face) {
+                        dnw |= DUPLICATE_NONCE_OUT_SAME;
+                    } else {
+                        dnw |= DUPLICATE_NONCE_OUT_OTHER;
+                    }
+                }
+            }
 
-  return dnw;
-}
+            return dnw;
+        }
 
-bool
-hasPendingOutRecords(const pit::Entry& pitEntry)
-{
-  time::steady_clock::TimePoint now = time::steady_clock::now();
-  return std::any_of(pitEntry.out_begin(), pitEntry.out_end(),
-                      [&now] (const pit::OutRecord& outRecord) {
+        bool
+        hasPendingOutRecords(const pit::Entry& pitEntry) {
+            time::steady_clock::TimePoint now = time::steady_clock::now();
+            return std::any_of(pitEntry.out_begin(), pitEntry.out_end(),
+                    [&now] (const pit::OutRecord & outRecord) {
                         return outRecord.getExpiry() >= now &&
-                               outRecord.getIncomingNack() == nullptr;
-                      });
-}
+                                outRecord.getIncomingNack() == nullptr;
+                    });
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

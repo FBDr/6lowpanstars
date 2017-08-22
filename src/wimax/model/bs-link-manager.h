@@ -32,61 +32,60 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- */
-class BSLinkManager : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  BSLinkManager (Ptr<BaseStationNetDevice> bs);
-  ~BSLinkManager (void);
-  /**
-   * \return the ranging opportunities to allocate
-   */
-  uint8_t CalculateRangingOppsToAllocate (void);
-  /**
-   * \return an available downlink channel
-   */
-  uint64_t SelectDlChannel (void);
-  /**
-   * \brief process a ranging request message
-   * \param cid the connection identifier in which the ranging message was received
-   * \param rngreq the ranging request message
-   */
+    /**
+     * \ingroup wimax
+     */
+    class BSLinkManager : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        BSLinkManager(Ptr<BaseStationNetDevice> bs);
+        ~BSLinkManager(void);
+        /**
+         * \return the ranging opportunities to allocate
+         */
+        uint8_t CalculateRangingOppsToAllocate(void);
+        /**
+         * \return an available downlink channel
+         */
+        uint64_t SelectDlChannel(void);
+        /**
+         * \brief process a ranging request message
+         * \param cid the connection identifier in which the ranging message was received
+         * \param rngreq the ranging request message
+         */
 
-  void ProcessRangingRequest (Cid cid, RngReq rngreq);
-  /**
-   * \brief Verifies at the end of an invited ranging interval if SS sent ranging message in it or not
-   */
-  void VerifyInvitedRanging (Cid cid, uint8_t uiuc);
-private:
-  BSLinkManager (const BSLinkManager &);
-  BSLinkManager & operator= (const BSLinkManager &);
+        void ProcessRangingRequest(Cid cid, RngReq rngreq);
+        /**
+         * \brief Verifies at the end of an invited ranging interval if SS sent ranging message in it or not
+         */
+        void VerifyInvitedRanging(Cid cid, uint8_t uiuc);
+    private:
+        BSLinkManager(const BSLinkManager &);
+        BSLinkManager & operator=(const BSLinkManager &);
 
-  void PerformRanging (Cid cid, RngReq rngreq);
-  void PerformInitialRanging (Cid cid, RngReq *rngreq, RngRsp *rngrsp);
-  void PerformInvitedRanging (Cid cid, RngRsp *rngrsp);
+        void PerformRanging(Cid cid, RngReq rngreq);
+        void PerformInitialRanging(Cid cid, RngReq *rngreq, RngRsp *rngrsp);
+        void PerformInvitedRanging(Cid cid, RngRsp *rngrsp);
 
-  void SetParametersToAdjust (RngRsp *rngrsp);
-  void AbortRanging (Cid cid, RngRsp *rngrsp, SSRecord *ssRecord, bool isNewSS);
-  void AcceptRanging (Cid cid, RngRsp *rngrsp, SSRecord *ssRecord);
-  void ContinueRanging (Cid cid, RngRsp *rngrsp, SSRecord *ssRecord);
-  void ScheduleRngRspMessage (Cid cid, RngRsp *rngrsp);
-  void DeallocateCids (Cid cid);
+        void SetParametersToAdjust(RngRsp *rngrsp);
+        void AbortRanging(Cid cid, RngRsp *rngrsp, SSRecord *ssRecord, bool isNewSS);
+        void AcceptRanging(Cid cid, RngRsp *rngrsp, SSRecord *ssRecord);
+        void ContinueRanging(Cid cid, RngRsp *rngrsp, SSRecord *ssRecord);
+        void ScheduleRngRspMessage(Cid cid, RngRsp *rngrsp);
+        void DeallocateCids(Cid cid);
 
-  bool ChangeDlChannel (void);
-  uint32_t GetNewDlChannel (void);
-  uint8_t GetSignalQuality (void);
-  bool IsRangingAcceptable (void);
+        bool ChangeDlChannel(void);
+        uint32_t GetNewDlChannel(void);
+        uint8_t GetSignalQuality(void);
+        bool IsRangingAcceptable(void);
 
-  Ptr<BaseStationNetDevice> m_bs;
+        Ptr<BaseStationNetDevice> m_bs;
 
-  // ranging parameters
-  uint32_t m_signalQuality;
-  uint8_t m_signalQualityThreshold;
-  int tries; // variable to test multiple RNG-REQ by the SS for example undecodable at BS or lost RNG-RSP
-};
+        // ranging parameters
+        uint32_t m_signalQuality;
+        uint8_t m_signalQualityThreshold;
+        int tries; // variable to test multiple RNG-REQ by the SS for example undecodable at BS or lost RNG-RSP
+    };
 
 } // namespace ns3
 

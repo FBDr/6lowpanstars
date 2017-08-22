@@ -35,78 +35,77 @@
 #include <ndn-cxx/mgmt/dispatcher.hpp>
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-class RibManager;
+        class RibManager;
 
-/**
- * \brief initializes and executes NFD-RIB service thread
- */
-class Service : noncopyable
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        /**
+         * \brief initializes and executes NFD-RIB service thread
+         */
+        class Service : noncopyable {
+        public:
 
-  /**
-   * \brief create NFD-RIB service
-   * \param configFile absolute or relative path of configuration file
-   * \param keyChain the KeyChain
-   */
-  Service(const std::string& configFile, ndn::KeyChain& keyChain);
+            class Error : public std::runtime_error {
+            public:
 
-  /**
-   * \brief create NFD-RIB service
-   * \param config parsed configuration section
-   * \param keyChain the KeyChain
-   * \note This constructor overload is more appropriate for integrated environments,
-   *       such as NS-3 or android. Error messages related to configuration file
-   *       will use "internal://nfd.conf" as configuration filename.
-   */
-  Service(const ConfigSection& config, ndn::KeyChain& keyChain);
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
 
-  /**
-   * \brief Destructor
-   */
-  ~Service();
+            /**
+             * \brief create NFD-RIB service
+             * \param configFile absolute or relative path of configuration file
+             * \param keyChain the KeyChain
+             */
+            Service(const std::string& configFile, ndn::KeyChain& keyChain);
 
-  /**
-   * \brief Perform initialization of NFD-RIB instance
-   *
-   * After initialization, NFD-RIB instance can be started by running the global io_service
-   */
-  void
-  initialize();
+            /**
+             * \brief create NFD-RIB service
+             * \param config parsed configuration section
+             * \param keyChain the KeyChain
+             * \note This constructor overload is more appropriate for integrated environments,
+             *       such as NS-3 or android. Error messages related to configuration file
+             *       will use "internal://nfd.conf" as configuration filename.
+             */
+            Service(const ConfigSection& config, ndn::KeyChain& keyChain);
 
-private:
-  void
-  initializeLogging();
+            /**
+             * \brief Destructor
+             */
+            ~Service();
 
-  /**
-   * \brief Look into the config file and construct appropriate transport to communicate with NFD
-   * If NFD-RIB instance was initialized with config file, INFO format is assumed
-   */
-  shared_ptr<ndn::Transport>
-  getLocalNfdTransport();
+            /**
+             * \brief Perform initialization of NFD-RIB instance
+             *
+             * After initialization, NFD-RIB instance can be started by running the global io_service
+             */
+            void
+            initialize();
 
-private:
-  std::string m_configFile;
-  ConfigSection m_configSection;
+        private:
+            void
+            initializeLogging();
 
-  ndn::KeyChain& m_keyChain;
-  unique_ptr<ndn::Face> m_face;
-  unique_ptr<ndn::mgmt::Dispatcher> m_dispatcher;
-  unique_ptr<RibManager> m_ribManager;
-};
+            /**
+             * \brief Look into the config file and construct appropriate transport to communicate with NFD
+             * If NFD-RIB instance was initialized with config file, INFO format is assumed
+             */
+            shared_ptr<ndn::Transport>
+            getLocalNfdTransport();
 
-} // namespace rib
+        private:
+            std::string m_configFile;
+            ConfigSection m_configSection;
+
+            ndn::KeyChain& m_keyChain;
+            unique_ptr<ndn::Face> m_face;
+            unique_ptr<ndn::mgmt::Dispatcher> m_dispatcher;
+            unique_ptr<RibManager> m_ribManager;
+        };
+
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_SERVICE_HPP

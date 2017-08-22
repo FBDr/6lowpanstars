@@ -30,26 +30,25 @@
 #include <boost/thread.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(TestRandom)
+        BOOST_AUTO_TEST_SUITE(TestRandom)
 
-BOOST_AUTO_TEST_CASE(ThreadLocalRng)
-{
-  std::mt19937* s1 = &getGlobalRng();
-  std::mt19937* s2 = nullptr;
-  boost::thread t([&s2] {
-    s2 = &getGlobalRng();
-  });
+        BOOST_AUTO_TEST_CASE(ThreadLocalRng) {
+            std::mt19937* s1 = &getGlobalRng();
+            std::mt19937* s2 = nullptr;
+            boost::thread t([&s2] {
+                s2 = &getGlobalRng();
+            });
 
-  t.join();
+            t.join();
 
-  BOOST_CHECK(s1 != nullptr);
-  BOOST_CHECK(s2 != nullptr);
-  BOOST_CHECK(s1 != s2);
-}
+            BOOST_CHECK(s1 != nullptr);
+            BOOST_CHECK(s2 != nullptr);
+            BOOST_CHECK(s1 != s2);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRandom
+        BOOST_AUTO_TEST_SUITE_END() // TestRandom
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

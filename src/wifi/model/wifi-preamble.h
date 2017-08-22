@@ -23,18 +23,17 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- * The type of preamble to be used by an IEEE 802.11 transmission
- */
-enum WifiPreamble
-{
-  WIFI_PREAMBLE_LONG,
-  WIFI_PREAMBLE_SHORT,
-  WIFI_PREAMBLE_HT_MF,
-  WIFI_PREAMBLE_HT_GF,
-  WIFI_PREAMBLE_NONE
-};
+    /**
+     * \ingroup wifi
+     * The type of preamble to be used by an IEEE 802.11 transmission
+     */
+    enum WifiPreamble {
+        WIFI_PREAMBLE_LONG,
+        WIFI_PREAMBLE_SHORT,
+        WIFI_PREAMBLE_HT_MF,
+        WIFI_PREAMBLE_HT_GF,
+        WIFI_PREAMBLE_NONE
+    };
 
 } //namespace ns3
 

@@ -26,29 +26,25 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup propagation
+     *
+     * The type of propagation environment
+     * 
+     */
+    enum EnvironmentType {
+        UrbanEnvironment, SubUrbanEnvironment, OpenAreasEnvironment
+    };
 
-/**
- * \ingroup propagation
- *
- * The type of propagation environment
- * 
- */
-enum EnvironmentType
-  {
-    UrbanEnvironment, SubUrbanEnvironment, OpenAreasEnvironment
-  };
-
-
-/**
- * \ingroup propagation
- *
- * The size of the city in which propagation takes place
- * 
- */
-enum CitySize
-  {
-    SmallCity, MediumCity, LargeCity
-  };
+    /**
+     * \ingroup propagation
+     *
+     * The size of the city in which propagation takes place
+     * 
+     */
+    enum CitySize {
+        SmallCity, MediumCity, LargeCity
+    };
 
 
 } // namespace ns3

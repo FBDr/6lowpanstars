@@ -36,102 +36,101 @@
 
 namespace ns3 {
 
-/**
- * This class is designed to probe an underlying ns3 TraceSource
- * exporting a packet, an IPv4 object, and an interface.  This probe
- * exports a trace source "Output" with arguments of type Ptr<const Packet>,
- * Ptr<Ipv4>, and uint32_t.  The Output trace source emits a value
- * when either the trace source emits a new value, or when SetValue ()
- * is called.
- */
-class Ipv4PacketProbe : public Probe
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
-  Ipv4PacketProbe ();
-  virtual ~Ipv4PacketProbe ();
+    /**
+     * This class is designed to probe an underlying ns3 TraceSource
+     * exporting a packet, an IPv4 object, and an interface.  This probe
+     * exports a trace source "Output" with arguments of type Ptr<const Packet>,
+     * Ptr<Ipv4>, and uint32_t.  The Output trace source emits a value
+     * when either the trace source emits a new value, or when SetValue ()
+     * is called.
+     */
+    class Ipv4PacketProbe : public Probe {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId();
+        Ipv4PacketProbe();
+        virtual ~Ipv4PacketProbe();
 
-  /**
-   * \brief Set a probe value
-   *
-   * \param packet set the traced packet equal to this
-   * \param ipv4 set the IPv4 object for the traced packet equal to this
-   * \param interface set the IPv4 interface for the traced packet equal to this
-   */
-  void SetValue (Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
+        /**
+         * \brief Set a probe value
+         *
+         * \param packet set the traced packet equal to this
+         * \param ipv4 set the IPv4 object for the traced packet equal to this
+         * \param interface set the IPv4 interface for the traced packet equal to this
+         */
+        void SetValue(Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
 
-  /**
-   * \brief Set a probe value by its name in the Config system
-   *
-   * \param path config path to access the probe
-   * \param packet set the traced packet equal to this
-   * \param ipv4 set the IPv4 object for the traced packet equal to this
-   * \param interface set the IPv4 interface for the traced packet equal to this
-   */
-  static void SetValueByPath (std::string path, Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
+        /**
+         * \brief Set a probe value by its name in the Config system
+         *
+         * \param path config path to access the probe
+         * \param packet set the traced packet equal to this
+         * \param ipv4 set the IPv4 object for the traced packet equal to this
+         * \param interface set the IPv4 interface for the traced packet equal to this
+         */
+        static void SetValueByPath(std::string path, Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
 
-  /**
-   * \brief connect to a trace source attribute provided by a given object
-   *
-   * \param traceSource the name of the attribute TraceSource to connect to
-   * \param obj ns3::Object to connect to
-   * \return true if the trace source was successfully connected
-   */
-  virtual bool ConnectByObject (std::string traceSource, Ptr<Object> obj);
+        /**
+         * \brief connect to a trace source attribute provided by a given object
+         *
+         * \param traceSource the name of the attribute TraceSource to connect to
+         * \param obj ns3::Object to connect to
+         * \return true if the trace source was successfully connected
+         */
+        virtual bool ConnectByObject(std::string traceSource, Ptr<Object> obj);
 
-  /**
-   * \brief connect to a trace source provided by a config path
-   *
-   * \param path Config path to bind to
-   *
-   * Note, if an invalid path is provided, the probe will not be connected
-   * to anything.
-   */
-  virtual void ConnectByPath (std::string path);
+        /**
+         * \brief connect to a trace source provided by a config path
+         *
+         * \param path Config path to bind to
+         *
+         * Note, if an invalid path is provided, the probe will not be connected
+         * to anything.
+         */
+        virtual void ConnectByPath(std::string path);
 
-  /**
-   * TracedCallback signature for PacketProbe events.
-   *
-   * \param [in] packet The packet.
-   * \param [in] ipv4 
-   * \param [in] interface
-   */
-  typedef void (* TracedCallback)
-    (const Ptr<const Packet> packet, const Ptr<const Ipv4> ipv4,
-     const uint32_t interface);
+        /**
+         * TracedCallback signature for PacketProbe events.
+         *
+         * \param [in] packet The packet.
+         * \param [in] ipv4 
+         * \param [in] interface
+         */
+        typedef void (* TracedCallback)
+        (const Ptr<const Packet> packet, const Ptr<const Ipv4> ipv4,
+                const uint32_t interface);
 
-private:
-  /**
-   * \brief Method to connect to an underlying ns3::TraceSource with
-   * arguments of type Ptr<const Packet>, Ptr<Ipv4>, and uint32_t
-   *
-   * \param packet the traced packet
-   * \param ipv4 the IPv4 object for the traced packet
-   * \param interface the IPv4 interface for the traced packet
-   */
-  void TraceSink (Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
+    private:
+        /**
+         * \brief Method to connect to an underlying ns3::TraceSource with
+         * arguments of type Ptr<const Packet>, Ptr<Ipv4>, and uint32_t
+         *
+         * \param packet the traced packet
+         * \param ipv4 the IPv4 object for the traced packet
+         * \param interface the IPv4 interface for the traced packet
+         */
+        void TraceSink(Ptr<const Packet> packet, Ptr<Ipv4> ipv4, uint32_t interface);
 
-  /// Traced Callback: the packet, the Ipv4 object and the interface.
-  ns3::TracedCallback<Ptr<const Packet>, Ptr<Ipv4>, uint32_t> m_output;
-  /// Traced Callback: the previous packet's size and the actual packet's size.
-  ns3::TracedCallback<uint32_t, uint32_t> m_outputBytes;
+        /// Traced Callback: the packet, the Ipv4 object and the interface.
+        ns3::TracedCallback<Ptr<const Packet>, Ptr<Ipv4>, uint32_t> m_output;
+        /// Traced Callback: the previous packet's size and the actual packet's size.
+        ns3::TracedCallback<uint32_t, uint32_t> m_outputBytes;
 
-  /// The traced packet.
-  Ptr<const Packet> m_packet;
+        /// The traced packet.
+        Ptr<const Packet> m_packet;
 
-  /// The IPv4 object for the traced packet.
-  Ptr<Ipv4> m_ipv4;
+        /// The IPv4 object for the traced packet.
+        Ptr<Ipv4> m_ipv4;
 
-  /// The IPv4 interface for the traced packet.
-  uint32_t m_interface;
+        /// The IPv4 interface for the traced packet.
+        uint32_t m_interface;
 
-  /// The size of the traced packet.
-  uint32_t m_packetSizeOld;
-};
+        /// The size of the traced packet.
+        uint32_t m_packetSizeOld;
+    };
 
 
 } // namespace ns3

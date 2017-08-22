@@ -22,47 +22,42 @@
 #include "uan-tx-mode.h"
 #include "ns3/mobility-model.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (UanPropModelIdeal);
-
-UanPropModelIdeal::UanPropModelIdeal ()
-{
-}
-
-UanPropModelIdeal::~UanPropModelIdeal ()
-{
-}
-
-TypeId
-UanPropModelIdeal::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::UanPropModelIdeal")
-    .SetParent<UanPropModel> ()
-    .SetGroupName ("Uan")
-    .AddConstructor<UanPropModelIdeal> ()
-  ;
-  return tid;
-}
-
-
-double
-UanPropModelIdeal::GetPathLossDb (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode)
+namespace ns3
 {
 
-  return 0;
-}
-UanPdp
-UanPropModelIdeal::GetPdp (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode)
-{
-  return UanPdp::CreateImpulsePdp ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(UanPropModelIdeal);
 
-Time
-UanPropModelIdeal::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode)
-{
-  return Seconds (a->GetDistanceFrom (b) / 1500.0);
-}
+    UanPropModelIdeal::UanPropModelIdeal() {
+    }
+
+    UanPropModelIdeal::~UanPropModelIdeal() {
+    }
+
+    TypeId
+    UanPropModelIdeal::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::UanPropModelIdeal")
+                .SetParent<UanPropModel> ()
+                .SetGroupName("Uan")
+                .AddConstructor<UanPropModelIdeal> ()
+                ;
+        return tid;
+    }
+
+    double
+    UanPropModelIdeal::GetPathLossDb(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode) {
+
+        return 0;
+    }
+
+    UanPdp
+    UanPropModelIdeal::GetPdp(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode) {
+        return UanPdp::CreateImpulsePdp();
+    }
+
+    Time
+    UanPropModelIdeal::GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode) {
+        return Seconds(a->GetDistanceFrom(b) / 1500.0);
+    }
 
 
 } // namespace ns3

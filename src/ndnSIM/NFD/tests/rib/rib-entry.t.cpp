@@ -27,53 +27,52 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace rib {
-namespace tests {
+    namespace rib {
+        namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TestRibEntry, nfd::tests::BaseFixture)
+            BOOST_FIXTURE_TEST_SUITE(TestRibEntry, nfd::tests::BaseFixture)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  rib::RibEntry entry;
-  rib::RibEntry::iterator entryIt;
-  bool didInsert = false;
+            BOOST_AUTO_TEST_CASE(Basic) {
+                rib::RibEntry entry;
+                rib::RibEntry::iterator entryIt;
+                bool didInsert = false;
 
-  rib::Route route1;
-  route1.faceId = 1;
-  route1.origin = 0;
+                rib::Route route1;
+                route1.faceId = 1;
+                route1.origin = 0;
 
-  std::tie(entryIt, didInsert) =  entry.insertRoute(route1);
-  BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
-  BOOST_CHECK(entryIt == entry.findRoute(route1));
-  BOOST_CHECK(didInsert);
+                std::tie(entryIt, didInsert) = entry.insertRoute(route1);
+                BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
+                BOOST_CHECK(entryIt == entry.findRoute(route1));
+                BOOST_CHECK(didInsert);
 
-  Route route2;
-  route2.faceId = 1;
-  route2.origin = 128;
+                Route route2;
+                route2.faceId = 1;
+                route2.origin = 128;
 
-  std::tie(entryIt, didInsert) = entry.insertRoute(route2);
-  BOOST_CHECK_EQUAL(entry.getRoutes().size(), 2);
-  BOOST_CHECK(entryIt == entry.findRoute(route2));
-  BOOST_CHECK(didInsert);
+                std::tie(entryIt, didInsert) = entry.insertRoute(route2);
+                BOOST_CHECK_EQUAL(entry.getRoutes().size(), 2);
+                BOOST_CHECK(entryIt == entry.findRoute(route2));
+                BOOST_CHECK(didInsert);
 
-  entry.eraseRoute(route1);
-  BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
-  BOOST_CHECK(entry.findRoute(route1) == entry.end());
+                entry.eraseRoute(route1);
+                BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
+                BOOST_CHECK(entry.findRoute(route1) == entry.end());
 
-  BOOST_CHECK(entry.findRoute(route1) == entry.getRoutes().end());
-  BOOST_CHECK(entry.findRoute(route2) != entry.getRoutes().end());
+                BOOST_CHECK(entry.findRoute(route1) == entry.getRoutes().end());
+                BOOST_CHECK(entry.findRoute(route2) != entry.getRoutes().end());
 
-  std::tie(entryIt, didInsert) = entry.insertRoute(route2);
-  BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
-  BOOST_CHECK(!didInsert);
+                std::tie(entryIt, didInsert) = entry.insertRoute(route2);
+                BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
+                BOOST_CHECK(!didInsert);
 
-  entry.eraseRoute(route1);
-  BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
-  BOOST_CHECK(entry.findRoute(route2) != entry.getRoutes().end());
-}
+                entry.eraseRoute(route1);
+                BOOST_CHECK_EQUAL(entry.getRoutes().size(), 1);
+                BOOST_CHECK(entry.findRoute(route2) != entry.getRoutes().end());
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRibEntry
+            BOOST_AUTO_TEST_SUITE_END() // TestRibEntry
 
-} // namespace tests
-} // namespace rib
+        } // namespace tests
+    } // namespace rib
 } // namespace nfd

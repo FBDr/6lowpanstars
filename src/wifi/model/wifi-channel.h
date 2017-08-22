@@ -25,26 +25,25 @@
 
 namespace ns3 {
 
-class WifiNetDevice;
-class WifiPhy;
+    class WifiNetDevice;
+    class WifiPhy;
 
-/**
- * \brief Wifi Channel interface specification
- * \ingroup wifi
- *
- * This class works in tandem with the ns3::WifiPhy class. If you want to
- * provide a new Wifi PHY layer, you have to subclass both ns3::WifiChannel
- * and ns3::WifiPhy.
- *
- * Typically, MyWifiChannel will define a Send method whose job is to distribute
- * packets from a MyWifiPhy source to a set of MyWifiPhy destinations. MyWifiPhy
- * also typically defines a Receive method which is invoked by MyWifiPhy.
- */
-class WifiChannel : public Channel
-{
-public:
-  static TypeId GetTypeId (void);
-};
+    /**
+     * \brief Wifi Channel interface specification
+     * \ingroup wifi
+     *
+     * This class works in tandem with the ns3::WifiPhy class. If you want to
+     * provide a new Wifi PHY layer, you have to subclass both ns3::WifiChannel
+     * and ns3::WifiPhy.
+     *
+     * Typically, MyWifiChannel will define a Send method whose job is to distribute
+     * packets from a MyWifiPhy source to a set of MyWifiPhy destinations. MyWifiPhy
+     * also typically defines a Receive method which is invoked by MyWifiPhy.
+     */
+    class WifiChannel : public Channel {
+    public:
+        static TypeId GetTypeId(void);
+    };
 
 } //namespace ns3
 

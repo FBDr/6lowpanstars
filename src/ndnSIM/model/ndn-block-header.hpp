@@ -27,43 +27,43 @@
 namespace nfdFace = nfd::face;
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-class BlockHeader : public Header {
-public:
-  static ns3::TypeId
-  GetTypeId();
+        class BlockHeader : public Header {
+        public:
+            static ns3::TypeId
+            GetTypeId();
 
-  virtual TypeId
-  GetInstanceTypeId(void) const;
+            virtual TypeId
+            GetInstanceTypeId(void) const;
 
-  BlockHeader();
+            BlockHeader();
 
-  BlockHeader(const nfdFace::Transport::Packet& packet);
+            BlockHeader(const nfdFace::Transport::Packet& packet);
 
-  virtual uint32_t
-  GetSerializedSize(void) const;
+            virtual uint32_t
+            GetSerializedSize(void) const;
 
-  virtual void
-  Serialize(ns3::Buffer::Iterator start) const;
+            virtual void
+            Serialize(ns3::Buffer::Iterator start) const;
 
-  virtual uint32_t
-  Deserialize(ns3::Buffer::Iterator start);
+            virtual uint32_t
+            Deserialize(ns3::Buffer::Iterator start);
 
-  virtual void
-  Print(std::ostream& os) const;
+            virtual void
+            Print(std::ostream& os) const;
 
-  Block&
-  getBlock();
+            Block&
+            getBlock();
 
-  const Block&
-  getBlock() const;
+            const Block&
+            getBlock() const;
 
-private:
-  Block m_block;
-};
+        private:
+            Block m_block;
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDNSIM_NDN_BLOCK_HEADER_HPP

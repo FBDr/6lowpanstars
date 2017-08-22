@@ -35,9 +35,13 @@ enum action_type {
 };
 
 struct action {
-    action(action_type t, connection_hdl h) : type(t), hdl(h) {}
+
+    action(action_type t, connection_hdl h) : type(t), hdl(h) {
+    }
+
     action(action_type t, connection_hdl h, server::message_ptr m)
-      : type(t), hdl(h), msg(m) {}
+    : type(t), hdl(h), msg(m) {
+    }
 
     action_type type;
     websocketpp::connection_hdl hdl;
@@ -46,14 +50,15 @@ struct action {
 
 class broadcast_server {
 public:
+
     broadcast_server() {
         // Initialize Asio Transport
         m_server.init_asio();
 
         // Register handler callbacks
-        m_server.set_open_handler(bind(&broadcast_server::on_open,this,::_1));
-        m_server.set_close_handler(bind(&broadcast_server::on_close,this,::_1));
-        m_server.set_message_handler(bind(&broadcast_server::on_message,this,::_1,::_2));
+        m_server.set_open_handler(bind(&broadcast_server::on_open, this, ::_1));
+        m_server.set_close_handler(bind(&broadcast_server::on_close, this, ::_1));
+        m_server.set_message_handler(bind(&broadcast_server::on_message, this, ::_1, ::_2));
     }
 
     void run(uint16_t port) {
@@ -75,7 +80,7 @@ public:
         {
             lock_guard<mutex> guard(m_action_lock);
             //std::cout << "on_open" << std::endl;
-            m_actions.push(action(SUBSCRIBE,hdl));
+            m_actions.push(action(SUBSCRIBE, hdl));
         }
         m_action_cond.notify_one();
     }
@@ -84,7 +89,7 @@ public:
         {
             lock_guard<mutex> guard(m_action_lock);
             //std::cout << "on_close" << std::endl;
-            m_actions.push(action(UNSUBSCRIBE,hdl));
+            m_actions.push(action(UNSUBSCRIBE, hdl));
         }
         m_action_cond.notify_one();
     }
@@ -94,16 +99,16 @@ public:
         {
             lock_guard<mutex> guard(m_action_lock);
             //std::cout << "on_message" << std::endl;
-            m_actions.push(action(MESSAGE,hdl,msg));
+            m_actions.push(action(MESSAGE, hdl, msg));
         }
         m_action_cond.notify_one();
     }
 
     void process_messages() {
-        while(1) {
+        while (1) {
             unique_lock<mutex> lock(m_action_lock);
 
-            while(m_actions.empty()) {
+            while (m_actions.empty()) {
                 m_action_cond.wait(lock);
             }
 
@@ -123,7 +128,7 @@ public:
 
                 con_list::iterator it;
                 for (it = m_connections.begin(); it != m_connections.end(); ++it) {
-                    m_server.send(*it,a.msg);
+                    m_server.send(*it, a.msg);
                 }
             } else {
                 // undefined.
@@ -131,7 +136,7 @@ public:
         }
     }
 private:
-    typedef std::set<connection_hdl,std::owner_less<connection_hdl> > con_list;
+    typedef std::set<connection_hdl, std::owner_less<connection_hdl> > con_list;
 
     server m_server;
     con_list m_connections;
@@ -144,15 +149,15 @@ private:
 
 int main() {
     try {
-    broadcast_server server_instance;
+        broadcast_server server_instance;
 
-    // Start a thread to run the processing loop
-    thread t(bind(&broadcast_server::process_messages,&server_instance));
+        // Start a thread to run the processing loop
+        thread t(bind(&broadcast_server::process_messages, &server_instance));
 
-    // Run the asio loop with the main thread
-    server_instance.run(9002);
+        // Run the asio loop with the main thread
+        server_instance.run(9002);
 
-    t.join();
+        t.join();
 
     } catch (websocketpp::exception const & e) {
         std::cout << e.what() << std::endl;

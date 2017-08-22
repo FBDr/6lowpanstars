@@ -27,27 +27,26 @@
 #include "ns3/node.h"
 
 namespace ns3 {
-  
-/**
- * \ingroup energy
- * \brief Creates a BasicEnergyHarvester object.
- */
-class BasicEnergyHarvesterHelper : public EnergyHarvesterHelper
-{
-public:
-  BasicEnergyHarvesterHelper ();
-  ~BasicEnergyHarvesterHelper ();
 
-  void Set (std::string name, const AttributeValue &v);
+    /**
+     * \ingroup energy
+     * \brief Creates a BasicEnergyHarvester object.
+     */
+    class BasicEnergyHarvesterHelper : public EnergyHarvesterHelper {
+    public:
+        BasicEnergyHarvesterHelper();
+        ~BasicEnergyHarvesterHelper();
 
-private:
-  virtual Ptr<EnergyHarvester> DoInstall (Ptr<EnergySource> source) const;
+        void Set(std::string name, const AttributeValue &v);
 
-private:
-  ObjectFactory m_basicEnergyHarvester;
+    private:
+        virtual Ptr<EnergyHarvester> DoInstall(Ptr<EnergySource> source) const;
 
-};
-  
+    private:
+        ObjectFactory m_basicEnergyHarvester;
+
+    };
+
 } // namespace ns3
 
 #endif /* defined(BASIC_ENERGY_HARVESTER_HELPER_H) */

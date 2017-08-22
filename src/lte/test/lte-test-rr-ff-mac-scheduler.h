@@ -27,7 +27,6 @@
 
 using namespace ns3;
 
-
 /**
  * This system test program creates different test cases with a single eNB and 
  * several UEs, all having the same Radio Bearer specification. In each test 
@@ -37,29 +36,25 @@ using namespace ns3;
  * is equal among users and matches a reference throughput value within a given 
  * tolerance.
  */
-class LenaRrFfMacSchedulerTestCase : public TestCase
-{
+class LenaRrFfMacSchedulerTestCase : public TestCase {
 public:
-  LenaRrFfMacSchedulerTestCase (uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl, bool errorModelEnabled);
-  virtual ~LenaRrFfMacSchedulerTestCase ();
+    LenaRrFfMacSchedulerTestCase(uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl, bool errorModelEnabled);
+    virtual ~LenaRrFfMacSchedulerTestCase();
 
 private:
-  virtual void DoRun (void);
-  static std::string BuildNameString (uint16_t nUser, uint16_t dist);
-  uint16_t m_nUser;
-  uint16_t m_dist;
-  double m_thrRefDl;
-  double m_thrRefUl;
-  bool m_errorModelEnabled;
+    virtual void DoRun(void);
+    static std::string BuildNameString(uint16_t nUser, uint16_t dist);
+    uint16_t m_nUser;
+    uint16_t m_dist;
+    double m_thrRefDl;
+    double m_thrRefUl;
+    bool m_errorModelEnabled;
 
 };
 
-
-
-class LenaTestRrFfMacSchedulerSuite : public TestSuite
-{
+class LenaTestRrFfMacSchedulerSuite : public TestSuite {
 public:
-  LenaTestRrFfMacSchedulerSuite ();
+    LenaTestRrFfMacSchedulerSuite();
 };
 
 #endif /* LENA_TEST_RR_FF_MAC_SCHEDULER_H */

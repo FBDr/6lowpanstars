@@ -26,60 +26,57 @@
 #include "v1/identity-certificate.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class SecuredBag
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        class SecuredBag {
+        public:
 
-  SecuredBag();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  SecuredBag(const Block& wire);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  SecuredBag(const v1::IdentityCertificate& cert,
-             ConstBufferPtr key);
+            SecuredBag();
 
-  virtual
-  ~SecuredBag();
+            explicit
+            SecuredBag(const Block& wire);
 
-  void
-  wireDecode(const Block& wire);
+            SecuredBag(const v1::IdentityCertificate& cert,
+                    ConstBufferPtr key);
 
-  const Block&
-  wireEncode() const;
+            virtual
+            ~SecuredBag();
 
-  const v1::IdentityCertificate&
-  getCertificate() const
-  {
-    return m_cert;
-  }
+            void
+            wireDecode(const Block& wire);
 
-  ConstBufferPtr
-  getKey() const
-  {
-    return m_key;
-  }
+            const Block&
+            wireEncode() const;
 
-private:
-  v1::IdentityCertificate m_cert;
-  ConstBufferPtr m_key;
+            const v1::IdentityCertificate&
+            getCertificate() const {
+                return m_cert;
+            }
 
-  mutable Block m_wire;
-};
+            ConstBufferPtr
+            getKey() const {
+                return m_key;
+            }
 
-} // namespace security
+        private:
+            v1::IdentityCertificate m_cert;
+            ConstBufferPtr m_key;
 
-using security::SecuredBag;
+            mutable Block m_wire;
+        };
+
+    } // namespace security
+
+    using security::SecuredBag;
 
 } // namespace ndn
 

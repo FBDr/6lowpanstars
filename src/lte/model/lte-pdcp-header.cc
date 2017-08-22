@@ -22,99 +22,87 @@
 
 #include "ns3/lte-pdcp-header.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("LtePdcpHeader");
-
-NS_OBJECT_ENSURE_REGISTERED (LtePdcpHeader);
-
-LtePdcpHeader::LtePdcpHeader ()
-  : m_dcBit (0xff),
-    m_sequenceNumber (0xfffa)
+namespace ns3
 {
-}
 
-LtePdcpHeader::~LtePdcpHeader ()
-{
-  m_dcBit = 0xff;
-  m_sequenceNumber = 0xfffb;
-}
+    NS_LOG_COMPONENT_DEFINE("LtePdcpHeader");
 
-void
-LtePdcpHeader::SetDcBit (uint8_t dcBit)
-{
-  m_dcBit = dcBit & 0x01;
-}
+    NS_OBJECT_ENSURE_REGISTERED(LtePdcpHeader);
 
-void
-LtePdcpHeader::SetSequenceNumber (uint16_t sequenceNumber)
-{
-  m_sequenceNumber = sequenceNumber & 0x0FFF;
-}
+    LtePdcpHeader::LtePdcpHeader()
+            : m_dcBit(0xff),
+            m_sequenceNumber(0xfffa) {
+    }
 
-uint8_t
-LtePdcpHeader::GetDcBit () const
-{
-  return m_dcBit;
-}
+    LtePdcpHeader::~LtePdcpHeader() {
+        m_dcBit = 0xff;
+        m_sequenceNumber = 0xfffb;
+    }
 
-uint16_t
-LtePdcpHeader::GetSequenceNumber () const
-{
-  return m_sequenceNumber;
-}
+    void
+    LtePdcpHeader::SetDcBit(uint8_t dcBit) {
+        m_dcBit = dcBit & 0x01;
+    }
 
+    void
+    LtePdcpHeader::SetSequenceNumber(uint16_t sequenceNumber) {
+        m_sequenceNumber = sequenceNumber & 0x0FFF;
+    }
 
-TypeId
-LtePdcpHeader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::LtePdcpHeader")
-    .SetParent<Header> ()
-    .SetGroupName("Lte")
-    .AddConstructor<LtePdcpHeader> ()
-  ;
-  return tid;
-}
+    uint8_t
+    LtePdcpHeader::GetDcBit() const {
+        return m_dcBit;
+    }
 
-TypeId
-LtePdcpHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    uint16_t
+    LtePdcpHeader::GetSequenceNumber() const {
+        return m_sequenceNumber;
+    }
 
-void LtePdcpHeader::Print (std::ostream &os)  const
-{
-  os << "D/C=" << (uint16_t)m_dcBit;
-  os << " SN=" << m_sequenceNumber;
-}
+    TypeId
+    LtePdcpHeader::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::LtePdcpHeader")
+                .SetParent<Header> ()
+                .SetGroupName("Lte")
+                .AddConstructor<LtePdcpHeader> ()
+                ;
+        return tid;
+    }
 
-uint32_t LtePdcpHeader::GetSerializedSize (void) const
-{
-  return 2;
-}
+    TypeId
+    LtePdcpHeader::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void LtePdcpHeader::Serialize (Buffer::Iterator start) const
-{
-  Buffer::Iterator i = start;
+    void LtePdcpHeader::Print(std::ostream & os) const {
+        os << "D/C=" << (uint16_t) m_dcBit;
+        os << " SN=" << m_sequenceNumber;
+    }
 
-  i.WriteU8 ( (m_dcBit << 7) | (m_sequenceNumber & 0x0F00) >> 8 );
-  i.WriteU8 ( (m_sequenceNumber & 0x00FF) );
-}
+    uint32_t LtePdcpHeader::GetSerializedSize(void) const {
+        return 2;
+    }
 
-uint32_t LtePdcpHeader::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-  uint8_t byte_1;
-  uint8_t byte_2;
+    void LtePdcpHeader::Serialize(Buffer::Iterator start) const {
+        Buffer::Iterator i = start;
 
-  byte_1 = i.ReadU8 ();
-  byte_2 = i.ReadU8 ();
-  m_dcBit = (byte_1 & 0x80) > 7;
-  // For now, we just support DATA PDUs
-  NS_ASSERT (m_dcBit == DATA_PDU);
-  m_sequenceNumber = ((byte_1 & 0x0F) << 8) | byte_2;
+        i.WriteU8((m_dcBit << 7) | (m_sequenceNumber & 0x0F00) >> 8);
+        i.WriteU8((m_sequenceNumber & 0x00FF));
+    }
 
-  return GetSerializedSize ();
-}
+    uint32_t LtePdcpHeader::Deserialize(Buffer::Iterator start) {
+        Buffer::Iterator i = start;
+        uint8_t byte_1;
+        uint8_t byte_2;
+
+        byte_1 = i.ReadU8();
+        byte_2 = i.ReadU8();
+        m_dcBit = (byte_1 & 0x80) > 7;
+        // For now, we just support DATA PDUs
+        NS_ASSERT(m_dcBit == DATA_PDU);
+        m_sequenceNumber = ((byte_1 & 0x0F) << 8) | byte_2;
+
+        return GetSerializedSize();
+    }
 
 }; // namespace ns3

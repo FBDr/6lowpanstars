@@ -37,238 +37,224 @@
 NS_LOG_COMPONENT_DEFINE("ndn.CsTracer");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-static std::list<std::tuple<shared_ptr<std::ostream>, std::list<Ptr<CsTracer>>>> g_tracers;
+        static std::list<std::tuple<shared_ptr<std::ostream>, std::list<Ptr<CsTracer>>>> g_tracers;
 
-void
-CsTracer::Destroy()
-{
-  g_tracers.clear();
-}
+        void
+        CsTracer::Destroy() {
+            g_tracers.clear();
+        }
 
-void
-CsTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seconds (0.5)*/)
-{
-  using namespace boost;
-  using namespace std;
+        void
+        CsTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seconds (0.5)*/) {
+            using namespace boost;
+            using namespace std;
 
-  std::list<Ptr<CsTracer>> tracers;
-  shared_ptr<std::ostream> outputStream;
-  if (file != "-") {
-    shared_ptr<std::ofstream> os(new std::ofstream());
-    os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
+            std::list<Ptr < CsTracer>> tracers;
+            shared_ptr<std::ostream> outputStream;
+            if (file != "-") {
+                shared_ptr<std::ofstream> os(new std::ofstream());
+                os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
-    if (!os->is_open()) {
-      NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
-      return;
-    }
+                if (!os->is_open()) {
+                    NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
+                    return;
+                }
 
-    outputStream = os;
-  }
-  else {
-    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
-  }
+                outputStream = os;
+            } else {
+                outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([] {
+                }));
+            }
 
-  for (NodeList::Iterator node = NodeList::Begin(); node != NodeList::End(); node++) {
-    Ptr<CsTracer> trace = Install(*node, outputStream, averagingPeriod);
-    tracers.push_back(trace);
-  }
+            for (NodeList::Iterator node = NodeList::Begin(); node != NodeList::End(); node++) {
+                Ptr<CsTracer> trace = Install(*node, outputStream, averagingPeriod);
+                tracers.push_back(trace);
+            }
 
-  if (tracers.size() > 0) {
-    // *m_l3RateTrace << "# "; // not necessary for R's read.table
-    tracers.front()->PrintHeader(*outputStream);
-    *outputStream << "\n";
-  }
+            if (tracers.size() > 0) {
+                // *m_l3RateTrace << "# "; // not necessary for R's read.table
+                tracers.front()->PrintHeader(*outputStream);
+                *outputStream << "\n";
+            }
 
-  g_tracers.push_back(std::make_tuple(outputStream, tracers));
-}
+            g_tracers.push_back(std::make_tuple(outputStream, tracers));
+        }
 
-void
-CsTracer::Install(const NodeContainer& nodes, const std::string& file,
-                  Time averagingPeriod /* = Seconds (0.5)*/)
-{
-  using namespace boost;
-  using namespace std;
+        void
+        CsTracer::Install(const NodeContainer& nodes, const std::string& file,
+                Time averagingPeriod /* = Seconds (0.5)*/) {
+            using namespace boost;
+            using namespace std;
 
-  std::list<Ptr<CsTracer>> tracers;
-  shared_ptr<std::ostream> outputStream;
-  if (file != "-") {
-    shared_ptr<std::ofstream> os(new std::ofstream());
-    os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
+            std::list<Ptr < CsTracer>> tracers;
+            shared_ptr<std::ostream> outputStream;
+            if (file != "-") {
+                shared_ptr<std::ofstream> os(new std::ofstream());
+                os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
-    if (!os->is_open()) {
-      NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
-      return;
-    }
+                if (!os->is_open()) {
+                    NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
+                    return;
+                }
 
-    outputStream = os;
-  }
-  else {
-    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
-  }
+                outputStream = os;
+            } else {
+                outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([] {
+                }));
+            }
 
-  for (NodeContainer::Iterator node = nodes.Begin(); node != nodes.End(); node++) {
-    Ptr<CsTracer> trace = Install(*node, outputStream, averagingPeriod);
-    tracers.push_back(trace);
-  }
+            for (NodeContainer::Iterator node = nodes.Begin(); node != nodes.End(); node++) {
+                Ptr<CsTracer> trace = Install(*node, outputStream, averagingPeriod);
+                tracers.push_back(trace);
+            }
 
-  if (tracers.size() > 0) {
-    // *m_l3RateTrace << "# "; // not necessary for R's read.table
-    tracers.front()->PrintHeader(*outputStream);
-    *outputStream << "\n";
-  }
+            if (tracers.size() > 0) {
+                // *m_l3RateTrace << "# "; // not necessary for R's read.table
+                tracers.front()->PrintHeader(*outputStream);
+                *outputStream << "\n";
+            }
 
-  g_tracers.push_back(std::make_tuple(outputStream, tracers));
-}
+            g_tracers.push_back(std::make_tuple(outputStream, tracers));
+        }
 
-void
-CsTracer::Install(Ptr<Node> node, const std::string& file,
-                  Time averagingPeriod /* = Seconds (0.5)*/)
-{
-  using namespace boost;
-  using namespace std;
+        void
+        CsTracer::Install(Ptr<Node> node, const std::string& file,
+                Time averagingPeriod /* = Seconds (0.5)*/) {
+            using namespace boost;
+            using namespace std;
 
-  std::list<Ptr<CsTracer>> tracers;
-  shared_ptr<std::ostream> outputStream;
-  if (file != "-") {
-    shared_ptr<std::ofstream> os(new std::ofstream());
-    os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
+            std::list<Ptr < CsTracer>> tracers;
+            shared_ptr<std::ostream> outputStream;
+            if (file != "-") {
+                shared_ptr<std::ofstream> os(new std::ofstream());
+                os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
-    if (!os->is_open()) {
-      NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
-      return;
-    }
+                if (!os->is_open()) {
+                    NS_LOG_ERROR("File " << file << " cannot be opened for writing. Tracing disabled");
+                    return;
+                }
 
-    outputStream = os;
-  }
-  else {
-    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
-  }
+                outputStream = os;
+            } else {
+                outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([] {
+                }));
+            }
 
-  Ptr<CsTracer> trace = Install(node, outputStream, averagingPeriod);
-  tracers.push_back(trace);
+            Ptr<CsTracer> trace = Install(node, outputStream, averagingPeriod);
+            tracers.push_back(trace);
 
-  if (tracers.size() > 0) {
-    // *m_l3RateTrace << "# "; // not necessary for R's read.table
-    tracers.front()->PrintHeader(*outputStream);
-    *outputStream << "\n";
-  }
+            if (tracers.size() > 0) {
+                // *m_l3RateTrace << "# "; // not necessary for R's read.table
+                tracers.front()->PrintHeader(*outputStream);
+                *outputStream << "\n";
+            }
 
-  g_tracers.push_back(std::make_tuple(outputStream, tracers));
-}
+            g_tracers.push_back(std::make_tuple(outputStream, tracers));
+        }
 
-Ptr<CsTracer>
-CsTracer::Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream,
-                  Time averagingPeriod /* = Seconds (0.5)*/)
-{
-  NS_LOG_DEBUG("Node: " << node->GetId());
+        Ptr<CsTracer>
+        CsTracer::Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream,
+                Time averagingPeriod /* = Seconds (0.5)*/) {
+            NS_LOG_DEBUG("Node: " << node->GetId());
 
-  Ptr<CsTracer> trace = Create<CsTracer>(outputStream, node);
-  trace->SetAveragingPeriod(averagingPeriod);
+            Ptr<CsTracer> trace = Create<CsTracer>(outputStream, node);
+            trace->SetAveragingPeriod(averagingPeriod);
 
-  return trace;
-}
+            return trace;
+        }
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
 
-CsTracer::CsTracer(shared_ptr<std::ostream> os, Ptr<Node> node)
-  : m_nodePtr(node)
-  , m_os(os)
-{
-  m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
+        CsTracer::CsTracer(shared_ptr<std::ostream> os, Ptr<Node> node)
+        : m_nodePtr(node)
+        , m_os(os) {
+            m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
 
-  Connect();
+            Connect();
 
-  std::string name = Names::FindName(node);
-  if (!name.empty()) {
-    m_node = name;
-  }
-}
+            std::string name = Names::FindName(node);
+            if (!name.empty()) {
+                m_node = name;
+            }
+        }
 
-CsTracer::CsTracer(shared_ptr<std::ostream> os, const std::string& node)
-  : m_node(node)
-  , m_os(os)
-{
-  Connect();
-}
+        CsTracer::CsTracer(shared_ptr<std::ostream> os, const std::string& node)
+        : m_node(node)
+        , m_os(os) {
+            Connect();
+        }
 
-CsTracer::~CsTracer(){};
+        CsTracer::~CsTracer() {
+        };
 
-void
-CsTracer::Connect()
-{
-  Ptr<ContentStore> cs = m_nodePtr->GetObject<ContentStore>();
-  cs->TraceConnectWithoutContext("CacheHits", MakeCallback(&CsTracer::CacheHits, this));
-  cs->TraceConnectWithoutContext("CacheMisses", MakeCallback(&CsTracer::CacheMisses, this));
+        void
+        CsTracer::Connect() {
+            Ptr<ContentStore> cs = m_nodePtr->GetObject<ContentStore>();
+            cs->TraceConnectWithoutContext("CacheHits", MakeCallback(&CsTracer::CacheHits, this));
+            cs->TraceConnectWithoutContext("CacheMisses", MakeCallback(&CsTracer::CacheMisses, this));
 
-  Reset();
-}
+            Reset();
+        }
 
-void
-CsTracer::SetAveragingPeriod(const Time& period)
-{
-  m_period = period;
-  m_printEvent.Cancel();
-  m_printEvent = Simulator::Schedule(m_period, &CsTracer::PeriodicPrinter, this);
-}
+        void
+        CsTracer::SetAveragingPeriod(const Time& period) {
+            m_period = period;
+            m_printEvent.Cancel();
+            m_printEvent = Simulator::Schedule(m_period, &CsTracer::PeriodicPrinter, this);
+        }
 
-void
-CsTracer::PeriodicPrinter()
-{
-  Print(*m_os);
-  Reset();
+        void
+        CsTracer::PeriodicPrinter() {
+            Print(*m_os);
+            Reset();
 
-  m_printEvent = Simulator::Schedule(m_period, &CsTracer::PeriodicPrinter, this);
-}
+            m_printEvent = Simulator::Schedule(m_period, &CsTracer::PeriodicPrinter, this);
+        }
 
-void
-CsTracer::PrintHeader(std::ostream& os) const
-{
-  os << "Time"
-     << "\t"
+        void
+        CsTracer::PrintHeader(std::ostream& os) const {
+            os << "Time"
+                    << "\t"
 
-     << "Node"
-     << "\t"
+                    << "Node"
+                    << "\t"
 
-     << "Type"
-     << "\t"
-     << "Packets"
-     << "\t";
-}
+                    << "Type"
+                    << "\t"
+                    << "Packets"
+                    << "\t";
+        }
 
-void
-CsTracer::Reset()
-{
-  m_stats.Reset();
-}
+        void
+        CsTracer::Reset() {
+            m_stats.Reset();
+        }
 
 #define PRINTER(printName, fieldName)                                                              \
   os << time.ToDouble(Time::S) << "\t" << m_node << "\t" << printName << "\t" << m_stats.fieldName \
      << "\n";
 
-void
-CsTracer::Print(std::ostream& os) const
-{
-  Time time = Simulator::Now();
+        void
+        CsTracer::Print(std::ostream& os) const {
+            Time time = Simulator::Now();
 
-  PRINTER("CacheHits", m_cacheHits);
-  PRINTER("CacheMisses", m_cacheMisses);
-}
+            PRINTER("CacheHits", m_cacheHits);
+            PRINTER("CacheMisses", m_cacheMisses);
+        }
 
-void
-CsTracer::CacheHits(shared_ptr<const Interest>, shared_ptr<const Data>)
-{
-  m_stats.m_cacheHits++;
-}
+        void
+        CsTracer::CacheHits(shared_ptr<const Interest>, shared_ptr<const Data>) {
+            m_stats.m_cacheHits++;
+        }
 
-void
-CsTracer::CacheMisses(shared_ptr<const Interest>)
-{
-  m_stats.m_cacheMisses++;
-}
+        void
+        CsTracer::CacheMisses(shared_ptr<const Interest>) {
+            m_stats.m_cacheMisses++;
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

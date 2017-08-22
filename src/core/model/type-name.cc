@@ -25,17 +25,47 @@
  * ns3::TypeNameGet() function implementations.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-template <> std::string TypeNameGet< int8_t  > (void) { return "int8_t"  ; }
-template <> std::string TypeNameGet< int16_t > (void) { return "int16_t" ; }
-template <> std::string TypeNameGet< int32_t > (void) { return "int32_t" ; }
-template <> std::string TypeNameGet< int64_t > (void) { return "int64_t" ; }
-template <> std::string TypeNameGet< uint8_t > (void) { return "uint8_t" ; }
-template <> std::string TypeNameGet< uint16_t> (void) { return "uint16_t"; }
-template <> std::string TypeNameGet< uint32_t> (void) { return "uint32_t"; }
-template <> std::string TypeNameGet< uint64_t> (void) { return "uint64_t"; }
-template <> std::string TypeNameGet< float   > (void) { return "float"   ; }
-template <> std::string TypeNameGet< double  > (void) { return "double"  ; }
-  
+    template <> std::string TypeNameGet< int8_t > (void) {
+        return "int8_t";
+    }
+
+    template <> std::string TypeNameGet< int16_t > (void) {
+        return "int16_t";
+    }
+
+    template <> std::string TypeNameGet< int32_t > (void) {
+        return "int32_t";
+    }
+
+    template <> std::string TypeNameGet< int64_t > (void) {
+        return "int64_t";
+    }
+
+    template <> std::string TypeNameGet< uint8_t > (void) {
+        return "uint8_t";
+    }
+
+    template <> std::string TypeNameGet< uint16_t> (void) {
+        return "uint16_t";
+    }
+
+    template <> std::string TypeNameGet< uint32_t> (void) {
+        return "uint32_t";
+    }
+
+    template <> std::string TypeNameGet< uint64_t> (void) {
+        return "uint64_t";
+    }
+
+    template <> std::string TypeNameGet< float > (void) {
+        return "float";
+    }
+
+    template <> std::string TypeNameGet< double > (void) {
+        return "double";
+    }
+
 } // namespace ns3

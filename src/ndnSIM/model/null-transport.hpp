@@ -24,47 +24,44 @@
 #include "ns3/ndnSIM/NFD/daemon/face/transport.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * \ingroup ndn-face
- * \brief Null transport (does nothing, just fulfills requirements of the interface)
- */
-class NullTransport : public nfd::face::Transport
-{
-public:
-  NullTransport(const std::string& localUri, const std::string& remoteUri,
-                ::ndn::nfd::FaceScope scope = ::ndn::nfd::FACE_SCOPE_NON_LOCAL,
-                ::ndn::nfd::FacePersistency persistency = ::ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-                ::ndn::nfd::LinkType linkType = ::ndn::nfd::LINK_TYPE_POINT_TO_POINT)
-  {
-    this->setLocalUri(FaceUri(localUri));
-    this->setRemoteUri(FaceUri(remoteUri));
-    this->setScope(scope);
-    this->setPersistency(persistency);
-    this->setLinkType(linkType);
-    // this->setMtu(udp::computeMtu(m_socket.local_endpoint())); // not sure what should be here
-  }
+        /**
+         * \ingroup ndn-face
+         * \brief Null transport (does nothing, just fulfills requirements of the interface)
+         */
+        class NullTransport : public nfd::face::Transport {
+        public:
 
-private:
-  virtual void
-  beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency)
-  {
-  }
+            NullTransport(const std::string& localUri, const std::string& remoteUri,
+                    ::ndn::nfd::FaceScope scope = ::ndn::nfd::FACE_SCOPE_NON_LOCAL,
+                    ::ndn::nfd::FacePersistency persistency = ::ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                    ::ndn::nfd::LinkType linkType = ::ndn::nfd::LINK_TYPE_POINT_TO_POINT) {
+                this->setLocalUri(FaceUri(localUri));
+                this->setRemoteUri(FaceUri(remoteUri));
+                this->setScope(scope);
+                this->setPersistency(persistency);
+                this->setLinkType(linkType);
+                // this->setMtu(udp::computeMtu(m_socket.local_endpoint())); // not sure what should be here
+            }
 
-  virtual void
-  doClose()
-  {
-    this->setState(nfd::face::TransportState::CLOSED);
-  }
+        private:
 
-  virtual void
-  doSend(Packet&& packet)
-  {
-  }
-};
+            virtual void
+            beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency) {
+            }
 
-} // namespace ndn
+            virtual void
+            doClose() {
+                this->setState(nfd::face::TransportState::CLOSED);
+            }
+
+            virtual void
+            doSend(Packet&& packet) {
+            }
+        };
+
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_NULL_TRANSPORT_HPP

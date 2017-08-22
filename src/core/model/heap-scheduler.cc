@@ -31,217 +31,191 @@
  * Implementation of ns3::HeapScheduler class.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("HeapScheduler");
-
-NS_OBJECT_ENSURE_REGISTERED (HeapScheduler);
-
-TypeId
-HeapScheduler::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::HeapScheduler")
-    .SetParent<Scheduler> ()
-    .SetGroupName ("Core")
-    .AddConstructor<HeapScheduler> ()
-  ;
-  return tid;
-}
 
-HeapScheduler::HeapScheduler ()
-{
-  NS_LOG_FUNCTION (this);
-  // we purposedly waste an item at the start of
-  // the array to make sure the indexes in the
-  // array start at one.
-  Scheduler::Event empty = { 0,{ 0,0}};
-  m_heap.push_back (empty);
-}
+    NS_LOG_COMPONENT_DEFINE("HeapScheduler");
 
-HeapScheduler::~HeapScheduler ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(HeapScheduler);
 
-uint32_t
-HeapScheduler::Parent (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return id / 2;
-}
-uint32_t
-HeapScheduler::Sibling (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return id + 1;
-}
-uint32_t
-HeapScheduler::LeftChild (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return id * 2;
-}
-uint32_t
-HeapScheduler::RightChild (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return id * 2 + 1;
-}
-
-uint32_t
-HeapScheduler::Root (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return 1;
-}
-
-bool
-HeapScheduler::IsRoot (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return (id == Root ()) ? true : false;
-}
-
-uint32_t
-HeapScheduler::Last (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_heap.size () - 1;
-}
-
-
-bool
-HeapScheduler::IsBottom (uint32_t id) const
-{
-  NS_LOG_FUNCTION (this << id);
-  return (id >= m_heap.size ()) ? true : false;
-}
-
-void
-HeapScheduler::Exch (uint32_t a, uint32_t b)
-{
-  NS_LOG_FUNCTION (this << a << b);
-  NS_ASSERT (b < m_heap.size () && a < m_heap.size ());
-  NS_LOG_DEBUG ("Exch " << a << ", " << b);
-  Event tmp (m_heap[a]);
-  m_heap[a] = m_heap[b];
-  m_heap[b] = tmp;
-}
-
-bool
-HeapScheduler::IsLessStrictly (uint32_t a, uint32_t b) const
-{
-  NS_LOG_FUNCTION (this << a << b);
-  return m_heap[a] < m_heap[b];
-}
-
-uint32_t
-HeapScheduler::Smallest (uint32_t a, uint32_t b) const
-{
-  NS_LOG_FUNCTION (this << a << b);
-  return IsLessStrictly (a,b) ? a : b;
-}
-
-bool
-HeapScheduler::IsEmpty (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return (m_heap.size () == 1) ? true : false;
-}
-
-void
-HeapScheduler::BottomUp (void)
-{
-  NS_LOG_FUNCTION (this);
-  uint32_t index = Last ();
-  while (!IsRoot (index)
-         && IsLessStrictly (index, Parent (index)))
-    {
-      Exch (index, Parent (index));
-      index = Parent (index);
+    TypeId
+    HeapScheduler::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::HeapScheduler")
+                .SetParent<Scheduler> ()
+                .SetGroupName("Core")
+                .AddConstructor<HeapScheduler> ()
+                ;
+        return tid;
     }
-}
 
-void
-HeapScheduler::TopDown (uint32_t start)
-{
-  NS_LOG_FUNCTION (this << start);
-  uint32_t index = start;
-  uint32_t right = RightChild (index);
-  while (!IsBottom (right))
-    {
-      uint32_t left = LeftChild (index);
-      uint32_t tmp = Smallest (left, right);
-      if (IsLessStrictly (index, tmp))
-        {
-          return;
-        }
-      Exch (index, tmp);
-      index = tmp;
-      right = RightChild (index);
+    HeapScheduler::HeapScheduler() {
+        NS_LOG_FUNCTION(this);
+        // we purposedly waste an item at the start of
+        // the array to make sure the indexes in the
+        // array start at one.
+        Scheduler::Event empty = {0,
+            { 0, 0}};
+        m_heap.push_back(empty);
     }
-  if (IsBottom (index))
-    {
-      return;
+
+    HeapScheduler::~HeapScheduler() {
+        NS_LOG_FUNCTION(this);
     }
-  NS_ASSERT (!IsBottom (index));
-  uint32_t left = LeftChild (index);
-  if (IsBottom (left))
-    {
-      return;
+
+    uint32_t
+    HeapScheduler::Parent(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return id / 2;
     }
-  if (IsLessStrictly (index, left))
-    {
-      return;
+
+    uint32_t
+    HeapScheduler::Sibling(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return id + 1;
     }
-  Exch (index, left);
-}
 
+    uint32_t
+    HeapScheduler::LeftChild(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return id * 2;
+    }
 
-void
-HeapScheduler::Insert (const Event &ev)
-{
-  NS_LOG_FUNCTION (this << &ev);
-  m_heap.push_back (ev);
-  BottomUp ();
-}
+    uint32_t
+    HeapScheduler::RightChild(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return id * 2 + 1;
+    }
 
-Scheduler::Event
-HeapScheduler::PeekNext (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_heap[Root ()];
-}
-Scheduler::Event
-HeapScheduler::RemoveNext (void)
-{
-  NS_LOG_FUNCTION (this);
-  Event next = m_heap[Root ()];
-  Exch (Root (), Last ());
-  m_heap.pop_back ();
-  TopDown (Root ());
-  return next;
-}
+    uint32_t
+    HeapScheduler::Root(void) const {
+        NS_LOG_FUNCTION(this);
+        return 1;
+    }
 
+    bool
+    HeapScheduler::IsRoot(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return (id == Root()) ? true : false;
+    }
 
-void
-HeapScheduler::Remove (const Event &ev)
-{
-  NS_LOG_FUNCTION (this << &ev);
-  uint32_t uid = ev.key.m_uid;
-  for (uint32_t i = 1; i < m_heap.size (); i++)
-    {
-      if (uid == m_heap[i].key.m_uid)
-        {
-          NS_ASSERT (m_heap[i].impl == ev.impl);
-          Exch (i, Last ());
-          m_heap.pop_back ();
-          TopDown (i);
-          return;
+    uint32_t
+    HeapScheduler::Last(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_heap.size() - 1;
+    }
+
+    bool
+    HeapScheduler::IsBottom(uint32_t id) const {
+        NS_LOG_FUNCTION(this << id);
+        return (id >= m_heap.size()) ? true : false;
+    }
+
+    void
+    HeapScheduler::Exch(uint32_t a, uint32_t b) {
+        NS_LOG_FUNCTION(this << a << b);
+        NS_ASSERT(b < m_heap.size() && a < m_heap.size());
+        NS_LOG_DEBUG("Exch " << a << ", " << b);
+        Event tmp(m_heap[a]);
+        m_heap[a] = m_heap[b];
+        m_heap[b] = tmp;
+    }
+
+    bool
+    HeapScheduler::IsLessStrictly(uint32_t a, uint32_t b) const {
+        NS_LOG_FUNCTION(this << a << b);
+        return m_heap[a] < m_heap[b];
+    }
+
+    uint32_t
+    HeapScheduler::Smallest(uint32_t a, uint32_t b) const {
+        NS_LOG_FUNCTION(this << a << b);
+        return IsLessStrictly(a, b) ? a : b;
+    }
+
+    bool
+    HeapScheduler::IsEmpty(void) const {
+        NS_LOG_FUNCTION(this);
+        return (m_heap.size() == 1) ? true : false;
+    }
+
+    void
+    HeapScheduler::BottomUp(void) {
+        NS_LOG_FUNCTION(this);
+        uint32_t index = Last();
+        while (!IsRoot(index)
+                && IsLessStrictly(index, Parent(index))) {
+            Exch(index, Parent(index));
+            index = Parent(index);
         }
     }
-  NS_ASSERT (false);
-}
+
+    void
+    HeapScheduler::TopDown(uint32_t start) {
+        NS_LOG_FUNCTION(this << start);
+        uint32_t index = start;
+        uint32_t right = RightChild(index);
+        while (!IsBottom(right)) {
+            uint32_t left = LeftChild(index);
+            uint32_t tmp = Smallest(left, right);
+            if (IsLessStrictly(index, tmp)) {
+                return;
+            }
+            Exch(index, tmp);
+            index = tmp;
+            right = RightChild(index);
+        }
+        if (IsBottom(index)) {
+            return;
+        }
+        NS_ASSERT(!IsBottom(index));
+        uint32_t left = LeftChild(index);
+        if (IsBottom(left)) {
+            return;
+        }
+        if (IsLessStrictly(index, left)) {
+            return;
+        }
+        Exch(index, left);
+    }
+
+    void
+    HeapScheduler::Insert(const Event & ev) {
+        NS_LOG_FUNCTION(this << &ev);
+        m_heap.push_back(ev);
+        BottomUp();
+    }
+
+    Scheduler::Event
+    HeapScheduler::PeekNext(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_heap[Root()];
+    }
+
+    Scheduler::Event
+    HeapScheduler::RemoveNext(void) {
+        NS_LOG_FUNCTION(this);
+        Event next = m_heap[Root()];
+        Exch(Root(), Last());
+        m_heap.pop_back();
+        TopDown(Root());
+        return next;
+    }
+
+    void
+    HeapScheduler::Remove(const Event & ev) {
+        NS_LOG_FUNCTION(this << &ev);
+        uint32_t uid = ev.key.m_uid;
+        for (uint32_t i = 1; i < m_heap.size(); i++) {
+            if (uid == m_heap[i].key.m_uid) {
+                NS_ASSERT(m_heap[i].impl == ev.impl);
+                Exch(i, Last());
+                m_heap.pop_back();
+                TopDown(i);
+                return;
+            }
+        }
+        NS_ASSERT(false);
+    }
 
 } // namespace ns3
 

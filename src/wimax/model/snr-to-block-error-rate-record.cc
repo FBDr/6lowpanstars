@@ -23,94 +23,89 @@
 #include "ns3/snr-to-block-error-rate-record.h"
 #include "ns3/assert.h"
 
-namespace ns3 {
+namespace ns3
+{
 
-SNRToBlockErrorRateRecord::SNRToBlockErrorRateRecord (double snrValue,
-                                                      double bitErrorRate, double blockErrorRate, double sigma2, double I1,
-                                                      double I2)
-{
-  m_snrValue = snrValue;
-  m_bitErrorRate = bitErrorRate;
-  m_blockErrorRate = blockErrorRate;
-  m_sigma2 = sigma2;
-  m_i1 = I1;
-  m_i2 = I2;
-}
+    SNRToBlockErrorRateRecord::SNRToBlockErrorRateRecord(double snrValue,
+            double bitErrorRate, double blockErrorRate, double sigma2, double I1,
+            double I2) {
+        m_snrValue = snrValue;
+        m_bitErrorRate = bitErrorRate;
+        m_blockErrorRate = blockErrorRate;
+        m_sigma2 = sigma2;
+        m_i1 = I1;
+        m_i2 = I2;
+    }
 
-SNRToBlockErrorRateRecord *
-SNRToBlockErrorRateRecord::Copy ()
-{
-  return (new SNRToBlockErrorRateRecord (m_snrValue, m_bitErrorRate,
-                                         m_blockErrorRate, m_sigma2, m_i1, m_i2));
+    SNRToBlockErrorRateRecord *
+            SNRToBlockErrorRateRecord::Copy() {
+        return (new SNRToBlockErrorRateRecord(m_snrValue, m_bitErrorRate,
+                m_blockErrorRate, m_sigma2, m_i1, m_i2));
 
-}
+    }
 
-double
-SNRToBlockErrorRateRecord::GetSNRValue (void)
-{
-  return m_snrValue;
-}
+    double
+    SNRToBlockErrorRateRecord::GetSNRValue(void) {
+        return m_snrValue;
+    }
 
-SNRToBlockErrorRateRecord::~SNRToBlockErrorRateRecord (void)
-{
-  m_snrValue = 0;
-  m_bitErrorRate = 0;
-  m_blockErrorRate = 0;
-  m_sigma2 = 0;
-  m_i1 = 0;
-  m_i2 = 0;
-}
+    SNRToBlockErrorRateRecord::~SNRToBlockErrorRateRecord(void) {
+        m_snrValue = 0;
+        m_bitErrorRate = 0;
+        m_blockErrorRate = 0;
+        m_sigma2 = 0;
+        m_i1 = 0;
+        m_i2 = 0;
+    }
 
-double
-SNRToBlockErrorRateRecord::GetBitErrorRate (void)
-{
-  return m_bitErrorRate;
-}
-double
-SNRToBlockErrorRateRecord::GetBlockErrorRate (void)
-{
-  return m_blockErrorRate;
-}
-double
-SNRToBlockErrorRateRecord::GetSigma2 (void)
-{
-  return m_sigma2;
-}
-double
-SNRToBlockErrorRateRecord::GetI1 (void)
-{
-  return m_i1;
-}
-double
-SNRToBlockErrorRateRecord::GetI2 (void)
-{
-  return m_i2;
-}
+    double
+    SNRToBlockErrorRateRecord::GetBitErrorRate(void) {
+        return m_bitErrorRate;
+    }
 
-void
-SNRToBlockErrorRateRecord::SetSNRValue (double snrValue)
-{
-  m_snrValue = snrValue;
-}
-void
-SNRToBlockErrorRateRecord::SetBitErrorRate (double bitErrorRate)
-{
-  m_bitErrorRate = bitErrorRate;
-}
-void
-SNRToBlockErrorRateRecord::SetBlockErrorRate (double blockErrorRate)
-{
-  m_blockErrorRate = blockErrorRate;
-}
-void
-SNRToBlockErrorRateRecord::SetI1 (double I1)
-{
-  m_i1 = I1;
-}
-void
-SNRToBlockErrorRateRecord::SetI2 (double I2)
-{
-  m_i2 = I2;
-}
+    double
+    SNRToBlockErrorRateRecord::GetBlockErrorRate(void) {
+        return m_blockErrorRate;
+    }
+
+    double
+    SNRToBlockErrorRateRecord::GetSigma2(void) {
+        return m_sigma2;
+    }
+
+    double
+    SNRToBlockErrorRateRecord::GetI1(void) {
+        return m_i1;
+    }
+
+    double
+    SNRToBlockErrorRateRecord::GetI2(void) {
+        return m_i2;
+    }
+
+    void
+    SNRToBlockErrorRateRecord::SetSNRValue(double snrValue) {
+        m_snrValue = snrValue;
+    }
+
+    void
+    SNRToBlockErrorRateRecord::SetBitErrorRate(double bitErrorRate) {
+        m_bitErrorRate = bitErrorRate;
+    }
+
+    void
+    SNRToBlockErrorRateRecord::SetBlockErrorRate(double blockErrorRate) {
+        m_blockErrorRate = blockErrorRate;
+    }
+
+    void
+    SNRToBlockErrorRateRecord::SetI1(double I1) {
+        m_i1 = I1;
+    }
+
+    void
+    SNRToBlockErrorRateRecord::SetI2(double I2) {
+        m_i2 = I2;
+    }
 
 }

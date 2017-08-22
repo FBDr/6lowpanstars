@@ -39,35 +39,35 @@
 #include "ns3/dsr-helper.h"
 
 namespace ns3 {
-/**
- * \brief Helper class that adds DSR routing to nodes.
- */
-class DsrMainHelper
-{
-public:
-  /**
-   * Create an DsrMainHelper that makes life easier for people who want to install
-   * DSR routing to nodes.
-   */
-  DsrMainHelper ();
-  ~DsrMainHelper ();
-  /**
-   * \brief Construct an DsrMainHelper from another previously initialized instance
-   * (Copy Constructor).
-   */
-  DsrMainHelper (const DsrMainHelper &);
-  void Install (DsrHelper &dsrHelper, NodeContainer nodes);
-  void SetDsrHelper (DsrHelper &dsrHelper);
 
-private:
-  void Install (Ptr<Node> node);
-  /**
-   * \brief Assignment operator declared private and not implemented to disallow
-   * assignment and prevent the compiler from happily inserting its own.
-   */
-  DsrMainHelper &operator = (const DsrMainHelper &o);
-  const DsrHelper *m_dsrHelper;
-};
+    /**
+     * \brief Helper class that adds DSR routing to nodes.
+     */
+    class DsrMainHelper {
+    public:
+        /**
+         * Create an DsrMainHelper that makes life easier for people who want to install
+         * DSR routing to nodes.
+         */
+        DsrMainHelper();
+        ~DsrMainHelper();
+        /**
+         * \brief Construct an DsrMainHelper from another previously initialized instance
+         * (Copy Constructor).
+         */
+        DsrMainHelper(const DsrMainHelper &);
+        void Install(DsrHelper &dsrHelper, NodeContainer nodes);
+        void SetDsrHelper(DsrHelper &dsrHelper);
+
+    private:
+        void Install(Ptr<Node> node);
+        /**
+         * \brief Assignment operator declared private and not implemented to disallow
+         * assignment and prevent the compiler from happily inserting its own.
+         */
+        DsrMainHelper &operator=(const DsrMainHelper &o);
+        const DsrHelper *m_dsrHelper;
+    };
 
 } // namespace ns3
 

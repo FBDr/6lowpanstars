@@ -22,57 +22,54 @@
 #include "mpdu-aggregator.h"
 #include "wifi-mac-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("MpduAggregator");
+NS_LOG_COMPONENT_DEFINE("MpduAggregator");
 
-namespace ns3 {
+namespace ns3{
 
-NS_OBJECT_ENSURE_REGISTERED (MpduAggregator);
+    NS_OBJECT_ENSURE_REGISTERED(MpduAggregator);
 
-TypeId
-MpduAggregator::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::MpduAggregator")
-    .SetParent<Object> ()
-    .SetGroupName ("Wifi")
-    //No AddConstructor because this is an abstract class.
-  ;
-  return tid;
-}
-
-MpduAggregator::DeaggregatedMpdus
-MpduAggregator::Deaggregate (Ptr<Packet> aggregatedPacket)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  DeaggregatedMpdus set;
-
-  AmpduSubframeHeader hdr;
-  Ptr<Packet> extractedMpdu = Create<Packet> ();
-  uint32_t maxSize = aggregatedPacket->GetSize ();
-  uint16_t extractedLength;
-  uint32_t padding;
-  uint32_t deserialized = 0;
-
-  while (deserialized < maxSize)
+    TypeId
+    MpduAggregator::GetTypeId(void)
     {
-      deserialized += aggregatedPacket->RemoveHeader (hdr);
-      extractedLength = hdr.GetLength ();
-      extractedMpdu = aggregatedPacket->CreateFragment (0, static_cast<uint32_t> (extractedLength));
-      aggregatedPacket->RemoveAtStart (extractedLength);
-      deserialized += extractedLength;
-
-      padding = (4 - (extractedLength % 4 )) % 4;
-
-      if (padding > 0 && deserialized < maxSize)
-        {
-          aggregatedPacket->RemoveAtStart (padding);
-          deserialized += padding;
-        }
-
-      std::pair<Ptr<Packet>, AmpduSubframeHeader> packetHdr (extractedMpdu, hdr);
-      set.push_back (packetHdr);
+        static TypeId tid = TypeId("ns3::MpduAggregator")
+        .SetParent<Object> ()
+        .SetGroupName("Wifi")
+        //No AddConstructor because this is an abstract class.
+        ;
+        return tid;
     }
-  NS_LOG_INFO ("Deaggreated A-MPDU: extracted " << set.size () << " MPDUs");
-  return set;
-}
 
+    MpduAggregator::DeaggregatedMpdus
+    MpduAggregator::Deaggregate(Ptr<Packet> aggregatedPacket)
+    {
+        NS_LOG_FUNCTION_NOARGS();
+        DeaggregatedMpdus set;
+
+        AmpduSubframeHeader hdr;
+        Ptr<Packet> extractedMpdu = Create<Packet> ();
+        uint32_t maxSize = aggregatedPacket->GetSize();
+        uint16_t extractedLength;
+        uint32_t padding;
+        uint32_t deserialized = 0;
+
+        while (deserialized < maxSize) {
+            deserialized += aggregatedPacket->RemoveHeader(hdr);
+            extractedLength = hdr.GetLength();
+            extractedMpdu = aggregatedPacket->CreateFragment(0, static_cast<uint32_t> (extractedLength));
+            aggregatedPacket->RemoveAtStart(extractedLength);
+            deserialized += extractedLength;
+
+            padding = (4 - (extractedLength % 4)) % 4;
+
+            if (padding > 0 && deserialized < maxSize) {
+                aggregatedPacket->RemoveAtStart(padding);
+                deserialized += padding;
+            }
+
+            std::pair<Ptr<Packet>, AmpduSubframeHeader> packetHdr(extractedMpdu, hdr);
+            set.push_back(packetHdr);
+        }
+        NS_LOG_INFO("Deaggreated A-MPDU: extracted " << set.size() << " MPDUs");
+        return set;
+    }
 } //namespace ns3

@@ -25,32 +25,30 @@
 #include <ndn-cxx/tag.hpp>
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-class Ns3PacketTag : public ::ndn::Tag {
-public:
-  static size_t
-  getTypeId()
-  {
-    return 0xaee87802; // md5("Ns3PacketTag")[0:8]
-  }
+        class Ns3PacketTag : public ::ndn::Tag {
+        public:
 
-  Ns3PacketTag(Ptr<const Packet> packet)
-    : m_packet(packet)
-  {
-  }
+            static size_t
+            getTypeId() {
+                return 0xaee87802; // md5("Ns3PacketTag")[0:8]
+            }
 
-  Ptr<const Packet>
-  getPacket() const
-  {
-    return m_packet;
-  }
+            Ns3PacketTag(Ptr<const Packet> packet)
+            : m_packet(packet) {
+            }
 
-private:
-  Ptr<const Packet> m_packet;
-};
+            Ptr<const Packet>
+            getPacket() const {
+                return m_packet;
+            }
 
-} // namespace ndn
+        private:
+            Ptr<const Packet> m_packet;
+        };
+
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_NS3_PACKET_TAG_HPP

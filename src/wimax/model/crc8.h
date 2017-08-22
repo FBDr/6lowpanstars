@@ -24,13 +24,13 @@
 
 namespace ns3 {
 
-/**
- * \param data buffer to calculate the checksum for
- * \param length the length of the buffer (bytes)
- * \returns the computed crc.
- *
- */
-uint8_t CRC8Calculate (const uint8_t *data, int length);
+    /**
+     * \param data buffer to calculate the checksum for
+     * \param length the length of the buffer (bytes)
+     * \returns the computed crc.
+     *
+     */
+    uint8_t CRC8Calculate(const uint8_t *data, int length);
 
 } // namespace ns3
 

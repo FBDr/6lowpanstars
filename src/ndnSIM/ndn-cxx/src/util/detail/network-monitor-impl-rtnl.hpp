@@ -27,27 +27,26 @@
 #include <boost/asio/posix/stream_descriptor.hpp>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-const size_t NETLINK_BUFFER_SIZE = 4096;
+        const size_t NETLINK_BUFFER_SIZE = 4096;
 
-class NetworkMonitor::Impl
-{
-public:
-  Impl(NetworkMonitor& nm, boost::asio::io_service& io);
+        class NetworkMonitor::Impl {
+        public:
+            Impl(NetworkMonitor& nm, boost::asio::io_service& io);
 
-private:
-  void
-  onReceiveRtNetlink(const boost::system::error_code& error, size_t nBytesReceived);
+        private:
+            void
+            onReceiveRtNetlink(const boost::system::error_code& error, size_t nBytesReceived);
 
-private:
-  NetworkMonitor& m_nm;
+        private:
+            NetworkMonitor& m_nm;
 
-  uint8_t m_buffer[NETLINK_BUFFER_SIZE];
-  boost::asio::posix::stream_descriptor m_socket;
-};
+            uint8_t m_buffer[NETLINK_BUFFER_SIZE];
+            boost::asio::posix::stream_descriptor m_socket;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_NETWORK_MONITOR_IMPL_RTNL_HPP

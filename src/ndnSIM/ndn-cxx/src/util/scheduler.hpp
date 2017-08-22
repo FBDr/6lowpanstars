@@ -30,91 +30,88 @@
 #include <set>
 
 namespace ndn {
-namespace util {
-namespace scheduler {
+    namespace util {
+        namespace scheduler {
 
-/** \class EventId
- *  \brief Opaque type (shared_ptr) representing ID of a scheduled event
- */
-typedef std::shared_ptr<ns3::EventId> EventId;
+            /** \class EventId
+             *  \brief Opaque type (shared_ptr) representing ID of a scheduled event
+             */
+            typedef std::shared_ptr<ns3::EventId> EventId;
 
-/**
- * \brief Generic scheduler
- */
-class Scheduler : noncopyable
-{
-public:
-  /**
-   * \deprecated use EventCallback
-   */
-  typedef function<void()> Event;
+            /**
+             * \brief Generic scheduler
+             */
+            class Scheduler : noncopyable {
+            public:
+                /**
+                 * \deprecated use EventCallback
+                 */
+                typedef function<void() > Event;
 
-  explicit
-  Scheduler(boost::asio::io_service& ioService);
+                explicit
+                Scheduler(boost::asio::io_service& ioService);
 
-  ~Scheduler();
+                ~Scheduler();
 
-  /**
-   * \brief Schedule a one-time event after the specified delay
-   * \return EventId that can be used to cancel the scheduled event
-   */
-  EventId
-  scheduleEvent(const time::nanoseconds& after, const Event& event);
+                /**
+                 * \brief Schedule a one-time event after the specified delay
+                 * \return EventId that can be used to cancel the scheduled event
+                 */
+                EventId
+                scheduleEvent(const time::nanoseconds& after, const Event& event);
 
-  /**
-   * \brief Cancel a scheduled event
-   */
-  void
-  cancelEvent(const EventId& eventId);
+                /**
+                 * \brief Cancel a scheduled event
+                 */
+                void
+                cancelEvent(const EventId& eventId);
 
-  /**
-   * \brief Cancel all scheduled events
-   */
-  void
-  cancelAllEvents();
+                /**
+                 * \brief Cancel all scheduled events
+                 */
+                void
+                cancelAllEvents();
 
-private:
-  struct EventInfo
-  {
-    EventInfo(const time::nanoseconds& after, const Event& event);
+            private:
 
-    EventInfo(const time::steady_clock::TimePoint& when, const EventInfo& previousEvent);
+                struct EventInfo {
+                    EventInfo(const time::nanoseconds& after, const Event& event);
 
-    bool
-    operator <=(const EventInfo& other) const
-    {
-      return this->m_scheduledTime <= other.m_scheduledTime;
-    }
+                    EventInfo(const time::steady_clock::TimePoint& when, const EventInfo& previousEvent);
 
-    bool
-    operator <(const EventInfo& other) const
-    {
-      return this->m_scheduledTime < other.m_scheduledTime;
-    }
+                    bool
+                    operator<=(const EventInfo& other) const {
+                        return this->m_scheduledTime <= other.m_scheduledTime;
+                    }
 
-    time::nanoseconds
-    expiresFromNow() const;
+                    bool
+                    operator<(const EventInfo& other) const {
+                        return this->m_scheduledTime < other.m_scheduledTime;
+                    }
 
-    time::steady_clock::TimePoint m_scheduledTime;
-    Event m_event;
-    mutable EventId m_eventId;
-  };
+                    time::nanoseconds
+                    expiresFromNow() const;
 
-  typedef std::multiset<EventId> EventQueue;
+                    time::steady_clock::TimePoint m_scheduledTime;
+                    Event m_event;
+                    mutable EventId m_eventId;
+                };
 
-  EventQueue m_events;
-  EventQueue::iterator m_scheduledEvent;
-};
+                typedef std::multiset<EventId> EventQueue;
 
-} // namespace scheduler
+                EventQueue m_events;
+                EventQueue::iterator m_scheduledEvent;
+            };
 
-using util::scheduler::Scheduler;
+        } // namespace scheduler
 
-} // namespace util
+        using util::scheduler::Scheduler;
 
-// for backwards compatibility
-using util::scheduler::Scheduler;
-using util::scheduler::EventId;
+    } // namespace util
+
+    // for backwards compatibility
+    using util::scheduler::Scheduler;
+    using util::scheduler::EventId;
 
 } // namespace ndn
 

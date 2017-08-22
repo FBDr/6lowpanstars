@@ -52,21 +52,20 @@
 #include "face-event-notification.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/** \brief A subscriber for Face status change notification stream
- *  \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Face-Status-Change-Notification
- */
-class FaceMonitor : public util::NotificationSubscriber<FaceEventNotification>
-{
-public:
-  FaceMonitor(Face& face)
-    : NotificationSubscriber<nfd::FaceEventNotification>(face, "ndn:/localhost/nfd/faces/events")
-  {
-  }
-};
+        /** \brief A subscriber for Face status change notification stream
+         *  \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Face-Status-Change-Notification
+         */
+        class FaceMonitor : public util::NotificationSubscriber<FaceEventNotification> {
+        public:
 
-} // namespace nfd
+            FaceMonitor(Face& face)
+            : NotificationSubscriber<nfd::FaceEventNotification>(face, "ndn:/localhost/nfd/faces/events") {
+            }
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FACE_MONITOR_HPP

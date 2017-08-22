@@ -24,92 +24,89 @@
 
 namespace ns3 {
 
-/**
- * Defines the TCP option of kind 0 (end of option list) as in \RFC{793}
- */
-class TcpOptionEnd : public TcpOption
-{
-public:
-  TcpOptionEnd ();
-  virtual ~TcpOptionEnd ();
+    /**
+     * Defines the TCP option of kind 0 (end of option list) as in \RFC{793}
+     */
+    class TcpOptionEnd : public TcpOption {
+    public:
+        TcpOptionEnd();
+        virtual ~TcpOptionEnd();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  virtual void Print (std::ostream &os) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        virtual void Print(std::ostream &os) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  virtual uint8_t GetKind (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
+        virtual uint8_t GetKind(void) const;
+        virtual uint32_t GetSerializedSize(void) const;
 
-};
+    };
 
-/**
- * Defines the TCP option of kind 1 (no operation) as in \RFC{793}
- */
-class TcpOptionNOP : public TcpOption
-{
-public:
-  TcpOptionNOP ();
-  virtual ~TcpOptionNOP ();
+    /**
+     * Defines the TCP option of kind 1 (no operation) as in \RFC{793}
+     */
+    class TcpOptionNOP : public TcpOption {
+    public:
+        TcpOptionNOP();
+        virtual ~TcpOptionNOP();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  virtual void Print (std::ostream &os) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        virtual void Print(std::ostream &os) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  virtual uint8_t GetKind (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
-};
+        virtual uint8_t GetKind(void) const;
+        virtual uint32_t GetSerializedSize(void) const;
+    };
 
-/**
- * Defines the TCP option of kind 2 (maximum segment size) as in \RFC{793}
- */
-class TcpOptionMSS : public TcpOption
-{
-public:
-  TcpOptionMSS ();
-  virtual ~TcpOptionMSS ();
+    /**
+     * Defines the TCP option of kind 2 (maximum segment size) as in \RFC{793}
+     */
+    class TcpOptionMSS : public TcpOption {
+    public:
+        TcpOptionMSS();
+        virtual ~TcpOptionMSS();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  virtual void Print (std::ostream &os) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        virtual void Print(std::ostream &os) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  virtual uint8_t GetKind (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
+        virtual uint8_t GetKind(void) const;
+        virtual uint32_t GetSerializedSize(void) const;
 
-  /**
-   * \brief Get the Maximum Segment Size stored in the Option
-   * \return The Maximum Segment Size
-   */
-  uint16_t GetMSS (void) const;
-  /**
-   * \brief Set the Maximum Segment Size stored in the Option
-   * \param mss The Maximum Segment Size
-   */
-  void SetMSS (uint16_t mss);
+        /**
+         * \brief Get the Maximum Segment Size stored in the Option
+         * \return The Maximum Segment Size
+         */
+        uint16_t GetMSS(void) const;
+        /**
+         * \brief Set the Maximum Segment Size stored in the Option
+         * \param mss The Maximum Segment Size
+         */
+        void SetMSS(uint16_t mss);
 
-protected:
-  uint16_t m_mss; //!< maximum segment size
-};
+    protected:
+        uint16_t m_mss; //!< maximum segment size
+    };
 
 } // namespace ns3
 

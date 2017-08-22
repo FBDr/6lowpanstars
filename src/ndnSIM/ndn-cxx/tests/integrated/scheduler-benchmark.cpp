@@ -28,61 +28,61 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace util {
-namespace scheduler {
-namespace tests {
+    namespace util {
+        namespace scheduler {
+            namespace tests {
 
-BOOST_AUTO_TEST_CASE(ScheduleCancel)
-{
-  boost::asio::io_service io;
-  Scheduler sched(io);
+                BOOST_AUTO_TEST_CASE(ScheduleCancel) {
+                    boost::asio::io_service io;
+                    Scheduler sched(io);
 
-  const int nEvents = 1000000;
-  std::vector<EventId> eventIds(nEvents);
+                    const int nEvents = 1000000;
+                    std::vector<EventId> eventIds(nEvents);
 
-  time::steady_clock::TimePoint t1 = time::steady_clock::now();
-  for (int i = 0; i < nEvents; ++i) {
-    eventIds[i] = sched.scheduleEvent(time::seconds(1), []{});
-  }
-  time::steady_clock::TimePoint t2 = time::steady_clock::now();
-  for (int i = 0; i < nEvents; ++i) {
-    sched.cancelEvent(eventIds[i]);
-  }
-  time::steady_clock::TimePoint t3 = time::steady_clock::now();
+                    time::steady_clock::TimePoint t1 = time::steady_clock::now();
+                    for (int i = 0; i < nEvents; ++i) {
+                        eventIds[i] = sched.scheduleEvent(time::seconds(1), [] {
+                        });
+                    }
+                    time::steady_clock::TimePoint t2 = time::steady_clock::now();
+                    for (int i = 0; i < nEvents; ++i) {
+                        sched.cancelEvent(eventIds[i]);
+                    }
+                    time::steady_clock::TimePoint t3 = time::steady_clock::now();
 
-  BOOST_TEST_MESSAGE("schedule " << nEvents << " events: " << (t2 - t1));
-  BOOST_TEST_MESSAGE("cancel " << nEvents << " events: " << (t3 - t2));
-}
+                    BOOST_TEST_MESSAGE("schedule " << nEvents << " events: " << (t2 - t1));
+                    BOOST_TEST_MESSAGE("cancel " << nEvents << " events: " << (t3 - t2));
+                }
 
-BOOST_AUTO_TEST_CASE(Execute)
-{
-  boost::asio::io_service io;
-  Scheduler sched(io);
+                BOOST_AUTO_TEST_CASE(Execute) {
+                    boost::asio::io_service io;
+                    Scheduler sched(io);
 
-  const int nEvents = 1000000;
-  int nExpired = 0;
+                    const int nEvents = 1000000;
+                    int nExpired = 0;
 
-  // Events should expire at t1, but execution finishes at t2. The difference is the overhead.
-  time::steady_clock::TimePoint t1 = time::steady_clock::now() + time::seconds(5);
-  time::steady_clock::TimePoint t2;
-  // +1ms ensures this extra event is executed last. In case the overhead is less than 1ms,
-  // it will be reported as 1ms.
-  sched.scheduleEvent(t1 - time::steady_clock::now() + time::milliseconds(1), [&] {
-    t2 = time::steady_clock::now();
-    BOOST_REQUIRE_EQUAL(nExpired, nEvents);
-  });
+                    // Events should expire at t1, but execution finishes at t2. The difference is the overhead.
+                    time::steady_clock::TimePoint t1 = time::steady_clock::now() + time::seconds(5);
+                    time::steady_clock::TimePoint t2;
+                    // +1ms ensures this extra event is executed last. In case the overhead is less than 1ms,
+                    // it will be reported as 1ms.
+                    sched.scheduleEvent(t1 - time::steady_clock::now() + time::milliseconds(1), [&] {
+                        t2 = time::steady_clock::now();
+                        BOOST_REQUIRE_EQUAL(nExpired, nEvents);
+                    });
 
-  for (int i = 0; i < nEvents; ++i) {
-    sched.scheduleEvent(t1 - time::steady_clock::now(), [&] { ++nExpired; });
-  }
+                    for (int i = 0; i < nEvents; ++i) {
+                        sched.scheduleEvent(t1 - time::steady_clock::now(), [&] {
+                            ++nExpired; });
+                    }
 
-  io.run();
+                    io.run();
 
-  BOOST_REQUIRE_EQUAL(nExpired, nEvents);
-  BOOST_TEST_MESSAGE("execute " << nEvents << " events: " << (t2 - t1));
-}
+                    BOOST_REQUIRE_EQUAL(nExpired, nEvents);
+                    BOOST_TEST_MESSAGE("execute " << nEvents << " events: " << (t2 - t1));
+                }
 
-} // namespace tests
-} // namespace scheduler
-} // namespace util
+            } // namespace tests
+        } // namespace scheduler
+    } // namespace util
 } // namespace ndn

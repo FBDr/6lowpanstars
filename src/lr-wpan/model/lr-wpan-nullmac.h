@@ -29,119 +29,118 @@
 
 namespace ns3 {
 
-/**
- * \defgroup lr-wpan LR-WPAN models
- *
- * This section documents the API of the IEEE 802.15.4-related models.  For a generic functional description, please refer to the ns-3 manual.
- */
+    /**
+     * \defgroup lr-wpan LR-WPAN models
+     *
+     * This section documents the API of the IEEE 802.15.4-related models.  For a generic functional description, please refer to the ns-3 manual.
+     */
 
-/**
- * \ingroup lr-wpan
- *
- * Class that implements the LR-WPAN Mac state machine
- */
-class LrWpanNullMac : public LrWpanMac
-{
-public:
-  /**
-   * Get the type ID.
-   *
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup lr-wpan
+     *
+     * Class that implements the LR-WPAN Mac state machine
+     */
+    class LrWpanNullMac : public LrWpanMac {
+    public:
+        /**
+         * Get the type ID.
+         *
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  LrWpanNullMac (void);
-  virtual ~LrWpanNullMac (void);
+        /**
+         * Default constructor.
+         */
+        LrWpanNullMac(void);
+        virtual ~LrWpanNullMac(void);
 
-  /**
-   * Check if the receiver will be enabled when the MAC is idle.
-   *
-   * \return true, if the receiver is enabled during idle periods, false otherwise
-   */
-  bool GetRxOnWhenIdle (void);
+        /**
+         * Check if the receiver will be enabled when the MAC is idle.
+         *
+         * \return true, if the receiver is enabled during idle periods, false otherwise
+         */
+        bool GetRxOnWhenIdle(void);
 
-  /**
-   * Set if the receiver should be enabled when the MAC is idle.
-   *
-   * \param rxOnWhenIdle set to true to enable the receiver during idle periods
-   */
-  void SetRxOnWhenIdle (bool rxOnWhenIdle);
+        /**
+         * Set if the receiver should be enabled when the MAC is idle.
+         *
+         * \param rxOnWhenIdle set to true to enable the receiver during idle periods
+         */
+        void SetRxOnWhenIdle(bool rxOnWhenIdle);
 
-  /**
-   * CSMA-CA algorithm calls back the MAC after executing channel assessment.
-   *
-   * \param macState indicate BUSY oder IDLE channel condition
-   */
-  void SetLrWpanMacState (LrWpanMacState macState);
+        /**
+         * CSMA-CA algorithm calls back the MAC after executing channel assessment.
+         *
+         * \param macState indicate BUSY oder IDLE channel condition
+         */
+        void SetLrWpanMacState(LrWpanMacState macState);
 
-  //MAC sublayer constants
-  /**
-   * Length of a superframe slot in symbols. Defaults to 60 symbols in each
-   * superframe slot.
-   * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
-   */
-  uint64_t m_aBaseSlotDuration;
+        //MAC sublayer constants
+        /**
+         * Length of a superframe slot in symbols. Defaults to 60 symbols in each
+         * superframe slot.
+         * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
+         */
+        uint64_t m_aBaseSlotDuration;
 
-  /**
-   * Number of a superframe slots per superframe. Defaults to 16.
-   * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
-   */
-  uint64_t m_aNumSuperframeSlots;
+        /**
+         * Number of a superframe slots per superframe. Defaults to 16.
+         * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
+         */
+        uint64_t m_aNumSuperframeSlots;
 
-  /**
-   * Length of a superframe in symbols. Defaults to
-   * aBaseSlotDuration * aNumSuperframeSlots in symbols.
-   * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
-   */
-  uint64_t m_aBaseSuperframeDuration;
+        /**
+         * Length of a superframe in symbols. Defaults to
+         * aBaseSlotDuration * aNumSuperframeSlots in symbols.
+         * See IEEE 802.15.4-2006, section 7.4.1, Table 85.
+         */
+        uint64_t m_aBaseSuperframeDuration;
 
-  //MAC PIB attributes
-  /**
-   * The time that the device transmitted its last beacon frame, in symbol
-   * periods. Only 24 bits used.
-   * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
-   */
-  uint64_t m_macBeaconTxTime;
+        //MAC PIB attributes
+        /**
+         * The time that the device transmitted its last beacon frame, in symbol
+         * periods. Only 24 bits used.
+         * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
+         */
+        uint64_t m_macBeaconTxTime;
 
-  /**
-   * Symbol boundary is same as m_macBeaconTxTime.
-   * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
-   */
-  uint64_t m_macSyncSymbolOffset;
+        /**
+         * Symbol boundary is same as m_macBeaconTxTime.
+         * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
+         */
+        uint64_t m_macSyncSymbolOffset;
 
-  /**
-   * Specification of how often the coordinator transmits its beacon.
-   * 0 - 15 with 15 means no beacons are being sent.
-   * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
-   */
-  uint64_t m_macBeaconOrder;
+        /**
+         * Specification of how often the coordinator transmits its beacon.
+         * 0 - 15 with 15 means no beacons are being sent.
+         * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
+         */
+        uint64_t m_macBeaconOrder;
 
-  /**
-   * The length of the active portion of the outgoing superframe, including the
-   * beacon frame.
-   * 0 - 15 with 15 means the superframe will not be active after the beacon.
-   * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
-   */
-  uint64_t m_macSuperframeOrder;
+        /**
+         * The length of the active portion of the outgoing superframe, including the
+         * beacon frame.
+         * 0 - 15 with 15 means the superframe will not be active after the beacon.
+         * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
+         */
+        uint64_t m_macSuperframeOrder;
 
-  /**
-   * Indication of whether the MAC sublayer is to enable its receiver during
-   * idle periods.
-   * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
-   */
-  bool m_macRxOnWhenIdle;
-  
-protected:
-  // Inherited from Object.
-  virtual void DoInitialize (void);
-  virtual void DoDispose (void);
+        /**
+         * Indication of whether the MAC sublayer is to enable its receiver during
+         * idle periods.
+         * See IEEE 802.15.4-2006, section 7.4.2, Table 86.
+         */
+        bool m_macRxOnWhenIdle;
 
-private:
+    protected:
+        // Inherited from Object.
+        virtual void DoInitialize(void);
+        virtual void DoDispose(void);
 
-};
+    private:
+
+    };
 
 
 } // namespace ns3

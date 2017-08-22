@@ -33,14 +33,12 @@
 using namespace ndn;
 
 void
-placeholdersTestFunction(int i)
-{
+placeholdersTestFunction(int i) {
 }
 
 int
-placeholdersTestMain()
-{
-  auto f = std::bind(&placeholdersTestFunction, _1);
-  f(1);
-  return 0;
+placeholdersTestMain() {
+    auto f = std::bind(&placeholdersTestFunction, _1);
+    f(1);
+    return 0;
 }

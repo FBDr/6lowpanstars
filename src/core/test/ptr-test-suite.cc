@@ -27,248 +27,235 @@ class PtrTestCase;
 
 class PtrTestBase
 {
-public:
-  PtrTestBase ();
-  virtual ~PtrTestBase ();
-  void Ref (void) const;
-  void Unref (void) const;
+    public :
+    PtrTestBase();
+    virtual ~PtrTestBase();
+    void Ref(void) const;
+    void Unref(void) const;
 private:
-  mutable uint32_t m_count;
-};
+    mutable uint32_t m_count;};
 
 class NoCount : public PtrTestBase
 {
-public:
-  NoCount (PtrTestCase *test);
-  ~NoCount ();
-  void Nothing (void) const;
+    public :
+    NoCount(PtrTestCase * test);
+    ~NoCount();
+    void Nothing(void) const;
 private:
-  PtrTestCase *m_test;
-};
+    PtrTestCase *m_test;};
 
 
 class PtrTestCase : public TestCase
 {
-public:
-  PtrTestCase ();
-  void DestroyNotify (void);
+    public :
+    PtrTestCase();
+    void DestroyNotify(void);
 private:
-  virtual void DoRun (void);
-  Ptr<NoCount> CallTest (Ptr<NoCount> p);
-  Ptr<NoCount> const CallTestConst (Ptr<NoCount> const p);
-  uint32_t m_nDestroyed;
-};
+    virtual void DoRun(void);
+    Ptr<NoCount> CallTest(Ptr<NoCount> p);
+    Ptr<NoCount> const CallTestConst(Ptr<NoCount> const p);
+    uint32_t m_nDestroyed;};
 
+PtrTestBase::PtrTestBase()
+: m_count(1) {
+}
 
-PtrTestBase::PtrTestBase ()
-  : m_count (1)
-{
+PtrTestBase::~PtrTestBase() {
 }
-PtrTestBase::~PtrTestBase ()
-{
-}
+
 void
-PtrTestBase::Ref (void) const
-{
-  m_count++;
+PtrTestBase::Ref(void) const {
+    m_count++;
 }
+
 void
-PtrTestBase::Unref (void) const
-{
-  m_count--;
-  if (m_count == 0)
-    {
-      delete this;
+PtrTestBase::Unref(void) const {
+    m_count--;
+    if (m_count == 0) {
+        delete this;
     }
 }
 
-NoCount::NoCount (PtrTestCase *test)
-  : m_test (test)
-{
+NoCount::NoCount(PtrTestCase *test)
+: m_test(test) {
 }
-NoCount::~NoCount ()
-{
-  m_test->DestroyNotify ();
+
+NoCount::~NoCount() {
+    m_test->DestroyNotify();
 }
+
 void
-NoCount::Nothing () const
-{}
-
-
-
-PtrTestCase::PtrTestCase (void)
-  : TestCase ("Sanity checking of Ptr<>")
-{
+NoCount::Nothing() const {
 }
+
+PtrTestCase::PtrTestCase(void)
+: TestCase("Sanity checking of Ptr<>") {
+}
+
 void
-PtrTestCase::DestroyNotify (void)
-{
-  m_nDestroyed++;
+PtrTestCase::DestroyNotify(void) {
+    m_nDestroyed++;
 }
+
 Ptr<NoCount>
-PtrTestCase::CallTest (Ptr<NoCount> p)
-{
-  return p;
+PtrTestCase::CallTest(Ptr<NoCount> p) {
+    return p;
 }
 
 Ptr<NoCount> const
-PtrTestCase::CallTestConst (Ptr<NoCount> const p)
-{
-  return p;
+PtrTestCase::CallTestConst(Ptr<NoCount> const p) {
+    return p;
 }
 
-
 void
-PtrTestCase::DoRun (void)
-{
-  m_nDestroyed = false;
-  {
-    Ptr<NoCount> p = Create<NoCount> (this);
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "001");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p;
-    p = Create<NoCount> (this);
-    p = p;
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "002");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
-    p1 = Create<NoCount> (this);
-    Ptr<NoCount> p2 = p1;
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "003");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
-    p1 = Create<NoCount> (this);
-    Ptr<NoCount> p2;
-    p2 = p1;
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "004");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
-    p1 = Create<NoCount> (this);
-    Ptr<NoCount> p2 = Create<NoCount> (this);
-    p2 = p1;
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 2, "005");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
-    p1 = Create<NoCount> (this);
-    Ptr<NoCount> p2;
-    p2 = Create<NoCount> (this);
-    p2 = p1;
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 2, "006");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
-    p1 = Create<NoCount> (this);
-    p1 = Create<NoCount> (this);
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 2, "007");
-
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
+PtrTestCase::DoRun(void) {
+    m_nDestroyed = false;
     {
-      Ptr<NoCount> p2;
-      p1 = Create<NoCount> (this);
-      p2 = Create<NoCount> (this);
-      p2 = p1;
+        Ptr<NoCount> p = Create<NoCount> (this);
     }
-    NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "008");
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 2, "009");
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "001");
 
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p1;
+    m_nDestroyed = 0;
     {
-      Ptr<NoCount> p2;
-      p1 = Create<NoCount> (this);
-      p2 = Create<NoCount> (this);
-      p2 = CallTest (p1);
+        Ptr<NoCount> p;
+        p = Create<NoCount> (this);
+        p = p;
     }
-    NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "010");
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 2, "011");
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "002");
 
-  {
-    Ptr<NoCount> p1;
-    Ptr<NoCount> const p2 = CallTest (p1);
-    Ptr<NoCount> const p3 = CallTestConst (p1);
-    Ptr<NoCount> p4 = CallTestConst (p1);
-    Ptr<NoCount const> p5 = p4;
-    //p4 = p5; You cannot make a const pointer be a non-const pointer.
-    // but if you use ConstCast, you can.
-    p4 = ConstCast<NoCount> (p5);
-    p5 = p1;
-    Ptr<NoCount> p;
-    if (p == 0)
-      {}
-    if (p != 0)
-      {}
-    if (0 == p)
-      {}
-    if (0 != p)
-      {}
-    if (p)
-      {}
-    if (!p)
-      {}
-  }
-
-  m_nDestroyed = 0;
-  {
-    NoCount *raw;
+    m_nDestroyed = 0;
     {
-      Ptr<NoCount> p = Create<NoCount> (this);
-      {
-        Ptr<NoCount const> p1 = p;
-      }
-      raw = GetPointer (p);
-      p = 0;
+        Ptr<NoCount> p1;
+        p1 = Create<NoCount> (this);
+        Ptr<NoCount> p2 = p1;
     }
-    NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 0, "012");
-    delete raw;
-  }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "003");
 
-  m_nDestroyed = 0;
-  {
-    Ptr<NoCount> p = Create<NoCount> (this);
-    const NoCount *v1 = PeekPointer (p);
-    NoCount *v2 = PeekPointer (p);
-    v1->Nothing ();
-    v2->Nothing ();
-  }
-  NS_TEST_EXPECT_MSG_EQ (m_nDestroyed, 1, "013");
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        p1 = Create<NoCount> (this);
+        Ptr<NoCount> p2;
+        p2 = p1;
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "004");
 
-  {
-    Ptr<PtrTestBase> p0 = Create<NoCount> (this);
-    Ptr<NoCount> p1 = Create<NoCount> (this);
-    NS_TEST_EXPECT_MSG_EQ ((p0 == p1), false, "operator == failed");
-    NS_TEST_EXPECT_MSG_EQ ((p0 != p1), true, "operator != failed");
-  }
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        p1 = Create<NoCount> (this);
+        Ptr<NoCount> p2 = Create<NoCount> (this);
+        p2 = p1;
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 2, "005");
+
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        p1 = Create<NoCount> (this);
+        Ptr<NoCount> p2;
+        p2 = Create<NoCount> (this);
+        p2 = p1;
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 2, "006");
+
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        p1 = Create<NoCount> (this);
+        p1 = Create<NoCount> (this);
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 2, "007");
+
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        {
+            Ptr<NoCount> p2;
+            p1 = Create<NoCount> (this);
+            p2 = Create<NoCount> (this);
+            p2 = p1;
+        }
+        NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "008");
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 2, "009");
+
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p1;
+        {
+            Ptr<NoCount> p2;
+            p1 = Create<NoCount> (this);
+            p2 = Create<NoCount> (this);
+            p2 = CallTest(p1);
+        }
+        NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "010");
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 2, "011");
+
+    {
+        Ptr<NoCount> p1;
+        Ptr<NoCount> const p2 = CallTest(p1);
+        Ptr<NoCount> const p3 = CallTestConst(p1);
+        Ptr<NoCount> p4 = CallTestConst(p1);
+        Ptr<NoCount const> p5 = p4;
+        //p4 = p5; You cannot make a const pointer be a non-const pointer.
+        // but if you use ConstCast, you can.
+        p4 = ConstCast<NoCount> (p5);
+        p5 = p1;
+        Ptr<NoCount> p;
+        if (p == 0) {
+        }
+        if (p != 0) {
+        }
+        if (0 == p) {
+        }
+        if (0 != p) {
+        }
+        if (p) {
+        }
+        if (!p) {
+        }
+    }
+
+    m_nDestroyed = 0;
+    {
+        NoCount *raw;
+        {
+            Ptr<NoCount> p = Create<NoCount> (this);
+            {
+                Ptr<NoCount const> p1 = p;
+            }
+            raw = GetPointer(p);
+            p = 0;
+        }
+        NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 0, "012");
+        delete raw;
+    }
+
+    m_nDestroyed = 0;
+    {
+        Ptr<NoCount> p = Create<NoCount> (this);
+        const NoCount *v1 = PeekPointer(p);
+        NoCount *v2 = PeekPointer(p);
+        v1->Nothing();
+        v2->Nothing();
+    }
+    NS_TEST_EXPECT_MSG_EQ(m_nDestroyed, 1, "013");
+
+    {
+        Ptr<PtrTestBase> p0 = Create<NoCount> (this);
+        Ptr<NoCount> p1 = Create<NoCount> (this);
+        NS_TEST_EXPECT_MSG_EQ((p0 == p1), false, "operator == failed");
+        NS_TEST_EXPECT_MSG_EQ((p0 != p1), true, "operator != failed");
+    }
 }
 
 static class PtrTestSuite : public TestSuite
 {
-public:
-  PtrTestSuite ()
-    : TestSuite ("ptr", UNIT)
-  {
-    AddTestCase (new PtrTestCase (), TestCase::QUICK);
-  }
-} g_ptrTestSuite;
+    public :
+    PtrTestSuite()
+    : TestSuite("ptr", UNIT)
+    {
+        AddTestCase(new PtrTestCase(), TestCase::QUICK);
+    }} g_ptrTestSuite;

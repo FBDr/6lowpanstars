@@ -27,31 +27,29 @@
 #include "algorithm.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const time::milliseconds RetxSuppressionFixed::DEFAULT_MIN_RETX_INTERVAL(100);
+        const time::milliseconds RetxSuppressionFixed::DEFAULT_MIN_RETX_INTERVAL(100);
 
-RetxSuppressionFixed::RetxSuppressionFixed(const time::milliseconds& minRetxInterval)
-  : m_minRetxInterval(minRetxInterval)
-{
-  BOOST_ASSERT(minRetxInterval > time::milliseconds::zero());
-}
+        RetxSuppressionFixed::RetxSuppressionFixed(const time::milliseconds& minRetxInterval)
+        : m_minRetxInterval(minRetxInterval) {
+            BOOST_ASSERT(minRetxInterval > time::milliseconds::zero());
+        }
 
-RetxSuppression::Result
-RetxSuppressionFixed::decide(const Face& inFace, const Interest& interest,
-                             pit::Entry& pitEntry) const
-{
-  bool isNewPitEntry = !hasPendingOutRecords(pitEntry);
-  if (isNewPitEntry) {
-    return NEW;
-  }
+        RetxSuppression::Result
+        RetxSuppressionFixed::decide(const Face& inFace, const Interest& interest,
+                pit::Entry& pitEntry) const {
+            bool isNewPitEntry = !hasPendingOutRecords(pitEntry);
+            if (isNewPitEntry) {
+                return NEW;
+            }
 
-  time::steady_clock::TimePoint lastOutgoing = this->getLastOutgoing(pitEntry);
-  time::steady_clock::TimePoint now = time::steady_clock::now();
-  time::steady_clock::Duration sinceLastOutgoing = now - lastOutgoing;
-  bool shouldSuppress = sinceLastOutgoing < m_minRetxInterval;
-  return shouldSuppress ? SUPPRESS : FORWARD;
-}
+            time::steady_clock::TimePoint lastOutgoing = this->getLastOutgoing(pitEntry);
+            time::steady_clock::TimePoint now = time::steady_clock::now();
+            time::steady_clock::Duration sinceLastOutgoing = now - lastOutgoing;
+            bool shouldSuppress = sinceLastOutgoing < m_minRetxInterval;
+            return shouldSuppress ? SUPPRESS : FORWARD;
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

@@ -25,69 +25,64 @@
 #include "ns3/config.h"
 #include "ns3/names.h"
 
-namespace ns3 {
-
-AcousticModemEnergyModelHelper::AcousticModemEnergyModelHelper ()
+namespace ns3
 {
-  m_modemEnergy.SetTypeId ("ns3::AcousticModemEnergyModel");
-  m_depletionCallback.Nullify ();
-}
 
-AcousticModemEnergyModelHelper::~AcousticModemEnergyModelHelper ()
-{
-}
-
-void
-AcousticModemEnergyModelHelper::Set (std::string name, const AttributeValue &v)
-{
-  m_modemEnergy.Set (name, v);
-}
-
-void
-AcousticModemEnergyModelHelper::SetDepletionCallback (
-  AcousticModemEnergyModel::AcousticModemEnergyDepletionCallback callback)
-{
-  m_depletionCallback = callback;
-}
-
-/*
- * Private function starts here.
- */
-
-Ptr<DeviceEnergyModel>
-AcousticModemEnergyModelHelper::DoInstall (Ptr<NetDevice> device,
-                                           Ptr<EnergySource> source) const
-{
-  NS_ASSERT (device != NULL);
-  NS_ASSERT (source != NULL);
-  // check if device is UanNetDevice
-  std::string deviceName = device->GetInstanceTypeId ().GetName ();
-  if (deviceName.compare ("ns3::UanNetDevice") != 0)
-    {
-      NS_FATAL_ERROR ("NetDevice type is not UanNetDevice!");
+    AcousticModemEnergyModelHelper::AcousticModemEnergyModelHelper() {
+        m_modemEnergy.SetTypeId("ns3::AcousticModemEnergyModel");
+        m_depletionCallback.Nullify();
     }
-  Ptr<Node> node = device->GetNode ();
-  Ptr<AcousticModemEnergyModel> model = m_modemEnergy.Create<AcousticModemEnergyModel> ();
-  NS_ASSERT (model != NULL);
-  // set node pointer
-  model->SetNode (node);
-  // set energy source pointer
-  model->SetEnergySource (source);
-  // get phy layer
-  Ptr<UanNetDevice> uanDevice = DynamicCast<UanNetDevice> (device);
-  Ptr<UanPhy> uanPhy = uanDevice->GetPhy ();
-  // set energy depletion callback
-  model->SetEnergyDepletionCallback (m_depletionCallback);
-  // add model to device model list in energy source
-  source->AppendDeviceEnergyModel (model);
-  // set node pointer
-  source->SetNode (node);
-  // create and install energy model callback
-  DeviceEnergyModel::ChangeStateCallback cb;
-  cb = MakeCallback (&DeviceEnergyModel::ChangeState, model);
-  uanPhy->SetEnergyModelCallback (cb);
 
-  return model;
-}
+    AcousticModemEnergyModelHelper::~AcousticModemEnergyModelHelper() {
+    }
+
+    void
+    AcousticModemEnergyModelHelper::Set(std::string name, const AttributeValue & v) {
+        m_modemEnergy.Set(name, v);
+    }
+
+    void
+    AcousticModemEnergyModelHelper::SetDepletionCallback(
+            AcousticModemEnergyModel::AcousticModemEnergyDepletionCallback callback) {
+        m_depletionCallback = callback;
+    }
+
+    /*
+     * Private function starts here.
+     */
+
+    Ptr<DeviceEnergyModel>
+            AcousticModemEnergyModelHelper::DoInstall(Ptr<NetDevice> device,
+            Ptr<EnergySource> source) const {
+        NS_ASSERT(device != NULL);
+        NS_ASSERT(source != NULL);
+        // check if device is UanNetDevice
+        std::string deviceName = device->GetInstanceTypeId().GetName();
+        if (deviceName.compare("ns3::UanNetDevice") != 0) {
+            NS_FATAL_ERROR("NetDevice type is not UanNetDevice!");
+        }
+        Ptr<Node> node = device->GetNode();
+        Ptr<AcousticModemEnergyModel> model = m_modemEnergy.Create<AcousticModemEnergyModel> ();
+        NS_ASSERT(model != NULL);
+        // set node pointer
+        model->SetNode(node);
+        // set energy source pointer
+        model->SetEnergySource(source);
+        // get phy layer
+        Ptr<UanNetDevice> uanDevice = DynamicCast<UanNetDevice> (device);
+        Ptr<UanPhy> uanPhy = uanDevice->GetPhy();
+        // set energy depletion callback
+        model->SetEnergyDepletionCallback(m_depletionCallback);
+        // add model to device model list in energy source
+        source->AppendDeviceEnergyModel(model);
+        // set node pointer
+        source->SetNode(node);
+        // create and install energy model callback
+        DeviceEnergyModel::ChangeStateCallback cb;
+        cb = MakeCallback(&DeviceEnergyModel::ChangeState, model);
+        uanPhy->SetEnergyModelCallback(cb);
+
+        return model;
+    }
 
 } // namespace ns3

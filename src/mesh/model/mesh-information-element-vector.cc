@@ -34,89 +34,82 @@
 #include "ns3/ie-dot11s-preq.h"
 #include "ns3/ie-dot11s-rann.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (MeshInformationElementVector);
-
-MeshInformationElementVector::MeshInformationElementVector ()
+namespace ns3
 {
-}
 
-MeshInformationElementVector::~MeshInformationElementVector ()
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(MeshInformationElementVector);
 
-
-TypeId
-MeshInformationElementVector::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::MeshInformationElementVector")
-    .SetParent<WifiInformationElementVector> ()
-    .SetGroupName ("Mesh")
-    .AddConstructor<MeshInformationElementVector> ();
-  return tid;
-}
-
-TypeId
-MeshInformationElementVector::GetInstanceTypeId () const
-{
-  return GetTypeId ();
-}
-
-uint32_t
-MeshInformationElementVector::DeserializeSingleIe (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-  uint8_t id = i.ReadU8 ();
-  uint8_t length = i.ReadU8 ();
-  Ptr<WifiInformationElement> newElement;
-  switch (id)
-    {
-    case IE11S_MESH_CONFIGURATION:
-      newElement = Create<dot11s::IeConfiguration> ();
-      break;
-    case IE11S_MESH_ID:
-      newElement = Create<dot11s::IeMeshId> ();
-      break;
-    case IE11S_LINK_METRIC_REPORT:
-      newElement = Create<dot11s::IeLinkMetricReport> ();
-      break;
-    case IE11S_PEERING_MANAGEMENT:
-      newElement = Create<dot11s::IePeerManagement> ();
-      break;
-    case IE11S_BEACON_TIMING:
-      newElement = Create<dot11s::IeBeaconTiming> ();
-      break;
-    case IE11S_RANN:
-      newElement = Create<dot11s::IeRann> ();
-      break;
-    case IE11S_PREQ:
-      newElement = Create<dot11s::IePreq> ();
-      break;
-    case IE11S_PREP:
-      newElement = Create<dot11s::IePrep> ();
-      break;
-    case IE11S_PERR:
-      newElement = Create<dot11s::IePerr> ();
-      break;
-    case IE11S_MESH_PEERING_PROTOCOL_VERSION:
-      newElement = Create<dot11s::IePeeringProtocol> ();
-      break;
-    default:
-      // We peeked at the ID and length, so we need to back up the
-      // pointer before deferring to our parent.
-      i.Prev (2);
-      return WifiInformationElementVector::DeserializeSingleIe (i);
+    MeshInformationElementVector::MeshInformationElementVector() {
     }
-  if (GetSize () + length > m_maxSize)
-    {
-      NS_FATAL_ERROR ("Check max size for information element!");
+
+    MeshInformationElementVector::~MeshInformationElementVector() {
     }
-  newElement->DeserializeInformationField (i, length);
-  i.Next (length);
-  m_elements.push_back (newElement);
-  return i.GetDistanceFrom (start);
-}
+
+    TypeId
+    MeshInformationElementVector::GetTypeId() {
+        static TypeId tid = TypeId("ns3::MeshInformationElementVector")
+                .SetParent<WifiInformationElementVector> ()
+                .SetGroupName("Mesh")
+                .AddConstructor<MeshInformationElementVector> ();
+        return tid;
+    }
+
+    TypeId
+    MeshInformationElementVector::GetInstanceTypeId() const {
+        return GetTypeId();
+    }
+
+    uint32_t
+    MeshInformationElementVector::DeserializeSingleIe(Buffer::Iterator start) {
+        Buffer::Iterator i = start;
+        uint8_t id = i.ReadU8();
+        uint8_t length = i.ReadU8();
+        Ptr<WifiInformationElement> newElement;
+        switch (id) {
+            case IE11S_MESH_CONFIGURATION:
+                newElement = Create<dot11s::IeConfiguration> ();
+                break;
+            case IE11S_MESH_ID:
+                newElement = Create<dot11s::IeMeshId> ();
+                break;
+            case IE11S_LINK_METRIC_REPORT:
+                newElement = Create<dot11s::IeLinkMetricReport> ();
+                break;
+            case IE11S_PEERING_MANAGEMENT:
+                newElement = Create<dot11s::IePeerManagement> ();
+                break;
+            case IE11S_BEACON_TIMING:
+                newElement = Create<dot11s::IeBeaconTiming> ();
+                break;
+            case IE11S_RANN:
+                newElement = Create<dot11s::IeRann> ();
+                break;
+            case IE11S_PREQ:
+                newElement = Create<dot11s::IePreq> ();
+                break;
+            case IE11S_PREP:
+                newElement = Create<dot11s::IePrep> ();
+                break;
+            case IE11S_PERR:
+                newElement = Create<dot11s::IePerr> ();
+                break;
+            case IE11S_MESH_PEERING_PROTOCOL_VERSION:
+                newElement = Create<dot11s::IePeeringProtocol> ();
+                break;
+            default:
+                // We peeked at the ID and length, so we need to back up the
+                // pointer before deferring to our parent.
+                i.Prev(2);
+                return WifiInformationElementVector::DeserializeSingleIe(i);
+        }
+        if (GetSize() + length > m_maxSize) {
+            NS_FATAL_ERROR("Check max size for information element!");
+        }
+        newElement->DeserializeInformationField(i, length);
+        i.Next(length);
+        m_elements.push_back(newElement);
+        return i.GetDistanceFrom(start);
+    }
 
 
 } // namespace ns3

@@ -33,118 +33,117 @@
 
 namespace ns3 {
 
-/**
- * \ingroup fd-net-device
- * \brief build a set of FdNetDevice objects attached to a virtual TAP network
- * interface
- *
- */
-class TapFdNetDeviceHelper : public EmuFdNetDeviceHelper
-{
-public:
-  /**
-   * Construct a TapFdNetDeviceHelper.
-   */
-  TapFdNetDeviceHelper ();
-  virtual ~TapFdNetDeviceHelper ()
-  {
-  }
+    /**
+     * \ingroup fd-net-device
+     * \brief build a set of FdNetDevice objects attached to a virtual TAP network
+     * interface
+     *
+     */
+    class TapFdNetDeviceHelper : public EmuFdNetDeviceHelper {
+    public:
+        /**
+         * Construct a TapFdNetDeviceHelper.
+         */
+        TapFdNetDeviceHelper();
 
-  /**
-   * Set flag IFF_NO_PI on the device.
-   *
-   * \param pi Set the IFF_NO_PI flag if pi is false.
-   */
-  void SetModePi (bool pi);
+        virtual ~TapFdNetDeviceHelper() {
+        }
 
-  /**
-   * Set the device IPv4 address.
-   *
-   * \param address The IPv4 address for the TAP device.
-   */
-  void SetTapIpv4Address (Ipv4Address address);
+        /**
+         * Set flag IFF_NO_PI on the device.
+         *
+         * \param pi Set the IFF_NO_PI flag if pi is false.
+         */
+        void SetModePi(bool pi);
 
-  /**
-   * Set the IPv4 network mask for the TAP device.
-   *
-   * \param mask The IPv4 network mask for the TAP device.
-   */
-  void SetTapIpv4Mask (Ipv4Mask mask);
+        /**
+         * Set the device IPv4 address.
+         *
+         * \param address The IPv4 address for the TAP device.
+         */
+        void SetTapIpv4Address(Ipv4Address address);
 
-  /**
-   * Set the device IPv6 address.
-   *
-   * \param address The IPv6 address for the TAP device.
-   */
-  void SetTapIpv6Address (Ipv6Address address);
+        /**
+         * Set the IPv4 network mask for the TAP device.
+         *
+         * \param mask The IPv4 network mask for the TAP device.
+         */
+        void SetTapIpv4Mask(Ipv4Mask mask);
 
-  /**
-   * Set the IPv6 network mask for the TAP device.
-   *
-   * \param prefix The IPv6 network prefix for the TAP device.
-   */
-  void SetTapIpv6Prefix (int prefix);
+        /**
+         * Set the device IPv6 address.
+         *
+         * \param address The IPv6 address for the TAP device.
+         */
+        void SetTapIpv6Address(Ipv6Address address);
 
-  /**
-   * Set the MAC address for the TAP device.
-   *
-   * \param mac The MAC address the TAP device.
-   */
-  void SetTapMacAddress (Mac48Address mac);
+        /**
+         * Set the IPv6 network mask for the TAP device.
+         *
+         * \param prefix The IPv6 network prefix for the TAP device.
+         */
+        void SetTapIpv6Prefix(int prefix);
 
-protected:
+        /**
+         * Set the MAC address for the TAP device.
+         *
+         * \param mac The MAC address the TAP device.
+         */
+        void SetTapMacAddress(Mac48Address mac);
 
-  /**
-   * This method creates an ns3::FdNetDevice attached to a virtual TAP network
-   * interface
-   *
-   * \param node The node to install the device in
-   * \returns A container holding the added net device.
-   */
-  Ptr<NetDevice> InstallPriv (Ptr<Node> node) const;
+    protected:
 
-  /**
-   * Sets a file descriptor on the FileDescriptorNetDevice.
-   */
-  virtual void SetFileDescriptor (Ptr<FdNetDevice> device) const;
+        /**
+         * This method creates an ns3::FdNetDevice attached to a virtual TAP network
+         * interface
+         *
+         * \param node The node to install the device in
+         * \returns A container holding the added net device.
+         */
+        Ptr<NetDevice> InstallPriv(Ptr<Node> node) const;
 
-  /**
-   * Call out to a separate process running as suid root in order to create a
-   * TAP device and obtain the file descriptor associated to it.
-   */
-  virtual int CreateFileDescriptor (void) const;
+        /**
+         * Sets a file descriptor on the FileDescriptorNetDevice.
+         */
+        virtual void SetFileDescriptor(Ptr<FdNetDevice> device) const;
 
-  /**
-   * The TAP device flag IFF_NO_PI.
-   */
-  bool m_modePi;
+        /**
+         * Call out to a separate process running as suid root in order to create a
+         * TAP device and obtain the file descriptor associated to it.
+         */
+        virtual int CreateFileDescriptor(void) const;
 
-  /**
-   * The IPv4 address for the TAP device.
-   */
-  Ipv4Address m_tapIp4;
+        /**
+         * The TAP device flag IFF_NO_PI.
+         */
+        bool m_modePi;
 
-  /**
-   * The IPv6 address for the TAP device.
-   */
-  Ipv6Address m_tapIp6;
+        /**
+         * The IPv4 address for the TAP device.
+         */
+        Ipv4Address m_tapIp4;
 
-  /**
-   * The network mask IPv4 for the TAP device.
-   */
-  Ipv4Mask m_tapMask4;
+        /**
+         * The IPv6 address for the TAP device.
+         */
+        Ipv6Address m_tapIp6;
 
-  /**
-   * The network prefix IPv6 for the TAP device.
-   */
-  int m_tapPrefix6;
+        /**
+         * The network mask IPv4 for the TAP device.
+         */
+        Ipv4Mask m_tapMask4;
 
-  /**
-   * The TAP device MAC address.
-   */
-  Mac48Address m_tapMac;
+        /**
+         * The network prefix IPv6 for the TAP device.
+         */
+        int m_tapPrefix6;
 
-};
+        /**
+         * The TAP device MAC address.
+         */
+        Mac48Address m_tapMac;
+
+    };
 
 } // namespace ns3
 

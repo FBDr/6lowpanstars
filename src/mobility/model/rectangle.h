@@ -26,75 +26,75 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mobility
- * \brief a 2d rectangle
- * \see attribute_Rectangle
- */
-class Rectangle
-{
-public:
-  /**
-   * enum for naming sides
-   */
-  enum Side {
-    RIGHT,
-    LEFT,
-    TOP,
-    BOTTOM
-  };
-  /**
-   * \param _xMin x coordinates of left boundary.
-   * \param _xMax x coordinates of right boundary.
-   * \param _yMin y coordinates of bottom boundary.
-   * \param _yMax y coordinates of top boundary.
-   *
-   * Create a rectangle.
-   */
-  Rectangle (double _xMin, double _xMax,
-             double _yMin, double _yMax);
-  /**
-   * Create a zero-sized rectangle located at coordinates (0.0,0.0)
-   */
-  Rectangle ();
-  /**
-   * \param position the position to test.
-   * \return true if the input position is located within the rectangle, false otherwise.
-   *
-   * This method compares only the x and y coordinates of the input position.
-   * It ignores the z coordinate.
-   */
-  bool IsInside (const Vector &position) const;
-  /**
-   * \param position the position to test.
-   * \return the side of the rectangle the input position is closest to.
-   *
-   * This method compares only the x and y coordinates of the input position.
-   * It ignores the z coordinate.
-   */
-  Side GetClosestSide (const Vector &position) const;
-  /**
-   * \param current the current position
-   * \param speed the current speed
-   * \return the intersection point between the rectangle and the current+speed vector.
-   *
-   * This method assumes that the current position is located _inside_
-   * the rectangle and checks for this with an assert.
-   * This method compares only the x and y coordinates of the input position
-   * and speed. It ignores the z coordinate.
-   */
-  Vector CalculateIntersection (const Vector &current, const Vector &speed) const;
+    /**
+     * \ingroup mobility
+     * \brief a 2d rectangle
+     * \see attribute_Rectangle
+     */
+    class Rectangle {
+    public:
 
-  double xMin; //!< The x coordinate of the left bound of the rectangle
-  double xMax; //!< The x coordinate of the right bound of the rectangle
-  double yMin; //!< The y coordinate of the bottom bound of the rectangle
-  double yMax; //!< The y coordinate of the top bound of the rectangle
-};
+        /**
+         * enum for naming sides
+         */
+        enum Side {
+            RIGHT,
+            LEFT,
+            TOP,
+            BOTTOM
+        };
+        /**
+         * \param _xMin x coordinates of left boundary.
+         * \param _xMax x coordinates of right boundary.
+         * \param _yMin y coordinates of bottom boundary.
+         * \param _yMax y coordinates of top boundary.
+         *
+         * Create a rectangle.
+         */
+        Rectangle(double _xMin, double _xMax,
+                double _yMin, double _yMax);
+        /**
+         * Create a zero-sized rectangle located at coordinates (0.0,0.0)
+         */
+        Rectangle();
+        /**
+         * \param position the position to test.
+         * \return true if the input position is located within the rectangle, false otherwise.
+         *
+         * This method compares only the x and y coordinates of the input position.
+         * It ignores the z coordinate.
+         */
+        bool IsInside(const Vector &position) const;
+        /**
+         * \param position the position to test.
+         * \return the side of the rectangle the input position is closest to.
+         *
+         * This method compares only the x and y coordinates of the input position.
+         * It ignores the z coordinate.
+         */
+        Side GetClosestSide(const Vector &position) const;
+        /**
+         * \param current the current position
+         * \param speed the current speed
+         * \return the intersection point between the rectangle and the current+speed vector.
+         *
+         * This method assumes that the current position is located _inside_
+         * the rectangle and checks for this with an assert.
+         * This method compares only the x and y coordinates of the input position
+         * and speed. It ignores the z coordinate.
+         */
+        Vector CalculateIntersection(const Vector &current, const Vector &speed) const;
 
-std::ostream &operator << (std::ostream &os, const Rectangle &rectangle);
-std::istream &operator >> (std::istream &is, Rectangle &rectangle);
+        double xMin; //!< The x coordinate of the left bound of the rectangle
+        double xMax; //!< The x coordinate of the right bound of the rectangle
+        double yMin; //!< The y coordinate of the bottom bound of the rectangle
+        double yMax; //!< The y coordinate of the top bound of the rectangle
+    };
 
-ATTRIBUTE_HELPER_HEADER (Rectangle);
+    std::ostream &operator<<(std::ostream &os, const Rectangle &rectangle);
+    std::istream &operator>>(std::istream &is, Rectangle &rectangle);
+
+    ATTRIBUTE_HELPER_HEADER(Rectangle);
 
 } // namespace ns3
 

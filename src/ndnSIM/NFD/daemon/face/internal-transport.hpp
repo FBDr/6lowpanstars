@@ -30,101 +30,95 @@
 #include <ndn-cxx/transport/transport.hpp>
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/** \brief abstracts a transport that can be paired with another
- */
-class InternalTransportBase
-{
-public:
-  /** \brief causes the transport to receive a link-layer packet
-   */
-  virtual void
-  receiveFromLink(const Block& packet) = 0;
+        /** \brief abstracts a transport that can be paired with another
+         */
+        class InternalTransportBase {
+        public:
+            /** \brief causes the transport to receive a link-layer packet
+             */
+            virtual void
+            receiveFromLink(const Block& packet) = 0;
 
-  signal::Signal<InternalTransportBase, Block> afterSend;
+            signal::Signal<InternalTransportBase, Block> afterSend;
 
-protected:
-  DECLARE_SIGNAL_EMIT(afterSend)
-};
+        protected:
+            DECLARE_SIGNAL_EMIT(afterSend)
+        };
 
-/** \brief implements a forwarder-side transport that can be paired with another
- */
-class InternalForwarderTransport : public face::Transport, public InternalTransportBase
-{
-public:
-  InternalForwarderTransport(const FaceUri& localUri = FaceUri("internal://"),
-                             const FaceUri& remoteUri = FaceUri("internal://"),
-                             ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_LOCAL,
-                             ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+        /** \brief implements a forwarder-side transport that can be paired with another
+         */
+        class InternalForwarderTransport : public face::Transport, public InternalTransportBase {
+        public:
+            InternalForwarderTransport(const FaceUri& localUri = FaceUri("internal://"),
+                    const FaceUri& remoteUri = FaceUri("internal://"),
+                    ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_LOCAL,
+                    ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT);
 
-  virtual void
-  receiveFromLink(const Block& packet) override;
+            virtual void
+            receiveFromLink(const Block& packet) override;
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) override;
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) override;
 
-  virtual void
-  doClose() override;
+            virtual void
+            doClose() override;
 
-private:
-  virtual void
-  doSend(Packet&& packet) override;
+        private:
+            virtual void
+            doSend(Packet&& packet) override;
 
-private:
-  NFD_LOG_INCLASS_DECLARE();
-};
+        private:
+            NFD_LOG_INCLASS_DECLARE();
+        };
 
-/** \brief implements a client-side transport that can be paired with another
- */
-class InternalClientTransport : public ndn::Transport, public InternalTransportBase
-{
-public:
-  /** \brief connect to a forwarder-side transport
-   *  \param forwarderTransport the forwarder-side transport to connect to; may be nullptr
-   *
-   *  The connected forwarder-side transport will be disconnected automatically if this method
-   *  is called again, or if that transport is closed.
-   *  It's safe to use InternalClientTransport without a connected forwarder-side transport:
-   *  all sent packets would be lost, and nothing would be received.
-   */
-  void
-  connectToForwarder(InternalForwarderTransport* forwarderTransport);
+        /** \brief implements a client-side transport that can be paired with another
+         */
+        class InternalClientTransport : public ndn::Transport, public InternalTransportBase {
+        public:
+            /** \brief connect to a forwarder-side transport
+             *  \param forwarderTransport the forwarder-side transport to connect to; may be nullptr
+             *
+             *  The connected forwarder-side transport will be disconnected automatically if this method
+             *  is called again, or if that transport is closed.
+             *  It's safe to use InternalClientTransport without a connected forwarder-side transport:
+             *  all sent packets would be lost, and nothing would be received.
+             */
+            void
+            connectToForwarder(InternalForwarderTransport* forwarderTransport);
 
-  virtual void
-  receiveFromLink(const Block& packet) override;
+            virtual void
+            receiveFromLink(const Block& packet) override;
 
-  virtual void
-  close() override
-  {
-  }
+            virtual void
+            close() override {
+            }
 
-  virtual void
-  pause() override
-  {
-  }
+            virtual void
+            pause() override {
+            }
 
-  virtual void
-  resume() override
-  {
-  }
+            virtual void
+            resume() override {
+            }
 
-  virtual void
-  send(const Block& wire) override;
+            virtual void
+            send(const Block& wire) override;
 
-  virtual void
-  send(const Block& header, const Block& payload) override;
+            virtual void
+            send(const Block& header, const Block& payload) override;
 
-private:
-  NFD_LOG_INCLASS_DECLARE();
+        private:
+            NFD_LOG_INCLASS_DECLARE();
 
-  signal::ScopedConnection m_fwToClientTransmitConn;
-  signal::ScopedConnection m_clientToFwTransmitConn;
-  signal::ScopedConnection m_fwTransportStateConn;
-};
+            signal::ScopedConnection m_fwToClientTransmitConn;
+            signal::ScopedConnection m_clientToFwTransmitConn;
+            signal::ScopedConnection m_fwTransportStateConn;
+        };
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_INTERNAL_TRANSPORT_HPP

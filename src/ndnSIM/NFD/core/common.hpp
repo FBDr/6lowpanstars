@@ -74,46 +74,46 @@
 
 namespace nfd {
 
-using std::size_t;
+    using std::size_t;
 
-using boost::noncopyable;
+    using boost::noncopyable;
 
-using std::shared_ptr;
-using std::unique_ptr;
-using std::weak_ptr;
-using std::make_shared;
-using ndn::make_unique;
-using std::enable_shared_from_this;
+    using std::shared_ptr;
+    using std::unique_ptr;
+    using std::weak_ptr;
+    using std::make_shared;
+    using ndn::make_unique;
+    using std::enable_shared_from_this;
 
-using std::static_pointer_cast;
-using std::dynamic_pointer_cast;
-using std::const_pointer_cast;
+    using std::static_pointer_cast;
+    using std::dynamic_pointer_cast;
+    using std::const_pointer_cast;
 
-using std::function;
-using std::bind;
-using std::ref;
-using std::cref;
+    using std::function;
+    using std::bind;
+    using std::ref;
+    using std::cref;
 
-using ndn::to_string;
+    using ndn::to_string;
 
-using ndn::Interest;
-using ndn::Data;
-using ndn::Name;
-using ndn::PartialName;
-using ndn::Exclude;
-using ndn::Link;
-using ndn::Block;
-using ndn::util::FaceUri;
+    using ndn::Interest;
+    using ndn::Data;
+    using ndn::Name;
+    using ndn::PartialName;
+    using ndn::Exclude;
+    using ndn::Link;
+    using ndn::Block;
+    using ndn::util::FaceUri;
 
-namespace tlv {
-// Don't write "namespace tlv = ndn::tlv", because NFD can add other members into this namespace.
-using namespace ndn::tlv;
-} // namespace tlv
+    namespace tlv {
+        // Don't write "namespace tlv = ndn::tlv", because NFD can add other members into this namespace.
+        using namespace ndn::tlv;
+    } // namespace tlv
 
-namespace lp = ndn::lp;
-namespace name = ndn::name;
-namespace time = ndn::time;
-namespace signal = ndn::util::signal;
+    namespace lp = ndn::lp;
+    namespace name = ndn::name;
+    namespace time = ndn::time;
+    namespace signal = ndn::util::signal;
 
 } // namespace nfd
 

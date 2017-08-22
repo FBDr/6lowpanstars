@@ -26,84 +26,85 @@
 #include "nfd-constants.hpp"
 
 namespace ndn {
-namespace tlv {
-namespace nfd {
+    namespace tlv {
+        namespace nfd {
 
-// NFD Management protocol
-enum {
-  // ControlParameters
-  ControlParameters   = 104,
-  FaceId              = 105,
-  Uri                 = 114,
-  LocalControlFeature = 110,
-  Origin              = 111,
-  Cost                = 106,
-  Flags               = 108,
-  Mask                = 112,
-  Strategy            = 107,
-  ExpirationPeriod    = 109,
+            // NFD Management protocol
 
-  // ControlResponse
-  ControlResponse = 101,
-  StatusCode      = 102,
-  StatusText      = 103,
+            enum {
+                // ControlParameters
+                ControlParameters = 104,
+                FaceId = 105,
+                Uri = 114,
+                LocalControlFeature = 110,
+                Origin = 111,
+                Cost = 106,
+                Flags = 108,
+                Mask = 112,
+                Strategy = 107,
+                ExpirationPeriod = 109,
 
-  // ForwarderStatus
-  NfdVersion           = 128,
-  StartTimestamp       = 129,
-  CurrentTimestamp     = 130,
-  NNameTreeEntries     = 131,
-  NFibEntries          = 132,
-  NPitEntries          = 133,
-  NMeasurementsEntries = 134,
-  NCsEntries           = 135,
+                // ControlResponse
+                ControlResponse = 101,
+                StatusCode = 102,
+                StatusText = 103,
 
-  // Face Management
-  FaceStatus            = 128,
-  LocalUri              = 129,
-  ChannelStatus         = 130,
-  UriScheme             = 131,
-  FaceScope             = 132,
-  FacePersistency       = 133,
-  LinkType              = 134,
-  FaceQueryFilter       = 150,
-  FaceEventNotification = 192,
-  FaceEventKind         = 193,
+                // ForwarderStatus
+                NfdVersion = 128,
+                StartTimestamp = 129,
+                CurrentTimestamp = 130,
+                NNameTreeEntries = 131,
+                NFibEntries = 132,
+                NPitEntries = 133,
+                NMeasurementsEntries = 134,
+                NCsEntries = 135,
 
-  // ForwarderStatus and FaceStatus counters
-  NInInterests  = 144,
-  NInDatas      = 145,
-  NInNacks      = 151,
-  NOutInterests = 146,
-  NOutDatas     = 147,
-  NOutNacks     = 152,
-  NInBytes      = 148,
-  NOutBytes     = 149,
+                // Face Management
+                FaceStatus = 128,
+                LocalUri = 129,
+                ChannelStatus = 130,
+                UriScheme = 131,
+                FaceScope = 132,
+                FacePersistency = 133,
+                LinkType = 134,
+                FaceQueryFilter = 150,
+                FaceEventNotification = 192,
+                FaceEventKind = 193,
 
-  // FIB Management
-  FibEntry      = 128,
-  NextHopRecord = 129,
+                // ForwarderStatus and FaceStatus counters
+                NInInterests = 144,
+                NInDatas = 145,
+                NInNacks = 151,
+                NOutInterests = 146,
+                NOutDatas = 147,
+                NOutNacks = 152,
+                NInBytes = 148,
+                NOutBytes = 149,
 
-  // Strategy Choice Management
-  StrategyChoice = 128,
+                // FIB Management
+                FibEntry = 128,
+                NextHopRecord = 129,
 
-  // RIB Management
-  RibEntry = 128,
-  Route    = 129
+                // Strategy Choice Management
+                StrategyChoice = 128,
 
-};
+                // RIB Management
+                RibEntry = 128,
+                Route = 129
 
-enum {
-  // Local Control Header
-  LocalControlHeader = 80,
-  IncomingFaceId     = 81,
-  NextHopFaceId      = 82,
-  CachingPolicy      = 83,
-  NoCache            = 96
-};
+            };
 
-} // namespace nfd
-} // namespace tlv
+            enum {
+                // Local Control Header
+                LocalControlHeader = 80,
+                IncomingFaceId = 81,
+                NextHopFaceId = 82,
+                CachingPolicy = 83,
+                NoCache = 96
+            };
+
+        } // namespace nfd
+    } // namespace tlv
 } // namespace ndn
 
 #endif // NDN_ENCODING_TLV_NFD_HPP

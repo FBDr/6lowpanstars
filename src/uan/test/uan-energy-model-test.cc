@@ -38,254 +38,242 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("UanEnergyModelTestSuite");
+NS_LOG_COMPONENT_DEFINE("UanEnergyModelTestSuite");
 
 class AcousticModemEnergyTestCase : public TestCase
 {
-public:
-  AcousticModemEnergyTestCase ();
-  ~AcousticModemEnergyTestCase ();
+    public :
+    AcousticModemEnergyTestCase();
+    ~AcousticModemEnergyTestCase();
 
-  bool RxPacket (Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &sender);
-  void SendOnePacket (Ptr<Node> node);
+    bool RxPacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address & sender);
+    void SendOnePacket(Ptr<Node> node);
 
-  void DoRun (void);
+    void DoRun(void);
 
-  double m_simTime;
-  uint32_t m_bytesRx;
-  uint32_t m_sentPackets;
-  uint32_t m_packetSize;
-  Ptr<Node> m_node;
-  Ptr<Node> m_gateway;
-};
+    double m_simTime;
+    uint32_t m_bytesRx;
+    uint32_t m_sentPackets;
+    uint32_t m_packetSize;
+    Ptr<Node> m_node;
+    Ptr<Node> m_gateway;};
 
-AcousticModemEnergyTestCase::AcousticModemEnergyTestCase ()
-  : TestCase ("Acoustic Modem energy model test case"),
-    m_simTime (25),
-    m_bytesRx (0),
-    m_sentPackets (0),
-    m_packetSize (17)
-{
+AcousticModemEnergyTestCase::AcousticModemEnergyTestCase()
+: TestCase("Acoustic Modem energy model test case"),
+m_simTime(25),
+m_bytesRx(0),
+m_sentPackets(0),
+m_packetSize(17) {
 }
 
-AcousticModemEnergyTestCase::~AcousticModemEnergyTestCase ()
-{
-  m_node = 0;
-  m_gateway = 0;
+AcousticModemEnergyTestCase::~AcousticModemEnergyTestCase() {
+    m_node = 0;
+    m_gateway = 0;
 }
 
 void
-AcousticModemEnergyTestCase::SendOnePacket (Ptr<Node> node)
-{
-  // create an empty 17 bytes packet
-  Ptr<Packet> pkt = Create<Packet> (m_packetSize);
-  // send the packet in broadcast
-  Ptr<UanNetDevice> dev = node->GetDevice (0)->GetObject<UanNetDevice> ();
-  dev->Send (pkt, dev->GetBroadcast (), 0);
-  // increase the sent packets number
-  ++m_sentPackets;
+AcousticModemEnergyTestCase::SendOnePacket(Ptr<Node> node) {
+    // create an empty 17 bytes packet
+    Ptr<Packet> pkt = Create<Packet> (m_packetSize);
+    // send the packet in broadcast
+    Ptr<UanNetDevice> dev = node->GetDevice(0)->GetObject<UanNetDevice> ();
+    dev->Send(pkt, dev->GetBroadcast(), 0);
+    // increase the sent packets number
+    ++m_sentPackets;
 
-  Simulator::Schedule (Seconds (10),
-                       &AcousticModemEnergyTestCase::SendOnePacket,
-                       this,
-                       node);
+    Simulator::Schedule(Seconds(10),
+            &AcousticModemEnergyTestCase::SendOnePacket,
+            this,
+            node);
 }
 
 bool
-AcousticModemEnergyTestCase::RxPacket (Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &sender)
-{
-  // increase the total bytes received
-  m_bytesRx += pkt->GetSize ();
+AcousticModemEnergyTestCase::RxPacket(Ptr<NetDevice> dev, Ptr<const Packet> pkt, uint16_t mode, const Address &sender) {
+    // increase the total bytes received
+    m_bytesRx += pkt->GetSize();
 
-  return true;
+    return true;
 }
 
 void
-AcousticModemEnergyTestCase::DoRun ()
-{
-  // create a generic node
-  m_node = CreateObject<Node> ();
+AcousticModemEnergyTestCase::DoRun() {
+    // create a generic node
+    m_node = CreateObject<Node> ();
 
-  // create a default underwater channel
-  Ptr<UanChannel> channel = CreateObject<UanChannel> ();
-  Ptr<UanNoiseModelDefault> noise = CreateObject<UanNoiseModelDefault> ();
-  channel->SetPropagationModel (CreateObject<UanPropModelIdeal> ());
-  channel->SetNoiseModel (noise);
+    // create a default underwater channel
+    Ptr<UanChannel> channel = CreateObject<UanChannel> ();
+    Ptr<UanNoiseModelDefault> noise = CreateObject<UanNoiseModelDefault> ();
+    channel->SetPropagationModel(CreateObject<UanPropModelIdeal> ());
+    channel->SetNoiseModel(noise);
 
-  // install the underwater communication stack
-  UanHelper uan;
-  Ptr<UanNetDevice> devNode = uan.Install (m_node, channel);
+    // install the underwater communication stack
+    UanHelper uan;
+    Ptr<UanNetDevice> devNode = uan.Install(m_node, channel);
 
-  // compute a packet (header + payload) duration
-  uint32_t datarate = devNode->GetPhy ()->GetMode (0).GetDataRateBps ();
-  UanHeaderCommon hd;
-  double packetDuration = (m_packetSize + hd.GetSerializedSize ()) * 8.0 / (double) datarate;
+    // compute a packet (header + payload) duration
+    uint32_t datarate = devNode->GetPhy()->GetMode(0).GetDataRateBps();
+    UanHeaderCommon hd;
+    double packetDuration = (m_packetSize + hd.GetSerializedSize()) * 8.0 / (double) datarate;
 
-  // energy source
-  BasicEnergySourceHelper eh;
-  eh.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (10000000.0));
-  eh.Install (m_node);
+    // energy source
+    BasicEnergySourceHelper eh;
+    eh.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(10000000.0));
+    eh.Install(m_node);
 
-  // mobility model
-  Ptr<ConstantPositionMobilityModel> mobility = CreateObject<ConstantPositionMobilityModel> ();
-  mobility->SetPosition (Vector (0,0,-500));
-  m_node->AggregateObject (mobility);
+    // mobility model
+    Ptr<ConstantPositionMobilityModel> mobility = CreateObject<ConstantPositionMobilityModel> ();
+    mobility->SetPosition(Vector(0, 0, -500));
+    m_node->AggregateObject(mobility);
 
-  // micro modem energy model
-  AcousticModemEnergyModelHelper modemHelper;
-  Ptr<EnergySource> source = m_node->GetObject<EnergySourceContainer> ()->Get (0);
-  DeviceEnergyModelContainer cont = modemHelper.Install (devNode,source);
+    // micro modem energy model
+    AcousticModemEnergyModelHelper modemHelper;
+    Ptr<EnergySource> source = m_node->GetObject<EnergySourceContainer> ()->Get(0);
+    DeviceEnergyModelContainer cont = modemHelper.Install(devNode, source);
 
-  // Schedule a packet every 10 seconds
-  Simulator::ScheduleNow (&AcousticModemEnergyTestCase::SendOnePacket,
-                          this,
-                          m_node);
+    // Schedule a packet every 10 seconds
+    Simulator::ScheduleNow(&AcousticModemEnergyTestCase::SendOnePacket,
+            this,
+            m_node);
 
-  // create a gateway node
-  m_gateway = CreateObject<Node> ();
+    // create a gateway node
+    m_gateway = CreateObject<Node> ();
 
-  // install the underwater communication stack
-  Ptr<UanNetDevice> devGateway = uan.Install (m_gateway, channel);
+    // install the underwater communication stack
+    Ptr<UanNetDevice> devGateway = uan.Install(m_gateway, channel);
 
-  // energy source
-  eh.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (10000000.0));
-  eh.Install (m_gateway);
+    // energy source
+    eh.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(10000000.0));
+    eh.Install(m_gateway);
 
-  // mobility model
-  Ptr<ConstantPositionMobilityModel> mobility2 = CreateObject<ConstantPositionMobilityModel> ();
-  mobility2->SetPosition (Vector (0,0,0));
-  m_gateway->AggregateObject (mobility2);
+    // mobility model
+    Ptr<ConstantPositionMobilityModel> mobility2 = CreateObject<ConstantPositionMobilityModel> ();
+    mobility2->SetPosition(Vector(0, 0, 0));
+    m_gateway->AggregateObject(mobility2);
 
-  // micro modem energy model
-  Ptr<EnergySource> source2 = m_gateway->GetObject<EnergySourceContainer> ()->Get (0);
-  DeviceEnergyModelContainer cont2 = modemHelper.Install (devGateway, source2);
+    // micro modem energy model
+    Ptr<EnergySource> source2 = m_gateway->GetObject<EnergySourceContainer> ()->Get(0);
+    DeviceEnergyModelContainer cont2 = modemHelper.Install(devGateway, source2);
 
-  // set the receive callback
-  Ptr<NetDevice> dev = m_gateway->GetDevice (0);
-  dev->SetReceiveCallback (MakeCallback (&AcousticModemEnergyTestCase::RxPacket,
-                                         this));
+    // set the receive callback
+    Ptr<NetDevice> dev = m_gateway->GetDevice(0);
+    dev->SetReceiveCallback(MakeCallback(&AcousticModemEnergyTestCase::RxPacket,
+            this));
 
-  // run the simulation
-  Simulator::Stop (Seconds (m_simTime));
-  Simulator::Run ();
+    // run the simulation
+    Simulator::Stop(Seconds(m_simTime));
+    Simulator::Run();
 
-  uint32_t receivedPackets = m_bytesRx / m_packetSize;
-  Ptr<EnergySource> src1 = m_gateway->GetObject<EnergySourceContainer> ()->Get (0);
-  double consumed1 = src1->GetInitialEnergy () - src1->GetRemainingEnergy ();
-  double computed1 = cont2.Get (0)->GetObject<AcousticModemEnergyModel> ()->GetRxPowerW () * packetDuration * receivedPackets +
-    cont2.Get (0)->GetObject<AcousticModemEnergyModel> ()->GetIdlePowerW () * (m_simTime - (double) 2.0 / 3.0 - packetDuration * receivedPackets);
+    uint32_t receivedPackets = m_bytesRx / m_packetSize;
+    Ptr<EnergySource> src1 = m_gateway->GetObject<EnergySourceContainer> ()->Get(0);
+    double consumed1 = src1->GetInitialEnergy() - src1->GetRemainingEnergy();
+    double computed1 = cont2.Get(0)->GetObject<AcousticModemEnergyModel> ()->GetRxPowerW() * packetDuration * receivedPackets +
+            cont2.Get(0)->GetObject<AcousticModemEnergyModel> ()->GetIdlePowerW() * (m_simTime - (double) 2.0 / 3.0 - packetDuration * receivedPackets);
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (consumed1, computed1, 1.0e-5,
-                             "Incorrect gateway consumed energy!");
+    NS_TEST_ASSERT_MSG_EQ_TOL(consumed1, computed1, 1.0e-5,
+            "Incorrect gateway consumed energy!");
 
-  Ptr<EnergySource> src2 = m_node->GetObject<EnergySourceContainer> ()->Get (0);
-  double consumed2 = src2->GetInitialEnergy () - src2->GetRemainingEnergy ();
-  double computed2 = cont.Get (0)->GetObject<AcousticModemEnergyModel> ()->GetTxPowerW () * packetDuration * m_sentPackets +
-    cont.Get (0)->GetObject<AcousticModemEnergyModel> ()->GetIdlePowerW () * (m_simTime - 1 - packetDuration * m_sentPackets);
+    Ptr<EnergySource> src2 = m_node->GetObject<EnergySourceContainer> ()->Get(0);
+    double consumed2 = src2->GetInitialEnergy() - src2->GetRemainingEnergy();
+    double computed2 = cont.Get(0)->GetObject<AcousticModemEnergyModel> ()->GetTxPowerW() * packetDuration * m_sentPackets +
+            cont.Get(0)->GetObject<AcousticModemEnergyModel> ()->GetIdlePowerW() * (m_simTime - 1 - packetDuration * m_sentPackets);
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (consumed2, computed2, 1.0e-5,
-                             "Incorrect node consumed energy!");
+    NS_TEST_ASSERT_MSG_EQ_TOL(consumed2, computed2, 1.0e-5,
+            "Incorrect node consumed energy!");
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 class AcousticModemEnergyDepletionTestCase : public TestCase
 {
-public:
-  AcousticModemEnergyDepletionTestCase ();
-  ~AcousticModemEnergyDepletionTestCase ();
+    public :
+    AcousticModemEnergyDepletionTestCase();
+    ~AcousticModemEnergyDepletionTestCase();
 
-  void DepletionHandler (void);
-  void SendOnePacket (Ptr<Node> node);
+    void DepletionHandler(void);
+    void SendOnePacket(Ptr<Node> node);
 
-  void DoRun (void);
+    void DoRun(void);
 
-  double m_simTime;
-  uint32_t m_callbackCount;
-  uint32_t m_packetSize;
-  Ptr<Node> m_node;
-};
+    double m_simTime;
+    uint32_t m_callbackCount;
+    uint32_t m_packetSize;
+    Ptr<Node> m_node;};
 
-AcousticModemEnergyDepletionTestCase::AcousticModemEnergyDepletionTestCase ()
-  : TestCase ("Acoustic Modem energy depletion test case"),
-    m_simTime (25),
-    m_callbackCount (0),
-    m_packetSize (17)
-{
+AcousticModemEnergyDepletionTestCase::AcousticModemEnergyDepletionTestCase()
+: TestCase("Acoustic Modem energy depletion test case"),
+m_simTime(25),
+m_callbackCount(0),
+m_packetSize(17) {
 }
 
-AcousticModemEnergyDepletionTestCase::~AcousticModemEnergyDepletionTestCase ()
-{
-  m_node = 0;
+AcousticModemEnergyDepletionTestCase::~AcousticModemEnergyDepletionTestCase() {
+    m_node = 0;
 }
 
 void
-AcousticModemEnergyDepletionTestCase::DepletionHandler (void)
-{
-  // increase callback count
-  m_callbackCount++;
+AcousticModemEnergyDepletionTestCase::DepletionHandler(void) {
+    // increase callback count
+    m_callbackCount++;
 }
 
 void
-AcousticModemEnergyDepletionTestCase::SendOnePacket (Ptr<Node> node)
-{
-  // create an empty packet
-  Ptr<Packet> pkt = Create<Packet> (m_packetSize);
-  // send the packet in broadcast
-  Ptr<UanNetDevice> dev = node->GetDevice (0)->GetObject<UanNetDevice> ();
-  dev->Send (pkt, dev->GetBroadcast (), 0);
+AcousticModemEnergyDepletionTestCase::SendOnePacket(Ptr<Node> node) {
+    // create an empty packet
+    Ptr<Packet> pkt = Create<Packet> (m_packetSize);
+    // send the packet in broadcast
+    Ptr<UanNetDevice> dev = node->GetDevice(0)->GetObject<UanNetDevice> ();
+    dev->Send(pkt, dev->GetBroadcast(), 0);
 
-  Simulator::Schedule (Seconds (10),
-                       &AcousticModemEnergyDepletionTestCase::SendOnePacket,
-                       this,
-                       node);
+    Simulator::Schedule(Seconds(10),
+            &AcousticModemEnergyDepletionTestCase::SendOnePacket,
+            this,
+            node);
 }
 
 void
-AcousticModemEnergyDepletionTestCase::DoRun (void)
-{
-  // create a generic node
-  m_node = CreateObject<Node> ();
+AcousticModemEnergyDepletionTestCase::DoRun(void) {
+    // create a generic node
+    m_node = CreateObject<Node> ();
 
-  // create a default underwater channel
-  Ptr<UanChannel> channel = CreateObject<UanChannel> ();
-  Ptr<UanNoiseModelDefault> noise = CreateObject<UanNoiseModelDefault> ();
-  channel->SetPropagationModel (CreateObject<UanPropModelIdeal> ());
-  channel->SetNoiseModel (noise);
+    // create a default underwater channel
+    Ptr<UanChannel> channel = CreateObject<UanChannel> ();
+    Ptr<UanNoiseModelDefault> noise = CreateObject<UanNoiseModelDefault> ();
+    channel->SetPropagationModel(CreateObject<UanPropModelIdeal> ());
+    channel->SetNoiseModel(noise);
 
-  // install the underwater communication stack
-  UanHelper uan;
-  Ptr<UanNetDevice> devNode = uan.Install (m_node, channel);
+    // install the underwater communication stack
+    UanHelper uan;
+    Ptr<UanNetDevice> devNode = uan.Install(m_node, channel);
 
-  // set an empty energy source
-  BasicEnergySourceHelper eh;
-  eh.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (0.0));
-  eh.Install (m_node);
+    // set an empty energy source
+    BasicEnergySourceHelper eh;
+    eh.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(0.0));
+    eh.Install(m_node);
 
-  // mobility model
-  Ptr<ConstantPositionMobilityModel> mobility = CreateObject<ConstantPositionMobilityModel> ();
-  mobility->SetPosition (Vector (0,0,0));
-  m_node->AggregateObject (mobility);
+    // mobility model
+    Ptr<ConstantPositionMobilityModel> mobility = CreateObject<ConstantPositionMobilityModel> ();
+    mobility->SetPosition(Vector(0, 0, 0));
+    m_node->AggregateObject(mobility);
 
-  // micro modem energy model
-  AcousticModemEnergyModelHelper modemHelper;
-  Ptr<EnergySource> source = m_node->GetObject<EnergySourceContainer> ()->Get (0);
-  // set the depletion callback
-  AcousticModemEnergyModel::AcousticModemEnergyDepletionCallback callback =
-    MakeCallback (&AcousticModemEnergyDepletionTestCase::DepletionHandler, this);
-  modemHelper.SetDepletionCallback (callback);
-  DeviceEnergyModelContainer cont = modemHelper.Install (devNode,source);
+    // micro modem energy model
+    AcousticModemEnergyModelHelper modemHelper;
+    Ptr<EnergySource> source = m_node->GetObject<EnergySourceContainer> ()->Get(0);
+    // set the depletion callback
+    AcousticModemEnergyModel::AcousticModemEnergyDepletionCallback callback =
+            MakeCallback(&AcousticModemEnergyDepletionTestCase::DepletionHandler, this);
+    modemHelper.SetDepletionCallback(callback);
+    DeviceEnergyModelContainer cont = modemHelper.Install(devNode, source);
 
-  // try to send a packet
-  Simulator::ScheduleNow (&AcousticModemEnergyDepletionTestCase::SendOnePacket,
-                          this,
-                          m_node);
+    // try to send a packet
+    Simulator::ScheduleNow(&AcousticModemEnergyDepletionTestCase::SendOnePacket,
+            this,
+            m_node);
 
-  Simulator::Stop (Seconds (m_simTime));
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(Seconds(m_simTime));
+    Simulator::Run();
+    Simulator::Destroy();
 
-  NS_TEST_ASSERT_MSG_EQ (m_callbackCount, 1, "Callback not invoked");
+    NS_TEST_ASSERT_MSG_EQ(m_callbackCount, 1, "Callback not invoked");
 }
 
 // -------------------------------------------------------------------------- //
@@ -296,15 +284,13 @@ AcousticModemEnergyDepletionTestCase::DoRun (void)
  */
 class UanEnergyModelTestSuite : public TestSuite
 {
-public:
-  UanEnergyModelTestSuite ();
-};
+    public :
+    UanEnergyModelTestSuite();};
 
-UanEnergyModelTestSuite::UanEnergyModelTestSuite ()
-  : TestSuite ("uan-energy-model", UNIT)
-{
-  AddTestCase (new AcousticModemEnergyTestCase, TestCase::QUICK);
-  AddTestCase (new AcousticModemEnergyDepletionTestCase, TestCase::QUICK);
+UanEnergyModelTestSuite::UanEnergyModelTestSuite()
+: TestSuite("uan-energy-model", UNIT) {
+    AddTestCase(new AcousticModemEnergyTestCase, TestCase::QUICK);
+    AddTestCase(new AcousticModemEnergyDepletionTestCase, TestCase::QUICK);
 }
 
 // create an instance of the test suite

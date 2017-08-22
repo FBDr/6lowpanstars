@@ -41,58 +41,57 @@ namespace nfd {
 }
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-using ::ndn::Name;
-namespace name = ::ndn::name;
+        using ::ndn::Name;
+        namespace name = ::ndn::name;
 
-ATTRIBUTE_HELPER_HEADER(Name);
+        ATTRIBUTE_HELPER_HEADER(Name);
 
-namespace time {
-using namespace ::ndn::time;
-}
+        namespace time {
+            using namespace ::ndn::time;
+        }
 
-namespace lp {
-using namespace ::ndn::lp;
-}
+        namespace lp {
+            using namespace ::ndn::lp;
+        }
 
-using ::ndn::Exclude;
+        using ::ndn::Exclude;
 
-using std::shared_ptr;
-using std::make_shared;
+        using std::shared_ptr;
+        using std::make_shared;
 
-using ::ndn::Interest;
-using ::ndn::Data;
-using ::ndn::KeyLocator;
-using ::ndn::Signature;
-using ::ndn::SignatureInfo;
-using ::ndn::Block;
-using ::ndn::KeyChain;
+        using ::ndn::Interest;
+        using ::ndn::Data;
+        using ::ndn::KeyLocator;
+        using ::ndn::Signature;
+        using ::ndn::SignatureInfo;
+        using ::ndn::Block;
+        using ::ndn::KeyChain;
 
-using ::nfd::Face;
-using ::ndn::util::FaceUri;
+        using ::nfd::Face;
+        using ::ndn::util::FaceUri;
 
 #ifndef DOXYGEN
-// For python bindings
-namespace nfd = ::nfd;
+        // For python bindings
+        namespace nfd = ::nfd;
 #endif // DOXYGEN
 
-using ::ndn::make_unique;
+        using ::ndn::make_unique;
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-inline std::ostream&
-operator<<(std::ostream& os, const Face& face)
-{
-  os << face.getLocalUri();
-  return os;
-}
+        inline std::ostream&
+        operator<<(std::ostream& os, const Face& face) {
+            os << face.getLocalUri();
+            return os;
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NDNSIM_NDN_COMMON_H

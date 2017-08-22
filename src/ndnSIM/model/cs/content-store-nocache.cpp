@@ -25,71 +25,61 @@
 NS_LOG_COMPONENT_DEFINE("ndn.cs.Nocache");
 
 namespace ns3 {
-namespace ndn {
-namespace cs {
+    namespace ndn {
+        namespace cs {
 
-NS_OBJECT_ENSURE_REGISTERED(Nocache);
+            NS_OBJECT_ENSURE_REGISTERED(Nocache);
 
-TypeId
-Nocache::GetTypeId(void)
-{
-  static TypeId tid = TypeId("ns3::ndn::cs::Nocache")
+            TypeId
+            Nocache::GetTypeId(void) {
+                static TypeId tid = TypeId("ns3::ndn::cs::Nocache")
                         .SetGroupName("Ndn")
                         .SetParent<ContentStore>()
                         .AddConstructor<Nocache>();
 
-  return tid;
-}
+                return tid;
+            }
 
-Nocache::Nocache()
-{
-}
+            Nocache::Nocache() {
+            }
 
-Nocache::~Nocache()
-{
-}
+            Nocache::~Nocache() {
+            }
 
-shared_ptr<Data>
-Nocache::Lookup(shared_ptr<const Interest> interest)
-{
-  this->m_cacheMissesTrace(interest);
-  return 0;
-}
+            shared_ptr<Data>
+            Nocache::Lookup(shared_ptr<const Interest> interest) {
+                this->m_cacheMissesTrace(interest);
+                return 0;
+            }
 
-bool
-Nocache::Add(shared_ptr<const Data> data)
-{
-  return false;
-}
+            bool
+            Nocache::Add(shared_ptr<const Data> data) {
+                return false;
+            }
 
-void
-Nocache::Print(std::ostream& os) const
-{
-}
+            void
+            Nocache::Print(std::ostream& os) const {
+            }
 
-uint32_t
-Nocache::GetSize() const
-{
-  return 0;
-}
+            uint32_t
+            Nocache::GetSize() const {
+                return 0;
+            }
 
-Ptr<cs::Entry>
-Nocache::Begin()
-{
-  return 0;
-}
+            Ptr<cs::Entry>
+            Nocache::Begin() {
+                return 0;
+            }
 
-Ptr<cs::Entry>
-Nocache::End()
-{
-  return 0;
-}
+            Ptr<cs::Entry>
+            Nocache::End() {
+                return 0;
+            }
 
-Ptr<cs::Entry> Nocache::Next(Ptr<cs::Entry>)
-{
-  return 0;
-}
+            Ptr<cs::Entry> Nocache::Next(Ptr<cs::Entry>) {
+                return 0;
+            }
 
-} // namespace cs
-} // namespace ndn
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3

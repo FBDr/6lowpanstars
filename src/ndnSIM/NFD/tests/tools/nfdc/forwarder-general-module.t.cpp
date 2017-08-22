@@ -29,44 +29,42 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestForwarderGeneralModule, ModuleFixture<ForwarderGeneralModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestForwarderGeneralModule, ModuleFixture<ForwarderGeneralModule>)
 
-class MakeNfdIdCollector
-{
-public:
-  unique_ptr<NfdIdCollector>
-  operator()(Face&, KeyChain&) const
-  {
-    return make_unique<NfdIdCollector>(make_unique<ValidatorNull>());
-  };
-};
+                class MakeNfdIdCollector {
+                public:
 
-class ForwarderGeneralStatusFixture : public ModuleFixture<ForwarderGeneralModule,
-                                                           MakeNfdIdCollector>
-{
-protected:
-  ForwarderGeneralStatusFixture()
-  {
-    module.setNfdIdCollector(*validator);
+                    unique_ptr<NfdIdCollector>
+                    operator()(Face&, KeyChain&) const {
+                        return make_unique<NfdIdCollector>(make_unique<ValidatorNull>());
+                    };
+                };
 
-    this->systemClock->setNow(time::seconds(1468784936));
-    BOOST_REQUIRE(this->addIdentity("/nfd-status/test-nfdid"));
-  }
+                class ForwarderGeneralStatusFixture : public ModuleFixture<ForwarderGeneralModule,
+                MakeNfdIdCollector> {
+                protected:
 
-private:
-  virtual void
-  signDatasetReply(Data& data) override
-  {
-    m_keyChain.sign(data, ndn::security::signingByIdentity("/nfd-status/test-nfdid"));
-  }
-};
+                    ForwarderGeneralStatusFixture() {
+                        module.setNfdIdCollector(*validator);
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                        this->systemClock->setNow(time::seconds(1468784936));
+                        BOOST_REQUIRE(this->addIdentity("/nfd-status/test-nfdid"));
+                    }
+
+                private:
+
+                    virtual void
+                    signDatasetReply(Data& data) override {
+                        m_keyChain.sign(data, ndn::security::signingByIdentity("/nfd-status/test-nfdid"));
+                    }
+                };
+
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <generalStatus>
     <nfdId>/nfd-status/test-nfdid/KEY/ksk-1468784936000/ID-CERT</nfdId>
     <version>0.4.1-1-g704430c</version>
@@ -93,7 +91,7 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </generalStatus>
 )XML");
 
-const std::string STATUS_TEXT = std::string(R"TEXT(
+                const std::string STATUS_TEXT = std::string(R"TEXT(
 General NFD status:
                  nfdId=/nfd-status/test-nfdid/KEY/ksk-1468784936000/ID-CERT
                version=0.4.1-1-g704430c
@@ -113,44 +111,42 @@ General NFD status:
              nOutNacks=26762
 )TEXT").substr(1);
 
-BOOST_FIXTURE_TEST_CASE(Status, ForwarderGeneralStatusFixture)
-{
-  this->fetchStatus();
-  ForwarderStatus payload;
-  payload.setNfdVersion("0.4.1-1-g704430c")
-         .setStartTimestamp(time::fromUnixTimestamp(time::milliseconds(1466781226856)))
-         .setCurrentTimestamp(time::fromUnixTimestamp(time::milliseconds(1468778154109)))
-         .setNNameTreeEntries(668)
-         .setNFibEntries(70)
-         .setNPitEntries(7)
-         .setNMeasurementsEntries(1)
-         .setNCsEntries(65536)
-         .setNInInterests(20699052)
-         .setNInDatas(5598070)
-         .setNInNacks(7230)
-         .setNOutInterests(36501092)
-         .setNOutDatas(5671942)
-         .setNOutNacks(26762);
-  this->sendDataset("/localhost/nfd/status/general", payload);
-  this->prepareStatusOutput();
+                BOOST_FIXTURE_TEST_CASE(Status, ForwarderGeneralStatusFixture) {
+                    this->fetchStatus();
+                    ForwarderStatus payload;
+                    payload.setNfdVersion("0.4.1-1-g704430c")
+                            .setStartTimestamp(time::fromUnixTimestamp(time::milliseconds(1466781226856)))
+                            .setCurrentTimestamp(time::fromUnixTimestamp(time::milliseconds(1468778154109)))
+                            .setNNameTreeEntries(668)
+                            .setNFibEntries(70)
+                            .setNPitEntries(7)
+                            .setNMeasurementsEntries(1)
+                            .setNCsEntries(65536)
+                            .setNInInterests(20699052)
+                            .setNInDatas(5598070)
+                            .setNInNacks(7230)
+                            .setNOutInterests(36501092)
+                            .setNOutDatas(5671942)
+                            .setNOutNacks(26762);
+                    this->sendDataset("/localhost/nfd/status/general", payload);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_CASE(StatusNoNfdId)
-{
-  this->fetchStatus();
-  ForwarderStatus payload;
-  payload.setNfdVersion("0.4.1-1-g704430c");
-  this->sendDataset("/localhost/nfd/status/general", payload);
-  BOOST_CHECK_NO_THROW(this->prepareStatusOutput());
-}
+                BOOST_AUTO_TEST_CASE(StatusNoNfdId) {
+                    this->fetchStatus();
+                    ForwarderStatus payload;
+                    payload.setNfdVersion("0.4.1-1-g704430c");
+                    this->sendDataset("/localhost/nfd/status/general", payload);
+                    BOOST_CHECK_NO_THROW(this->prepareStatusOutput());
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestForwarderGeneralModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestForwarderGeneralModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

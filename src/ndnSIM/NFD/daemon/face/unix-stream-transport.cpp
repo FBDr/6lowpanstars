@@ -26,37 +26,35 @@
 #include "unix-stream-transport.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(StreamTransport, UnixStreamTransport::protocol,
-                                               "UnixStreamTransport");
+        NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE(StreamTransport, UnixStreamTransport::protocol,
+                "UnixStreamTransport");
 
-UnixStreamTransport::UnixStreamTransport(protocol::socket&& socket)
-  : StreamTransport(std::move(socket))
-{
-  static_assert(
-    std::is_same<std::remove_cv<protocol::socket::native_handle_type>::type, int>::value,
-    "The native handle type for UnixStreamTransport sockets must be 'int'"
-  );
+        UnixStreamTransport::UnixStreamTransport(protocol::socket&& socket)
+        : StreamTransport(std::move(socket)) {
+            static_assert(
+                    std::is_same<std::remove_cv<protocol::socket::native_handle_type>::type, int>::value,
+                    "The native handle type for UnixStreamTransport sockets must be 'int'"
+                    );
 
-  this->setLocalUri(FaceUri(m_socket.local_endpoint()));
-  this->setRemoteUri(FaceUri::fromFd(m_socket.native_handle()));
-  this->setScope(ndn::nfd::FACE_SCOPE_LOCAL);
-  this->setPersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  this->setMtu(MTU_UNLIMITED);
+            this->setLocalUri(FaceUri(m_socket.local_endpoint()));
+            this->setRemoteUri(FaceUri::fromFd(m_socket.native_handle()));
+            this->setScope(ndn::nfd::FACE_SCOPE_LOCAL);
+            this->setPersistency(ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+            this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+            this->setMtu(MTU_UNLIMITED);
 
-  NFD_LOG_FACE_INFO("Creating transport");
-}
+            NFD_LOG_FACE_INFO("Creating transport");
+        }
 
-void
-UnixStreamTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency)
-{
-  if (newPersistency != ndn::nfd::FACE_PERSISTENCY_ON_DEMAND) {
-    BOOST_THROW_EXCEPTION(
-      std::invalid_argument("UnixStreamTransport supports only FACE_PERSISTENCY_ON_DEMAND"));
-  }
-}
+        void
+        UnixStreamTransport::beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) {
+            if (newPersistency != ndn::nfd::FACE_PERSISTENCY_ON_DEMAND) {
+                BOOST_THROW_EXCEPTION(
+                        std::invalid_argument("UnixStreamTransport supports only FACE_PERSISTENCY_ON_DEMAND"));
+            }
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

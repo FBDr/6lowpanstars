@@ -25,61 +25,55 @@
 NS_LOG_COMPONENT_DEFINE("ndn.cs.ContentStore");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED(ContentStore);
+        NS_OBJECT_ENSURE_REGISTERED(ContentStore);
 
-TypeId
-ContentStore::GetTypeId(void)
-{
-  static TypeId tid =
-    TypeId("ns3::ndn::ContentStore")
-      .SetGroupName("Ndn")
-      .SetParent<Object>()
+        TypeId
+        ContentStore::GetTypeId(void) {
+            static TypeId tid =
+                    TypeId("ns3::ndn::ContentStore")
+                    .SetGroupName("Ndn")
+                    .SetParent<Object>()
 
-      .AddTraceSource("CacheHits", "Trace called every time there is a cache hit",
-                      MakeTraceSourceAccessor(&ContentStore::m_cacheHitsTrace),
-                      "ns3::ndn::ContentStore::CacheHitsCallback")
+                    .AddTraceSource("CacheHits", "Trace called every time there is a cache hit",
+                    MakeTraceSourceAccessor(&ContentStore::m_cacheHitsTrace),
+                    "ns3::ndn::ContentStore::CacheHitsCallback")
 
-      .AddTraceSource("CacheMisses", "Trace called every time there is a cache miss",
-                      MakeTraceSourceAccessor(&ContentStore::m_cacheMissesTrace),
-                      "ns3::ndn::ContentStrore::CacheMissesCallback");
+                    .AddTraceSource("CacheMisses", "Trace called every time there is a cache miss",
+                    MakeTraceSourceAccessor(&ContentStore::m_cacheMissesTrace),
+                    "ns3::ndn::ContentStrore::CacheMissesCallback");
 
-  return tid;
-}
+            return tid;
+        }
 
-ContentStore::~ContentStore()
-{
-}
+        ContentStore::~ContentStore() {
+        }
 
-namespace cs {
+        namespace cs {
 
-//////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////
 
-Entry::Entry(Ptr<ContentStore> cs, shared_ptr<const Data> data)
-  : m_cs(cs)
-  , m_data(data)
-{
-}
+            Entry::Entry(Ptr<ContentStore> cs, shared_ptr<const Data> data)
+            : m_cs(cs)
+            , m_data(data) {
+            }
 
-const Name&
-Entry::GetName() const
-{
-  return m_data->getName();
-}
+            const Name&
+            Entry::GetName() const {
+                return m_data->getName();
+            }
 
-shared_ptr<const Data>
-Entry::GetData() const
-{
-  return m_data;
-}
+            shared_ptr<const Data>
+            Entry::GetData() const {
+                return m_data;
+            }
 
-Ptr<ContentStore>
-Entry::GetContentStore()
-{
-  return m_cs;
-}
+            Ptr<ContentStore>
+            Entry::GetContentStore() {
+                return m_cs;
+            }
 
-} // namespace cs
-} // namespace ndn
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3

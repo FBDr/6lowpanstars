@@ -28,61 +28,58 @@
 #include <type_traits>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-std::ostream&
-operator<<(std::ostream& os, LogLevel level)
-{
-  switch (level) {
-  case LogLevel::FATAL:
-    return os << "FATAL";
-  case LogLevel::NONE:
-    return os << "NONE";
-  case LogLevel::ERROR:
-    return os << "ERROR";
-  case LogLevel::WARN:
-    return os << "WARN";
-  case LogLevel::INFO:
-    return os << "INFO";
-  case LogLevel::DEBUG:
-    return os << "DEBUG";
-  case LogLevel::TRACE:
-    return os << "TRACE";
-  case LogLevel::ALL:
-    return os << "ALL";
-  }
+        std::ostream&
+        operator<<(std::ostream& os, LogLevel level) {
+            switch (level) {
+                case LogLevel::FATAL:
+                    return os << "FATAL";
+                case LogLevel::NONE:
+                    return os << "NONE";
+                case LogLevel::ERROR:
+                    return os << "ERROR";
+                case LogLevel::WARN:
+                    return os << "WARN";
+                case LogLevel::INFO:
+                    return os << "INFO";
+                case LogLevel::DEBUG:
+                    return os << "DEBUG";
+                case LogLevel::TRACE:
+                    return os << "TRACE";
+                case LogLevel::ALL:
+                    return os << "ALL";
+            }
 
-  BOOST_THROW_EXCEPTION(std::invalid_argument("unknown log level " + to_string(static_cast<int>(level))));
-}
+            BOOST_THROW_EXCEPTION(std::invalid_argument("unknown log level " + to_string(static_cast<int> (level))));
+        }
 
-LogLevel
-parseLogLevel(const std::string& s)
-{
-  if (s == "FATAL")
-    return LogLevel::FATAL;
-  else if (s == "NONE")
-    return LogLevel::NONE;
-  else if (s == "ERROR")
-    return LogLevel::ERROR;
-  else if (s == "WARN")
-    return LogLevel::WARN;
-  else if (s == "INFO")
-    return LogLevel::INFO;
-  else if (s == "DEBUG")
-    return LogLevel::DEBUG;
-  else if (s == "TRACE")
-    return LogLevel::TRACE;
-  else if (s == "ALL")
-    return LogLevel::ALL;
+        LogLevel
+        parseLogLevel(const std::string& s) {
+            if (s == "FATAL")
+                return LogLevel::FATAL;
+            else if (s == "NONE")
+                return LogLevel::NONE;
+            else if (s == "ERROR")
+                return LogLevel::ERROR;
+            else if (s == "WARN")
+                return LogLevel::WARN;
+            else if (s == "INFO")
+                return LogLevel::INFO;
+            else if (s == "DEBUG")
+                return LogLevel::DEBUG;
+            else if (s == "TRACE")
+                return LogLevel::TRACE;
+            else if (s == "ALL")
+                return LogLevel::ALL;
 
-  BOOST_THROW_EXCEPTION(std::invalid_argument("unrecognized log level '" + s + "'"));
-}
+            BOOST_THROW_EXCEPTION(std::invalid_argument("unrecognized log level '" + s + "'"));
+        }
 
-Logger::Logger(const std::string& name)
-  : m_moduleName(name)
-{
+        Logger::Logger(const std::string& name)
+        : m_moduleName(name) {
 
-}
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

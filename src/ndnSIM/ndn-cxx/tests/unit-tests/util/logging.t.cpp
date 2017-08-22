@@ -27,400 +27,379 @@
 #include "../unit-test-time-fixture.hpp"
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-using namespace ndn::tests;
-using boost::test_tools::output_test_stream;
+            using namespace ndn::tests;
+            using boost::test_tools::output_test_stream;
 
-void
-logFromModule1();
+            void
+            logFromModule1();
 
-void
-logFromModule2();
+            void
+            logFromModule2();
 
-void
-logFromNewLogger(const std::string& moduleName)
-{
-  // clang complains -Wreturn-stack-address on OSX-10.9 if Logger is allocated on stack
-  auto loggerPtr = make_unique<Logger>(moduleName);
-  Logger& logger = *loggerPtr;
+            void
+            logFromNewLogger(const std::string& moduleName) {
+                // clang complains -Wreturn-stack-address on OSX-10.9 if Logger is allocated on stack
+                auto loggerPtr = make_unique<Logger>(moduleName);
+                Logger& logger = *loggerPtr;
 
-  auto getNdnCxxLogger = [&logger] () -> Logger& { return logger; };
-  NDN_LOG_TRACE("trace" << moduleName);
-  NDN_LOG_DEBUG("debug" << moduleName);
-  NDN_LOG_INFO("info" << moduleName);
-  NDN_LOG_WARN("warn" << moduleName);
-  NDN_LOG_ERROR("error" << moduleName);
-  NDN_LOG_FATAL("fatal" << moduleName);
+                auto getNdnCxxLogger = [&logger] () -> Logger& {
+                    return logger;
+                };
+                NDN_LOG_TRACE("trace" << moduleName);
+                NDN_LOG_DEBUG("debug" << moduleName);
+                NDN_LOG_INFO("info" << moduleName);
+                NDN_LOG_WARN("warn" << moduleName);
+                NDN_LOG_ERROR("error" << moduleName);
+                NDN_LOG_FATAL("fatal" << moduleName);
 
-  BOOST_CHECK(Logging::get().removeLogger(logger));
-}
+                BOOST_CHECK(Logging::get().removeLogger(logger));
+            }
 
-const time::system_clock::Duration LOG_SYSTIME = time::microseconds(1468108800311239LL);
-const std::string LOG_SYSTIME_STR = "1468108800.311239";
+            const time::system_clock::Duration LOG_SYSTIME = time::microseconds(1468108800311239LL);
+            const std::string LOG_SYSTIME_STR = "1468108800.311239";
 
-class LoggingFixture : public UnitTestTimeFixture
-{
-protected:
-  explicit
-  LoggingFixture()
-    : m_oldLevels(Logging::get().getLevels())
-    , m_oldDestination(Logging::get().getDestination())
-  {
-    this->systemClock->setNow(LOG_SYSTIME);
-    Logging::get().resetLevels();
-    Logging::setDestination(os);
-  }
+            class LoggingFixture : public UnitTestTimeFixture {
+            protected:
 
-  ~LoggingFixture()
-  {
-    Logging::setLevel(m_oldLevels);
-    Logging::setDestination(m_oldDestination);
-  }
+                explicit
+                LoggingFixture()
+                : m_oldLevels(Logging::get().getLevels())
+                , m_oldDestination(Logging::get().getDestination()) {
+                    this->systemClock->setNow(LOG_SYSTIME);
+                    Logging::get().resetLevels();
+                    Logging::setDestination(os);
+                }
 
-protected:
-  output_test_stream os;
+                ~LoggingFixture() {
+                    Logging::setLevel(m_oldLevels);
+                    Logging::setDestination(m_oldDestination);
+                }
 
-private:
-  std::string m_oldLevels;
-  shared_ptr<std::ostream> m_oldDestination;
-};
+            protected:
+                output_test_stream os;
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_FIXTURE_TEST_SUITE(TestLogging, LoggingFixture)
+            private:
+                std::string m_oldLevels;
+                shared_ptr<std::ostream> m_oldDestination;
+            };
 
-BOOST_AUTO_TEST_SUITE(Severity)
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_FIXTURE_TEST_SUITE(TestLogging, LoggingFixture)
 
-BOOST_AUTO_TEST_CASE(None)
-{
-  Logging::setLevel("Module1", LogLevel::NONE);
-  logFromModule1();
+            BOOST_AUTO_TEST_SUITE(Severity)
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(None) {
+                Logging::setLevel("Module1", LogLevel::NONE);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(Error)
-{
-  Logging::setLevel("Module1", LogLevel::ERROR);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Error) {
+                Logging::setLevel("Module1", LogLevel::ERROR);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(Warn)
-{
-  Logging::setLevel("Module1", LogLevel::WARN);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Warn) {
+                Logging::setLevel("Module1", LogLevel::WARN);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(Info)
-{
-  Logging::setLevel("Module1", LogLevel::INFO);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Info) {
+                Logging::setLevel("Module1", LogLevel::INFO);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(Debug)
-{
-  Logging::setLevel("Module1", LogLevel::DEBUG);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
-    LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Debug) {
+                Logging::setLevel("Module1", LogLevel::DEBUG);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(Trace)
-{
-  Logging::setLevel("Module1", LogLevel::TRACE);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " TRACE: [Module1] trace1\n" +
-    LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
-    LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Trace) {
+                Logging::setLevel("Module1", LogLevel::TRACE);
+                logFromModule1();
 
-BOOST_AUTO_TEST_CASE(All)
-{
-  Logging::setLevel("Module1", LogLevel::ALL);
-  logFromModule1();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " TRACE: [Module1] trace1\n" +
+                        LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " TRACE: [Module1] trace1\n" +
-    LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
-    LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(All) {
+                Logging::setLevel("Module1", LogLevel::ALL);
+                logFromModule1();
 
-BOOST_AUTO_TEST_SUITE_END() // Severity
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " TRACE: [Module1] trace1\n" +
+                        LOG_SYSTIME_STR + " DEBUG: [Module1] debug1\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module1] info1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_CASE(SameNameLoggers)
-{
-  Logging::setLevel("Module1", LogLevel::WARN);
-  logFromModule1();
-  logFromNewLogger("Module1");
+            BOOST_AUTO_TEST_SUITE_END() // Severity
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module1] warnModule1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] errorModule1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatalModule1\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SameNameLoggers) {
+                Logging::setLevel("Module1", LogLevel::WARN);
+                logFromModule1();
+                logFromNewLogger("Module1");
 
-BOOST_AUTO_TEST_CASE(LateRegistration)
-{
-  BOOST_CHECK_NO_THROW(Logging::setLevel("Module3", LogLevel::DEBUG));
-  logFromNewLogger("Module3");
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warnModule1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] errorModule1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatalModule1\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " DEBUG: [Module3] debugModule3\n" +
-    LOG_SYSTIME_STR + " INFO: [Module3] infoModule3\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module3] warnModule3\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module3] errorModule3\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module3] fatalModule3\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(LateRegistration) {
+                BOOST_CHECK_NO_THROW(Logging::setLevel("Module3", LogLevel::DEBUG));
+                logFromNewLogger("Module3");
 
-BOOST_AUTO_TEST_SUITE(DefaultSeverity)
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " DEBUG: [Module3] debugModule3\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module3] infoModule3\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module3] warnModule3\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module3] errorModule3\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module3] fatalModule3\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_CASE(Unset)
-{
-  logFromModule1();
-  logFromModule2();
+            BOOST_AUTO_TEST_SUITE(DefaultSeverity)
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Unset) {
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(NoOverride)
-{
-  Logging::setLevel("*", LogLevel::WARN);
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(NoOverride) {
+                Logging::setLevel("*", LogLevel::WARN);
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(Override)
-{
-  Logging::setLevel("*", LogLevel::WARN);
-  Logging::setLevel("Module2", LogLevel::DEBUG);
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
-    LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Override) {
+                Logging::setLevel("*", LogLevel::WARN);
+                Logging::setLevel("Module2", LogLevel::DEBUG);
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_SUITE_END() // DefaultSeverity
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_SUITE(SeverityConfig)
+            BOOST_AUTO_TEST_SUITE_END() // DefaultSeverity
 
-BOOST_AUTO_TEST_CASE(SetEmpty)
-{
-  Logging::setLevel("");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "");
-  logFromModule1();
-  logFromModule2();
+            BOOST_AUTO_TEST_SUITE(SeverityConfig)
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SetEmpty) {
+                Logging::setLevel("");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(SetDefault)
-{
-  Logging::setLevel("*=WARN");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN");
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SetDefault) {
+                Logging::setLevel("*=WARN");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(SetModule)
-{
-  Logging::setLevel("Module1=ERROR");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "Module1=ERROR");
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SetModule) {
+                Logging::setLevel("Module1=ERROR");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "Module1=ERROR");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(SetOverride)
-{
-  Logging::setLevel("*=WARN:Module2=DEBUG");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN:Module2=DEBUG");
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
-    LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SetOverride) {
+                Logging::setLevel("*=WARN:Module2=DEBUG");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN:Module2=DEBUG");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(SetTwice)
-{
-  Logging::setLevel("*=WARN");
-  Logging::setLevel("Module2=DEBUG");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN:Module2=DEBUG");
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
-    LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
-    LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(SetTwice) {
+                Logging::setLevel("*=WARN");
+                Logging::setLevel("Module2=DEBUG");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=WARN:Module2=DEBUG");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(Reset)
-{
-  Logging::setLevel("Module2=DEBUG");
-  Logging::setLevel("*=ERROR");
-  BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=ERROR");
-  logFromModule1();
-  logFromModule2();
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " WARNING: [Module1] warn1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " DEBUG: [Module2] debug2\n" +
+                        LOG_SYSTIME_STR + " INFO: [Module2] info2\n" +
+                        LOG_SYSTIME_STR + " WARNING: [Module2] warn2\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-  Logging::flush();
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
-    LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
-}
+            BOOST_AUTO_TEST_CASE(Reset) {
+                Logging::setLevel("Module2=DEBUG");
+                Logging::setLevel("*=ERROR");
+                BOOST_CHECK_EQUAL(Logging::get().getLevels(), "*=ERROR");
+                logFromModule1();
+                logFromModule2();
 
-BOOST_AUTO_TEST_CASE(Malformed)
-{
-  BOOST_CHECK_THROW(Logging::setLevel("Module1=INVALID-LEVEL"), std::invalid_argument);
-  BOOST_CHECK_THROW(Logging::setLevel("Module1-MISSING-EQUAL-SIGN"), std::invalid_argument);
-}
+                Logging::flush();
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " ERROR: [Module1] error1\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n" +
+                        LOG_SYSTIME_STR + " ERROR: [Module2] error2\n" +
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // SeverityConfig
+            BOOST_AUTO_TEST_CASE(Malformed) {
+                BOOST_CHECK_THROW(Logging::setLevel("Module1=INVALID-LEVEL"), std::invalid_argument);
+                BOOST_CHECK_THROW(Logging::setLevel("Module1-MISSING-EQUAL-SIGN"), std::invalid_argument);
+            }
 
-BOOST_AUTO_TEST_CASE(ChangeDestination)
-{
-  logFromModule1();
+            BOOST_AUTO_TEST_SUITE_END() // SeverityConfig
 
-  auto os2 = make_shared<output_test_stream>();
-  Logging::setDestination(os2);
-  weak_ptr<output_test_stream> os2weak(os2);
-  os2.reset();
+            BOOST_AUTO_TEST_CASE(ChangeDestination) {
+                logFromModule1();
 
-  logFromModule2();
+                auto os2 = make_shared<output_test_stream>();
+                Logging::setDestination(os2);
+                weak_ptr<output_test_stream> os2weak(os2);
+                os2.reset();
 
-  Logging::flush();
-  os2 = os2weak.lock();
-  BOOST_REQUIRE(os2 != nullptr);
+                logFromModule2();
 
-  BOOST_CHECK(os.is_equal(
-    LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
-    ));
-  BOOST_CHECK(os2->is_equal(
-    LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
-    ));
+                Logging::flush();
+                os2 = os2weak.lock();
+                BOOST_REQUIRE(os2 != nullptr);
 
-  os2.reset();
-  Logging::setDestination(os);
-  BOOST_CHECK(os2weak.expired());
-}
+                BOOST_CHECK(os.is_equal(
+                        LOG_SYSTIME_STR + " FATAL: [Module1] fatal1\n"
+                        ));
+                BOOST_CHECK(os2->is_equal(
+                        LOG_SYSTIME_STR + " FATAL: [Module2] fatal2\n"
+                        ));
 
-BOOST_AUTO_TEST_SUITE_END() // TestLogging
-BOOST_AUTO_TEST_SUITE_END() // Util
+                os2.reset();
+                Logging::setDestination(os);
+                BOOST_CHECK(os2weak.expired());
+            }
 
-} // namespace tests
-} // namespace util
+            BOOST_AUTO_TEST_SUITE_END() // TestLogging
+            BOOST_AUTO_TEST_SUITE_END() // Util
+
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

@@ -30,71 +30,66 @@
 #include "strategy-info-host.hpp"
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-/** \brief contains information about an Interest
- *         on an incoming or outgoing face
- *  \note This is an implementation detail to extract common functionality
- *        of InRecord and OutRecord
- */
-class FaceRecord : public StrategyInfoHost
-{
-public:
-  explicit
-  FaceRecord(Face& face);
+        /** \brief contains information about an Interest
+         *         on an incoming or outgoing face
+         *  \note This is an implementation detail to extract common functionality
+         *        of InRecord and OutRecord
+         */
+        class FaceRecord : public StrategyInfoHost {
+        public:
+            explicit
+            FaceRecord(Face& face);
 
-  Face&
-  getFace() const;
+            Face&
+            getFace() const;
 
-  uint32_t
-  getLastNonce() const;
+            uint32_t
+            getLastNonce() const;
 
-  time::steady_clock::TimePoint
-  getLastRenewed() const;
+            time::steady_clock::TimePoint
+            getLastRenewed() const;
 
-  /** \brief gives the time point this record expires
-   *  \return getLastRenewed() + InterestLifetime
-   */
-  time::steady_clock::TimePoint
-  getExpiry() const;
+            /** \brief gives the time point this record expires
+             *  \return getLastRenewed() + InterestLifetime
+             */
+            time::steady_clock::TimePoint
+            getExpiry() const;
 
-  /** \brief updates lastNonce, lastRenewed, expiry fields
-   */
-  void
-  update(const Interest& interest);
+            /** \brief updates lastNonce, lastRenewed, expiry fields
+             */
+            void
+            update(const Interest& interest);
 
-private:
-  Face& m_face;
-  uint32_t m_lastNonce;
-  time::steady_clock::TimePoint m_lastRenewed;
-  time::steady_clock::TimePoint m_expiry;
-};
+        private:
+            Face& m_face;
+            uint32_t m_lastNonce;
+            time::steady_clock::TimePoint m_lastRenewed;
+            time::steady_clock::TimePoint m_expiry;
+        };
 
-inline Face&
-FaceRecord::getFace() const
-{
-  return m_face;
-}
+        inline Face&
+        FaceRecord::getFace() const {
+            return m_face;
+        }
 
-inline uint32_t
-FaceRecord::getLastNonce() const
-{
-  return m_lastNonce;
-}
+        inline uint32_t
+        FaceRecord::getLastNonce() const {
+            return m_lastNonce;
+        }
 
-inline time::steady_clock::TimePoint
-FaceRecord::getLastRenewed() const
-{
-  return m_lastRenewed;
-}
+        inline time::steady_clock::TimePoint
+        FaceRecord::getLastRenewed() const {
+            return m_lastRenewed;
+        }
 
-inline time::steady_clock::TimePoint
-FaceRecord::getExpiry() const
-{
-  return m_expiry;
-}
+        inline time::steady_clock::TimePoint
+        FaceRecord::getExpiry() const {
+            return m_expiry;
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_PIT_FACE_RECORD_HPP

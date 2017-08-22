@@ -27,81 +27,72 @@
 
 namespace ndn {
 
-/**
- * @brief A container that emits onEmpty signal when it becomes empty
- */
-template<class T>
-class ContainerWithOnEmptySignal
-{
-public:
-  typedef std::list<T> Base;
-  typedef typename Base::value_type value_type;
-  typedef typename Base::iterator iterator;
+    /**
+     * @brief A container that emits onEmpty signal when it becomes empty
+     */
+    template<class T>
+    class ContainerWithOnEmptySignal {
+    public:
+        typedef std::list<T> Base;
+        typedef typename Base::value_type value_type;
+        typedef typename Base::iterator iterator;
 
-  iterator
-  begin()
-  {
-    return m_container.begin();
-  }
+        iterator
+        begin() {
+            return m_container.begin();
+        }
 
-  iterator
-  end()
-  {
-    return m_container.end();
-  }
+        iterator
+        end() {
+            return m_container.end();
+        }
 
-  size_t
-  size()
-  {
-    return m_container.size();
-  }
+        size_t
+        size() {
+            return m_container.size();
+        }
 
-  bool
-  empty()
-  {
-    return m_container.empty();
-  }
+        bool
+        empty() {
+            return m_container.empty();
+        }
 
-  iterator
-  erase(iterator item)
-  {
-    iterator next = m_container.erase(item);
-    if (empty()) {
-      this->onEmpty();
-    }
-    return next;
-  }
+        iterator
+        erase(iterator item) {
+            iterator next = m_container.erase(item);
+            if (empty()) {
+                this->onEmpty();
+            }
+            return next;
+        }
 
-  void
-  clear()
-  {
-    m_container.clear();
-    this->onEmpty();
-  }
+        void
+        clear() {
+            m_container.clear();
+            this->onEmpty();
+        }
 
-  std::pair<iterator, bool>
-  insert(const value_type& value)
-  {
-    return {m_container.insert(end(), value), true};
-  }
+        std::pair<iterator, bool>
+        insert(const value_type& value) {
+            return {m_container.insert(end(), value), true};
+        }
 
-  template<class Predicate>
-  void remove_if(Predicate p)
-  {
-    m_container.remove_if(p);
-    if (empty()) {
-      this->onEmpty();
-    }
-  }
+        template<class Predicate>
+        void remove_if(Predicate p) {
+            m_container.remove_if(p);
+            if (empty()) {
+                this->onEmpty();
+            }
+        }
 
-public:
-  Base m_container;
+    public:
+        Base m_container;
 
-  /**
-   * @brief Signal to be fired when container becomes empty
-   */
-  util::Signal<ContainerWithOnEmptySignal<T>> onEmpty;
-};
+        /**
+         * @brief Signal to be fired when container becomes empty
+         */
+        util::Signal<ContainerWithOnEmptySignal<T>> onEmpty;
+    };
 
 } // namespace ndn
 

@@ -23,89 +23,79 @@
 #include "ns3/header.h"
 #include "ppp-header.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PppHeader");
-
-NS_OBJECT_ENSURE_REGISTERED (PppHeader);
-
-PppHeader::PppHeader ()
+namespace ns3
 {
-}
 
-PppHeader::~PppHeader ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("PppHeader");
 
-TypeId
-PppHeader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::PppHeader")
-    .SetParent<Header> ()
-    .SetGroupName ("PointToPoint")
-    .AddConstructor<PppHeader> ()
-  ;
-  return tid;
-}
+    NS_OBJECT_ENSURE_REGISTERED(PppHeader);
 
-TypeId
-PppHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-void 
-PppHeader::Print (std::ostream &os) const
-{
-  std::string proto;
-
-  switch(m_protocol)
-    {
-    case 0x0021: /* IPv4 */
-      proto = "IP (0x0021)";
-      break;
-    case 0x0057: /* IPv6 */
-      proto = "IPv6 (0x0057)";
-      break;
-    case 0x0077: /* NDN */
-      proto = "NDN (0x0077)";
-      break;
-    default:
-      NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
+    PppHeader::PppHeader() {
     }
-  os << "Point-to-Point Protocol: " << proto; 
-}
 
-uint32_t
-PppHeader::GetSerializedSize (void) const
-{
-  return 2;
-}
+    PppHeader::~PppHeader() {
+    }
 
-void
-PppHeader::Serialize (Buffer::Iterator start) const
-{
-  start.WriteHtonU16 (m_protocol);
-}
+    TypeId
+    PppHeader::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PppHeader")
+                .SetParent<Header> ()
+                .SetGroupName("PointToPoint")
+                .AddConstructor<PppHeader> ()
+                ;
+        return tid;
+    }
 
-uint32_t
-PppHeader::Deserialize (Buffer::Iterator start)
-{
-  m_protocol = start.ReadNtohU16 ();
-  return GetSerializedSize ();
-}
+    TypeId
+    PppHeader::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-PppHeader::SetProtocol (uint16_t protocol)
-{
-  m_protocol=protocol;
-}
+    void
+    PppHeader::Print(std::ostream & os) const {
+        std::string proto;
 
-uint16_t
-PppHeader::GetProtocol (void)
-{
-  return m_protocol;
-}
+        switch (m_protocol) {
+            case 0x0021: /* IPv4 */
+                proto = "IP (0x0021)";
+                break;
+            case 0x0057: /* IPv6 */
+                proto = "IPv6 (0x0057)";
+                break;
+            case 0x0077: /* NDN */
+                proto = "NDN (0x0077)";
+                break;
+            default:
+                NS_ASSERT_MSG(false, "PPP Protocol number not defined!");
+        }
+        os << "Point-to-Point Protocol: " << proto;
+    }
+
+    uint32_t
+    PppHeader::GetSerializedSize(void) const {
+        return 2;
+    }
+
+    void
+    PppHeader::Serialize(Buffer::Iterator start) const {
+        start.WriteHtonU16(m_protocol);
+    }
+
+    uint32_t
+    PppHeader::Deserialize(Buffer::Iterator start) {
+        m_protocol = start.ReadNtohU16();
+        return GetSerializedSize();
+    }
+
+    void
+    PppHeader::SetProtocol(uint16_t protocol) {
+        m_protocol = protocol;
+    }
+
+    uint16_t
+    PppHeader::GetProtocol(void) {
+        return m_protocol;
+    }
 
 
 } // namespace ns3

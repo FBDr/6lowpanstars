@@ -23,220 +23,188 @@
 #include <ns3/simulator.h>
 #include <ns3/log.h>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("MacStatsCalculator");
-
-NS_OBJECT_ENSURE_REGISTERED (MacStatsCalculator);
-
-MacStatsCalculator::MacStatsCalculator ()
-  : m_dlFirstWrite (true),
-    m_ulFirstWrite (true)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
 
-}
+    NS_LOG_COMPONENT_DEFINE("MacStatsCalculator");
 
-MacStatsCalculator::~MacStatsCalculator ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(MacStatsCalculator);
 
-TypeId
-MacStatsCalculator::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::MacStatsCalculator")
-    .SetParent<LteStatsCalculator> ()
-    .SetGroupName("Lte")
-    .AddConstructor<MacStatsCalculator> ()
-    .AddAttribute ("DlOutputFilename",
-                   "Name of the file where the downlink results will be saved.",
-                   StringValue ("DlMacStats.txt"),
-                   MakeStringAccessor (&MacStatsCalculator::SetDlOutputFilename),
-                   MakeStringChecker ())
-    .AddAttribute ("UlOutputFilename",
-                   "Name of the file where the uplink results will be saved.",
-                   StringValue ("UlMacStats.txt"),
-                   MakeStringAccessor (&MacStatsCalculator::SetUlOutputFilename),
-                   MakeStringChecker ())
-  ;
-  return tid;
-}
+    MacStatsCalculator::MacStatsCalculator()
+            : m_dlFirstWrite(true),
+            m_ulFirstWrite(true) {
+        NS_LOG_FUNCTION(this);
 
-void
-MacStatsCalculator::SetUlOutputFilename (std::string outputFilename)
-{
-  LteStatsCalculator::SetUlOutputFilename (outputFilename);
-}
+    }
 
-std::string
-MacStatsCalculator::GetUlOutputFilename (void)
-{
-  return LteStatsCalculator::GetUlOutputFilename ();
-}
+    MacStatsCalculator::~MacStatsCalculator() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-MacStatsCalculator::SetDlOutputFilename (std::string outputFilename)
-{
-  LteStatsCalculator::SetDlOutputFilename (outputFilename);
-}
+    TypeId
+    MacStatsCalculator::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::MacStatsCalculator")
+                .SetParent<LteStatsCalculator> ()
+                .SetGroupName("Lte")
+                .AddConstructor<MacStatsCalculator> ()
+                .AddAttribute("DlOutputFilename",
+                "Name of the file where the downlink results will be saved.",
+                StringValue("DlMacStats.txt"),
+                MakeStringAccessor(&MacStatsCalculator::SetDlOutputFilename),
+                MakeStringChecker())
+                .AddAttribute("UlOutputFilename",
+                "Name of the file where the uplink results will be saved.",
+                StringValue("UlMacStats.txt"),
+                MakeStringAccessor(&MacStatsCalculator::SetUlOutputFilename),
+                MakeStringChecker())
+                ;
+        return tid;
+    }
 
-std::string
-MacStatsCalculator::GetDlOutputFilename (void)
-{
-  return LteStatsCalculator::GetDlOutputFilename ();
-}
+    void
+    MacStatsCalculator::SetUlOutputFilename(std::string outputFilename) {
+        LteStatsCalculator::SetUlOutputFilename(outputFilename);
+    }
 
-void
-MacStatsCalculator::DlScheduling (uint16_t cellId, uint64_t imsi, uint32_t frameNo, uint32_t subframeNo,
-                                  uint16_t rnti, uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2)
-{
-  NS_LOG_FUNCTION (this << cellId << imsi << frameNo << subframeNo << rnti << (uint32_t) mcsTb1 << sizeTb1 << (uint32_t) mcsTb2 << sizeTb2);
-  NS_LOG_INFO ("Write DL Mac Stats in " << GetDlOutputFilename ().c_str ());
+    std::string
+    MacStatsCalculator::GetUlOutputFilename(void) {
+        return LteStatsCalculator::GetUlOutputFilename();
+    }
 
-  std::ofstream outFile;
-  if ( m_dlFirstWrite == true )
-    {
-      outFile.open (GetDlOutputFilename ().c_str ());
-      if (!outFile.is_open ())
-        {
-          NS_LOG_ERROR ("Can't open file " << GetDlOutputFilename ().c_str ());
-          return;
+    void
+    MacStatsCalculator::SetDlOutputFilename(std::string outputFilename) {
+        LteStatsCalculator::SetDlOutputFilename(outputFilename);
+    }
+
+    std::string
+    MacStatsCalculator::GetDlOutputFilename(void) {
+        return LteStatsCalculator::GetDlOutputFilename();
+    }
+
+    void
+    MacStatsCalculator::DlScheduling(uint16_t cellId, uint64_t imsi, uint32_t frameNo, uint32_t subframeNo,
+            uint16_t rnti, uint8_t mcsTb1, uint16_t sizeTb1, uint8_t mcsTb2, uint16_t sizeTb2) {
+        NS_LOG_FUNCTION(this << cellId << imsi << frameNo << subframeNo << rnti << (uint32_t) mcsTb1 << sizeTb1 << (uint32_t) mcsTb2 << sizeTb2);
+        NS_LOG_INFO("Write DL Mac Stats in " << GetDlOutputFilename().c_str());
+
+        std::ofstream outFile;
+        if (m_dlFirstWrite == true) {
+            outFile.open(GetDlOutputFilename().c_str());
+            if (!outFile.is_open()) {
+                NS_LOG_ERROR("Can't open file " << GetDlOutputFilename().c_str());
+                return;
+            }
+            m_dlFirstWrite = false;
+            outFile << "% time\tcellId\tIMSI\tframe\tsframe\tRNTI\tmcsTb1\tsizeTb1\tmcsTb2\tsizeTb2";
+            outFile << std::endl;
+        } else {
+            outFile.open(GetDlOutputFilename().c_str(), std::ios_base::app);
+            if (!outFile.is_open()) {
+                NS_LOG_ERROR("Can't open file " << GetDlOutputFilename().c_str());
+                return;
+            }
         }
-      m_dlFirstWrite = false;
-      outFile << "% time\tcellId\tIMSI\tframe\tsframe\tRNTI\tmcsTb1\tsizeTb1\tmcsTb2\tsizeTb2";
-      outFile << std::endl;
+
+        outFile << Simulator::Now().GetNanoSeconds() / (double) 1e9 << "\t";
+        outFile << (uint32_t) cellId << "\t";
+        outFile << imsi << "\t";
+        outFile << frameNo << "\t";
+        outFile << subframeNo << "\t";
+        outFile << rnti << "\t";
+        outFile << (uint32_t) mcsTb1 << "\t";
+        outFile << sizeTb1 << "\t";
+        outFile << (uint32_t) mcsTb2 << "\t";
+        outFile << sizeTb2 << std::endl;
+        outFile.close();
     }
-  else
-    {
-      outFile.open (GetDlOutputFilename ().c_str (),  std::ios_base::app);
-      if (!outFile.is_open ())
-        {
-          NS_LOG_ERROR ("Can't open file " << GetDlOutputFilename ().c_str ());
-          return;
+
+    void
+    MacStatsCalculator::UlScheduling(uint16_t cellId, uint64_t imsi, uint32_t frameNo,
+            uint32_t subframeNo, uint16_t rnti, uint8_t mcsTb, uint16_t size) {
+        NS_LOG_FUNCTION(this << cellId << imsi << frameNo << subframeNo << rnti << (uint32_t) mcsTb << size);
+        NS_LOG_INFO("Write UL Mac Stats in " << GetUlOutputFilename().c_str());
+
+        std::ofstream outFile;
+        if (m_ulFirstWrite == true) {
+            outFile.open(GetUlOutputFilename().c_str());
+            if (!outFile.is_open()) {
+                NS_LOG_ERROR("Can't open file " << GetUlOutputFilename().c_str());
+                return;
+            }
+            m_ulFirstWrite = false;
+            outFile << "% time\tcellId\tIMSI\tframe\tsframe\tRNTI\tmcs\tsize";
+            outFile << std::endl;
+        } else {
+            outFile.open(GetUlOutputFilename().c_str(), std::ios_base::app);
+            if (!outFile.is_open()) {
+                NS_LOG_ERROR("Can't open file " << GetUlOutputFilename().c_str());
+                return;
+            }
         }
+
+        outFile << Simulator::Now().GetNanoSeconds() / (double) 1e9 << "\t";
+        outFile << (uint32_t) cellId << "\t";
+        outFile << imsi << "\t";
+        outFile << frameNo << "\t";
+        outFile << subframeNo << "\t";
+        outFile << rnti << "\t";
+        outFile << (uint32_t) mcsTb << "\t";
+        outFile << size << std::endl;
+        outFile.close();
     }
 
-  outFile << Simulator::Now ().GetNanoSeconds () / (double) 1e9 << "\t";
-  outFile << (uint32_t) cellId << "\t";
-  outFile << imsi << "\t";
-  outFile << frameNo << "\t";
-  outFile << subframeNo << "\t";
-  outFile << rnti << "\t";
-  outFile << (uint32_t) mcsTb1 << "\t";
-  outFile << sizeTb1 << "\t";
-  outFile << (uint32_t) mcsTb2 << "\t";
-  outFile << sizeTb2 << std::endl;
-  outFile.close ();
-}
-
-void
-MacStatsCalculator::UlScheduling (uint16_t cellId, uint64_t imsi, uint32_t frameNo,
-                                  uint32_t subframeNo, uint16_t rnti,uint8_t mcsTb, uint16_t size)
-{
-  NS_LOG_FUNCTION (this << cellId << imsi << frameNo << subframeNo << rnti << (uint32_t) mcsTb << size);
-  NS_LOG_INFO ("Write UL Mac Stats in " << GetUlOutputFilename ().c_str ());
-
-  std::ofstream outFile;
-  if ( m_ulFirstWrite == true )
-    {
-      outFile.open (GetUlOutputFilename ().c_str ());
-      if (!outFile.is_open ())
-        {
-          NS_LOG_ERROR ("Can't open file " << GetUlOutputFilename ().c_str ());
-          return;
+    void
+    MacStatsCalculator::DlSchedulingCallback(Ptr<MacStatsCalculator> macStats,
+            std::string path, uint32_t frameNo, uint32_t subframeNo,
+            uint16_t rnti, uint8_t mcsTb1, uint16_t sizeTb1,
+            uint8_t mcsTb2, uint16_t sizeTb2) {
+        NS_LOG_FUNCTION(macStats << path);
+        uint64_t imsi = 0;
+        std::ostringstream pathAndRnti;
+        pathAndRnti << path << "/" << rnti;
+        if (macStats->ExistsImsiPath(pathAndRnti.str()) == true) {
+            imsi = macStats->GetImsiPath(pathAndRnti.str());
+        } else {
+            imsi = FindImsiFromEnbMac(path, rnti);
+            macStats->SetImsiPath(pathAndRnti.str(), imsi);
         }
-      m_ulFirstWrite = false;
-      outFile << "% time\tcellId\tIMSI\tframe\tsframe\tRNTI\tmcs\tsize";
-      outFile << std::endl;
-    }
-  else
-    {
-      outFile.open (GetUlOutputFilename ().c_str (),  std::ios_base::app);
-      if (!outFile.is_open ())
-        {
-          NS_LOG_ERROR ("Can't open file " << GetUlOutputFilename ().c_str ());
-          return;
+
+        uint16_t cellId = 0;
+        if (macStats->ExistsCellIdPath(pathAndRnti.str()) == true) {
+            cellId = macStats->GetCellIdPath(pathAndRnti.str());
+        } else {
+            cellId = FindCellIdFromEnbMac(path, rnti);
+            macStats->SetCellIdPath(pathAndRnti.str(), cellId);
         }
+
+        macStats->DlScheduling(cellId, imsi, frameNo, subframeNo, rnti, mcsTb1, sizeTb1, mcsTb2, sizeTb2);
     }
 
-  outFile << Simulator::Now ().GetNanoSeconds () / (double) 1e9 << "\t";
-  outFile << (uint32_t) cellId << "\t";
-  outFile << imsi << "\t";
-  outFile << frameNo << "\t";
-  outFile << subframeNo << "\t";
-  outFile << rnti << "\t";
-  outFile << (uint32_t) mcsTb << "\t";
-  outFile << size << std::endl;
-  outFile.close ();
-}
+    void
+    MacStatsCalculator::UlSchedulingCallback(Ptr<MacStatsCalculator> macStats, std::string path,
+            uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
+            uint8_t mcs, uint16_t size) {
+        NS_LOG_FUNCTION(macStats << path);
 
-void
-MacStatsCalculator::DlSchedulingCallback (Ptr<MacStatsCalculator> macStats,
-                      std::string path, uint32_t frameNo, uint32_t subframeNo,
-                      uint16_t rnti, uint8_t mcsTb1, uint16_t sizeTb1,
-                      uint8_t mcsTb2, uint16_t sizeTb2)
-{
-  NS_LOG_FUNCTION (macStats << path);
-  uint64_t imsi = 0;
-  std::ostringstream pathAndRnti;
-  pathAndRnti << path << "/" << rnti;
-  if (macStats->ExistsImsiPath (pathAndRnti.str ()) == true)
-    {
-      imsi = macStats->GetImsiPath (pathAndRnti.str ());
-    }
-  else
-    {
-      imsi = FindImsiFromEnbMac (path, rnti);
-      macStats->SetImsiPath (pathAndRnti.str (), imsi);
-    }
+        uint64_t imsi = 0;
+        std::ostringstream pathAndRnti;
+        pathAndRnti << path << "/" << rnti;
+        if (macStats->ExistsImsiPath(pathAndRnti.str()) == true) {
+            imsi = macStats->GetImsiPath(pathAndRnti.str());
+        } else {
+            imsi = FindImsiFromEnbMac(path, rnti);
+            macStats->SetImsiPath(pathAndRnti.str(), imsi);
+        }
+        uint16_t cellId = 0;
+        if (macStats->ExistsCellIdPath(pathAndRnti.str()) == true) {
+            cellId = macStats->GetCellIdPath(pathAndRnti.str());
+        } else {
+            cellId = FindCellIdFromEnbMac(path, rnti);
+            macStats->SetCellIdPath(pathAndRnti.str(), cellId);
+        }
 
-  uint16_t cellId = 0;
-  if (macStats->ExistsCellIdPath (pathAndRnti.str ()) == true)
-    {
-      cellId = macStats->GetCellIdPath (pathAndRnti.str ());
+        macStats->UlScheduling(cellId, imsi, frameNo, subframeNo, rnti, mcs, size);
     }
-  else
-    {
-      cellId = FindCellIdFromEnbMac (path, rnti);
-      macStats->SetCellIdPath (pathAndRnti.str (), cellId);
-    }
-
-  macStats->DlScheduling (cellId, imsi, frameNo, subframeNo, rnti, mcsTb1, sizeTb1, mcsTb2, sizeTb2);
-}
-
-void
-MacStatsCalculator::UlSchedulingCallback (Ptr<MacStatsCalculator> macStats, std::string path,
-                      uint32_t frameNo, uint32_t subframeNo, uint16_t rnti,
-                      uint8_t mcs, uint16_t size)
-{
-  NS_LOG_FUNCTION (macStats << path);
-
-  uint64_t imsi = 0;
-  std::ostringstream pathAndRnti;
-  pathAndRnti << path << "/" << rnti;
-  if (macStats->ExistsImsiPath (pathAndRnti.str ()) == true)
-    {
-      imsi = macStats->GetImsiPath (pathAndRnti.str ());
-    }
-  else
-    {
-      imsi = FindImsiFromEnbMac (path, rnti);
-      macStats->SetImsiPath (pathAndRnti.str (), imsi);
-    }
-  uint16_t cellId = 0;
-  if (macStats->ExistsCellIdPath (pathAndRnti.str ()) == true)
-    {
-      cellId = macStats->GetCellIdPath (pathAndRnti.str ());
-    }
-  else
-    {
-      cellId = FindCellIdFromEnbMac (path, rnti);
-      macStats->SetCellIdPath (pathAndRnti.str (), cellId);
-    }
-
-  macStats->UlScheduling (cellId, imsi, frameNo, subframeNo, rnti, mcs, size);
-}
 
 
 } // namespace ns3

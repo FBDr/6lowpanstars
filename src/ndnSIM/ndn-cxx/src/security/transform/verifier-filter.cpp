@@ -23,96 +23,90 @@
 #include "../detail/openssl.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class VerifierFilter::Impl
-{
-public:
-  Impl(const PublicKey& key, const uint8_t* sig, size_t sigLen)
-    : m_key(key)
-    , m_md(BIO_new(BIO_f_md()))
-    , m_sink(BIO_new(BIO_s_null()))
-    , m_sig(sig)
-    , m_sigLen(sigLen)
-  {
-    BIO_push(m_md, m_sink);
-  }
+            class VerifierFilter::Impl {
+            public:
 
-  ~Impl()
-  {
-    BIO_free_all(m_md);
-  }
+                Impl(const PublicKey& key, const uint8_t* sig, size_t sigLen)
+                : m_key(key)
+                , m_md(BIO_new(BIO_f_md()))
+                , m_sink(BIO_new(BIO_s_null()))
+                , m_sig(sig)
+                , m_sigLen(sigLen) {
+                    BIO_push(m_md, m_sink);
+                }
 
-public:
-  const PublicKey& m_key;
+                ~Impl() {
+                    BIO_free_all(m_md);
+                }
 
-  BIO* m_md;
-  BIO* m_sink;
+            public:
+                const PublicKey& m_key;
 
-  const uint8_t* m_sig;
-  size_t m_sigLen;
-};
+                BIO* m_md;
+                BIO* m_sink;
 
-VerifierFilter::VerifierFilter(DigestAlgorithm algo, const PublicKey& key,
-                               const uint8_t* sig, size_t sigLen)
-  : m_impl(new Impl(key, sig, sigLen))
-{
-  switch (algo) {
-    case DigestAlgorithm::SHA256: {
-      if (!BIO_set_md(m_impl->m_md, EVP_sha256()))
-        BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest"));
-      break;
-    }
+                const uint8_t* m_sig;
+                size_t m_sigLen;
+            };
 
-    default:
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Digest algorithm is not supported"));
-  }
-}
+            VerifierFilter::VerifierFilter(DigestAlgorithm algo, const PublicKey& key,
+                    const uint8_t* sig, size_t sigLen)
+            : m_impl(new Impl(key, sig, sigLen)) {
+                switch (algo) {
+                    case DigestAlgorithm::SHA256:
+                    {
+                        if (!BIO_set_md(m_impl->m_md, EVP_sha256()))
+                            BOOST_THROW_EXCEPTION(Error(getIndex(), "Cannot set digest"));
+                        break;
+                    }
 
-size_t
-VerifierFilter::convert(const uint8_t* buf, size_t size)
-{
-  int wLen = BIO_write(m_impl->m_md, buf, size);
+                    default:
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Digest algorithm is not supported"));
+                }
+            }
 
-  if (wLen <= 0) { // fail to write data
-    if (!BIO_should_retry(m_impl->m_md)) {
-      // we haven't written everything but some error happens, and we cannot retry
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
-    }
-    return 0;
-  }
-  else { // update number of bytes written
-    return wLen;
-  }
-}
+            size_t
+            VerifierFilter::convert(const uint8_t* buf, size_t size) {
+                int wLen = BIO_write(m_impl->m_md, buf, size);
 
-void
-VerifierFilter::finalize()
-{
-  EVP_PKEY* key = reinterpret_cast<EVP_PKEY*>(m_impl->m_key.getEvpPkey());
-  auto buffer = make_unique<OBuffer>(1);
+                if (wLen <= 0) { // fail to write data
+                    if (!BIO_should_retry(m_impl->m_md)) {
+                        // we haven't written everything but some error happens, and we cannot retry
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
+                    }
+                    return 0;
+                } else { // update number of bytes written
+                    return wLen;
+                }
+            }
 
-  EVP_MD_CTX* ctx = nullptr;
-  BIO_get_md_ctx(m_impl->m_md, &ctx);
-  int res = EVP_VerifyFinal(ctx, m_impl->m_sig, m_impl->m_sigLen, key);
+            void
+            VerifierFilter::finalize() {
+                EVP_PKEY* key = reinterpret_cast<EVP_PKEY*> (m_impl->m_key.getEvpPkey());
+                auto buffer = make_unique<OBuffer>(1);
 
-  if (res < 0)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Verification error"));
+                EVP_MD_CTX* ctx = nullptr;
+                BIO_get_md_ctx(m_impl->m_md, &ctx);
+                int res = EVP_VerifyFinal(ctx, m_impl->m_sig, m_impl->m_sigLen, key);
 
-  (*buffer)[0] = (res != 0) ? 1 : 0;
-  setOutputBuffer(std::move(buffer));
+                if (res < 0)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Verification error"));
 
-  flushAllOutput();
-}
+                (*buffer)[0] = (res != 0) ? 1 : 0;
+                setOutputBuffer(std::move(buffer));
 
-unique_ptr<Transform>
-verifierFilter(DigestAlgorithm algo, const PublicKey& key,
-               const uint8_t* sig, size_t sigLen)
-{
-  return make_unique<VerifierFilter>(algo, key, sig, sigLen);
-}
+                flushAllOutput();
+            }
 
-} // namespace transform
-} // namespace security
+            unique_ptr<Transform>
+            verifierFilter(DigestAlgorithm algo, const PublicKey& key,
+                    const uint8_t* sig, size_t sigLen) {
+                return make_unique<VerifierFilter>(algo, key, sig, sigLen);
+            }
+
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

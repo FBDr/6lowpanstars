@@ -26,46 +26,45 @@
 #include "../security-common.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to calculate digest.
- */
-class DigestFilter : public Transform
-{
-public:
-  /**
-   * @brief Create a digest module with algorithm @p algo
-   */
-  explicit
-  DigestFilter(DigestAlgorithm algo);
+            /**
+             * @brief The module to calculate digest.
+             */
+            class DigestFilter : public Transform {
+            public:
+                /**
+                 * @brief Create a digest module with algorithm @p algo
+                 */
+                explicit
+                DigestFilter(DigestAlgorithm algo);
 
-private:
-  /**
-   * @brief Append data @p buf into digest calculation
-   *
-   * @return The number of bytes that have been accepted
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief Append data @p buf into digest calculation
+                 *
+                 * @return The number of bytes that have been accepted
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize digest calculation and write the digest into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize digest calculation and write the digest into next module.
+                 */
+                virtual void
+                finalize() final;
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-digestFilter(DigestAlgorithm algo = DigestAlgorithm::SHA256);
+            unique_ptr<Transform>
+            digestFilter(DigestAlgorithm algo = DigestAlgorithm::SHA256);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_DIGEST_FILTER_HPP

@@ -25,83 +25,73 @@
 
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SpectrumConverter");
-
-SpectrumConverter::SpectrumConverter ()
+namespace ns3
 {
-}
 
-SpectrumConverter::SpectrumConverter (Ptr<const SpectrumModel> fromSpectrumModel, Ptr<const SpectrumModel> toSpectrumModel)
-{
-  NS_LOG_FUNCTION (this);
-  m_fromSpectrumModel = fromSpectrumModel;
-  m_toSpectrumModel = toSpectrumModel;
+    NS_LOG_COMPONENT_DEFINE("SpectrumConverter");
 
-  for (Bands::const_iterator toit = toSpectrumModel->Begin (); toit != toSpectrumModel->End (); ++toit)
-    {
-      std::vector<double> coeffs;
+    SpectrumConverter::SpectrumConverter() {
+    }
 
-      for (Bands::const_iterator fromit = fromSpectrumModel->Begin (); fromit != fromSpectrumModel->End (); ++fromit)
-        {
-          double c = GetCoefficient (*fromit, *toit);
-          NS_LOG_LOGIC ("(" << fromit->fl << ","  << fromit->fh << ")"
-                            << " --> " <<
+    SpectrumConverter::SpectrumConverter(Ptr<const SpectrumModel> fromSpectrumModel, Ptr<const SpectrumModel> toSpectrumModel) {
+        NS_LOG_FUNCTION(this);
+        m_fromSpectrumModel = fromSpectrumModel;
+        m_toSpectrumModel = toSpectrumModel;
+
+        for (Bands::const_iterator toit = toSpectrumModel->Begin(); toit != toSpectrumModel->End(); ++toit) {
+            std::vector<double> coeffs;
+
+            for (Bands::const_iterator fromit = fromSpectrumModel->Begin(); fromit != fromSpectrumModel->End(); ++fromit) {
+                double c = GetCoefficient(*fromit, *toit);
+                NS_LOG_LOGIC("(" << fromit->fl << "," << fromit->fh << ")"
+                        << " --> " <<
                         "(" << toit->fl << "," << toit->fh << ")"
-                            << " = " << c);
-          coeffs.push_back (c);
+                        << " = " << c);
+                coeffs.push_back(c);
+            }
+
+            m_conversionMatrix.push_back(coeffs);
         }
 
-      m_conversionMatrix.push_back (coeffs);
     }
 
-}
+    double SpectrumConverter::GetCoefficient(const BandInfo& from, const BandInfo & to) const {
+        NS_LOG_FUNCTION(this);
+        double coeff = std::min(from.fh, to.fh) - std::max(from.fl, to.fl);
+        coeff = std::max(0.0, coeff);
+        coeff = std::min(1.0, coeff / (to.fh - to.fl));
+        return coeff;
+    }
+
+    Ptr<SpectrumValue>
+            SpectrumConverter::Convert(Ptr<const SpectrumValue> fvvf) const {
+        NS_ASSERT(*(fvvf->GetSpectrumModel()) == *m_fromSpectrumModel);
+
+        Ptr<SpectrumValue> tvvf = Create<SpectrumValue> (m_toSpectrumModel);
+
+        Values::iterator tvit = tvvf->ValuesBegin();
 
 
-double SpectrumConverter::GetCoefficient (const BandInfo& from, const BandInfo& to) const
-{
-  NS_LOG_FUNCTION (this);
-  double coeff = std::min (from.fh, to.fh) - std::max (from.fl, to.fl);
-  coeff = std::max (0.0, coeff);
-  coeff = std::min (1.0, coeff / (to.fh - to.fl));
-  return coeff;
-}
+        for (std::vector<std::vector<double> >::const_iterator toit = m_conversionMatrix.begin();
+                toit != m_conversionMatrix.end();
+                ++toit) {
+            NS_ASSERT(tvit != tvvf->ValuesEnd());
+            Values::const_iterator fvit = fvvf->ConstValuesBegin();
 
-
-
-Ptr<SpectrumValue>
-SpectrumConverter::Convert (Ptr<const SpectrumValue> fvvf) const
-{
-  NS_ASSERT ( *(fvvf->GetSpectrumModel ()) == *m_fromSpectrumModel);
-
-  Ptr<SpectrumValue> tvvf = Create<SpectrumValue> (m_toSpectrumModel);
-
-  Values::iterator tvit = tvvf->ValuesBegin ();
-
-
-  for (std::vector<std::vector<double> >::const_iterator toit = m_conversionMatrix.begin ();
-       toit != m_conversionMatrix.end ();
-       ++toit)
-    {
-      NS_ASSERT (tvit != tvvf->ValuesEnd ());
-      Values::const_iterator fvit = fvvf->ConstValuesBegin ();
-
-      double sum = 0;
-      for (std::vector<double>::const_iterator fromit = toit->begin ();
-           fromit != toit->end ();
-           ++fromit)
-        {
-          NS_ASSERT (fvit != fvvf->ConstValuesEnd ());
-          sum += (*fvit) * (*fromit);
-          ++fvit;
+            double sum = 0;
+            for (std::vector<double>::const_iterator fromit = toit->begin();
+                    fromit != toit->end();
+                    ++fromit) {
+                NS_ASSERT(fvit != fvvf->ConstValuesEnd());
+                sum += (*fvit) * (*fromit);
+                ++fvit;
+            }
+            *tvit = sum;
+            ++tvit;
         }
-      *tvit = sum;
-      ++tvit;
-    }
 
-  return tvvf;
-}
+        return tvvf;
+    }
 
 
 

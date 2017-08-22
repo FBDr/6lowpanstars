@@ -33,56 +33,49 @@ using namespace ns3;
 
 class OneUniformRandomVariableManyGetValueCallsTestCase : public TestCase
 {
-public:
-  OneUniformRandomVariableManyGetValueCallsTestCase ();
-  virtual ~OneUniformRandomVariableManyGetValueCallsTestCase ();
+    public :
+    OneUniformRandomVariableManyGetValueCallsTestCase();
+    virtual ~OneUniformRandomVariableManyGetValueCallsTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-OneUniformRandomVariableManyGetValueCallsTestCase::OneUniformRandomVariableManyGetValueCallsTestCase ()
-  : TestCase ("One Uniform Random Variable with Many GetValue() Calls")
-{
+OneUniformRandomVariableManyGetValueCallsTestCase::OneUniformRandomVariableManyGetValueCallsTestCase()
+: TestCase("One Uniform Random Variable with Many GetValue() Calls") {
 }
 
-OneUniformRandomVariableManyGetValueCallsTestCase::~OneUniformRandomVariableManyGetValueCallsTestCase ()
-{
+OneUniformRandomVariableManyGetValueCallsTestCase::~OneUniformRandomVariableManyGetValueCallsTestCase() {
 }
 
 void
-OneUniformRandomVariableManyGetValueCallsTestCase::DoRun (void)
-{
-  double min = 0.0;
-  double max = 10.0;
+OneUniformRandomVariableManyGetValueCallsTestCase::DoRun(void) {
+    double min = 0.0;
+    double max = 10.0;
 
-  Config::SetDefault ("ns3::UniformRandomVariable::Min", DoubleValue (min));
-  Config::SetDefault ("ns3::UniformRandomVariable::Max", DoubleValue (max));
+    Config::SetDefault("ns3::UniformRandomVariable::Min", DoubleValue(min));
+    Config::SetDefault("ns3::UniformRandomVariable::Max", DoubleValue(max));
 
-  Ptr<UniformRandomVariable> uniform = CreateObject<UniformRandomVariable> ();
+    Ptr<UniformRandomVariable> uniform = CreateObject<UniformRandomVariable> ();
 
-  // Get many values from 1 random number generator.
-  double value;
-  int count = 100000000;
-  for (int i = 0; i < count; i++)
-    {
-      value = uniform->GetValue ();
+    // Get many values from 1 random number generator.
+    double value;
+    int count = 100000000;
+    for (int i = 0; i < count; i++) {
+        value = uniform->GetValue();
 
-      NS_TEST_ASSERT_MSG_GT (value, min, "Value less than minimum.");
-      NS_TEST_ASSERT_MSG_LT (value, max, "Value greater than maximum.");
+        NS_TEST_ASSERT_MSG_GT(value, min, "Value less than minimum.");
+        NS_TEST_ASSERT_MSG_LT(value, max, "Value greater than maximum.");
     }
 }
 
 class OneUniformRandomVariableManyGetValueCallsTestSuite : public TestSuite
 {
-public:
-  OneUniformRandomVariableManyGetValueCallsTestSuite ();
-};
+    public :
+    OneUniformRandomVariableManyGetValueCallsTestSuite();};
 
-OneUniformRandomVariableManyGetValueCallsTestSuite::OneUniformRandomVariableManyGetValueCallsTestSuite ()
-  : TestSuite ("one-uniform-random-variable-many-get-value-calls", PERFORMANCE)
-{
-  AddTestCase (new OneUniformRandomVariableManyGetValueCallsTestCase, TestCase::QUICK);
+OneUniformRandomVariableManyGetValueCallsTestSuite::OneUniformRandomVariableManyGetValueCallsTestSuite()
+: TestSuite("one-uniform-random-variable-many-get-value-calls", PERFORMANCE) {
+    AddTestCase(new OneUniformRandomVariableManyGetValueCallsTestCase, TestCase::QUICK);
 }
 
 static OneUniformRandomVariableManyGetValueCallsTestSuite oneUniformRandomVariableManyGetValueCallsTestSuite;

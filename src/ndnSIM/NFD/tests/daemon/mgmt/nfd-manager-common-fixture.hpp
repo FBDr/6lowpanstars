@@ -31,56 +31,53 @@
 #include "mgmt/command-authenticator.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-/** \brief base fixture for testing an NFD Manager
- */
-class NfdManagerCommonFixture : public ManagerCommonFixture
-{
-public:
-  NfdManagerCommonFixture();
+        /** \brief base fixture for testing an NFD Manager
+         */
+        class NfdManagerCommonFixture : public ManagerCommonFixture {
+        public:
+            NfdManagerCommonFixture();
 
-  /** \brief add /localhost/nfd as a top prefix to the dispatcher
-   */
-  void
-  setTopPrefix();
+            /** \brief add /localhost/nfd as a top prefix to the dispatcher
+             */
+            void
+            setTopPrefix();
 
-  /** \brief grant m_identityName privilege to sign commands for the management module
-   */
-  void
-  setPrivilege(const std::string& privilege);
+            /** \brief grant m_identityName privilege to sign commands for the management module
+             */
+            void
+            setPrivilege(const std::string& privilege);
 
-protected:
-  Forwarder m_forwarder;
-  shared_ptr<CommandAuthenticator> m_authenticator;
-};
+        protected:
+            Forwarder m_forwarder;
+            shared_ptr<CommandAuthenticator> m_authenticator;
+        };
 
-class CommandSuccess
-{
-public:
-  static ControlResponse
-  getExpected()
-  {
-    return ControlResponse()
-      .setCode(200)
-      .setText("OK");
-  }
-};
+        class CommandSuccess {
+        public:
 
-template<int CODE>
-class CommandFailure
-{
-public:
-  static ControlResponse
-  getExpected()
-  {
-    return ControlResponse()
-      .setCode(CODE);
-    // error description should not be checked
-  }
-};
+            static ControlResponse
+            getExpected() {
+                return ControlResponse()
+                        .setCode(200)
+                        .setText("OK");
+            }
+        };
 
-} // namespace tests
+        template<int CODE>
+        class CommandFailure {
+        public:
+
+            static ControlResponse
+            getExpected() {
+                return ControlResponse()
+                        .setCode(CODE);
+                // error description should not be checked
+            }
+        };
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_MGMT_NFD_MANAGER_COMMON_FIXTURE_HPP

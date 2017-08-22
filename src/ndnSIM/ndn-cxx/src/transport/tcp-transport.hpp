@@ -26,69 +26,68 @@
 #include "../util/config-file.hpp"
 
 namespace boost {
-namespace asio {
-namespace ip {
-class tcp;
-} // namespace ip
-} // namespace asio
+    namespace asio {
+        namespace ip {
+            class tcp;
+        } // namespace ip
+    } // namespace asio
 } // namespace boost
 
 namespace ndn {
 
-template<typename BaseTransport, typename Protocol>
-class StreamTransportImpl;
+    template<typename BaseTransport, typename Protocol>
+    class StreamTransportImpl;
 
-template<typename BaseTransport, typename Protocol>
-class StreamTransportWithResolverImpl;
+    template<typename BaseTransport, typename Protocol>
+    class StreamTransportWithResolverImpl;
 
-/** \brief a transport using TCP socket
- */
-class TcpTransport : public Transport
-{
-public:
-  explicit
-  TcpTransport(const std::string& host, const std::string& port = "6363");
+    /** \brief a transport using TCP socket
+     */
+    class TcpTransport : public Transport {
+    public:
+        explicit
+        TcpTransport(const std::string& host, const std::string& port = "6363");
 
-  ~TcpTransport();
+        ~TcpTransport();
 
-  virtual void
-  connect(boost::asio::io_service& ioService,
-          const ReceiveCallback& receiveCallback) override;
+        virtual void
+        connect(boost::asio::io_service& ioService,
+                const ReceiveCallback& receiveCallback) override;
 
-  virtual void
-  close() override;
+        virtual void
+        close() override;
 
-  virtual void
-  pause() override;
+        virtual void
+        pause() override;
 
-  virtual void
-  resume() override;
+        virtual void
+        resume() override;
 
-  virtual void
-  send(const Block& wire) override;
+        virtual void
+        send(const Block& wire) override;
 
-  virtual void
-  send(const Block& header, const Block& payload) override;
+        virtual void
+        send(const Block& header, const Block& payload) override;
 
-  /** \brief Create transport with parameters defined in URI
-   *  \throw Transport::Error incorrect URI or unsupported protocol is specified
-   */
-  static shared_ptr<TcpTransport>
-  create(const std::string& uri);
+        /** \brief Create transport with parameters defined in URI
+         *  \throw Transport::Error incorrect URI or unsupported protocol is specified
+         */
+        static shared_ptr<TcpTransport>
+        create(const std::string& uri);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  static std::pair<std::string, std::string>
-  getSocketHostAndPortFromUri(const std::string& uri);
+        static std::pair<std::string, std::string>
+        getSocketHostAndPortFromUri(const std::string& uri);
 
-private:
-  std::string m_host;
-  std::string m_port;
+    private:
+        std::string m_host;
+        std::string m_port;
 
-  typedef StreamTransportWithResolverImpl<TcpTransport, boost::asio::ip::tcp> Impl;
-  friend class StreamTransportImpl<TcpTransport, boost::asio::ip::tcp>;
-  friend class StreamTransportWithResolverImpl<TcpTransport, boost::asio::ip::tcp>;
-  shared_ptr<Impl> m_impl;
-};
+        typedef StreamTransportWithResolverImpl<TcpTransport, boost::asio::ip::tcp> Impl;
+        friend class StreamTransportImpl<TcpTransport, boost::asio::ip::tcp>;
+        friend class StreamTransportWithResolverImpl<TcpTransport, boost::asio::ip::tcp>;
+        shared_ptr<Impl> m_impl;
+    };
 
 } // namespace ndn
 

@@ -26,26 +26,25 @@
 
 namespace ns3 {
 
-/**
- * \ingroup energy
- * \brief Creates a BasicEnergySource object.
- *
- */
-class BasicEnergySourceHelper : public EnergySourceHelper
-{
-public:
-  BasicEnergySourceHelper ();
-  ~BasicEnergySourceHelper ();
+    /**
+     * \ingroup energy
+     * \brief Creates a BasicEnergySource object.
+     *
+     */
+    class BasicEnergySourceHelper : public EnergySourceHelper {
+    public:
+        BasicEnergySourceHelper();
+        ~BasicEnergySourceHelper();
 
-  void Set (std::string name, const AttributeValue &v);
+        void Set(std::string name, const AttributeValue &v);
 
-private:
-  virtual Ptr<EnergySource> DoInstall (Ptr<Node> node) const;
+    private:
+        virtual Ptr<EnergySource> DoInstall(Ptr<Node> node) const;
 
-private:
-  ObjectFactory m_basicEnergySource;
+    private:
+        ObjectFactory m_basicEnergySource;
 
-};
+    };
 
 } // namespace ns3
 

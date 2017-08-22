@@ -24,51 +24,47 @@
 #include "ndn-stack-helper.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-NS_LOG_COMPONENT_DEFINE("ndn.StrategyChoiceHelper");
+        NS_LOG_COMPONENT_DEFINE("ndn.StrategyChoiceHelper");
 
-void
-StrategyChoiceHelper::sendCommand(const ControlParameters& parameters, Ptr<Node> node)
-{
-  NS_LOG_DEBUG("Strategy choice command was initialized");
-  Block encodedParameters(parameters.wireEncode());
+        void
+        StrategyChoiceHelper::sendCommand(const ControlParameters& parameters, Ptr<Node> node) {
+            NS_LOG_DEBUG("Strategy choice command was initialized");
+            Block encodedParameters(parameters.wireEncode());
 
-  Name commandName("/localhost/nfd/strategy-choice");
-  commandName.append("set");
-  commandName.append(encodedParameters);
+            Name commandName("/localhost/nfd/strategy-choice");
+            commandName.append("set");
+            commandName.append(encodedParameters);
 
-  shared_ptr<Interest> command(make_shared<Interest>(commandName));
-  StackHelper::getKeyChain().sign(*command);
+            shared_ptr<Interest> command(make_shared<Interest>(commandName));
+            StackHelper::getKeyChain().sign(*command);
 
-  Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
-  l3protocol->injectInterest(*command);
-}
+            Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
+            l3protocol->injectInterest(*command);
+        }
 
-void
-StrategyChoiceHelper::Install(const NodeContainer& c, const Name& namePrefix, const Name& strategy)
-{
-  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
-    Install(*i, namePrefix, strategy);
-  }
-}
+        void
+        StrategyChoiceHelper::Install(const NodeContainer& c, const Name& namePrefix, const Name& strategy) {
+            for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+                Install(*i, namePrefix, strategy);
+            }
+        }
 
-void
-StrategyChoiceHelper::Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy)
-{
-  ControlParameters parameters;
-  parameters.setName(namePrefix);
-  NS_LOG_DEBUG("Node ID: " << node->GetId() << " with forwarding strategy " << strategy);
-  parameters.setStrategy(strategy);
-  sendCommand(parameters, node);
-}
+        void
+        StrategyChoiceHelper::Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy) {
+            ControlParameters parameters;
+            parameters.setName(namePrefix);
+            NS_LOG_DEBUG("Node ID: " << node->GetId() << " with forwarding strategy " << strategy);
+            parameters.setStrategy(strategy);
+            sendCommand(parameters, node);
+        }
 
-void
-StrategyChoiceHelper::InstallAll(const Name& namePrefix, const Name& strategy)
-{
-  Install(NodeContainer::GetGlobal(), namePrefix, strategy);
-}
+        void
+        StrategyChoiceHelper::InstallAll(const Name& namePrefix, const Name& strategy) {
+            Install(NodeContainer::GetGlobal(), namePrefix, strategy);
+        }
 
-} // namespace ndn
+    } // namespace ndn
 
 } // namespace ns

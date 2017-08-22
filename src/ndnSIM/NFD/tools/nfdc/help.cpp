@@ -29,76 +29,72 @@
 #include <unistd.h>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-NDN_LOG_INIT(nfdc.Help);
+            NDN_LOG_INIT(nfdc.Help);
 
-const int LIST_COMMAND_NAME_COLUMN_WIDTH = 16;
+            const int LIST_COMMAND_NAME_COLUMN_WIDTH = 16;
 
-void
-helpList(std::ostream& os, const CommandParser& parser, ParseMode mode, const std::string& noun)
-{
-  os << "nfdc [-h] [-V] <command> [<args>]\n\n";
-  if (noun.empty()) {
-    os << "All subcommands:\n";
-  }
-  else {
-    os << "Subcommands starting with " << noun << ":\n";
-  }
+            void
+            helpList(std::ostream& os, const CommandParser& parser, ParseMode mode, const std::string& noun) {
+                os << "nfdc [-h] [-V] <command> [<args>]\n\n";
+                if (noun.empty()) {
+                    os << "All subcommands:\n";
+                } else {
+                    os << "Subcommands starting with " << noun << ":\n";
+                }
 
-  std::vector<const CommandDefinition*> commands = parser.listCommands(noun, mode);
-  if (commands.empty()) {
-    os << "  (none)\n";
-    return;
-  }
+                std::vector<const CommandDefinition*> commands = parser.listCommands(noun, mode);
+                if (commands.empty()) {
+                    os << "  (none)\n";
+                    return;
+                }
 
-  for (auto def : commands) {
-    os << "  " << def->getNoun() << ' ' << def->getVerb() << ' '
-       << text::Spaces{static_cast<int>(LIST_COMMAND_NAME_COLUMN_WIDTH -
-                       def->getNoun().size() - def->getVerb().size() - 2)}
-       << def->getTitle() << '\n';
-  }
+                for (auto def : commands) {
+                    os << "  " << def->getNoun() << ' ' << def->getVerb() << ' '
+                            << text::Spaces {
+                        static_cast<int> (LIST_COMMAND_NAME_COLUMN_WIDTH -
+                                def->getNoun().size() - def->getVerb().size() - 2)
+                    }
+                    << def->getTitle() << '\n';
+                }
 
-  os << "\nSee 'nfdc help <command>' to read about a specific subcommand.\n";
-}
+                os << "\nSee 'nfdc help <command>' to read about a specific subcommand.\n";
+            }
 
-static int
-helpSingle(const std::string& noun, const std::string& verb)
-{
-  std::string manpage = "nfdc-" + noun;
+            static int
+            helpSingle(const std::string& noun, const std::string& verb) {
+                std::string manpage = "nfdc-" + noun;
 
-  execlp("man", "man", manpage.data(), nullptr);
-  NDN_LOG_FATAL("Error opening man page for " << manpage);
-  return 1;
-}
+                execlp("man", "man", manpage.data(), nullptr);
+                NDN_LOG_FATAL("Error opening man page for " << manpage);
+                return 1;
+            }
 
-int
-help(ExecuteContext& ctx, const CommandParser& parser, std::ostream& os)
-{
-  std::string noun = ctx.args.get<std::string>("noun", "");
-  std::string verb = ctx.args.get<std::string>("verb", "");
+            int
+            help(ExecuteContext& ctx, const CommandParser& parser, std::ostream& os) {
+                std::string noun = ctx.args.get<std::string>("noun", "");
+                std::string verb = ctx.args.get<std::string>("verb", "");
 
-  if (noun.empty()) {
-    helpList(os, parser, ParseMode::ONE_SHOT, noun);
-    return 0;
-  }
-  else {
-    return helpSingle(noun, verb);
-  }
-}
+                if (noun.empty()) {
+                    helpList(os, parser, ParseMode::ONE_SHOT, noun);
+                    return 0;
+                } else {
+                    return helpSingle(noun, verb);
+                }
+            }
 
-void
-registerHelpCommand(CommandParser& parser)
-{
-  CommandDefinition defHelp("help", "");
-  defHelp
-    .setTitle("display help information")
-    .addArg("noun", ArgValueType::STRING, Required::NO, Positional::YES)
-    .addArg("verb", ArgValueType::STRING, Required::NO, Positional::YES);
-  parser.addCommand(defHelp, bind(&help, _1, cref(parser), ref(std::cout)));
-}
+            void
+            registerHelpCommand(CommandParser& parser) {
+                CommandDefinition defHelp("help", "");
+                defHelp
+                        .setTitle("display help information")
+                        .addArg("noun", ArgValueType::STRING, Required::NO, Positional::YES)
+                        .addArg("verb", ArgValueType::STRING, Required::NO, Positional::YES);
+                parser.addCommand(defHelp, bind(&help, _1, cref(parser), ref(std::cout)));
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

@@ -32,141 +32,140 @@
 
 namespace ns3 {
 
-class Node;
-class NetDevice;
-class VirtualNetDevice;
-class EpcSgwPgwApplication;
-class EpcX2;
-class EpcMme;
+    class Node;
+    class NetDevice;
+    class VirtualNetDevice;
+    class EpcSgwPgwApplication;
+    class EpcX2;
+    class EpcMme;
 
-/**
- * \ingroup lte
- * \brief Create an EPC network with PointToPoint links
- *
- * This Helper will create an EPC network topology comprising of a
- * single node that implements both the SGW and PGW functionality, and
- * an MME node. The S1-U, X2-U and X2-C interfaces are realized over
- * PointToPoint links. 
- */
-class PointToPointEpcHelper : public EpcHelper
-{
-public:
-  
-  /** 
-   * Constructor
-   */
-  PointToPointEpcHelper ();
+    /**
+     * \ingroup lte
+     * \brief Create an EPC network with PointToPoint links
+     *
+     * This Helper will create an EPC network topology comprising of a
+     * single node that implements both the SGW and PGW functionality, and
+     * an MME node. The S1-U, X2-U and X2-C interfaces are realized over
+     * PointToPoint links. 
+     */
+    class PointToPointEpcHelper : public EpcHelper {
+    public:
 
-  /** 
-   * Destructor
-   */  
-  virtual ~PointToPointEpcHelper ();
-  
-  // inherited from Object
-  /**
-   *  Register this type.
-   *  \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
-  virtual void DoDispose ();
+        /** 
+         * Constructor
+         */
+        PointToPointEpcHelper();
 
-  // inherited from EpcHelper
-  virtual void AddEnb (Ptr<Node> enbNode, Ptr<NetDevice> lteEnbNetDevice, uint16_t cellId);
-  virtual void AddUe (Ptr<NetDevice> ueLteDevice, uint64_t imsi);
-  virtual void AddX2Interface (Ptr<Node> enbNode1, Ptr<Node> enbNode2);
-  virtual uint8_t ActivateEpsBearer (Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
-  virtual Ptr<Node> GetPgwNode ();
-  virtual Ipv4InterfaceContainer AssignUeIpv4Address (NetDeviceContainer ueDevices);
-  virtual Ipv4Address GetUeDefaultGatewayAddress ();
+        /** 
+         * Destructor
+         */
+        virtual ~PointToPointEpcHelper();
 
+        // inherited from Object
+        /**
+         *  Register this type.
+         *  \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
+        virtual void DoDispose();
+
+        // inherited from EpcHelper
+        virtual void AddEnb(Ptr<Node> enbNode, Ptr<NetDevice> lteEnbNetDevice, uint16_t cellId);
+        virtual void AddUe(Ptr<NetDevice> ueLteDevice, uint64_t imsi);
+        virtual void AddX2Interface(Ptr<Node> enbNode1, Ptr<Node> enbNode2);
+        virtual uint8_t ActivateEpsBearer(Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
+        virtual Ptr<Node> GetPgwNode();
+        virtual Ipv4InterfaceContainer AssignUeIpv4Address(NetDeviceContainer ueDevices);
+        virtual Ipv4Address GetUeDefaultGatewayAddress();
 
 
-private:
 
-  /** 
-   * helper to assign addresses to UE devices as well as to the TUN device of the SGW/PGW
-   */
-  Ipv4AddressHelper m_ueAddressHelper; 
-  
-  /**
-   * SGW-PGW network element
-   */
-  Ptr<Node> m_sgwPgw; 
+    private:
 
-  /**
-   * SGW-PGW application
-   */
-  Ptr<EpcSgwPgwApplication> m_sgwPgwApp;
+        /** 
+         * helper to assign addresses to UE devices as well as to the TUN device of the SGW/PGW
+         */
+        Ipv4AddressHelper m_ueAddressHelper;
 
-  /**
-   * TUN device implementing tunneling of user data over GTP-U/UDP/IP
-   */
-  Ptr<VirtualNetDevice> m_tunDevice;
+        /**
+         * SGW-PGW network element
+         */
+        Ptr<Node> m_sgwPgw;
 
-  /**
-   * MME network element
-   */
-  Ptr<EpcMme> m_mme;
+        /**
+         * SGW-PGW application
+         */
+        Ptr<EpcSgwPgwApplication> m_sgwPgwApp;
 
-  /**
-   * S1-U interfaces
-   */
+        /**
+         * TUN device implementing tunneling of user data over GTP-U/UDP/IP
+         */
+        Ptr<VirtualNetDevice> m_tunDevice;
 
-  /** 
-   * helper to assign addresses to S1-U NetDevices 
-   */
-  Ipv4AddressHelper m_s1uIpv4AddressHelper; 
+        /**
+         * MME network element
+         */
+        Ptr<EpcMme> m_mme;
 
-  /**
-   * The data rate to be used for the next S1-U link to be created
-   */
-  DataRate m_s1uLinkDataRate;
+        /**
+         * S1-U interfaces
+         */
 
-  /**
-   * The delay to be used for the next S1-U link to be created
-   */
-  Time     m_s1uLinkDelay;
+        /** 
+         * helper to assign addresses to S1-U NetDevices 
+         */
+        Ipv4AddressHelper m_s1uIpv4AddressHelper;
 
-  /**
-   * The MTU of the next S1-U link to be created. Note that,
-   * because of the additional GTP/UDP/IP tunneling overhead,
-   * you need a MTU larger than the end-to-end MTU that you
-   * want to support.
-   */
-  uint16_t m_s1uLinkMtu;
+        /**
+         * The data rate to be used for the next S1-U link to be created
+         */
+        DataRate m_s1uLinkDataRate;
 
-  /**
-   * UDP port where the GTP-U Socket is bound, fixed by the standard as 2152
-   */
-  uint16_t m_gtpuUdpPort;
+        /**
+         * The delay to be used for the next S1-U link to be created
+         */
+        Time m_s1uLinkDelay;
 
-  /**
-   * Map storing for each IMSI the corresponding eNB NetDevice
-   */
-  std::map<uint64_t, Ptr<NetDevice> > m_imsiEnbDeviceMap;
-  
-  /** 
-   * helper to assign addresses to X2 NetDevices 
-   */
-  Ipv4AddressHelper m_x2Ipv4AddressHelper;   
+        /**
+         * The MTU of the next S1-U link to be created. Note that,
+         * because of the additional GTP/UDP/IP tunneling overhead,
+         * you need a MTU larger than the end-to-end MTU that you
+         * want to support.
+         */
+        uint16_t m_s1uLinkMtu;
 
-  /**
-   * The data rate to be used for the next X2 link to be created
-   */
-  DataRate m_x2LinkDataRate;
+        /**
+         * UDP port where the GTP-U Socket is bound, fixed by the standard as 2152
+         */
+        uint16_t m_gtpuUdpPort;
 
-  /**
-   * The delay to be used for the next X2 link to be created
-   */
-  Time     m_x2LinkDelay;
+        /**
+         * Map storing for each IMSI the corresponding eNB NetDevice
+         */
+        std::map<uint64_t, Ptr<NetDevice> > m_imsiEnbDeviceMap;
 
-  /**
-   * The MTU of the next X2 link to be created. Note that,
-   * because of some big X2 messages, you need a big MTU.
-   */
-  uint16_t m_x2LinkMtu;
+        /** 
+         * helper to assign addresses to X2 NetDevices 
+         */
+        Ipv4AddressHelper m_x2Ipv4AddressHelper;
 
-};
+        /**
+         * The data rate to be used for the next X2 link to be created
+         */
+        DataRate m_x2LinkDataRate;
+
+        /**
+         * The delay to be used for the next X2 link to be created
+         */
+        Time m_x2LinkDelay;
+
+        /**
+         * The MTU of the next X2 link to be created. Note that,
+         * because of some big X2 messages, you need a big MTU.
+         */
+        uint16_t m_x2LinkMtu;
+
+    };
 
 
 

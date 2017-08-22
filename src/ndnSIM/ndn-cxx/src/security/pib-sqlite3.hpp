@@ -27,117 +27,116 @@
 struct sqlite3;
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief Pib backend implementation based on SQLite3 database
- *
- * All the contents in Pib are stored in a SQLite3 database file.
- * This backend provides more persistent storage than PibMemory.
- */
-class PibSqlite3 : public PibImpl
-{
-public:
-  /**
-   * @brief Constructor of PibSqlite3
-   *
-   * This method will create a SQLite3 database file under the directory @p dir.
-   * If the directory does not exist, it will be created automatically.
-   * It assumes that the directory does not contain a PIB database of an older version,
-   * It is user's responsibility to update the older version database or remove the database.
-   *
-   * @param dir The directory where the database file is located. By default, it points to the
-   *        $HOME/.ndn directory.
-   * @throws PibImpl::Error when initialization fails.
-   */
-  explicit
-  PibSqlite3(const std::string& dir = "");
+        /**
+         * @brief Pib backend implementation based on SQLite3 database
+         *
+         * All the contents in Pib are stored in a SQLite3 database file.
+         * This backend provides more persistent storage than PibMemory.
+         */
+        class PibSqlite3 : public PibImpl {
+        public:
+            /**
+             * @brief Constructor of PibSqlite3
+             *
+             * This method will create a SQLite3 database file under the directory @p dir.
+             * If the directory does not exist, it will be created automatically.
+             * It assumes that the directory does not contain a PIB database of an older version,
+             * It is user's responsibility to update the older version database or remove the database.
+             *
+             * @param dir The directory where the database file is located. By default, it points to the
+             *        $HOME/.ndn directory.
+             * @throws PibImpl::Error when initialization fails.
+             */
+            explicit
+            PibSqlite3(const std::string& dir = "");
 
-  /**
-   * @brief Destruct and cleanup internal state
-   */
-  ~PibSqlite3();
+            /**
+             * @brief Destruct and cleanup internal state
+             */
+            ~PibSqlite3();
 
-public: // TpmLocator management
+        public: // TpmLocator management
 
-  virtual void
-  setTpmLocator(const std::string& tpmLocator) final;
+            virtual void
+            setTpmLocator(const std::string& tpmLocator) final;
 
-  virtual std::string
-  getTpmLocator() const final;
+            virtual std::string
+            getTpmLocator() const final;
 
-public: // Identity management
+        public: // Identity management
 
-  virtual bool
-  hasIdentity(const Name& identity) const final;
+            virtual bool
+            hasIdentity(const Name& identity) const final;
 
-  virtual void
-  addIdentity(const Name& identity) final;
+            virtual void
+            addIdentity(const Name& identity) final;
 
-  virtual void
-  removeIdentity(const Name& identity) final;
+            virtual void
+            removeIdentity(const Name& identity) final;
 
-  virtual std::set<Name>
-  getIdentities() const final;
+            virtual std::set<Name>
+            getIdentities() const final;
 
-  virtual void
-  setDefaultIdentity(const Name& identityName) final;
+            virtual void
+            setDefaultIdentity(const Name& identityName) final;
 
-  virtual Name
-  getDefaultIdentity() const final;
+            virtual Name
+            getDefaultIdentity() const final;
 
-public: // Key management
+        public: // Key management
 
-  virtual bool
-  hasKey(const Name& identity, const name::Component& keyId) const final;
+            virtual bool
+            hasKey(const Name& identity, const name::Component& keyId) const final;
 
-  virtual void
-  addKey(const Name& identity, const name::Component& keyId, const v1::PublicKey& publicKey) final;
+            virtual void
+            addKey(const Name& identity, const name::Component& keyId, const v1::PublicKey& publicKey) final;
 
-  virtual void
-  removeKey(const Name& identity, const name::Component& keyId) final;
+            virtual void
+            removeKey(const Name& identity, const name::Component& keyId) final;
 
-  virtual v1::PublicKey
-  getKeyBits(const Name& identity, const name::Component& keyId) const final;
+            virtual v1::PublicKey
+            getKeyBits(const Name& identity, const name::Component& keyId) const final;
 
-  virtual std::set<name::Component>
-  getKeysOfIdentity(const Name& identity) const final;
+            virtual std::set<name::Component>
+            getKeysOfIdentity(const Name& identity) const final;
 
-  virtual void
-  setDefaultKeyOfIdentity(const Name& identity, const name::Component& keyId) final;
+            virtual void
+            setDefaultKeyOfIdentity(const Name& identity, const name::Component& keyId) final;
 
-  virtual name::Component
-  getDefaultKeyOfIdentity(const Name& identity) const final;
+            virtual name::Component
+            getDefaultKeyOfIdentity(const Name& identity) const final;
 
-public: // Certificate Management
+        public: // Certificate Management
 
-  virtual bool
-  hasCertificate(const Name& certName) const final;
+            virtual bool
+            hasCertificate(const Name& certName) const final;
 
-  virtual void
-  addCertificate(const v1::IdentityCertificate& certificate) final;
+            virtual void
+            addCertificate(const v1::IdentityCertificate& certificate) final;
 
-  virtual void
-  removeCertificate(const Name& certName) final;
+            virtual void
+            removeCertificate(const Name& certName) final;
 
-  virtual v1::IdentityCertificate
-  getCertificate(const Name& certName) const final;
+            virtual v1::IdentityCertificate
+            getCertificate(const Name& certName) const final;
 
-  virtual std::set<Name>
-  getCertificatesOfKey(const Name& identity, const name::Component& keyId) const final;
+            virtual std::set<Name>
+            getCertificatesOfKey(const Name& identity, const name::Component& keyId) const final;
 
-  virtual void
-  setDefaultCertificateOfKey(const Name& identity, const name::Component& keyId,
-                             const Name& certName) final;
+            virtual void
+            setDefaultCertificateOfKey(const Name& identity, const name::Component& keyId,
+                    const Name& certName) final;
 
-  virtual v1::IdentityCertificate
-  getDefaultCertificateOfKey(const Name& identity, const name::Component& keyId) const final;
+            virtual v1::IdentityCertificate
+            getDefaultCertificateOfKey(const Name& identity, const name::Component& keyId) const final;
 
-private:
-  sqlite3* m_database;
-};
+        private:
+            sqlite3* m_database;
+        };
 
-} // namespace security
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITTY_PIB_SQLITE3_HPP

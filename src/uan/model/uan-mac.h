@@ -31,101 +31,98 @@
 
 namespace ns3 {
 
-class UanPhy;
-class UanChannel;
-class UanNetDevice;
-class UanTransducer;
-class UanTxMode;
-class UanAddress;
+    class UanPhy;
+    class UanChannel;
+    class UanNetDevice;
+    class UanTransducer;
+    class UanTxMode;
+    class UanAddress;
 
+    /**
+     * \ingroup uan
+     *
+     * Virtual base class for all UAN MAC protocols.
+     */
+    class UanMac : public Object {
+    public:
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
+        /**
+         * Get the MAC Address.
+         *
+         * \return MAC Address.
+         */
+        virtual Address GetAddress(void) = 0;
 
-/**
- * \ingroup uan
- *
- * Virtual base class for all UAN MAC protocols.
- */
-class UanMac : public Object
-{
-public:
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-   static TypeId GetTypeId (void);
+        /**
+         * Set the address.
+         *
+         * \param addr UanAddress for this MAC.
+         */
+        virtual void SetAddress(UanAddress addr) = 0;
 
-  /**
-   * Get the MAC Address.
-   *
-   * \return MAC Address.
-   */
-  virtual Address GetAddress (void) = 0;
+        /**
+         * Enqueue packet to be transmitted.
+         *
+         * \param pkt Packet to be transmitted.
+         * \param dest Destination address.
+         * \param protocolNumber Protocol number.  Usage varies by MAC.
+         * \return True if packet was successfully enqueued.
+         */
+        virtual bool Enqueue(Ptr<Packet> pkt, const Address &dest, uint16_t protocolNumber) = 0;
+        /**
+         * Set the callback to forward packets up to higher layers.
+         * 
+         * \param cb The callback.
+         * \pname{packet} The packet.
+         * \pname{address} The source address.
+         */
+        virtual void SetForwardUpCb(Callback<void, Ptr<Packet>, const UanAddress&> cb) = 0;
 
-  /**
-   * Set the address.
-   *
-   * \param addr UanAddress for this MAC.
-   */
-  virtual void SetAddress (UanAddress addr) = 0;
+        /**
+         * Attach PHY layer to this MAC.
+         *
+         * Some MACs may be designed to work with multiple PHY
+         * layers.  Others may only work with one.
+         *
+         * \param phy Phy layer to attach to this MAC.
+         */
+        virtual void AttachPhy(Ptr<UanPhy> phy) = 0;
 
-  /**
-   * Enqueue packet to be transmitted.
-   *
-   * \param pkt Packet to be transmitted.
-   * \param dest Destination address.
-   * \param protocolNumber Protocol number.  Usage varies by MAC.
-   * \return True if packet was successfully enqueued.
-   */
-  virtual bool Enqueue (Ptr<Packet> pkt, const Address &dest, uint16_t protocolNumber) = 0;
-  /**
-   * Set the callback to forward packets up to higher layers.
-   * 
-   * \param cb The callback.
-   * \pname{packet} The packet.
-   * \pname{address} The source address.
-   */
-  virtual void SetForwardUpCb (Callback<void, Ptr<Packet>, const UanAddress&> cb) = 0;
+        /**
+         * Get the broadcast address.
+         *
+         * \return The broadcast address.
+         */
+        virtual Address GetBroadcast(void) const = 0;
 
-  /**
-   * Attach PHY layer to this MAC.
-   *
-   * Some MACs may be designed to work with multiple PHY
-   * layers.  Others may only work with one.
-   *
-   * \param phy Phy layer to attach to this MAC.
-   */
-  virtual void AttachPhy (Ptr<UanPhy> phy) = 0;
+        /** Clears all pointer references. */
+        virtual void Clear(void) = 0;
 
-  /**
-   * Get the broadcast address.
-   *
-   * \return The broadcast address.
-   */
-  virtual Address GetBroadcast (void) const = 0;
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream First stream index to use.
+         * \return The number of stream indices assigned by this model.
+         */
+        virtual int64_t AssignStreams(int64_t stream) = 0;
 
-  /** Clears all pointer references. */
-  virtual void Clear (void) = 0;
+        /**
+         *  TracedCallback signature for packet reception/enqueue/dequeue events.
+         *
+         * \param [in] packet The Packet.
+         * \param [in] mode The UanTxMode.
+         */
+        typedef void (* PacketModeTracedCallback)
+        (const Ptr<const Packet> packet, const UanTxMode & mode);
 
- /**
-  * Assign a fixed random variable stream number to the random variables
-  * used by this model.  Return the number of streams (possibly zero) that
-  * have been assigned.
-  *
-  * \param stream First stream index to use.
-  * \return The number of stream indices assigned by this model.
-  */
-  virtual int64_t AssignStreams (int64_t stream) = 0;
-
-  /**
-   *  TracedCallback signature for packet reception/enqueue/dequeue events.
-   *
-   * \param [in] packet The Packet.
-   * \param [in] mode The UanTxMode.
-   */
-  typedef void (* PacketModeTracedCallback)
-    (const Ptr<const Packet> packet, const UanTxMode & mode);
-
-};  // class UanMac
+    }; // class UanMac
 
 } // namespace ns3
 

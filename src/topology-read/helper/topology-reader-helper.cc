@@ -26,59 +26,48 @@
 #include "ns3/rocketfuel-topology-reader.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("TopologyReaderHelper");
-
-TopologyReaderHelper::TopologyReaderHelper ()
+namespace ns3
 {
-  m_inputModel = 0;
-}
 
-void
-TopologyReaderHelper::SetFileName (const std::string fileName)
-{
-  m_fileName = fileName;
-}
+    NS_LOG_COMPONENT_DEFINE("TopologyReaderHelper");
 
-void
-TopologyReaderHelper::SetFileType (const std::string fileType)
-{
-  m_fileType = fileType;
-}
-
-Ptr<TopologyReader>
-TopologyReaderHelper::GetTopologyReader ()
-{
-  if (!m_inputModel)
-    {
-      NS_ASSERT_MSG (!m_fileType.empty (), "Missing File Type");
-      NS_ASSERT_MSG (!m_fileName.empty (), "Missing File Name");
-
-      if (m_fileType == "Orbis")
-        {
-          NS_LOG_INFO ("Creating Orbis formatted data input.");
-          m_inputModel = Create<OrbisTopologyReader> ();
-        }
-      else if (m_fileType == "Inet")
-        {
-          NS_LOG_INFO ("Creating Inet formatted data input.");
-          m_inputModel = Create<InetTopologyReader> ();
-        }
-      else if (m_fileType == "Rocketfuel")
-        {
-          NS_LOG_INFO ("Creating Rocketfuel formatted data input.");
-          m_inputModel = Create<RocketfuelTopologyReader> ();
-        }
-      else
-        {
-          NS_ASSERT_MSG (false, "Wrong (unknown) File Type");
-        }
-
-      m_inputModel->SetFileName (m_fileName);
+    TopologyReaderHelper::TopologyReaderHelper() {
+        m_inputModel = 0;
     }
-  return m_inputModel;
-}
+
+    void
+    TopologyReaderHelper::SetFileName(const std::string fileName) {
+        m_fileName = fileName;
+    }
+
+    void
+    TopologyReaderHelper::SetFileType(const std::string fileType) {
+        m_fileType = fileType;
+    }
+
+    Ptr<TopologyReader>
+            TopologyReaderHelper::GetTopologyReader() {
+        if (!m_inputModel) {
+            NS_ASSERT_MSG(!m_fileType.empty(), "Missing File Type");
+            NS_ASSERT_MSG(!m_fileName.empty(), "Missing File Name");
+
+            if (m_fileType == "Orbis") {
+                NS_LOG_INFO("Creating Orbis formatted data input.");
+                m_inputModel = Create<OrbisTopologyReader> ();
+            } else if (m_fileType == "Inet") {
+                NS_LOG_INFO("Creating Inet formatted data input.");
+                m_inputModel = Create<InetTopologyReader> ();
+            } else if (m_fileType == "Rocketfuel") {
+                NS_LOG_INFO("Creating Rocketfuel formatted data input.");
+                m_inputModel = Create<RocketfuelTopologyReader> ();
+            } else {
+                NS_ASSERT_MSG(false, "Wrong (unknown) File Type");
+            }
+
+            m_inputModel->SetFileName(m_fileName);
+        }
+        return m_inputModel;
+    }
 
 
 

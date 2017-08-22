@@ -25,53 +25,47 @@
 #include <random>
 
 namespace ndn {
-namespace random {
+    namespace random {
 
-uint32_t
-generateSecureWord32()
-{
-  uint32_t random;
-  generateSecureBytes(reinterpret_cast<uint8_t*>(&random), sizeof(random));
-  return random;
-}
+        uint32_t
+        generateSecureWord32() {
+            uint32_t random;
+            generateSecureBytes(reinterpret_cast<uint8_t*> (&random), sizeof (random));
+            return random;
+        }
 
-uint64_t
-generateSecureWord64()
-{
-  uint64_t random;
-  generateSecureBytes(reinterpret_cast<uint8_t*>(&random), sizeof(random));
-  return random;
-}
+        uint64_t
+        generateSecureWord64() {
+            uint64_t random;
+            generateSecureBytes(reinterpret_cast<uint8_t*> (&random), sizeof (random));
+            return random;
+        }
 
-void
-generateSecureBytes(uint8_t* bytes, size_t size)
-{
-  if (RAND_bytes(bytes, size) != 1) {
-    BOOST_THROW_EXCEPTION(std::runtime_error("Failed to generate random bytes (error code " +
-                                             std::to_string(ERR_get_error()) + ")"));
-  }
-}
+        void
+        generateSecureBytes(uint8_t* bytes, size_t size) {
+            if (RAND_bytes(bytes, size) != 1) {
+                BOOST_THROW_EXCEPTION(std::runtime_error("Failed to generate random bytes (error code " +
+                        std::to_string(ERR_get_error()) + ")"));
+            }
+        }
 
-static std::mt19937&
-getRandomGenerator()
-{
-  static std::mt19937 rng{std::random_device{}()};
-  return rng;
-}
+        static std::mt19937&
+        getRandomGenerator() {
+            static std::mt19937 rng{std::random_device{}()};
+            return rng;
+        }
 
-uint32_t
-generateWord32()
-{
-  static std::uniform_int_distribution<uint32_t> distribution;
-  return distribution(getRandomGenerator());
-}
+        uint32_t
+        generateWord32() {
+            static std::uniform_int_distribution<uint32_t> distribution;
+            return distribution(getRandomGenerator());
+        }
 
-uint64_t
-generateWord64()
-{
-  static std::uniform_int_distribution<uint64_t> distribution;
-  return distribution(getRandomGenerator());
-}
+        uint64_t
+        generateWord64() {
+            static std::uniform_int_distribution<uint64_t> distribution;
+            return distribution(getRandomGenerator());
+        }
 
-} // namespace random
+    } // namespace random
 } // namespace ndn

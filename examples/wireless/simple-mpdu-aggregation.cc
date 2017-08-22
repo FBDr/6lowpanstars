@@ -48,119 +48,118 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("SimpleMpduAggregation");
+NS_LOG_COMPONENT_DEFINE("SimpleMpduAggregation");
 
-int main (int argc, char *argv[])
-{
-  uint32_t payloadSize = 1472; //bytes
-  uint64_t simulationTime = 10; //seconds
-  uint32_t nMpdus = 1;
-  bool enableRts = 0;
-    
-  CommandLine cmd;
-  cmd.AddValue("nMpdus", "Number of aggregated MPDUs", nMpdus); //number of aggregated MPDUs specified by the user
-  cmd.AddValue("payloadSize", "Payload size in bytes", payloadSize);
-  cmd.AddValue("enableRts", "Enable RTS/CTS", enableRts);
-  cmd.AddValue("simulationTime", "Simulation time in seconds", simulationTime);
-  cmd.Parse (argc, argv);
-    
-  if(!enableRts)
-    Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("999999"));
-  else
-    Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("0"));
-     
-  Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("990000"));
+int main(int argc, char *argv[]) {
+    uint32_t payloadSize = 1472; //bytes
+    uint64_t simulationTime = 10; //seconds
+    uint32_t nMpdus = 1;
+    bool enableRts = 0;
 
-  NodeContainer wifiStaNode;
-  wifiStaNode.Create (1);
-  NodeContainer wifiApNode;
-  wifiApNode.Create(1);
+    CommandLine cmd;
+    cmd.AddValue("nMpdus", "Number of aggregated MPDUs", nMpdus); //number of aggregated MPDUs specified by the user
+    cmd.AddValue("payloadSize", "Payload size in bytes", payloadSize);
+    cmd.AddValue("enableRts", "Enable RTS/CTS", enableRts);
+    cmd.AddValue("simulationTime", "Simulation time in seconds", simulationTime);
+    cmd.Parse(argc, argv);
 
-  YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
-  YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
-  phy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
-  phy.SetChannel (channel.Create());
+    if (!enableRts)
+        Config::SetDefault("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue("999999"));
+    else
+        Config::SetDefault("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue("0"));
 
-  WifiHelper wifi = WifiHelper::Default ();
-  wifi.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
-  wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate65MbpsBW20MHz"), "ControlMode", StringValue("OfdmRate6_5MbpsBW20MHz"));
-  HtWifiMacHelper mac = HtWifiMacHelper::Default ();
+    Config::SetDefault("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue("990000"));
 
-  Ssid ssid = Ssid ("simple-mpdu-aggregation");
-  mac.SetType ("ns3::StaWifiMac",
-               "Ssid", SsidValue (ssid),
-               "ActiveProbing", BooleanValue (false));
+    NodeContainer wifiStaNode;
+    wifiStaNode.Create(1);
+    NodeContainer wifiApNode;
+    wifiApNode.Create(1);
 
-  if (nMpdus > 1) mac.SetBlockAckThresholdForAc (AC_BE, 2); //enable Block ACK when A-MPDU is enabled (i.e. nMpdus > 1)
+    YansWifiChannelHelper channel = YansWifiChannelHelper::Default();
+    YansWifiPhyHelper phy = YansWifiPhyHelper::Default();
+    phy.SetPcapDataLinkType(YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
+    phy.SetChannel(channel.Create());
 
-  mac.SetMpduAggregatorForAc (AC_BE,"ns3::MpduStandardAggregator",
-                              "MaxAmpduSize", UintegerValue (nMpdus*(payloadSize+100))); //enable MPDU aggregation for AC_BE with a maximum aggregated size of nMpdus*(payloadSize+100) bytes, i.e. nMpdus aggregated packets in an A-MPDU
-  
-  NetDeviceContainer staDevice;
-  staDevice = wifi.Install (phy, mac, wifiStaNode);
+    WifiHelper wifi = WifiHelper::Default();
+    wifi.SetStandard(WIFI_PHY_STANDARD_80211n_5GHZ);
+    wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode", StringValue("OfdmRate65MbpsBW20MHz"), "ControlMode", StringValue("OfdmRate6_5MbpsBW20MHz"));
+    HtWifiMacHelper mac = HtWifiMacHelper::Default();
 
-  mac.SetType ("ns3::ApWifiMac",
-               "Ssid", SsidValue (ssid),
-               "BeaconInterval", TimeValue (MicroSeconds(102400)),
-               "BeaconGeneration", BooleanValue (true));
+    Ssid ssid = Ssid("simple-mpdu-aggregation");
+    mac.SetType("ns3::StaWifiMac",
+            "Ssid", SsidValue(ssid),
+            "ActiveProbing", BooleanValue(false));
 
-  if (nMpdus > 1) mac.SetBlockAckThresholdForAc (AC_BE, 2); //enable Block ACK when A-MPDU is enabled (i.e. nMpdus > 1)
-    
-  mac.SetMpduAggregatorForAc (AC_BE,"ns3::MpduStandardAggregator",
-                              "MaxAmpduSize", UintegerValue (nMpdus*(payloadSize+100))); //enable MPDU aggregation for AC_BE with a maximum aggregated size of nMpdus*(payloadSize+100) bytes, i.e. nMpdus aggregated packets in an A-MPDU
+    if (nMpdus > 1) mac.SetBlockAckThresholdForAc(AC_BE, 2); //enable Block ACK when A-MPDU is enabled (i.e. nMpdus > 1)
 
-  NetDeviceContainer apDevice;
-  apDevice = wifi.Install (phy, mac, wifiApNode);
+    mac.SetMpduAggregatorForAc(AC_BE, "ns3::MpduStandardAggregator",
+            "MaxAmpduSize", UintegerValue(nMpdus * (payloadSize + 100))); //enable MPDU aggregation for AC_BE with a maximum aggregated size of nMpdus*(payloadSize+100) bytes, i.e. nMpdus aggregated packets in an A-MPDU
 
-  /* Setting mobility model */
-  MobilityHelper mobility;
-  Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+    NetDeviceContainer staDevice;
+    staDevice = wifi.Install(phy, mac, wifiStaNode);
 
-  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (1.0, 0.0, 0.0));
-  mobility.SetPositionAllocator (positionAlloc);
+    mac.SetType("ns3::ApWifiMac",
+            "Ssid", SsidValue(ssid),
+            "BeaconInterval", TimeValue(MicroSeconds(102400)),
+            "BeaconGeneration", BooleanValue(true));
 
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    if (nMpdus > 1) mac.SetBlockAckThresholdForAc(AC_BE, 2); //enable Block ACK when A-MPDU is enabled (i.e. nMpdus > 1)
 
-  mobility.Install (wifiApNode);
-  mobility.Install (wifiStaNode);
+    mac.SetMpduAggregatorForAc(AC_BE, "ns3::MpduStandardAggregator",
+            "MaxAmpduSize", UintegerValue(nMpdus * (payloadSize + 100))); //enable MPDU aggregation for AC_BE with a maximum aggregated size of nMpdus*(payloadSize+100) bytes, i.e. nMpdus aggregated packets in an A-MPDU
 
-  /* Internet stack*/
-  InternetStackHelper stack;
-  stack.Install (wifiApNode);
-  stack.Install (wifiStaNode);
+    NetDeviceContainer apDevice;
+    apDevice = wifi.Install(phy, mac, wifiApNode);
 
-  Ipv4AddressHelper address;
+    /* Setting mobility model */
+    MobilityHelper mobility;
+    Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
 
-  address.SetBase ("192.168.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer StaInterface;
-  StaInterface = address.Assign (staDevice);
-  Ipv4InterfaceContainer ApInterface;
-  ApInterface = address.Assign (apDevice);
- 
-  /* Setting applications */
-  UdpServerHelper myServer (9);
-  ApplicationContainer serverApp = myServer.Install (wifiStaNode.Get (0));
-  serverApp.Start (Seconds (0.0));
-  serverApp.Stop (Seconds (simulationTime+1));
-      
-  UdpClientHelper myClient (StaInterface.GetAddress (0), 9);
-  myClient.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-  myClient.SetAttribute ("Interval", TimeValue (Time ("0.00002"))); //packets/s
-  myClient.SetAttribute ("PacketSize", UintegerValue (payloadSize));
-              
-  ApplicationContainer clientApp = myClient.Install (wifiApNode.Get (0));
-  clientApp.Start (Seconds (1.0));
-  clientApp.Stop (Seconds (simulationTime+1));
-      
-  Simulator::Stop (Seconds (simulationTime+1));
+    positionAlloc->Add(Vector(0.0, 0.0, 0.0));
+    positionAlloc->Add(Vector(1.0, 0.0, 0.0));
+    mobility.SetPositionAllocator(positionAlloc);
 
-  Simulator::Run ();
-  Simulator::Destroy ();
-      
-  uint32_t totalPacketsThrough = DynamicCast<UdpServer>(serverApp.Get (0))->GetReceived ();
-  double throughput = totalPacketsThrough*payloadSize*8/(simulationTime*1000000.0);
-  std::cout << "Throughput: " << throughput << " Mbit/s" << '\n';
-    
-  return 0;
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+
+    mobility.Install(wifiApNode);
+    mobility.Install(wifiStaNode);
+
+    /* Internet stack*/
+    InternetStackHelper stack;
+    stack.Install(wifiApNode);
+    stack.Install(wifiStaNode);
+
+    Ipv4AddressHelper address;
+
+    address.SetBase("192.168.1.0", "255.255.255.0");
+    Ipv4InterfaceContainer StaInterface;
+    StaInterface = address.Assign(staDevice);
+    Ipv4InterfaceContainer ApInterface;
+    ApInterface = address.Assign(apDevice);
+
+    /* Setting applications */
+    UdpServerHelper myServer(9);
+    ApplicationContainer serverApp = myServer.Install(wifiStaNode.Get(0));
+    serverApp.Start(Seconds(0.0));
+    serverApp.Stop(Seconds(simulationTime + 1));
+
+    UdpClientHelper myClient(StaInterface.GetAddress(0), 9);
+    myClient.SetAttribute("MaxPackets", UintegerValue(4294967295u));
+    myClient.SetAttribute("Interval", TimeValue(Time("0.00002"))); //packets/s
+    myClient.SetAttribute("PacketSize", UintegerValue(payloadSize));
+
+    ApplicationContainer clientApp = myClient.Install(wifiApNode.Get(0));
+    clientApp.Start(Seconds(1.0));
+    clientApp.Stop(Seconds(simulationTime + 1));
+
+    Simulator::Stop(Seconds(simulationTime + 1));
+
+    Simulator::Run();
+    Simulator::Destroy();
+
+    uint32_t totalPacketsThrough = DynamicCast<UdpServer>(serverApp.Get(0))->GetReceived();
+    double throughput = totalPacketsThrough * payloadSize * 8 / (simulationTime * 1000000.0);
+    std::cout << "Throughput: " << throughput << " Mbit/s" << '\n';
+
+    return 0;
 }

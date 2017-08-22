@@ -33,66 +33,64 @@
 #include "ns3/log.h"
 #include <algorithm>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("DsrGraReplyTable");
-  
-namespace dsr {
-
-NS_OBJECT_ENSURE_REGISTERED (GraReply);
-
-TypeId GraReply::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::dsr::GraReply")
-    .SetParent<Object> ()
-    .SetGroupName ("Dsr")
-    .AddConstructor<GraReply> ()
-  ;
-  return tid;
-}
 
-GraReply::GraReply ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("DsrGraReplyTable");
 
-GraReply::~GraReply ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-}
+    namespace dsr{
 
-bool
-GraReply::FindAndUpdate (Ipv4Address replyTo, Ipv4Address replyFrom, Time gratReplyHoldoff)
-{
-  Purge ();  // purge the gratuitous reply table
-  for (std::vector<GraReplyEntry>::iterator i = m_graReply.begin ();
-       i != m_graReply.end (); ++i)
-    {
-      if ((i->m_replyTo == replyTo) && (i->m_hearFrom == replyFrom))
+        NS_OBJECT_ENSURE_REGISTERED(GraReply);
+
+        TypeId GraReply::GetTypeId()
         {
-          NS_LOG_DEBUG ("Update the reply to ip address if found the gratuitous reply entry");
-          i->m_gratReplyHoldoff = std::max (gratReplyHoldoff + Simulator::Now (), i->m_gratReplyHoldoff);
-          return true;
+            static TypeId tid = TypeId("ns3::dsr::GraReply")
+            .SetParent<Object> ()
+            .SetGroupName("Dsr")
+            .AddConstructor<GraReply> ()
+            ;
+            return tid;
         }
-    }
-  return false;
-}
 
-bool
-GraReply::AddEntry (GraReplyEntry & graTableEntry)
-{
-  m_graReply.push_back (graTableEntry);
-  return true;
-}
+        GraReply::GraReply()
+        {
+        }
 
-void
-GraReply::Purge ()
-{
-  /*
-   * Purge the expired gratuitous reply entries
-   */
-  m_graReply.erase (remove_if (m_graReply.begin (), m_graReply.end (),
-                               IsExpired ()), m_graReply.end ());
-}
+        GraReply::~GraReply()
+        {
+            NS_LOG_FUNCTION_NOARGS();
+        }
 
+        bool
+        GraReply::FindAndUpdate(Ipv4Address replyTo, Ipv4Address replyFrom, Time gratReplyHoldoff)
+        {
+            Purge(); // purge the gratuitous reply table
+            for (std::vector<GraReplyEntry>::iterator i = m_graReply.begin();
+                    i != m_graReply.end(); ++i) {
+                if ((i->m_replyTo == replyTo) && (i->m_hearFrom == replyFrom)) {
+                    NS_LOG_DEBUG("Update the reply to ip address if found the gratuitous reply entry");
+                    i->m_gratReplyHoldoff = std::max(gratReplyHoldoff + Simulator::Now(), i->m_gratReplyHoldoff);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool
+        GraReply::AddEntry(GraReplyEntry & graTableEntry)
+        {
+            m_graReply.push_back(graTableEntry);
+            return true;
+        }
+
+        void
+        GraReply::Purge()
+        {
+            /*
+             * Purge the expired gratuitous reply entries
+             */
+            m_graReply.erase(remove_if(m_graReply.begin(), m_graReply.end(),
+            IsExpired()), m_graReply.end());
+        }
 } // namespace dsr
 } // namespace ns3

@@ -32,78 +32,75 @@ NS_LOG_COMPONENT_DEFINE("OneInterestRequester");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED(OneInterestRequester);
+    NS_OBJECT_ENSURE_REGISTERED(OneInterestRequester);
 
-// register NS-3 type
-TypeId
-OneInterestRequester::GetTypeId()
-{
-  static TypeId tid =
-    TypeId("OneInterestRequester")
-      .SetParent<ndn::App>()
-      .AddConstructor<OneInterestRequester>()
+    // register NS-3 type
 
-      .AddAttribute("Prefix", "Requested name", StringValue("/dumb-interest"),
-                    ndn::MakeNameAccessor(&OneInterestRequester::m_name), ndn::MakeNameChecker());
-  return tid;
-}
+    TypeId
+    OneInterestRequester::GetTypeId() {
+        static TypeId tid =
+                TypeId("OneInterestRequester")
+                .SetParent<ndn::App>()
+                .AddConstructor<OneInterestRequester>()
 
-OneInterestRequester::OneInterestRequester()
-  : m_isRunning(false)
-{
-}
+                .AddAttribute("Prefix", "Requested name", StringValue("/dumb-interest"),
+                ndn::MakeNameAccessor(&OneInterestRequester::m_name), ndn::MakeNameChecker());
+        return tid;
+    }
 
-// Processing upon start of the application
-void
-OneInterestRequester::StartApplication()
-{
-  // initialize ndn::App
-  ndn::App::StartApplication();
+    OneInterestRequester::OneInterestRequester()
+    : m_isRunning(false) {
+    }
 
-  m_isRunning = true;
-  Simulator::ScheduleNow(&OneInterestRequester::SendInterest, this);
-}
+    // Processing upon start of the application
 
-// Processing when application is stopped
-void
-OneInterestRequester::StopApplication()
-{
-  m_isRunning = false;
-  // cleanup ndn::App
-  ndn::App::StopApplication();
-}
+    void
+    OneInterestRequester::StartApplication() {
+        // initialize ndn::App
+        ndn::App::StartApplication();
 
-void
-OneInterestRequester::SendInterest()
-{
-  if (!m_isRunning)
-    return;
+        m_isRunning = true;
+        Simulator::ScheduleNow(&OneInterestRequester::SendInterest, this);
+    }
 
-  /////////////////////////////////////
-  // Sending one Interest packet out //
-  /////////////////////////////////////
+    // Processing when application is stopped
 
-  // Create and configure ndn::Interest
-  auto interest = std::make_shared<ndn::Interest>(m_name);
-  Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
-  interest->setNonce(rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
-  interest->setInterestLifetime(ndn::time::seconds(1));
+    void
+    OneInterestRequester::StopApplication() {
+        m_isRunning = false;
+        // cleanup ndn::App
+        ndn::App::StopApplication();
+    }
 
-  NS_LOG_DEBUG("Sending Interest packet for " << m_name);
+    void
+    OneInterestRequester::SendInterest() {
+        if (!m_isRunning)
+            return;
 
-  // Call trace (for logging purposes)
-  m_transmittedInterests(interest, this, m_face);
+        /////////////////////////////////////
+        // Sending one Interest packet out //
+        /////////////////////////////////////
 
-  NS_LOG_DEBUG(">> I: " << m_name);
+        // Create and configure ndn::Interest
+        auto interest = std::make_shared<ndn::Interest>(m_name);
+        Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+        interest->setNonce(rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
+        interest->setInterestLifetime(ndn::time::seconds(1));
 
-  // Forward packet to lower (network) layer
-  m_appLink->onReceiveInterest(*interest);
-}
+        NS_LOG_DEBUG("Sending Interest packet for " << m_name);
 
-void
-OneInterestRequester::OnData(std::shared_ptr<const ndn::Data> data)
-{
-  NS_LOG_DEBUG("<< D: " << data->getName());
-}
+        // Call trace (for logging purposes)
+        m_transmittedInterests(interest, this, m_face);
+
+        NS_LOG_DEBUG(">> I: " << m_name);
+
+        // Forward packet to lower (network) layer
+        m_appLink->onReceiveInterest(*interest);
+    }
+
+    void
+    OneInterestRequester::OnData(std::shared_ptr<const ndn::Data> data) {
+        NS_LOG_DEBUG("<< D: " << data->getName());
+    }
 
 } // namespace ns3

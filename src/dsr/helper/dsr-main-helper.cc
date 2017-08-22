@@ -40,71 +40,63 @@
 #include "ns3/ptr.h"
 #include "ns3/node.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("DsrMainHelper");
-
-DsrMainHelper::DsrMainHelper ()
-  : m_dsrHelper (0)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-DsrMainHelper::DsrMainHelper (const DsrMainHelper &o)
-{
-  NS_LOG_FUNCTION (this);
-  m_dsrHelper = o.m_dsrHelper->Copy ();
-}
+    NS_LOG_COMPONENT_DEFINE("DsrMainHelper");
 
-DsrMainHelper::~DsrMainHelper ()
-{
-  NS_LOG_FUNCTION (this);
-  delete m_dsrHelper;
-}
-
-DsrMainHelper &
-DsrMainHelper::operator = (const DsrMainHelper &o)
-{
-  if (this == &o)
-    {
-      return *this;
+    DsrMainHelper::DsrMainHelper()
+            : m_dsrHelper(0) {
+        NS_LOG_FUNCTION(this);
     }
-  m_dsrHelper = o.m_dsrHelper->Copy ();
-  return *this;
-}
 
-void
-DsrMainHelper::Install (DsrHelper &dsrHelper, NodeContainer nodes)
-{
-  NS_LOG_DEBUG ("Passed node container");
-  delete m_dsrHelper;
-  m_dsrHelper = dsrHelper.Copy ();
-  for (NodeContainer::Iterator i = nodes.Begin (); i != nodes.End (); ++i)
-    {
-      Install (*i);
+    DsrMainHelper::DsrMainHelper(const DsrMainHelper & o) {
+        NS_LOG_FUNCTION(this);
+        m_dsrHelper = o.m_dsrHelper->Copy();
     }
-}
 
-void
-DsrMainHelper::Install (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (node);
-  Ptr<ns3::dsr::DsrRouting> dsr = m_dsrHelper->Create (node);
-//  Ptr<ns3::dsr::RouteCache> routeCache = CreateObject<ns3::dsr::RouteCache> ();
-//  Ptr<ns3::dsr::RreqTable> rreqTable = CreateObject<ns3::dsr::RreqTable> ();
-//  dsr->SetRouteCache (routeCache);
-//  dsr->SetRequestTable (rreqTable);
-  dsr->SetNode (node);
-//  node->AggregateObject (routeCache);
-//  node->AggregateObject (rreqTable);
-}
+    DsrMainHelper::~DsrMainHelper() {
+        NS_LOG_FUNCTION(this);
+        delete m_dsrHelper;
+    }
 
-void
-DsrMainHelper::SetDsrHelper (DsrHelper &dsrHelper)
-{
-  NS_LOG_FUNCTION (this);
-  delete m_dsrHelper;
-  m_dsrHelper = dsrHelper.Copy ();
-}
+    DsrMainHelper &
+            DsrMainHelper::operator = (const DsrMainHelper & o){
+        if (this == &o) {
+            return *this;
+        }
+        m_dsrHelper = o.m_dsrHelper->Copy();
+        return *this;
+    }
+
+    void
+    DsrMainHelper::Install(DsrHelper &dsrHelper, NodeContainer nodes) {
+        NS_LOG_DEBUG("Passed node container");
+        delete m_dsrHelper;
+        m_dsrHelper = dsrHelper.Copy();
+        for (NodeContainer::Iterator i = nodes.Begin(); i != nodes.End(); ++i) {
+            Install(*i);
+        }
+    }
+
+    void
+    DsrMainHelper::Install(Ptr<Node> node) {
+        NS_LOG_FUNCTION(node);
+        Ptr<ns3::dsr::DsrRouting> dsr = m_dsrHelper->Create(node);
+        //  Ptr<ns3::dsr::RouteCache> routeCache = CreateObject<ns3::dsr::RouteCache> ();
+        //  Ptr<ns3::dsr::RreqTable> rreqTable = CreateObject<ns3::dsr::RreqTable> ();
+        //  dsr->SetRouteCache (routeCache);
+        //  dsr->SetRequestTable (rreqTable);
+        dsr->SetNode(node);
+        //  node->AggregateObject (routeCache);
+        //  node->AggregateObject (rreqTable);
+    }
+
+    void
+    DsrMainHelper::SetDsrHelper(DsrHelper & dsrHelper) {
+        NS_LOG_FUNCTION(this);
+        delete m_dsrHelper;
+        m_dsrHelper = dsrHelper.Copy();
+    }
 
 } // namespace ns3

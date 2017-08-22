@@ -23,29 +23,29 @@
 #define MESH_STACK_INSTALLER_H
 #include "ns3/mesh-point-device.h"
 namespace ns3 {
-/**
- * \ingroup mesh
- *
- * \brief Prototype for class, which helps to install MAC-layer
- * routing stack to ns3::MeshPointDevice
- *
- * You need to create a MeshPointDevice and attach all
- * interfaces to it, than call Install method
- */
-class MeshStack : public Object
-{
-public:
-  /// \brief Register this type.
-  /// \return The TypeId.
-  static TypeId GetTypeId (void);
-  
-  ///\brief Installs mesh stack. needed by helper only
-  virtual bool InstallStack (Ptr<MeshPointDevice> mp) = 0;
-  /// Report statistics of a given mesh point
-  virtual void Report (const Ptr<MeshPointDevice> mp, std::ostream&) = 0;
-  /// Reset statistics of a given mesh point
-  virtual void ResetStats (const Ptr<MeshPointDevice> mp) = 0;
-};
+
+    /**
+     * \ingroup mesh
+     *
+     * \brief Prototype for class, which helps to install MAC-layer
+     * routing stack to ns3::MeshPointDevice
+     *
+     * You need to create a MeshPointDevice and attach all
+     * interfaces to it, than call Install method
+     */
+    class MeshStack : public Object {
+    public:
+        /// \brief Register this type.
+        /// \return The TypeId.
+        static TypeId GetTypeId(void);
+
+        ///\brief Installs mesh stack. needed by helper only
+        virtual bool InstallStack(Ptr<MeshPointDevice> mp) = 0;
+        /// Report statistics of a given mesh point
+        virtual void Report(const Ptr<MeshPointDevice> mp, std::ostream&) = 0;
+        /// Reset statistics of a given mesh point
+        virtual void ResetStats(const Ptr<MeshPointDevice> mp) = 0;
+    };
 }
 #endif
 

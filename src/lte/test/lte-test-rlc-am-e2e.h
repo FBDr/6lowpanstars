@@ -27,15 +27,13 @@
 
 using namespace ns3;
 
-
 /**
  * Provides the test suite lte-rlc-am-e2e. See the testing section of
  * the LTE module documentation for details.  
  */
-class LteRlcAmE2eTestSuite : public TestSuite
-{
+class LteRlcAmE2eTestSuite : public TestSuite {
 public:
-  LteRlcAmE2eTestSuite ();
+    LteRlcAmE2eTestSuite();
 };
 
 /**
@@ -43,21 +41,20 @@ public:
  * the LTE module documentation for details.  
  * 
  */
-class LteRlcAmE2eTestCase : public TestCase
-{
-  public:
-  LteRlcAmE2eTestCase (std::string name, uint32_t seed, double losses, bool bulkSduArrival);
-    LteRlcAmE2eTestCase ();
-    virtual ~LteRlcAmE2eTestCase ();
+class LteRlcAmE2eTestCase : public TestCase {
+public:
+    LteRlcAmE2eTestCase(std::string name, uint32_t seed, double losses, bool bulkSduArrival);
+    LteRlcAmE2eTestCase();
+    virtual ~LteRlcAmE2eTestCase();
 
-  private:
-    virtual void DoRun (void);
+private:
+    virtual void DoRun(void);
 
-    void DlDropEvent (Ptr<const Packet> p);
-    void UlDropEvent (Ptr<const Packet> p);
+    void DlDropEvent(Ptr<const Packet> p);
+    void UlDropEvent(Ptr<const Packet> p);
 
     uint32_t m_run;
-    double   m_losses;
+    double m_losses;
     bool m_bulkSduArrival;
 
     uint32_t m_dlDrops;

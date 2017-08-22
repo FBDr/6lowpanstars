@@ -33,26 +33,25 @@
 #include <iostream>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-BOOST_AUTO_TEST_SUITE(UtilNetworkMonitor)
+        BOOST_AUTO_TEST_SUITE(UtilNetworkMonitor)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  boost::asio::io_service io;
-  BOOST_REQUIRE_NO_THROW((NetworkMonitor(io)));
+        BOOST_AUTO_TEST_CASE(Basic) {
+            boost::asio::io_service io;
+            BOOST_REQUIRE_NO_THROW((NetworkMonitor(io)));
 
-  NetworkMonitor monitor(io);
+            NetworkMonitor monitor(io);
 
-  monitor.onNetworkStateChanged.connect([] {
-      std::cout << time::toString(time::system_clock::now())
-                << "\tReceived network state change event" << std::endl;
-    });
+            monitor.onNetworkStateChanged.connect([] {
+                std::cout << time::toString(time::system_clock::now())
+                        << "\tReceived network state change event" << std::endl;
+            });
 
-  io.run();
-}
+            io.run();
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

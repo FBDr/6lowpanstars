@@ -28,78 +28,77 @@
 
 namespace ns3 {
 
-/**
- * \brief Information element vector
- * \ingroup wifi
- *
- * Implements a vector of WifiInformationElements.
- * Information elements typically come in groups, and the
- * WifiInformationElementVector class provides a representation of a
- * series of IEs, and the facility for serialisation to and
- * deserialisation from the over-the-air format.
- */
-class WifiInformationElementVector : public Header
-{
-public:
-  WifiInformationElementVector ();
-  virtual ~WifiInformationElementVector ();
+    /**
+     * \brief Information element vector
+     * \ingroup wifi
+     *
+     * Implements a vector of WifiInformationElements.
+     * Information elements typically come in groups, and the
+     * WifiInformationElementVector class provides a representation of a
+     * series of IEs, and the facility for serialisation to and
+     * deserialisation from the over-the-air format.
+     */
+    class WifiInformationElementVector : public Header {
+    public:
+        WifiInformationElementVector();
+        virtual ~WifiInformationElementVector();
 
-  static TypeId GetTypeId ();
-  TypeId GetInstanceTypeId () const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  /**
-   * \attention When you use RemoveHeader, WifiInformationElementVector supposes, that
-   * all buffer consists of information elements
-   *
-   * \param start
-   */
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-  virtual void Print (std::ostream &os) const;
+        static TypeId GetTypeId();
+        TypeId GetInstanceTypeId() const;
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        /**
+         * \attention When you use RemoveHeader, WifiInformationElementVector supposes, that
+         * all buffer consists of information elements
+         *
+         * \param start
+         */
+        virtual uint32_t Deserialize(Buffer::Iterator start);
+        virtual void Print(std::ostream &os) const;
 
-  /**
-   * \brief Needed when you try to deserialize a lonely IE inside other header
-   *
-   * \param start is the start of the buffer
-   *
-   * \return deserialized bytes
-   */
-  virtual uint32_t DeserializeSingleIe (Buffer::Iterator start);
-  /// Set maximum size to control overflow of the max packet length
-  void SetMaxSize (uint16_t size);
-  /// As soon as this is a vector, we define an Iterator
-  typedef std::vector<Ptr<WifiInformationElement> >::iterator Iterator;
-  /// Returns Begin of the vector
-  Iterator Begin ();
-  /// Returns End of the vector
-  Iterator End ();
-  /// add an IE, if maxSize has exceeded, returns false
-  bool AddInformationElement (Ptr<WifiInformationElement> element);
-  /// vector of pointers to information elements is the body of IeVector
-  Ptr<WifiInformationElement> FindFirst (WifiInformationElementId id) const;
+        /**
+         * \brief Needed when you try to deserialize a lonely IE inside other header
+         *
+         * \param start is the start of the buffer
+         *
+         * \return deserialized bytes
+         */
+        virtual uint32_t DeserializeSingleIe(Buffer::Iterator start);
+        /// Set maximum size to control overflow of the max packet length
+        void SetMaxSize(uint16_t size);
+        /// As soon as this is a vector, we define an Iterator
+        typedef std::vector<Ptr<WifiInformationElement> >::iterator Iterator;
+        /// Returns Begin of the vector
+        Iterator Begin();
+        /// Returns End of the vector
+        Iterator End();
+        /// add an IE, if maxSize has exceeded, returns false
+        bool AddInformationElement(Ptr<WifiInformationElement> element);
+        /// vector of pointers to information elements is the body of IeVector
+        Ptr<WifiInformationElement> FindFirst(WifiInformationElementId id) const;
 
-  /**
-   * Check if the given WifiInformationElementVectors are equivalent.
-   *
-   * \param a another WifiInformationElementVector
-   *
-   * \return true if the given WifiInformationElementVectors are equivalent,
-   *         false otherwise
-   */
-  virtual bool operator== (const WifiInformationElementVector & a) const;
+        /**
+         * Check if the given WifiInformationElementVectors are equivalent.
+         *
+         * \param a another WifiInformationElementVector
+         *
+         * \return true if the given WifiInformationElementVectors are equivalent,
+         *         false otherwise
+         */
+        virtual bool operator==(const WifiInformationElementVector & a) const;
 
 
-protected:
-  /**
-   * typedef for a vector of WifiInformationElements.
-   */
-  typedef std::vector<Ptr<WifiInformationElement> > IE_VECTOR;
-  /// Current number of bytes
-  uint32_t GetSize () const;
-  IE_VECTOR m_elements; //!< Information element vector
-  /// Size in bytes (actually, max packet length)
-  uint16_t m_maxSize;
-};
+    protected:
+        /**
+         * typedef for a vector of WifiInformationElements.
+         */
+        typedef std::vector<Ptr<WifiInformationElement> > IE_VECTOR;
+        /// Current number of bytes
+        uint32_t GetSize() const;
+        IE_VECTOR m_elements; //!< Information element vector
+        /// Size in bytes (actually, max packet length)
+        uint16_t m_maxSize;
+    };
 
 } //namespace ns3
 

@@ -32,26 +32,26 @@
 #include "fw/algorithm.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-class RandomLoadBalancerStrategy : public Strategy {
-public:
-  RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        class RandomLoadBalancerStrategy : public Strategy {
+        public:
+            RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual ~RandomLoadBalancerStrategy() override;
+            virtual ~RandomLoadBalancerStrategy() override;
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-public:
-  static const Name STRATEGY_NAME;
+        public:
+            static const Name STRATEGY_NAME;
 
-protected:
-  boost::random::mt19937 m_randomGenerator;
-};
+        protected:
+            boost::random::mt19937 m_randomGenerator;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NDNSIM_EXAMPLES_NDN_LOAD_BALANCER_RANDOM_LOAD_BALANCER_STRATEGY_HPP

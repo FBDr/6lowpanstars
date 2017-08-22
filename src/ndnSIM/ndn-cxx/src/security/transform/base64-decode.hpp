@@ -25,65 +25,64 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to perform Base64 decoding transformation.
- */
-class Base64Decode : public Transform
-{
-public:
-  /**
-   * @brief Create a base64 decoding module
-   *
-   * @p expectNewlineEvery64Bytes if true, expect newline after every 64 bytes, otherwise expect
-   *                              all input to be in a single line. Output is undefined if input
-   *                              does not conform to the requirement.
-   */
-  explicit
-  Base64Decode(bool expectNewlineEvery64Bytes = true);
+            /**
+             * @brief The module to perform Base64 decoding transformation.
+             */
+            class Base64Decode : public Transform {
+            public:
+                /**
+                 * @brief Create a base64 decoding module
+                 *
+                 * @p expectNewlineEvery64Bytes if true, expect newline after every 64 bytes, otherwise expect
+                 *                              all input to be in a single line. Output is undefined if input
+                 *                              does not conform to the requirement.
+                 */
+                explicit
+                Base64Decode(bool expectNewlineEvery64Bytes = true);
 
-private:
+            private:
 
-  /**
-   * @brief Read partial transformation results into output buffer and write them into next module.
-   */
-  virtual void
-  preTransform() final;
+                /**
+                 * @brief Read partial transformation results into output buffer and write them into next module.
+                 */
+                virtual void
+                preTransform() final;
 
-  /**
-   * @brief Decode data @p buf in base64 format
-   *
-   * @return number of bytes that have been accepted by the converter
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+                /**
+                 * @brief Decode data @p buf in base64 format
+                 *
+                 * @return number of bytes that have been accepted by the converter
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize base64 decoding
-   *
-   * This method with read all decoding results from the converter and write them into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize base64 decoding
+                 *
+                 * This method with read all decoding results from the converter and write them into next module.
+                 */
+                virtual void
+                finalize() final;
 
-  /**
-   * @brief Try to fill partial decoding result into output buffer.
-   */
-  void
-  fillOutputBuffer();
+                /**
+                 * @brief Try to fill partial decoding result into output buffer.
+                 */
+                void
+                fillOutputBuffer();
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-base64Decode(bool expectNewlineEvery64Bytes = true);
+            unique_ptr<Transform>
+            base64Decode(bool expectNewlineEvery64Bytes = true);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_BASE64_DECODE_HPP

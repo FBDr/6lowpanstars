@@ -32,105 +32,103 @@
 
 namespace ns3 {
 
+    /**
+     * \brief Simple Frequency Reuse algorithm implementation which uses only 1 sub-band.
+     *                Used to test Downlink Power Allocation. When Simple FR receives UE measurements
+     *                it immediately call functions to change PdschConfigDedicated (i.e. P_A) value for
+     *                this UE.
+     */
+    class LteFfrSimple : public LteFfrAlgorithm {
+    public:
+        /**
+         * \brief Creates a trivial ffr algorithm instance.
+         */
+        LteFfrSimple();
 
-/**
- * \brief Simple Frequency Reuse algorithm implementation which uses only 1 sub-band.
- *                Used to test Downlink Power Allocation. When Simple FR receives UE measurements
- *                it immediately call functions to change PdschConfigDedicated (i.e. P_A) value for
- *                this UE.
- */
-class LteFfrSimple : public LteFfrAlgorithm
-{
-public:
-  /**
-   * \brief Creates a trivial ffr algorithm instance.
-   */
-  LteFfrSimple ();
+        virtual ~LteFfrSimple();
 
-  virtual ~LteFfrSimple ();
+        // inherited from Object
+        static TypeId GetTypeId();
 
-  // inherited from Object
-  static TypeId GetTypeId ();
+        void ChangePdschConfigDedicated(bool change);
+        void SetPdschConfigDedicated(LteRrcSap::PdschConfigDedicated pdschConfigDedicated);
 
-  void ChangePdschConfigDedicated (bool change);
-  void SetPdschConfigDedicated (LteRrcSap::PdschConfigDedicated pdschConfigDedicated);
+        void SetTpc(uint32_t tpc, uint32_t num, bool acculumatedMode);
 
-  void SetTpc (uint32_t tpc, uint32_t num, bool acculumatedMode);
+        // inherited from LteFfrAlgorithm
+        virtual void SetLteFfrSapUser(LteFfrSapUser* s);
+        virtual LteFfrSapProvider* GetLteFfrSapProvider();
 
-  // inherited from LteFfrAlgorithm
-  virtual void SetLteFfrSapUser (LteFfrSapUser* s);
-  virtual LteFfrSapProvider* GetLteFfrSapProvider ();
+        virtual void SetLteFfrRrcSapUser(LteFfrRrcSapUser* s);
+        virtual LteFfrRrcSapProvider* GetLteFfrRrcSapProvider();
 
-  virtual void SetLteFfrRrcSapUser (LteFfrRrcSapUser* s);
-  virtual LteFfrRrcSapProvider* GetLteFfrRrcSapProvider ();
+        // let the forwarder class access the protected and private members
+        friend class MemberLteFfrSapProvider<LteFfrSimple>;
+        friend class MemberLteFfrRrcSapProvider<LteFfrSimple>;
 
-  // let the forwarder class access the protected and private members
-  friend class MemberLteFfrSapProvider<LteFfrSimple>;
-  friend class MemberLteFfrRrcSapProvider<LteFfrSimple>;
+    protected:
+        // inherited from Object
+        virtual void DoInitialize();
+        virtual void DoDispose();
 
-protected:
-  // inherited from Object
-  virtual void DoInitialize ();
-  virtual void DoDispose ();
+        virtual void Reconfigure();
 
-  virtual void Reconfigure ();
+        // FFR SAP PROVIDER IMPLEMENTATION
+        virtual std::vector <bool> DoGetAvailableDlRbg();
+        virtual bool DoIsDlRbgAvailableForUe(int i, uint16_t rnti);
+        virtual std::vector <bool> DoGetAvailableUlRbg();
+        virtual bool DoIsUlRbgAvailableForUe(int i, uint16_t rnti);
+        virtual void DoReportDlCqiInfo(const struct FfMacSchedSapProvider::SchedDlCqiInfoReqParameters& params);
+        virtual void DoReportUlCqiInfo(const struct FfMacSchedSapProvider::SchedUlCqiInfoReqParameters& params);
+        virtual void DoReportUlCqiInfo(std::map <uint16_t, std::vector <double> > ulCqiMap);
+        virtual uint8_t DoGetTpc(uint16_t rnti);
+        virtual uint8_t DoGetMinContinuousUlBandwidth();
 
-  // FFR SAP PROVIDER IMPLEMENTATION
-  virtual std::vector <bool> DoGetAvailableDlRbg ();
-  virtual bool DoIsDlRbgAvailableForUe (int i, uint16_t rnti);
-  virtual std::vector <bool> DoGetAvailableUlRbg ();
-  virtual bool DoIsUlRbgAvailableForUe (int i, uint16_t rnti);
-  virtual void DoReportDlCqiInfo (const struct FfMacSchedSapProvider::SchedDlCqiInfoReqParameters& params);
-  virtual void DoReportUlCqiInfo (const struct FfMacSchedSapProvider::SchedUlCqiInfoReqParameters& params);
-  virtual void DoReportUlCqiInfo ( std::map <uint16_t, std::vector <double> > ulCqiMap );
-  virtual uint8_t DoGetTpc (uint16_t rnti);
-  virtual uint8_t DoGetMinContinuousUlBandwidth ();
+        // FFR SAP RRC PROVIDER IMPLEMENTATION
+        virtual void DoReportUeMeas(uint16_t rnti, LteRrcSap::MeasResults measResults);
+        virtual void DoRecvLoadInformation(EpcX2Sap::LoadInformationParams params);
 
-  // FFR SAP RRC PROVIDER IMPLEMENTATION
-  virtual void DoReportUeMeas (uint16_t rnti, LteRrcSap::MeasResults measResults);
-  virtual void DoRecvLoadInformation (EpcX2Sap::LoadInformationParams params);
+    private:
 
-private:
+        void UpdatePdschConfigDedicated();
 
-  void UpdatePdschConfigDedicated ();
+        // FFR SAP
+        LteFfrSapUser* m_ffrSapUser;
+        LteFfrSapProvider* m_ffrSapProvider;
 
-  // FFR SAP
-  LteFfrSapUser* m_ffrSapUser;
-  LteFfrSapProvider* m_ffrSapProvider;
+        // FFR RRF SAP
+        LteFfrRrcSapUser* m_ffrRrcSapUser;
+        LteFfrRrcSapProvider* m_ffrRrcSapProvider;
 
-  // FFR RRF SAP
-  LteFfrRrcSapUser* m_ffrRrcSapUser;
-  LteFfrRrcSapProvider* m_ffrRrcSapProvider;
+        uint8_t m_dlOffset;
+        uint8_t m_dlSubBand;
 
-  uint8_t m_dlOffset;
-  uint8_t m_dlSubBand;
+        uint8_t m_ulOffset;
+        uint8_t m_ulSubBand;
 
-  uint8_t m_ulOffset;
-  uint8_t m_ulSubBand;
+        std::vector <bool> m_dlRbgMap;
+        std::vector <bool> m_ulRbgMap;
 
-  std::vector <bool> m_dlRbgMap;
-  std::vector <bool> m_ulRbgMap;
+        std::map <uint16_t, LteRrcSap::PdschConfigDedicated> m_ues;
 
-  std::map <uint16_t, LteRrcSap::PdschConfigDedicated> m_ues;
+        // The expected measurement identity
+        uint8_t m_measId;
 
-  // The expected measurement identity
-  uint8_t m_measId;
+        bool m_changePdschConfigDedicated;
 
-  bool m_changePdschConfigDedicated;
+        LteRrcSap::PdschConfigDedicated m_pdschConfigDedicated;
 
-  LteRrcSap::PdschConfigDedicated m_pdschConfigDedicated;
+        typedef void (* PdschTracedCallback)(uint16_t, uint8_t);
 
-  typedef void (* PdschTracedCallback)(uint16_t, uint8_t);
-
-  TracedCallback<uint16_t, uint8_t> m_changePdschConfigDedicatedTrace;
+        TracedCallback<uint16_t, uint8_t> m_changePdschConfigDedicatedTrace;
 
 
-  //Uplink Power Control
-  uint32_t m_tpc;
-  uint32_t m_tpcNum;
-  bool m_acculumatedMode;
+        //Uplink Power Control
+        uint32_t m_tpc;
+        uint32_t m_tpcNum;
+        bool m_acculumatedMode;
 
-}; // end of class LteFfrSimple
+    }; // end of class LteFfrSimple
 
 
 } // end of namespace ns3

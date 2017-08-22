@@ -25,95 +25,95 @@
 
 namespace ns3 {
 
-struct ParfWifiRemoteStation;
-/**
- * \ingroup wifi
- * PARF Rate control algorithm
- *
- * This class implements the PARF algorithm as described in
- * <i>Self-management in chaotic wireless deployments</i>, by
- * Akella, A.; Judd, G.; Seshan, S. and Steenkiste, P. in
- * Wireless Networks, Kluwer Academic Publishers, 2007, 13, 737-755
- * http://www.cs.odu.edu/~nadeem/classes/cs795-WNS-S13/papers/enter-006.pdf
- *
- */
-class ParfWifiManager : public WifiRemoteStationManager
-{
-public:
-  /**
-   * Register this type.
-   * \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
-  ParfWifiManager ();
-  virtual ~ParfWifiManager ();
+    struct ParfWifiRemoteStation;
 
-  virtual void SetupPhy (Ptr<WifiPhy> phy);
+    /**
+     * \ingroup wifi
+     * PARF Rate control algorithm
+     *
+     * This class implements the PARF algorithm as described in
+     * <i>Self-management in chaotic wireless deployments</i>, by
+     * Akella, A.; Judd, G.; Seshan, S. and Steenkiste, P. in
+     * Wireless Networks, Kluwer Academic Publishers, 2007, 13, 737-755
+     * http://www.cs.odu.edu/~nadeem/classes/cs795-WNS-S13/papers/enter-006.pdf
+     *
+     */
+    class ParfWifiManager : public WifiRemoteStationManager {
+    public:
+        /**
+         * Register this type.
+         * \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
+        ParfWifiManager();
+        virtual ~ParfWifiManager();
 
-  /**
-   * TracedCallback signature for power change events.
-   *
-   * \param [in] power The new power.
-   * \param [in] address The remote station MAC address.
-   */
-  typedef void (*PowerChangeTracedCallback)(const uint8_t power, const Mac48Address remoteAddress);
-  /**
-   * TracedCallback signature for rate change events.
-   *
-   * \param [in] rate The new rate.
-   * \param [in] address The remote station MAC address.
-   */
-  typedef void (*RateChangeTracedCallback)(const uint32_t rate, const Mac48Address remoteAddress);
+        virtual void SetupPhy(Ptr<WifiPhy> phy);
+
+        /**
+         * TracedCallback signature for power change events.
+         *
+         * \param [in] power The new power.
+         * \param [in] address The remote station MAC address.
+         */
+        typedef void (*PowerChangeTracedCallback)(const uint8_t power, const Mac48Address remoteAddress);
+        /**
+         * TracedCallback signature for rate change events.
+         *
+         * \param [in] rate The new rate.
+         * \param [in] address The remote station MAC address.
+         */
+        typedef void (*RateChangeTracedCallback)(const uint32_t rate, const Mac48Address remoteAddress);
 
 
-private:
-  //overriden from base class
-  virtual WifiRemoteStation * DoCreateStation (void) const;
-  virtual void DoReportRxOk (WifiRemoteStation *station,
-                             double rxSnr, WifiMode txMode);
-  virtual void DoReportRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportDataFailed (WifiRemoteStation *station);
-  virtual void DoReportRtsOk (WifiRemoteStation *station,
-                              double ctsSnr, WifiMode ctsMode, double rtsSnr);
-  virtual void DoReportDataOk (WifiRemoteStation *station,
-                               double ackSnr, WifiMode ackMode, double dataSnr);
-  virtual void DoReportFinalRtsFailed (WifiRemoteStation *station);
-  virtual void DoReportFinalDataFailed (WifiRemoteStation *station);
-  virtual WifiTxVector DoGetDataTxVector (WifiRemoteStation *station, uint32_t size);
-  virtual WifiTxVector DoGetRtsTxVector (WifiRemoteStation *station);
-  virtual bool IsLowLatency (void) const;
+    private:
+        //overriden from base class
+        virtual WifiRemoteStation * DoCreateStation(void) const;
+        virtual void DoReportRxOk(WifiRemoteStation *station,
+                double rxSnr, WifiMode txMode);
+        virtual void DoReportRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportDataFailed(WifiRemoteStation *station);
+        virtual void DoReportRtsOk(WifiRemoteStation *station,
+                double ctsSnr, WifiMode ctsMode, double rtsSnr);
+        virtual void DoReportDataOk(WifiRemoteStation *station,
+                double ackSnr, WifiMode ackMode, double dataSnr);
+        virtual void DoReportFinalRtsFailed(WifiRemoteStation *station);
+        virtual void DoReportFinalDataFailed(WifiRemoteStation *station);
+        virtual WifiTxVector DoGetDataTxVector(WifiRemoteStation *station, uint32_t size);
+        virtual WifiTxVector DoGetRtsTxVector(WifiRemoteStation *station);
+        virtual bool IsLowLatency(void) const;
 
-  /** Check for initializations.
-   *
-   * \param station The remote station.
-   */
-  void CheckInit (ParfWifiRemoteStation *station);
+        /** Check for initializations.
+         *
+         * \param station The remote station.
+         */
+        void CheckInit(ParfWifiRemoteStation *station);
 
-  uint32_t m_attemptThreshold; //!< The minimum number of transmission attempts to try a new power or rate. The 'timer' threshold in the ARF algorithm.
-  uint32_t m_successThreshold; //!< The minimum number of successful transmissions to try a new power or rate.
-  
-  /**
-   * Minimal power level.
-   * In contrast to rate, power levels do not depend on the remote station.
-   * The levels depend only on the physical layer of the device.
-   */
-  uint32_t m_minPower;
+        uint32_t m_attemptThreshold; //!< The minimum number of transmission attempts to try a new power or rate. The 'timer' threshold in the ARF algorithm.
+        uint32_t m_successThreshold; //!< The minimum number of successful transmissions to try a new power or rate.
 
-  /**
-   * Maximal power level.
-   */
-  uint32_t m_maxPower;
+        /**
+         * Minimal power level.
+         * In contrast to rate, power levels do not depend on the remote station.
+         * The levels depend only on the physical layer of the device.
+         */
+        uint32_t m_minPower;
 
-  /**
-   * The trace source fired when the transmission power changes....
-   */
-  TracedCallback<uint8_t, Mac48Address> m_powerChange;
-  /**
-   * The trace source fired when the transmission rate changes.
-   */
-  TracedCallback<uint32_t, Mac48Address> m_rateChange;
+        /**
+         * Maximal power level.
+         */
+        uint32_t m_maxPower;
 
-};
+        /**
+         * The trace source fired when the transmission power changes....
+         */
+        TracedCallback<uint8_t, Mac48Address> m_powerChange;
+        /**
+         * The trace source fired when the transmission rate changes.
+         */
+        TracedCallback<uint32_t, Mac48Address> m_rateChange;
+
+    };
 
 } //namespace ns3
 

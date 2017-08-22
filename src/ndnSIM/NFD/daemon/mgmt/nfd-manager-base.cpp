@@ -27,18 +27,16 @@
 
 namespace nfd {
 
-NfdManagerBase::NfdManagerBase(Dispatcher& dispatcher,
-                               CommandAuthenticator& authenticator,
-                               const std::string& module)
-  : ManagerBase(dispatcher, module)
-  , m_authenticator(authenticator)
-{
-}
+    NfdManagerBase::NfdManagerBase(Dispatcher& dispatcher,
+            CommandAuthenticator& authenticator,
+            const std::string& module)
+    : ManagerBase(dispatcher, module)
+    , m_authenticator(authenticator) {
+    }
 
-ndn::mgmt::Authorization
-NfdManagerBase::makeAuthorization(const std::string& verb)
-{
-  return m_authenticator.makeAuthorization(this->getModule(), verb);
-}
+    ndn::mgmt::Authorization
+    NfdManagerBase::makeAuthorization(const std::string& verb) {
+        return m_authenticator.makeAuthorization(this->getModule(), verb);
+    }
 
 } // namespace nfd

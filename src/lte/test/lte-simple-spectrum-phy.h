@@ -32,54 +32,52 @@
 
 namespace ns3 {
 
-/**
- * \ingroup lte
- *
- * The LteSimpleSpectrumPhy models the physical layer of LTE
- * This class is used to test Frequency Reuse Algorithms,
- * it allow to get SpectrumValue from channel and pass it to
- * test script by trace mechanism.
- * When m_cellId is 0, all received signals will be traced,
- * if m_cellId > 0, only signals from specified Cell will be traced.
- *
- */
+    /**
+     * \ingroup lte
+     *
+     * The LteSimpleSpectrumPhy models the physical layer of LTE
+     * This class is used to test Frequency Reuse Algorithms,
+     * it allow to get SpectrumValue from channel and pass it to
+     * test script by trace mechanism.
+     * When m_cellId is 0, all received signals will be traced,
+     * if m_cellId > 0, only signals from specified Cell will be traced.
+     *
+     */
 
-class LteSimpleSpectrumPhy : public SpectrumPhy
-{
+    class LteSimpleSpectrumPhy : public SpectrumPhy {
+    public:
+        LteSimpleSpectrumPhy();
+        virtual ~LteSimpleSpectrumPhy();
 
-public:
-  LteSimpleSpectrumPhy ();
-  virtual ~LteSimpleSpectrumPhy ();
+        // inherited from Object
+        static TypeId GetTypeId(void);
+        virtual void DoDispose();
 
-  // inherited from Object
-  static TypeId GetTypeId (void);
-  virtual void DoDispose ();
+        // inherited from SpectrumPhy
+        void SetChannel(Ptr<SpectrumChannel> c);
+        void SetMobility(Ptr<MobilityModel> m);
+        void SetDevice(Ptr<NetDevice> d);
+        Ptr<MobilityModel> GetMobility();
+        Ptr<NetDevice> GetDevice() const;
+        Ptr<const SpectrumModel> GetRxSpectrumModel() const;
+        Ptr<AntennaModel> GetRxAntenna();
+        void StartRx(Ptr<SpectrumSignalParameters> params);
 
-  // inherited from SpectrumPhy
-  void SetChannel (Ptr<SpectrumChannel> c);
-  void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice () const;
-  Ptr<const SpectrumModel> GetRxSpectrumModel () const;
-  Ptr<AntennaModel> GetRxAntenna ();
-  void StartRx (Ptr<SpectrumSignalParameters> params);
+        void SetRxSpectrumModel(Ptr<const SpectrumModel> model);
 
-  void SetRxSpectrumModel (Ptr<const SpectrumModel> model);
+        void SetCellId(uint16_t cellId);
 
-  void SetCellId (uint16_t cellId);
+    private:
+        Ptr<MobilityModel> m_mobility;
+        Ptr<AntennaModel> m_antenna;
+        Ptr<NetDevice> m_device;
+        Ptr<SpectrumChannel> m_channel;
+        Ptr<const SpectrumModel> m_rxSpectrumModel;
 
-private:
-  Ptr<MobilityModel> m_mobility;
-  Ptr<AntennaModel> m_antenna;
-  Ptr<NetDevice> m_device;
-  Ptr<SpectrumChannel> m_channel;
-  Ptr<const SpectrumModel> m_rxSpectrumModel;
+        uint16_t m_cellId;
 
-  uint16_t m_cellId;
-
-  TracedCallback< Ptr<const SpectrumValue> > m_rxStart;
-};
+        TracedCallback< Ptr<const SpectrumValue> > m_rxStart;
+    };
 
 
 

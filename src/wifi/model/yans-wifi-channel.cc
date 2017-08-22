@@ -30,131 +30,115 @@
 #include "ns3/propagation-loss-model.h"
 #include "ns3/propagation-delay-model.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("YansWifiChannel");
-
-NS_OBJECT_ENSURE_REGISTERED (YansWifiChannel);
-
-TypeId
-YansWifiChannel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::YansWifiChannel")
-    .SetParent<WifiChannel> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<YansWifiChannel> ()
-    .AddAttribute ("PropagationLossModel", "A pointer to the propagation loss model attached to this channel.",
-                   PointerValue (),
-                   MakePointerAccessor (&YansWifiChannel::m_loss),
-                   MakePointerChecker<PropagationLossModel> ())
-    .AddAttribute ("PropagationDelayModel", "A pointer to the propagation delay model attached to this channel.",
-                   PointerValue (),
-                   MakePointerAccessor (&YansWifiChannel::m_delay),
-                   MakePointerChecker<PropagationDelayModel> ())
-  ;
-  return tid;
-}
 
-YansWifiChannel::YansWifiChannel ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("YansWifiChannel");
 
-YansWifiChannel::~YansWifiChannel ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_phyList.clear ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(YansWifiChannel);
 
-void
-YansWifiChannel::SetPropagationLossModel (Ptr<PropagationLossModel> loss)
-{
-  m_loss = loss;
-}
+    TypeId
+    YansWifiChannel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::YansWifiChannel")
+                .SetParent<WifiChannel> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<YansWifiChannel> ()
+                .AddAttribute("PropagationLossModel", "A pointer to the propagation loss model attached to this channel.",
+                PointerValue(),
+                MakePointerAccessor(&YansWifiChannel::m_loss),
+                MakePointerChecker<PropagationLossModel> ())
+                .AddAttribute("PropagationDelayModel", "A pointer to the propagation delay model attached to this channel.",
+                PointerValue(),
+                MakePointerAccessor(&YansWifiChannel::m_delay),
+                MakePointerChecker<PropagationDelayModel> ())
+                ;
+        return tid;
+    }
 
-void
-YansWifiChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
-{
-  m_delay = delay;
-}
+    YansWifiChannel::YansWifiChannel() {
+    }
 
-void
-YansWifiChannel::Send (Ptr<YansWifiPhy> sender, Ptr<const Packet> packet, double txPowerDbm,
-                       WifiTxVector txVector, WifiPreamble preamble, struct mpduInfo aMpdu, Time duration) const
-{
-  Ptr<MobilityModel> senderMobility = sender->GetMobility ()->GetObject<MobilityModel> ();
-  NS_ASSERT (senderMobility != 0);
-  uint32_t j = 0;
-  for (PhyList::const_iterator i = m_phyList.begin (); i != m_phyList.end (); i++, j++)
-    {
-      if (sender != (*i))
-        {
-          //For now don't account for inter channel interference
-          if ((*i)->GetChannelNumber () != sender->GetChannelNumber ())
-            {
-              continue;
+    YansWifiChannel::~YansWifiChannel() {
+        NS_LOG_FUNCTION_NOARGS();
+        m_phyList.clear();
+    }
+
+    void
+    YansWifiChannel::SetPropagationLossModel(Ptr<PropagationLossModel> loss) {
+        m_loss = loss;
+    }
+
+    void
+    YansWifiChannel::SetPropagationDelayModel(Ptr<PropagationDelayModel> delay) {
+        m_delay = delay;
+    }
+
+    void
+    YansWifiChannel::Send(Ptr<YansWifiPhy> sender, Ptr<const Packet> packet, double txPowerDbm,
+            WifiTxVector txVector, WifiPreamble preamble, struct mpduInfo aMpdu, Time duration) const {
+        Ptr<MobilityModel> senderMobility = sender->GetMobility()->GetObject<MobilityModel> ();
+        NS_ASSERT(senderMobility != 0);
+        uint32_t j = 0;
+        for (PhyList::const_iterator i = m_phyList.begin(); i != m_phyList.end(); i++, j++) {
+            if (sender != (*i)) {
+                //For now don't account for inter channel interference
+                if ((*i)->GetChannelNumber() != sender->GetChannelNumber()) {
+                    continue;
+                }
+
+                Ptr<MobilityModel> receiverMobility = (*i)->GetMobility()->GetObject<MobilityModel> ();
+                Time delay = m_delay->GetDelay(senderMobility, receiverMobility);
+                double rxPowerDbm = m_loss->CalcRxPower(txPowerDbm, senderMobility, receiverMobility);
+                NS_LOG_DEBUG("propagation: txPower=" << txPowerDbm << "dbm, rxPower=" << rxPowerDbm << "dbm, " <<
+                        "distance=" << senderMobility->GetDistanceFrom(receiverMobility) << "m, delay=" << delay);
+                Ptr<Packet> copy = packet->Copy();
+                Ptr<Object> dstNetDevice = m_phyList[j]->GetDevice();
+                uint32_t dstNode;
+                if (dstNetDevice == 0) {
+                    dstNode = 0xffffffff;
+                } else {
+                    dstNode = dstNetDevice->GetObject<NetDevice> ()->GetNode()->GetId();
+                }
+
+                struct Parameters parameters;
+                parameters.rxPowerDbm = rxPowerDbm;
+                parameters.aMpdu = aMpdu;
+                parameters.duration = duration;
+                parameters.txVector = txVector;
+                parameters.preamble = preamble;
+
+                Simulator::ScheduleWithContext(dstNode,
+                        delay, &YansWifiChannel::Receive, this,
+                        j, copy, parameters);
             }
-
-          Ptr<MobilityModel> receiverMobility = (*i)->GetMobility ()->GetObject<MobilityModel> ();
-          Time delay = m_delay->GetDelay (senderMobility, receiverMobility);
-          double rxPowerDbm = m_loss->CalcRxPower (txPowerDbm, senderMobility, receiverMobility);
-          NS_LOG_DEBUG ("propagation: txPower=" << txPowerDbm << "dbm, rxPower=" << rxPowerDbm << "dbm, " <<
-                        "distance=" << senderMobility->GetDistanceFrom (receiverMobility) << "m, delay=" << delay);
-          Ptr<Packet> copy = packet->Copy ();
-          Ptr<Object> dstNetDevice = m_phyList[j]->GetDevice ();
-          uint32_t dstNode;
-          if (dstNetDevice == 0)
-            {
-              dstNode = 0xffffffff;
-            }
-          else
-            {
-              dstNode = dstNetDevice->GetObject<NetDevice> ()->GetNode ()->GetId ();
-            }
-
-          struct Parameters parameters;
-          parameters.rxPowerDbm = rxPowerDbm;
-          parameters.aMpdu = aMpdu;
-          parameters.duration = duration;
-          parameters.txVector = txVector;
-          parameters.preamble = preamble;
-
-          Simulator::ScheduleWithContext (dstNode,
-                                          delay, &YansWifiChannel::Receive, this,
-                                          j, copy, parameters);
         }
     }
-}
 
-void
-YansWifiChannel::Receive (uint32_t i, Ptr<Packet> packet, struct Parameters parameters) const
-{
-  m_phyList[i]->StartReceivePreambleAndHeader (packet, parameters.rxPowerDbm, parameters.txVector, parameters.preamble, parameters.aMpdu, parameters.duration);
-}
+    void
+    YansWifiChannel::Receive(uint32_t i, Ptr<Packet> packet, struct Parameters parameters) const {
+        m_phyList[i]->StartReceivePreambleAndHeader(packet, parameters.rxPowerDbm, parameters.txVector, parameters.preamble, parameters.aMpdu, parameters.duration);
+    }
 
-uint32_t
-YansWifiChannel::GetNDevices (void) const
-{
-  return m_phyList.size ();
-}
+    uint32_t
+    YansWifiChannel::GetNDevices(void) const {
+        return m_phyList.size();
+    }
 
-Ptr<NetDevice>
-YansWifiChannel::GetDevice (uint32_t i) const
-{
-  return m_phyList[i]->GetDevice ()->GetObject<NetDevice> ();
-}
+    Ptr<NetDevice>
+            YansWifiChannel::GetDevice(uint32_t i) const {
+        return m_phyList[i]->GetDevice()->GetObject<NetDevice> ();
+    }
 
-void
-YansWifiChannel::Add (Ptr<YansWifiPhy> phy)
-{
-  m_phyList.push_back (phy);
-}
+    void
+    YansWifiChannel::Add(Ptr<YansWifiPhy> phy) {
+        m_phyList.push_back(phy);
+    }
 
-int64_t
-YansWifiChannel::AssignStreams (int64_t stream)
-{
-  int64_t currentStream = stream;
-  currentStream += m_loss->AssignStreams (stream);
-  return (currentStream - stream);
-}
+    int64_t
+    YansWifiChannel::AssignStreams(int64_t stream) {
+        int64_t currentStream = stream;
+        currentStream += m_loss->AssignStreams(stream);
+        return (currentStream - stream);
+    }
 
 } //namespace ns3

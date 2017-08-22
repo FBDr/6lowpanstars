@@ -27,61 +27,58 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup propagation
+     *
+     * \brief Empirical propagation model for the 2.6 GHz frequency
+     * 
+     * This class implements the empirical model for 2.6 GHz taken from this paper:
+     * Sun Kun, Wang Ping, Li Yingze 
+     * "Path Loss Models for Suburban Scenario at 2.3GHz, 2.6GHz and 3.5GHz"
+     * 8th International Symposium on Antennas, Propagation and EM Theory (ISAPE), 2008.
+     */
+    class Kun2600MhzPropagationLossModel : public PropagationLossModel {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-/**
- * \ingroup propagation
- *
- * \brief Empirical propagation model for the 2.6 GHz frequency
- * 
- * This class implements the empirical model for 2.6 GHz taken from this paper:
- * Sun Kun, Wang Ping, Li Yingze 
- * "Path Loss Models for Suburban Scenario at 2.3GHz, 2.6GHz and 3.5GHz"
- * 8th International Symposium on Antennas, Propagation and EM Theory (ISAPE), 2008.
- */
-class Kun2600MhzPropagationLossModel : public PropagationLossModel
-{
+        Kun2600MhzPropagationLossModel();
+        virtual ~Kun2600MhzPropagationLossModel();
 
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+        /** 
+         * \param a the first mobility model
+         * \param b the second mobility model
+         * 
+         * \return the loss in dBm for the propagation between
+         * the two given mobility models
+         */
+        double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  Kun2600MhzPropagationLossModel ();
-  virtual ~Kun2600MhzPropagationLossModel ();
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         */
+        Kun2600MhzPropagationLossModel(const Kun2600MhzPropagationLossModel &);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         * \returns
+         */
+        Kun2600MhzPropagationLossModel & operator=(const Kun2600MhzPropagationLossModel &);
 
-  /** 
-   * \param a the first mobility model
-   * \param b the second mobility model
-   * 
-   * \return the loss in dBm for the propagation between
-   * the two given mobility models
-   */
-  double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        // inherited from PropagationLossModel
+        virtual double DoCalcRxPower(double txPowerDbm,
+                Ptr<MobilityModel> a,
+                Ptr<MobilityModel> b) const;
+        virtual int64_t DoAssignStreams(int64_t stream);
 
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   */
-  Kun2600MhzPropagationLossModel (const Kun2600MhzPropagationLossModel &);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   * \returns
-   */
-  Kun2600MhzPropagationLossModel & operator = (const Kun2600MhzPropagationLossModel &);
-
-  // inherited from PropagationLossModel
-  virtual double DoCalcRxPower (double txPowerDbm,
-                                Ptr<MobilityModel> a,
-                                Ptr<MobilityModel> b) const;
-  virtual int64_t DoAssignStreams (int64_t stream);
-  
-};
+    };
 
 } // namespace ns3
 

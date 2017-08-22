@@ -25,32 +25,29 @@
 #include <ns3/spectrum-channel.h>
 #include <ns3/log.h>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SpectrumPhy");
-
-NS_OBJECT_ENSURE_REGISTERED (SpectrumPhy);
-
-
-TypeId
-SpectrumPhy::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SpectrumPhy")
-    .SetParent<Object> ()
-    .SetGroupName ("Spectrum")
-  ;
-  return tid;
-}
 
-SpectrumPhy::SpectrumPhy ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("SpectrumPhy");
 
-SpectrumPhy::~SpectrumPhy ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(SpectrumPhy);
+
+    TypeId
+    SpectrumPhy::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SpectrumPhy")
+                .SetParent<Object> ()
+                .SetGroupName("Spectrum")
+                ;
+        return tid;
+    }
+
+    SpectrumPhy::SpectrumPhy() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    SpectrumPhy::~SpectrumPhy() {
+        NS_LOG_FUNCTION(this);
+    }
 
 
 } // namespace

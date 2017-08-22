@@ -29,11 +29,11 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <?xml version="1.0"?>
   <nfdStatus xmlns="ndn:/localhost/nfd/status/1">
     <module1/>
@@ -41,180 +41,166 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </nfdStatus>
 )XML");
 
-const std::string STATUS_TEXT = std::string(R"TEXT(
+                const std::string STATUS_TEXT = std::string(R"TEXT(
 module1
 module2
 )TEXT").substr(1);
 
-class DummyModule : public Module
-{
-public:
-  explicit
-  DummyModule(const std::string& moduleName)
-    : m_moduleName(moduleName)
-    , m_res(0)
-    , m_delay(time::milliseconds(1))
-  {
-  }
+                class DummyModule : public Module {
+                public:
 
-  /** \brief cause fetchStatus to succeed or fail
-   *  \param res zero to succeed, non-zero to fail with specific code
-   *  \param delay duration from fetchStatus invocation to succeed or fail; must be positive
-   */
-  void
-  setResult(uint32_t res, time::nanoseconds delay)
-  {
-    BOOST_ASSERT(delay > time::nanoseconds::zero());
-    m_res = res;
-    m_delay = delay;
-  }
+                    explicit
+                    DummyModule(const std::string& moduleName)
+                    : m_moduleName(moduleName)
+                    , m_res(0)
+                    , m_delay(time::milliseconds(1)) {
+                    }
 
-  virtual void
-  fetchStatus(Controller& controller,
-              const function<void()>& onSuccess,
-              const Controller::DatasetFailCallback& onFailure,
-              const CommandOptions& options) override
-  {
-    ++nFetchStatusCalls;
-    scheduler::schedule(m_delay, [=] {
-      if (m_res == 0) {
-        onSuccess();
-      }
-      else {
-        onFailure(m_res, m_moduleName + " fails with code " + to_string(m_res));
-      }
-    });
-  }
+                    /** \brief cause fetchStatus to succeed or fail
+                     *  \param res zero to succeed, non-zero to fail with specific code
+                     *  \param delay duration from fetchStatus invocation to succeed or fail; must be positive
+                     */
+                    void
+                    setResult(uint32_t res, time::nanoseconds delay) {
+                        BOOST_ASSERT(delay > time::nanoseconds::zero());
+                        m_res = res;
+                        m_delay = delay;
+                    }
 
-  virtual void
-  formatStatusXml(std::ostream& os) const override
-  {
-    os << '<' << m_moduleName << "/>";
-  }
+                    virtual void
+                    fetchStatus(Controller& controller,
+                            const function<void()>& onSuccess,
+                            const Controller::DatasetFailCallback& onFailure,
+                            const CommandOptions& options) override {
+                        ++nFetchStatusCalls;
+                        scheduler::schedule(m_delay, [ = ]{
+                            if (m_res == 0) {
+                                onSuccess();
+                            } else {
+                                onFailure(m_res, m_moduleName + " fails with code " + to_string(m_res));
+                            }
+                        });
+                    }
 
-  virtual void
-  formatStatusText(std::ostream& os) const override
-  {
-    os << m_moduleName << '\n';
-  }
+                    virtual void
+                    formatStatusXml(std::ostream& os) const override {
+                        os << '<' << m_moduleName << "/>";
+                    }
 
-public:
-  int nFetchStatusCalls = 0;
+                    virtual void
+                    formatStatusText(std::ostream& os) const override {
+                        os << m_moduleName << '\n';
+                    }
 
-private:
-  std::string m_moduleName;
-  uint32_t m_res;
-  time::nanoseconds m_delay;
-};
+                public:
+                    int nFetchStatusCalls = 0;
 
-class StatusReportTester : public StatusReport
-{
-private:
-  virtual void
-  processEvents(Face&) override
-  {
-    processEventsFunc();
-  }
+                private:
+                    std::string m_moduleName;
+                    uint32_t m_res;
+                    time::nanoseconds m_delay;
+                };
 
-public:
-  std::function<void()> processEventsFunc;
-};
+                class StatusReportTester : public StatusReport {
+                private:
 
-class StatusReportModulesFixture : public IdentityManagementTimeFixture
-{
-protected:
-  StatusReportModulesFixture()
-    : face(g_io, m_keyChain)
-    , controller(face, m_keyChain, validator)
-    , res(0)
-  {
-  }
+                    virtual void
+                    processEvents(Face&) override {
+                        processEventsFunc();
+                    }
 
-  DummyModule&
-  addModule(const std::string& moduleName)
-  {
-    report.sections.push_back(make_unique<DummyModule>(moduleName));
-    return static_cast<DummyModule&>(*report.sections.back());
-  }
+                public:
+                    std::function<void() > processEventsFunc;
+                };
 
-  void
-  collect(time::nanoseconds tick, size_t nTicks)
-  {
-    report.processEventsFunc = [=] {
-      this->advanceClocks(tick, nTicks);
-    };
-    res = report.collect(face, m_keyChain, validator, CommandOptions());
+                class StatusReportModulesFixture : public IdentityManagementTimeFixture {
+                protected:
 
-    if (res == 0) {
-      statusXml.str("");
-      report.formatXml(statusXml);
-      statusText.str("");
-      report.formatText(statusText);
-    }
-  }
+                    StatusReportModulesFixture()
+                    : face(g_io, m_keyChain)
+                    , controller(face, m_keyChain, validator)
+                    , res(0) {
+                    }
 
-protected:
-  DummyClientFace face;
-  ValidatorNull validator;
-  Controller controller;
-  StatusReportTester report;
+                    DummyModule&
+                    addModule(const std::string& moduleName) {
+                        report.sections.push_back(make_unique<DummyModule>(moduleName));
+                        return static_cast<DummyModule&> (*report.sections.back());
+                    }
 
-  uint32_t res;
-  output_test_stream statusXml;
-  output_test_stream statusText;
-};
+                    void
+                    collect(time::nanoseconds tick, size_t nTicks) {
+                        report.processEventsFunc = [ = ]{
+                            this->advanceClocks(tick, nTicks);
+                        };
+                        res = report.collect(face, m_keyChain, validator, CommandOptions());
 
+                        if (res == 0) {
+                            statusXml.str("");
+                            report.formatXml(statusXml);
+                            statusText.str("");
+                            report.formatText(statusText);
+                        }
+                    }
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestStatusReport, StatusReportModulesFixture)
+                protected:
+                    DummyClientFace face;
+                    ValidatorNull validator;
+                    Controller controller;
+                    StatusReportTester report;
 
-BOOST_AUTO_TEST_CASE(Normal)
-{
-  DummyModule& m1 = addModule("module1");
-  m1.setResult(0, time::milliseconds(10));
-  DummyModule& m2 = addModule("module2");
-  m2.setResult(0, time::milliseconds(20));
+                    uint32_t res;
+                    output_test_stream statusXml;
+                    output_test_stream statusText;
+                };
 
-  this->collect(time::milliseconds(5), 6);
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestStatusReport, StatusReportModulesFixture)
 
-  BOOST_CHECK_EQUAL(m1.nFetchStatusCalls, 1);
-  BOOST_CHECK_EQUAL(m2.nFetchStatusCalls, 1);
+                BOOST_AUTO_TEST_CASE(Normal) {
+                    DummyModule& m1 = addModule("module1");
+                    m1.setResult(0, time::milliseconds(10));
+                    DummyModule& m2 = addModule("module2");
+                    m2.setResult(0, time::milliseconds(20));
 
-  BOOST_CHECK_EQUAL(res, 0);
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    this->collect(time::milliseconds(5), 6);
 
-BOOST_AUTO_TEST_CASE(Reorder)
-{
-  DummyModule& m1 = addModule("module1");
-  m1.setResult(0, time::milliseconds(20));
-  DummyModule& m2 = addModule("module2");
-  m2.setResult(0, time::milliseconds(10)); // module2 completes earlier than module1
+                    BOOST_CHECK_EQUAL(m1.nFetchStatusCalls, 1);
+                    BOOST_CHECK_EQUAL(m2.nFetchStatusCalls, 1);
 
-  this->collect(time::milliseconds(5), 6);
+                    BOOST_CHECK_EQUAL(res, 0);
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-  BOOST_CHECK_EQUAL(res, 0);
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML)); // output is still in order
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                BOOST_AUTO_TEST_CASE(Reorder) {
+                    DummyModule& m1 = addModule("module1");
+                    m1.setResult(0, time::milliseconds(20));
+                    DummyModule& m2 = addModule("module2");
+                    m2.setResult(0, time::milliseconds(10)); // module2 completes earlier than module1
 
-BOOST_AUTO_TEST_CASE(Error)
-{
-  DummyModule& m1 = addModule("module1");
-  m1.setResult(0, time::milliseconds(20));
-  DummyModule& m2 = addModule("module2");
-  m2.setResult(500, time::milliseconds(10));
+                    this->collect(time::milliseconds(5), 6);
 
-  this->collect(time::milliseconds(5), 6);
+                    BOOST_CHECK_EQUAL(res, 0);
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML)); // output is still in order
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-  BOOST_CHECK_EQUAL(res, 1000500);
-}
+                BOOST_AUTO_TEST_CASE(Error) {
+                    DummyModule& m1 = addModule("module1");
+                    m1.setResult(0, time::milliseconds(20));
+                    DummyModule& m2 = addModule("module2");
+                    m2.setResult(500, time::milliseconds(10));
 
-BOOST_AUTO_TEST_SUITE_END() // TestStatusReport
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                    this->collect(time::milliseconds(5), 6);
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+                    BOOST_CHECK_EQUAL(res, 1000500);
+                }
+
+                BOOST_AUTO_TEST_SUITE_END() // TestStatusReport
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
+
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

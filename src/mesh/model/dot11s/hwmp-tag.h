@@ -27,51 +27,51 @@
 #include "ns3/object.h"
 #include "ns3/mac48-address.h"
 namespace ns3 {
-namespace dot11s {
-/**
- * \ingroup dot11s
- *
- * \brief Hwmp tag implements interaction between HWMP
- * protocol and MeshWifiMac
- *
- * Hwmp tag keeps the following:
- * 1. When packet is passed from Hwmp to 11sMAC:
- *  - retransmitter address,
- *  - TTL value,
- * 2. When packet is passed to Hwmp from 11sMAC:
- *  - lasthop address,
- *  - TTL value,
- *  - metric value (metric of link is recalculated
- *  at each packet, but routing table stores metric
- *  obtained during path discovery procedure)
- */
-class HwmpTag : public Tag
-{
-public:
-  HwmpTag ();
-  ~HwmpTag ();
-  void  SetAddress (Mac48Address retransmitter);
-  Mac48Address GetAddress ();
-  void  SetTtl (uint8_t ttl);
-  uint8_t GetTtl ();
-  void  SetMetric (uint32_t metric);
-  uint32_t GetMetric ();
-  void  SetSeqno (uint32_t seqno);
-  uint32_t GetSeqno ();
-  void  DecrementTtl ();
+    namespace dot11s {
 
-  static  TypeId  GetTypeId ();
-  virtual TypeId  GetInstanceTypeId () const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void  Serialize (TagBuffer i) const;
-  virtual void  Deserialize (TagBuffer i);
-  virtual void  Print (std::ostream &os) const;
-private:
-  Mac48Address m_address;
-  uint8_t  m_ttl;
-  uint32_t m_metric;
-  uint32_t m_seqno;
-};
-} // namespace dot11s
+        /**
+         * \ingroup dot11s
+         *
+         * \brief Hwmp tag implements interaction between HWMP
+         * protocol and MeshWifiMac
+         *
+         * Hwmp tag keeps the following:
+         * 1. When packet is passed from Hwmp to 11sMAC:
+         *  - retransmitter address,
+         *  - TTL value,
+         * 2. When packet is passed to Hwmp from 11sMAC:
+         *  - lasthop address,
+         *  - TTL value,
+         *  - metric value (metric of link is recalculated
+         *  at each packet, but routing table stores metric
+         *  obtained during path discovery procedure)
+         */
+        class HwmpTag : public Tag {
+        public:
+            HwmpTag();
+            ~HwmpTag();
+            void SetAddress(Mac48Address retransmitter);
+            Mac48Address GetAddress();
+            void SetTtl(uint8_t ttl);
+            uint8_t GetTtl();
+            void SetMetric(uint32_t metric);
+            uint32_t GetMetric();
+            void SetSeqno(uint32_t seqno);
+            uint32_t GetSeqno();
+            void DecrementTtl();
+
+            static TypeId GetTypeId();
+            virtual TypeId GetInstanceTypeId() const;
+            virtual uint32_t GetSerializedSize() const;
+            virtual void Serialize(TagBuffer i) const;
+            virtual void Deserialize(TagBuffer i);
+            virtual void Print(std::ostream &os) const;
+        private:
+            Mac48Address m_address;
+            uint8_t m_ttl;
+            uint32_t m_metric;
+            uint32_t m_seqno;
+        };
+    } // namespace dot11s
 } // namespace ns3
 #endif

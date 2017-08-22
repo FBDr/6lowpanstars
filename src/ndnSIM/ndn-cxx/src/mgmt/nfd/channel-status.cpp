@@ -25,85 +25,78 @@
 #include "util/concepts.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-//BOOST_CONCEPT_ASSERT((boost::EqualityComparable<ChannelStatus>));
-BOOST_CONCEPT_ASSERT((WireEncodable<ChannelStatus>));
-BOOST_CONCEPT_ASSERT((WireDecodable<ChannelStatus>));
-static_assert(std::is_base_of<tlv::Error, ChannelStatus::Error>::value,
-              "ChannelStatus::Error must inherit from tlv::Error");
+        //BOOST_CONCEPT_ASSERT((boost::EqualityComparable<ChannelStatus>));
+        BOOST_CONCEPT_ASSERT((WireEncodable<ChannelStatus>));
+        BOOST_CONCEPT_ASSERT((WireDecodable<ChannelStatus>));
+        static_assert(std::is_base_of<tlv::Error, ChannelStatus::Error>::value,
+                "ChannelStatus::Error must inherit from tlv::Error");
 
-ChannelStatus::ChannelStatus()
-{
-}
+        ChannelStatus::ChannelStatus() {
+        }
 
-ChannelStatus::ChannelStatus(const Block& payload)
-{
-  this->wireDecode(payload);
-}
+        ChannelStatus::ChannelStatus(const Block& payload) {
+            this->wireDecode(payload);
+        }
 
-template<encoding::Tag TAG>
-size_t
-ChannelStatus::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t totalLength = 0;
+        template<encoding::Tag TAG>
+        size_t
+        ChannelStatus::wireEncode(EncodingImpl<TAG>& encoder) const {
+            size_t totalLength = 0;
 
-  totalLength += encoder.prependByteArrayBlock(tlv::nfd::LocalUri,
-                 reinterpret_cast<const uint8_t*>(m_localUri.c_str()), m_localUri.size());
+            totalLength += encoder.prependByteArrayBlock(tlv::nfd::LocalUri,
+                    reinterpret_cast<const uint8_t*> (m_localUri.c_str()), m_localUri.size());
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::nfd::ChannelStatus);
-  return totalLength;
-}
+            totalLength += encoder.prependVarNumber(totalLength);
+            totalLength += encoder.prependVarNumber(tlv::nfd::ChannelStatus);
+            return totalLength;
+        }
 
-template size_t
-ChannelStatus::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>&) const;
+        template size_t
+        ChannelStatus::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>&) const;
 
-template size_t
-ChannelStatus::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>&) const;
+        template size_t
+        ChannelStatus::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>&) const;
 
-const Block&
-ChannelStatus::wireEncode() const
-{
-  if (m_wire.hasWire())
-    return m_wire;
+        const Block&
+        ChannelStatus::wireEncode() const {
+            if (m_wire.hasWire())
+                return m_wire;
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  m_wire = buffer.block();
-  return m_wire;
-}
+            m_wire = buffer.block();
+            return m_wire;
+        }
 
-void
-ChannelStatus::wireDecode(const Block& block)
-{
-  if (block.type() != tlv::nfd::ChannelStatus) {
-    BOOST_THROW_EXCEPTION(Error("Expecting ChannelStatus block"));
-  }
-  m_wire = block;
-  m_wire.parse();
-  Block::element_const_iterator val = m_wire.elements_begin();
+        void
+        ChannelStatus::wireDecode(const Block& block) {
+            if (block.type() != tlv::nfd::ChannelStatus) {
+                BOOST_THROW_EXCEPTION(Error("Expecting ChannelStatus block"));
+            }
+            m_wire = block;
+            m_wire.parse();
+            Block::element_const_iterator val = m_wire.elements_begin();
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::LocalUri) {
-    m_localUri.assign(reinterpret_cast<const char*>(val->value()), val->value_size());
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("Missing required LocalUri field"));
-  }
-}
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::LocalUri) {
+                m_localUri.assign(reinterpret_cast<const char*> (val->value()), val->value_size());
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("Missing required LocalUri field"));
+            }
+        }
 
-ChannelStatus&
-ChannelStatus::setLocalUri(const std::string localUri)
-{
-  m_wire.reset();
-  m_localUri = localUri;
-  return *this;
-}
+        ChannelStatus&
+        ChannelStatus::setLocalUri(const std::string localUri) {
+            m_wire.reset();
+            m_localUri = localUri;
+            return *this;
+        }
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace ndn

@@ -22,17 +22,16 @@
 #include "key-chain-fixture.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-KeyChainFixture::KeyChainFixture()
-{
-  addIdentity(Name("/localhost/ndn-cxx-test-identity").appendVersion());
-}
+        KeyChainFixture::KeyChainFixture() {
+            addIdentity(Name("/localhost/ndn-cxx-test-identity").appendVersion());
+        }
 
-BOOST_GLOBAL_FIXTURE(KeyChainFixture)
+        BOOST_GLOBAL_FIXTURE(KeyChainFixture)
 #if BOOST_VERSION >= 105900
-;
+        ;
 #endif // BOOST_VERSION >= 105900
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

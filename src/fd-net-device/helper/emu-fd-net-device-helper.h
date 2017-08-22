@@ -31,65 +31,64 @@
 
 namespace ns3 {
 
-/**
- * \ingroup fd-net-device
- * \brief build a set of FdNetDevice objects attached to a physical network
- * interface
- *
- */
-class EmuFdNetDeviceHelper : public FdNetDeviceHelper
-{
-public:
-  /**
-   * Construct a EmuFdNetDeviceHelper.
-   */
-  EmuFdNetDeviceHelper ();
-  virtual ~EmuFdNetDeviceHelper ()
-  {
-  }
+    /**
+     * \ingroup fd-net-device
+     * \brief build a set of FdNetDevice objects attached to a physical network
+     * interface
+     *
+     */
+    class EmuFdNetDeviceHelper : public FdNetDeviceHelper {
+    public:
+        /**
+         * Construct a EmuFdNetDeviceHelper.
+         */
+        EmuFdNetDeviceHelper();
 
-  /**
-   * Get the device name of this device.
-   *
-   * \returns The device name of this device.
-   */
-  std::string GetDeviceName (void);
+        virtual ~EmuFdNetDeviceHelper() {
+        }
 
-  /**
-   * Set the device name of this device.
-   *
-   * \param deviceName The device name of this device.
-   */
-  void SetDeviceName (std::string deviceName);
+        /**
+         * Get the device name of this device.
+         *
+         * \returns The device name of this device.
+         */
+        std::string GetDeviceName(void);
 
-protected:
+        /**
+         * Set the device name of this device.
+         *
+         * \param deviceName The device name of this device.
+         */
+        void SetDeviceName(std::string deviceName);
 
-  /**
-   * This method creates an ns3::FdNetDevice attached to a physical network
-   * interface
-   *
-   * \param node The node to install the device in
-   * \returns A container holding the added net device.
-   */
-  Ptr<NetDevice> InstallPriv (Ptr<Node> node) const;
+    protected:
 
-  /**
-   * Sets a file descriptor on the FileDescriptorNetDevice.
-   */
-  virtual void SetFileDescriptor (Ptr<FdNetDevice> device) const;
+        /**
+         * This method creates an ns3::FdNetDevice attached to a physical network
+         * interface
+         *
+         * \param node The node to install the device in
+         * \returns A container holding the added net device.
+         */
+        Ptr<NetDevice> InstallPriv(Ptr<Node> node) const;
 
-  /**
-   * Call out to a separate process running as suid root in order to get a raw
-   * socket.  We do this to avoid having the entire simulation running as root.
-   * \return the rawSocket number
-   */
-  virtual int CreateFileDescriptor (void) const;
+        /**
+         * Sets a file descriptor on the FileDescriptorNetDevice.
+         */
+        virtual void SetFileDescriptor(Ptr<FdNetDevice> device) const;
 
-  /**
-   * The unix/linux name of the underlying device (e.g., eth0)
-   */
-  std::string m_deviceName;
-};
+        /**
+         * Call out to a separate process running as suid root in order to get a raw
+         * socket.  We do this to avoid having the entire simulation running as root.
+         * \return the rawSocket number
+         */
+        virtual int CreateFileDescriptor(void) const;
+
+        /**
+         * The unix/linux name of the underlying device (e.g., eth0)
+         */
+        std::string m_deviceName;
+    };
 
 } // namespace ns3
 

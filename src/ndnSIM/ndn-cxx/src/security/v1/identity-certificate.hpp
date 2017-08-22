@@ -28,81 +28,79 @@
 #include "certificate.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-class IdentityCertificate : public Certificate
-{
-public:
-  class Error : public Certificate::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Certificate::Error(what)
-    {
-    }
-  };
+            class IdentityCertificate : public Certificate {
+            public:
 
-  /**
-   * @brief The default constructor.
-   */
-  IdentityCertificate();
+                class Error : public Certificate::Error {
+                public:
 
-  /**
-   * @brief Create an IdentityCertificate from the content in the data packet.
-   * @param data The data packet with the content to decode.
-   */
-  explicit
-  IdentityCertificate(const Data& data);
+                    explicit
+                    Error(const std::string& what)
+                    : Certificate::Error(what) {
+                    }
+                };
 
-  /**
-   * @brief Create an IdentityCertificate from a block.
-   * @param block The raw block of the certificate.
-   */
-  explicit
-  IdentityCertificate(const Block& block);
+                /**
+                 * @brief The default constructor.
+                 */
+                IdentityCertificate();
 
-  void
-  wireDecode(const Block& wire);
+                /**
+                 * @brief Create an IdentityCertificate from the content in the data packet.
+                 * @param data The data packet with the content to decode.
+                 */
+                explicit
+                IdentityCertificate(const Data& data);
 
-  void
-  setName(const Name& name);
+                /**
+                 * @brief Create an IdentityCertificate from a block.
+                 * @param block The raw block of the certificate.
+                 */
+                explicit
+                IdentityCertificate(const Block& block);
 
-  const Name&
-  getPublicKeyName() const
-  {
-    return m_publicKeyName;
-  }
+                void
+                wireDecode(const Block& wire);
 
-  static bool
-  isIdentityCertificate(const Certificate& certificate);
+                void
+                setName(const Name& name);
 
-  /**
-   * @brief Get the public key name from the full certificate name.
-   * @param certificateName The full certificate name.
-   * @return The related public key name.
-   */
-  static Name
-  certificateNameToPublicKeyName(const Name& certificateName);
+                const Name&
+                getPublicKeyName() const {
+                    return m_publicKeyName;
+                }
 
-private:
-  static bool
-  isCorrectName(const Name& name);
+                static bool
+                isIdentityCertificate(const Certificate& certificate);
 
-  void
-  setPublicKeyName();
+                /**
+                 * @brief Get the public key name from the full certificate name.
+                 * @param certificateName The full certificate name.
+                 * @return The related public key name.
+                 */
+                static Name
+                certificateNameToPublicKeyName(const Name& certificateName);
 
-protected:
-  Name m_publicKeyName;
-};
+            private:
+                static bool
+                isCorrectName(const Name& name);
 
-} // namespace v1
-} // namespace security
+                void
+                setPublicKeyName();
+
+            protected:
+                Name m_publicKeyName;
+            };
+
+        } // namespace v1
+    } // namespace security
 
 #ifdef NDN_CXX_KEEP_SECURITY_V1_ALIASES
-/// @deprecated When needed, use explicit namespace
-using security::v1::IdentityCertificate;
+    /// @deprecated When needed, use explicit namespace
+    using security::v1::IdentityCertificate;
 #endif // NDN_CXX_KEEP_SECURITY_V1_ALIASES
 
 } // namespace ndn

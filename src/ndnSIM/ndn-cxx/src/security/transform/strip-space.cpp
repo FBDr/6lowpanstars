@@ -22,41 +22,38 @@
 #include "strip-space.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-const char* const StripSpace::DEFAULT_WHITESPACES = " \f\n\r\t\v";
+            const char* const StripSpace::DEFAULT_WHITESPACES = " \f\n\r\t\v";
 
-StripSpace::StripSpace(const char* whitespaces)
-{
-  for (const char* i = whitespaces; *i != '\0'; ++i) {
-    m_isWhitespace.set(*i);
-  }
-}
+            StripSpace::StripSpace(const char* whitespaces) {
+                for (const char* i = whitespaces; *i != '\0'; ++i) {
+                    m_isWhitespace.set(*i);
+                }
+            }
 
-size_t
-StripSpace::convert(const uint8_t* buf, size_t buflen)
-{
-  auto buffer = make_unique<OBuffer>();
-  buffer->reserve(buflen);
+            size_t
+            StripSpace::convert(const uint8_t* buf, size_t buflen) {
+                auto buffer = make_unique<OBuffer>();
+                buffer->reserve(buflen);
 
-  for (size_t i = 0; i < buflen; ++i) {
-    uint8_t ch = buf[i];
-    if (!m_isWhitespace[ch]) {
-      buffer->push_back(ch);
-    }
-  }
+                for (size_t i = 0; i < buflen; ++i) {
+                    uint8_t ch = buf[i];
+                    if (!m_isWhitespace[ch]) {
+                        buffer->push_back(ch);
+                    }
+                }
 
-  setOutputBuffer(std::move(buffer));
-  return buflen;
-}
+                setOutputBuffer(std::move(buffer));
+                return buflen;
+            }
 
-unique_ptr<Transform>
-stripSpace(const char* whitespaces)
-{
-  return make_unique<StripSpace>(whitespaces);
-}
+            unique_ptr<Transform>
+            stripSpace(const char* whitespaces) {
+                return make_unique<StripSpace>(whitespaces);
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

@@ -31,81 +31,79 @@
 
 namespace ns3 {
 
-class Packet;
-class PacketBurst;
-class SimpleOfdmWimaxPhy;
+    class Packet;
+    class PacketBurst;
+    class SimpleOfdmWimaxPhy;
 
-/**
- * \ingroup wimax
- */
-class SimpleOfdmWimaxChannel : public WimaxChannel
-{
-public:
-  SimpleOfdmWimaxChannel (void);
-  ~SimpleOfdmWimaxChannel (void);
+    /**
+     * \ingroup wimax
+     */
+    class SimpleOfdmWimaxChannel : public WimaxChannel {
+    public:
+        SimpleOfdmWimaxChannel(void);
+        ~SimpleOfdmWimaxChannel(void);
 
-  enum PropModel
-  {
-    RANDOM_PROPAGATION,
-    FRIIS_PROPAGATION,
-    LOG_DISTANCE_PROPAGATION,
-    COST231_PROPAGATION
-  };
-  
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  /**
-   * \brief Creates a channel and sets the propagation model
-   * \param propModel the propagation model to use
-   */
-  SimpleOfdmWimaxChannel (PropModel propModel);
+        enum PropModel {
+            RANDOM_PROPAGATION,
+            FRIIS_PROPAGATION,
+            LOG_DISTANCE_PROPAGATION,
+            COST231_PROPAGATION
+        };
 
-  /**
-   * \brief Sends a dummy fec block to all connected physical devices
-   * \param BlockTime the time needed to send the block
-   * \param burstSize the size of the burst
-   * \param phy the sender device
-   * \param isFirstBlock true if this block is the first one, false otherwise
-   * \param isLastBlock true if this block is the last one, false otherwise
-   * \param frequency the frequency on which the block is sent
-   * \param modulationType the modulation used to send the fec block
-   * \param direction uplink or downlink
-   * \param txPowerDbm the transmission power
-   * \param burst the packet burst to send
-   */
-  void Send (Time BlockTime,
-             uint32_t burstSize, Ptr<WimaxPhy> phy, bool isFirstBlock,
-             bool isLastBlock,
-             uint64_t frequency, WimaxPhy::ModulationType modulationType,
-             uint8_t direction, double txPowerDbm, Ptr<PacketBurst> burst);
-  /**
-   * \brief sets the propagation model
-   * \param propModel the propagation model to used
-   */
-  void SetPropagationModel (PropModel propModel);
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
- /**
-  * Assign a fixed random variable stream number to the random variables
-  * used by this model.  Return the number of streams (possibly zero) that
-  * have been assigned.
-  *
-  * \param stream first stream index to use
-  * \return the number of stream indices assigned by this model
-  */
-  int64_t AssignStreams (int64_t stream);
+        /**
+         * \brief Creates a channel and sets the propagation model
+         * \param propModel the propagation model to use
+         */
+        SimpleOfdmWimaxChannel(PropModel propModel);
 
-private:
-  void DoAttach (Ptr<WimaxPhy> phy);
-  std::list<Ptr<SimpleOfdmWimaxPhy> > m_phyList;
-  uint32_t DoGetNDevices (void) const;
-  void EndSendDummyBlock  (Ptr<SimpleOfdmWimaxPhy> rxphy, simpleOfdmSendParam * param);
-  Ptr<NetDevice> DoGetDevice (uint32_t i) const;
-  Ptr<PropagationLossModel> m_loss;
-};
+        /**
+         * \brief Sends a dummy fec block to all connected physical devices
+         * \param BlockTime the time needed to send the block
+         * \param burstSize the size of the burst
+         * \param phy the sender device
+         * \param isFirstBlock true if this block is the first one, false otherwise
+         * \param isLastBlock true if this block is the last one, false otherwise
+         * \param frequency the frequency on which the block is sent
+         * \param modulationType the modulation used to send the fec block
+         * \param direction uplink or downlink
+         * \param txPowerDbm the transmission power
+         * \param burst the packet burst to send
+         */
+        void Send(Time BlockTime,
+                uint32_t burstSize, Ptr<WimaxPhy> phy, bool isFirstBlock,
+                bool isLastBlock,
+                uint64_t frequency, WimaxPhy::ModulationType modulationType,
+                uint8_t direction, double txPowerDbm, Ptr<PacketBurst> burst);
+        /**
+         * \brief sets the propagation model
+         * \param propModel the propagation model to used
+         */
+        void SetPropagationModel(PropModel propModel);
+
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         * \return the number of stream indices assigned by this model
+         */
+        int64_t AssignStreams(int64_t stream);
+
+    private:
+        void DoAttach(Ptr<WimaxPhy> phy);
+        std::list<Ptr<SimpleOfdmWimaxPhy> > m_phyList;
+        uint32_t DoGetNDevices(void) const;
+        void EndSendDummyBlock(Ptr<SimpleOfdmWimaxPhy> rxphy, simpleOfdmSendParam * param);
+        Ptr<NetDevice> DoGetDevice(uint32_t i) const;
+        Ptr<PropagationLossModel> m_loss;
+    };
 
 } // namespace ns3
 

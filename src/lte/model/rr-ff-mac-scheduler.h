@@ -37,223 +37,219 @@
 namespace ns3 {
 
 
-typedef std::vector < uint8_t > DlHarqProcessesStatus_t;
-typedef std::vector < uint8_t > DlHarqProcessesTimer_t;
-typedef std::vector < DlDciListElement_s > DlHarqProcessesDciBuffer_t;
-typedef std::vector < std::vector <struct RlcPduListElement_s> > RlcPduList_t; // vector of the LCs and layers per UE
-typedef std::vector < RlcPduList_t > DlHarqRlcPduListBuffer_t; // vector of the 8 HARQ processes per UE
+    typedef std::vector < uint8_t > DlHarqProcessesStatus_t;
+    typedef std::vector < uint8_t > DlHarqProcessesTimer_t;
+    typedef std::vector < DlDciListElement_s > DlHarqProcessesDciBuffer_t;
+    typedef std::vector < std::vector <struct RlcPduListElement_s> > RlcPduList_t; // vector of the LCs and layers per UE
+    typedef std::vector < RlcPduList_t > DlHarqRlcPduListBuffer_t; // vector of the 8 HARQ processes per UE
 
-typedef std::vector < UlDciListElement_s > UlHarqProcessesDciBuffer_t;
-typedef std::vector < uint8_t > UlHarqProcessesStatus_t;
+    typedef std::vector < UlDciListElement_s > UlHarqProcessesDciBuffer_t;
+    typedef std::vector < uint8_t > UlHarqProcessesStatus_t;
 
+    /**
+     * \ingroup ff-api
+     * \brief Implements the SCHED SAP and CSCHED SAP for a Round Robin scheduler
+     *
+     * This class implements the interface defined by the FfMacScheduler abstract class
+     */
 
+    class RrFfMacScheduler : public FfMacScheduler {
+    public:
+        /**
+         * \brief Constructor
+         *
+         * Creates the MAC Scheduler interface implementation
+         */
+        RrFfMacScheduler();
 
+        /**
+         * Destructor
+         */
+        virtual ~RrFfMacScheduler();
 
-/**
- * \ingroup ff-api
- * \brief Implements the SCHED SAP and CSCHED SAP for a Round Robin scheduler
- *
- * This class implements the interface defined by the FfMacScheduler abstract class
- */
+        // inherited from Object
+        virtual void DoDispose(void);
+        static TypeId GetTypeId(void);
 
-class RrFfMacScheduler : public FfMacScheduler
-{
-public:
-  /**
-   * \brief Constructor
-   *
-   * Creates the MAC Scheduler interface implementation
-   */
-  RrFfMacScheduler ();
+        // inherited from FfMacScheduler
+        virtual void SetFfMacCschedSapUser(FfMacCschedSapUser* s);
+        virtual void SetFfMacSchedSapUser(FfMacSchedSapUser* s);
+        virtual FfMacCschedSapProvider* GetFfMacCschedSapProvider();
+        virtual FfMacSchedSapProvider* GetFfMacSchedSapProvider();
 
-  /**
-   * Destructor
-   */
-  virtual ~RrFfMacScheduler ();
+        // FFR SAPs
+        virtual void SetLteFfrSapProvider(LteFfrSapProvider* s);
+        virtual LteFfrSapUser* GetLteFfrSapUser();
 
-  // inherited from Object
-  virtual void DoDispose (void);
-  static TypeId GetTypeId (void);
+        friend class RrSchedulerMemberCschedSapProvider;
+        friend class RrSchedulerMemberSchedSapProvider;
 
-  // inherited from FfMacScheduler
-  virtual void SetFfMacCschedSapUser (FfMacCschedSapUser* s);
-  virtual void SetFfMacSchedSapUser (FfMacSchedSapUser* s);
-  virtual FfMacCschedSapProvider* GetFfMacCschedSapProvider ();
-  virtual FfMacSchedSapProvider* GetFfMacSchedSapProvider ();
+        void TransmissionModeConfigurationUpdate(uint16_t rnti, uint8_t txMode);
 
-  // FFR SAPs
-  virtual void SetLteFfrSapProvider (LteFfrSapProvider* s);
-  virtual LteFfrSapUser* GetLteFfrSapUser ();
+    private:
+        //
+        // Implementation of the CSCHED API primitives
+        // (See 4.1 for description of the primitives)
+        //
 
-  friend class RrSchedulerMemberCschedSapProvider;
-  friend class RrSchedulerMemberSchedSapProvider;
+        void DoCschedCellConfigReq(const struct FfMacCschedSapProvider::CschedCellConfigReqParameters& params);
 
-  void TransmissionModeConfigurationUpdate (uint16_t rnti, uint8_t txMode);
+        void DoCschedUeConfigReq(const struct FfMacCschedSapProvider::CschedUeConfigReqParameters& params);
 
-private:
-  //
-  // Implementation of the CSCHED API primitives
-  // (See 4.1 for description of the primitives)
-  //
+        void DoCschedLcConfigReq(const struct FfMacCschedSapProvider::CschedLcConfigReqParameters& params);
 
-  void DoCschedCellConfigReq (const struct FfMacCschedSapProvider::CschedCellConfigReqParameters& params);
+        void DoCschedLcReleaseReq(const struct FfMacCschedSapProvider::CschedLcReleaseReqParameters& params);
 
-  void DoCschedUeConfigReq (const struct FfMacCschedSapProvider::CschedUeConfigReqParameters& params);
+        void DoCschedUeReleaseReq(const struct FfMacCschedSapProvider::CschedUeReleaseReqParameters& params);
 
-  void DoCschedLcConfigReq (const struct FfMacCschedSapProvider::CschedLcConfigReqParameters& params);
+        //
+        // Implementation of the SCHED API primitives
+        // (See 4.2 for description of the primitives)
+        //
 
-  void DoCschedLcReleaseReq (const struct FfMacCschedSapProvider::CschedLcReleaseReqParameters& params);
+        void DoSchedDlRlcBufferReq(const struct FfMacSchedSapProvider::SchedDlRlcBufferReqParameters& params);
 
-  void DoCschedUeReleaseReq (const struct FfMacCschedSapProvider::CschedUeReleaseReqParameters& params);
+        void DoSchedDlPagingBufferReq(const struct FfMacSchedSapProvider::SchedDlPagingBufferReqParameters& params);
 
-  //
-  // Implementation of the SCHED API primitives
-  // (See 4.2 for description of the primitives)
-  //
+        void DoSchedDlMacBufferReq(const struct FfMacSchedSapProvider::SchedDlMacBufferReqParameters& params);
 
-  void DoSchedDlRlcBufferReq (const struct FfMacSchedSapProvider::SchedDlRlcBufferReqParameters& params);
+        void DoSchedDlTriggerReq(const struct FfMacSchedSapProvider::SchedDlTriggerReqParameters& params);
 
-  void DoSchedDlPagingBufferReq (const struct FfMacSchedSapProvider::SchedDlPagingBufferReqParameters& params);
+        void DoSchedDlRachInfoReq(const struct FfMacSchedSapProvider::SchedDlRachInfoReqParameters& params);
 
-  void DoSchedDlMacBufferReq (const struct FfMacSchedSapProvider::SchedDlMacBufferReqParameters& params);
+        void DoSchedDlCqiInfoReq(const struct FfMacSchedSapProvider::SchedDlCqiInfoReqParameters& params);
 
-  void DoSchedDlTriggerReq (const struct FfMacSchedSapProvider::SchedDlTriggerReqParameters& params);
+        void DoSchedUlTriggerReq(const struct FfMacSchedSapProvider::SchedUlTriggerReqParameters& params);
 
-  void DoSchedDlRachInfoReq (const struct FfMacSchedSapProvider::SchedDlRachInfoReqParameters& params);
+        void DoSchedUlNoiseInterferenceReq(const struct FfMacSchedSapProvider::SchedUlNoiseInterferenceReqParameters& params);
 
-  void DoSchedDlCqiInfoReq (const struct FfMacSchedSapProvider::SchedDlCqiInfoReqParameters& params);
+        void DoSchedUlSrInfoReq(const struct FfMacSchedSapProvider::SchedUlSrInfoReqParameters& params);
 
-  void DoSchedUlTriggerReq (const struct FfMacSchedSapProvider::SchedUlTriggerReqParameters& params);
+        void DoSchedUlMacCtrlInfoReq(const struct FfMacSchedSapProvider::SchedUlMacCtrlInfoReqParameters& params);
 
-  void DoSchedUlNoiseInterferenceReq (const struct FfMacSchedSapProvider::SchedUlNoiseInterferenceReqParameters& params);
-
-  void DoSchedUlSrInfoReq (const struct FfMacSchedSapProvider::SchedUlSrInfoReqParameters& params);
-
-  void DoSchedUlMacCtrlInfoReq (const struct FfMacSchedSapProvider::SchedUlMacCtrlInfoReqParameters& params);
-
-  void DoSchedUlCqiInfoReq (const struct FfMacSchedSapProvider::SchedUlCqiInfoReqParameters& params);
+        void DoSchedUlCqiInfoReq(const struct FfMacSchedSapProvider::SchedUlCqiInfoReqParameters& params);
 
 
-  int GetRbgSize (int dlbandwidth);
+        int GetRbgSize(int dlbandwidth);
 
-  static bool SortRlcBufferReq (FfMacSchedSapProvider::SchedDlRlcBufferReqParameters i,FfMacSchedSapProvider::SchedDlRlcBufferReqParameters j);
+        static bool SortRlcBufferReq(FfMacSchedSapProvider::SchedDlRlcBufferReqParameters i, FfMacSchedSapProvider::SchedDlRlcBufferReqParameters j);
 
-  void RefreshDlCqiMaps (void);
-  void RefreshUlCqiMaps (void);
+        void RefreshDlCqiMaps(void);
+        void RefreshUlCqiMaps(void);
 
-  void UpdateDlRlcBufferInfo (uint16_t rnti, uint8_t lcid, uint16_t size);
-  void UpdateUlRlcBufferInfo (uint16_t rnti, uint16_t size);
+        void UpdateDlRlcBufferInfo(uint16_t rnti, uint8_t lcid, uint16_t size);
+        void UpdateUlRlcBufferInfo(uint16_t rnti, uint16_t size);
 
-  /**
-  * \brief Update and return a new process Id for the RNTI specified
-  *
-  * \param rnti the RNTI of the UE to be updated
-  * \return the process id  value
-  */
-  uint8_t UpdateHarqProcessId (uint16_t rnti);
+        /**
+         * \brief Update and return a new process Id for the RNTI specified
+         *
+         * \param rnti the RNTI of the UE to be updated
+         * \return the process id  value
+         */
+        uint8_t UpdateHarqProcessId(uint16_t rnti);
 
-  /**
-  * \brief Return the availability of free process for the RNTI specified
-  *
-  * \param rnti the RNTI of the UE to be updated
-  * \return the process id  value
-  */
-  uint8_t HarqProcessAvailability (uint16_t rnti);
+        /**
+         * \brief Return the availability of free process for the RNTI specified
+         *
+         * \param rnti the RNTI of the UE to be updated
+         * \return the process id  value
+         */
+        uint8_t HarqProcessAvailability(uint16_t rnti);
 
-  /**
-  * \brief Refresh HARQ processes according to the timers
-  *
-  */
-  void RefreshHarqProcesses ();
+        /**
+         * \brief Refresh HARQ processes according to the timers
+         *
+         */
+        void RefreshHarqProcesses();
 
-  Ptr<LteAmc> m_amc;
+        Ptr<LteAmc> m_amc;
 
-  /*
-   * Vectors of UE's RLC info
-  */
-  std::list <FfMacSchedSapProvider::SchedDlRlcBufferReqParameters> m_rlcBufferReq;
+        /*
+         * Vectors of UE's RLC info
+         */
+        std::list <FfMacSchedSapProvider::SchedDlRlcBufferReqParameters> m_rlcBufferReq;
 
-  /*
-  * Map of UE's DL CQI P01 received
-  */
-  std::map <uint16_t,uint8_t> m_p10CqiRxed;
-  /*
-  * Map of UE's timers on DL CQI P01 received
-  */
-  std::map <uint16_t,uint32_t> m_p10CqiTimers;
+        /*
+         * Map of UE's DL CQI P01 received
+         */
+        std::map <uint16_t, uint8_t> m_p10CqiRxed;
+        /*
+         * Map of UE's timers on DL CQI P01 received
+         */
+        std::map <uint16_t, uint32_t> m_p10CqiTimers;
 
-  /*
-  * Map of previous allocated UE per RBG
-  * (used to retrieve info from UL-CQI)
-  */
-  std::map <uint16_t, std::vector <uint16_t> > m_allocationMaps;
+        /*
+         * Map of previous allocated UE per RBG
+         * (used to retrieve info from UL-CQI)
+         */
+        std::map <uint16_t, std::vector <uint16_t> > m_allocationMaps;
 
-  /*
-  * Map of UEs' UL-CQI per RBG
-  */
-  std::map <uint16_t, std::vector <double> > m_ueCqi;
-  /*
-  * Map of UEs' timers on UL-CQI per RBG
-  */
-  std::map <uint16_t, uint32_t> m_ueCqiTimers;
+        /*
+         * Map of UEs' UL-CQI per RBG
+         */
+        std::map <uint16_t, std::vector <double> > m_ueCqi;
+        /*
+         * Map of UEs' timers on UL-CQI per RBG
+         */
+        std::map <uint16_t, uint32_t> m_ueCqiTimers;
 
 
 
-  /*
-  * Map of UE's buffer status reports received
-  */
-  std::map <uint16_t,uint32_t> m_ceBsrRxed;
+        /*
+         * Map of UE's buffer status reports received
+         */
+        std::map <uint16_t, uint32_t> m_ceBsrRxed;
 
-  // MAC SAPs
-  FfMacCschedSapUser* m_cschedSapUser;
-  FfMacSchedSapUser* m_schedSapUser;
-  FfMacCschedSapProvider* m_cschedSapProvider;
-  FfMacSchedSapProvider* m_schedSapProvider;
+        // MAC SAPs
+        FfMacCschedSapUser* m_cschedSapUser;
+        FfMacSchedSapUser* m_schedSapUser;
+        FfMacCschedSapProvider* m_cschedSapProvider;
+        FfMacSchedSapProvider* m_schedSapProvider;
 
-  // FFR SAPs
-  LteFfrSapUser* m_ffrSapUser;
-  LteFfrSapProvider* m_ffrSapProvider;
+        // FFR SAPs
+        LteFfrSapUser* m_ffrSapUser;
+        LteFfrSapProvider* m_ffrSapProvider;
 
-  // Internal parameters
-  FfMacCschedSapProvider::CschedCellConfigReqParameters m_cschedCellConfig;
+        // Internal parameters
+        FfMacCschedSapProvider::CschedCellConfigReqParameters m_cschedCellConfig;
 
-  uint16_t m_nextRntiDl; // RNTI of the next user to be served next scheduling in DL
-  uint16_t m_nextRntiUl; // RNTI of the next user to be served next scheduling in UL
+        uint16_t m_nextRntiDl; // RNTI of the next user to be served next scheduling in DL
+        uint16_t m_nextRntiUl; // RNTI of the next user to be served next scheduling in UL
 
-  uint32_t m_cqiTimersThreshold; // # of TTIs for which a CQI canbe considered valid
+        uint32_t m_cqiTimersThreshold; // # of TTIs for which a CQI canbe considered valid
 
-  std::map <uint16_t,uint8_t> m_uesTxMode; // txMode of the UEs
-  
-
-
-  // HARQ attributes
-  /**
-  * m_harqOn when false inhibit te HARQ mechanisms (by default active)
-  */
-  bool m_harqOn;
-  std::map <uint16_t, uint8_t> m_dlHarqCurrentProcessId;
-  //HARQ status
-  // 0: process Id available
-  // x>0: process Id equal to `x` trasmission count
-  std::map <uint16_t, DlHarqProcessesStatus_t> m_dlHarqProcessesStatus;
-  std::map <uint16_t, DlHarqProcessesTimer_t> m_dlHarqProcessesTimer;
-  std::map <uint16_t, DlHarqProcessesDciBuffer_t> m_dlHarqProcessesDciBuffer;
-  std::map <uint16_t, DlHarqRlcPduListBuffer_t> m_dlHarqProcessesRlcPduListBuffer;
-  std::vector <DlInfoListElement_s> m_dlInfoListBuffered; // HARQ retx buffered
-
-  std::map <uint16_t, uint8_t> m_ulHarqCurrentProcessId;
-  //HARQ status
-  // 0: process Id available
-  // x>0: process Id equal to `x` trasmission count
-  std::map <uint16_t, UlHarqProcessesStatus_t> m_ulHarqProcessesStatus;
-  std::map <uint16_t, UlHarqProcessesDciBuffer_t> m_ulHarqProcessesDciBuffer;
+        std::map <uint16_t, uint8_t> m_uesTxMode; // txMode of the UEs
 
 
-  // RACH attributes
-  std::vector <struct RachListElement_s> m_rachList;
-  std::vector <uint16_t> m_rachAllocationMap;
-  uint8_t m_ulGrantMcs; // MCS for UL grant (default 0)
-};
+
+        // HARQ attributes
+        /**
+         * m_harqOn when false inhibit te HARQ mechanisms (by default active)
+         */
+        bool m_harqOn;
+        std::map <uint16_t, uint8_t> m_dlHarqCurrentProcessId;
+        //HARQ status
+        // 0: process Id available
+        // x>0: process Id equal to `x` trasmission count
+        std::map <uint16_t, DlHarqProcessesStatus_t> m_dlHarqProcessesStatus;
+        std::map <uint16_t, DlHarqProcessesTimer_t> m_dlHarqProcessesTimer;
+        std::map <uint16_t, DlHarqProcessesDciBuffer_t> m_dlHarqProcessesDciBuffer;
+        std::map <uint16_t, DlHarqRlcPduListBuffer_t> m_dlHarqProcessesRlcPduListBuffer;
+        std::vector <DlInfoListElement_s> m_dlInfoListBuffered; // HARQ retx buffered
+
+        std::map <uint16_t, uint8_t> m_ulHarqCurrentProcessId;
+        //HARQ status
+        // 0: process Id available
+        // x>0: process Id equal to `x` trasmission count
+        std::map <uint16_t, UlHarqProcessesStatus_t> m_ulHarqProcessesStatus;
+        std::map <uint16_t, UlHarqProcessesDciBuffer_t> m_ulHarqProcessesDciBuffer;
+
+
+        // RACH attributes
+        std::vector <struct RachListElement_s> m_rachList;
+        std::vector <uint16_t> m_rachAllocationMap;
+        uint8_t m_ulGrantMcs; // MCS for UL grant (default 0)
+    };
 
 } // namespace ns3
 

@@ -30,64 +30,75 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace cs {
-namespace tests {
+    namespace cs {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Table)
-BOOST_AUTO_TEST_SUITE(TestCsLru)
+            BOOST_AUTO_TEST_SUITE(Table)
+            BOOST_AUTO_TEST_SUITE(TestCsLru)
 
-BOOST_FIXTURE_TEST_CASE(EvictOne, UnitTestTimeFixture)
-{
-  Cs cs(3);
-  cs.setPolicy(make_unique<LruPolicy>());
+            BOOST_FIXTURE_TEST_CASE(EvictOne, UnitTestTimeFixture) {
+                Cs cs(3);
+                cs.setPolicy(make_unique<LruPolicy>());
 
-  cs.insert(*makeData("ndn:/A"));
-  cs.insert(*makeData("ndn:/B"));
-  cs.insert(*makeData("ndn:/C"));
-  BOOST_CHECK_EQUAL(cs.size(), 3);
+                cs.insert(*makeData("ndn:/A"));
+                cs.insert(*makeData("ndn:/B"));
+                cs.insert(*makeData("ndn:/C"));
+                BOOST_CHECK_EQUAL(cs.size(), 3);
 
-  // evict A
-  cs.insert(*makeData("ndn:/D"));
-  BOOST_CHECK_EQUAL(cs.size(), 3);
-  cs.find(Interest("ndn:/A"),
-          bind([] { BOOST_CHECK(false); }),
-          bind([] { BOOST_CHECK(true); }));
+                // evict A
+                cs.insert(*makeData("ndn:/D"));
+                BOOST_CHECK_EQUAL(cs.size(), 3);
+                cs.find(Interest("ndn:/A"),
+                        bind([] {
+                            BOOST_CHECK(false); }),
+                bind([] {
+                    BOOST_CHECK(true); }));
 
-  // use C then B
-  cs.find(Interest("ndn:/C"),
-          bind([] { BOOST_CHECK(true); }),
-          bind([] { BOOST_CHECK(false); }));
-  cs.find(Interest("ndn:/B"),
-          bind([] { BOOST_CHECK(true); }),
-          bind([] { BOOST_CHECK(false); }));
+                // use C then B
+                cs.find(Interest("ndn:/C"),
+                        bind([] {
+                            BOOST_CHECK(true); }),
+                bind([] {
+                    BOOST_CHECK(false); }));
+                cs.find(Interest("ndn:/B"),
+                        bind([] {
+                            BOOST_CHECK(true); }),
+                bind([] {
+                    BOOST_CHECK(false); }));
 
-  // evict D then C
-  cs.insert(*makeData("ndn:/E"));
-  BOOST_CHECK_EQUAL(cs.size(), 3);
-  cs.find(Interest("ndn:/D"),
-          bind([] { BOOST_CHECK(false); }),
-          bind([] { BOOST_CHECK(true); }));
-  cs.insert(*makeData("ndn:/F"));
-  BOOST_CHECK_EQUAL(cs.size(), 3);
-  cs.find(Interest("ndn:/C"),
-          bind([] { BOOST_CHECK(false); }),
-          bind([] { BOOST_CHECK(true); }));
+                // evict D then C
+                cs.insert(*makeData("ndn:/E"));
+                BOOST_CHECK_EQUAL(cs.size(), 3);
+                cs.find(Interest("ndn:/D"),
+                        bind([] {
+                            BOOST_CHECK(false); }),
+                bind([] {
+                    BOOST_CHECK(true); }));
+                cs.insert(*makeData("ndn:/F"));
+                BOOST_CHECK_EQUAL(cs.size(), 3);
+                cs.find(Interest("ndn:/C"),
+                        bind([] {
+                            BOOST_CHECK(false); }),
+                bind([] {
+                    BOOST_CHECK(true); }));
 
-  // refresh B
-  cs.insert(*makeData("ndn:/B"));
-  // evict E
-  cs.insert(*makeData("ndn:/G"));
-  BOOST_CHECK_EQUAL(cs.size(), 3);
-  cs.find(Interest("ndn:/E"),
-          bind([] { BOOST_CHECK(false); }),
-          bind([] { BOOST_CHECK(true); }));
-}
+                // refresh B
+                cs.insert(*makeData("ndn:/B"));
+                // evict E
+                cs.insert(*makeData("ndn:/G"));
+                BOOST_CHECK_EQUAL(cs.size(), 3);
+                cs.find(Interest("ndn:/E"),
+                        bind([] {
+                            BOOST_CHECK(false); }),
+                bind([] {
+                    BOOST_CHECK(true); }));
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestCsLru
-BOOST_AUTO_TEST_SUITE_END() // Table
+            BOOST_AUTO_TEST_SUITE_END() // TestCsLru
+            BOOST_AUTO_TEST_SUITE_END() // Table
 
-} // namespace tests
-} // namespace cs
+        } // namespace tests
+    } // namespace cs
 } // namespace nfd

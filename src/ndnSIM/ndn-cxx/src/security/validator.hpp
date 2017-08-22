@@ -34,306 +34,300 @@
 #include "v1/identity-certificate.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief provides the interfaces for packet validation.
- */
-class Validator
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        /**
+         * @brief provides the interfaces for packet validation.
+         */
+        class Validator {
+        public:
 
-  /**
-   * @brief Validator constructor
-   *
-   * @param face Pointer to face through which validator may retrieve certificates.
-   *             Passing a null pointer implies the validator is in offline mode.
-   *
-   * @note Make sure the lifetime of the passed Face is longer than validator.
-   */
-  explicit
-  Validator(Face* face = nullptr);
+            class Error : public std::runtime_error {
+            public:
 
-  /// @deprecated Use the constructor taking Face* as parameter.
-  explicit
-  Validator(Face& face);
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
 
-  virtual
-  ~Validator();
+            /**
+             * @brief Validator constructor
+             *
+             * @param face Pointer to face through which validator may retrieve certificates.
+             *             Passing a null pointer implies the validator is in offline mode.
+             *
+             * @note Make sure the lifetime of the passed Face is longer than validator.
+             */
+            explicit
+            Validator(Face* face = nullptr);
 
-  /**
-   * @brief Validate Data and call either onValidated or onValidationFailed.
-   *
-   * @param data The Data with the signature to check.
-   * @param onValidated If the Data is validated, this calls onValidated(data).
-   * @param onValidationFailed If validation fails, this calls onValidationFailed(data).
-   */
-  void
-  validate(const Data& data,
-           const OnDataValidated& onValidated,
-           const OnDataValidationFailed& onValidationFailed)
-  {
-    validate(data, onValidated, onValidationFailed, 0);
-  }
+            /// @deprecated Use the constructor taking Face* as parameter.
+            explicit
+            Validator(Face& face);
 
-  /**
-   * @brief Validate Interest and call either onValidated or onValidationFailed.
-   *
-   * @param interest The Interest with the signature to check.
-   * @param onValidated If the Interest is validated, this calls onValidated(interest).
-   * @param onValidationFailed If validation fails, this calls onValidationFailed(interest).
-   */
-  void
-  validate(const Interest& interest,
-           const OnInterestValidated& onValidated,
-           const OnInterestValidationFailed& onValidationFailed)
-  {
-    validate(interest, onValidated, onValidationFailed, 0);
-  }
+            virtual
+            ~Validator();
 
-  /*****************************************
-   *      verifySignature method set       *
-   *****************************************/
+            /**
+             * @brief Validate Data and call either onValidated or onValidationFailed.
+             *
+             * @param data The Data with the signature to check.
+             * @param onValidated If the Data is validated, this calls onValidated(data).
+             * @param onValidationFailed If validation fails, this calls onValidationFailed(data).
+             */
+            void
+            validate(const Data& data,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed) {
+                validate(data, onValidated, onValidationFailed, 0);
+            }
 
-  /// @brief Verify the data using the publicKey.
-  static bool
-  verifySignature(const Data& data, const v1::PublicKey& publicKey);
+            /**
+             * @brief Validate Interest and call either onValidated or onValidationFailed.
+             *
+             * @param interest The Interest with the signature to check.
+             * @param onValidated If the Interest is validated, this calls onValidated(interest).
+             * @param onValidationFailed If validation fails, this calls onValidationFailed(interest).
+             */
+            void
+            validate(const Interest& interest,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed) {
+                validate(interest, onValidated, onValidationFailed, 0);
+            }
 
-  /**
-   * @brief Verify the signed Interest using the publicKey.
-   *
-   * (Note the signature covers the first n-2 name components).
-   */
-  static bool
-  verifySignature(const Interest& interest, const v1::PublicKey& publicKey);
+            /*****************************************
+             *      verifySignature method set       *
+             *****************************************/
 
-  /// @brief Verify the blob using the publicKey against the signature.
-  static bool
-  verifySignature(const Buffer& blob, const Signature& sig, const v1::PublicKey& publicKey)
-  {
-    return verifySignature(blob.buf(), blob.size(), sig, publicKey);
-  }
+            /// @brief Verify the data using the publicKey.
+            static bool
+            verifySignature(const Data& data, const v1::PublicKey& publicKey);
 
-  /// @brief Verify the data using the publicKey against the SHA256-RSA signature.
-  static bool
-  verifySignature(const Data& data,
-                  const Signature& sig,
-                  const v1::PublicKey& publicKey)
-  {
-    return verifySignature(data.wireEncode().value(),
-                           data.wireEncode().value_size() - data.getSignature().getValue().size(),
-                           sig, publicKey);
-  }
+            /**
+             * @brief Verify the signed Interest using the publicKey.
+             *
+             * (Note the signature covers the first n-2 name components).
+             */
+            static bool
+            verifySignature(const Interest& interest, const v1::PublicKey& publicKey);
 
-  /** @brief Verify the interest using the publicKey against the SHA256-RSA signature.
-   *
-   * (Note the signature covers the first n-2 name components).
-   */
-  static bool
-  verifySignature(const Interest& interest,
-                  const Signature& sig,
-                  const v1::PublicKey& publicKey)
-  {
-    if (interest.getName().size() < 2)
-      return false;
+            /// @brief Verify the blob using the publicKey against the signature.
 
-    const Name& name = interest.getName();
+            static bool
+            verifySignature(const Buffer& blob, const Signature& sig, const v1::PublicKey& publicKey) {
+                return verifySignature(blob.buf(), blob.size(), sig, publicKey);
+            }
 
-    return verifySignature(name.wireEncode().value(),
-                           name.wireEncode().value_size() - name[-1].size(),
-                           sig, publicKey);
-  }
+            /// @brief Verify the data using the publicKey against the SHA256-RSA signature.
 
-  /// @brief Verify the blob using the publicKey against the SHA256-RSA signature.
-  static bool
-  verifySignature(const uint8_t* buf,
-                  const size_t size,
-                  const Signature& sig,
-                  const v1::PublicKey& publicKey);
+            static bool
+            verifySignature(const Data& data,
+                    const Signature& sig,
+                    const v1::PublicKey& publicKey) {
+                return verifySignature(data.wireEncode().value(),
+                        data.wireEncode().value_size() - data.getSignature().getValue().size(),
+                        sig, publicKey);
+            }
+
+            /** @brief Verify the interest using the publicKey against the SHA256-RSA signature.
+             *
+             * (Note the signature covers the first n-2 name components).
+             */
+            static bool
+            verifySignature(const Interest& interest,
+                    const Signature& sig,
+                    const v1::PublicKey& publicKey) {
+                if (interest.getName().size() < 2)
+                    return false;
+
+                const Name& name = interest.getName();
+
+                return verifySignature(name.wireEncode().value(),
+                        name.wireEncode().value_size() - name[-1].size(),
+                        sig, publicKey);
+            }
+
+            /// @brief Verify the blob using the publicKey against the SHA256-RSA signature.
+            static bool
+            verifySignature(const uint8_t* buf,
+                    const size_t size,
+                    const Signature& sig,
+                    const v1::PublicKey& publicKey);
 
 
-  /// @brief Verify the data against the SHA256 signature.
-  static bool
-  verifySignature(const Data& data, const DigestSha256& sig)
-  {
-    return verifySignature(data.wireEncode().value(),
-                           data.wireEncode().value_size() -
-                           data.getSignature().getValue().size(),
-                           sig);
-  }
+            /// @brief Verify the data against the SHA256 signature.
 
-  /** @brief Verify the interest against the SHA256 signature.
-   *
-   * (Note the signature covers the first n-2 name components).
-   */
-  static bool
-  verifySignature(const Interest& interest, const DigestSha256& sig)
-  {
-    if (interest.getName().size() < 2)
-      return false;
+            static bool
+            verifySignature(const Data& data, const DigestSha256& sig) {
+                return verifySignature(data.wireEncode().value(),
+                        data.wireEncode().value_size() -
+                        data.getSignature().getValue().size(),
+                        sig);
+            }
 
-    const Name& name = interest.getName();
+            /** @brief Verify the interest against the SHA256 signature.
+             *
+             * (Note the signature covers the first n-2 name components).
+             */
+            static bool
+            verifySignature(const Interest& interest, const DigestSha256& sig) {
+                if (interest.getName().size() < 2)
+                    return false;
 
-    return verifySignature(name.wireEncode().value(),
-                           name.wireEncode().value_size() - name[-1].size(),
-                           sig);
-  }
+                const Name& name = interest.getName();
 
-  /// @brief Verify the blob against the SHA256 signature.
-  static bool
-  verifySignature(const Buffer& blob, const DigestSha256& sig)
-  {
-    return verifySignature (blob.buf(), blob.size(), sig);
-  }
+                return verifySignature(name.wireEncode().value(),
+                        name.wireEncode().value_size() - name[-1].size(),
+                        sig);
+            }
 
-  /// @brief Verify the blob against the SHA256 signature.
-  static bool
-  verifySignature(const uint8_t* buf, const size_t size, const DigestSha256& sig);
+            /// @brief Verify the blob against the SHA256 signature.
 
-protected:
-  /**
-   * @brief Check the Data against policy and return the next validation step if necessary.
-   *
-   * If there is no next validation step, that validation MUST have been done.
-   * i.e., either onValidated or onValidationFailed callback is invoked.
-   *
-   * @param data               The Data to check.
-   * @param nSteps             The number of validation steps that have been done.
-   * @param onValidated        If the Data is validated, this calls onValidated(data)
-   * @param onValidationFailed If validation fails, this calls onValidationFailed(data)
-   * @param nextSteps          On return, contains the next validation step
-   */
-  virtual void
-  checkPolicy(const Data& data,
-              int nSteps,
-              const OnDataValidated& onValidated,
-              const OnDataValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest>>& nextSteps) = 0;
+            static bool
+            verifySignature(const Buffer& blob, const DigestSha256& sig) {
+                return verifySignature(blob.buf(), blob.size(), sig);
+            }
 
-  /**
-   * @brief Check the Interest against validation policy and return the next validation step
-   *        if necessary.
-   *
-   * If there is no next validation step, that validation MUST have been done.
-   * i.e., either onValidated or onValidationFailed callback is invoked.
-   *
-   * @param interest           The Interest to check.
-   * @param nSteps             The number of validation steps that have been done.
-   * @param onValidated        If the Interest is validated, this calls onValidated(data)
-   * @param onValidationFailed If validation fails, this calls onValidationFailed(data)
-   * @param nextSteps          On return, contains the next validation step
-   */
-  virtual void
-  checkPolicy(const Interest& interest,
-              int nSteps,
-              const OnInterestValidated& onValidated,
-              const OnInterestValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest>>& nextSteps) = 0;
+            /// @brief Verify the blob against the SHA256 signature.
+            static bool
+            verifySignature(const uint8_t* buf, const size_t size, const DigestSha256& sig);
 
-  typedef function<void(const std::string&)> OnFailure;
+        protected:
+            /**
+             * @brief Check the Data against policy and return the next validation step if necessary.
+             *
+             * If there is no next validation step, that validation MUST have been done.
+             * i.e., either onValidated or onValidationFailed callback is invoked.
+             *
+             * @param data               The Data to check.
+             * @param nSteps             The number of validation steps that have been done.
+             * @param onValidated        If the Data is validated, this calls onValidated(data)
+             * @param onValidationFailed If validation fails, this calls onValidationFailed(data)
+             * @param nextSteps          On return, contains the next validation step
+             */
+            virtual void
+            checkPolicy(const Data& data,
+                    int nSteps,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest>>&nextSteps) = 0;
 
-  /// @brief Process the received certificate.
-  void
-  onData(const Interest& interest,
-         const Data& data,
-         const shared_ptr<ValidationRequest>& nextStep);
+            /**
+             * @brief Check the Interest against validation policy and return the next validation step
+             *        if necessary.
+             *
+             * If there is no next validation step, that validation MUST have been done.
+             * i.e., either onValidated or onValidationFailed callback is invoked.
+             *
+             * @param interest           The Interest to check.
+             * @param nSteps             The number of validation steps that have been done.
+             * @param onValidated        If the Interest is validated, this calls onValidated(data)
+             * @param onValidationFailed If validation fails, this calls onValidationFailed(data)
+             * @param nextSteps          On return, contains the next validation step
+             */
+            virtual void
+            checkPolicy(const Interest& interest,
+                    int nSteps,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest>>&nextSteps) = 0;
 
-  void
-  validate(const Data& data,
-           const OnDataValidated& onValidated,
-           const OnDataValidationFailed& onValidationFailed,
-           int nSteps);
+            typedef function<void(const std::string&) > OnFailure;
 
-  void
-  validate(const Interest& interest,
-           const OnInterestValidated& onValidated,
-           const OnInterestValidationFailed& onValidationFailed,
-           int nSteps);
+            /// @brief Process the received certificate.
+            void
+            onData(const Interest& interest,
+                    const Data& data,
+                    const shared_ptr<ValidationRequest>& nextStep);
 
-  /// Hooks
+            void
+            validate(const Data& data,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed,
+                    int nSteps);
 
-  /**
-   * @brief trigger before validating requested certificate.
-   *
-   * The Data:
-   * - matches the interest in the validation-request.
-   * - may be certificate or a data encapsulating certificate.
-   *
-   * This method returns a data (actually certificate) that is will be passed as Data into:
-   * Validator::validate(const Data& data,
-   *                     const OnDataValidated& onValidated,
-   *                     const OnDataValidationFailed& onValidationFailed,
-   *                     int nSteps);
-   */
-  virtual shared_ptr<const Data>
-  preCertificateValidation(const Data& data)
-  {
-    return data.shared_from_this();
-  }
+            void
+            validate(const Interest& interest,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed,
+                    int nSteps);
 
-  /**
-   * @brief trigger when interest retrieves a Nack.
-   *
-   * Validator can decide how to handle a Nack, either call onFailure, or retry.
-   *
-   * @param interest The interest that retrieves a Nack.
-   * @param nack The Nack that is retrieved.
-   * @param nRemainingRetries The number of retries left.
-   * @param onFailure Failure callback when there is no more retries remaining.
-   * @param validationRequest The validationRequest containing the context of the interest.
-   */
-  virtual void
-  onNack(const Interest& interest,
-         const lp::Nack& nack,
-         int nRemainingRetries,
-         const OnFailure& onFailure,
-         const shared_ptr<ValidationRequest>& validationRequest);
+            /// Hooks
 
-  /**
-   * @brief trigger when interest for certificate times out.
-   *
-   * Validator can decide how to handle the timeout, either call onFailure, or retry.
-   *
-   * @param interest The interest that times out.
-   * @param nRemainingRetries The number of retries left.
-   * @param onFailure Failure callback when there is no more retries remaining.
-   * @param validationRequest The validationRequest containing the context of the interest.
-   */
-  virtual void
-  onTimeout(const Interest& interest,
-            int nRemainingRetries,
-            const OnFailure& onFailure,
-            const shared_ptr<ValidationRequest>& validationRequest);
+            /**
+             * @brief trigger before validating requested certificate.
+             *
+             * The Data:
+             * - matches the interest in the validation-request.
+             * - may be certificate or a data encapsulating certificate.
+             *
+             * This method returns a data (actually certificate) that is will be passed as Data into:
+             * Validator::validate(const Data& data,
+             *                     const OnDataValidated& onValidated,
+             *                     const OnDataValidationFailed& onValidationFailed,
+             *                     int nSteps);
+             */
+            virtual shared_ptr<const Data>
+            preCertificateValidation(const Data& data) {
+                return data.shared_from_this();
+            }
 
-  /**
-   * @brief trigger after checkPolicy is done.
-   *
-   * Validator can decide how to handle the set of validation requests according to
-   * the trust model.
-   *
-   * @param nextSteps A set of validation request made by checkPolicy.
-   * @param onFailure Failure callback when errors happen in processing nextSteps.
-   */
-  virtual void
-  afterCheckPolicy(const std::vector<shared_ptr<ValidationRequest>>& nextSteps,
-                   const OnFailure& onFailure);
+            /**
+             * @brief trigger when interest retrieves a Nack.
+             *
+             * Validator can decide how to handle a Nack, either call onFailure, or retry.
+             *
+             * @param interest The interest that retrieves a Nack.
+             * @param nack The Nack that is retrieved.
+             * @param nRemainingRetries The number of retries left.
+             * @param onFailure Failure callback when there is no more retries remaining.
+             * @param validationRequest The validationRequest containing the context of the interest.
+             */
+            virtual void
+            onNack(const Interest& interest,
+                    const lp::Nack& nack,
+                    int nRemainingRetries,
+                    const OnFailure& onFailure,
+                    const shared_ptr<ValidationRequest>& validationRequest);
 
-protected:
-  Face* m_face;
-};
+            /**
+             * @brief trigger when interest for certificate times out.
+             *
+             * Validator can decide how to handle the timeout, either call onFailure, or retry.
+             *
+             * @param interest The interest that times out.
+             * @param nRemainingRetries The number of retries left.
+             * @param onFailure Failure callback when there is no more retries remaining.
+             * @param validationRequest The validationRequest containing the context of the interest.
+             */
+            virtual void
+            onTimeout(const Interest& interest,
+                    int nRemainingRetries,
+                    const OnFailure& onFailure,
+                    const shared_ptr<ValidationRequest>& validationRequest);
 
-} // namespace security
+            /**
+             * @brief trigger after checkPolicy is done.
+             *
+             * Validator can decide how to handle the set of validation requests according to
+             * the trust model.
+             *
+             * @param nextSteps A set of validation request made by checkPolicy.
+             * @param onFailure Failure callback when errors happen in processing nextSteps.
+             */
+            virtual void
+            afterCheckPolicy(const std::vector<shared_ptr<ValidationRequest>>&nextSteps,
+                    const OnFailure& onFailure);
 
-using security::Validator;
+        protected:
+            Face* m_face;
+        };
+
+    } // namespace security
+
+    using security::Validator;
 
 } // namespace ndn
 

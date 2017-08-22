@@ -25,35 +25,32 @@
 #include "isotropic-antenna-model.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("IsotropicAntennaModel");
-
-NS_OBJECT_ENSURE_REGISTERED (IsotropicAntennaModel);
-
-
-TypeId 
-IsotropicAntennaModel::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::IsotropicAntennaModel")
-    .SetParent<AntennaModel> ()
-    .SetGroupName("Antenna")
-    .AddConstructor<IsotropicAntennaModel> ()
-  ;
-  return tid;
-}
 
-IsotropicAntennaModel::IsotropicAntennaModel ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("IsotropicAntennaModel");
 
-double 
-IsotropicAntennaModel::GetGainDb (Angles a)
-{
-  NS_LOG_FUNCTION (this << a);
-  return 0.0;
-}
+    NS_OBJECT_ENSURE_REGISTERED(IsotropicAntennaModel);
+
+    TypeId
+    IsotropicAntennaModel::GetTypeId() {
+        static TypeId tid = TypeId("ns3::IsotropicAntennaModel")
+                .SetParent<AntennaModel> ()
+                .SetGroupName("Antenna")
+                .AddConstructor<IsotropicAntennaModel> ()
+                ;
+        return tid;
+    }
+
+    IsotropicAntennaModel::IsotropicAntennaModel() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    double
+    IsotropicAntennaModel::GetGainDb(Angles a) {
+        NS_LOG_FUNCTION(this << a);
+        return 0.0;
+    }
 
 }
 

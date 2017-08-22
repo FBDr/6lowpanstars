@@ -48,10 +48,10 @@ int main() {
             done = true;
         } else if (input == "help") {
             std::cout
-                << "\nCommand List:\n"
-                << "help: Display this help text\n"
-                << "quit: Exit the program\n"
-                << std::endl;
+                    << "\nCommand List:\n"
+                    << "help: Display this help text\n"
+                    << "quit: Exit the program\n"
+                    << std::endl;
         } else {
             std::cout << "Unrecognized Command" << std::endl;
         }

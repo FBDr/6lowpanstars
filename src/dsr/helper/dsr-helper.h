@@ -41,42 +41,42 @@
 #include "ns3/icmpv4-l4-protocol.h"
 
 namespace ns3 {
-class DsrHelper
-{
-public:
-  /**
-   * Create an DsrHelper that makes life easier for people who want to install
-   * Dsr routing to nodes.
-   */
-  DsrHelper ();
-  ~DsrHelper ();
-  /**
-   * \brief Construct an DsrHelper from another previously initialized instance
-   * (Copy Constructor).
-   */
-  DsrHelper (const DsrHelper &);
-  /**
-   * \returns pointer to clone of this DsrHelper
-   *
-   * This method is mainly for internal use by the other helpers;
-   * clients are expected to free the dynamic memory allocated by this method
-   */
-  DsrHelper* Copy (void) const;
-  /**
-   * \param node the node on which the routing protocol will run
-   * \returns a newly-created L4 protocol
-   */
-  Ptr<ns3::dsr::DsrRouting> Create (Ptr<Node> node) const;
-  void Set (std::string name, const AttributeValue &value);
-private:
-  /**
-   * \brief Assignment operator declared private and not implemented to disallow
-   * assignment and prevent the compiler from happily inserting its own.
-   */
-  DsrHelper & operator = (const DsrHelper &o);
-  ObjectFactory m_agentFactory;
-  NodeContainer m_nodes;
-};
+
+    class DsrHelper {
+    public:
+        /**
+         * Create an DsrHelper that makes life easier for people who want to install
+         * Dsr routing to nodes.
+         */
+        DsrHelper();
+        ~DsrHelper();
+        /**
+         * \brief Construct an DsrHelper from another previously initialized instance
+         * (Copy Constructor).
+         */
+        DsrHelper(const DsrHelper &);
+        /**
+         * \returns pointer to clone of this DsrHelper
+         *
+         * This method is mainly for internal use by the other helpers;
+         * clients are expected to free the dynamic memory allocated by this method
+         */
+        DsrHelper* Copy(void) const;
+        /**
+         * \param node the node on which the routing protocol will run
+         * \returns a newly-created L4 protocol
+         */
+        Ptr<ns3::dsr::DsrRouting> Create(Ptr<Node> node) const;
+        void Set(std::string name, const AttributeValue &value);
+    private:
+        /**
+         * \brief Assignment operator declared private and not implemented to disallow
+         * assignment and prevent the compiler from happily inserting its own.
+         */
+        DsrHelper & operator=(const DsrHelper &o);
+        ObjectFactory m_agentFactory;
+        NodeContainer m_nodes;
+    };
 
 } // namespace ns3
 

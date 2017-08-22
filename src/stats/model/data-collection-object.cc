@@ -24,74 +24,66 @@
 
 #include "data-collection-object.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("DataCollectionObject");
-
-NS_OBJECT_ENSURE_REGISTERED (DataCollectionObject);
-
-TypeId
-DataCollectionObject::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::DataCollectionObject")
-    .SetParent<Object> ()
-    .SetGroupName ("Stats")
-    .AddConstructor<DataCollectionObject> ()
-    .AddAttribute ( "Name",
-                    "Object's name",
-                    StringValue ("unnamed"), MakeStringAccessor (&DataCollectionObject::GetName, &DataCollectionObject::SetName), MakeStringChecker ())
-    .AddAttribute ( "Enabled",
-                    "Object's enabled status",
-                    BooleanValue (true), MakeBooleanAccessor (&DataCollectionObject::m_enabled), MakeBooleanChecker ())
-  ;
-  return tid;
-}
 
-DataCollectionObject::DataCollectionObject ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("DataCollectionObject");
 
-DataCollectionObject::~DataCollectionObject ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(DataCollectionObject);
 
-bool
-DataCollectionObject::IsEnabled (void) const
-{
-  return m_enabled;
-}
-
-std::string
-DataCollectionObject::GetName (void) const
-{
-  return m_name;
-}
-
-void
-DataCollectionObject::SetName (std::string name)
-{
-  NS_LOG_FUNCTION (this << name);
-  for (size_t pos = name.find (" "); pos != std::string::npos; pos = name.find (" ", pos + 1, 1))
-    {
-      name[pos] = '_';
+    TypeId
+    DataCollectionObject::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::DataCollectionObject")
+                .SetParent<Object> ()
+                .SetGroupName("Stats")
+                .AddConstructor<DataCollectionObject> ()
+                .AddAttribute("Name",
+                "Object's name",
+                StringValue("unnamed"), MakeStringAccessor(&DataCollectionObject::GetName, &DataCollectionObject::SetName), MakeStringChecker())
+                .AddAttribute("Enabled",
+                "Object's enabled status",
+                BooleanValue(true), MakeBooleanAccessor(&DataCollectionObject::m_enabled), MakeBooleanChecker())
+                ;
+        return tid;
     }
 
-  m_name = name;
-}
+    DataCollectionObject::DataCollectionObject() {
+    }
 
-void
-DataCollectionObject::Enable (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_enabled = true;
-}
+    DataCollectionObject::~DataCollectionObject() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-DataCollectionObject::Disable (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_enabled = false;
-}
+    bool
+    DataCollectionObject::IsEnabled(void) const {
+        return m_enabled;
+    }
+
+    std::string
+    DataCollectionObject::GetName(void) const {
+        return m_name;
+    }
+
+    void
+    DataCollectionObject::SetName(std::string name) {
+        NS_LOG_FUNCTION(this << name);
+        for (size_t pos = name.find(" "); pos != std::string::npos; pos = name.find(" ", pos + 1, 1)) {
+            name[pos] = '_';
+        }
+
+        m_name = name;
+    }
+
+    void
+    DataCollectionObject::Enable(void) {
+        NS_LOG_FUNCTION(this);
+        m_enabled = true;
+    }
+
+    void
+    DataCollectionObject::Disable(void) {
+        NS_LOG_FUNCTION(this);
+        m_enabled = false;
+    }
 
 } // namespace ns3

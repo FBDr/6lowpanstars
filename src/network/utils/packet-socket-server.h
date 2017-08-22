@@ -28,64 +28,63 @@
 
 namespace ns3 {
 
-class Socket;
-class Packet;
+    class Socket;
+    class Packet;
 
-/**
- * \ingroup socket
- *
- * \brief A server using PacketSocket.
- *
- * Receives packets using PacketSocket. It does not require (or use) IP.
- * The application has the same requirements as the PacketSocket for
- * what concerns the underlying NetDevice and the Address scheme.
- * It is meant to be used in ns-3 tests.
- *
- * Provides a "Rx" Traced Callback (received packets, source address)
- */
-class PacketSocketServer : public Application
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup socket
+     *
+     * \brief A server using PacketSocket.
+     *
+     * Receives packets using PacketSocket. It does not require (or use) IP.
+     * The application has the same requirements as the PacketSocket for
+     * what concerns the underlying NetDevice and the Address scheme.
+     * It is meant to be used in ns-3 tests.
+     *
+     * Provides a "Rx" Traced Callback (received packets, source address)
+     */
+    class PacketSocketServer : public Application {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-  PacketSocketServer ();
+        PacketSocketServer();
 
-  virtual ~PacketSocketServer ();
+        virtual ~PacketSocketServer();
 
-  /**
-   * \brief set the local address and protocol to be used
-   * \param addr local address
-   */
-  void SetLocal (PacketSocketAddress addr);
+        /**
+         * \brief set the local address and protocol to be used
+         * \param addr local address
+         */
+        void SetLocal(PacketSocketAddress addr);
 
-protected:
-  virtual void DoDispose (void);
+    protected:
+        virtual void DoDispose(void);
 
-private:
+    private:
 
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
+        virtual void StartApplication(void);
+        virtual void StopApplication(void);
 
-  /**
-   * \brief Handle a packet received by the application
-   * \param socket the receiving socket
-   */
-  void HandleRead (Ptr<Socket> socket);
+        /**
+         * \brief Handle a packet received by the application
+         * \param socket the receiving socket
+         */
+        void HandleRead(Ptr<Socket> socket);
 
-  uint32_t m_pktRx;    //!< The number of received packets
-  uint32_t m_bytesRx;  //!< Total bytes received
+        uint32_t m_pktRx; //!< The number of received packets
+        uint32_t m_bytesRx; //!< Total bytes received
 
-  Ptr<Socket> m_socket; //!< Socket
-  PacketSocketAddress m_localAddress; //!< Local address
-  bool m_localAddressSet; //!< Sanity check
+        Ptr<Socket> m_socket; //!< Socket
+        PacketSocketAddress m_localAddress; //!< Local address
+        bool m_localAddressSet; //!< Sanity check
 
-  /// Traced Callback: received packets, source address.
-  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
-};
+        /// Traced Callback: received packets, source address.
+        TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
+    };
 
 } // namespace ns3
 

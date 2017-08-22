@@ -22,85 +22,75 @@
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (AmpduTag);
-
-TypeId
-AmpduTag::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::AmpduTag")
-    .SetParent<Tag> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<AmpduTag> ()
-    .AddAttribute ("Ampdu Exists", "The value that indicates that the packet contains an AMPDU",
-                   UintegerValue (false),
-                   MakeUintegerAccessor (&AmpduTag::GetAmpdu),
-                   MakeUintegerChecker<uint8_t> ())
-  ;
-  return tid;
-}
 
-TypeId
-AmpduTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(AmpduTag);
 
-AmpduTag::AmpduTag ()
-  : m_ampdu (0)
-{
-}
+    TypeId
+    AmpduTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::AmpduTag")
+                .SetParent<Tag> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<AmpduTag> ()
+                .AddAttribute("Ampdu Exists", "The value that indicates that the packet contains an AMPDU",
+                UintegerValue(false),
+                MakeUintegerAccessor(&AmpduTag::GetAmpdu),
+                MakeUintegerChecker<uint8_t> ())
+                ;
+        return tid;
+    }
 
-void
-AmpduTag::SetAmpdu (bool supported)
-{
-  m_ampdu = supported;
-}
+    TypeId
+    AmpduTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-AmpduTag::SetNoOfMpdus (uint8_t noofmpdus)
-{
-  NS_ASSERT (noofmpdus <= 64);
-  m_noOfMpdus = noofmpdus;
-}
+    AmpduTag::AmpduTag()
+            : m_ampdu(0) {
+    }
 
-uint32_t
-AmpduTag::GetSerializedSize (void) const
-{
-  return 2;
-}
+    void
+    AmpduTag::SetAmpdu(bool supported) {
+        m_ampdu = supported;
+    }
 
-void
-AmpduTag::Serialize (TagBuffer i) const
-{
-  i.WriteU8 (m_ampdu);
-  i.WriteU8 (m_noOfMpdus);
-}
+    void
+    AmpduTag::SetNoOfMpdus(uint8_t noofmpdus) {
+        NS_ASSERT(noofmpdus <= 64);
+        m_noOfMpdus = noofmpdus;
+    }
 
-void
-AmpduTag::Deserialize (TagBuffer i)
-{
-  m_ampdu = i.ReadU8 ();
-  m_noOfMpdus = i.ReadU8 ();
-}
+    uint32_t
+    AmpduTag::GetSerializedSize(void) const {
+        return 2;
+    }
 
-bool
-AmpduTag::GetAmpdu () const
-{
-  return (m_ampdu == 1) ? true : false;
-}
+    void
+    AmpduTag::Serialize(TagBuffer i) const {
+        i.WriteU8(m_ampdu);
+        i.WriteU8(m_noOfMpdus);
+    }
 
-uint8_t
-AmpduTag::GetNoOfMpdus () const
-{
-  return m_noOfMpdus;
-}
+    void
+    AmpduTag::Deserialize(TagBuffer i) {
+        m_ampdu = i.ReadU8();
+        m_noOfMpdus = i.ReadU8();
+    }
 
-void
-AmpduTag::Print (std::ostream &os) const
-{
-  os << "A-MPDU exists=" << m_ampdu;
-}
+    bool
+    AmpduTag::GetAmpdu() const {
+        return (m_ampdu == 1) ? true : false;
+    }
+
+    uint8_t
+    AmpduTag::GetNoOfMpdus() const {
+        return m_noOfMpdus;
+    }
+
+    void
+    AmpduTag::Print(std::ostream & os) const {
+        os << "A-MPDU exists=" << m_ampdu;
+    }
 
 } //namespace ns3

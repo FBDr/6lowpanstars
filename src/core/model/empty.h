@@ -27,10 +27,12 @@
  */
 
 namespace ns3 {
-/**
- * \brief make Callback use a separate empty type
- */
-class empty {};
+
+    /**
+     * \brief make Callback use a separate empty type
+     */
+    class empty {
+    };
 }
 
 #endif /* EMPTY_H */

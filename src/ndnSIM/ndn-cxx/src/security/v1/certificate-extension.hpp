@@ -31,96 +31,88 @@
 #include "../../encoding/oid.hpp"
 
 namespace CryptoPP {
-class BufferedTransformation;
+    class BufferedTransformation;
 } // namespace CryptoPP
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-/**
- * A CertificateExtension represents the Extension entry in a certificate.
- */
-class CertificateExtension
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            /**
+             * A CertificateExtension represents the Extension entry in a certificate.
+             */
+            class CertificateExtension {
+            public:
 
-  explicit
-  CertificateExtension(CryptoPP::BufferedTransformation& in)
-  {
-    decode(in);
-  }
+                class Error : public std::runtime_error {
+                public:
 
-  /**
-   * Create a new CertificateExtension.
-   * @param oid The oid of subject description entry.
-   * @param isCritical If true, the extension must be handled.
-   * @param value The extension value.
-   */
-  CertificateExtension(const Oid& oid, const bool isCritical, const Buffer& value)
-    : m_extensionId(oid), m_isCritical(isCritical), m_extensionValue(value)
-  {
-  }
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-  CertificateExtension(const Oid& oid, const bool isCritical,
-                       const uint8_t* value, size_t valueSize)
-    : m_extensionId(oid), m_isCritical(isCritical), m_extensionValue(value, valueSize)
-  {
-  }
+                explicit
+                CertificateExtension(CryptoPP::BufferedTransformation& in) {
+                    decode(in);
+                }
 
-  /**
-   * The virtual destructor.
-   */
-  virtual
-  ~CertificateExtension()
-  {
-  }
+                /**
+                 * Create a new CertificateExtension.
+                 * @param oid The oid of subject description entry.
+                 * @param isCritical If true, the extension must be handled.
+                 * @param value The extension value.
+                 */
+                CertificateExtension(const Oid& oid, const bool isCritical, const Buffer& value)
+                : m_extensionId(oid), m_isCritical(isCritical), m_extensionValue(value) {
+                }
 
-  void
-  encode(CryptoPP::BufferedTransformation& out) const;
+                CertificateExtension(const Oid& oid, const bool isCritical,
+                        const uint8_t* value, size_t valueSize)
+                : m_extensionId(oid), m_isCritical(isCritical), m_extensionValue(value, valueSize) {
+                }
 
-  void
-  decode(CryptoPP::BufferedTransformation& in);
+                /**
+                 * The virtual destructor.
+                 */
+                virtual
+                ~CertificateExtension() {
+                }
 
-  inline const Oid&
-  getOid() const
-  {
-    return m_extensionId;
-  }
+                void
+                encode(CryptoPP::BufferedTransformation& out) const;
 
-  inline bool
-  getIsCritical() const
-  {
-    return m_isCritical;
-  }
+                void
+                decode(CryptoPP::BufferedTransformation& in);
 
-  inline const Buffer&
-  getValue() const
-  {
-    return m_extensionValue;
-  }
+                inline const Oid&
+                getOid() const {
+                    return m_extensionId;
+                }
 
-protected:
-  Oid m_extensionId;
-  bool m_isCritical;
-  Buffer m_extensionValue;
-};
+                inline bool
+                getIsCritical() const {
+                    return m_isCritical;
+                }
 
-} // namespace v1
-} // namespace security
+                inline const Buffer&
+                getValue() const {
+                    return m_extensionValue;
+                }
+
+            protected:
+                Oid m_extensionId;
+                bool m_isCritical;
+                Buffer m_extensionValue;
+            };
+
+        } // namespace v1
+    } // namespace security
 
 #ifdef NDN_CXX_KEEP_SECURITY_V1_ALIASES
-/// @deprecated When needed, use explicit namespace
-using security::v1::CertificateExtension;
+    /// @deprecated When needed, use explicit namespace
+    using security::v1::CertificateExtension;
 #endif // NDN_CXX_KEEP_SECURITY_V1_ALIASES
 
 } // namespace ndn

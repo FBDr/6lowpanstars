@@ -28,14 +28,14 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestChannelModule, ModuleFixture<ChannelModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestChannelModule, ModuleFixture<ChannelModule>)
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <channels>
     <channel>
       <localUri>tcp4://192.0.2.1:6363</localUri>
@@ -46,30 +46,29 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </channels>
 )XML");
 
-const std::string STATUS_TEXT = std::string(R"TEXT(
+                const std::string STATUS_TEXT = std::string(R"TEXT(
 Channels:
   tcp4://192.0.2.1:6363
   ws://[::]:9696/NFD
 )TEXT").substr(1);
 
-BOOST_AUTO_TEST_CASE(Status)
-{
-  this->fetchStatus();
-  ChannelStatus payload1;
-  payload1.setLocalUri("tcp4://192.0.2.1:6363");
-  ChannelStatus payload2;
-  payload2.setLocalUri("ws://[::]:9696/NFD");
-  this->sendDataset("/localhost/nfd/faces/channels", payload1, payload2);
-  this->prepareStatusOutput();
+                BOOST_AUTO_TEST_CASE(Status) {
+                    this->fetchStatus();
+                    ChannelStatus payload1;
+                    payload1.setLocalUri("tcp4://192.0.2.1:6363");
+                    ChannelStatus payload2;
+                    payload2.setLocalUri("ws://[::]:9696/NFD");
+                    this->sendDataset("/localhost/nfd/faces/channels", payload1, payload2);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestChannelModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestChannelModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

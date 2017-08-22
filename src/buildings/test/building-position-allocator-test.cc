@@ -34,109 +34,100 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("BuildingPositionAllocatorTest");
+NS_LOG_COMPONENT_DEFINE("BuildingPositionAllocatorTest");
 
-struct Room
-{
-  Room (uint32_t xx, uint32_t yy, uint32_t zz);
-  uint32_t x;
-  uint32_t y;
-  uint32_t z;
+struct Room {
+    Room(uint32_t xx, uint32_t yy, uint32_t zz);
+    uint32_t x;
+    uint32_t y;
+    uint32_t z;
 };
 
-Room::Room (uint32_t xx, uint32_t yy, uint32_t zz)
-  : x (xx),
-    y (yy),
-    z (zz)
-{
+Room::Room(uint32_t xx, uint32_t yy, uint32_t zz)
+: x(xx),
+y(yy),
+z(zz) {
 }
 
 bool
-operator < (const Room& a, const Room& b)
-{
-  return ( (a.x < b.x) 
-           || ( (a.x == b.x) && (a.y < b.y) ) 
-           || ( (a.x == b.x) && (a.y == b.y) && (a.z < b.z) ));
+operator < (const Room& a, const Room& b) {
+    return ( (a.x < b.x)
+            || ((a.x == b.x) && (a.y < b.y))
+            || ((a.x == b.x) && (a.y == b.y) && (a.z < b.z)));
 }
 
 
 
 class RandomRoomPositionAllocatorTestCase : public TestCase
 {
-public:
-  RandomRoomPositionAllocatorTestCase ();
+    public :
+    RandomRoomPositionAllocatorTestCase();
 
 private:
-  virtual void DoRun (void);
-
+    virtual void DoRun(void);
 };
 
-
-RandomRoomPositionAllocatorTestCase::RandomRoomPositionAllocatorTestCase ()
-  : TestCase ("RandomRoom, 12 rooms, 24 nodes")
-{
+RandomRoomPositionAllocatorTestCase::RandomRoomPositionAllocatorTestCase()
+: TestCase("RandomRoom, 12 rooms, 24 nodes") {
 }
 
 void
-RandomRoomPositionAllocatorTestCase::DoRun ()
-{
-  NS_LOG_FUNCTION (this);
+RandomRoomPositionAllocatorTestCase::DoRun() {
+    NS_LOG_FUNCTION(this);
 
- 
 
-  NS_LOG_LOGIC ("create building");
-  Ptr<Building> b = CreateObject<Building> ();
-  b->SetBoundaries (Box (1, 3, 1, 4, 1, 3));
-  b->SetNFloors (2);
-  b->SetNRoomsX (2);
-  b->SetNRoomsY (3);
 
-  NodeContainer nodes;
-  nodes.Create (24);
+    NS_LOG_LOGIC("create building");
+    Ptr<Building> b = CreateObject<Building> ();
+    b->SetBoundaries(Box(1, 3, 1, 4, 1, 3));
+    b->SetNFloors(2);
+    b->SetNRoomsX(2);
+    b->SetNRoomsY(3);
 
-  MobilityHelper mobility;
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  Ptr<PositionAllocator> positionAlloc = CreateObject<RandomRoomPositionAllocator> ();
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.Install (nodes);
-  BuildingsHelper::Install (nodes);
+    NodeContainer nodes;
+    nodes.Create(24);
 
-  BuildingsHelper::MakeMobilityModelConsistent ();
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    Ptr<PositionAllocator> positionAlloc = CreateObject<RandomRoomPositionAllocator> ();
+    mobility.SetPositionAllocator(positionAlloc);
+    mobility.Install(nodes);
+    BuildingsHelper::Install(nodes);
 
-  std::map<Room, uint32_t> roomCounter;
+    BuildingsHelper::MakeMobilityModelConsistent();
 
-  for (NodeContainer::Iterator it = nodes.Begin (); it != nodes.End (); ++it)
-    {
-      Ptr<MobilityModel> mm = (*it)->GetObject<MobilityModel> ();
-      NS_ASSERT_MSG (mm, "no mobility model aggregated to this node");
-      Ptr<MobilityBuildingInfo> bmm = mm->GetObject<MobilityBuildingInfo> ();
-      NS_ASSERT_MSG (bmm, "MobilityBuildingInfo has not been aggregated to this node mobility model");
+    std::map<Room, uint32_t> roomCounter;
 
-      NS_TEST_ASSERT_MSG_EQ (bmm->IsIndoor (), true, "node should be indoor");
-      Room r (bmm->GetRoomNumberX (), bmm->GetRoomNumberY (), bmm->GetFloorNumber ());
-      ++(roomCounter[r]);
+    for (NodeContainer::Iterator it = nodes.Begin(); it != nodes.End(); ++it) {
+        Ptr<MobilityModel> mm = (*it)->GetObject<MobilityModel> ();
+        NS_ASSERT_MSG(mm, "no mobility model aggregated to this node");
+        Ptr<MobilityBuildingInfo> bmm = mm->GetObject<MobilityBuildingInfo> ();
+        NS_ASSERT_MSG(bmm, "MobilityBuildingInfo has not been aggregated to this node mobility model");
 
-      Vector p = mm->GetPosition ();
-      NS_TEST_ASSERT_MSG_GT (p.x, bmm->GetRoomNumberX (), "wrong x value");
-      NS_TEST_ASSERT_MSG_LT (p.x, bmm->GetRoomNumberX () + 1, "wrong x value");
-      NS_TEST_ASSERT_MSG_GT (p.y, bmm->GetRoomNumberY (), "wrong y value");
-      NS_TEST_ASSERT_MSG_LT (p.y, bmm->GetRoomNumberY () + 1, "wrong y value");
-      NS_TEST_ASSERT_MSG_GT (p.z, bmm->GetFloorNumber (), "wrong z value");
-      NS_TEST_ASSERT_MSG_LT (p.z, bmm->GetFloorNumber () + 1, "wrong z value");
+        NS_TEST_ASSERT_MSG_EQ(bmm->IsIndoor(), true, "node should be indoor");
+        Room r(bmm->GetRoomNumberX(), bmm->GetRoomNumberY(), bmm->GetFloorNumber());
+        ++(roomCounter[r]);
+
+        Vector p = mm->GetPosition();
+        NS_TEST_ASSERT_MSG_GT(p.x, bmm->GetRoomNumberX(), "wrong x value");
+        NS_TEST_ASSERT_MSG_LT(p.x, bmm->GetRoomNumberX() + 1, "wrong x value");
+        NS_TEST_ASSERT_MSG_GT(p.y, bmm->GetRoomNumberY(), "wrong y value");
+        NS_TEST_ASSERT_MSG_LT(p.y, bmm->GetRoomNumberY() + 1, "wrong y value");
+        NS_TEST_ASSERT_MSG_GT(p.z, bmm->GetFloorNumber(), "wrong z value");
+        NS_TEST_ASSERT_MSG_LT(p.z, bmm->GetFloorNumber() + 1, "wrong z value");
 
     }
 
-  for (std::map<Room, uint32_t>::iterator it = roomCounter.begin (); it != roomCounter.end (); ++it)
-    {
-      // random selection is done without replacement until the set of
-      // eligible room is empty, at which point the set is filled
-      // again. Hence with 24 nodes and 12 rooms we expect 2 nodes per room
-      NS_TEST_ASSERT_MSG_EQ (it->second, 2, "expected 2 nodes per room");
+    for (std::map<Room, uint32_t>::iterator it = roomCounter.begin(); it != roomCounter.end(); ++it) {
+        // random selection is done without replacement until the set of
+        // eligible room is empty, at which point the set is filled
+        // again. Hence with 24 nodes and 12 rooms we expect 2 nodes per room
+        NS_TEST_ASSERT_MSG_EQ(it->second, 2, "expected 2 nodes per room");
     }
 
-  NS_TEST_ASSERT_MSG_EQ (roomCounter.size (), 12, "expected 12 rooms allocated");
+    NS_TEST_ASSERT_MSG_EQ(roomCounter.size(), 12, "expected 12 rooms allocated");
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 
@@ -145,76 +136,70 @@ RandomRoomPositionAllocatorTestCase::DoRun ()
 
 class SameRoomPositionAllocatorTestCase : public TestCase
 {
-public:
-  SameRoomPositionAllocatorTestCase ();
+    public :
+    SameRoomPositionAllocatorTestCase();
 
 private:
-  virtual void DoRun (void);
-
+    virtual void DoRun(void);
 };
 
-
-SameRoomPositionAllocatorTestCase::SameRoomPositionAllocatorTestCase ()
-  : TestCase ("SameRoom 48 nodes")
-{
+SameRoomPositionAllocatorTestCase::SameRoomPositionAllocatorTestCase()
+: TestCase("SameRoom 48 nodes") {
 }
 
 void
-SameRoomPositionAllocatorTestCase::DoRun ()
-{
-  NS_LOG_FUNCTION (this);
+SameRoomPositionAllocatorTestCase::DoRun() {
+    NS_LOG_FUNCTION(this);
 
- 
 
-  NS_LOG_LOGIC ("create building");
-  Ptr<Building> b = CreateObject<Building> ();
-  b->SetBoundaries (Box (-10, -6, 20, 26, -1, 5));
-  b->SetNFloors (2);
-  b->SetNRoomsX (2);
-  b->SetNRoomsY (3);
 
-  NodeContainer nodes;
-  nodes.Create (24);
+    NS_LOG_LOGIC("create building");
+    Ptr<Building> b = CreateObject<Building> ();
+    b->SetBoundaries(Box(-10, -6, 20, 26, -1, 5));
+    b->SetNFloors(2);
+    b->SetNRoomsX(2);
+    b->SetNRoomsY(3);
 
-  MobilityHelper mobility;
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  Ptr<PositionAllocator> positionAlloc = CreateObject<RandomRoomPositionAllocator> ();
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.Install (nodes);
-  BuildingsHelper::Install (nodes);
+    NodeContainer nodes;
+    nodes.Create(24);
 
-  NodeContainer copyNodes;
-  copyNodes.Create (48);
-  positionAlloc = CreateObject<SameRoomPositionAllocator> (nodes);
-  mobility.SetPositionAllocator (positionAlloc);
-  mobility.Install (copyNodes);
-  BuildingsHelper::Install (copyNodes);
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    Ptr<PositionAllocator> positionAlloc = CreateObject<RandomRoomPositionAllocator> ();
+    mobility.SetPositionAllocator(positionAlloc);
+    mobility.Install(nodes);
+    BuildingsHelper::Install(nodes);
 
-  BuildingsHelper::MakeMobilityModelConsistent ();
+    NodeContainer copyNodes;
+    copyNodes.Create(48);
+    positionAlloc = CreateObject<SameRoomPositionAllocator> (nodes);
+    mobility.SetPositionAllocator(positionAlloc);
+    mobility.Install(copyNodes);
+    BuildingsHelper::Install(copyNodes);
 
-  std::map<Room, uint32_t> roomCounter;
+    BuildingsHelper::MakeMobilityModelConsistent();
 
-  for (NodeContainer::Iterator it = copyNodes.Begin (); it != copyNodes.End (); ++it)
-    {
-      Ptr<MobilityModel> mm = (*it)->GetObject<MobilityModel> ();
-      NS_ASSERT_MSG (mm, "no mobility model aggregated to this node");
-      Ptr<MobilityBuildingInfo> bmm = mm->GetObject<MobilityBuildingInfo> ();
-      NS_ASSERT_MSG (bmm, "MobilityBuildingInfo has not been aggregated to this node mobility model");
+    std::map<Room, uint32_t> roomCounter;
 
-      NS_TEST_ASSERT_MSG_EQ (bmm->IsIndoor (), true, "node should be indoor");
-      Room r (bmm->GetRoomNumberX (), bmm->GetRoomNumberY (), bmm->GetFloorNumber ());
-      ++(roomCounter[r]);
+    for (NodeContainer::Iterator it = copyNodes.Begin(); it != copyNodes.End(); ++it) {
+        Ptr<MobilityModel> mm = (*it)->GetObject<MobilityModel> ();
+        NS_ASSERT_MSG(mm, "no mobility model aggregated to this node");
+        Ptr<MobilityBuildingInfo> bmm = mm->GetObject<MobilityBuildingInfo> ();
+        NS_ASSERT_MSG(bmm, "MobilityBuildingInfo has not been aggregated to this node mobility model");
+
+        NS_TEST_ASSERT_MSG_EQ(bmm->IsIndoor(), true, "node should be indoor");
+        Room r(bmm->GetRoomNumberX(), bmm->GetRoomNumberY(), bmm->GetFloorNumber());
+        ++(roomCounter[r]);
     }
 
-  for (std::map<Room, uint32_t>::iterator it = roomCounter.begin (); it != roomCounter.end (); ++it)
-    {
+    for (std::map<Room, uint32_t>::iterator it = roomCounter.begin(); it != roomCounter.end(); ++it) {
 
-      NS_TEST_ASSERT_MSG_EQ (it->second, 4, "expected 4 nodes per room");
+        NS_TEST_ASSERT_MSG_EQ(it->second, 4, "expected 4 nodes per room");
     }
 
-  NS_TEST_ASSERT_MSG_EQ (roomCounter.size (), 12, "expected 12 rooms allocated");
+    NS_TEST_ASSERT_MSG_EQ(roomCounter.size(), 12, "expected 12 rooms allocated");
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 
@@ -224,18 +209,15 @@ SameRoomPositionAllocatorTestCase::DoRun ()
 
 class BuildingPositionAllocatorTestSuite : public TestSuite
 {
-public:
-  BuildingPositionAllocatorTestSuite ();
-};
+    public :
+    BuildingPositionAllocatorTestSuite();};
 
+BuildingPositionAllocatorTestSuite::BuildingPositionAllocatorTestSuite()
+: TestSuite("building-position-allocator", UNIT) {
+    NS_LOG_FUNCTION(this);
 
-BuildingPositionAllocatorTestSuite::BuildingPositionAllocatorTestSuite ()
-  : TestSuite ("building-position-allocator", UNIT)
-{
-  NS_LOG_FUNCTION (this);
-
-  AddTestCase (new RandomRoomPositionAllocatorTestCase, TestCase::QUICK);
-  AddTestCase (new SameRoomPositionAllocatorTestCase, TestCase::QUICK);
+    AddTestCase(new RandomRoomPositionAllocatorTestCase, TestCase::QUICK);
+    AddTestCase(new SameRoomPositionAllocatorTestCase, TestCase::QUICK);
 
 }
 

@@ -21,45 +21,44 @@
 
 namespace ns3 {
 
-class NscTcpL4Protocol;
+    class NscTcpL4Protocol;
 
-/**
- * \ingroup internet
- * \defgroup nsctcp NscTcp
- *
- * An alternate implementation of TCP for ns-3 is provided by the
- * Network Simulation Cradle (NSC) project. NSC is a separately linked
- * library that provides ported TCP stacks from popular operating systems
- * such as Linux and FreeBSD.  Glue code such as the ns-3 NSC code
- * allows users to delegate Internet stack processing to the logic
- * from these operating systems.  This allows a user to reproduce
- * with high fidelity the behavior of a real TCP stack.
- */
+    /**
+     * \ingroup internet
+     * \defgroup nsctcp NscTcp
+     *
+     * An alternate implementation of TCP for ns-3 is provided by the
+     * Network Simulation Cradle (NSC) project. NSC is a separately linked
+     * library that provides ported TCP stacks from popular operating systems
+     * such as Linux and FreeBSD.  Glue code such as the ns-3 NSC code
+     * allows users to delegate Internet stack processing to the logic
+     * from these operating systems.  This allows a user to reproduce
+     * with high fidelity the behavior of a real TCP stack.
+     */
 
-/**
- * \ingroup nsctcp
- *
- * \brief socket factory implementation for creating instances of NSC TCP
- */
-class NscTcpSocketFactoryImpl : public TcpSocketFactory
-{
-public:
-  NscTcpSocketFactoryImpl ();
-  virtual ~NscTcpSocketFactoryImpl ();
+    /**
+     * \ingroup nsctcp
+     *
+     * \brief socket factory implementation for creating instances of NSC TCP
+     */
+    class NscTcpSocketFactoryImpl : public TcpSocketFactory {
+    public:
+        NscTcpSocketFactoryImpl();
+        virtual ~NscTcpSocketFactoryImpl();
 
-  /**
-   * \brief Set the associated TCP L4 protocol.
-   * \param tcp the TCP L4 protocol
-   */
-  void SetTcp (Ptr<NscTcpL4Protocol> tcp);
+        /**
+         * \brief Set the associated TCP L4 protocol.
+         * \param tcp the TCP L4 protocol
+         */
+        void SetTcp(Ptr<NscTcpL4Protocol> tcp);
 
-  virtual Ptr<Socket> CreateSocket (void);
+        virtual Ptr<Socket> CreateSocket(void);
 
-protected:
-  virtual void DoDispose (void);
-private:
-  Ptr<NscTcpL4Protocol> m_tcp; //!< the associated TCP L4 protocol
-};
+    protected:
+        virtual void DoDispose(void);
+    private:
+        Ptr<NscTcpL4Protocol> m_tcp; //!< the associated TCP L4 protocol
+    };
 
 } // namespace ns3
 

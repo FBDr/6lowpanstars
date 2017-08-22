@@ -29,70 +29,69 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- */
-class Cid
-{
-public:
-  enum Type
-  {
-    BROADCAST = 1,
-    INITIAL_RANGING,
-    BASIC,
-    PRIMARY,
-    TRANSPORT,
-    MULTICAST,
-    PADDING
-  };
+    /**
+     * \ingroup wimax
+     */
+    class Cid {
+    public:
 
-  // Create a cid of unknown type
-  Cid (void);
-  Cid (uint16_t cid);
-  ~Cid (void);
-  /**
-   * \return the identifier of the cid
-   */
-  uint16_t GetIdentifier (void) const;
-  /**
-   * \return true if the cid is a multicast cid, false otherwise
-   */
-  bool IsMulticast (void) const;
-  /**
-   * \return true if the cid is a broadcast cid, false otherwise
-   */
-  bool IsBroadcast (void) const;
-  /**
-   * \return true if the cid is a padding cid, false otherwise
-   */
-  bool IsPadding (void) const;
-  /**
-   * \return true if the cid is an initial ranging cid, false otherwise
-   */
-  bool IsInitialRanging (void) const;
-  /**
-   * \return the broadcast cid
-   */
-  static Cid Broadcast (void);
-  /**
-   * \return the padding cid
-   */
-  static Cid Padding (void);
-  /**
-   * \return the initial ranging cid
-   */
-  static Cid InitialRanging (void);
+        enum Type {
+            BROADCAST = 1,
+            INITIAL_RANGING,
+            BASIC,
+            PRIMARY,
+            TRANSPORT,
+            MULTICAST,
+            PADDING
+        };
 
-private:
-  friend class CidFactory;
-  friend bool operator == (const Cid &lhs, const Cid &rhs);
-  uint16_t m_identifier;
-};
+        // Create a cid of unknown type
+        Cid(void);
+        Cid(uint16_t cid);
+        ~Cid(void);
+        /**
+         * \return the identifier of the cid
+         */
+        uint16_t GetIdentifier(void) const;
+        /**
+         * \return true if the cid is a multicast cid, false otherwise
+         */
+        bool IsMulticast(void) const;
+        /**
+         * \return true if the cid is a broadcast cid, false otherwise
+         */
+        bool IsBroadcast(void) const;
+        /**
+         * \return true if the cid is a padding cid, false otherwise
+         */
+        bool IsPadding(void) const;
+        /**
+         * \return true if the cid is an initial ranging cid, false otherwise
+         */
+        bool IsInitialRanging(void) const;
+        /**
+         * \return the broadcast cid
+         */
+        static Cid Broadcast(void);
+        /**
+         * \return the padding cid
+         */
+        static Cid Padding(void);
+        /**
+         * \return the initial ranging cid
+         */
+        static Cid InitialRanging(void);
 
-bool operator == (const Cid &lhs, const Cid &rhs);
-bool operator != (const Cid &lhs, const Cid &rhs);
+    private:
+        friend class CidFactory;
+        friend bool operator==(const Cid &lhs, const Cid &rhs);
+        uint16_t m_identifier;
+    };
 
-std::ostream & operator << (std::ostream &os, const Cid &cid);
+    bool operator==(const Cid &lhs, const Cid &rhs);
+    bool operator!=(const Cid &lhs, const Cid &rhs);
+
+    std::ostream & operator<<(std::ostream &os, const Cid &cid);
 
 } // namespace ns3
 

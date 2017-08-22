@@ -21,87 +21,76 @@
 #include "tcp-rfc793.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("TcpRfc793");
-
-NS_OBJECT_ENSURE_REGISTERED (TcpRfc793);
-
-TypeId
-TcpRfc793::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::TcpRfc793")
-    .SetParent<TcpSocketBase> ()
-    .SetGroupName ("Internet")
-    .AddConstructor<TcpRfc793> ()
-  ;
-  return tid;
-}
 
-TcpRfc793::TcpRfc793 (void)
-{
-  NS_LOG_FUNCTION (this);
-  SetDelAckMaxCount (0);  // Delayed ACK is not in RFC793
-}
+    NS_LOG_COMPONENT_DEFINE("TcpRfc793");
 
-TcpRfc793::TcpRfc793 (const TcpRfc793& sock) : TcpSocketBase (sock)
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(TcpRfc793);
 
-TcpRfc793::~TcpRfc793 (void)
-{
-}
+    TypeId
+    TcpRfc793::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::TcpRfc793")
+                .SetParent<TcpSocketBase> ()
+                .SetGroupName("Internet")
+                .AddConstructor<TcpRfc793> ()
+                ;
+        return tid;
+    }
 
-Ptr<TcpSocketBase>
-TcpRfc793::Fork (void)
-{
-  return CopyObject<TcpRfc793> (this);
-}
+    TcpRfc793::TcpRfc793(void) {
+        NS_LOG_FUNCTION(this);
+        SetDelAckMaxCount(0); // Delayed ACK is not in RFC793
+    }
 
-void
-TcpRfc793::DupAck (const TcpHeader& t, uint32_t count)
-{
-}
+    TcpRfc793::TcpRfc793(const TcpRfc793 & sock) : TcpSocketBase(sock) {
+    }
 
-void
-TcpRfc793::SetInitialSSThresh (uint32_t threshold)
-{
-  NS_LOG_WARN ("DoD TCP does not perform slow start");
-}
+    TcpRfc793::~TcpRfc793(void) {
+    }
 
-uint32_t
-TcpRfc793::GetInitialSSThresh (void) const
-{
-  NS_LOG_WARN ("DoD TCP does not perform slow start");
-  return 0;
-}
+    Ptr<TcpSocketBase>
+            TcpRfc793::Fork(void) {
+        return CopyObject<TcpRfc793> (this);
+    }
 
-void
-TcpRfc793::SetInitialCwnd (uint32_t cwnd)
-{
-  NS_LOG_WARN ("DoD TCP does not have congestion window");
-}
+    void
+    TcpRfc793::DupAck(const TcpHeader& t, uint32_t count) {
+    }
 
-uint32_t
-TcpRfc793::GetInitialCwnd (void) const
-{
-  NS_LOG_WARN ("DoD TCP does not have congestion window");
-  return 0;
-}
+    void
+    TcpRfc793::SetInitialSSThresh(uint32_t threshold) {
+        NS_LOG_WARN("DoD TCP does not perform slow start");
+    }
 
-uint32_t
-TcpRfc793::Window ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_rWnd;
-}
+    uint32_t
+    TcpRfc793::GetInitialSSThresh(void) const {
+        NS_LOG_WARN("DoD TCP does not perform slow start");
+        return 0;
+    }
 
-void
-TcpRfc793::ScaleSsThresh (uint8_t scaleFactor)
-{
-  NS_LOG_WARN ("DoD TCP does not perform slow start");
-  return;
-}
+    void
+    TcpRfc793::SetInitialCwnd(uint32_t cwnd) {
+        NS_LOG_WARN("DoD TCP does not have congestion window");
+    }
+
+    uint32_t
+    TcpRfc793::GetInitialCwnd(void) const {
+        NS_LOG_WARN("DoD TCP does not have congestion window");
+        return 0;
+    }
+
+    uint32_t
+    TcpRfc793::Window() {
+        NS_LOG_FUNCTION(this);
+        return m_rWnd;
+    }
+
+    void
+    TcpRfc793::ScaleSsThresh(uint8_t scaleFactor) {
+        NS_LOG_WARN("DoD TCP does not perform slow start");
+        return;
+    }
 
 
 } // namespace ns3

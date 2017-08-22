@@ -38,76 +38,75 @@
 #include "ns3/nstime.h"
 
 namespace ns3 {
-namespace dsdv {
-/**
- * \ingroup dsdv
- * \brief DSDV Update Packet Format
- * \verbatim
- |      0        |      1        |      2        |       3       |
-  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                      Destination Address                      |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                            HopCount                           |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                       Sequence Number                         |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * \endverbatim
- */
+    namespace dsdv {
 
-class DsdvHeader : public Header
-{
-public:
-  DsdvHeader (Ipv4Address dst = Ipv4Address (), uint32_t hopcount = 0, uint32_t dstSeqNo = 0);
-  virtual ~DsdvHeader ();
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-  virtual void Print (std::ostream &os) const;
+        /**
+         * \ingroup dsdv
+         * \brief DSDV Update Packet Format
+         * \verbatim
+         |      0        |      1        |      2        |       3       |
+          0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                      Destination Address                      |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                            HopCount                           |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                       Sequence Number                         |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         * \endverbatim
+         */
 
-  void
-  SetDst (Ipv4Address destination)
-  {
-    m_dst = destination;
-  }
-  Ipv4Address
-  GetDst () const
-  {
-    return m_dst;
-  }
-  void
-  SetHopCount (uint32_t hopCount)
-  {
-    m_hopCount = hopCount;
-  }
-  uint32_t
-  GetHopCount () const
-  {
-    return m_hopCount;
-  }
-  void
-  SetDstSeqno (uint32_t sequenceNumber)
-  {
-    m_dstSeqNo = sequenceNumber;
-  }
-  uint32_t
-  GetDstSeqno () const
-  {
-    return m_dstSeqNo;
-  }
-private:
-  Ipv4Address m_dst; ///< Destination IP Address
-  uint32_t m_hopCount; ///< Number of Hops
-  uint32_t m_dstSeqNo; ///< Destination Sequence Number
-};
-static inline std::ostream & operator<< (std::ostream& os, const DsdvHeader & packet)
-{
-  packet.Print (os);
-  return os;
-}
-}
+        class DsdvHeader : public Header {
+        public:
+            DsdvHeader(Ipv4Address dst = Ipv4Address(), uint32_t hopcount = 0, uint32_t dstSeqNo = 0);
+            virtual ~DsdvHeader();
+            static TypeId GetTypeId(void);
+            virtual TypeId GetInstanceTypeId(void) const;
+            virtual uint32_t GetSerializedSize() const;
+            virtual void Serialize(Buffer::Iterator start) const;
+            virtual uint32_t Deserialize(Buffer::Iterator start);
+            virtual void Print(std::ostream &os) const;
+
+            void
+            SetDst(Ipv4Address destination) {
+                m_dst = destination;
+            }
+
+            Ipv4Address
+            GetDst() const {
+                return m_dst;
+            }
+
+            void
+            SetHopCount(uint32_t hopCount) {
+                m_hopCount = hopCount;
+            }
+
+            uint32_t
+            GetHopCount() const {
+                return m_hopCount;
+            }
+
+            void
+            SetDstSeqno(uint32_t sequenceNumber) {
+                m_dstSeqNo = sequenceNumber;
+            }
+
+            uint32_t
+            GetDstSeqno() const {
+                return m_dstSeqNo;
+            }
+        private:
+            Ipv4Address m_dst; ///< Destination IP Address
+            uint32_t m_hopCount; ///< Number of Hops
+            uint32_t m_dstSeqNo; ///< Destination Sequence Number
+        };
+
+        static inline std::ostream & operator<<(std::ostream& os, const DsdvHeader & packet) {
+            packet.Print(os);
+            return os;
+        }
+    }
 }
 
 #endif /* DSDV_PACKET_H */

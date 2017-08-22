@@ -22,23 +22,20 @@
 #include "in-memory-storage-persistent.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-InMemoryStoragePersistent::InMemoryStoragePersistent()
-  : InMemoryStorage()
-{
-}
+        InMemoryStoragePersistent::InMemoryStoragePersistent()
+        : InMemoryStorage() {
+        }
 
-InMemoryStoragePersistent::InMemoryStoragePersistent(boost::asio::io_service& ioService)
-  : InMemoryStorage(ioService)
-{
-}
+        InMemoryStoragePersistent::InMemoryStoragePersistent(boost::asio::io_service& ioService)
+        : InMemoryStorage(ioService) {
+        }
 
-bool
-InMemoryStoragePersistent::evictItem()
-{
-  return false;
-}
+        bool
+        InMemoryStoragePersistent::evictItem() {
+            return false;
+        }
 
-} // namespace util
+    } // namespace util
 } // namespace ndn

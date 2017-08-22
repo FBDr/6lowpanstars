@@ -28,44 +28,43 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-/**
- * @brief IdentityManagementFixture is a test suite level fixture.
- * Test cases in the suite can use this fixture to create identities.
- * Identities added via addIdentity method are automatically deleted
- * during test teardown.
- */
-class IdentityManagementFixture
-{
-public:
-  IdentityManagementFixture();
+        /**
+         * @brief IdentityManagementFixture is a test suite level fixture.
+         * Test cases in the suite can use this fixture to create identities.
+         * Identities added via addIdentity method are automatically deleted
+         * during test teardown.
+         */
+        class IdentityManagementFixture {
+        public:
+            IdentityManagementFixture();
 
-  ~IdentityManagementFixture();
+            ~IdentityManagementFixture();
 
-  /// @brief add identity, return true if succeed.
-  bool
-  addIdentity(const Name& identity, const KeyParams& params = KeyChain::DEFAULT_KEY_PARAMS);
+            /// @brief add identity, return true if succeed.
+            bool
+            addIdentity(const Name& identity, const KeyParams& params = KeyChain::DEFAULT_KEY_PARAMS);
 
-  /**
-   *  @brief save identity certificate to a file
-   *  @param identity identity name
-   *  @param filename file name, should be writable
-   *  @param wantAdd if true, add new identity when necessary
-   *  @return whether successful
-   */
-  bool
-  saveIdentityCertificate(const Name& identity, const std::string& filename, bool wantAdd = false);
+            /**
+             *  @brief save identity certificate to a file
+             *  @param identity identity name
+             *  @param filename file name, should be writable
+             *  @param wantAdd if true, add new identity when necessary
+             *  @return whether successful
+             */
+            bool
+            saveIdentityCertificate(const Name& identity, const std::string& filename, bool wantAdd = false);
 
-protected:
-  KeyChain m_keyChain;
+        protected:
+            KeyChain m_keyChain;
 
-private:
-  std::vector<Name> m_identities;
-  std::vector<std::string> m_certFiles;
-};
+        private:
+            std::vector<Name> m_identities;
+            std::vector<std::string> m_certFiles;
+        };
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn
 
 #endif // NDN_TESTS_IDENTITY_MANAGEMENT_FIXTURE_HPP

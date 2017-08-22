@@ -30,39 +30,38 @@
 
 namespace nfd {
 
-namespace strategy_choice {
-class StrategyChoice;
-} // namespace strategy_choice
+    namespace strategy_choice {
+        class StrategyChoice;
+    } // namespace strategy_choice
 
-/**
- * @brief implement the Strategy Choice Management of NFD Management Protocol.
- * @sa http://redmine.named-data.net/projects/nfd/wiki/StrategyChoice
- */
-class StrategyChoiceManager : public NfdManagerBase
-{
-public:
-  StrategyChoiceManager(strategy_choice::StrategyChoice& table,
-                        Dispatcher& dispatcher,
-                        CommandAuthenticator& authenticator);
+    /**
+     * @brief implement the Strategy Choice Management of NFD Management Protocol.
+     * @sa http://redmine.named-data.net/projects/nfd/wiki/StrategyChoice
+     */
+    class StrategyChoiceManager : public NfdManagerBase {
+    public:
+        StrategyChoiceManager(strategy_choice::StrategyChoice& table,
+                Dispatcher& dispatcher,
+                CommandAuthenticator& authenticator);
 
-private:
-  void
-  setStrategy(const Name& topPrefix, const Interest& interest,
-              ControlParameters parameters,
-              const ndn::mgmt::CommandContinuation& done);
-
-  void
-  unsetStrategy(const Name& topPrefix, const Interest& interest,
+    private:
+        void
+        setStrategy(const Name& topPrefix, const Interest& interest,
                 ControlParameters parameters,
                 const ndn::mgmt::CommandContinuation& done);
 
-  void
-  listChoices(const Name& topPrefix, const Interest& interest,
-              ndn::mgmt::StatusDatasetContext& context);
+        void
+        unsetStrategy(const Name& topPrefix, const Interest& interest,
+                ControlParameters parameters,
+                const ndn::mgmt::CommandContinuation& done);
 
-private:
-  strategy_choice::StrategyChoice& m_table;
-};
+        void
+        listChoices(const Name& topPrefix, const Interest& interest,
+                ndn::mgmt::StatusDatasetContext& context);
+
+    private:
+        strategy_choice::StrategyChoice& m_table;
+    };
 
 } // namespace nfd
 

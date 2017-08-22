@@ -25,62 +25,61 @@
 #include "ns3/simulator.h"
 namespace ns3 {
 
-/**
- * \ingroup uan
- *
- * Half duplex implementation of transducer object
- *
- * This class will only allow attached Phy's to receive packets
- * if not in TX mode.
- */
-class UanTransducerHd : public UanTransducer
-{
-public:
-  /** Constructor */
-  UanTransducerHd ();
-  /** Dummy destructor, see DoDispose */
-  virtual ~UanTransducerHd ();
+    /**
+     * \ingroup uan
+     *
+     * Half duplex implementation of transducer object
+     *
+     * This class will only allow attached Phy's to receive packets
+     * if not in TX mode.
+     */
+    class UanTransducerHd : public UanTransducer {
+    public:
+        /** Constructor */
+        UanTransducerHd();
+        /** Dummy destructor, see DoDispose */
+        virtual ~UanTransducerHd();
 
-  /**
-   * Register this type.
-   * \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
+        /**
+         * Register this type.
+         * \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  // inherited methods
-  virtual State GetState (void) const;
-  virtual bool IsRx (void) const;
-  virtual bool IsTx (void) const;
-  virtual const ArrivalList &GetArrivalList (void) const;
-  virtual void Receive (Ptr<Packet> packet, double rxPowerDb, UanTxMode txMode, UanPdp pdp);
-  virtual void Transmit (Ptr<UanPhy> src, Ptr<Packet> packet, double txPowerDb, UanTxMode txMode);
-  virtual void SetChannel (Ptr<UanChannel> chan);
-  virtual Ptr<UanChannel> GetChannel (void) const;
-  virtual void AddPhy (Ptr<UanPhy>);
-  virtual const UanPhyList &GetPhyList (void) const;
-  virtual void Clear (void);
+        // inherited methods
+        virtual State GetState(void) const;
+        virtual bool IsRx(void) const;
+        virtual bool IsTx(void) const;
+        virtual const ArrivalList &GetArrivalList(void) const;
+        virtual void Receive(Ptr<Packet> packet, double rxPowerDb, UanTxMode txMode, UanPdp pdp);
+        virtual void Transmit(Ptr<UanPhy> src, Ptr<Packet> packet, double txPowerDb, UanTxMode txMode);
+        virtual void SetChannel(Ptr<UanChannel> chan);
+        virtual Ptr<UanChannel> GetChannel(void) const;
+        virtual void AddPhy(Ptr<UanPhy>);
+        virtual const UanPhyList &GetPhyList(void) const;
+        virtual void Clear(void);
 
-private:
-  State m_state;              //!< Transducer state.
-  ArrivalList m_arrivalList;  //!< List of arriving packets which overlap in time.
-  UanPhyList m_phyList;       //!< List of physical layers attached above this tranducer.
-  Ptr<UanChannel> m_channel;  //!< The attached channel.
-  EventId m_endTxEvent;       //!< Event scheduled for end of transmission.
-  Time m_endTxTime;           //!< Time at which transmission will be completed.
-  bool m_cleared;             //!< Flab when we've been cleared.
+    private:
+        State m_state; //!< Transducer state.
+        ArrivalList m_arrivalList; //!< List of arriving packets which overlap in time.
+        UanPhyList m_phyList; //!< List of physical layers attached above this tranducer.
+        Ptr<UanChannel> m_channel; //!< The attached channel.
+        EventId m_endTxEvent; //!< Event scheduled for end of transmission.
+        Time m_endTxTime; //!< Time at which transmission will be completed.
+        bool m_cleared; //!< Flab when we've been cleared.
 
-  /**
-   * Remove an entry from the arrival list.
-   *
-   * \param arrival The packet arrival to remove.
-   */
-  void RemoveArrival (UanPacketArrival arrival);
-  /** Handle end of transmission event. */
-  void EndTx (void);
-protected:
-  virtual void DoDispose ();
+        /**
+         * Remove an entry from the arrival list.
+         *
+         * \param arrival The packet arrival to remove.
+         */
+        void RemoveArrival(UanPacketArrival arrival);
+        /** Handle end of transmission event. */
+        void EndTx(void);
+    protected:
+        virtual void DoDispose();
 
-};  // class UanTransducerHd
+    }; // class UanTransducerHd
 
 } // namespace ns3
 

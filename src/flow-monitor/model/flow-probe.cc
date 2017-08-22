@@ -21,106 +21,97 @@
 #include "ns3/flow-probe.h"
 #include "ns3/flow-monitor.h"
 
-namespace ns3 {
-
-/* static */
-TypeId FlowProbe::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::FlowProbe")
-    .SetParent<Object> ()
-    .SetGroupName ("FlowMonitor")
-    // No AddConstructor because this class has no default constructor.
-    ;
 
-  return tid;
-}
+    /* static */
+    TypeId FlowProbe::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::FlowProbe")
+                .SetParent<Object> ()
+                .SetGroupName("FlowMonitor")
+                // No AddConstructor because this class has no default constructor.
+                ;
 
-FlowProbe::~FlowProbe ()
-{
-}
-
-
-FlowProbe::FlowProbe (Ptr<FlowMonitor> flowMonitor)
-  : m_flowMonitor (flowMonitor)
-{
-  m_flowMonitor->AddProbe (this);
-}
-
-void
-FlowProbe::DoDispose (void)
-{
-  m_flowMonitor = 0;
-  Object::DoDispose ();
-}
-
-void
-FlowProbe::AddPacketStats (FlowId flowId, uint32_t packetSize, Time delayFromFirstProbe)
-{
-  FlowStats &flow = m_stats[flowId];
-  flow.delayFromFirstProbeSum += delayFromFirstProbe;
-  flow.bytes += packetSize;
-  ++flow.packets;
-}
-
-void
-FlowProbe::AddPacketDropStats (FlowId flowId, uint32_t packetSize, uint32_t reasonCode)
-{
-  FlowStats &flow = m_stats[flowId];
-
-  if (flow.packetsDropped.size () < reasonCode + 1)
-    {
-      flow.packetsDropped.resize (reasonCode + 1, 0);
-      flow.bytesDropped.resize (reasonCode + 1, 0);
+        return tid;
     }
-  ++flow.packetsDropped[reasonCode];
-  flow.bytesDropped[reasonCode] += packetSize;
-}
- 
-FlowProbe::Stats
-FlowProbe::GetStats () const 
-{
-  return m_stats;
-}
 
-void
-FlowProbe::SerializeToXmlStream (std::ostream &os, int indent, uint32_t index) const
-{
-  #define INDENT(level) for (int __xpto = 0; __xpto < level; __xpto++) os << ' ';
-
-  INDENT (indent); os << "<FlowProbe index=\"" << index << "\">\n";
-
-  indent += 2;
-
-  for (Stats::const_iterator iter = m_stats.begin (); iter != m_stats.end (); iter++)
-    {
-      INDENT (indent);
-      os << "<FlowStats "
-         << " flowId=\"" << iter->first << "\""
-         << " packets=\"" << iter->second.packets << "\""
-         << " bytes=\"" << iter->second.bytes << "\""
-         << " delayFromFirstProbeSum=\"" << iter->second.delayFromFirstProbeSum << "\""
-         << " >\n";
-      indent += 2;
-      for (uint32_t reasonCode = 0; reasonCode < iter->second.packetsDropped.size (); reasonCode++)
-        {
-          INDENT (indent);
-          os << "<packetsDropped reasonCode=\"" << reasonCode << "\""
-             << " number=\"" << iter->second.packetsDropped[reasonCode]
-             << "\" />\n";
-        }
-      for (uint32_t reasonCode = 0; reasonCode < iter->second.bytesDropped.size (); reasonCode++)
-        {
-          INDENT (indent);
-          os << "<bytesDropped reasonCode=\"" << reasonCode << "\""
-             << " bytes=\"" << iter->second.bytesDropped[reasonCode]
-             << "\" />\n";
-        }
-      indent -= 2;
-      INDENT (indent); os << "</FlowStats>\n";
+    FlowProbe::~FlowProbe() {
     }
-  indent -= 2;
-  INDENT (indent); os << "</FlowProbe>\n";
-}
+
+    FlowProbe::FlowProbe(Ptr<FlowMonitor> flowMonitor)
+            : m_flowMonitor(flowMonitor) {
+        m_flowMonitor->AddProbe(this);
+    }
+
+    void
+    FlowProbe::DoDispose(void) {
+        m_flowMonitor = 0;
+        Object::DoDispose();
+    }
+
+    void
+    FlowProbe::AddPacketStats(FlowId flowId, uint32_t packetSize, Time delayFromFirstProbe) {
+        FlowStats &flow = m_stats[flowId];
+        flow.delayFromFirstProbeSum += delayFromFirstProbe;
+        flow.bytes += packetSize;
+        ++flow.packets;
+    }
+
+    void
+    FlowProbe::AddPacketDropStats(FlowId flowId, uint32_t packetSize, uint32_t reasonCode) {
+        FlowStats &flow = m_stats[flowId];
+
+        if (flow.packetsDropped.size() < reasonCode + 1) {
+            flow.packetsDropped.resize(reasonCode + 1, 0);
+            flow.bytesDropped.resize(reasonCode + 1, 0);
+        }
+        ++flow.packetsDropped[reasonCode];
+        flow.bytesDropped[reasonCode] += packetSize;
+    }
+
+    FlowProbe::Stats
+    FlowProbe::GetStats() const {
+        return m_stats;
+    }
+
+    void
+    FlowProbe::SerializeToXmlStream(std::ostream &os, int indent, uint32_t index) const {
+#define INDENT(level) for (int __xpto = 0; __xpto < level; __xpto++) os << ' ';
+
+        INDENT(indent);
+        os << "<FlowProbe index=\"" << index << "\">\n";
+
+        indent += 2;
+
+        for (Stats::const_iterator iter = m_stats.begin(); iter != m_stats.end(); iter++) {
+            INDENT(indent);
+            os << "<FlowStats "
+                    << " flowId=\"" << iter->first << "\""
+                    << " packets=\"" << iter->second.packets << "\""
+                    << " bytes=\"" << iter->second.bytes << "\""
+                    << " delayFromFirstProbeSum=\"" << iter->second.delayFromFirstProbeSum << "\""
+                    << " >\n";
+            indent += 2;
+            for (uint32_t reasonCode = 0; reasonCode < iter->second.packetsDropped.size(); reasonCode++) {
+                INDENT(indent);
+                os << "<packetsDropped reasonCode=\"" << reasonCode << "\""
+                        << " number=\"" << iter->second.packetsDropped[reasonCode]
+                        << "\" />\n";
+            }
+            for (uint32_t reasonCode = 0; reasonCode < iter->second.bytesDropped.size(); reasonCode++) {
+                INDENT(indent);
+                os << "<bytesDropped reasonCode=\"" << reasonCode << "\""
+                        << " bytes=\"" << iter->second.bytesDropped[reasonCode]
+                        << "\" />\n";
+            }
+            indent -= 2;
+            INDENT(indent);
+            os << "</FlowStats>\n";
+        }
+        indent -= 2;
+        INDENT(indent);
+        os << "</FlowProbe>\n";
+    }
 
 
 

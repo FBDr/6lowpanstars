@@ -28,14 +28,14 @@
 #include "module-fixture.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceModule, ModuleFixture<StrategyChoiceModule>)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceModule, ModuleFixture<StrategyChoiceModule>)
 
-const std::string STATUS_XML = stripXmlSpaces(R"XML(
+                const std::string STATUS_XML = stripXmlSpaces(R"XML(
   <strategyChoices>
     <strategyChoice>
       <namespace>/</namespace>
@@ -52,32 +52,31 @@ const std::string STATUS_XML = stripXmlSpaces(R"XML(
   </strategyChoices>
 )XML");
 
-const std::string STATUS_TEXT = std::string(R"TEXT(
+                const std::string STATUS_TEXT = std::string(R"TEXT(
 Strategy choices:
   / strategy=/localhost/nfd/strategy/best-route/%FD%04
   /localhost strategy=/localhost/nfd/strategy/multicast/%FD%01
 )TEXT").substr(1);
 
-BOOST_AUTO_TEST_CASE(Status)
-{
-  this->fetchStatus();
-  StrategyChoice payload1;
-  payload1.setName("/")
-          .setStrategy("/localhost/nfd/strategy/best-route/%FD%04");
-  StrategyChoice payload2;
-  payload2.setName("/localhost")
-          .setStrategy("/localhost/nfd/strategy/multicast/%FD%01");
-  this->sendDataset("/localhost/nfd/strategy-choice/list", payload1, payload2);
-  this->prepareStatusOutput();
+                BOOST_AUTO_TEST_CASE(Status) {
+                    this->fetchStatus();
+                    StrategyChoice payload1;
+                    payload1.setName("/")
+                            .setStrategy("/localhost/nfd/strategy/best-route/%FD%04");
+                    StrategyChoice payload2;
+                    payload2.setName("/localhost")
+                            .setStrategy("/localhost/nfd/strategy/multicast/%FD%01");
+                    this->sendDataset("/localhost/nfd/strategy-choice/list", payload1, payload2);
+                    this->prepareStatusOutput();
 
-  BOOST_CHECK(statusXml.is_equal(STATUS_XML));
-  BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
-}
+                    BOOST_CHECK(statusXml.is_equal(STATUS_XML));
+                    BOOST_CHECK(statusText.is_equal(STATUS_TEXT));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestStrategyChoiceModule
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestStrategyChoiceModule
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

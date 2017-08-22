@@ -20,18 +20,18 @@
 
 #include "chunk.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (Chunk);
-
-TypeId 
-Chunk::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Chunk")
-    .SetParent<ObjectBase> ()
-    .SetGroupName("Network")
-  ;
-  return tid;
-}
+
+    NS_OBJECT_ENSURE_REGISTERED(Chunk);
+
+    TypeId
+    Chunk::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Chunk")
+                .SetParent<ObjectBase> ()
+                .SetGroupName("Network")
+                ;
+        return tid;
+    }
 
 } // namespace ns3

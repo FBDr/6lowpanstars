@@ -34,110 +34,99 @@
 
 #include <string>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SimpleNetDeviceHelper");
-
-SimpleNetDeviceHelper::SimpleNetDeviceHelper ()
+namespace ns3
 {
-  m_queueFactory.SetTypeId ("ns3::DropTailQueue");
-  m_deviceFactory.SetTypeId ("ns3::SimpleNetDevice");
-  m_channelFactory.SetTypeId ("ns3::SimpleChannel");
-  m_pointToPointMode = false;
-}
 
-void 
-SimpleNetDeviceHelper::SetQueue (std::string type,
-                                 std::string n1, const AttributeValue &v1,
-                                 std::string n2, const AttributeValue &v2,
-                                 std::string n3, const AttributeValue &v3,
-                                 std::string n4, const AttributeValue &v4)
-{
-  m_queueFactory.SetTypeId (type);
-  m_queueFactory.Set (n1, v1);
-  m_queueFactory.Set (n2, v2);
-  m_queueFactory.Set (n3, v3);
-  m_queueFactory.Set (n4, v4);
-}
+    NS_LOG_COMPONENT_DEFINE("SimpleNetDeviceHelper");
 
-void
-SimpleNetDeviceHelper::SetChannel (std::string type,
-                                   std::string n1, const AttributeValue &v1,
-                                   std::string n2, const AttributeValue &v2,
-                                   std::string n3, const AttributeValue &v3,
-                                   std::string n4, const AttributeValue &v4)
-{
-  m_channelFactory.SetTypeId (type);
-  m_channelFactory.Set (n1, v1);
-  m_channelFactory.Set (n2, v2);
-  m_channelFactory.Set (n3, v3);
-  m_channelFactory.Set (n4, v4);
-}
-
-void
-SimpleNetDeviceHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
-{
-  m_deviceFactory.Set (n1, v1);
-}
-
-void
-SimpleNetDeviceHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
-{
-  m_channelFactory.Set (n1, v1);
-}
-
-void
-SimpleNetDeviceHelper::SetNetDevicePointToPointMode (bool pointToPointMode)
-{
-  m_pointToPointMode = pointToPointMode;
-}
-
-NetDeviceContainer
-SimpleNetDeviceHelper::Install (Ptr<Node> node) const
-{
-  Ptr<SimpleChannel> channel = m_channelFactory.Create<SimpleChannel> ();
-  return Install (node, channel);
-}
-
-NetDeviceContainer
-SimpleNetDeviceHelper::Install (Ptr<Node> node, Ptr<SimpleChannel> channel) const
-{
-  return NetDeviceContainer (InstallPriv (node, channel));
-}
-
-NetDeviceContainer 
-SimpleNetDeviceHelper::Install (const NodeContainer &c) const
-{
-  Ptr<SimpleChannel> channel = m_channelFactory.Create<SimpleChannel> ();
-
-  return Install (c, channel);
-}
-
-NetDeviceContainer 
-SimpleNetDeviceHelper::Install (const NodeContainer &c, Ptr<SimpleChannel> channel) const
-{
-  NetDeviceContainer devs;
-
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-    {
-      devs.Add (InstallPriv (*i, channel));
+    SimpleNetDeviceHelper::SimpleNetDeviceHelper() {
+        m_queueFactory.SetTypeId("ns3::DropTailQueue");
+        m_deviceFactory.SetTypeId("ns3::SimpleNetDevice");
+        m_channelFactory.SetTypeId("ns3::SimpleChannel");
+        m_pointToPointMode = false;
     }
 
-  return devs;
-}
+    void
+    SimpleNetDeviceHelper::SetQueue(std::string type,
+            std::string n1, const AttributeValue &v1,
+            std::string n2, const AttributeValue &v2,
+            std::string n3, const AttributeValue &v3,
+            std::string n4, const AttributeValue & v4) {
+        m_queueFactory.SetTypeId(type);
+        m_queueFactory.Set(n1, v1);
+        m_queueFactory.Set(n2, v2);
+        m_queueFactory.Set(n3, v3);
+        m_queueFactory.Set(n4, v4);
+    }
 
-Ptr<NetDevice>
-SimpleNetDeviceHelper::InstallPriv (Ptr<Node> node, Ptr<SimpleChannel> channel) const
-{
-  Ptr<SimpleNetDevice> device = m_deviceFactory.Create<SimpleNetDevice> ();
-  device->SetAttribute ("PointToPointMode", BooleanValue (m_pointToPointMode));
-  device->SetAddress (Mac48Address::Allocate ());
-  node->AddDevice (device);
-  device->SetChannel (channel);
-  Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
-  device->SetQueue (queue);
-  NS_ASSERT_MSG (!m_pointToPointMode || (channel->GetNDevices () <= 2), "Device set to PointToPoint and more than 2 devices on the channel.");
-  return device;
-}
+    void
+    SimpleNetDeviceHelper::SetChannel(std::string type,
+            std::string n1, const AttributeValue &v1,
+            std::string n2, const AttributeValue &v2,
+            std::string n3, const AttributeValue &v3,
+            std::string n4, const AttributeValue & v4) {
+        m_channelFactory.SetTypeId(type);
+        m_channelFactory.Set(n1, v1);
+        m_channelFactory.Set(n2, v2);
+        m_channelFactory.Set(n3, v3);
+        m_channelFactory.Set(n4, v4);
+    }
+
+    void
+    SimpleNetDeviceHelper::SetDeviceAttribute(std::string n1, const AttributeValue & v1) {
+        m_deviceFactory.Set(n1, v1);
+    }
+
+    void
+    SimpleNetDeviceHelper::SetChannelAttribute(std::string n1, const AttributeValue & v1) {
+        m_channelFactory.Set(n1, v1);
+    }
+
+    void
+    SimpleNetDeviceHelper::SetNetDevicePointToPointMode(bool pointToPointMode) {
+        m_pointToPointMode = pointToPointMode;
+    }
+
+    NetDeviceContainer
+    SimpleNetDeviceHelper::Install(Ptr<Node> node) const {
+        Ptr<SimpleChannel> channel = m_channelFactory.Create<SimpleChannel> ();
+        return Install(node, channel);
+    }
+
+    NetDeviceContainer
+    SimpleNetDeviceHelper::Install(Ptr<Node> node, Ptr<SimpleChannel> channel) const {
+        return NetDeviceContainer(InstallPriv(node, channel));
+    }
+
+    NetDeviceContainer
+    SimpleNetDeviceHelper::Install(const NodeContainer & c) const {
+        Ptr<SimpleChannel> channel = m_channelFactory.Create<SimpleChannel> ();
+
+        return Install(c, channel);
+    }
+
+    NetDeviceContainer
+    SimpleNetDeviceHelper::Install(const NodeContainer &c, Ptr<SimpleChannel> channel) const {
+        NetDeviceContainer devs;
+
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); i++) {
+            devs.Add(InstallPriv(*i, channel));
+        }
+
+        return devs;
+    }
+
+    Ptr<NetDevice>
+            SimpleNetDeviceHelper::InstallPriv(Ptr<Node> node, Ptr<SimpleChannel> channel) const {
+        Ptr<SimpleNetDevice> device = m_deviceFactory.Create<SimpleNetDevice> ();
+        device->SetAttribute("PointToPointMode", BooleanValue(m_pointToPointMode));
+        device->SetAddress(Mac48Address::Allocate());
+        node->AddDevice(device);
+        device->SetChannel(channel);
+        Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
+        device->SetQueue(queue);
+        NS_ASSERT_MSG(!m_pointToPointMode || (channel->GetNDevices() <= 2), "Device set to PointToPoint and more than 2 devices on the channel.");
+        return device;
+    }
 
 } // namespace ns3

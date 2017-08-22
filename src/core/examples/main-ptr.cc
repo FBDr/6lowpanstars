@@ -34,26 +34,25 @@ using namespace ns3;
  */
 class PtrExample : public Object
 {
-public:
-  /** Constructor. */
-  PtrExample ();
-  /** Destructor. */
-  ~PtrExample ();
-  /** Example class method. */
-  void Method (void);
-};
-PtrExample::PtrExample ()
-{
-  std::cout << "PtrExample constructor" << std::endl;
+    public :
+    /** Constructor. */
+    PtrExample();
+    /** Destructor. */
+    ~PtrExample();
+    /** Example class method. */
+    void Method(void);};
+
+PtrExample::PtrExample() {
+    std::cout << "PtrExample constructor" << std::endl;
 }
-PtrExample::~PtrExample()
-{
-  std::cout << "PtrExample destructor" << std::endl;
+
+PtrExample::~PtrExample() {
+    std::cout << "PtrExample destructor" << std::endl;
 }
+
 void
-PtrExample::Method (void)
-{
-  std::cout << "PtrExample method" << std::endl;
+PtrExample::Method(void) {
+    std::cout << "PtrExample method" << std::endl;
 }
 
 
@@ -71,51 +70,46 @@ static Ptr<PtrExample> g_ptr = 0;
  * \returns The prior value of \c g_ptr.
  */
 static Ptr<PtrExample>
-StorePtr (Ptr<PtrExample> p)
-{
-  Ptr<PtrExample> prev = g_ptr;
-  g_ptr = p;
-  return prev;
+StorePtr(Ptr<PtrExample> p) {
+    Ptr<PtrExample> prev = g_ptr;
+    g_ptr = p;
+    return prev;
 }
 
 /**
  *  Set \c g_ptr to NULL.
  */
 static void
-ClearPtr (void)
-{
-  g_ptr = 0;
+ClearPtr(void) {
+    g_ptr = 0;
 }
 
+int main(int argc, char *argv[]) {
+    {
+        // Create a new object of type PtrExample, store it in global 
+        // variable g_ptr
+        Ptr<PtrExample> p = CreateObject<PtrExample> ();
+        p->Method();
+        Ptr<PtrExample> prev = StorePtr(p);
+        NS_ASSERT(prev == 0);
+    }
+
+    {
+        // Create a new object of type PtrExample, store it in global 
+        // variable g_ptr, get a hold on the previous PtrExample object.
+        Ptr<PtrExample> p = CreateObject<PtrExample> ();
+        Ptr<PtrExample> prev = StorePtr(p);
+        // call method on object
+        prev->Method();
+        // Clear the currently-stored object
+        ClearPtr();
+        // get the raw pointer and release it.
+        PtrExample *raw = GetPointer(prev);
+        prev = 0;
+        raw->Method();
+        raw->Unref();
+    }
 
 
-int main (int argc, char *argv[])
-{
-  {
-    // Create a new object of type PtrExample, store it in global 
-    // variable g_ptr
-    Ptr<PtrExample> p = CreateObject<PtrExample> ();
-    p->Method ();
-    Ptr<PtrExample> prev = StorePtr (p);
-    NS_ASSERT (prev == 0);
-  }
-
-  {
-    // Create a new object of type PtrExample, store it in global 
-    // variable g_ptr, get a hold on the previous PtrExample object.
-    Ptr<PtrExample> p = CreateObject<PtrExample> ();
-    Ptr<PtrExample> prev = StorePtr (p);
-    // call method on object
-    prev->Method ();
-    // Clear the currently-stored object
-    ClearPtr ();
-    // get the raw pointer and release it.
-    PtrExample *raw = GetPointer (prev);
-    prev = 0;
-    raw->Method ();
-    raw->Unref ();
-  }
-
-
-  return 0;
+    return 0;
 }

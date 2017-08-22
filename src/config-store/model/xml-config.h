@@ -28,41 +28,39 @@
 
 namespace ns3 {
 
-/**
- * \ingroup configstore
- *
- */
-class XmlConfigSave : public FileConfig
-{
-public:
-  XmlConfigSave ();
-  virtual ~XmlConfigSave ();
+    /**
+     * \ingroup configstore
+     *
+     */
+    class XmlConfigSave : public FileConfig {
+    public:
+        XmlConfigSave();
+        virtual ~XmlConfigSave();
 
-  virtual void SetFilename (std::string filename);
-  virtual void Default (void);
-  virtual void Global (void);
-  virtual void Attributes (void);
-private:
-  xmlTextWriterPtr m_writer;
-};
+        virtual void SetFilename(std::string filename);
+        virtual void Default(void);
+        virtual void Global(void);
+        virtual void Attributes(void);
+    private:
+        xmlTextWriterPtr m_writer;
+    };
 
-/**
- * \ingroup configstore
- *
- */
-class XmlConfigLoad : public FileConfig
-{
-public:
-  XmlConfigLoad ();
-  virtual ~XmlConfigLoad ();
+    /**
+     * \ingroup configstore
+     *
+     */
+    class XmlConfigLoad : public FileConfig {
+    public:
+        XmlConfigLoad();
+        virtual ~XmlConfigLoad();
 
-  virtual void SetFilename (std::string filename);
-  virtual void Default (void);
-  virtual void Global (void);
-  virtual void Attributes (void);
-private:
-  std::string m_filename;
-};
+        virtual void SetFilename(std::string filename);
+        virtual void Default(void);
+        virtual void Global(void);
+        virtual void Attributes(void);
+    private:
+        std::string m_filename;
+    };
 
 } // namespace ns3
 

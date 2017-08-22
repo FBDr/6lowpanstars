@@ -31,34 +31,35 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-struct CreateFaceExpectedResult
-{
-  enum { FAILURE, SUCCESS } result;
-  uint32_t status;
-  std::string reason;
-};
+        struct CreateFaceExpectedResult {
 
-inline void
-createFace(ProtocolFactory& factory,
-           const FaceUri& uri,
-           ndn::nfd::FacePersistency persistency,
-           bool wantLocalFieldsEnabled,
-           const CreateFaceExpectedResult& expected)
-{
-  factory.createFace(uri, persistency, wantLocalFieldsEnabled,
-                     [expected] (const shared_ptr<Face>&) {
-                       BOOST_CHECK_EQUAL(CreateFaceExpectedResult::SUCCESS, expected.result);
-                     },
-                     [expected] (uint32_t actualStatus, const std::string& actualReason) {
-                       BOOST_CHECK_EQUAL(CreateFaceExpectedResult::FAILURE, expected.result);
-                       BOOST_CHECK_EQUAL(actualStatus, expected.status);
-                       BOOST_CHECK_EQUAL(actualReason, expected.reason);
-                     });
-}
+            enum {
+                FAILURE, SUCCESS
+            } result;
+            uint32_t status;
+            std::string reason;
+        };
 
-} // namespace tests
+        inline void
+        createFace(ProtocolFactory& factory,
+                const FaceUri& uri,
+                ndn::nfd::FacePersistency persistency,
+                bool wantLocalFieldsEnabled,
+                const CreateFaceExpectedResult& expected) {
+            factory.createFace(uri, persistency, wantLocalFieldsEnabled,
+                    [expected] (const shared_ptr<Face>&) {
+                        BOOST_CHECK_EQUAL(CreateFaceExpectedResult::SUCCESS, expected.result);
+                    },
+            [expected] (uint32_t actualStatus, const std::string & actualReason) {
+                BOOST_CHECK_EQUAL(CreateFaceExpectedResult::FAILURE, expected.result);
+                BOOST_CHECK_EQUAL(actualStatus, expected.status);
+                BOOST_CHECK_EQUAL(actualReason, expected.reason);
+            });
+        }
+
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_FACTORY_TEST_COMMON_HPP

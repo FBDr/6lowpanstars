@@ -30,137 +30,137 @@
 
 namespace ns3 {
 
-class ArpCache;
-class NetDevice;
-class Node;
-class Packet;
-class Ipv4Interface;
+    class ArpCache;
+    class NetDevice;
+    class Node;
+    class Packet;
+    class Ipv4Interface;
 
-/**
- * \ingroup internet
- * \defgroup arp Arp
- *
- * This is an overview of Arp capabilities (write me).
- */
-/**
- * \ingroup arp
- * \brief An implementation of the ARP protocol
- */
-class ArpL3Protocol : public Object
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  static const uint16_t PROT_NUMBER; //!< ARP protocol number (0x0806)
+    /**
+     * \ingroup internet
+     * \defgroup arp Arp
+     *
+     * This is an overview of Arp capabilities (write me).
+     */
 
-  ArpL3Protocol ();
-  virtual ~ArpL3Protocol ();
+    /**
+     * \ingroup arp
+     * \brief An implementation of the ARP protocol
+     */
+    class ArpL3Protocol : public Object {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        static const uint16_t PROT_NUMBER; //!< ARP protocol number (0x0806)
 
-  /**
-   * \brief Set the node the ARP L3 protocol is associated with
-   * \param node the node
-   */
-  void SetNode (Ptr<Node> node);
+        ArpL3Protocol();
+        virtual ~ArpL3Protocol();
 
-  /**
-   * \brief Create an ARP cache for the device/interface
-   * \param device the NetDevice
-   * \param interface the Ipv4Interface
-   * \returns a smart pointer to the ARP cache
-   */
-  Ptr<ArpCache> CreateCache (Ptr<NetDevice> device, Ptr<Ipv4Interface> interface);
+        /**
+         * \brief Set the node the ARP L3 protocol is associated with
+         * \param node the node
+         */
+        void SetNode(Ptr<Node> node);
 
-  /**
-   * \brief Receive a packet
-   * \param device the source NetDevice
-   * \param p the packet
-   * \param protocol the protocol
-   * \param from the source address
-   * \param to the destination address
-   * \param packetType type of packet (i.e., unicast, multicast, etc.)
-   */
-  void Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol, const Address &from, const Address &to,
+        /**
+         * \brief Create an ARP cache for the device/interface
+         * \param device the NetDevice
+         * \param interface the Ipv4Interface
+         * \returns a smart pointer to the ARP cache
+         */
+        Ptr<ArpCache> CreateCache(Ptr<NetDevice> device, Ptr<Ipv4Interface> interface);
+
+        /**
+         * \brief Receive a packet
+         * \param device the source NetDevice
+         * \param p the packet
+         * \param protocol the protocol
+         * \param from the source address
+         * \param to the destination address
+         * \param packetType type of packet (i.e., unicast, multicast, etc.)
+         */
+        void Receive(Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol, const Address &from, const Address &to,
                 NetDevice::PacketType packetType);
-  /**
-   * \brief Perform an ARP lookup
-   * \param p the packet
-   * \param destination destination IP address
-   * \param device outgoing device
-   * \param cache ARP cache
-   * \param hardwareDestination filled with the destination MAC address (if the entry exists)
-   * \return true if there is a matching ARP Entry
-   */
-  bool Lookup (Ptr<Packet> p, Ipv4Address destination, 
-               Ptr<NetDevice> device,
-               Ptr<ArpCache> cache,
-               Address *hardwareDestination);
+        /**
+         * \brief Perform an ARP lookup
+         * \param p the packet
+         * \param destination destination IP address
+         * \param device outgoing device
+         * \param cache ARP cache
+         * \param hardwareDestination filled with the destination MAC address (if the entry exists)
+         * \return true if there is a matching ARP Entry
+         */
+        bool Lookup(Ptr<Packet> p, Ipv4Address destination,
+                Ptr<NetDevice> device,
+                Ptr<ArpCache> cache,
+                Address *hardwareDestination);
 
-  /**
-   * Assign a fixed random variable stream number to the random variables
-   * used by this model.  Return the number of streams (possibly zero) that
-   * have been assigned.
-   *
-   * \param stream first stream index to use
-   * \return the number of stream indices assigned by this model
-   */
-  int64_t AssignStreams (int64_t stream);
+        /**
+         * Assign a fixed random variable stream number to the random variables
+         * used by this model.  Return the number of streams (possibly zero) that
+         * have been assigned.
+         *
+         * \param stream first stream index to use
+         * \return the number of stream indices assigned by this model
+         */
+        int64_t AssignStreams(int64_t stream);
 
-protected:
-  virtual void DoDispose (void);
-  /*
-   * This function will notify other components connected to the node that a new stack member is now connected
-   * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
-   */
-  virtual void NotifyNewAggregate ();
-private:
-  typedef std::list<Ptr<ArpCache> > CacheList; //!< container of the ARP caches
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   * \param o
-   */
-  ArpL3Protocol (const ArpL3Protocol &o);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   * \param o
-   * \returns
-   */
-  ArpL3Protocol &operator = (const ArpL3Protocol &o);
+    protected:
+        virtual void DoDispose(void);
+        /*
+         * This function will notify other components connected to the node that a new stack member is now connected
+         * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
+         */
+        virtual void NotifyNewAggregate();
+    private:
+        typedef std::list<Ptr<ArpCache> > CacheList; //!< container of the ARP caches
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         * \param o
+         */
+        ArpL3Protocol(const ArpL3Protocol &o);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         * \param o
+         * \returns
+         */
+        ArpL3Protocol &operator=(const ArpL3Protocol &o);
 
-  /**
-   * \brief Finds the cache associated with a NetDevice
-   * \param device the NetDevice
-   * \returns the ARP cache, or null if no cache is found
-   */
-  Ptr<ArpCache> FindCache (Ptr<NetDevice> device);
+        /**
+         * \brief Finds the cache associated with a NetDevice
+         * \param device the NetDevice
+         * \returns the ARP cache, or null if no cache is found
+         */
+        Ptr<ArpCache> FindCache(Ptr<NetDevice> device);
 
-  /**
-   * \brief Send an ARP request to an host
-   * \param cache the ARP cache to use
-   * \param to the destination IP
-   */
-  void SendArpRequest (Ptr<const ArpCache>cache, Ipv4Address to);
-  /**
-   * \brief Send an ARP reply to an host
-   * \param cache the ARP cache to use
-   * \param myIp the source IP address
-   * \param toIp the destination IP
-   * \param toMac the destination MAC address
-   */
-  void SendArpReply (Ptr<const ArpCache> cache, Ipv4Address myIp, Ipv4Address toIp, Address toMac);
+        /**
+         * \brief Send an ARP request to an host
+         * \param cache the ARP cache to use
+         * \param to the destination IP
+         */
+        void SendArpRequest(Ptr<const ArpCache>cache, Ipv4Address to);
+        /**
+         * \brief Send an ARP reply to an host
+         * \param cache the ARP cache to use
+         * \param myIp the source IP address
+         * \param toIp the destination IP
+         * \param toMac the destination MAC address
+         */
+        void SendArpReply(Ptr<const ArpCache> cache, Ipv4Address myIp, Ipv4Address toIp, Address toMac);
 
-  CacheList m_cacheList; //!< ARP cache container
-  Ptr<Node> m_node; //!< node the ARP L3 protocol is associated with
-  TracedCallback<Ptr<const Packet> > m_dropTrace; //!< trace for packets dropped by ARP
-  Ptr<RandomVariableStream> m_requestJitter; //!< jitter to de-sync ARP requests
+        CacheList m_cacheList; //!< ARP cache container
+        Ptr<Node> m_node; //!< node the ARP L3 protocol is associated with
+        TracedCallback<Ptr<const Packet> > m_dropTrace; //!< trace for packets dropped by ARP
+        Ptr<RandomVariableStream> m_requestJitter; //!< jitter to de-sync ARP requests
 
-};
+    };
 
 } // namespace ns3
 

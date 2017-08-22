@@ -28,57 +28,57 @@
 namespace ns3 {
 
 
-// ------------------------------------------------------------
-// --------------------------------------------
-/**
- * \ingroup topology
- *
- * \brief Topology file reader (Orbis-format type).
- *
- * This class takes an input file in Orbis format and extracts all
- * the informations needed to build the topology
- * (i.e.number of nodes, links and links structure).
- * It have been tested with Orbis 0.70
- * http://www.sysnet.ucsd.edu/~pmahadevan/topo_research/topo.html
- */
-class OrbisTopologyReader : public TopologyReader
-{
-public:
-  OrbisTopologyReader ();
-  virtual ~OrbisTopologyReader ();
+    // ------------------------------------------------------------
+    // --------------------------------------------
 
-  /**
-   * \brief Main topology reading function.
-   *
-   * This method opens an input stream and reads the Orbis-format file.
-   * Every row represents a topology link (the ids of a couple of nodes),
-   * so the input file is read line by line to figure out how many links
-   * and nodes are in the topology.
-   *
-   * \return The container of the nodes created (or empty container if there was an error)
-   */
-  virtual NodeContainer Read (void);
+    /**
+     * \ingroup topology
+     *
+     * \brief Topology file reader (Orbis-format type).
+     *
+     * This class takes an input file in Orbis format and extracts all
+     * the informations needed to build the topology
+     * (i.e.number of nodes, links and links structure).
+     * It have been tested with Orbis 0.70
+     * http://www.sysnet.ucsd.edu/~pmahadevan/topo_research/topo.html
+     */
+    class OrbisTopologyReader : public TopologyReader {
+    public:
+        OrbisTopologyReader();
+        virtual ~OrbisTopologyReader();
 
-private:
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   */
-  OrbisTopologyReader (const OrbisTopologyReader&);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   * \returns
-   */
-  OrbisTopologyReader& operator= (const OrbisTopologyReader&);
+        /**
+         * \brief Main topology reading function.
+         *
+         * This method opens an input stream and reads the Orbis-format file.
+         * Every row represents a topology link (the ids of a couple of nodes),
+         * so the input file is read line by line to figure out how many links
+         * and nodes are in the topology.
+         *
+         * \return The container of the nodes created (or empty container if there was an error)
+         */
+        virtual NodeContainer Read(void);
 
-  // end class OrbisTopologyReader
-};
+    private:
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         */
+        OrbisTopologyReader(const OrbisTopologyReader&);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         * \returns
+         */
+        OrbisTopologyReader& operator=(const OrbisTopologyReader&);
 
-// end namespace ns3
+        // end class OrbisTopologyReader
+    };
+
+    // end namespace ns3
 };
 
 

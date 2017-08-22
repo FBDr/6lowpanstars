@@ -25,55 +25,52 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace nfd {
-namespace tests {
+    namespace nfd {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Mgmt)
-BOOST_AUTO_TEST_SUITE(Nfd)
-BOOST_AUTO_TEST_SUITE(TestCommandOptions)
+            BOOST_AUTO_TEST_SUITE(Mgmt)
+            BOOST_AUTO_TEST_SUITE(Nfd)
+            BOOST_AUTO_TEST_SUITE(TestCommandOptions)
 
-BOOST_AUTO_TEST_CASE(Timeout)
-{
-  CommandOptions co;
-  BOOST_CHECK_EQUAL(co.getTimeout(), CommandOptions::DEFAULT_TIMEOUT);
+            BOOST_AUTO_TEST_CASE(Timeout) {
+                CommandOptions co;
+                BOOST_CHECK_EQUAL(co.getTimeout(), CommandOptions::DEFAULT_TIMEOUT);
 
-  co.setTimeout(time::milliseconds(7414));
-  BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(7414));
+                co.setTimeout(time::milliseconds(7414));
+                BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(7414));
 
-  BOOST_CHECK_THROW(co.setTimeout(time::milliseconds::zero()), std::out_of_range);
-  BOOST_CHECK_THROW(co.setTimeout(time::milliseconds(-1)), std::out_of_range);
-  BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(7414)); // unchanged after throw
+                BOOST_CHECK_THROW(co.setTimeout(time::milliseconds::zero()), std::out_of_range);
+                BOOST_CHECK_THROW(co.setTimeout(time::milliseconds(-1)), std::out_of_range);
+                BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(7414)); // unchanged after throw
 
-  co.setTimeout(time::milliseconds(1));
-  BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(1));
-}
+                co.setTimeout(time::milliseconds(1));
+                BOOST_CHECK_EQUAL(co.getTimeout(), time::milliseconds(1));
+            }
 
-BOOST_AUTO_TEST_CASE(Prefix)
-{
-  CommandOptions co;
-  BOOST_CHECK_EQUAL(co.getPrefix(), CommandOptions::DEFAULT_PREFIX);
+            BOOST_AUTO_TEST_CASE(Prefix) {
+                CommandOptions co;
+                BOOST_CHECK_EQUAL(co.getPrefix(), CommandOptions::DEFAULT_PREFIX);
 
-  co.setPrefix(Name()); // empty Name is okay
-  BOOST_CHECK_EQUAL(co.getPrefix(), Name());
+                co.setPrefix(Name()); // empty Name is okay
+                BOOST_CHECK_EQUAL(co.getPrefix(), Name());
 
-  co.setPrefix("ndn:/localhop/net/example/nfd");
-  BOOST_CHECK_EQUAL(co.getPrefix(), Name("ndn:/localhop/net/example/nfd"));
-}
+                co.setPrefix("ndn:/localhop/net/example/nfd");
+                BOOST_CHECK_EQUAL(co.getPrefix(), Name("ndn:/localhop/net/example/nfd"));
+            }
 
-BOOST_AUTO_TEST_CASE(SigningInfo)
-{
-  CommandOptions co;
-  BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerType(), security::SigningInfo::SIGNER_TYPE_NULL);
+            BOOST_AUTO_TEST_CASE(SigningInfo) {
+                CommandOptions co;
+                BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerType(), security::SigningInfo::SIGNER_TYPE_NULL);
 
-  co.setSigningInfo(signingByIdentity("ndn:/tmp/identity"));
-  BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerType(), security::SigningInfo::SIGNER_TYPE_ID);
-  BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerName(), "ndn:/tmp/identity");
-}
+                co.setSigningInfo(signingByIdentity("ndn:/tmp/identity"));
+                BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerType(), security::SigningInfo::SIGNER_TYPE_ID);
+                BOOST_CHECK_EQUAL(co.getSigningInfo().getSignerName(), "ndn:/tmp/identity");
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestCommandOptions
-BOOST_AUTO_TEST_SUITE_END() // Nfd
-BOOST_AUTO_TEST_SUITE_END() // Mgmt
+            BOOST_AUTO_TEST_SUITE_END() // TestCommandOptions
+            BOOST_AUTO_TEST_SUITE_END() // Nfd
+            BOOST_AUTO_TEST_SUITE_END() // Mgmt
 
-} // namespace tests
-} // namespace nfd
+        } // namespace tests
+    } // namespace nfd
 } // namespace ndn

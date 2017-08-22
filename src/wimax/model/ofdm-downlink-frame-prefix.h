@@ -26,43 +26,42 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- *\brief This class implements  the DL Frame Prefix IE as described by IEEE-802.16 standard
- *\brief The DL Frame Prefix IE is contained in DLFP (Downlink Frame Prefix) in OFDM PHY
- */
-class DlFramePrefixIe
-{
-public:
-  DlFramePrefixIe ();
-  ~DlFramePrefixIe ();
+    /**
+     * \ingroup wimax
+     *\brief This class implements  the DL Frame Prefix IE as described by IEEE-802.16 standard
+     *\brief The DL Frame Prefix IE is contained in DLFP (Downlink Frame Prefix) in OFDM PHY
+     */
+    class DlFramePrefixIe {
+    public:
+        DlFramePrefixIe();
+        ~DlFramePrefixIe();
 
-  void SetRateId (uint8_t rateId);
-  void SetDiuc (uint8_t diuc);
-  void SetPreamblePresent (uint8_t preamblePresent);
-  void SetLength (uint16_t length);
-  void SetStartTime (uint16_t startTime);
+        void SetRateId(uint8_t rateId);
+        void SetDiuc(uint8_t diuc);
+        void SetPreamblePresent(uint8_t preamblePresent);
+        void SetLength(uint16_t length);
+        void SetStartTime(uint16_t startTime);
 
-  uint8_t GetRateId (void) const;
-  uint8_t GetDiuc (void) const;
-  uint8_t GetPreamblePresent (void) const;
-  uint16_t GetLength (void) const;
-  uint16_t GetStartTime (void) const;
+        uint8_t GetRateId(void) const;
+        uint8_t GetDiuc(void) const;
+        uint8_t GetPreamblePresent(void) const;
+        uint16_t GetLength(void) const;
+        uint16_t GetStartTime(void) const;
 
-  uint16_t GetSize (void) const;
+        uint16_t GetSize(void) const;
 
-  Buffer::Iterator Write (Buffer::Iterator start) const;
-  Buffer::Iterator Read (Buffer::Iterator start);
-private:
-  uint8_t m_rateId;
-  uint8_t m_diuc;
-  uint8_t m_preamblePresent;
-  uint16_t m_length;
-  uint16_t m_startTime;
+        Buffer::Iterator Write(Buffer::Iterator start) const;
+        Buffer::Iterator Read(Buffer::Iterator start);
+    private:
+        uint8_t m_rateId;
+        uint8_t m_diuc;
+        uint8_t m_preamblePresent;
+        uint16_t m_length;
+        uint16_t m_startTime;
 
-  // shall actually contain m_startTime if DIUC is 0. see Table 225, page 452
+        // shall actually contain m_startTime if DIUC is 0. see Table 225, page 452
 
-};
+    };
 
 } // namespace ns3
 
@@ -77,42 +76,41 @@ private:
 
 namespace ns3 {
 
-class OfdmDownlinkFramePrefix : public Header
-{
-public:
-  OfdmDownlinkFramePrefix ();
-  ~OfdmDownlinkFramePrefix ();
+    class OfdmDownlinkFramePrefix : public Header {
+    public:
+        OfdmDownlinkFramePrefix();
+        ~OfdmDownlinkFramePrefix();
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  void SetBaseStationId (Mac48Address baseStationId);
-  void SetFrameNumber (uint32_t frameNumber);
-  void SetConfigurationChangeCount (uint8_t configurationChangeCount);
-  void AddDlFramePrefixElement (DlFramePrefixIe dlFramePrefixElement);
-  void SetHcs (uint8_t hcs);
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  Mac48Address GetBaseStationId (void) const;
-  uint32_t GetFrameNumber (void) const;
-  uint8_t GetConfigurationChangeCount (void) const;
-  std::vector<DlFramePrefixIe> GetDlFramePrefixElements (void) const;
-  uint8_t GetHcs (void) const;
+        void SetBaseStationId(Mac48Address baseStationId);
+        void SetFrameNumber(uint32_t frameNumber);
+        void SetConfigurationChangeCount(uint8_t configurationChangeCount);
+        void AddDlFramePrefixElement(DlFramePrefixIe dlFramePrefixElement);
+        void SetHcs(uint8_t hcs);
 
-  std::string GetName (void) const;
-  void Print (std::ostream &os) const;
-  uint32_t GetSerializedSize (void) const;
-  void Serialize (Buffer::Iterator start) const;
-  uint32_t Deserialize (Buffer::Iterator start);
-private:
-  Mac48Address m_baseStationId;
-  uint32_t m_frameNumber; // shall actually be only 4 LSB of the same field in OFDM DCD Channel Encodings
-  uint8_t m_configurationChangeCount; // shall actually be only 4 LSB of the same field in DCD
-  std::vector<DlFramePrefixIe> m_dlFramePrefixElements; // vector of dl frame prefix elements
-  uint8_t m_hcs; // Header Check Sequence
-};
+        Mac48Address GetBaseStationId(void) const;
+        uint32_t GetFrameNumber(void) const;
+        uint8_t GetConfigurationChangeCount(void) const;
+        std::vector<DlFramePrefixIe> GetDlFramePrefixElements(void) const;
+        uint8_t GetHcs(void) const;
+
+        std::string GetName(void) const;
+        void Print(std::ostream &os) const;
+        uint32_t GetSerializedSize(void) const;
+        void Serialize(Buffer::Iterator start) const;
+        uint32_t Deserialize(Buffer::Iterator start);
+    private:
+        Mac48Address m_baseStationId;
+        uint32_t m_frameNumber; // shall actually be only 4 LSB of the same field in OFDM DCD Channel Encodings
+        uint8_t m_configurationChangeCount; // shall actually be only 4 LSB of the same field in DCD
+        std::vector<DlFramePrefixIe> m_dlFramePrefixElements; // vector of dl frame prefix elements
+        uint8_t m_hcs; // Header Check Sequence
+    };
 
 } // namespace ns3
 

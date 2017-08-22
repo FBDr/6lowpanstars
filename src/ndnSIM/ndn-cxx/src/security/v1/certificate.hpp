@@ -33,192 +33,176 @@
 #include "public-key.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-class Certificate : public Data
-{
-public:
-  class Error : public Data::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Data::Error(what)
-    {
-    }
-  };
+            class Certificate : public Data {
+            public:
 
-  typedef std::vector<CertificateSubjectDescription> SubjectDescriptionList;
-  typedef std::vector<CertificateExtension> ExtensionList;
+                class Error : public Data::Error {
+                public:
 
-  /**
-   * @brief The default constructor.
-   */
-  Certificate();
+                    explicit
+                    Error(const std::string& what)
+                    : Data::Error(what) {
+                    }
+                };
 
-  /**
-   * @brief Create a Certificate from the content in the data packet.
-   * @param data The data packet with the content to decode.
-   */
-  explicit
-  Certificate(const Data& data);
+                typedef std::vector<CertificateSubjectDescription> SubjectDescriptionList;
+                typedef std::vector<CertificateExtension> ExtensionList;
 
-  /**
-   * @brief Create a Certificate from the a block
-   * @param block The raw block of the certificate
-   */
-  explicit
-  Certificate(const Block& block);
+                /**
+                 * @brief The default constructor.
+                 */
+                Certificate();
 
-  virtual
-  ~Certificate();
+                /**
+                 * @brief Create a Certificate from the content in the data packet.
+                 * @param data The data packet with the content to decode.
+                 */
+                explicit
+                Certificate(const Data& data);
 
-  void
-  wireDecode(const Block& wire);
+                /**
+                 * @brief Create a Certificate from the a block
+                 * @param block The raw block of the certificate
+                 */
+                explicit
+                Certificate(const Block& block);
 
-  /**
-   * @brief encode certificate info into content
-   */
-  void
-  encode();
+                virtual
+                ~Certificate();
 
-  /**
-   * @brief Add a subject description.
-   * @param description The description to be added.
-   */
-  void
-  addSubjectDescription(const CertificateSubjectDescription& description)
-  {
-    m_subjectDescriptionList.push_back(description);
-  }
+                void
+                wireDecode(const Block& wire);
 
-  const SubjectDescriptionList&
-  getSubjectDescriptionList() const
-  {
-    return m_subjectDescriptionList;
-  }
+                /**
+                 * @brief encode certificate info into content
+                 */
+                void
+                encode();
 
-  SubjectDescriptionList&
-  getSubjectDescriptionList()
-  {
-    return m_subjectDescriptionList;
-  }
+                /**
+                 * @brief Add a subject description.
+                 * @param description The description to be added.
+                 */
+                void
+                addSubjectDescription(const CertificateSubjectDescription& description) {
+                    m_subjectDescriptionList.push_back(description);
+                }
 
-  /**
-   * @brief Add a certificate extension.
-   * @param extension the extension to be added
-   */
-  void
-  addExtension(const CertificateExtension& extension)
-  {
-    m_extensionList.push_back(extension);
-  }
+                const SubjectDescriptionList&
+                getSubjectDescriptionList() const {
+                    return m_subjectDescriptionList;
+                }
 
-  const ExtensionList&
-  getExtensionList() const
-  {
-    return m_extensionList;
-  }
+                SubjectDescriptionList&
+                getSubjectDescriptionList() {
+                    return m_subjectDescriptionList;
+                }
 
-  ExtensionList&
-  getExtensionList()
-  {
-    return m_extensionList;
-  }
+                /**
+                 * @brief Add a certificate extension.
+                 * @param extension the extension to be added
+                 */
+                void
+                addExtension(const CertificateExtension& extension) {
+                    m_extensionList.push_back(extension);
+                }
 
-  void
-  setNotBefore(const time::system_clock::TimePoint& notBefore)
-  {
-    m_notBefore = notBefore;
-  }
+                const ExtensionList&
+                getExtensionList() const {
+                    return m_extensionList;
+                }
 
-  time::system_clock::TimePoint&
-  getNotBefore()
-  {
-    return m_notBefore;
-  }
+                ExtensionList&
+                getExtensionList() {
+                    return m_extensionList;
+                }
 
-  const time::system_clock::TimePoint&
-  getNotBefore() const
-  {
-    return m_notBefore;
-  }
+                void
+                setNotBefore(const time::system_clock::TimePoint& notBefore) {
+                    m_notBefore = notBefore;
+                }
 
-  void
-  setNotAfter(const time::system_clock::TimePoint& notAfter)
-  {
-    m_notAfter = notAfter;
-  }
+                time::system_clock::TimePoint&
+                getNotBefore() {
+                    return m_notBefore;
+                }
 
-  time::system_clock::TimePoint&
-  getNotAfter()
-  {
-    return m_notAfter;
-  }
+                const time::system_clock::TimePoint&
+                getNotBefore() const {
+                    return m_notBefore;
+                }
 
-  const time::system_clock::TimePoint&
-  getNotAfter() const
-  {
-    return m_notAfter;
-  }
+                void
+                setNotAfter(const time::system_clock::TimePoint& notAfter) {
+                    m_notAfter = notAfter;
+                }
 
-  void
-  setPublicKeyInfo(const PublicKey& key)
-  {
-    m_key = key;
-  }
+                time::system_clock::TimePoint&
+                getNotAfter() {
+                    return m_notAfter;
+                }
 
-  PublicKey&
-  getPublicKeyInfo()
-  {
-    return m_key;
-  }
+                const time::system_clock::TimePoint&
+                getNotAfter() const {
+                    return m_notAfter;
+                }
 
-  const PublicKey&
-  getPublicKeyInfo() const
-  {
-    return m_key;
-  }
+                void
+                setPublicKeyInfo(const PublicKey& key) {
+                    m_key = key;
+                }
 
-  /**
-   * @brief Check if the certificate is valid.
-   * @return True if the current time is earlier than notBefore.
-   */
-  bool
-  isTooEarly();
+                PublicKey&
+                getPublicKeyInfo() {
+                    return m_key;
+                }
 
-  /**
-   * @brief Check if the certificate is valid.
-   * @return True if the current time is later than notAfter.
-   */
-  bool
-  isTooLate();
+                const PublicKey&
+                getPublicKeyInfo() const {
+                    return m_key;
+                }
 
-  void
-  printCertificate(std::ostream& os, const std::string& indent = "") const;
+                /**
+                 * @brief Check if the certificate is valid.
+                 * @return True if the current time is earlier than notBefore.
+                 */
+                bool
+                isTooEarly();
 
-protected:
-  void
-  decode();
+                /**
+                 * @brief Check if the certificate is valid.
+                 * @return True if the current time is later than notAfter.
+                 */
+                bool
+                isTooLate();
 
-protected:
-  SubjectDescriptionList m_subjectDescriptionList;
-  time::system_clock::TimePoint m_notBefore;
-  time::system_clock::TimePoint m_notAfter;
-  PublicKey m_key;
-  ExtensionList m_extensionList;
-};
+                void
+                printCertificate(std::ostream& os, const std::string& indent = "") const;
 
-std::ostream&
-operator<<(std::ostream& os, const Certificate& cert);
+            protected:
+                void
+                decode();
 
-} // namespace v1
-} // namespace security
+            protected:
+                SubjectDescriptionList m_subjectDescriptionList;
+                time::system_clock::TimePoint m_notBefore;
+                time::system_clock::TimePoint m_notAfter;
+                PublicKey m_key;
+                ExtensionList m_extensionList;
+            };
+
+            std::ostream&
+            operator<<(std::ostream& os, const Certificate& cert);
+
+        } // namespace v1
+    } // namespace security
 
 #ifdef NDN_CXX_KEEP_SECURITY_V1_ALIASES
-/// @deprecated When needed, use explicit namespace
-using security::v1::Certificate;
+    /// @deprecated When needed, use explicit namespace
+    using security::v1::Certificate;
 #endif // NDN_CXX_KEEP_SECURITY_V1_ALIASES
 
 } // namespace ndn

@@ -29,57 +29,56 @@
 #include "base.hpp"
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-/**
- * @brief Base class for stages that use DNS-based guessing
- */
-class BaseDns : public Base
-{
-protected:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            /**
+             * @brief Base class for stages that use DNS-based guessing
+             */
+            class BaseDns : public Base {
+            protected:
 
-  BaseDns(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
+                class Error : public std::runtime_error {
+                public:
 
-  /**
-   * @brief Send DNS SRV request for a @p fqdn fully qualified domain name
-   * @return FaceUri of the hub from the requested SRV record
-   * @throw Error if query returns nothing or SRV record cannot be parsed
-   */
-  std::string
-  querySrvRr(const std::string& fqdn);
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-  /**
-   * @brief Send DNS SRV request using search domain list
-   * @return FaceUri of the hub from the requested SRV record
-   * @throw Error if query returns nothing or SRV record cannot be parsed
-   */
-  std::string
-  querySrvRrSearch();
+                BaseDns(Face& face, KeyChain& keyChain, const NextStageCallback& nextStageOnFailure);
 
-private:
-  union QueryAnswer;
+                /**
+                 * @brief Send DNS SRV request for a @p fqdn fully qualified domain name
+                 * @return FaceUri of the hub from the requested SRV record
+                 * @throw Error if query returns nothing or SRV record cannot be parsed
+                 */
+                std::string
+                querySrvRr(const std::string& fqdn);
 
-  /**
-   * @brief Parse SRV record
-   * @return FaceUri of the hub from the SRV record
-   * @throw Error if SRV record cannot be parsed
-   */
-  std::string
-  parseSrvRr(const QueryAnswer& queryAnswer, int answerSize);
-};
+                /**
+                 * @brief Send DNS SRV request using search domain list
+                 * @return FaceUri of the hub from the requested SRV record
+                 * @throw Error if query returns nothing or SRV record cannot be parsed
+                 */
+                std::string
+                querySrvRrSearch();
 
-} // namespace autoconfig
-} // namespace tools
+            private:
+                union QueryAnswer;
+
+                /**
+                 * @brief Parse SRV record
+                 * @return FaceUri of the hub from the SRV record
+                 * @throw Error if SRV record cannot be parsed
+                 */
+                std::string
+                parseSrvRr(const QueryAnswer& queryAnswer, int answerSize);
+            };
+
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn
 
 #endif // NFD_TOOLS_NDN_AUTOCONFIG_BASE_DNS_HPP

@@ -29,36 +29,33 @@
 
 using namespace ns3;
 
-
 /**
-* This system test program creates different test cases with a single eNB and 
-* several UEs, all having the same Radio Bearer specification. In each test 
-* case, the UEs see the same SINR from the eNB; different test cases are 
-* implemented obtained by using different SINR values and different numbers of 
-* UEs. The test consists on checking that the obtained throughput performance 
-* is consistent with the definition of maximum throughput
-* scheduling
-*/
-class LenaFdMtFfMacSchedulerTestCase : public TestCase
-{
+ * This system test program creates different test cases with a single eNB and 
+ * several UEs, all having the same Radio Bearer specification. In each test 
+ * case, the UEs see the same SINR from the eNB; different test cases are 
+ * implemented obtained by using different SINR values and different numbers of 
+ * UEs. The test consists on checking that the obtained throughput performance 
+ * is consistent with the definition of maximum throughput
+ * scheduling
+ */
+class LenaFdMtFfMacSchedulerTestCase : public TestCase {
 public:
-  LenaFdMtFfMacSchedulerTestCase (uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl,bool errorModelEnabled);
-  virtual ~LenaFdMtFfMacSchedulerTestCase ();
+    LenaFdMtFfMacSchedulerTestCase(uint16_t nUser, uint16_t dist, double thrRefDl, double thrRefUl, bool errorModelEnabled);
+    virtual ~LenaFdMtFfMacSchedulerTestCase();
 
 private:
-  static std::string BuildNameString (uint16_t nUser, uint16_t dist);
-  virtual void DoRun (void);
-  uint16_t m_nUser;
-  uint16_t m_dist;
-  double m_thrRefDl;
-  double m_thrRefUl;
-  bool m_errorModelEnabled;
+    static std::string BuildNameString(uint16_t nUser, uint16_t dist);
+    virtual void DoRun(void);
+    uint16_t m_nUser;
+    uint16_t m_dist;
+    double m_thrRefDl;
+    double m_thrRefUl;
+    bool m_errorModelEnabled;
 };
 
-class LenaTestFdMtFfMacSchedulerSuite : public TestSuite
-{
+class LenaTestFdMtFfMacSchedulerSuite : public TestSuite {
 public:
-  LenaTestFdMtFfMacSchedulerSuite ();
+    LenaTestFdMtFfMacSchedulerSuite();
 };
 
 

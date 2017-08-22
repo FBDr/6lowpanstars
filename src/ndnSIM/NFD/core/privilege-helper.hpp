@@ -32,57 +32,54 @@
 
 namespace nfd {
 
-class PrivilegeHelper
-{
-public:
+    class PrivilegeHelper {
+    public:
 
-  /** \brief represents a serious seteuid/gid failure
-   *
-   *  This should only be caught by main as part of a graceful program termination.
-   *  \note This is not an std::exception and BOOST_THROW_EXCEPTION should not be used.
-   */
-  class Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : m_whatMessage(what)
-    {
-    }
+        /** \brief represents a serious seteuid/gid failure
+         *
+         *  This should only be caught by main as part of a graceful program termination.
+         *  \note This is not an std::exception and BOOST_THROW_EXCEPTION should not be used.
+         */
+        class Error {
+        public:
 
-    const char*
-    what() const
-    {
-      return m_whatMessage.c_str();
-    }
+            explicit
+            Error(const std::string& what)
+            : m_whatMessage(what) {
+            }
 
-  private:
-    const std::string m_whatMessage;
-  };
+            const char*
+            what() const {
+                return m_whatMessage.c_str();
+            }
 
-  static void
-  initialize(const std::string& userName, const std::string& groupName);
+        private:
+            const std::string m_whatMessage;
+        };
 
-  static void
-  drop();
+        static void
+        initialize(const std::string& userName, const std::string& groupName);
 
-  static void
-  runElevated(function<void()> f);
+        static void
+        drop();
+
+        static void
+        runElevated(function<void() > f);
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
 
-  static void
-  raise();
+        static void
+        raise();
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
 #ifdef HAVE_PRIVILEGE_DROP_AND_ELEVATE
-  static uid_t s_normalUid;
-  static gid_t s_normalGid;
+        static uid_t s_normalUid;
+        static gid_t s_normalGid;
 
-  static uid_t s_privilegedUid;
-  static gid_t s_privilegedGid;
+        static uid_t s_privilegedUid;
+        static gid_t s_privilegedGid;
 #endif // HAVE_PRIVILEGE_DROP_AND_ELEVATE
-};
+    };
 
 } // namespace nfd
 

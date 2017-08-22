@@ -29,38 +29,37 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wimax
- * \brief this class manages a list of SSrecord
- * \see SSrecord
- */
-class SSManager : public Object
-{
-public:
-  static TypeId GetTypeId (void);
-  SSManager (void);
-  ~SSManager (void);
-  SSRecord* CreateSSRecord (const Mac48Address &macAddress);
-  SSRecord* GetSSRecord (const Mac48Address &macAddress) const;
-  /**
-   * \brief returns the ssrecord which has been assigned this cid. Since
-   *        different types of cids (basic, primary, transport) are assigned
-   *        different values, all cids (basic, primary and transport) of the
-   *        ssrecord are matched.
-   * \param cid the cid to be matched
-   * \return the ss record that has the cid
-   */
-  SSRecord* GetSSRecord (Cid cid) const;
-  std::vector<SSRecord*>* GetSSRecords (void) const;
-  bool IsInRecord (const Mac48Address &macAddress) const;
-  bool IsRegistered (const Mac48Address &macAddress) const;
-  void DeleteSSRecord (Cid cid);
-  Mac48Address GetMacAddress (Cid cid) const;
-  uint32_t GetNSSs (void) const;
-  uint32_t GetNRegisteredSSs (void) const;
-private:
-  std::vector<SSRecord*> *m_ssRecords;
-};
+    /**
+     * \ingroup wimax
+     * \brief this class manages a list of SSrecord
+     * \see SSrecord
+     */
+    class SSManager : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        SSManager(void);
+        ~SSManager(void);
+        SSRecord* CreateSSRecord(const Mac48Address &macAddress);
+        SSRecord* GetSSRecord(const Mac48Address &macAddress) const;
+        /**
+         * \brief returns the ssrecord which has been assigned this cid. Since
+         *        different types of cids (basic, primary, transport) are assigned
+         *        different values, all cids (basic, primary and transport) of the
+         *        ssrecord are matched.
+         * \param cid the cid to be matched
+         * \return the ss record that has the cid
+         */
+        SSRecord* GetSSRecord(Cid cid) const;
+        std::vector<SSRecord*>* GetSSRecords(void) const;
+        bool IsInRecord(const Mac48Address &macAddress) const;
+        bool IsRegistered(const Mac48Address &macAddress) const;
+        void DeleteSSRecord(Cid cid);
+        Mac48Address GetMacAddress(Cid cid) const;
+        uint32_t GetNSSs(void) const;
+        uint32_t GetNRegisteredSSs(void) const;
+    private:
+        std::vector<SSRecord*> *m_ssRecords;
+    };
 
 } // namespace ns3
 

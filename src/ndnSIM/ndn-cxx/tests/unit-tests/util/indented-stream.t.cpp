@@ -27,53 +27,52 @@
 using boost::test_tools::output_test_stream;
 
 namespace ndn {
-namespace util {
-namespace tests {
+    namespace util {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(UtilIndentedStream)
+            BOOST_AUTO_TEST_SUITE(UtilIndentedStream)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  output_test_stream os;
+            BOOST_AUTO_TEST_CASE(Basic) {
+                output_test_stream os;
 
-  os << "Hello" << std::endl;
-  {
-    IndentedStream os1(os, " [prefix] ");
-    os1 << "," << "\n";
-    {
-      IndentedStream os2(os1, " [another prefix] ");
-      os2 << "World!" << "\n";
-    }
-  }
+                os << "Hello" << std::endl;
+                {
+                    IndentedStream os1(os, " [prefix] ");
+                    os1 << "," << "\n";
+                    {
+                        IndentedStream os2(os1, " [another prefix] ");
+                        os2 << "World!" << "\n";
+                    }
+                }
 
-  BOOST_CHECK(os.is_equal("Hello\n"
-                          " [prefix] ,\n"
-                          " [prefix]  [another prefix] World!\n"
-                          ));
-}
+                BOOST_CHECK(os.is_equal("Hello\n"
+                        " [prefix] ,\n"
+                        " [prefix]  [another prefix] World!\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_CASE(BasicWithFlushes) // Bug #2723
-{
-  output_test_stream os;
+            BOOST_AUTO_TEST_CASE(BasicWithFlushes) // Bug #2723
+            {
+                output_test_stream os;
 
-  os << "Hello" << std::endl;
-  {
-    IndentedStream os1(os, " [prefix] ");
-    os1 << "," << std::endl;
-    {
-      IndentedStream os2(os1, " [another prefix] ");
-      os2 << "World!" << std::endl;
-    }
-  }
+                os << "Hello" << std::endl;
+                {
+                    IndentedStream os1(os, " [prefix] ");
+                    os1 << "," << std::endl;
+                    {
+                        IndentedStream os2(os1, " [another prefix] ");
+                        os2 << "World!" << std::endl;
+                    }
+                }
 
-  BOOST_CHECK(os.is_equal("Hello\n"
-                          " [prefix] ,\n"
-                          " [prefix]  [another prefix] World!\n"
-                          ));
-}
+                BOOST_CHECK(os.is_equal("Hello\n"
+                        " [prefix] ,\n"
+                        " [prefix]  [another prefix] World!\n"
+                        ));
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace util
+        } // namespace tests
+    } // namespace util
 } // namespace ndn

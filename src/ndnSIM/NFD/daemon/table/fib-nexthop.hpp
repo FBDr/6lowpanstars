@@ -30,41 +30,37 @@
 #include "face/face.hpp"
 
 namespace nfd {
-namespace fib {
+    namespace fib {
 
-/** \class NextHop
- *  \brief represents a nexthop record in FIB entry
- */
-class NextHop
-{
-public:
-  explicit
-  NextHop(Face& face);
+        /** \class NextHop
+         *  \brief represents a nexthop record in FIB entry
+         */
+        class NextHop {
+        public:
+            explicit
+            NextHop(Face& face);
 
-  Face&
-  getFace() const
-  {
-    return *m_face;
-  }
+            Face&
+            getFace() const {
+                return *m_face;
+            }
 
-  uint64_t
-  getCost() const
-  {
-    return m_cost;
-  }
+            uint64_t
+            getCost() const {
+                return m_cost;
+            }
 
-  void
-  setCost(uint64_t cost)
-  {
-    m_cost = cost;
-  }
+            void
+            setCost(uint64_t cost) {
+                m_cost = cost;
+            }
 
-private:
-  Face* m_face;
-  uint64_t m_cost;
-};
+        private:
+            Face* m_face;
+            uint64_t m_cost;
+        };
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_FIB_NEXTHOP_HPP

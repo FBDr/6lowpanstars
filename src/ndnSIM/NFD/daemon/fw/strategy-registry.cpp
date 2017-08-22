@@ -27,37 +27,33 @@
 #include "best-route-strategy2.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-unique_ptr<Strategy>
-makeDefaultStrategy(Forwarder& forwarder)
-{
-  return make_unique<BestRouteStrategy2>(ref(forwarder));
-}
+        unique_ptr<Strategy>
+        makeDefaultStrategy(Forwarder& forwarder) {
+            return make_unique<BestRouteStrategy2>(ref(forwarder));
+        }
 
-static std::map<Name, StrategyCreateFunc>&
-getStrategyFactories()
-{
-  static std::map<Name, StrategyCreateFunc> strategyFactories;
-  return strategyFactories;
-}
+        static std::map<Name, StrategyCreateFunc>&
+        getStrategyFactories() {
+            static std::map<Name, StrategyCreateFunc> strategyFactories;
+            return strategyFactories;
+        }
 
-void
-registerStrategyImpl(const Name& strategyName, const StrategyCreateFunc& createFunc)
-{
-  getStrategyFactories().insert({strategyName, createFunc});
-}
+        void
+        registerStrategyImpl(const Name& strategyName, const StrategyCreateFunc& createFunc) {
+            getStrategyFactories().insert({strategyName, createFunc});
+        }
 
-void
-installStrategies(Forwarder& forwarder)
-{
-  StrategyChoice& sc = forwarder.getStrategyChoice();
-  for (const auto& pair : getStrategyFactories()) {
-    if (!sc.hasStrategy(pair.first, true)) {
-      sc.install(pair.second(forwarder));
-    }
-  }
-}
+        void
+        installStrategies(Forwarder& forwarder) {
+            StrategyChoice& sc = forwarder.getStrategyChoice();
+            for (const auto& pair : getStrategyFactories()) {
+                if (!sc.hasStrategy(pair.first, true)) {
+                    sc.install(pair.second(forwarder));
+                }
+            }
+        }
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd

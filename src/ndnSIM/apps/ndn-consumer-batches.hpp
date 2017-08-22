@@ -27,44 +27,44 @@
 #include "ns3/ndnSIM/utils/batches.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * @ingroup ndn-apps
- * \brief Ndn application for sending out Interest packets in batches
- */
-class ConsumerBatches : public Consumer {
-public:
-  static TypeId
-  GetTypeId();
+        /**
+         * @ingroup ndn-apps
+         * \brief Ndn application for sending out Interest packets in batches
+         */
+        class ConsumerBatches : public Consumer {
+        public:
+            static TypeId
+            GetTypeId();
 
-  /**
-   * \brief Default constructor
-   */
-  ConsumerBatches();
+            /**
+             * \brief Default constructor
+             */
+            ConsumerBatches();
 
-private:
-  virtual void
-  StartApplication(); ///< @brief Called at time specified by Start
+        private:
+            virtual void
+            StartApplication(); ///< @brief Called at time specified by Start
 
-  void
-  AddBatch(uint32_t amount);
+            void
+            AddBatch(uint32_t amount);
 
-protected:
-  /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
-   * protocol
-   */
-  virtual void
-  ScheduleNextPacket();
+        protected:
+            /**
+             * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
+             * protocol
+             */
+            virtual void
+            ScheduleNextPacket();
 
-private:
-  bool m_initial;
+        private:
+            bool m_initial;
 
-  Batches m_batches;
-};
+            Batches m_batches;
+        };
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3
 
 #endif

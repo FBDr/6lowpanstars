@@ -27,171 +27,146 @@
  * ns3::ObjectFactory class implementation.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE("ObjectFactory");
+    NS_LOG_COMPONENT_DEFINE("ObjectFactory");
 
-ObjectFactory::ObjectFactory ()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-ObjectFactory::ObjectFactory (std::string typeId)
-{
-  NS_LOG_FUNCTION (this << typeId);
-  SetTypeId (typeId);
-}
-
-void
-ObjectFactory::SetTypeId (TypeId tid)
-{
-  NS_LOG_FUNCTION (this << tid.GetName ());
-  m_tid = tid;
-}
-void
-ObjectFactory::SetTypeId (std::string tid)
-{
-  NS_LOG_FUNCTION (this << tid);
-  m_tid = TypeId::LookupByName (tid);
-}
-void
-ObjectFactory::SetTypeId (const char *tid)
-{
-  NS_LOG_FUNCTION (this << tid);
-  m_tid = TypeId::LookupByName (tid);
-}
-void
-ObjectFactory::Set (std::string name, const AttributeValue &value)
-{
-  NS_LOG_FUNCTION (this << name << &value);
-  if (name == "")
-    {
-      return;
+    ObjectFactory::ObjectFactory() {
+        NS_LOG_FUNCTION(this);
     }
-  
-  struct TypeId::AttributeInformation info;
-  if (!m_tid.LookupAttributeByName (name, &info))
-    {
-      NS_FATAL_ERROR ("Invalid attribute set (" << name << ") on " << m_tid.GetName ());
-      return;
+
+    ObjectFactory::ObjectFactory(std::string typeId) {
+        NS_LOG_FUNCTION(this << typeId);
+        SetTypeId(typeId);
     }
-  Ptr<AttributeValue> v = info.checker->CreateValidValue (value);
-  if (v == 0)
-    {
-      NS_FATAL_ERROR ("Invalid value for attribute set (" << name << ") on " << m_tid.GetName ());
-      return;
+
+    void
+    ObjectFactory::SetTypeId(TypeId tid) {
+        NS_LOG_FUNCTION(this << tid.GetName());
+        m_tid = tid;
     }
-  m_parameters.Add (name, info.checker, value.Copy ());
-}
 
-TypeId 
-ObjectFactory::GetTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_tid;
-}
+    void
+    ObjectFactory::SetTypeId(std::string tid) {
+        NS_LOG_FUNCTION(this << tid);
+        m_tid = TypeId::LookupByName(tid);
+    }
 
-Ptr<Object> 
-ObjectFactory::Create (void) const
-{
-  NS_LOG_FUNCTION (this);
-  Callback<ObjectBase *> cb = m_tid.GetConstructor ();
-  ObjectBase *base = cb ();
-  Object *derived = dynamic_cast<Object *> (base);
-  NS_ASSERT (derived != 0);
-  derived->SetTypeId (m_tid);
-  derived->Construct (m_parameters);
-  Ptr<Object> object = Ptr<Object> (derived, false);
-  return object;
-}
+    void
+    ObjectFactory::SetTypeId(const char *tid) {
+        NS_LOG_FUNCTION(this << tid);
+        m_tid = TypeId::LookupByName(tid);
+    }
 
-std::ostream & operator << (std::ostream &os, const ObjectFactory &factory)
-{
-  os << factory.m_tid.GetName () << "[";
-  bool first = true;
-  for (AttributeConstructionList::CIterator i = factory.m_parameters.Begin (); i != factory.m_parameters.End (); ++i)
-    {
-      os << i->name << "=" << i->value->SerializeToString (i->checker);
-      if (first)
-        {
-          os << "|";
+    void
+    ObjectFactory::Set(std::string name, const AttributeValue & value) {
+        NS_LOG_FUNCTION(this << name << &value);
+        if (name == "") {
+            return;
         }
-    }
-  os << "]";
-  return os;
-}
-std::istream & operator >> (std::istream &is, ObjectFactory &factory)
-{
-  std::string v;
-  is >> v;
-  std::string::size_type lbracket, rbracket;
-  lbracket = v.find ("[");
-  rbracket = v.find ("]");
-  if (lbracket == std::string::npos && rbracket == std::string::npos)
-    {
-      factory.SetTypeId (v);
-      return is;
-    }
-  if (lbracket == std::string::npos || rbracket == std::string::npos)
-    {
-      return is;
-    }
-  NS_ASSERT (lbracket != std::string::npos);
-  NS_ASSERT (rbracket != std::string::npos);
-  std::string tid = v.substr (0, lbracket);
-  std::string parameters = v.substr (lbracket+1,rbracket-(lbracket+1));
-  factory.SetTypeId (tid);
-  std::string::size_type cur;
-  cur = 0;
-  while (cur != parameters.size ())
-    {
-      std::string::size_type equal = parameters.find ("=", cur);
-      if (equal == std::string::npos)
-        {
-          is.setstate (std::ios_base::failbit);
-          break;
+
+        struct TypeId::AttributeInformation info;
+        if (!m_tid.LookupAttributeByName(name, &info)) {
+            NS_FATAL_ERROR("Invalid attribute set (" << name << ") on " << m_tid.GetName());
+            return;
         }
-      else
-        {
-          std::string name = parameters.substr (cur, equal-cur);
-          struct TypeId::AttributeInformation info;
-          if (!factory.m_tid.LookupAttributeByName (name, &info))
-            {
-              is.setstate (std::ios_base::failbit);
-              break;
+        Ptr<AttributeValue> v = info.checker->CreateValidValue(value);
+        if (v == 0) {
+            NS_FATAL_ERROR("Invalid value for attribute set (" << name << ") on " << m_tid.GetName());
+            return;
+        }
+        m_parameters.Add(name, info.checker, value.Copy());
+    }
+
+    TypeId
+    ObjectFactory::GetTypeId(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_tid;
+    }
+
+    Ptr<Object>
+            ObjectFactory::Create(void) const {
+        NS_LOG_FUNCTION(this);
+        Callback<ObjectBase *> cb = m_tid.GetConstructor();
+        ObjectBase *base = cb();
+        Object *derived = dynamic_cast<Object *> (base);
+        NS_ASSERT(derived != 0);
+        derived->SetTypeId(m_tid);
+        derived->Construct(m_parameters);
+        Ptr<Object> object = Ptr<Object> (derived, false);
+        return object;
+    }
+
+    std::ostream & operator << (std::ostream &os, const ObjectFactory & factory) {
+        os << factory.m_tid.GetName() << "[";
+        bool first = true;
+        for (AttributeConstructionList::CIterator i = factory.m_parameters.Begin(); i != factory.m_parameters.End(); ++i) {
+            os << i->name << "=" << i->value->SerializeToString(i->checker);
+            if (first) {
+                os << "|";
             }
-          else
-            {
-              std::string::size_type next = parameters.find ("|", cur);
-              std::string value;
-              if (next == std::string::npos)
-                {
-                  value = parameters.substr (equal+1, parameters.size () - (equal+1));
-                  cur = parameters.size ();
-                }
-              else
-                {
-                  value = parameters.substr (equal+1, next - (equal+1));
-                  cur = next + 1;
-                }
-              Ptr<AttributeValue> val = info.checker->Create ();
-              bool ok = val->DeserializeFromString (value, info.checker);
-              if (!ok)
-                {
-                  is.setstate (std::ios_base::failbit);
-                  break;
-                }
-              else
-                {
-                  factory.m_parameters.Add (name, info.checker, val);
+        }
+        os << "]";
+        return os;
+    }
+
+    std::istream & operator >> (std::istream &is, ObjectFactory & factory) {
+        std::string v;
+        is >> v;
+        std::string::size_type lbracket, rbracket;
+        lbracket = v.find("[");
+        rbracket = v.find("]");
+        if (lbracket == std::string::npos && rbracket == std::string::npos) {
+            factory.SetTypeId(v);
+            return is;
+        }
+        if (lbracket == std::string::npos || rbracket == std::string::npos) {
+            return is;
+        }
+        NS_ASSERT(lbracket != std::string::npos);
+        NS_ASSERT(rbracket != std::string::npos);
+        std::string tid = v.substr(0, lbracket);
+        std::string parameters = v.substr(lbracket + 1, rbracket - (lbracket + 1));
+        factory.SetTypeId(tid);
+        std::string::size_type cur;
+        cur = 0;
+        while (cur != parameters.size()) {
+            std::string::size_type equal = parameters.find("=", cur);
+            if (equal == std::string::npos) {
+                is.setstate(std::ios_base::failbit);
+                break;
+            } else {
+                std::string name = parameters.substr(cur, equal - cur);
+                struct TypeId::AttributeInformation info;
+                if (!factory.m_tid.LookupAttributeByName(name, &info)) {
+                    is.setstate(std::ios_base::failbit);
+                    break;
+                } else {
+                    std::string::size_type next = parameters.find("|", cur);
+                    std::string value;
+                    if (next == std::string::npos) {
+                        value = parameters.substr(equal + 1, parameters.size() - (equal + 1));
+                        cur = parameters.size();
+                    } else {
+                        value = parameters.substr(equal + 1, next - (equal + 1));
+                        cur = next + 1;
+                    }
+                    Ptr<AttributeValue> val = info.checker->Create();
+                    bool ok = val->DeserializeFromString(value, info.checker);
+                    if (!ok) {
+                        is.setstate(std::ios_base::failbit);
+                        break;
+                    } else {
+                        factory.m_parameters.Add(name, info.checker, val);
+                    }
                 }
             }
         }
+        return is;
     }
-  return is;
-}
 
 
-ATTRIBUTE_HELPER_CPP (ObjectFactory);
+    ATTRIBUTE_HELPER_CPP(ObjectFactory);
 
 } // namespace ns3

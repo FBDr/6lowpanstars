@@ -28,31 +28,28 @@
 using namespace ns3;
 
 /**
-* Test 1.1 pathloss calculation
-*/
-class BuildingsPathlossTestSuite : public TestSuite
-{
+ * Test 1.1 pathloss calculation
+ */
+class BuildingsPathlossTestSuite : public TestSuite {
 public:
-  BuildingsPathlossTestSuite ();
+    BuildingsPathlossTestSuite();
 };
 
-
-class BuildingsPathlossTestCase : public TestCase
-{
+class BuildingsPathlossTestCase : public TestCase {
 public:
-  BuildingsPathlossTestCase (double freq, uint16_t m1, uint16_t m2, EnvironmentType env, CitySize city, double refValue, std::string name);
-  virtual ~BuildingsPathlossTestCase ();
+    BuildingsPathlossTestCase(double freq, uint16_t m1, uint16_t m2, EnvironmentType env, CitySize city, double refValue, std::string name);
+    virtual ~BuildingsPathlossTestCase();
 
 private:
-  virtual void DoRun (void);
-  Ptr<MobilityModel> CreateMobilityModel (uint16_t index);
+    virtual void DoRun(void);
+    Ptr<MobilityModel> CreateMobilityModel(uint16_t index);
 
-  double m_freq;
-  uint16_t m_mobilityModelIndex1;
-  uint16_t m_mobilityModelIndex2;
-  EnvironmentType m_env;
-  CitySize m_city;
-  double m_lossRef;
+    double m_freq;
+    uint16_t m_mobilityModelIndex1;
+    uint16_t m_mobilityModelIndex2;
+    EnvironmentType m_env;
+    CitySize m_city;
+    double m_lossRef;
 
 };
 

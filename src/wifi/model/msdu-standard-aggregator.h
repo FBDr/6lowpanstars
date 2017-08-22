@@ -25,45 +25,44 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- * Standard MSDU aggregator
- *
- */
-class MsduStandardAggregator : public MsduAggregator
-{
-public:
-  static TypeId GetTypeId (void);
-  MsduStandardAggregator ();
-  ~MsduStandardAggregator ();
-  /**
-   * \param packet Packet we have to insert into <i>aggregatedPacket</i>.
-   * \param aggregatedPacket Packet that will contain <i>packet</i>, if aggregation is possible,
-   * \param src Source address of <i>packet</i>.
-   * \param dest Destination address of <i>packet</i>.
-   *
-   * \return true if the packet can be aggregated,
-   *         false otherwise
-   *
-   * This method performs an MSDU aggregation.
-   * Returns true if <i>packet</i> can be aggregated to <i>aggregatedPacket</i>, false otherwise.
-   */
-  virtual bool Aggregate (Ptr<const Packet> packet, Ptr<Packet> aggregatedPacket,
-                          Mac48Address src, Mac48Address dest);
-private:
-  /**
-   * Calculates how much padding must be added to the end of aggregated packet,
-   * after that a new packet is added.
-   * Each A-MSDU subframe is padded so that its length is multiple of 4 octets.
-   *
-   * \param packet
-   *
-   * \return the number of octets required for padding
-   */
-  uint32_t CalculatePadding (Ptr<const Packet> packet);
+    /**
+     * \ingroup wifi
+     * Standard MSDU aggregator
+     *
+     */
+    class MsduStandardAggregator : public MsduAggregator {
+    public:
+        static TypeId GetTypeId(void);
+        MsduStandardAggregator();
+        ~MsduStandardAggregator();
+        /**
+         * \param packet Packet we have to insert into <i>aggregatedPacket</i>.
+         * \param aggregatedPacket Packet that will contain <i>packet</i>, if aggregation is possible,
+         * \param src Source address of <i>packet</i>.
+         * \param dest Destination address of <i>packet</i>.
+         *
+         * \return true if the packet can be aggregated,
+         *         false otherwise
+         *
+         * This method performs an MSDU aggregation.
+         * Returns true if <i>packet</i> can be aggregated to <i>aggregatedPacket</i>, false otherwise.
+         */
+        virtual bool Aggregate(Ptr<const Packet> packet, Ptr<Packet> aggregatedPacket,
+                Mac48Address src, Mac48Address dest);
+    private:
+        /**
+         * Calculates how much padding must be added to the end of aggregated packet,
+         * after that a new packet is added.
+         * Each A-MSDU subframe is padded so that its length is multiple of 4 octets.
+         *
+         * \param packet
+         *
+         * \return the number of octets required for padding
+         */
+        uint32_t CalculatePadding(Ptr<const Packet> packet);
 
-  uint32_t m_maxAmsduLength;
-};
+        uint32_t m_maxAmsduLength;
+    };
 
 } //namespace ns3
 

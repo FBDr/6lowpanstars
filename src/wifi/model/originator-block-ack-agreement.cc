@@ -21,87 +21,75 @@
 
 #include "originator-block-ack-agreement.h"
 
-namespace ns3 {
-
-OriginatorBlockAckAgreement::OriginatorBlockAckAgreement ()
-  : BlockAckAgreement (),
-    m_state (PENDING),
-    m_sentMpdus (0),
-    m_needBlockAckReq (false)
+namespace ns3
 {
-}
 
-OriginatorBlockAckAgreement::OriginatorBlockAckAgreement (Mac48Address recipient, uint8_t tid)
-  : BlockAckAgreement (recipient, tid),
-    m_state (PENDING),
-    m_sentMpdus (0),
-    m_needBlockAckReq (false)
-{
-}
-
-OriginatorBlockAckAgreement::~OriginatorBlockAckAgreement ()
-{
-}
-
-void
-OriginatorBlockAckAgreement::SetState (enum State state)
-{
-  m_state = state;
-  if (state == INACTIVE)
-    {
-      m_needBlockAckReq = false;
-      m_sentMpdus = 0;
+    OriginatorBlockAckAgreement::OriginatorBlockAckAgreement()
+            : BlockAckAgreement(),
+            m_state(PENDING),
+            m_sentMpdus(0),
+            m_needBlockAckReq(false) {
     }
-}
 
-bool
-OriginatorBlockAckAgreement::IsPending (void) const
-{
-  return (m_state == PENDING) ? true : false;
-}
-
-bool
-OriginatorBlockAckAgreement::IsEstablished (void) const
-{
-  return (m_state == ESTABLISHED) ? true : false;
-}
-
-bool
-OriginatorBlockAckAgreement::IsInactive (void) const
-{
-  return (m_state == INACTIVE) ? true : false;
-}
-
-bool
-OriginatorBlockAckAgreement::IsUnsuccessful (void) const
-{
-  return (m_state == UNSUCCESSFUL) ? true : false;
-}
-
-void
-OriginatorBlockAckAgreement::NotifyMpduTransmission (uint16_t nextSeqNumber)
-{
-  NS_ASSERT (m_sentMpdus < m_bufferSize);
-  m_sentMpdus++;
-  uint16_t delta = (nextSeqNumber - m_startingSeq + 4096) % 4096;
-  uint16_t min = m_bufferSize < 64 ? m_bufferSize : 64;
-  if (delta >= min || m_sentMpdus == m_bufferSize)
-    {
-      m_needBlockAckReq = true;
+    OriginatorBlockAckAgreement::OriginatorBlockAckAgreement(Mac48Address recipient, uint8_t tid)
+            : BlockAckAgreement(recipient, tid),
+            m_state(PENDING),
+            m_sentMpdus(0),
+            m_needBlockAckReq(false) {
     }
-}
 
-bool
-OriginatorBlockAckAgreement::IsBlockAckRequestNeeded (void) const
-{
-  return m_needBlockAckReq;
-}
+    OriginatorBlockAckAgreement::~OriginatorBlockAckAgreement() {
+    }
 
-void
-OriginatorBlockAckAgreement::CompleteExchange (void)
-{
-  m_needBlockAckReq = false;
-  m_sentMpdus = 0;
-}
+    void
+    OriginatorBlockAckAgreement::SetState(enum State state) {
+        m_state = state;
+        if (state == INACTIVE) {
+            m_needBlockAckReq = false;
+            m_sentMpdus = 0;
+        }
+    }
+
+    bool
+    OriginatorBlockAckAgreement::IsPending(void) const {
+        return (m_state == PENDING) ? true : false;
+    }
+
+    bool
+    OriginatorBlockAckAgreement::IsEstablished(void) const {
+        return (m_state == ESTABLISHED) ? true : false;
+    }
+
+    bool
+    OriginatorBlockAckAgreement::IsInactive(void) const {
+        return (m_state == INACTIVE) ? true : false;
+    }
+
+    bool
+    OriginatorBlockAckAgreement::IsUnsuccessful(void) const {
+        return (m_state == UNSUCCESSFUL) ? true : false;
+    }
+
+    void
+    OriginatorBlockAckAgreement::NotifyMpduTransmission(uint16_t nextSeqNumber) {
+        NS_ASSERT(m_sentMpdus < m_bufferSize);
+        m_sentMpdus++;
+        uint16_t delta = (nextSeqNumber - m_startingSeq + 4096) % 4096;
+        uint16_t min = m_bufferSize < 64 ? m_bufferSize : 64;
+        if (delta >= min || m_sentMpdus == m_bufferSize) {
+            m_needBlockAckReq = true;
+        }
+    }
+
+    bool
+    OriginatorBlockAckAgreement::IsBlockAckRequestNeeded(void) const {
+        return m_needBlockAckReq;
+    }
+
+    void
+    OriginatorBlockAckAgreement::CompleteExchange(void) {
+        m_needBlockAckReq = false;
+        m_sentMpdus = 0;
+    }
 
 } //namespace ns3

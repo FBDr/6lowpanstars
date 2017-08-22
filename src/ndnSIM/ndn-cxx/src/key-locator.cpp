@@ -24,169 +24,156 @@
 
 namespace ndn {
 
-BOOST_CONCEPT_ASSERT((boost::EqualityComparable<KeyLocator>));
-BOOST_CONCEPT_ASSERT((WireEncodable<KeyLocator>));
-BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<KeyLocator>));
-BOOST_CONCEPT_ASSERT((WireDecodable<KeyLocator>));
-static_assert(std::is_base_of<tlv::Error, KeyLocator::Error>::value,
-              "KeyLocator::Error must inherit from tlv::Error");
+    BOOST_CONCEPT_ASSERT((boost::EqualityComparable<KeyLocator>));
+    BOOST_CONCEPT_ASSERT((WireEncodable<KeyLocator>));
+    BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<KeyLocator>));
+    BOOST_CONCEPT_ASSERT((WireDecodable<KeyLocator>));
+    static_assert(std::is_base_of<tlv::Error, KeyLocator::Error>::value,
+            "KeyLocator::Error must inherit from tlv::Error");
 
-KeyLocator::KeyLocator()
-  : m_type(KeyLocator_None)
-{
-}
+    KeyLocator::KeyLocator()
+    : m_type(KeyLocator_None) {
+    }
 
-KeyLocator::KeyLocator(const Block& wire)
-{
-  wireDecode(wire);
-}
+    KeyLocator::KeyLocator(const Block& wire) {
+        wireDecode(wire);
+    }
 
-KeyLocator::KeyLocator(const Name& name)
-{
-  setName(name);
-}
+    KeyLocator::KeyLocator(const Name& name) {
+        setName(name);
+    }
 
-template<encoding::Tag TAG>
-size_t
-KeyLocator::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  // KeyLocator ::= KEY-LOCATOR-TYPE TLV-LENGTH (Name | KeyDigest)
-  // KeyDigest ::= KEY-DIGEST-TYPE TLV-LENGTH BYTE+
+    template<encoding::Tag TAG>
+    size_t
+    KeyLocator::wireEncode(EncodingImpl<TAG>& encoder) const {
+        // KeyLocator ::= KEY-LOCATOR-TYPE TLV-LENGTH (Name | KeyDigest)
+        // KeyDigest ::= KEY-DIGEST-TYPE TLV-LENGTH BYTE+
 
-  size_t totalLength = 0;
+        size_t totalLength = 0;
 
-  switch (m_type) {
-  case KeyLocator_None:
-    break;
-  case KeyLocator_Name:
-    totalLength += m_name.wireEncode(encoder);
-    break;
-  case KeyLocator_KeyDigest:
-    totalLength += encoder.prependBlock(m_keyDigest);
-    break;
-  default:
-    BOOST_THROW_EXCEPTION(Error("Unsupported KeyLocator type"));
-  }
+        switch (m_type) {
+            case KeyLocator_None:
+                break;
+            case KeyLocator_Name:
+                totalLength += m_name.wireEncode(encoder);
+                break;
+            case KeyLocator_KeyDigest:
+                totalLength += encoder.prependBlock(m_keyDigest);
+                break;
+            default:
+                BOOST_THROW_EXCEPTION(Error("Unsupported KeyLocator type"));
+        }
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::KeyLocator);
-  return totalLength;
-}
+        totalLength += encoder.prependVarNumber(totalLength);
+        totalLength += encoder.prependVarNumber(tlv::KeyLocator);
+        return totalLength;
+    }
 
-template size_t
-KeyLocator::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+    template size_t
+    KeyLocator::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
 
-template size_t
-KeyLocator::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+    template size_t
+    KeyLocator::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
 
-const Block&
-KeyLocator::wireEncode() const
-{
-  if (m_wire.hasWire())
-    return m_wire;
+    const Block&
+    KeyLocator::wireEncode() const {
+        if (m_wire.hasWire())
+            return m_wire;
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+        EncodingEstimator estimator;
+        size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+        EncodingBuffer buffer(estimatedSize, 0);
+        wireEncode(buffer);
 
-  m_wire = buffer.block();
-  return m_wire;
-}
+        m_wire = buffer.block();
+        return m_wire;
+    }
 
-void
-KeyLocator::wireDecode(const Block& wire)
-{
-  if (wire.type() != tlv::KeyLocator)
-    BOOST_THROW_EXCEPTION(Error("Unexpected TLV type during KeyLocator decoding"));
+    void
+    KeyLocator::wireDecode(const Block& wire) {
+        if (wire.type() != tlv::KeyLocator)
+            BOOST_THROW_EXCEPTION(Error("Unexpected TLV type during KeyLocator decoding"));
 
-  m_wire = wire;
-  m_wire.parse();
+        m_wire = wire;
+        m_wire.parse();
 
-  if (m_wire.elements().empty()) {
-    m_type = KeyLocator_None;
-    return;
-  }
+        if (m_wire.elements().empty()) {
+            m_type = KeyLocator_None;
+            return;
+        }
 
-  switch (m_wire.elements_begin()->type()) {
-  case tlv::Name:
-    m_type = KeyLocator_Name;
-    m_name.wireDecode(*m_wire.elements_begin());
-    break;
-  case tlv::KeyDigest:
-    m_type = KeyLocator_KeyDigest;
-    m_keyDigest = *m_wire.elements_begin();
-    break;
-  default:
-    m_type = KeyLocator_Unknown;
-    break;
-  }
-}
+        switch (m_wire.elements_begin()->type()) {
+            case tlv::Name:
+                m_type = KeyLocator_Name;
+                m_name.wireDecode(*m_wire.elements_begin());
+                break;
+            case tlv::KeyDigest:
+                m_type = KeyLocator_KeyDigest;
+                m_keyDigest = *m_wire.elements_begin();
+                break;
+            default:
+                m_type = KeyLocator_Unknown;
+                break;
+        }
+    }
 
-KeyLocator&
-KeyLocator::clear()
-{
-  m_wire.reset();
-  m_type = KeyLocator_None;
-  m_name.clear();
-  m_keyDigest.reset();
-  return *this;
-}
+    KeyLocator&
+    KeyLocator::clear() {
+        m_wire.reset();
+        m_type = KeyLocator_None;
+        m_name.clear();
+        m_keyDigest.reset();
+        return *this;
+    }
 
-const Name&
-KeyLocator::getName() const
-{
-  if (m_type != KeyLocator_Name)
-    BOOST_THROW_EXCEPTION(Error("KeyLocator type is not Name"));
+    const Name&
+    KeyLocator::getName() const {
+        if (m_type != KeyLocator_Name)
+            BOOST_THROW_EXCEPTION(Error("KeyLocator type is not Name"));
 
-  return m_name;
-}
+        return m_name;
+    }
 
-KeyLocator&
-KeyLocator::setName(const Name& name)
-{
-  this->clear();
-  m_type = KeyLocator_Name;
-  m_name = name;
-  return *this;
-}
+    KeyLocator&
+    KeyLocator::setName(const Name& name) {
+        this->clear();
+        m_type = KeyLocator_Name;
+        m_name = name;
+        return *this;
+    }
 
-const Block&
-KeyLocator::getKeyDigest() const
-{
-  if (m_type != KeyLocator_KeyDigest)
-    BOOST_THROW_EXCEPTION(Error("KeyLocator type is not KeyDigest"));
+    const Block&
+    KeyLocator::getKeyDigest() const {
+        if (m_type != KeyLocator_KeyDigest)
+            BOOST_THROW_EXCEPTION(Error("KeyLocator type is not KeyDigest"));
 
-  return m_keyDigest;
-}
+        return m_keyDigest;
+    }
 
-KeyLocator&
-KeyLocator::setKeyDigest(const Block& keyDigest)
-{
-  if (keyDigest.type() != tlv::KeyDigest)
-    BOOST_THROW_EXCEPTION(Error("expecting KeyDigest block"));
+    KeyLocator&
+    KeyLocator::setKeyDigest(const Block& keyDigest) {
+        if (keyDigest.type() != tlv::KeyDigest)
+            BOOST_THROW_EXCEPTION(Error("expecting KeyDigest block"));
 
-  this->clear();
-  m_type = KeyLocator_KeyDigest;
-  m_keyDigest = keyDigest;
-  return *this;
-}
+        this->clear();
+        m_type = KeyLocator_KeyDigest;
+        m_keyDigest = keyDigest;
+        return *this;
+    }
 
-KeyLocator&
-KeyLocator::setKeyDigest(const ConstBufferPtr& keyDigest)
-{
-  // WARNING: ConstBufferPtr is shared_ptr<const Buffer>
-  // This function takes a constant reference of a shared pointer.
-  // It MUST NOT change the reference count of that shared pointer.
+    KeyLocator&
+    KeyLocator::setKeyDigest(const ConstBufferPtr& keyDigest) {
+        // WARNING: ConstBufferPtr is shared_ptr<const Buffer>
+        // This function takes a constant reference of a shared pointer.
+        // It MUST NOT change the reference count of that shared pointer.
 
-  return this->setKeyDigest(makeBinaryBlock(tlv::KeyDigest, keyDigest->get(), keyDigest->size()));
-}
+        return this->setKeyDigest(makeBinaryBlock(tlv::KeyDigest, keyDigest->get(), keyDigest->size()));
+    }
 
-bool
-KeyLocator::operator==(const KeyLocator& other) const
-{
-  return wireEncode() == other.wireEncode();
-}
+    bool
+    KeyLocator::operator==(const KeyLocator& other) const {
+        return wireEncode() == other.wireEncode();
+    }
 
 } // namespace ndn

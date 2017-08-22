@@ -27,114 +27,101 @@
 #include "dummy-transport.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-class DummyFace::LinkService : public face::LinkService
-{
-public:
-  void
-  receiveInterest(const Interest& interest)
-  {
-    this->face::LinkService::receiveInterest(interest);
-  }
+            class DummyFace::LinkService : public face::LinkService {
+            public:
 
-  void
-  receiveData(const Data& data)
-  {
-    this->face::LinkService::receiveData(data);
-  }
+                void
+                receiveInterest(const Interest& interest) {
+                    this->face::LinkService::receiveInterest(interest);
+                }
 
-  void
-  receiveNack(const lp::Nack& nack)
-  {
-    this->face::LinkService::receiveNack(nack);
-  }
+                void
+                receiveData(const Data& data) {
+                    this->face::LinkService::receiveData(data);
+                }
 
-  signal::Signal<LinkService, uint32_t> afterSend;
+                void
+                receiveNack(const lp::Nack& nack) {
+                    this->face::LinkService::receiveNack(nack);
+                }
 
-private:
-  virtual void
-  doSendInterest(const Interest& interest) override
-  {
-    this->sentInterests.push_back(interest);
-    this->afterSend(tlv::Interest);
-  }
+                signal::Signal<LinkService, uint32_t> afterSend;
 
-  virtual void
-  doSendData(const Data& data) override
-  {
-    this->sentData.push_back(data);
-    this->afterSend(tlv::Data);
-  }
+            private:
 
-  virtual void
-  doSendNack(const lp::Nack& nack) override
-  {
-    this->sentNacks.push_back(nack);
-    this->afterSend(lp::tlv::Nack);
-  }
+                virtual void
+                doSendInterest(const Interest& interest) override {
+                    this->sentInterests.push_back(interest);
+                    this->afterSend(tlv::Interest);
+                }
 
-  virtual void
-  doReceivePacket(Transport::Packet&& packet) override
-  {
-    BOOST_ASSERT(false);
-  }
+                virtual void
+                doSendData(const Data& data) override {
+                    this->sentData.push_back(data);
+                    this->afterSend(tlv::Data);
+                }
 
-public:
-  std::vector<Interest> sentInterests;
-  std::vector<Data> sentData;
-  std::vector<lp::Nack> sentNacks;
-};
+                virtual void
+                doSendNack(const lp::Nack& nack) override {
+                    this->sentNacks.push_back(nack);
+                    this->afterSend(lp::tlv::Nack);
+                }
 
-DummyFace::DummyFace(const std::string& localUri, const std::string& remoteUri,
-                     ndn::nfd::FaceScope scope, ndn::nfd::FacePersistency persistency,
-                     ndn::nfd::LinkType linkType)
-  : Face(make_unique<LinkService>(),
-         make_unique<DummyTransport>(localUri, remoteUri, scope, persistency, linkType))
-  , afterSend(this->getLinkServiceInternal()->afterSend)
-  , sentInterests(this->getLinkServiceInternal()->sentInterests)
-  , sentData(this->getLinkServiceInternal()->sentData)
-  , sentNacks(this->getLinkServiceInternal()->sentNacks)
-{
-}
+                virtual void
+                doReceivePacket(Transport::Packet&& packet) override {
+                    BOOST_ASSERT(false);
+                }
 
-void
-DummyFace::setState(FaceState state)
-{
-  this->getTransportInternal()->setState(state);
-}
+            public:
+                std::vector<Interest> sentInterests;
+                std::vector<Data> sentData;
+                std::vector<lp::Nack> sentNacks;
+            };
 
-void
-DummyFace::receiveInterest(const Interest& interest)
-{
-  this->getLinkServiceInternal()->receiveInterest(interest);
-}
+            DummyFace::DummyFace(const std::string& localUri, const std::string& remoteUri,
+                    ndn::nfd::FaceScope scope, ndn::nfd::FacePersistency persistency,
+                    ndn::nfd::LinkType linkType)
+            : Face(make_unique<LinkService>(),
+            make_unique<DummyTransport>(localUri, remoteUri, scope, persistency, linkType))
+            , afterSend(this->getLinkServiceInternal()->afterSend)
+            , sentInterests(this->getLinkServiceInternal()->sentInterests)
+            , sentData(this->getLinkServiceInternal()->sentData)
+            , sentNacks(this->getLinkServiceInternal()->sentNacks) {
+            }
 
-void
-DummyFace::receiveData(const Data& data)
-{
-  this->getLinkServiceInternal()->receiveData(data);
-}
+            void
+            DummyFace::setState(FaceState state) {
+                this->getTransportInternal()->setState(state);
+            }
 
-void
-DummyFace::receiveNack(const lp::Nack& nack)
-{
-  this->getLinkServiceInternal()->receiveNack(nack);
-}
+            void
+            DummyFace::receiveInterest(const Interest& interest) {
+                this->getLinkServiceInternal()->receiveInterest(interest);
+            }
 
-DummyFace::LinkService*
-DummyFace::getLinkServiceInternal()
-{
-  return static_cast<LinkService*>(this->getLinkService());
-}
+            void
+            DummyFace::receiveData(const Data& data) {
+                this->getLinkServiceInternal()->receiveData(data);
+            }
 
-DummyTransport*
-DummyFace::getTransportInternal()
-{
-  return static_cast<DummyTransport*>(this->getTransport());
-}
+            void
+            DummyFace::receiveNack(const lp::Nack& nack) {
+                this->getLinkServiceInternal()->receiveNack(nack);
+            }
 
-} // namespace tests
-} // namespace face
+            DummyFace::LinkService*
+            DummyFace::getLinkServiceInternal() {
+                return static_cast<LinkService*> (this->getLinkService());
+            }
+
+            DummyTransport*
+            DummyFace::getTransportInternal() {
+                return static_cast<DummyTransport*> (this->getTransport());
+            }
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

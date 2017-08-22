@@ -27,49 +27,48 @@
 
 namespace ns3 {
 
-/**
- * \ingroup lte
- * \brief The packet header for the Packet Data Convergence Protocol (PDCP) packets
- *
- * This class has fields corresponding to those in an PDCP header as well as
- * methods for serialization to and deserialization from a byte buffer.
- * It follows 3GPP TS 36.323 Packet Data Convergence Protocol (PDCP) specification.
- */
-class LtePdcpHeader : public Header
-{
-public:
+    /**
+     * \ingroup lte
+     * \brief The packet header for the Packet Data Convergence Protocol (PDCP) packets
+     *
+     * This class has fields corresponding to those in an PDCP header as well as
+     * methods for serialization to and deserialization from a byte buffer.
+     * It follows 3GPP TS 36.323 Packet Data Convergence Protocol (PDCP) specification.
+     */
+    class LtePdcpHeader : public Header {
+    public:
 
-  /**
-   * \brief Constructor
-   *
-   * Creates a null header
-   */
-  LtePdcpHeader ();
-  ~LtePdcpHeader ();
+        /**
+         * \brief Constructor
+         *
+         * Creates a null header
+         */
+        LtePdcpHeader();
+        ~LtePdcpHeader();
 
-  void SetDcBit (uint8_t dcBit);
-  void SetSequenceNumber (uint16_t sequenceNumber);
+        void SetDcBit(uint8_t dcBit);
+        void SetSequenceNumber(uint16_t sequenceNumber);
 
-  uint8_t GetDcBit () const;
-  uint16_t GetSequenceNumber () const;
+        uint8_t GetDcBit() const;
+        uint16_t GetSequenceNumber() const;
 
-  typedef enum {
-    CONTROL_PDU   = 0,
-    DATA_PDU      = 1
-  } DcBit_t;
+        typedef enum {
+            CONTROL_PDU = 0,
+            DATA_PDU = 1
+        } DcBit_t;
 
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual void Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
+        virtual void Print(std::ostream &os) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(Buffer::Iterator start) const;
+        virtual uint32_t Deserialize(Buffer::Iterator start);
 
-private:
-  uint8_t m_dcBit;
-  uint16_t m_sequenceNumber;
+    private:
+        uint8_t m_dcBit;
+        uint16_t m_sequenceNumber;
 
-};
+    };
 
 } // namespace ns3
 

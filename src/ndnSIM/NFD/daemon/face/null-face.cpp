@@ -28,17 +28,16 @@
 #include "internal-transport.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-// FIB could restrict creating a nexthop record toward non-local face in /localhost namespace.
-// NullFace has scope=local to enable creating a "blackhole" FIB entry under /localhost.
+        // FIB could restrict creating a nexthop record toward non-local face in /localhost namespace.
+        // NullFace has scope=local to enable creating a "blackhole" FIB entry under /localhost.
 
-shared_ptr<Face>
-makeNullFace(const FaceUri& uri)
-{
-  return make_shared<Face>(make_unique<GenericLinkService>(),
-                           make_unique<InternalForwarderTransport>(uri, uri, ndn::nfd::FACE_SCOPE_LOCAL));
-}
+        shared_ptr<Face>
+        makeNullFace(const FaceUri& uri) {
+            return make_shared<Face>(make_unique<GenericLinkService>(),
+                    make_unique<InternalForwarderTransport>(uri, uri, ndn::nfd::FACE_SCOPE_LOCAL));
+        }
 
-} // namespace face
+    } // namespace face
 } // namespace nfd

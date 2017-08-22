@@ -30,48 +30,47 @@
 
 namespace ndn {
 
-class RegexPatternListMatcher;
-class RegexBackrefManager;
+    class RegexPatternListMatcher;
+    class RegexBackrefManager;
 
-class RegexTopMatcher: public RegexMatcher
-{
-public:
-  RegexTopMatcher(const std::string& expr, const std::string& expand = "");
+    class RegexTopMatcher : public RegexMatcher {
+    public:
+        RegexTopMatcher(const std::string& expr, const std::string& expand = "");
 
-  virtual
-  ~RegexTopMatcher();
+        virtual
+        ~RegexTopMatcher();
 
-  bool
-  match(const Name& name);
+        bool
+        match(const Name& name);
 
-  virtual bool
-  match(const Name& name, size_t offset, size_t len);
+        virtual bool
+        match(const Name& name, size_t offset, size_t len);
 
-  virtual Name
-  expand(const std::string& expand = "");
+        virtual Name
+        expand(const std::string& expand = "");
 
-  static shared_ptr<RegexTopMatcher>
-  fromName(const Name& name, bool hasAnchor=false);
+        static shared_ptr<RegexTopMatcher>
+        fromName(const Name& name, bool hasAnchor = false);
 
-protected:
-  virtual void
-  compile();
+    protected:
+        virtual void
+        compile();
 
-private:
-  std::string
-  getItemFromExpand(const std::string& expand, size_t& offset);
+    private:
+        std::string
+        getItemFromExpand(const std::string& expand, size_t& offset);
 
-  static std::string
-  convertSpecialChar(const std::string& str);
+        static std::string
+        convertSpecialChar(const std::string& str);
 
-private:
-  const std::string m_expand;
-  shared_ptr<RegexPatternListMatcher> m_primaryMatcher;
-  shared_ptr<RegexPatternListMatcher> m_secondaryMatcher;
-  shared_ptr<RegexBackrefManager> m_primaryBackrefManager;
-  shared_ptr<RegexBackrefManager> m_secondaryBackrefManager;
-  bool m_isSecondaryUsed;
-};
+    private:
+        const std::string m_expand;
+        shared_ptr<RegexPatternListMatcher> m_primaryMatcher;
+        shared_ptr<RegexPatternListMatcher> m_secondaryMatcher;
+        shared_ptr<RegexBackrefManager> m_primaryBackrefManager;
+        shared_ptr<RegexBackrefManager> m_secondaryBackrefManager;
+        bool m_isSecondaryUsed;
+    };
 
 } // namespace ndn
 

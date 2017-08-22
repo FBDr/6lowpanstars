@@ -26,118 +26,109 @@
  * ObjectPtrContainer attribute value implementation.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("ObjectPtrContainer");
+    NS_LOG_COMPONENT_DEFINE("ObjectPtrContainer");
 
-ObjectPtrContainerValue::ObjectPtrContainerValue ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    ObjectPtrContainerValue::ObjectPtrContainerValue() {
+        NS_LOG_FUNCTION(this);
+    }
 
-ObjectPtrContainerValue::Iterator
-ObjectPtrContainerValue::Begin (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_objects.begin ();
-}
-ObjectPtrContainerValue::Iterator
-ObjectPtrContainerValue::End (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_objects.end ();
-}
-uint32_t
-ObjectPtrContainerValue::GetN (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_objects.size ();
-}
-Ptr<Object>
-ObjectPtrContainerValue::Get (uint32_t i) const
-{
-  NS_LOG_FUNCTION (this << i);
-  Iterator it = m_objects.find (i); 
-  Ptr<Object> value = 0;
-  if ( it != m_objects.end () )
-  {
-    value = m_objects.find (i)->second;
-  }
-  return value;
-}
+    ObjectPtrContainerValue::Iterator
+    ObjectPtrContainerValue::Begin(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_objects.begin();
+    }
 
-Ptr<AttributeValue>
-ObjectPtrContainerValue::Copy (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return ns3::Create<ObjectPtrContainerValue> (*this);
-}
-std::string 
-ObjectPtrContainerValue::SerializeToString (Ptr<const AttributeChecker> checker) const
-{
-  NS_LOG_FUNCTION (this << checker);
-  std::ostringstream oss;
-  Iterator it;
-  for (it = Begin (); it != End (); ++it)
-    {
-      oss << (*it).second;
-      if (it != End ())
-        {
-          oss << " ";
+    ObjectPtrContainerValue::Iterator
+    ObjectPtrContainerValue::End(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_objects.end();
+    }
+
+    uint32_t
+    ObjectPtrContainerValue::GetN(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_objects.size();
+    }
+
+    Ptr<Object>
+            ObjectPtrContainerValue::Get(uint32_t i) const {
+        NS_LOG_FUNCTION(this << i);
+        Iterator it = m_objects.find(i);
+        Ptr<Object> value = 0;
+        if (it != m_objects.end()) {
+            value = m_objects.find(i)->second;
         }
+        return value;
     }
-  return oss.str ();
-}
-bool 
-ObjectPtrContainerValue::DeserializeFromString (std::string value, Ptr<const AttributeChecker> checker)
-{
-  NS_LOG_FUNCTION (this << value << checker);
-  NS_FATAL_ERROR ("cannot deserialize a set of object pointers.");
-  return true;
-}
 
-bool 
-ObjectPtrContainerAccessor::Set (ObjectBase * object, const AttributeValue & value) const
-{
-  // not allowed.
-  NS_LOG_FUNCTION (this << object << &value);
-  return false;
-}
-bool 
-ObjectPtrContainerAccessor::Get (const ObjectBase * object, AttributeValue &value) const
-{
-  NS_LOG_FUNCTION (this << object << &value);
-  ObjectPtrContainerValue *v = dynamic_cast<ObjectPtrContainerValue *> (&value);
-  if (v == 0)
-    {
-      return false;
+    Ptr<AttributeValue>
+            ObjectPtrContainerValue::Copy(void) const {
+        NS_LOG_FUNCTION(this);
+        return ns3::Create<ObjectPtrContainerValue> (*this);
     }
-  v->m_objects.clear ();
-  uint32_t n;
-  bool ok = DoGetN (object, &n);
-  if (!ok)
-    {
-      return false;
+
+    std::string
+    ObjectPtrContainerValue::SerializeToString(Ptr<const AttributeChecker> checker) const {
+        NS_LOG_FUNCTION(this << checker);
+        std::ostringstream oss;
+        Iterator it;
+        for (it = Begin(); it != End(); ++it) {
+            oss << (*it).second;
+            if (it != End()) {
+                oss << " ";
+            }
+        }
+        return oss.str();
     }
-  for (uint32_t i = 0; i < n; i++)
-    {
-      uint32_t index;
-      Ptr<Object> o = DoGet (object, i, &index);
-      v->m_objects.insert (std::pair <uint32_t, Ptr<Object> > (index, o));
+
+    bool
+    ObjectPtrContainerValue::DeserializeFromString(std::string value, Ptr<const AttributeChecker> checker) {
+        NS_LOG_FUNCTION(this << value << checker);
+        NS_FATAL_ERROR("cannot deserialize a set of object pointers.");
+        return true;
     }
-  return true;
-}
-bool 
-ObjectPtrContainerAccessor::HasGetter (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return true;
-}
-bool 
-ObjectPtrContainerAccessor::HasSetter (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
-}
+
+    bool
+    ObjectPtrContainerAccessor::Set(ObjectBase * object, const AttributeValue & value) const {
+        // not allowed.
+        NS_LOG_FUNCTION(this << object << &value);
+        return false;
+    }
+
+    bool
+    ObjectPtrContainerAccessor::Get(const ObjectBase * object, AttributeValue & value) const {
+        NS_LOG_FUNCTION(this << object << &value);
+        ObjectPtrContainerValue *v = dynamic_cast<ObjectPtrContainerValue *> (&value);
+        if (v == 0) {
+            return false;
+        }
+        v->m_objects.clear();
+        uint32_t n;
+        bool ok = DoGetN(object, &n);
+        if (!ok) {
+            return false;
+        }
+        for (uint32_t i = 0; i < n; i++) {
+            uint32_t index;
+            Ptr<Object> o = DoGet(object, i, &index);
+            v->m_objects.insert(std::pair <uint32_t, Ptr<Object> > (index, o));
+        }
+        return true;
+    }
+
+    bool
+    ObjectPtrContainerAccessor::HasGetter(void) const {
+        NS_LOG_FUNCTION(this);
+        return true;
+    }
+
+    bool
+    ObjectPtrContainerAccessor::HasSetter(void) const {
+        NS_LOG_FUNCTION(this);
+        return false;
+    }
 
 } // name

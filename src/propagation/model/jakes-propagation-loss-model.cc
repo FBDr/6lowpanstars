@@ -25,59 +25,52 @@
 namespace ns3
 {
 
-NS_LOG_COMPONENT_DEFINE ("Jakes");
-  
-NS_OBJECT_ENSURE_REGISTERED (JakesPropagationLossModel);
+    NS_LOG_COMPONENT_DEFINE("Jakes");
 
+    NS_OBJECT_ENSURE_REGISTERED(JakesPropagationLossModel);
 
-JakesPropagationLossModel::JakesPropagationLossModel()
-{
-  m_uniformVariable = CreateObject<UniformRandomVariable> ();
-  m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * M_PI));
-  m_uniformVariable->SetAttribute ("Max", DoubleValue (M_PI));
-}
-
-JakesPropagationLossModel::~JakesPropagationLossModel()
-{}
-
-TypeId
-JakesPropagationLossModel::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::JakesPropagationLossModel")
-    .SetParent<PropagationLossModel> ()
-    .SetGroupName ("Propagation")
-    .AddConstructor<JakesPropagationLossModel> ()
-  ;
-  return tid;
-}
-
-double
-JakesPropagationLossModel::DoCalcRxPower (double txPowerDbm,
-                                          Ptr<MobilityModel> a,
-                                          Ptr<MobilityModel> b) const
-{
-  Ptr<JakesProcess> pathData = m_propagationCache.GetPathData (a, b, 0 /**Spectrum model uid is not used in PropagationLossModel*/);
-  if (pathData == 0)
-    {
-      pathData = CreateObject<JakesProcess> ();
-      pathData->SetPropagationLossModel (this);
-      m_propagationCache.AddPathData (pathData, a, b, 0 /**Spectrum model uid is not used in PropagationLossModel*/);
+    JakesPropagationLossModel::JakesPropagationLossModel() {
+        m_uniformVariable = CreateObject<UniformRandomVariable> ();
+        m_uniformVariable->SetAttribute("Min", DoubleValue(-1.0 * M_PI));
+        m_uniformVariable->SetAttribute("Max", DoubleValue(M_PI));
     }
-  return txPowerDbm + pathData->GetChannelGainDb ();
-}
 
-Ptr<UniformRandomVariable>
-JakesPropagationLossModel::GetUniformRandomVariable () const
-{
-  return m_uniformVariable;
-}
+    JakesPropagationLossModel::~JakesPropagationLossModel() {
+    }
 
-int64_t
-JakesPropagationLossModel::DoAssignStreams (int64_t stream)
-{
-  m_uniformVariable->SetStream (stream);
-  return 1;
-}
+    TypeId
+    JakesPropagationLossModel::GetTypeId() {
+        static TypeId tid = TypeId("ns3::JakesPropagationLossModel")
+                .SetParent<PropagationLossModel> ()
+                .SetGroupName("Propagation")
+                .AddConstructor<JakesPropagationLossModel> ()
+                ;
+        return tid;
+    }
+
+    double
+    JakesPropagationLossModel::DoCalcRxPower(double txPowerDbm,
+            Ptr<MobilityModel> a,
+            Ptr<MobilityModel> b) const {
+        Ptr<JakesProcess> pathData = m_propagationCache.GetPathData(a, b, 0 /**Spectrum model uid is not used in PropagationLossModel*/);
+        if (pathData == 0) {
+            pathData = CreateObject<JakesProcess> ();
+            pathData->SetPropagationLossModel(this);
+            m_propagationCache.AddPathData(pathData, a, b, 0 /**Spectrum model uid is not used in PropagationLossModel*/);
+        }
+        return txPowerDbm + pathData->GetChannelGainDb();
+    }
+
+    Ptr<UniformRandomVariable>
+            JakesPropagationLossModel::GetUniformRandomVariable() const {
+        return m_uniformVariable;
+    }
+
+    int64_t
+    JakesPropagationLossModel::DoAssignStreams(int64_t stream) {
+        m_uniformVariable->SetStream(stream);
+        return 1;
+    }
 
 } // namespace ns3
 

@@ -23,77 +23,66 @@
 #include <cmath> // for M_PI
 
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (FriisSpectrumPropagationLossModel);
-
-
-FriisSpectrumPropagationLossModel::FriisSpectrumPropagationLossModel ()
+namespace ns3
 {
-}
 
-FriisSpectrumPropagationLossModel::~FriisSpectrumPropagationLossModel ()
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(FriisSpectrumPropagationLossModel);
 
-
-TypeId
-FriisSpectrumPropagationLossModel::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::FriisSpectrumPropagationLossModel")
-    .SetParent<SpectrumPropagationLossModel> ()
-    .SetGroupName ("Spectrum")
-    .AddConstructor<FriisSpectrumPropagationLossModel> ()
-  ;
-  return tid;
-}
-
-
-Ptr<SpectrumValue>
-FriisSpectrumPropagationLossModel::DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                                 Ptr<const MobilityModel> a,
-                                                                 Ptr<const MobilityModel> b) const
-{
-  Ptr<SpectrumValue> rxPsd = Copy<SpectrumValue> (txPsd);
-  Values::iterator vit = rxPsd->ValuesBegin ();
-  Bands::const_iterator fit = rxPsd->ConstBandsBegin ();
-
-  NS_ASSERT (a);
-  NS_ASSERT (b);
-
-  double d = a->GetDistanceFrom (b);
-
-  while (vit != rxPsd->ValuesEnd ())
-    {
-      NS_ASSERT (fit != rxPsd->ConstBandsEnd ());
-      *vit /= CalculateLoss (fit->fc, d); // Prx = Ptx / loss
-      ++vit;
-      ++fit;
-    }
-  return rxPsd;
-}
-
-
-double
-FriisSpectrumPropagationLossModel::CalculateLoss (double f, double d) const
-{
-  NS_ASSERT (d >= 0);
-
-  if (d == 0)
-    {
-      return 1;
+    FriisSpectrumPropagationLossModel::FriisSpectrumPropagationLossModel() {
     }
 
-  NS_ASSERT (f > 0);
-  double loss_sqrt = (4 * M_PI * f * d) / 3e8;
-  double loss = loss_sqrt * loss_sqrt;
-
-  if (loss < 1)
-    {
-      loss = 1;
+    FriisSpectrumPropagationLossModel::~FriisSpectrumPropagationLossModel() {
     }
-  return loss;
-}
+
+    TypeId
+    FriisSpectrumPropagationLossModel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::FriisSpectrumPropagationLossModel")
+                .SetParent<SpectrumPropagationLossModel> ()
+                .SetGroupName("Spectrum")
+                .AddConstructor<FriisSpectrumPropagationLossModel> ()
+                ;
+        return tid;
+    }
+
+    Ptr<SpectrumValue>
+            FriisSpectrumPropagationLossModel::DoCalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+            Ptr<const MobilityModel> a,
+            Ptr<const MobilityModel> b) const {
+        Ptr<SpectrumValue> rxPsd = Copy<SpectrumValue> (txPsd);
+        Values::iterator vit = rxPsd->ValuesBegin();
+        Bands::const_iterator fit = rxPsd->ConstBandsBegin();
+
+        NS_ASSERT(a);
+        NS_ASSERT(b);
+
+        double d = a->GetDistanceFrom(b);
+
+        while (vit != rxPsd->ValuesEnd()) {
+            NS_ASSERT(fit != rxPsd->ConstBandsEnd());
+            *vit /= CalculateLoss(fit->fc, d); // Prx = Ptx / loss
+            ++vit;
+            ++fit;
+        }
+        return rxPsd;
+    }
+
+    double
+    FriisSpectrumPropagationLossModel::CalculateLoss(double f, double d) const {
+        NS_ASSERT(d >= 0);
+
+        if (d == 0) {
+            return 1;
+        }
+
+        NS_ASSERT(f > 0);
+        double loss_sqrt = (4 * M_PI * f * d) / 3e8;
+        double loss = loss_sqrt * loss_sqrt;
+
+        if (loss < 1) {
+            loss = 1;
+        }
+        return loss;
+    }
 
 
 
@@ -105,4 +94,4 @@ FriisSpectrumPropagationLossModel::CalculateLoss (double f, double d) const
 
 
 
-}  // namespace ns3
+} // namespace ns3

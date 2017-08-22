@@ -28,71 +28,70 @@
 
 namespace ns3 {
 
-/**
- * \ingroup wifi
- *
- * The IEEE 802.11 SSID Information Element
- *
- * \see attribute_Ssid
- */
-class Ssid : public WifiInformationElement
-{
-public:
-  // broadcast ssid
-  Ssid ();
-  /**
-   * Create SSID from a given string
-   *
-   * \param s SSID in string
-   */
-  Ssid (std::string s);
-  /**
-   * Create SSID from a given array of char and given length.
-   *
-   * \param ssid
-   * \param length
-   */
-  Ssid (char const ssid[32], uint8_t length);
+    /**
+     * \ingroup wifi
+     *
+     * The IEEE 802.11 SSID Information Element
+     *
+     * \see attribute_Ssid
+     */
+    class Ssid : public WifiInformationElement {
+    public:
+        // broadcast ssid
+        Ssid();
+        /**
+         * Create SSID from a given string
+         *
+         * \param s SSID in string
+         */
+        Ssid(std::string s);
+        /**
+         * Create SSID from a given array of char and given length.
+         *
+         * \param ssid
+         * \param length
+         */
+        Ssid(char const ssid[32], uint8_t length);
 
-  /**
-   * Check if the two SSIDs are equal.
-   *
-   * \param o SSID to compare to
-   *
-   * \return true if the two SSIDs are equal,
-   *         false otherwise
-   */
-  bool IsEqual (const Ssid& o) const;
-  /**
-   * Check if the SSID is broadcast.
-   *
-   * \return true if the SSID is broadcast,
-   *         false otherwise
-   */
-  bool IsBroadcast (void) const;
+        /**
+         * Check if the two SSIDs are equal.
+         *
+         * \param o SSID to compare to
+         *
+         * \return true if the two SSIDs are equal,
+         *         false otherwise
+         */
+        bool IsEqual(const Ssid& o) const;
+        /**
+         * Check if the SSID is broadcast.
+         *
+         * \return true if the SSID is broadcast,
+         *         false otherwise
+         */
+        bool IsBroadcast(void) const;
 
-  /**
-   * Peek the SSID.
-   *
-   * \return a pointer to SSID string
-   */
-  char* PeekString (void) const;
+        /**
+         * Peek the SSID.
+         *
+         * \return a pointer to SSID string
+         */
+        char* PeekString(void) const;
 
-  WifiInformationElementId ElementId () const;
-  uint8_t GetInformationFieldSize () const;
-  void SerializeInformationField (Buffer::Iterator start) const;
-  uint8_t DeserializeInformationField (Buffer::Iterator start,
-                                       uint8_t length);
+        WifiInformationElementId ElementId() const;
+        uint8_t GetInformationFieldSize() const;
+        void SerializeInformationField(Buffer::Iterator start) const;
+        uint8_t DeserializeInformationField(Buffer::Iterator start,
+                uint8_t length);
 
-private:
-  uint8_t m_ssid[33]; //!< Raw SSID value
-  uint8_t m_length;   //!< Length of the SSID
-};
+    private:
+        uint8_t m_ssid[33]; //!< Raw SSID value
+        uint8_t m_length; //!< Length of the SSID
+    };
 
-std::ostream &operator << (std::ostream &os, const Ssid &ssid);
-std::istream &operator >> (std::istream &is, Ssid &ssid);
+    std::ostream &operator<<(std::ostream &os, const Ssid &ssid);
+    std::istream &operator>>(std::istream &is, Ssid &ssid);
 
-ATTRIBUTE_HELPER_HEADER (Ssid);
+    ATTRIBUTE_HELPER_HEADER(Ssid);
 
 } //namespace ns3
 

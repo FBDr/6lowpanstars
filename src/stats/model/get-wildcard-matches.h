@@ -25,20 +25,20 @@
 
 namespace ns3 {
 
-/**
- * \param configPath Config path to access the probe.
- * \param matchedPath the path that matched the Config path.
- * \param wildcardSeparator the text to put betwen the wildcard
- * matches.  By default, a space is used.
- * \return String value of text matches
- *
- * \brief Returns the text matches from the matched path for each of
- * the wildcards in the Config path, separated by the wild card
- * separator.
- */
-std::string GetWildcardMatches (const std::string &configPath,
-                                const std::string &matchedPath,
-                                const std::string &wildcardSeparator = " ");
+    /**
+     * \param configPath Config path to access the probe.
+     * \param matchedPath the path that matched the Config path.
+     * \param wildcardSeparator the text to put betwen the wildcard
+     * matches.  By default, a space is used.
+     * \return String value of text matches
+     *
+     * \brief Returns the text matches from the matched path for each of
+     * the wildcards in the Config path, separated by the wild card
+     * separator.
+     */
+    std::string GetWildcardMatches(const std::string &configPath,
+            const std::string &matchedPath,
+            const std::string &wildcardSeparator = " ");
 
 } // namespace ns3
 

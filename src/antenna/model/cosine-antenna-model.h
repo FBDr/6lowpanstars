@@ -27,50 +27,49 @@
 
 namespace ns3 {
 
-/**
- * 
- * \brief Cosine Antenna Model 
- *
- * This class implements the cosine model as described in:
- *
- * Li Chunjian, "Efficient Antenna Patterns for Three-Sector WCDMA Systems"
- *
- * Note that only the element factor of the above model is
- * considered. Also, an additional constant gain is added to model the
- * radiation pattern on the vertical plane (to account for the fact
- * that the elevation angle is not included in the model).
- */
-class CosineAntennaModel : public AntennaModel
-{
-public:
+    /**
+     * 
+     * \brief Cosine Antenna Model 
+     *
+     * This class implements the cosine model as described in:
+     *
+     * Li Chunjian, "Efficient Antenna Patterns for Three-Sector WCDMA Systems"
+     *
+     * Note that only the element factor of the above model is
+     * considered. Also, an additional constant gain is added to model the
+     * radiation pattern on the vertical plane (to account for the fact
+     * that the elevation angle is not included in the model).
+     */
+    class CosineAntennaModel : public AntennaModel {
+    public:
 
-  // inherited from Object
-  static TypeId GetTypeId ();
+        // inherited from Object
+        static TypeId GetTypeId();
 
-  // inherited from AntennaModel
-  virtual double GetGainDb (Angles a);
+        // inherited from AntennaModel
+        virtual double GetGainDb(Angles a);
 
 
-  // attribute getters/setters
-  void SetBeamwidth (double beamwidthDegrees);
-  double GetBeamwidth () const;
-  void SetOrientation (double orientationDegrees);
-  double GetOrientation () const;
+        // attribute getters/setters
+        void SetBeamwidth(double beamwidthDegrees);
+        double GetBeamwidth() const;
+        void SetOrientation(double orientationDegrees);
+        double GetOrientation() const;
 
-private:
+    private:
 
-  /**
-   * this is the variable "n" in the paper by Chunjian
-   * 
-   */
-  double m_exponent; 
+        /**
+         * this is the variable "n" in the paper by Chunjian
+         * 
+         */
+        double m_exponent;
 
-  double m_beamwidthRadians;
+        double m_beamwidthRadians;
 
-  double m_orientationRadians;
+        double m_orientationRadians;
 
-  double m_maxGain;
-};
+        double m_maxGain;
+    };
 
 
 

@@ -48,144 +48,138 @@ using namespace ns3;
 
 class Ipv6ForwardingTest : public TestCase
 {
-  Ptr<Packet> m_receivedPacket;
-  void DoSendData (Ptr<Socket> socket, std::string to);
-  void SendData (Ptr<Socket> socket, std::string to);
+    Ptr<Packet> m_receivedPacket;
+    void DoSendData(Ptr<Socket> socket, std::string to);
+    void SendData(Ptr<Socket> socket, std::string to);
 
 public:
-  virtual void DoRun (void);
-  Ipv6ForwardingTest ();
+    virtual void DoRun(void);
+    Ipv6ForwardingTest();
 
-  void ReceivePkt (Ptr<Socket> socket);
-};
+    void ReceivePkt(Ptr<Socket> socket);};
 
-Ipv6ForwardingTest::Ipv6ForwardingTest ()
-  : TestCase ("IPv6 forwarding")
-{
+Ipv6ForwardingTest::Ipv6ForwardingTest()
+: TestCase("IPv6 forwarding") {
 }
 
-void Ipv6ForwardingTest::ReceivePkt (Ptr<Socket> socket)
-{
-  uint32_t availableData;
-  availableData = socket->GetRxAvailable ();
-  m_receivedPacket = socket->Recv (std::numeric_limits<uint32_t>::max (), 0);
-  NS_ASSERT (availableData == m_receivedPacket->GetSize ());
-  //cast availableData to void, to suppress 'availableData' set but not used
-  //compiler warning
-  (void) availableData;
+void Ipv6ForwardingTest::ReceivePkt(Ptr<Socket> socket) {
+    uint32_t availableData;
+    availableData = socket->GetRxAvailable();
+    m_receivedPacket = socket->Recv(std::numeric_limits<uint32_t>::max(), 0);
+    NS_ASSERT(availableData == m_receivedPacket->GetSize());
+    //cast availableData to void, to suppress 'availableData' set but not used
+    //compiler warning
+    (void) availableData;
 }
 
 void
-Ipv6ForwardingTest::DoSendData (Ptr<Socket> socket, std::string to)
-{
-  Address realTo = Inet6SocketAddress (Ipv6Address (to.c_str ()), 1234);
-  NS_TEST_EXPECT_MSG_EQ (socket->SendTo (Create<Packet> (123), 0, realTo),
-                         123, "100");
+Ipv6ForwardingTest::DoSendData(Ptr<Socket> socket, std::string to) {
+    Address realTo = Inet6SocketAddress(Ipv6Address(to.c_str()), 1234);
+    NS_TEST_EXPECT_MSG_EQ(socket->SendTo(Create<Packet> (123), 0, realTo),
+            123, "100");
 }
 
 void
-Ipv6ForwardingTest::SendData (Ptr<Socket> socket, std::string to)
-{
-  m_receivedPacket = Create<Packet> ();
-  Simulator::ScheduleWithContext (socket->GetNode ()->GetId (), Seconds (0),
-                                  &Ipv6ForwardingTest::DoSendData, this, socket, to);
-  Simulator::Run ();
+Ipv6ForwardingTest::SendData(Ptr<Socket> socket, std::string to) {
+    m_receivedPacket = Create<Packet> ();
+    Simulator::ScheduleWithContext(socket->GetNode()->GetId(), Seconds(0),
+            &Ipv6ForwardingTest::DoSendData, this, socket, to);
+    Simulator::Run();
 }
 
 void
-Ipv6ForwardingTest::DoRun (void)
-{
-  // Create topology
+Ipv6ForwardingTest::DoRun(void) {
+    // Create topology
 
-  // Receiver Node
-  Ptr<Node> rxNode = CreateObject<Node> ();
-  // Forwarding Node
-  Ptr<Node> fwNode = CreateObject<Node> ();
-  // Sender Node
-  Ptr<Node> txNode = CreateObject<Node> ();
+    // Receiver Node
+    Ptr<Node> rxNode = CreateObject<Node> ();
+    // Forwarding Node
+    Ptr<Node> fwNode = CreateObject<Node> ();
+    // Sender Node
+    Ptr<Node> txNode = CreateObject<Node> ();
 
-  NodeContainer net1nodes (rxNode, fwNode);
-  NodeContainer net2nodes (fwNode, txNode);
-  NodeContainer nodes (rxNode, fwNode, txNode);
+    NodeContainer net1nodes(rxNode, fwNode);
+    NodeContainer net2nodes(fwNode, txNode);
+    NodeContainer nodes(rxNode, fwNode, txNode);
 
-  SimpleNetDeviceHelper helperChannel1;
-  helperChannel1.SetNetDevicePointToPointMode (true);
-  NetDeviceContainer net1 = helperChannel1.Install (net1nodes);
+    SimpleNetDeviceHelper helperChannel1;
+    helperChannel1.SetNetDevicePointToPointMode(true);
+    NetDeviceContainer net1 = helperChannel1.Install(net1nodes);
 
-  SimpleNetDeviceHelper helperChannel2;
-  helperChannel2.SetNetDevicePointToPointMode (true);
-  NetDeviceContainer net2 = helperChannel2.Install (net2nodes);
+    SimpleNetDeviceHelper helperChannel2;
+    helperChannel2.SetNetDevicePointToPointMode(true);
+    NetDeviceContainer net2 = helperChannel2.Install(net2nodes);
 
-  InternetStackHelper internetv6;
-  internetv6.Install (nodes);
+    InternetStackHelper internetv6;
+    internetv6.Install(nodes);
 
-  txNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute ("DAD", BooleanValue (false));
-  fwNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute ("DAD", BooleanValue (false));
-  rxNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute ("DAD", BooleanValue (false));
+    txNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute("DAD", BooleanValue(false));
+    fwNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute("DAD", BooleanValue(false));
+    rxNode->GetObject<Icmpv6L4Protocol> ()->SetAttribute("DAD", BooleanValue(false));
 
-  Ipv6AddressHelper ipv6helper;
-  Ipv6InterfaceContainer iic1 = ipv6helper.AssignWithoutAddress (net1);
-  Ipv6InterfaceContainer iic2 = ipv6helper.AssignWithoutAddress (net2);
+    Ipv6AddressHelper ipv6helper;
+    Ipv6InterfaceContainer iic1 = ipv6helper.AssignWithoutAddress(net1);
+    Ipv6InterfaceContainer iic2 = ipv6helper.AssignWithoutAddress(net2);
 
-  Ptr<NetDevice> device;
-  Ptr<Ipv6> ipv6;
-  int32_t ifIndex;
-  Ipv6InterfaceAddress ipv6Addr;
+    Ptr<NetDevice> device;
+    Ptr<Ipv6> ipv6;
+    int32_t ifIndex;
+    Ipv6InterfaceAddress ipv6Addr;
 
-  ipv6 = rxNode->GetObject<Ipv6> ();
-  device = net1.Get (0);
-  ifIndex = ipv6->GetInterfaceForDevice (device);
-  ipv6Addr = Ipv6InterfaceAddress (Ipv6Address ("2001:1::2"), Ipv6Prefix (64));
-  ipv6->AddAddress (ifIndex, ipv6Addr);
+    ipv6 = rxNode->GetObject<Ipv6> ();
+    device = net1.Get(0);
+    ifIndex = ipv6->GetInterfaceForDevice(device);
+    ipv6Addr = Ipv6InterfaceAddress(Ipv6Address("2001:1::2"), Ipv6Prefix(64));
+    ipv6->AddAddress(ifIndex, ipv6Addr);
 
-  ipv6 = fwNode->GetObject<Ipv6> ();
-  device = net1.Get (1);
-  ifIndex = ipv6->GetInterfaceForDevice (device);
-  ipv6Addr = Ipv6InterfaceAddress (Ipv6Address ("2001:1::1"), Ipv6Prefix (64));
-  ipv6->AddAddress (ifIndex, ipv6Addr);
+    ipv6 = fwNode->GetObject<Ipv6> ();
+    device = net1.Get(1);
+    ifIndex = ipv6->GetInterfaceForDevice(device);
+    ipv6Addr = Ipv6InterfaceAddress(Ipv6Address("2001:1::1"), Ipv6Prefix(64));
+    ipv6->AddAddress(ifIndex, ipv6Addr);
 
-  device = net2.Get (0);
-  ifIndex = ipv6->GetInterfaceForDevice (device);
-  ipv6Addr = Ipv6InterfaceAddress (Ipv6Address ("2001:2::1"), Ipv6Prefix (64));
-  ipv6->AddAddress (ifIndex, ipv6Addr);
+    device = net2.Get(0);
+    ifIndex = ipv6->GetInterfaceForDevice(device);
+    ipv6Addr = Ipv6InterfaceAddress(Ipv6Address("2001:2::1"), Ipv6Prefix(64));
+    ipv6->AddAddress(ifIndex, ipv6Addr);
 
-  ipv6 = txNode->GetObject<Ipv6> ();
-  device = net2.Get (1);
-  ifIndex = ipv6->GetInterfaceForDevice (device);
-  ipv6Addr = Ipv6InterfaceAddress (Ipv6Address ("2001:2::2"), Ipv6Prefix (64));
-  ipv6->AddAddress (ifIndex, ipv6Addr);
+    ipv6 = txNode->GetObject<Ipv6> ();
+    device = net2.Get(1);
+    ifIndex = ipv6->GetInterfaceForDevice(device);
+    ipv6Addr = Ipv6InterfaceAddress(Ipv6Address("2001:2::2"), Ipv6Prefix(64));
+    ipv6->AddAddress(ifIndex, ipv6Addr);
 
-  // Setup at least a route from the sender.
-  Ptr<Ipv6StaticRouting> ipv6StaticRouting = Ipv6RoutingHelper::GetRouting <Ipv6StaticRouting> (txNode->GetObject<Ipv6> ()->GetRoutingProtocol ());
-  ipv6StaticRouting->SetDefaultRoute (Ipv6Address ("2001:2::1"), ifIndex);
+    // Setup at least a route from the sender.
+    Ptr<Ipv6StaticRouting> ipv6StaticRouting = Ipv6RoutingHelper::GetRouting <Ipv6StaticRouting> (txNode->GetObject<Ipv6> ()->GetRoutingProtocol());
+    ipv6StaticRouting->SetDefaultRoute(Ipv6Address("2001:2::1"), ifIndex);
 
-  // Create the UDP sockets
-  Ptr<SocketFactory> rxSocketFactory = rxNode->GetObject<UdpSocketFactory> ();
-  Ptr<Socket> rxSocket = rxSocketFactory->CreateSocket ();
-  NS_TEST_EXPECT_MSG_EQ (rxSocket->Bind (Inet6SocketAddress (Ipv6Address ("2001:1::2"), 1234)), 0, "trivial");
-  rxSocket->SetRecvCallback (MakeCallback (&Ipv6ForwardingTest::ReceivePkt, this));
+    // Create the UDP sockets
+    Ptr<SocketFactory> rxSocketFactory = rxNode->GetObject<UdpSocketFactory> ();
+    Ptr<Socket> rxSocket = rxSocketFactory->CreateSocket();
+    NS_TEST_EXPECT_MSG_EQ(rxSocket->Bind(Inet6SocketAddress(Ipv6Address("2001:1::2"), 1234)), 0, "trivial");
+    rxSocket->SetRecvCallback(MakeCallback(&Ipv6ForwardingTest::ReceivePkt, this));
 
-  Ptr<SocketFactory> txSocketFactory = txNode->GetObject<UdpSocketFactory> ();
-  Ptr<Socket> txSocket = txSocketFactory->CreateSocket ();
-  txSocket->SetAllowBroadcast (true);
+    Ptr<SocketFactory> txSocketFactory = txNode->GetObject<UdpSocketFactory> ();
+    Ptr<Socket> txSocket = txSocketFactory->CreateSocket();
+    txSocket->SetAllowBroadcast(true);
 
-  // ------ Now the tests ------------
+    // ------ Now the tests ------------
 
-  // Unicast test
-  SendData (txSocket, "2001:1::2");
-  NS_TEST_EXPECT_MSG_EQ (m_receivedPacket->GetSize (), 0, "IPv6 Forwarding off");
+    // Unicast test
+    SendData(txSocket, "2001:1::2");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacket->GetSize(), 0, "IPv6 Forwarding off");
 
-  m_receivedPacket->RemoveAllByteTags ();
-  m_receivedPacket = 0;
+    m_receivedPacket->RemoveAllByteTags();
+    m_receivedPacket = 0;
 
-  ipv6 = fwNode->GetObject<Ipv6> ();
-  ipv6->SetAttribute("IpForward", BooleanValue (true));
-  SendData (txSocket, "2001:1::2");
-  NS_TEST_EXPECT_MSG_EQ (m_receivedPacket->GetSize (), 123, "IPv6 Forwarding on");
+    ipv6 = fwNode->GetObject<Ipv6> ();
+    ipv6->SetAttribute("IpForward", BooleanValue(true));
+    SendData(txSocket, "2001:1::2");
+    NS_TEST_EXPECT_MSG_EQ(m_receivedPacket->GetSize(), 123, "IPv6 Forwarding on");
 
-  m_receivedPacket->RemoveAllByteTags ();
+    m_receivedPacket->RemoveAllByteTags();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 
 }
 
@@ -194,9 +188,8 @@ Ipv6ForwardingTest::DoRun (void)
 //-----------------------------------------------------------------------------
 class Ipv6ForwardingTestSuite : public TestSuite
 {
-public:
-  Ipv6ForwardingTestSuite () : TestSuite ("ipv6-forwarding", UNIT)
-  {
-    AddTestCase (new Ipv6ForwardingTest, TestCase::QUICK);
-  }
-} g_ipv6forwardingTestSuite;
+    public :
+    Ipv6ForwardingTestSuite() : TestSuite("ipv6-forwarding", UNIT)
+    {
+        AddTestCase(new Ipv6ForwardingTest, TestCase::QUICK);
+    }} g_ipv6forwardingTestSuite;

@@ -28,59 +28,56 @@
 #include <boost/mpl/vector.hpp>
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(TestTagHost)
+        BOOST_AUTO_TEST_SUITE(TestTagHost)
 
-class TestTag : public Tag
-{
-public:
-  static constexpr size_t
-  getTypeId()
-  {
-    return 1;
-  }
-};
+        class TestTag : public Tag {
+        public:
 
-class TestTag2 : public Tag
-{
-public:
-  static constexpr size_t
-  getTypeId()
-  {
-    return 2;
-  }
-};
+            static constexpr size_t
+            getTypeId() {
+                return 1;
+            }
+        };
 
-typedef boost::mpl::vector<TagHost, Interest, Data> Fixtures;
+        class TestTag2 : public Tag {
+        public:
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(Basic, T, Fixtures, T)
-{
-  BOOST_CHECK(this->template getTag<TestTag>() == nullptr);
-  BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
+            static constexpr size_t
+            getTypeId() {
+                return 2;
+            }
+        };
 
-  this->setTag(make_shared<TestTag>());
+        typedef boost::mpl::vector<TagHost, Interest, Data> Fixtures;
 
-  BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
-  BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
+        BOOST_FIXTURE_TEST_CASE_TEMPLATE(Basic, T, Fixtures, T) {
+            BOOST_CHECK(this->template getTag<TestTag>() == nullptr);
+            BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
 
-  this->setTag(make_shared<TestTag2>());
+            this->setTag(make_shared<TestTag>());
 
-  BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
-  BOOST_CHECK(this->template getTag<TestTag2>() != nullptr);
+            BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
+            BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
 
-  this->template removeTag<TestTag2>();
+            this->setTag(make_shared<TestTag2>());
 
-  BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
-  BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
+            BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
+            BOOST_CHECK(this->template getTag<TestTag2>() != nullptr);
 
-  this->template removeTag<TestTag>();
+            this->template removeTag<TestTag2>();
 
-  BOOST_CHECK(this->template getTag<TestTag>() == nullptr);
-  BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
-}
+            BOOST_CHECK(this->template getTag<TestTag>() != nullptr);
+            BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
 
-BOOST_AUTO_TEST_SUITE_END()
+            this->template removeTag<TestTag>();
 
-} // namespace tests
+            BOOST_CHECK(this->template getTag<TestTag>() == nullptr);
+            BOOST_CHECK(this->template getTag<TestTag2>() == nullptr);
+        }
+
+        BOOST_AUTO_TEST_SUITE_END()
+
+    } // namespace tests
 } // namespace ndn

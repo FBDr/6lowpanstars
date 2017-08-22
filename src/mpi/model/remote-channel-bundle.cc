@@ -26,105 +26,92 @@
 
 #include <ns3/simulator.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 #define NS_TIME_INFINITY ns3::Time (0x7fffffffffffffffLL)
 
-TypeId RemoteChannelBundle::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::RemoteChannelBundle")
-    .SetParent<Object> ()
-    .SetGroupName ("Mpi")
-    .AddConstructor <RemoteChannelBundle> ();
-  return tid;
-}
-
-RemoteChannelBundle::RemoteChannelBundle ()
-  : m_remoteSystemId (-1),
-    m_guaranteeTime (0),
-    m_delay (NS_TIME_INFINITY)
-{
-}
-
-RemoteChannelBundle::RemoteChannelBundle (const uint32_t remoteSystemId)
-  : m_remoteSystemId (remoteSystemId),
-    m_guaranteeTime (0),
-    m_delay (NS_TIME_INFINITY)
-{
-}
-
-void
-RemoteChannelBundle::AddChannel (Ptr<Channel> channel, Time delay)
-{
-  m_channels[channel->GetId ()] = channel;
-  m_delay = ns3::Min (m_delay, delay);
-}
-
-uint32_t
-RemoteChannelBundle::GetSystemId () const
-{
-  return m_remoteSystemId;
-}
-
-Time
-RemoteChannelBundle::GetGuaranteeTime (void) const
-{
-  return m_guaranteeTime;
-}
-
-void
-RemoteChannelBundle::SetGuaranteeTime (Time time)
-{
-  NS_ASSERT (time >= Simulator::Now ());
-
-  m_guaranteeTime = time;
-}
-
-Time
-RemoteChannelBundle::GetDelay (void) const
-{
-  return m_delay;
-}
-
-void
-RemoteChannelBundle::SetEventId (EventId id)
-{
-  m_nullEventId = id;
-}
-
-EventId
-RemoteChannelBundle::GetEventId (void) const
-{
-  return m_nullEventId;
-}
-
-int
-RemoteChannelBundle::GetSize (void) const
-{
-  return m_channels.size ();
-}
-
-void 
-RemoteChannelBundle::Send(Time time)
-{
-  NullMessageMpiInterface::SendNullMessage (time, this);  
-}
-
-std::ostream& operator<< (std::ostream& out, ns3::RemoteChannelBundle& bundle )
-{
-  out << "RemoteChannelBundle Rank = " << bundle.m_remoteSystemId
-      << ", GuaranteeTime = "  << bundle.m_guaranteeTime
-      << ", Delay = " << bundle.m_delay << std::endl;
-  
-  for (std::map < uint32_t, Ptr < Channel > > ::const_iterator pair = bundle.m_channels.begin ();
-       pair != bundle.m_channels.end ();
-       ++pair)
-    {
-      out << "\t" << (*pair).second << std::endl;
+    TypeId RemoteChannelBundle::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::RemoteChannelBundle")
+                .SetParent<Object> ()
+                .SetGroupName("Mpi")
+                .AddConstructor <RemoteChannelBundle> ();
+        return tid;
     }
-  
-  return out;
-}
+
+    RemoteChannelBundle::RemoteChannelBundle()
+            : m_remoteSystemId(-1),
+            m_guaranteeTime(0),
+            m_delay(NS_TIME_INFINITY) {
+    }
+
+    RemoteChannelBundle::RemoteChannelBundle(const uint32_t remoteSystemId)
+            : m_remoteSystemId(remoteSystemId),
+            m_guaranteeTime(0),
+            m_delay(NS_TIME_INFINITY) {
+    }
+
+    void
+    RemoteChannelBundle::AddChannel(Ptr<Channel> channel, Time delay) {
+        m_channels[channel->GetId()] = channel;
+        m_delay = ns3::Min(m_delay, delay);
+    }
+
+    uint32_t
+    RemoteChannelBundle::GetSystemId() const {
+        return m_remoteSystemId;
+    }
+
+    Time
+    RemoteChannelBundle::GetGuaranteeTime(void) const {
+        return m_guaranteeTime;
+    }
+
+    void
+    RemoteChannelBundle::SetGuaranteeTime(Time time) {
+        NS_ASSERT(time >= Simulator::Now());
+
+        m_guaranteeTime = time;
+    }
+
+    Time
+    RemoteChannelBundle::GetDelay(void) const {
+        return m_delay;
+    }
+
+    void
+    RemoteChannelBundle::SetEventId(EventId id) {
+        m_nullEventId = id;
+    }
+
+    EventId
+    RemoteChannelBundle::GetEventId(void) const {
+        return m_nullEventId;
+    }
+
+    int
+    RemoteChannelBundle::GetSize(void) const {
+        return m_channels.size();
+    }
+
+    void
+    RemoteChannelBundle::Send(Time time) {
+        NullMessageMpiInterface::SendNullMessage(time, this);
+    }
+
+    std::ostream & operator << (std::ostream& out, ns3::RemoteChannelBundle & bundle) {
+        out << "RemoteChannelBundle Rank = " << bundle.m_remoteSystemId
+                << ", GuaranteeTime = " << bundle.m_guaranteeTime
+                << ", Delay = " << bundle.m_delay << std::endl;
+
+        for (std::map < uint32_t, Ptr < Channel > > ::const_iterator pair = bundle.m_channels.begin();
+                pair != bundle.m_channels.end();
+                ++pair) {
+            out << "\t" << (*pair).second << std::endl;
+        }
+
+        return out;
+    }
 
 
 } // namespace ns3

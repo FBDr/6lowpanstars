@@ -29,23 +29,22 @@
 #include <boost/property_tree/ptree.hpp>
 
 namespace ndn {
-namespace security {
-namespace conf {
+    namespace security {
+        namespace conf {
 
-typedef boost::property_tree::ptree ConfigSection;
+            typedef boost::property_tree::ptree ConfigSection;
 
-class Error : public std::runtime_error
-{
-public:
-  explicit
-  Error(const std::string& what)
-    : std::runtime_error(what)
-  {
-  }
-};
+            class Error : public std::runtime_error {
+            public:
 
-} // namespace conf
-} // namespace security
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
+
+        } // namespace conf
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_CONF_COMMON_HPP

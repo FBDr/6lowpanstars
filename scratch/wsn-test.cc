@@ -39,7 +39,8 @@
 #include "ns3/mobility-module.h"
 #include "ns3/ndnSIM-module.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("Ping6WsnExample");
 
     int main(int argc, char **argv) {

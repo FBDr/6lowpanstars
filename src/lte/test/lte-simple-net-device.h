@@ -30,33 +30,30 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup lte
+     * The LteSimpleNetDevice class implements the LTE simple net device
+     */
+    class LteSimpleNetDevice : public SimpleNetDevice {
+    public:
+        static TypeId GetTypeId(void);
 
-/**
- * \ingroup lte
- * The LteSimpleNetDevice class implements the LTE simple net device
- */
-class LteSimpleNetDevice : public SimpleNetDevice
-{
+        LteSimpleNetDevice(void);
+        LteSimpleNetDevice(Ptr<Node> node);
 
-public:
-  static TypeId GetTypeId (void);
-
-  LteSimpleNetDevice (void);
-  LteSimpleNetDevice (Ptr<Node> node);
-
-  virtual ~LteSimpleNetDevice (void);
-  virtual void DoDispose ();
+        virtual ~LteSimpleNetDevice(void);
+        virtual void DoDispose();
 
 
-  // inherited from NetDevice
-  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+        // inherited from NetDevice
+        virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
 
 
-protected:
-  // inherited from Object
-  virtual void DoInitialize (void);
+    protected:
+        // inherited from Object
+        virtual void DoInitialize(void);
 
-};
+    };
 
 } // namespace ns3
 

@@ -31,88 +31,86 @@
 
 namespace nfd {
 
-namespace websocket {
-typedef boost::asio::ip::tcp::endpoint Endpoint;
-} // namespace websocket
+    namespace websocket {
+        typedef boost::asio::ip::tcp::endpoint Endpoint;
+    } // namespace websocket
 
-/**
- * \brief Class implementing WebSocket-based channel to create faces
- */
-class WebSocketChannel : public Channel
-{
-public:
-  /**
-   * \brief Create WebSocket channel for the local endpoint
-   *
-   * To enable creation of faces upon incoming connections,
-   * one needs to explicitly call WebSocketChannel::listen method.
-   * The created channel is bound to the localEndpoint.
-   */
-  explicit
-  WebSocketChannel(const websocket::Endpoint& localEndpoint);
+    /**
+     * \brief Class implementing WebSocket-based channel to create faces
+     */
+    class WebSocketChannel : public Channel {
+    public:
+        /**
+         * \brief Create WebSocket channel for the local endpoint
+         *
+         * To enable creation of faces upon incoming connections,
+         * one needs to explicitly call WebSocketChannel::listen method.
+         * The created channel is bound to the localEndpoint.
+         */
+        explicit
+        WebSocketChannel(const websocket::Endpoint& localEndpoint);
 
-  /**
-   * \brief Enable listening on the local endpoint, accept connections,
-   *        and create faces when remote host makes a connection
-   *
-   * \param onFaceCreated Callback to notify successful creation of a face
-   */
-  void
-  listen(const FaceCreatedCallback& onFaceCreated);
+        /**
+         * \brief Enable listening on the local endpoint, accept connections,
+         *        and create faces when remote host makes a connection
+         *
+         * \param onFaceCreated Callback to notify successful creation of a face
+         */
+        void
+        listen(const FaceCreatedCallback& onFaceCreated);
 
-  /**
-   * \brief Get number of faces in the channel
-   */
-  size_t
-  size() const;
+        /**
+         * \brief Get number of faces in the channel
+         */
+        size_t
+        size() const;
 
-  bool
-  isListening() const;
+        bool
+        isListening() const;
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  /** \pre listen hasn't been invoked
-   */
-  void
-  setPingInterval(time::milliseconds interval);
+        /** \pre listen hasn't been invoked
+         */
+        void
+        setPingInterval(time::milliseconds interval);
 
-  /** \pre listen hasn't been invoked
-   */
-  void
-  setPongTimeout(time::milliseconds timeout);
+        /** \pre listen hasn't been invoked
+         */
+        void
+        setPongTimeout(time::milliseconds timeout);
 
-  void
-  handlePong(websocketpp::connection_hdl hdl);
+        void
+        handlePong(websocketpp::connection_hdl hdl);
 
-  void
-  handlePongTimeout(websocketpp::connection_hdl hdl);
+        void
+        handlePongTimeout(websocketpp::connection_hdl hdl);
 
-private:
-  void
-  handleMessage(websocketpp::connection_hdl hdl,
+    private:
+        void
+        handleMessage(websocketpp::connection_hdl hdl,
                 websocket::Server::message_ptr msg);
 
-  void
-  handleOpen(websocketpp::connection_hdl hdl);
+        void
+        handleOpen(websocketpp::connection_hdl hdl);
 
-  void
-  handleClose(websocketpp::connection_hdl hdl);
+        void
+        handleClose(websocketpp::connection_hdl hdl);
 
-private:
-  websocket::Endpoint m_localEndpoint;
-  websocket::Server m_server;
+    private:
+        websocket::Endpoint m_localEndpoint;
+        websocket::Server m_server;
 
-  std::map<websocketpp::connection_hdl, shared_ptr<Face>,
-           std::owner_less<websocketpp::connection_hdl>> m_channelFaces;
+        std::map<websocketpp::connection_hdl, shared_ptr<Face>,
+        std::owner_less<websocketpp::connection_hdl>> m_channelFaces;
 
-  FaceCreatedCallback m_onFaceCreatedCallback;
-  time::milliseconds m_pingInterval;
-};
+        FaceCreatedCallback m_onFaceCreatedCallback;
+        time::milliseconds m_pingInterval;
+    };
 
-inline bool
-WebSocketChannel::isListening() const
-{
-  return m_server.is_listening();
-}
+    inline bool
+    WebSocketChannel::isListening() const {
+        return m_server.is_listening();
+    }
 
 } // namespace nfd
 

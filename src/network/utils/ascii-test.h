@@ -35,7 +35,7 @@
  * \param expectedFilename The name of the reference file to read in
  * including its path
  */
-#define NS_ASCII_TEST_EXPECT_EQ(gotFilename, expectedFilename)		\
+#define NS_ASCII_TEST_EXPECT_EQ(gotFilename, expectedFilename)  \
   do {                                                                  \
     uint64_t line(0);                                                   \
     bool diff = AsciiFile::Diff (gotFilename, expectedFilename, line);  \

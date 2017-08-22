@@ -30,41 +30,40 @@
 #include "command-parser.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-struct StatusReportOptions
-{
-  ReportFormat output = ReportFormat::TEXT;
-  bool wantForwarderGeneral = false;
-  bool wantChannels = false;
-  bool wantFaces = false;
-  bool wantFib = false;
-  bool wantRib = false;
-  bool wantStrategyChoice = false;
-};
+            struct StatusReportOptions {
+                ReportFormat output = ReportFormat::TEXT;
+                bool wantForwarderGeneral = false;
+                bool wantChannels = false;
+                bool wantFaces = false;
+                bool wantFib = false;
+                bool wantRib = false;
+                bool wantStrategyChoice = false;
+            };
 
-/** \brief collect a status report and write to stdout
- */
-int
-reportStatus(ExecuteContext& ctx, const StatusReportOptions& options);
+            /** \brief collect a status report and write to stdout
+             */
+            int
+            reportStatus(ExecuteContext& ctx, const StatusReportOptions& options);
 
-/** \brief registers status commands
- *
- *  Providing the following commands:
- *  \li status report
- *  \li status show
- *  \li face list
- *  \li channel list
- *  \li strategy list
- *  \li fib list
- *  \li route list
- */
-void
-registerStatusCommands(CommandParser& parser);
+            /** \brief registers status commands
+             *
+             *  Providing the following commands:
+             *  \li status report
+             *  \li status show
+             *  \li face list
+             *  \li channel list
+             *  \li strategy list
+             *  \li fib list
+             *  \li route list
+             */
+            void
+            registerStatusCommands(CommandParser& parser);
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_STATUS_HPP

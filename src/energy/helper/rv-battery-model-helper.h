@@ -26,26 +26,25 @@
 
 namespace ns3 {
 
-/**
- * \ingroup energy
- * \brief Creates a RvBatteryModel object.
- *
- */
-class RvBatteryModelHelper : public EnergySourceHelper
-{
-public:
-  RvBatteryModelHelper ();
-  ~RvBatteryModelHelper ();
+    /**
+     * \ingroup energy
+     * \brief Creates a RvBatteryModel object.
+     *
+     */
+    class RvBatteryModelHelper : public EnergySourceHelper {
+    public:
+        RvBatteryModelHelper();
+        ~RvBatteryModelHelper();
 
-  void Set (std::string name, const AttributeValue &v);
+        void Set(std::string name, const AttributeValue &v);
 
-private:
-  virtual Ptr<EnergySource> DoInstall (Ptr<Node> node) const;
+    private:
+        virtual Ptr<EnergySource> DoInstall(Ptr<Node> node) const;
 
-private:
-  ObjectFactory m_rvBatteryModel;
+    private:
+        ObjectFactory m_rvBatteryModel;
 
-};
+    };
 
 } // namespace ns3
 

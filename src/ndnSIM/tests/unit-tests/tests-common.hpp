@@ -27,25 +27,23 @@
 #include "boost-test.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-class CleanupFixture
-{
-public:
-  ~CleanupFixture()
-  {
-    Simulator::Destroy();
-    Names::Clear();
-    GlobalRouter::clear();
-  }
-};
+        class CleanupFixture {
+        public:
 
-class ScenarioHelperWithCleanupFixture : public ScenarioHelper, public CleanupFixture
-{
-public:
-};
+            ~CleanupFixture() {
+                Simulator::Destroy();
+                Names::Clear();
+                GlobalRouter::clear();
+            }
+        };
 
-} // namespace ndn
+        class ScenarioHelperWithCleanupFixture : public ScenarioHelper, public CleanupFixture {
+        public:
+        };
+
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDNSIM_TESTS_UNIT_TESTS_TESTS_COMMON_HPP

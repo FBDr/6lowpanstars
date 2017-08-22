@@ -22,55 +22,47 @@
 #include "spectrum-propagation-loss-model.h"
 #include <ns3/log.h>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("SpectrumPropagationLossModel");
-
-NS_OBJECT_ENSURE_REGISTERED (SpectrumPropagationLossModel);
-
-SpectrumPropagationLossModel::SpectrumPropagationLossModel ()
-  : m_next (0)
+namespace ns3
 {
-}
 
-SpectrumPropagationLossModel::~SpectrumPropagationLossModel ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("SpectrumPropagationLossModel");
 
-void
-SpectrumPropagationLossModel::DoDispose ()
-{
-  m_next = 0;
-}
+    NS_OBJECT_ENSURE_REGISTERED(SpectrumPropagationLossModel);
 
-TypeId
-SpectrumPropagationLossModel::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SpectrumPropagationLossModel")
-    .SetParent<Object> ()
-    .SetGroupName ("Spectrum")
-  ;
-  return tid;
-}
-
-
-void SpectrumPropagationLossModel::SetNext (Ptr<SpectrumPropagationLossModel> next)
-{
-  m_next = next;
-}
-
-
-Ptr<SpectrumValue>
-SpectrumPropagationLossModel::CalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                          Ptr<const MobilityModel> a,
-                                                          Ptr<const MobilityModel> b) const
-{
-  Ptr<SpectrumValue> rxPsd = DoCalcRxPowerSpectralDensity (txPsd, a, b);
-  if (m_next != 0)
-    {
-      rxPsd = m_next->DoCalcRxPowerSpectralDensity (rxPsd, a, b);
+    SpectrumPropagationLossModel::SpectrumPropagationLossModel()
+            : m_next(0) {
     }
-  return rxPsd;
-}
+
+    SpectrumPropagationLossModel::~SpectrumPropagationLossModel() {
+    }
+
+    void
+    SpectrumPropagationLossModel::DoDispose() {
+        m_next = 0;
+    }
+
+    TypeId
+    SpectrumPropagationLossModel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SpectrumPropagationLossModel")
+                .SetParent<Object> ()
+                .SetGroupName("Spectrum")
+                ;
+        return tid;
+    }
+
+    void SpectrumPropagationLossModel::SetNext(Ptr<SpectrumPropagationLossModel> next) {
+        m_next = next;
+    }
+
+    Ptr<SpectrumValue>
+            SpectrumPropagationLossModel::CalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+            Ptr<const MobilityModel> a,
+            Ptr<const MobilityModel> b) const {
+        Ptr<SpectrumValue> rxPsd = DoCalcRxPowerSpectralDensity(txPsd, a, b);
+        if (m_next != 0) {
+            rxPsd = m_next->DoCalcRxPowerSpectralDensity(rxPsd, a, b);
+        }
+        return rxPsd;
+    }
 
 } // namespace ns3

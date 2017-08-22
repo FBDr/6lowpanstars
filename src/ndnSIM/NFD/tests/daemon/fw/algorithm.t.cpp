@@ -29,239 +29,227 @@
 #include "tests/daemon/face/dummy-face.hpp"
 
 namespace nfd {
-namespace fw {
-namespace tests {
+    namespace fw {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_FIXTURE_TEST_SUITE(TestAlgorithm, BaseFixture)
+            BOOST_AUTO_TEST_SUITE(Fw)
+            BOOST_FIXTURE_TEST_SUITE(TestAlgorithm, BaseFixture)
 
-class ScopeControlFixture : public BaseFixture
-{
-protected:
-  ScopeControlFixture()
-    : nonLocalFace1(make_shared<DummyFace>("dummy://1", "dummy://1", ndn::nfd::FACE_SCOPE_NON_LOCAL))
-    , nonLocalFace2(make_shared<DummyFace>("dummy://2", "dummy://2", ndn::nfd::FACE_SCOPE_NON_LOCAL))
-    , localFace3(make_shared<DummyFace>("dummy://3", "dummy://3", ndn::nfd::FACE_SCOPE_LOCAL))
-    , localFace4(make_shared<DummyFace>("dummy://4", "dummy://4", ndn::nfd::FACE_SCOPE_LOCAL))
-  {
-  }
+            class ScopeControlFixture : public BaseFixture {
+            protected:
 
-protected:
-  shared_ptr<Face> nonLocalFace1;
-  shared_ptr<Face> nonLocalFace2;
-  shared_ptr<Face> localFace3;
-  shared_ptr<Face> localFace4;
-};
+                ScopeControlFixture()
+                : nonLocalFace1(make_shared<DummyFace>("dummy://1", "dummy://1", ndn::nfd::FACE_SCOPE_NON_LOCAL))
+                , nonLocalFace2(make_shared<DummyFace>("dummy://2", "dummy://2", ndn::nfd::FACE_SCOPE_NON_LOCAL))
+                , localFace3(make_shared<DummyFace>("dummy://3", "dummy://3", ndn::nfd::FACE_SCOPE_LOCAL))
+                , localFace4(make_shared<DummyFace>("dummy://4", "dummy://4", ndn::nfd::FACE_SCOPE_LOCAL)) {
+                }
 
-BOOST_FIXTURE_TEST_SUITE(WouldViolateScope, ScopeControlFixture)
+            protected:
+                shared_ptr<Face> nonLocalFace1;
+                shared_ptr<Face> nonLocalFace2;
+                shared_ptr<Face> localFace3;
+                shared_ptr<Face> localFace4;
+            };
 
-BOOST_AUTO_TEST_CASE(Unrestricted)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/ieWRzDsCu");
+            BOOST_FIXTURE_TEST_SUITE(WouldViolateScope, ScopeControlFixture)
 
-  BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *localFace4), false);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(Unrestricted) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/ieWRzDsCu");
 
-BOOST_AUTO_TEST_CASE(Localhost)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhost/5n1LzIt3");
+                BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *localFace4), false);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
+            }
 
-  // /localhost Interests from non-local faces should be rejected by incoming Interest pipeline,
-  // and are not tested here.
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), true);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(Localhost) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhost/5n1LzIt3");
 
-BOOST_AUTO_TEST_CASE(Localhop)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhop/YcIKWCRYJ");
+                // /localhost Interests from non-local faces should be rejected by incoming Interest pipeline,
+                // and are not tested here.
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), true);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
+            }
 
-  BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *nonLocalFace2), true);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *localFace4), false);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(Localhop) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhop/YcIKWCRYJ");
 
-BOOST_AUTO_TEST_SUITE_END() // WouldViolateScope
+                BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *nonLocalFace2), true);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*nonLocalFace1, *interest, *localFace4), false);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(wouldViolateScope(*localFace3, *interest, *localFace4), false);
+            }
 
-BOOST_FIXTURE_TEST_SUITE(ViolatesScope, ScopeControlFixture)
+            BOOST_AUTO_TEST_SUITE_END() // WouldViolateScope
 
-BOOST_AUTO_TEST_CASE(Unrestricted)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/ieWRzDsCu");
-  pit::Entry entry(*interest);
+            BOOST_FIXTURE_TEST_SUITE(ViolatesScope, ScopeControlFixture)
 
-  entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(Unrestricted) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/ieWRzDsCu");
+                pit::Entry entry(*interest);
 
-BOOST_AUTO_TEST_CASE(Localhost)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhost/5n1LzIt3");
-  pit::Entry entry(*interest);
+                entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
+            }
 
-  entry.insertOrUpdateInRecord(*localFace3, *interest);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), true);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(Localhost) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhost/5n1LzIt3");
+                pit::Entry entry(*interest);
 
-BOOST_AUTO_TEST_CASE(LocalhopFromLocal)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhop/YcIKWCRYJ");
-  pit::Entry entry(*interest);
+                entry.insertOrUpdateInRecord(*localFace3, *interest);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), true);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
+            }
 
-  entry.insertOrUpdateInRecord(*localFace3, *interest);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(LocalhopFromLocal) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhop/YcIKWCRYJ");
+                pit::Entry entry(*interest);
 
-BOOST_AUTO_TEST_CASE(LocalhopFromNonLocal)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhop/x5uFr5IpqY");
-  pit::Entry entry(*interest);
+                entry.insertOrUpdateInRecord(*localFace3, *interest);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
+            }
 
-  entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), true);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(LocalhopFromNonLocal) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhop/x5uFr5IpqY");
+                pit::Entry entry(*interest);
 
-BOOST_AUTO_TEST_CASE(LocalhopFromLocalAndNonLocal)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/localhop/gNn2MJAXt");
-  pit::Entry entry(*interest);
+                entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), true);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
+            }
 
-  entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
-  entry.insertOrUpdateInRecord(*localFace3, *interest);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
-  BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
-}
+            BOOST_AUTO_TEST_CASE(LocalhopFromLocalAndNonLocal) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/localhop/gNn2MJAXt");
+                pit::Entry entry(*interest);
 
-BOOST_AUTO_TEST_SUITE_END() // ViolatesScope
+                entry.insertOrUpdateInRecord(*nonLocalFace1, *interest);
+                entry.insertOrUpdateInRecord(*localFace3, *interest);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *nonLocalFace2), false);
+                BOOST_CHECK_EQUAL(violatesScope(entry, *localFace4), false);
+            }
 
-BOOST_AUTO_TEST_CASE(CanForwardToLegacy)
-{
-  shared_ptr<Interest> interest = makeInterest("ndn:/WDsuBLIMG");
-  pit::Entry entry(*interest);
+            BOOST_AUTO_TEST_SUITE_END() // ViolatesScope
 
-  auto face1 = make_shared<DummyFace>();
-  auto face2 = make_shared<DummyFace>();
+            BOOST_AUTO_TEST_CASE(CanForwardToLegacy) {
+                shared_ptr<Interest> interest = makeInterest("ndn:/WDsuBLIMG");
+                pit::Entry entry(*interest);
 
-  entry.insertOrUpdateInRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), false);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
+                auto face1 = make_shared<DummyFace>();
+                auto face2 = make_shared<DummyFace>();
 
-  entry.insertOrUpdateInRecord(*face2, *interest);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), true);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
+                entry.insertOrUpdateInRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), false);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
 
-  entry.insertOrUpdateOutRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), false);
-  BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
-}
+                entry.insertOrUpdateInRecord(*face2, *interest);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), true);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
 
-BOOST_AUTO_TEST_CASE(Nonce)
-{
-  auto face1 = make_shared<DummyFace>();
-  auto face2 = make_shared<DummyFace>();
+                entry.insertOrUpdateOutRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face1), false);
+                BOOST_CHECK_EQUAL(canForwardToLegacy(entry, *face2), true);
+            }
 
-  shared_ptr<Interest> interest = makeInterest("ndn:/qtCQ7I1c");
-  interest->setNonce(25559);
+            BOOST_AUTO_TEST_CASE(Nonce) {
+                auto face1 = make_shared<DummyFace>();
+                auto face2 = make_shared<DummyFace>();
 
-  pit::Entry entry0(*interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 25559, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 25559, *face2), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 19004, *face2), DUPLICATE_NONCE_NONE);
+                shared_ptr<Interest> interest = makeInterest("ndn:/qtCQ7I1c");
+                interest->setNonce(25559);
 
-  pit::Entry entry1(*interest);
-  entry1.insertOrUpdateInRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 25559, *face1), DUPLICATE_NONCE_IN_SAME);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 25559, *face2), DUPLICATE_NONCE_IN_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 19004, *face2), DUPLICATE_NONCE_NONE);
+                pit::Entry entry0(*interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 25559, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 25559, *face2), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry0, 19004, *face2), DUPLICATE_NONCE_NONE);
 
-  pit::Entry entry2(*interest);
-  entry2.insertOrUpdateOutRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 25559, *face1), DUPLICATE_NONCE_OUT_SAME);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 25559, *face2), DUPLICATE_NONCE_OUT_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 19004, *face2), DUPLICATE_NONCE_NONE);
+                pit::Entry entry1(*interest);
+                entry1.insertOrUpdateInRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 25559, *face1), DUPLICATE_NONCE_IN_SAME);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 25559, *face2), DUPLICATE_NONCE_IN_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry1, 19004, *face2), DUPLICATE_NONCE_NONE);
 
-  pit::Entry entry3(*interest);
-  entry3.insertOrUpdateInRecord(*face1, *interest);
-  entry3.insertOrUpdateOutRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 25559, *face1),
-                    DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_OUT_SAME);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 25559, *face2),
-                    DUPLICATE_NONCE_IN_OTHER | DUPLICATE_NONCE_OUT_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 19004, *face2), DUPLICATE_NONCE_NONE);
+                pit::Entry entry2(*interest);
+                entry2.insertOrUpdateOutRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 25559, *face1), DUPLICATE_NONCE_OUT_SAME);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 25559, *face2), DUPLICATE_NONCE_OUT_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry2, 19004, *face2), DUPLICATE_NONCE_NONE);
 
-  pit::Entry entry4(*interest);
-  entry4.insertOrUpdateInRecord(*face1, *interest);
-  entry4.insertOrUpdateInRecord(*face2, *interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 25559, *face1),
-                    DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_IN_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 25559, *face2),
-                    DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_IN_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 19004, *face2), DUPLICATE_NONCE_NONE);
+                pit::Entry entry3(*interest);
+                entry3.insertOrUpdateInRecord(*face1, *interest);
+                entry3.insertOrUpdateOutRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 25559, *face1),
+                        DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_OUT_SAME);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 25559, *face2),
+                        DUPLICATE_NONCE_IN_OTHER | DUPLICATE_NONCE_OUT_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry3, 19004, *face2), DUPLICATE_NONCE_NONE);
 
-  pit::Entry entry5(*interest);
-  entry5.insertOrUpdateOutRecord(*face1, *interest);
-  entry5.insertOrUpdateOutRecord(*face2, *interest);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 25559, *face1),
-                    DUPLICATE_NONCE_OUT_SAME | DUPLICATE_NONCE_OUT_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 25559, *face2),
-                    DUPLICATE_NONCE_OUT_SAME | DUPLICATE_NONCE_OUT_OTHER);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 19004, *face1), DUPLICATE_NONCE_NONE);
-  BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 19004, *face2), DUPLICATE_NONCE_NONE);
-}
+                pit::Entry entry4(*interest);
+                entry4.insertOrUpdateInRecord(*face1, *interest);
+                entry4.insertOrUpdateInRecord(*face2, *interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 25559, *face1),
+                        DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_IN_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 25559, *face2),
+                        DUPLICATE_NONCE_IN_SAME | DUPLICATE_NONCE_IN_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry4, 19004, *face2), DUPLICATE_NONCE_NONE);
 
-BOOST_FIXTURE_TEST_CASE(HasPendingOutRecords, UnitTestTimeFixture)
-{
-  auto face1 = make_shared<DummyFace>();
-  auto face2 = make_shared<DummyFace>();
-  auto face3 = make_shared<DummyFace>();
+                pit::Entry entry5(*interest);
+                entry5.insertOrUpdateOutRecord(*face1, *interest);
+                entry5.insertOrUpdateOutRecord(*face2, *interest);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 25559, *face1),
+                        DUPLICATE_NONCE_OUT_SAME | DUPLICATE_NONCE_OUT_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 25559, *face2),
+                        DUPLICATE_NONCE_OUT_SAME | DUPLICATE_NONCE_OUT_OTHER);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 19004, *face1), DUPLICATE_NONCE_NONE);
+                BOOST_CHECK_EQUAL(findDuplicateNonce(entry5, 19004, *face2), DUPLICATE_NONCE_NONE);
+            }
 
-  shared_ptr<Interest> interest = makeInterest("ndn:/totzXG0d");
-  interest->setNonce(29321);
+            BOOST_FIXTURE_TEST_CASE(HasPendingOutRecords, UnitTestTimeFixture) {
+                auto face1 = make_shared<DummyFace>();
+                auto face2 = make_shared<DummyFace>();
+                auto face3 = make_shared<DummyFace>();
 
-  pit::Entry entry(*interest);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
+                shared_ptr<Interest> interest = makeInterest("ndn:/totzXG0d");
+                interest->setNonce(29321);
 
-  // Interest-Data
-  entry.insertOrUpdateOutRecord(*face1, *interest);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
-  entry.deleteOutRecord(*face1);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
+                pit::Entry entry(*interest);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
 
-  // Interest-Nack
-  entry.insertOrUpdateOutRecord(*face2, *interest);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
-  pit::OutRecordCollection::iterator outR = entry.getOutRecord(*face2);
-  BOOST_REQUIRE(outR != entry.out_end());
-  lp::Nack nack = makeNack("ndn:/totzXG0d", 29321, lp::NackReason::DUPLICATE);
-  bool isNackAccepted = outR->setIncomingNack(nack); // Nack arrival
-  BOOST_REQUIRE(isNackAccepted);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
+                // Interest-Data
+                entry.insertOrUpdateOutRecord(*face1, *interest);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
+                entry.deleteOutRecord(*face1);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
 
-  // Interest-timeout
-  entry.insertOrUpdateOutRecord(*face3, *interest);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
-  this->advanceClocks(ndn::DEFAULT_INTEREST_LIFETIME, 2);
-  BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
-}
+                // Interest-Nack
+                entry.insertOrUpdateOutRecord(*face2, *interest);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
+                pit::OutRecordCollection::iterator outR = entry.getOutRecord(*face2);
+                BOOST_REQUIRE(outR != entry.out_end());
+                lp::Nack nack = makeNack("ndn:/totzXG0d", 29321, lp::NackReason::DUPLICATE);
+                bool isNackAccepted = outR->setIncomingNack(nack); // Nack arrival
+                BOOST_REQUIRE(isNackAccepted);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
 
-BOOST_AUTO_TEST_SUITE_END() // TestPitAlgorithm
-BOOST_AUTO_TEST_SUITE_END() // Fw
+                // Interest-timeout
+                entry.insertOrUpdateOutRecord(*face3, *interest);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), true);
+                this->advanceClocks(ndn::DEFAULT_INTEREST_LIFETIME, 2);
+                BOOST_CHECK_EQUAL(hasPendingOutRecords(entry), false);
+            }
 
-} // namespace tests
-} // namespace fw
+            BOOST_AUTO_TEST_SUITE_END() // TestPitAlgorithm
+            BOOST_AUTO_TEST_SUITE_END() // Fw
+
+        } // namespace tests
+    } // namespace fw
 } // namespace nfd

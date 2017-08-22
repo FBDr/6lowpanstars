@@ -30,66 +30,65 @@
 
 namespace ns3 {
 
-class BaseStationNetDevice;
-class SSRecord;
-class ServiceFlow;
+    class BaseStationNetDevice;
+    class SSRecord;
+    class ServiceFlow;
 
-/**
- * \ingroup wimax
- */
-class UplinkSchedulerSimple : public UplinkScheduler
-{
-public:
-  UplinkSchedulerSimple (void);
-  UplinkSchedulerSimple (Ptr<BaseStationNetDevice> bs);
-  ~UplinkSchedulerSimple (void);
+    /**
+     * \ingroup wimax
+     */
+    class UplinkSchedulerSimple : public UplinkScheduler {
+    public:
+        UplinkSchedulerSimple(void);
+        UplinkSchedulerSimple(Ptr<BaseStationNetDevice> bs);
+        ~UplinkSchedulerSimple(void);
 
-  static TypeId GetTypeId (void);
+        static TypeId GetTypeId(void);
 
-  std::list<OfdmUlMapIe> GetUplinkAllocations (void) const;
+        std::list<OfdmUlMapIe> GetUplinkAllocations(void) const;
 
-  /**
-   * \brief Determines if channel descriptors sent in the current frame are
-   * required to be updated
-   */
-  void GetChannelDescriptorsToUpdate (bool&, bool&, bool&, bool&);
-  uint32_t CalculateAllocationStartTime (void);
-  void AddUplinkAllocation (OfdmUlMapIe &ulMapIe,
-                            const uint32_t &allocationSize,
-                            uint32_t &symbolsToAllocation,
-                            uint32_t &availableSymbols);
-  void Schedule (void);
-  void ServiceUnsolicitedGrants (const SSRecord *ssRecord,
-                                 enum ServiceFlow::SchedulingType schedulingType,
-                                 OfdmUlMapIe &ulMapIe,
-                                 const WimaxPhy::ModulationType modulationType,
-                                 uint32_t &symbolsToAllocation,
-                                 uint32_t &availableSymbols);
-  void ServiceBandwidthRequests (const SSRecord *ssRecord,
-                                 enum ServiceFlow::SchedulingType schedulingType,
-                                 OfdmUlMapIe &ulMapIe,
-                                 const WimaxPhy::ModulationType modulationType,
-                                 uint32_t &symbolsToAllocation,
-                                 uint32_t &availableSymbols);
-  bool ServiceBandwidthRequests (ServiceFlow *serviceFlow,
-                                 enum ServiceFlow::SchedulingType schedulingType,
-                                 OfdmUlMapIe &ulMapIe,
-                                 const WimaxPhy::ModulationType modulationType,
-                                 uint32_t &symbolsToAllocation,
-                                 uint32_t &availableSymbols);
-  void AllocateInitialRangingInterval (uint32_t &symbolsToAllocation, uint32_t &availableSymbols);
-  void SetupServiceFlow (SSRecord *ssRecord, ServiceFlow *serviceFlow);
+        /**
+         * \brief Determines if channel descriptors sent in the current frame are
+         * required to be updated
+         */
+        void GetChannelDescriptorsToUpdate(bool&, bool&, bool&, bool&);
+        uint32_t CalculateAllocationStartTime(void);
+        void AddUplinkAllocation(OfdmUlMapIe &ulMapIe,
+                const uint32_t &allocationSize,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols);
+        void Schedule(void);
+        void ServiceUnsolicitedGrants(const SSRecord *ssRecord,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols);
+        void ServiceBandwidthRequests(const SSRecord *ssRecord,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols);
+        bool ServiceBandwidthRequests(ServiceFlow *serviceFlow,
+                enum ServiceFlow::SchedulingType schedulingType,
+                OfdmUlMapIe &ulMapIe,
+                const WimaxPhy::ModulationType modulationType,
+                uint32_t &symbolsToAllocation,
+                uint32_t &availableSymbols);
+        void AllocateInitialRangingInterval(uint32_t &symbolsToAllocation, uint32_t &availableSymbols);
+        void SetupServiceFlow(SSRecord *ssRecord, ServiceFlow *serviceFlow);
 
-  void ProcessBandwidthRequest (const BandwidthRequestHeader &bwRequestHdr);
+        void ProcessBandwidthRequest(const BandwidthRequestHeader &bwRequestHdr);
 
-  void InitOnce (void);
+        void InitOnce(void);
 
-  void OnSetRequestedBandwidth (ServiceFlowRecord *sfr);
+        void OnSetRequestedBandwidth(ServiceFlowRecord *sfr);
 
-private:
-  std::list<OfdmUlMapIe> m_uplinkAllocations;
+    private:
+        std::list<OfdmUlMapIe> m_uplinkAllocations;
 
-};
+    };
 
 } // namespace ns3
 

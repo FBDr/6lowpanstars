@@ -22,19 +22,18 @@
 
 namespace ns3 {
 
-/**
- * \ingroup configstore
- * \brief A class that provides a GTK-based front end to ns3::ConfigStore 
- *
- */
-class GtkConfigStore
-{
-public:
-  GtkConfigStore ();
+    /**
+     * \ingroup configstore
+     * \brief A class that provides a GTK-based front end to ns3::ConfigStore 
+     *
+     */
+    class GtkConfigStore {
+    public:
+        GtkConfigStore();
 
-  void ConfigureDefaults (void);
-  void ConfigureAttributes (void);
-};
+        void ConfigureDefaults(void);
+        void ConfigureAttributes(void);
+    };
 
 
 } // namespace ns3

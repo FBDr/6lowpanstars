@@ -34,305 +34,290 @@
 #include "../../utils/trie/trie-with-policy.hpp"
 
 namespace ns3 {
-namespace ndn {
-namespace cs {
+    namespace ndn {
+        namespace cs {
 
-/**
- * @ingroup ndn-cs
- * @brief Cache entry implementation with additional references to the base container
- */
-template<class CS>
-class EntryImpl : public Entry {
-public:
-  typedef Entry base_type;
+            /**
+             * @ingroup ndn-cs
+             * @brief Cache entry implementation with additional references to the base container
+             */
+            template<class CS>
+            class EntryImpl : public Entry {
+            public:
+                typedef Entry base_type;
 
-public:
-  EntryImpl(Ptr<ContentStore> cs, shared_ptr<const Data> data)
-    : Entry(cs, data)
-    , item_(0)
-  {
-  }
+            public:
 
-  void
-  SetTrie(typename CS::super::iterator item)
-  {
-    item_ = item;
-  }
+                EntryImpl(Ptr<ContentStore> cs, shared_ptr<const Data> data)
+                : Entry(cs, data)
+                , item_(0) {
+                }
 
-  typename CS::super::iterator
-  to_iterator()
-  {
-    return item_;
-  }
-  typename CS::super::const_iterator
-  to_iterator() const
-  {
-    return item_;
-  }
+                void
+                SetTrie(typename CS::super::iterator item) {
+                    item_ = item;
+                }
 
-private:
-  typename CS::super::iterator item_;
-};
+                typename CS::super::iterator
+                to_iterator() {
+                    return item_;
+                }
 
-/**
- * @ingroup ndn-cs
- * @brief Base implementation of NDN content store
- */
-template<class Policy>
-class ContentStoreImpl
-  : public ContentStore,
-    protected ndnSIM::
-      trie_with_policy<Name,
-                       ndnSIM::smart_pointer_payload_traits<EntryImpl<ContentStoreImpl<Policy>>,
-                                                            Entry>,
-                       Policy> {
-public:
-  typedef ndnSIM::
-    trie_with_policy<Name, ndnSIM::smart_pointer_payload_traits<EntryImpl<ContentStoreImpl<Policy>>,
-                                                                Entry>,
-                     Policy> super;
+                typename CS::super::const_iterator
+                to_iterator() const {
+                    return item_;
+                }
 
-  typedef EntryImpl<ContentStoreImpl<Policy>> entry;
+            private:
+                typename CS::super::iterator item_;
+            };
 
-  static TypeId
-  GetTypeId();
+            /**
+             * @ingroup ndn-cs
+             * @brief Base implementation of NDN content store
+             */
+            template<class Policy>
+            class ContentStoreImpl
+            : public ContentStore,
+            protected ndnSIM::
+            trie_with_policy<Name,
+            ndnSIM::smart_pointer_payload_traits<EntryImpl<ContentStoreImpl<Policy>>,
+            Entry>,
+            Policy>
+            {
+                public:
+                typedef ndnSIM::
+                        trie_with_policy<Name, ndnSIM::smart_pointer_payload_traits<EntryImpl<ContentStoreImpl < Policy>>,
+                        Entry>,
+                        Policy> super;
 
-  ContentStoreImpl(){};
-  virtual ~ContentStoreImpl(){};
+                typedef EntryImpl<ContentStoreImpl < Policy>> entry;
 
-  // from ContentStore
+                static TypeId
+                GetTypeId();
 
-  virtual inline shared_ptr<Data>
-  Lookup(shared_ptr<const Interest> interest);
+                ContentStoreImpl() {
+                };
 
-  virtual inline bool
-  Add(shared_ptr<const Data> data);
+                virtual ~ContentStoreImpl() {
+                };
 
-  // virtual bool
-  // Remove (shared_ptr<Interest> header);
+                // from ContentStore
 
-  virtual inline void
-  Print(std::ostream& os) const;
+                virtual inline shared_ptr<Data>
+                        Lookup(shared_ptr<const Interest> interest);
 
-  virtual uint32_t
-  GetSize() const;
+                virtual inline bool
+                Add(shared_ptr<const Data> data);
 
-  virtual Ptr<Entry>
-  Begin();
+                // virtual bool
+                // Remove (shared_ptr<Interest> header);
 
-  virtual Ptr<Entry>
-  End();
+                virtual inline void
+                Print(std::ostream & os) const;
 
-  virtual Ptr<Entry> Next(Ptr<Entry>);
+                virtual uint32_t
+                GetSize() const;
 
-  const typename super::policy_container&
-  GetPolicy() const
-  {
-    return super::getPolicy();
-  }
+                virtual Ptr<Entry>
+                        Begin();
 
-  typename super::policy_container&
-  GetPolicy()
-  {
-    return super::getPolicy();
-  }
+                virtual Ptr<Entry>
+                        End();
 
-public:
-  typedef void (*CsEntryCallback)(Ptr<const Entry>);
+                virtual Ptr<Entry> Next(Ptr<Entry>);
 
-private:
-  void
-  SetMaxSize(uint32_t maxSize);
+                const typename super::policy_container &
+                        GetPolicy() const {
+                    return super::getPolicy();
+                }
 
-  uint32_t
-  GetMaxSize() const;
+                typename super::policy_container &
+                        GetPolicy() {
+                    return super::getPolicy();
+                }
 
-private:
-  static LogComponent g_log; ///< @brief Logging variable
+                public:
+                typedef void (*CsEntryCallback)(Ptr<const Entry>);
 
-  /// @brief trace of for entry additions (fired every time entry is successfully added to the
-  /// cache): first parameter is pointer to the CS entry
-  TracedCallback<Ptr<const Entry>> m_didAddEntry;
-};
+                private:
+                void
+                SetMaxSize(uint32_t maxSize);
 
-//////////////////////////////////////////
-////////// Implementation ////////////////
-//////////////////////////////////////////
+                uint32_t
+                GetMaxSize() const;
 
-template<class Policy>
-LogComponent ContentStoreImpl<Policy>::g_log = LogComponent(("ndn.cs." + Policy::GetName()).c_str(), __FILE__);
+                private:
+                static LogComponent g_log; ///< @brief Logging variable
 
-template<class Policy>
-TypeId
-ContentStoreImpl<Policy>::GetTypeId()
-{
-  static TypeId tid =
-    TypeId(("ns3::ndn::cs::" + Policy::GetName()).c_str())
-      .SetGroupName("Ndn")
-      .SetParent<ContentStore>()
-      .AddConstructor<ContentStoreImpl<Policy>>()
-      .AddAttribute("MaxSize",
-                    "Set maximum number of entries in ContentStore. If 0, limit is not enforced",
-                    StringValue("100"), MakeUintegerAccessor(&ContentStoreImpl<Policy>::GetMaxSize,
-                                                             &ContentStoreImpl<Policy>::SetMaxSize),
-                    MakeUintegerChecker<uint32_t>())
+                /// @brief trace of for entry additions (fired every time entry is successfully added to the
+                /// cache): first parameter is pointer to the CS entry
+                TracedCallback<Ptr<const Entry>> m_didAddEntry;
+            };
 
-      .AddTraceSource("DidAddEntry",
-                      "Trace fired every time entry is successfully added to the cache",
-                      MakeTraceSourceAccessor(&ContentStoreImpl<Policy>::m_didAddEntry),
-                      "ns3::ndn::cs::ContentStoreImpl::CsEntryCallback");
+            //////////////////////////////////////////
+            ////////// Implementation ////////////////
+            //////////////////////////////////////////
 
-  return tid;
-}
+            template<class Policy>
+            LogComponent ContentStoreImpl<Policy>::g_log = LogComponent(("ndn.cs." + Policy::GetName()).c_str(), __FILE__);
 
-struct isNotExcluded {
-  inline isNotExcluded(const Exclude& exclude)
-    : m_exclude(exclude)
-  {
-  }
+            template<class Policy>
+            TypeId
+            ContentStoreImpl<Policy>::GetTypeId() {
+                static TypeId tid =
+                        TypeId(("ns3::ndn::cs::" + Policy::GetName()).c_str())
+                        .SetGroupName("Ndn")
+                        .SetParent<ContentStore>()
+                        .AddConstructor<ContentStoreImpl < Policy >> ()
+                        .AddAttribute("MaxSize",
+                        "Set maximum number of entries in ContentStore. If 0, limit is not enforced",
+                        StringValue("100"), MakeUintegerAccessor(&ContentStoreImpl<Policy>::GetMaxSize,
+                        &ContentStoreImpl<Policy>::SetMaxSize),
+                        MakeUintegerChecker<uint32_t>())
 
-  bool
-  operator()(const name::Component& comp) const
-  {
-    return !m_exclude.isExcluded(comp);
-  }
+                        .AddTraceSource("DidAddEntry",
+                        "Trace fired every time entry is successfully added to the cache",
+                        MakeTraceSourceAccessor(&ContentStoreImpl<Policy>::m_didAddEntry),
+                        "ns3::ndn::cs::ContentStoreImpl::CsEntryCallback");
 
-private:
-  const Exclude& m_exclude;
-};
+                return tid;
+            }
 
-template<class Policy>
-shared_ptr<Data>
-ContentStoreImpl<Policy>::Lookup(shared_ptr<const Interest> interest)
-{
-  NS_LOG_FUNCTION(this << interest->getName());
+            struct isNotExcluded {
 
-  typename super::const_iterator node;
-  if (interest->getExclude().empty()) {
-    node = this->deepest_prefix_match(interest->getName());
-  }
-  else {
-    node = this->deepest_prefix_match_if_next_level(interest->getName(),
-                                                    isNotExcluded(interest->getExclude()));
-  }
+                inline isNotExcluded(const Exclude& exclude)
+                : m_exclude(exclude) {
+                }
 
-  if (node != this->end()) {
-    this->m_cacheHitsTrace(interest, node->payload()->GetData());
+                bool
+                operator()(const name::Component& comp) const {
+                    return !m_exclude.isExcluded(comp);
+                }
 
-    shared_ptr<Data> copy = make_shared<Data>(*node->payload()->GetData());
-    return copy;
-  }
-  else {
-    this->m_cacheMissesTrace(interest);
-    return 0;
-  }
-}
+            private:
+                const Exclude& m_exclude;
+            };
 
-template<class Policy>
-bool
-ContentStoreImpl<Policy>::Add(shared_ptr<const Data> data)
-{
-  NS_LOG_FUNCTION(this << data->getName());
+            template<class Policy>
+            shared_ptr<Data>
+            ContentStoreImpl<Policy>::Lookup(shared_ptr<const Interest> interest) {
+                NS_LOG_FUNCTION(this << interest->getName());
 
-  Ptr<entry> newEntry = Create<entry>(this, data);
-  std::pair<typename super::iterator, bool> result = super::insert(data->getName(), newEntry);
+                typename super::const_iterator node;
+                if (interest->getExclude().empty()) {
+                    node = this->deepest_prefix_match(interest->getName());
+                } else {
+                    node = this->deepest_prefix_match_if_next_level(interest->getName(),
+                            isNotExcluded(interest->getExclude()));
+                }
 
-  if (result.first != super::end()) {
-    if (result.second) {
-      newEntry->SetTrie(result.first);
+                if (node != this->end()) {
+                    this->m_cacheHitsTrace(interest, node->payload()->GetData());
 
-      m_didAddEntry(newEntry);
-      return true;
-    }
-    else {
-      // should we do anything?
-      // update payload? add new payload?
-      return false;
-    }
-  }
-  else
-    return false; // cannot insert entry
-}
+                    shared_ptr<Data> copy = make_shared<Data>(*node->payload()->GetData());
+                    return copy;
+                } else {
+                    this->m_cacheMissesTrace(interest);
+                    return 0;
+                }
+            }
 
-template<class Policy>
-void
-ContentStoreImpl<Policy>::Print(std::ostream& os) const
-{
-  for (typename super::policy_container::const_iterator item = this->getPolicy().begin();
-       item != this->getPolicy().end(); item++) {
-    os << item->payload ()->GetName () << std::endl;
-  }
-}
+            template<class Policy>
+            bool
+            ContentStoreImpl<Policy>::Add(shared_ptr<const Data> data) {
+                NS_LOG_FUNCTION(this << data->getName());
 
-template<class Policy>
-void
-ContentStoreImpl<Policy>::SetMaxSize(uint32_t maxSize)
-{
-  this->getPolicy().set_max_size(maxSize);
-}
+                Ptr<entry> newEntry = Create<entry>(this, data);
+                std::pair<typename super::iterator, bool> result = super::insert(data->getName(), newEntry);
 
-template<class Policy>
-uint32_t
-ContentStoreImpl<Policy>::GetMaxSize() const
-{
-  return this->getPolicy().get_max_size();
-}
+                if (result.first != super::end()) {
+                    if (result.second) {
+                        newEntry->SetTrie(result.first);
 
-template<class Policy>
-uint32_t
-ContentStoreImpl<Policy>::GetSize() const
-{
-  return this->getPolicy().size();
-}
+                        m_didAddEntry(newEntry);
+                        return true;
+                    } else {
+                        // should we do anything?
+                        // update payload? add new payload?
+                        return false;
+                    }
+                } else
+                    return false; // cannot insert entry
+            }
 
-template<class Policy>
-Ptr<Entry>
-ContentStoreImpl<Policy>::Begin()
-{
-  typename super::parent_trie::recursive_iterator item(super::getTrie()), end(0);
-  for (; item != end; item++) {
-    if (item->payload() == 0)
-      continue;
-    break;
-  }
+            template<class Policy>
+            void
+            ContentStoreImpl<Policy>::Print(std::ostream& os) const {
+                for (typename super::policy_container::const_iterator item = this->getPolicy().begin();
+                        item != this->getPolicy().end(); item++) {
+                    os << item->payload()->GetName() << std::endl;
+                }
+            }
 
-  if (item == end)
-    return End();
-  else
-    return item->payload();
-}
+            template<class Policy>
+            void
+            ContentStoreImpl<Policy>::SetMaxSize(uint32_t maxSize) {
+                this->getPolicy().set_max_size(maxSize);
+            }
 
-template<class Policy>
-Ptr<Entry>
-ContentStoreImpl<Policy>::End()
-{
-  return 0;
-}
+            template<class Policy>
+            uint32_t
+            ContentStoreImpl<Policy>::GetMaxSize() const {
+                return this->getPolicy().get_max_size();
+            }
 
-template<class Policy>
-Ptr<Entry>
-ContentStoreImpl<Policy>::Next(Ptr<Entry> from)
-{
-  if (from == 0)
-    return 0;
+            template<class Policy>
+            uint32_t
+            ContentStoreImpl<Policy>::GetSize() const {
+                return this->getPolicy().size();
+            }
 
-  typename super::parent_trie::recursive_iterator item(*StaticCast<entry>(from)->to_iterator()),
-    end(0);
+            template<class Policy>
+            Ptr<Entry>
+            ContentStoreImpl<Policy>::Begin() {
+                typename super::parent_trie::recursive_iterator item(super::getTrie()), end(0);
+                for (; item != end; item++) {
+                    if (item->payload() == 0)
+                        continue;
+                    break;
+                }
 
-  for (item++; item != end; item++) {
-    if (item->payload() == 0)
-      continue;
-    break;
-  }
+                if (item == end)
+                    return End();
+                else
+                    return item->payload();
+            }
 
-  if (item == end)
-    return End();
-  else
-    return item->payload();
-}
+            template<class Policy>
+            Ptr<Entry>
+            ContentStoreImpl<Policy>::End() {
+                return 0;
+            }
 
-} // namespace cs
-} // namespace ndn
+            template<class Policy>
+            Ptr<Entry>
+            ContentStoreImpl<Policy>::Next(Ptr<Entry> from) {
+                if (from == 0)
+                    return 0;
+
+                typename super::parent_trie::recursive_iterator item(*StaticCast<entry>(from)->to_iterator()),
+                        end(0);
+
+                for (item++; item != end; item++) {
+                    if (item->payload() == 0)
+                        continue;
+                    break;
+                }
+
+                if (item == end)
+                    return End();
+                else
+                    return item->payload();
+            }
+
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_CONTENT_STORE_IMPL_H_

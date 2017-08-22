@@ -40,183 +40,189 @@
 #include <boost/multi_index/member.hpp>
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-/**
- * @ingroup ndn-apps
- * \brief NDN application for sending out Interest packets
- */
-class Consumer : public App {
-public:
-  static TypeId
-  GetTypeId();
+        /**
+         * @ingroup ndn-apps
+         * \brief NDN application for sending out Interest packets
+         */
+        class Consumer : public App {
+        public:
+            static TypeId
+            GetTypeId();
 
-  /**
-   * \brief Default constructor
-   * Sets up randomizer function and packet sequence number
-   */
-  Consumer();
-  virtual ~Consumer(){};
+            /**
+             * \brief Default constructor
+             * Sets up randomizer function and packet sequence number
+             */
+            Consumer();
 
-  // From App
-  virtual void
-  OnData(shared_ptr<const Data> contentObject);
+            virtual ~Consumer() {
+            };
 
-  // From App
-  virtual void
-  OnNack(shared_ptr<const lp::Nack> nack);
+            // From App
+            virtual void
+            OnData(shared_ptr<const Data> contentObject);
 
-  /**
-   * @brief Timeout event
-   * @param sequenceNumber time outed sequence number
-   */
-  virtual void
-  OnTimeout(uint32_t sequenceNumber);
+            // From App
+            virtual void
+            OnNack(shared_ptr<const lp::Nack> nack);
 
-  /**
-   * @brief Actually send packet
-   */
-  void
-  SendPacket();
+            /**
+             * @brief Timeout event
+             * @param sequenceNumber time outed sequence number
+             */
+            virtual void
+            OnTimeout(uint32_t sequenceNumber);
 
-  /**
-   * @brief An event that is fired just before an Interest packet is actually send out (send is
-   *inevitable)
-   *
-   * The reason for "before" even is that in certain cases (when it is possible to satisfy from the
-   *local cache),
-   * the send call will immediately return data, and if "after" even was used, this after would be
-   *called after
-   * all processing of incoming data, potentially producing unexpected results.
-   */
-  virtual void
-  WillSendOutInterest(uint32_t sequenceNumber);
+            /**
+             * @brief Actually send packet
+             */
+            void
+            SendPacket();
 
-public:
-  typedef void (*LastRetransmittedInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount);
-  typedef void (*FirstInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount, int32_t hopCount);
+            /**
+             * @brief An event that is fired just before an Interest packet is actually send out (send is
+             *inevitable)
+             *
+             * The reason for "before" even is that in certain cases (when it is possible to satisfy from the
+             *local cache),
+             * the send call will immediately return data, and if "after" even was used, this after would be
+             *called after
+             * all processing of incoming data, potentially producing unexpected results.
+             */
+            virtual void
+            WillSendOutInterest(uint32_t sequenceNumber);
 
-protected:
-  // from App
-  virtual void
-  StartApplication();
+        public:
+            typedef void (*LastRetransmittedInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount);
+            typedef void (*FirstInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount, int32_t hopCount);
 
-  virtual void
-  StopApplication();
+        protected:
+            // from App
+            virtual void
+            StartApplication();
 
-  /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
-   * protocol
-   */
-  virtual void
-  ScheduleNextPacket() = 0;
+            virtual void
+            StopApplication();
 
-  /**
-   * \brief Checks if the packet need to be retransmitted becuase of retransmission timer expiration
-   */
-  void
-  CheckRetxTimeout();
+            /**
+             * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
+             * protocol
+             */
+            virtual void
+            ScheduleNextPacket() = 0;
 
-  /**
-   * \brief Modifies the frequency of checking the retransmission timeouts
-   * \param retxTimer Timeout defining how frequent retransmission timeouts should be checked
-   */
-  void
-  SetRetxTimer(Time retxTimer);
+            /**
+             * \brief Checks if the packet need to be retransmitted becuase of retransmission timer expiration
+             */
+            void
+            CheckRetxTimeout();
 
-  /**
-   * \brief Returns the frequency of checking the retransmission timeouts
-   * \return Timeout defining how frequent retransmission timeouts should be checked
-   */
-  Time
-  GetRetxTimer() const;
+            /**
+             * \brief Modifies the frequency of checking the retransmission timeouts
+             * \param retxTimer Timeout defining how frequent retransmission timeouts should be checked
+             */
+            void
+            SetRetxTimer(Time retxTimer);
 
-protected:
-  Ptr<UniformRandomVariable> m_rand; ///< @brief nonce generator
+            /**
+             * \brief Returns the frequency of checking the retransmission timeouts
+             * \return Timeout defining how frequent retransmission timeouts should be checked
+             */
+            Time
+            GetRetxTimer() const;
 
-  uint32_t m_seq;      ///< @brief currently requested sequence number
-  uint32_t m_seqMax;   ///< @brief maximum number of sequence number
-  EventId m_sendEvent; ///< @brief EventId of pending "send packet" event
-  Time m_retxTimer;    ///< @brief Currently estimated retransmission timer
-  EventId m_retxEvent; ///< @brief Event to check whether or not retransmission should be performed
-  uint64_t m_tx_bytes; ///< @brief Total transmitted bytes
-  uint64_t m_rx_bytes; ///< @brief Total received bytes
-  uint64_t m_tx_packets; ///< @brief Total transmitted bytes
-  uint64_t m_rx_packets; ///< @brief Total received bytes
+        protected:
+            Ptr<UniformRandomVariable> m_rand; ///< @brief nonce generator
 
-  Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
+            uint32_t m_seq; ///< @brief currently requested sequence number
+            uint32_t m_seqMax; ///< @brief maximum number of sequence number
+            EventId m_sendEvent; ///< @brief EventId of pending "send packet" event
+            Time m_retxTimer; ///< @brief Currently estimated retransmission timer
+            EventId m_retxEvent; ///< @brief Event to check whether or not retransmission should be performed
+            uint64_t m_tx_bytes; ///< @brief Total transmitted bytes
+            uint64_t m_rx_bytes; ///< @brief Total received bytes
+            uint64_t m_tx_packets; ///< @brief Total transmitted bytes
+            uint64_t m_rx_packets; ///< @brief Total received bytes
 
-  Time m_offTime;          ///< \brief Time interval between packets
-  Name m_interestName;     ///< \brief NDN Name of the Interest (use Name)
-  Time m_interestLifeTime; ///< \brief LifeTime for interest packet
+            Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
 
-  /// @cond include_hidden
-  /**
-   * \struct This struct contains sequence numbers of packets to be retransmitted
-   */
-  struct RetxSeqsContainer : public std::set<uint32_t> {
-  };
+            Time m_offTime; ///< \brief Time interval between packets
+            Name m_interestName; ///< \brief NDN Name of the Interest (use Name)
+            Time m_interestLifeTime; ///< \brief LifeTime for interest packet
 
-  RetxSeqsContainer m_retxSeqs; ///< \brief ordered set of sequence numbers to be retransmitted
+            /// @cond include_hidden
 
-  /**
-   * \struct This struct contains a pair of packet sequence number and its timeout
-   */
-  struct SeqTimeout {
-    SeqTimeout(uint32_t _seq, Time _time)
-      : seq(_seq)
-      , time(_time)
-    {
-    }
+            /**
+             * \struct This struct contains sequence numbers of packets to be retransmitted
+             */
+            struct RetxSeqsContainer : public std::set<uint32_t> {
+            };
 
-    uint32_t seq;
-    Time time;
-  };
-  /// @endcond
+            RetxSeqsContainer m_retxSeqs; ///< \brief ordered set of sequence numbers to be retransmitted
 
-  /// @cond include_hidden
-  class i_seq {
-  };
-  class i_timestamp {
-  };
-  /// @endcond
+            /**
+             * \struct This struct contains a pair of packet sequence number and its timeout
+             */
+            struct SeqTimeout {
 
-  /// @cond include_hidden
-  /**
-   * \struct This struct contains a multi-index for the set of SeqTimeout structs
-   */
-  struct SeqTimeoutsContainer
-    : public boost::multi_index::
-        multi_index_container<SeqTimeout,
-                              boost::multi_index::
-                                indexed_by<boost::multi_index::
-                                             ordered_unique<boost::multi_index::tag<i_seq>,
-                                                            boost::multi_index::
-                                                              member<SeqTimeout, uint32_t,
-                                                                     &SeqTimeout::seq>>,
-                                           boost::multi_index::
-                                             ordered_non_unique<boost::multi_index::
-                                                                  tag<i_timestamp>,
-                                                                boost::multi_index::
-                                                                  member<SeqTimeout, Time,
-                                                                         &SeqTimeout::time>>>> {
-  };
+                SeqTimeout(uint32_t _seq, Time _time)
+                : seq(_seq)
+                , time(_time) {
+                }
 
-  SeqTimeoutsContainer m_seqTimeouts; ///< \brief multi-index for the set of SeqTimeout structs
+                uint32_t seq;
+                Time time;
+            };
+            /// @endcond
 
-  SeqTimeoutsContainer m_seqLastDelay;
-  SeqTimeoutsContainer m_seqFullDelay;
-  std::map<uint32_t, uint32_t> m_seqRetxCounts;
+            /// @cond include_hidden
 
-  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */, int32_t /*hop count*/>
-    m_lastRetransmittedInterestDataDelay;
-  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */,
-                 uint32_t /*retx count*/, int32_t /*hop count*/> m_firstInterestDataDelay;
+            class i_seq {
+            };
 
-  /// @endcond
-};
+            class i_timestamp {
+            };
+            /// @endcond
 
-} // namespace ndn
+            /// @cond include_hidden
+            /**
+             * \struct This struct contains a multi-index for the set of SeqTimeout structs
+             */
+            struct SeqTimeoutsContainer
+            : public boost::multi_index::
+            multi_index_container<SeqTimeout,
+            boost::multi_index::
+            indexed_by<boost::multi_index::
+            ordered_unique<boost::multi_index::tag<i_seq>,
+            boost::multi_index::
+            member<SeqTimeout, uint32_t,
+            &SeqTimeout::seq>>,
+            boost::multi_index::
+            ordered_non_unique<boost::multi_index::
+            tag<i_timestamp>,
+            boost::multi_index::
+            member<SeqTimeout, Time,
+            &SeqTimeout::time>>>>
+            {
+            };
+
+            SeqTimeoutsContainer m_seqTimeouts; ///< \brief multi-index for the set of SeqTimeout structs
+
+            SeqTimeoutsContainer m_seqLastDelay;
+            SeqTimeoutsContainer m_seqFullDelay;
+            std::map<uint32_t, uint32_t> m_seqRetxCounts;
+
+            TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */, int32_t /*hop count*/>
+            m_lastRetransmittedInterestDataDelay;
+            TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */,
+            uint32_t /*retx count*/, int32_t /*hop count*/> m_firstInterestDataDelay;
+
+            /// @endcond
+        };
+
+    } // namespace ndn
 } // namespace ns3
 
 #endif

@@ -13,7 +13,8 @@
 
 #include "stacks_header.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("ip-stack");
 
     void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
@@ -106,7 +107,7 @@ namespace ns3 {
                 server.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
                 apps = server.Install(iot[itr].Get(jdx));
                 server.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
-                interval_sel = Rinterval->GetValue(0.1,1);
+                interval_sel = Rinterval->GetValue(0.1, 1);
                 apps.Start(Seconds(1.0 + interval_sel));
                 apps.Stop(Seconds(simtime));
 

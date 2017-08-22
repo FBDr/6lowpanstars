@@ -33,66 +33,61 @@ const double TOLERANCE = 1e-14;
 
 class OneIntegerAverageTestCase : public TestCase
 {
-public:
-  OneIntegerAverageTestCase ();
-  virtual ~OneIntegerAverageTestCase ();
+    public :
+    OneIntegerAverageTestCase();
+    virtual ~OneIntegerAverageTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-OneIntegerAverageTestCase::OneIntegerAverageTestCase ()
-  : TestCase ("Average Object Test using One Integer")
-
-{
+OneIntegerAverageTestCase::OneIntegerAverageTestCase()
+: TestCase("Average Object Test using One Integer")
+ {
 }
 
-OneIntegerAverageTestCase::~OneIntegerAverageTestCase ()
-{
+OneIntegerAverageTestCase::~OneIntegerAverageTestCase() {
 }
 
 void
-OneIntegerAverageTestCase::DoRun (void)
-{
-  Average<int> calculator;
+OneIntegerAverageTestCase::DoRun(void) {
+    Average<int> calculator;
 
-  long count = 1;
+    long count = 1;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  int multiple = 5;
-  int value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    int multiple = 5;
+    int value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = 0;
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = 0;
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Count (),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Min (),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Max (),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Mean (),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Stddev (),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Var (), variance, TOLERANCE, "Variance value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Count(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Min(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Max(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Mean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Stddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Var(), variance, TOLERANCE, "Variance value wrong");
 }
 
 
@@ -102,66 +97,61 @@ OneIntegerAverageTestCase::DoRun (void)
 
 class FiveIntegersAverageTestCase : public TestCase
 {
-public:
-  FiveIntegersAverageTestCase ();
-  virtual ~FiveIntegersAverageTestCase ();
+    public :
+    FiveIntegersAverageTestCase();
+    virtual ~FiveIntegersAverageTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-FiveIntegersAverageTestCase::FiveIntegersAverageTestCase ()
-  : TestCase ("Average Object Test using Five Integers")
-
-{
+FiveIntegersAverageTestCase::FiveIntegersAverageTestCase()
+: TestCase("Average Object Test using Five Integers")
+ {
 }
 
-FiveIntegersAverageTestCase::~FiveIntegersAverageTestCase ()
-{
+FiveIntegersAverageTestCase::~FiveIntegersAverageTestCase() {
 }
 
 void
-FiveIntegersAverageTestCase::DoRun (void)
-{
-  Average<int> calculator;
+FiveIntegersAverageTestCase::DoRun(void) {
+    Average<int> calculator;
 
-  long count = 5;
+    long count = 5;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  int multiple = 5;
-  int value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    int multiple = 5;
+    int value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = (count * sqrSum - sum * sum) / (count * (count - 1));
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = (count * sqrSum - sum * sum) / (count * (count - 1));
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Count (),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Min (),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Max (),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Mean (),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Stddev (),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Var (), variance, TOLERANCE, "Variance value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Count(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Min(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Max(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Mean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Stddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Var(), variance, TOLERANCE, "Variance value wrong");
 }
 
 
@@ -171,81 +161,74 @@ FiveIntegersAverageTestCase::DoRun (void)
 
 class FiveDoublesAverageTestCase : public TestCase
 {
-public:
-  FiveDoublesAverageTestCase ();
-  virtual ~FiveDoublesAverageTestCase ();
+    public :
+    FiveDoublesAverageTestCase();
+    virtual ~FiveDoublesAverageTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-FiveDoublesAverageTestCase::FiveDoublesAverageTestCase ()
-  : TestCase ("Average Object Test using Five Double Values")
-
-{
+FiveDoublesAverageTestCase::FiveDoublesAverageTestCase()
+: TestCase("Average Object Test using Five Double Values")
+ {
 }
 
-FiveDoublesAverageTestCase::~FiveDoublesAverageTestCase ()
-{
+FiveDoublesAverageTestCase::~FiveDoublesAverageTestCase() {
 }
 
 void
-FiveDoublesAverageTestCase::DoRun (void)
-{
-  Average<double> calculator;
+FiveDoublesAverageTestCase::DoRun(void) {
+    Average<double> calculator;
 
-  long count = 5;
+    long count = 5;
 
-  double sum = 0;
-  double sqrSum = 0;
-  double min;
-  double max;
-  double mean;
-  double stddev;
-  double variance;
+    double sum = 0;
+    double sqrSum = 0;
+    double min;
+    double max;
+    double mean;
+    double stddev;
+    double variance;
 
-  // Put all of the values into the calculator.
-  double multiple = 3.14;
-  double value;
-  for (long i = 0; i < count; i++)
-    {
-      value = multiple * (i + 1);
+    // Put all of the values into the calculator.
+    double multiple = 3.14;
+    double value;
+    for (long i = 0; i < count; i++) {
+        value = multiple * (i + 1);
 
-      calculator.Update (value);
+        calculator.Update(value);
 
-      sum    += value;
-      sqrSum += value * value;
+        sum += value;
+        sqrSum += value * value;
     }
 
-  // Calculate the expected values for the statistical functions.
-  min = multiple;
-  max = multiple * count;
-  mean = sum / count;
-  variance = (count * sqrSum - sum * sum) / (count * (count - 1));
-  stddev = std::sqrt (variance);
+    // Calculate the expected values for the statistical functions.
+    min = multiple;
+    max = multiple * count;
+    mean = sum / count;
+    variance = (count * sqrSum - sum * sum) / (count * (count - 1));
+    stddev = std::sqrt(variance);
 
-  // Test the calculator.
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Count (),    count,    TOLERANCE, "Count value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Min (),      min,      TOLERANCE, "Min value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Max (),      max,      TOLERANCE, "Max value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Mean (),     mean,     TOLERANCE, "Mean value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Stddev (),   stddev,   TOLERANCE, "Stddev value wrong");
-  NS_TEST_ASSERT_MSG_EQ_TOL (calculator.Var (), variance, TOLERANCE, "Variance value wrong");
+    // Test the calculator.
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Count(), count, TOLERANCE, "Count value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Min(), min, TOLERANCE, "Min value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Max(), max, TOLERANCE, "Max value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Mean(), mean, TOLERANCE, "Mean value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Stddev(), stddev, TOLERANCE, "Stddev value wrong");
+    NS_TEST_ASSERT_MSG_EQ_TOL(calculator.Var(), variance, TOLERANCE, "Variance value wrong");
 }
 
 
 class AverageTestSuite : public TestSuite
 {
-public:
-  AverageTestSuite ();
-};
+    public :
+    AverageTestSuite();};
 
-AverageTestSuite::AverageTestSuite ()
-  : TestSuite ("average", UNIT)
-{
-  AddTestCase (new OneIntegerAverageTestCase, TestCase::QUICK);
-  AddTestCase (new FiveIntegersAverageTestCase, TestCase::QUICK);
-  AddTestCase (new FiveDoublesAverageTestCase, TestCase::QUICK);
+AverageTestSuite::AverageTestSuite()
+: TestSuite("average", UNIT) {
+    AddTestCase(new OneIntegerAverageTestCase, TestCase::QUICK);
+    AddTestCase(new FiveIntegersAverageTestCase, TestCase::QUICK);
+    AddTestCase(new FiveDoublesAverageTestCase, TestCase::QUICK);
 }
 
 static AverageTestSuite averageTestSuite;

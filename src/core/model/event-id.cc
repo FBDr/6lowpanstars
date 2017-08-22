@@ -28,82 +28,80 @@
  * ns3::EventId implementation.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("EventId");
+    NS_LOG_COMPONENT_DEFINE("EventId");
 
-EventId::EventId ()
-  : m_eventImpl (0),
-    m_ts (0),
-    m_context (0),
-    m_uid (0)
-{
-  NS_LOG_FUNCTION (this);
-}
+    EventId::EventId()
+            : m_eventImpl(0),
+            m_ts(0),
+            m_context(0),
+            m_uid(0) {
+        NS_LOG_FUNCTION(this);
+    }
 
-EventId::EventId (const Ptr<EventImpl> &impl, uint64_t ts, uint32_t context, uint32_t uid)
-  : m_eventImpl (impl),
-    m_ts (ts),
-    m_context (context),
-    m_uid (uid)
-{
-  NS_LOG_FUNCTION (this << impl << ts << context << uid);
-}
-void
-EventId::Cancel (void)
-{
-  NS_LOG_FUNCTION (this);
-  Simulator::Cancel (*this);
-}
-bool
-EventId::IsExpired (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return Simulator::IsExpired (*this);
-}
-bool
-EventId::IsRunning (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return !IsExpired ();
-}
-EventImpl *
-EventId::PeekEventImpl (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return PeekPointer (m_eventImpl);
-}
-uint64_t 
-EventId::GetTs (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_ts;
-}
-uint32_t 
-EventId::GetContext (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_context;
-}
-uint32_t 
-EventId::GetUid (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_uid;
-}
+    EventId::EventId(const Ptr<EventImpl> &impl, uint64_t ts, uint32_t context, uint32_t uid)
+            : m_eventImpl(impl),
+            m_ts(ts),
+            m_context(context),
+            m_uid(uid) {
+        NS_LOG_FUNCTION(this << impl << ts << context << uid);
+    }
 
-bool operator == (const EventId &a, const EventId &b)
-{
-  return 
-    a.m_uid == b.m_uid && 
-    a.m_context == b.m_context && 
-    a.m_ts == b.m_ts && 
-    a.m_eventImpl == b.m_eventImpl;
-}
-bool operator != (const EventId &a, const EventId &b)
-{
-  return !(a == b);
-}
+    void
+    EventId::Cancel(void) {
+        NS_LOG_FUNCTION(this);
+        Simulator::Cancel(*this);
+    }
+
+    bool
+    EventId::IsExpired(void) const {
+        NS_LOG_FUNCTION(this);
+        return Simulator::IsExpired(*this);
+    }
+
+    bool
+    EventId::IsRunning(void) const {
+        NS_LOG_FUNCTION(this);
+        return !IsExpired();
+    }
+
+    EventImpl *
+            EventId::PeekEventImpl(void) const {
+        NS_LOG_FUNCTION(this);
+        return PeekPointer(m_eventImpl);
+    }
+
+    uint64_t
+    EventId::GetTs(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_ts;
+    }
+
+    uint32_t
+    EventId::GetContext(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_context;
+    }
+
+    uint32_t
+    EventId::GetUid(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_uid;
+    }
+
+    bool operator == (const EventId &a, const EventId & b) {
+        return
+        a.m_uid == b.m_uid &&
+                a.m_context == b.m_context &&
+                a.m_ts == b.m_ts &&
+                a.m_eventImpl == b.m_eventImpl;
+    }
+
+    bool operator != (const EventId &a, const EventId & b) {
+        return !(a == b);
+    }
 
 
 

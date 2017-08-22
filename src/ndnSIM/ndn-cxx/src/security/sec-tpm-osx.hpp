@@ -33,137 +33,131 @@
 #include "sec-tpm.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class SecTpmOsx : public SecTpm
-{
-public:
-  class Error : public SecTpm::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : SecTpm::Error(what)
-    {
-    }
-  };
+        class SecTpmOsx : public SecTpm {
+        public:
 
-  explicit
-  SecTpmOsx(const std::string& location = "");
+            class Error : public SecTpm::Error {
+            public:
 
-  virtual
-  ~SecTpmOsx();
+                explicit
+                Error(const std::string& what)
+                : SecTpm::Error(what) {
+                }
+            };
 
-  // Following methods are inherited from SecTpm
-  virtual void
-  setTpmPassword(const uint8_t* password, size_t passwordLength);
+            explicit
+            SecTpmOsx(const std::string& location = "");
 
-  virtual void
-  resetTpmPassword();
+            virtual
+            ~SecTpmOsx();
 
-  virtual void
-  setInTerminal(bool inTerminal);
+            // Following methods are inherited from SecTpm
+            virtual void
+            setTpmPassword(const uint8_t* password, size_t passwordLength);
 
-  virtual bool
-  getInTerminal() const;
+            virtual void
+            resetTpmPassword();
 
-  virtual bool
-  isLocked();
+            virtual void
+            setInTerminal(bool inTerminal);
 
-  virtual bool
-  unlockTpm(const char* password, size_t passwordLength, bool usePassword);
+            virtual bool
+            getInTerminal() const;
 
-  virtual void
-  generateKeyPairInTpm(const Name& keyName, const KeyParams& params)
-  {
-    generateKeyPairInTpmInternal(keyName, params, false);
-  }
+            virtual bool
+            isLocked();
 
-  virtual void
-  deleteKeyPairInTpm(const Name& keyName)
-  {
-    deleteKeyPairInTpmInternal(keyName, false);
-  }
+            virtual bool
+            unlockTpm(const char* password, size_t passwordLength, bool usePassword);
 
-  virtual shared_ptr<v1::PublicKey>
-  getPublicKeyFromTpm(const Name& keyName);
+            virtual void
+            generateKeyPairInTpm(const Name& keyName, const KeyParams& params) {
+                generateKeyPairInTpmInternal(keyName, params, false);
+            }
 
-  virtual Block
-  signInTpm(const uint8_t* data, size_t dataLength,
-            const Name& keyName, DigestAlgorithm digestAlgorithm)
-  {
-    return signInTpmInternal(data, dataLength, keyName, digestAlgorithm, false);
-  }
+            virtual void
+            deleteKeyPairInTpm(const Name& keyName) {
+                deleteKeyPairInTpmInternal(keyName, false);
+            }
 
-  virtual ConstBufferPtr
-  decryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
+            virtual shared_ptr<v1::PublicKey>
+            getPublicKeyFromTpm(const Name& keyName);
 
-  virtual ConstBufferPtr
-  encryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
+            virtual Block
+            signInTpm(const uint8_t* data, size_t dataLength,
+                    const Name& keyName, DigestAlgorithm digestAlgorithm) {
+                return signInTpmInternal(data, dataLength, keyName, digestAlgorithm, false);
+            }
 
-  virtual void
-  generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params);
+            virtual ConstBufferPtr
+            decryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
 
-  virtual bool
-  doesKeyExistInTpm(const Name& keyName, KeyClass keyClass);
+            virtual ConstBufferPtr
+            encryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
 
-  virtual bool
-  generateRandomBlock(uint8_t* res, size_t size);
+            virtual void
+            generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params);
 
-  virtual void
-  addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl);
+            virtual bool
+            doesKeyExistInTpm(const Name& keyName, KeyClass keyClass);
 
-protected:
-  // Following methods are inherited from SecTpm
-  virtual std::string
-  getScheme();
+            virtual bool
+            generateRandomBlock(uint8_t* res, size_t size);
 
-  virtual ConstBufferPtr
-  exportPrivateKeyPkcs8FromTpm(const Name& keyName)
-  {
-    return exportPrivateKeyPkcs8FromTpmInternal(keyName, false);
-  }
+            virtual void
+            addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl);
 
-  virtual bool
-  importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size)
-  {
-    return importPrivateKeyPkcs8IntoTpmInternal(keyName, buf, size, false);
-  }
+        protected:
+            // Following methods are inherited from SecTpm
+            virtual std::string
+            getScheme();
 
-  virtual bool
-  importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
+            virtual ConstBufferPtr
+            exportPrivateKeyPkcs8FromTpm(const Name& keyName) {
+                return exportPrivateKeyPkcs8FromTpmInternal(keyName, false);
+            }
 
-  // Following methods are OSX-specific
-  void
-  generateKeyPairInTpmInternal(const Name& keyName, const KeyParams& params, bool needRetry);
+            virtual bool
+            importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size) {
+                return importPrivateKeyPkcs8IntoTpmInternal(keyName, buf, size, false);
+            }
 
-  void
-  deleteKeyPairInTpmInternal(const Name& keyName, bool needRetry);
+            virtual bool
+            importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
 
-  ConstBufferPtr
-  exportPrivateKeyPkcs8FromTpmInternal(const Name& keyName, bool needRetry);
+            // Following methods are OSX-specific
+            void
+            generateKeyPairInTpmInternal(const Name& keyName, const KeyParams& params, bool needRetry);
 
-  bool
-  importPrivateKeyPkcs8IntoTpmInternal(const Name& keyName,
-                                       const uint8_t* buf, size_t size,
-                                       bool needRetry);
+            void
+            deleteKeyPairInTpmInternal(const Name& keyName, bool needRetry);
 
-  Block
-  signInTpmInternal(const uint8_t* data, size_t dataLength,
+            ConstBufferPtr
+            exportPrivateKeyPkcs8FromTpmInternal(const Name& keyName, bool needRetry);
+
+            bool
+            importPrivateKeyPkcs8IntoTpmInternal(const Name& keyName,
+                    const uint8_t* buf, size_t size,
+                    bool needRetry);
+
+            Block
+            signInTpmInternal(const uint8_t* data, size_t dataLength,
                     const Name& keyName, DigestAlgorithm digestAlgorithm,
                     bool needRetry);
 
-public:
-  static const std::string SCHEME;
+        public:
+            static const std::string SCHEME;
 
-private:
-  class Impl;
-  shared_ptr<Impl> m_impl;
-};
+        private:
+            class Impl;
+            shared_ptr<Impl> m_impl;
+        };
 
-} // namespace security
+    } // namespace security
 
-using security::SecTpmOsx;
+    using security::SecTpmOsx;
 
 } // namespace ndn
 

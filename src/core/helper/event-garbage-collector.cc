@@ -23,67 +23,57 @@
 #define CLEANUP_CHUNK_MAX_SIZE 128
 
 
-namespace ns3 {
-
-
-EventGarbageCollector::EventGarbageCollector () :
-  m_nextCleanupSize (CLEANUP_CHUNK_MIN_SIZE)
+namespace ns3
 {
-}
 
-void
-EventGarbageCollector::Track (EventId event)
-{
-  m_events.insert (event);
-  if (m_events.size () >= m_nextCleanupSize)
-    Cleanup ();
-}
+    EventGarbageCollector::EventGarbageCollector() :
+            m_nextCleanupSize(CLEANUP_CHUNK_MIN_SIZE) {
+    }
 
-void
-EventGarbageCollector::Grow ()
-{
-  m_nextCleanupSize += (m_nextCleanupSize < CLEANUP_CHUNK_MAX_SIZE ?
-                        m_nextCleanupSize : CLEANUP_CHUNK_MAX_SIZE);
-}
+    void
+    EventGarbageCollector::Track(EventId event) {
+        m_events.insert(event);
+        if (m_events.size() >= m_nextCleanupSize)
+            Cleanup();
+    }
 
-void
-EventGarbageCollector::Shrink ()
-{
-  while (m_nextCleanupSize > m_events.size ())
-    m_nextCleanupSize >>= 1;
-  Grow ();
-}
+    void
+    EventGarbageCollector::Grow() {
+        m_nextCleanupSize += (m_nextCleanupSize < CLEANUP_CHUNK_MAX_SIZE ?
+                m_nextCleanupSize : CLEANUP_CHUNK_MAX_SIZE);
+    }
 
-// Called when a new event was added and the cleanup limit was exceeded in consequence.
-void
-EventGarbageCollector::Cleanup ()
-{
-  for (EventList::iterator iter = m_events.begin (); iter != m_events.end ();)
-    {
-      if ((*iter).IsExpired ())
-        {
-          m_events.erase (iter++);
+    void
+    EventGarbageCollector::Shrink() {
+        while (m_nextCleanupSize > m_events.size())
+            m_nextCleanupSize >>= 1;
+        Grow();
+    }
+
+    // Called when a new event was added and the cleanup limit was exceeded in consequence.
+
+    void
+    EventGarbageCollector::Cleanup() {
+        for (EventList::iterator iter = m_events.begin(); iter != m_events.end();) {
+            if ((*iter).IsExpired()) {
+                m_events.erase(iter++);
+            } else
+                break; // EventIds are sorted by timestamp => further events are not expired for sure
         }
-      else
-        break;  // EventIds are sorted by timestamp => further events are not expired for sure
+
+        // If after cleanup we are still over the limit, increase the limit.
+        if (m_events.size() >= m_nextCleanupSize)
+            Grow();
+        else
+            Shrink();
     }
 
-  // If after cleanup we are still over the limit, increase the limit.
-  if (m_events.size () >= m_nextCleanupSize)
-    Grow ();
-  else
-    Shrink ();
-}
-
-
-EventGarbageCollector::~EventGarbageCollector ()
-{
-  for (EventList::iterator event = m_events.begin ();
-       event != m_events.end (); event++)
-    {
-      Simulator::Cancel (*event);
+    EventGarbageCollector::~EventGarbageCollector() {
+        for (EventList::iterator event = m_events.begin();
+                event != m_events.end(); event++) {
+            Simulator::Cancel(*event);
+        }
     }
-}
 
 } // namespace ns3
 

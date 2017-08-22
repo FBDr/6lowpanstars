@@ -30,150 +30,127 @@
 
 namespace ns3 {
 
-class SSRecord;
-class ServiceFlow;
+    class SSRecord;
+    class ServiceFlow;
 
-enum ReqType
-{
-  DATA, UNICAST_POLLING
-};
+    enum ReqType {
+        DATA, UNICAST_POLLING
+    };
 
-/**
- * \ingroup wimax
- * \brief this class implements a structure to compute the priority of service flows
- */
-class UlJob : public Object
-{
-public:
-  enum JobPriority
-  {
-    LOW, INTERMEDIATE, HIGH
-  };
-  UlJob (void);
-  virtual ~UlJob (void);
-  SSRecord *
-  GetSsRecord (void);
-  void SetSsRecord (SSRecord* ssRecord);
-  enum ServiceFlow::SchedulingType GetSchedulingType (void);
-  void SetSchedulingType (ServiceFlow::SchedulingType schedulingType);
-  ServiceFlow *
-  GetServiceFlow (void);
-  void SetServiceFlow (ServiceFlow *serviceFlow);
+    /**
+     * \ingroup wimax
+     * \brief this class implements a structure to compute the priority of service flows
+     */
+    class UlJob : public Object {
+    public:
 
-  ReqType GetType (void);
-  void SetType (ReqType type);
+        enum JobPriority {
+            LOW, INTERMEDIATE, HIGH
+        };
+        UlJob(void);
+        virtual ~UlJob(void);
+        SSRecord *
+        GetSsRecord(void);
+        void SetSsRecord(SSRecord* ssRecord);
+        enum ServiceFlow::SchedulingType GetSchedulingType(void);
+        void SetSchedulingType(ServiceFlow::SchedulingType schedulingType);
+        ServiceFlow *
+        GetServiceFlow(void);
+        void SetServiceFlow(ServiceFlow *serviceFlow);
 
-  Time GetReleaseTime (void);
-  void SetReleaseTime (Time releaseTime);
+        ReqType GetType(void);
+        void SetType(ReqType type);
 
-  Time GetPeriod (void);
-  void SetPeriod (Time period);
+        Time GetReleaseTime(void);
+        void SetReleaseTime(Time releaseTime);
 
-  Time GetDeadline (void);
-  void SetDeadline (Time deadline);
+        Time GetPeriod(void);
+        void SetPeriod(Time period);
 
-  uint32_t GetSize (void);
-  void SetSize (uint32_t size);
+        Time GetDeadline(void);
+        void SetDeadline(Time deadline);
 
-private:
-  friend bool operator == (const UlJob &a, const UlJob &b);
+        uint32_t GetSize(void);
+        void SetSize(uint32_t size);
 
-  Time m_releaseTime; /* The time after which the job can be processed*/
-  Time m_period; /* For periodic jobs*/
-  Time m_deadline; /* Request should be satisfied by this time */
-  uint32_t m_size; /* Number of minislots requested */
-  enum ServiceFlow::SchedulingType m_schedulingType; /* Scheduling type of flow */
+    private:
+        friend bool operator==(const UlJob &a, const UlJob &b);
 
-  uint8_t m_flag; /* To delete or not..*/
-  uint8_t m_retryCount;
-  double m_ugsJitter; /* The jitter in the grant, valid only for UGS flows */
-  int m_jitterSamples;
-  double m_last_jitterCalTime; /* Last time avg jitter was calculated */
+        Time m_releaseTime; /* The time after which the job can be processed*/
+        Time m_period; /* For periodic jobs*/
+        Time m_deadline; /* Request should be satisfied by this time */
+        uint32_t m_size; /* Number of minislots requested */
+        enum ServiceFlow::SchedulingType m_schedulingType; /* Scheduling type of flow */
 
-  SSRecord *m_ssRecord; /* Pointer to SSRecord */
+        uint8_t m_flag; /* To delete or not..*/
+        uint8_t m_retryCount;
+        double m_ugsJitter; /* The jitter in the grant, valid only for UGS flows */
+        int m_jitterSamples;
+        double m_last_jitterCalTime; /* Last time avg jitter was calculated */
 
-  ReqType m_type; /* Type of request, DATA or Unicast req slots */
-  ServiceFlow *m_serviceFlow;
+        SSRecord *m_ssRecord; /* Pointer to SSRecord */
 
-};
+        ReqType m_type; /* Type of request, DATA or Unicast req slots */
+        ServiceFlow *m_serviceFlow;
 
+    };
 
-class PriorityUlJob : public Object
-{
+    class PriorityUlJob : public Object {
+        /**
+         * \brief this class implements an auxiliar struct to compute the priority of the rtPS and nrtPS in
+         * the intermediate queue
+         */
+    public:
+        PriorityUlJob();
+        int GetPriority(void);
+        void SetPriority(int priority);
 
-  /**
-   * \brief this class implements an auxiliar struct to compute the priority of the rtPS and nrtPS in
-   * the intermediate queue
-   */
-public:
-  PriorityUlJob ();
-  int GetPriority (void);
-  void SetPriority (int priority);
+        Ptr<UlJob>
+        GetUlJob(void);
+        void SetUlJob(Ptr<UlJob> job);
 
-  Ptr<UlJob>
-  GetUlJob (void);
-  void SetUlJob (Ptr<UlJob> job);
+    private:
+        int m_priority;
+        Ptr<UlJob> m_job;
+    };
 
-private:
-  int m_priority;
-  Ptr<UlJob> m_job;
-};
+    struct SortProcess : public std::binary_function<PriorityUlJob*, PriorityUlJob*, bool> {
 
-struct SortProcess : public std::binary_function<PriorityUlJob*, PriorityUlJob*, bool>
-{
-  bool operator () (PriorityUlJob& left, PriorityUlJob& right) const
-  { // return true if left is logically less then right for given comparison
-    if (left.GetPriority () < right.GetPriority ())
-      {
-        return true;
-      }
-    else if (left.GetPriority () == right.GetPriority ())
-      {
-        int32_t leftBacklogged = left.GetUlJob ()->GetServiceFlow ()->GetRecord ()->GetBacklogged ();
-        int32_t rightBacklogged = left.GetUlJob ()->GetServiceFlow ()->GetRecord ()->GetBacklogged ();
-        if (leftBacklogged <= rightBacklogged)
-          {
-            return true;
-          }
-        else
-          {
-            return false;
-          }
-      }
-    else
-      {
-        return false;
-      }
-  }
-};
+        bool operator()(PriorityUlJob& left, PriorityUlJob& right) const { // return true if left is logically less then right for given comparison
+            if (left.GetPriority() < right.GetPriority()) {
+                return true;
+            } else if (left.GetPriority() == right.GetPriority()) {
+                int32_t leftBacklogged = left.GetUlJob()->GetServiceFlow()->GetRecord()->GetBacklogged();
+                int32_t rightBacklogged = left.GetUlJob()->GetServiceFlow()->GetRecord()->GetBacklogged();
+                if (leftBacklogged <= rightBacklogged) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    };
 
-struct SortProcessPtr: public std::binary_function< Ptr<PriorityUlJob>, Ptr<PriorityUlJob>, bool>
-{
-  bool operator () (Ptr<PriorityUlJob>& left, Ptr<PriorityUlJob>& right) const
-  { //return true if left is logically less then right for given comparison
-    if (left->GetPriority () < right->GetPriority ())
-      {
-        return true;
-      }
-    else if (left->GetPriority () == right->GetPriority ())
-      {
-        int32_t leftBacklogged = left->GetUlJob ()->GetServiceFlow ()->GetRecord ()->GetBacklogged ();
-        int32_t rightBacklogged = left->GetUlJob ()->GetServiceFlow ()->GetRecord ()->GetBacklogged ();
-        if (leftBacklogged <= rightBacklogged)
-          {
-            return true;
-          }
-        else
-          {
-            return false;
-          }
-      }
-    else
-      {
-        return false;
-      }
-  }
-};
+    struct SortProcessPtr : public std::binary_function< Ptr<PriorityUlJob>, Ptr<PriorityUlJob>, bool> {
+
+        bool operator()(Ptr<PriorityUlJob>& left, Ptr<PriorityUlJob>& right) const { //return true if left is logically less then right for given comparison
+            if (left->GetPriority() < right->GetPriority()) {
+                return true;
+            } else if (left->GetPriority() == right->GetPriority()) {
+                int32_t leftBacklogged = left->GetUlJob()->GetServiceFlow()->GetRecord()->GetBacklogged();
+                int32_t rightBacklogged = left->GetUlJob()->GetServiceFlow()->GetRecord()->GetBacklogged();
+                if (leftBacklogged <= rightBacklogged) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    };
 
 
 } // namespace ns3

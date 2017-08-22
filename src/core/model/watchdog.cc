@@ -27,50 +27,43 @@
  * ns3::Watchdog timer class implementation.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Watchdog");
-
-Watchdog::Watchdog ()
-  : m_impl (0),
-    m_event (),
-    m_end (MicroSeconds (0))
+namespace ns3
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
 
-Watchdog::~Watchdog ()
-{
-  NS_LOG_FUNCTION (this);
-  delete m_impl;
-}
+    NS_LOG_COMPONENT_DEFINE("Watchdog");
 
-void
-Watchdog::Ping (Time delay)
-{
-  NS_LOG_FUNCTION (this << delay);
-  Time end = Simulator::Now () + delay;
-  m_end = std::max (m_end, end);
-  if (m_event.IsRunning ())
-    {
-      return;
+    Watchdog::Watchdog()
+            : m_impl(0),
+            m_event(),
+            m_end(MicroSeconds(0)) {
+        NS_LOG_FUNCTION_NOARGS();
     }
-  m_event = Simulator::Schedule (m_end - Now (), &Watchdog::Expire, this);
-}
 
-void
-Watchdog::Expire (void)
-{
-  NS_LOG_FUNCTION (this);
-  if (m_end == Simulator::Now ())
-    {
-      m_impl->Invoke ();
+    Watchdog::~Watchdog() {
+        NS_LOG_FUNCTION(this);
+        delete m_impl;
     }
-  else
-    {
-      m_event = Simulator::Schedule (m_end - Now (), &Watchdog::Expire, this);
+
+    void
+    Watchdog::Ping(Time delay) {
+        NS_LOG_FUNCTION(this << delay);
+        Time end = Simulator::Now() + delay;
+        m_end = std::max(m_end, end);
+        if (m_event.IsRunning()) {
+            return;
+        }
+        m_event = Simulator::Schedule(m_end - Now(), &Watchdog::Expire, this);
     }
-}
+
+    void
+    Watchdog::Expire(void) {
+        NS_LOG_FUNCTION(this);
+        if (m_end == Simulator::Now()) {
+            m_impl->Invoke();
+        } else {
+            m_event = Simulator::Schedule(m_end - Now(), &Watchdog::Expire, this);
+        }
+    }
 
 } // namespace ns3
 

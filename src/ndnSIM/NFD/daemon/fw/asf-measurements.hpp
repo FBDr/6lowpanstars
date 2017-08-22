@@ -31,282 +31,257 @@
 #include "table/measurements-accessor.hpp"
 
 namespace nfd {
-namespace fw {
-namespace asf {
+    namespace fw {
+        namespace asf {
 
-class RttStats
-{
-public:
-  typedef time::duration<double, boost::micro> Rtt;
+            class RttStats {
+            public:
+                typedef time::duration<double, boost::micro> Rtt;
 
-  RttStats();
+                RttStats();
 
-  void
-  addRttMeasurement(RttEstimator::Duration& durationRtt);
+                void
+                addRttMeasurement(RttEstimator::Duration& durationRtt);
 
-  void
-  recordTimeout()
-  {
-    m_rtt = RTT_TIMEOUT;
-  }
+                void
+                recordTimeout() {
+                    m_rtt = RTT_TIMEOUT;
+                }
 
-  Rtt
-  getRtt() const
-  {
-    return m_rtt;
-  }
+                Rtt
+                getRtt() const {
+                    return m_rtt;
+                }
 
-  Rtt
-  getSrtt() const
-  {
-    return m_srtt;
-  }
+                Rtt
+                getSrtt() const {
+                    return m_srtt;
+                }
 
-  RttEstimator::Duration
-  computeRto() const
-  {
-    return m_rttEstimator.computeRto();
-  }
+                RttEstimator::Duration
+                computeRto() const {
+                    return m_rttEstimator.computeRto();
+                }
 
-private:
-  static Rtt
-  computeSrtt(Rtt previousSrtt, Rtt currentRtt);
+            private:
+                static Rtt
+                computeSrtt(Rtt previousSrtt, Rtt currentRtt);
 
-public:
-  static const Rtt RTT_TIMEOUT;
-  static const Rtt RTT_NO_MEASUREMENT;
+            public:
+                static const Rtt RTT_TIMEOUT;
+                static const Rtt RTT_NO_MEASUREMENT;
 
-private:
-  Rtt m_srtt;
-  Rtt m_rtt;
-  RttEstimator m_rttEstimator;
+            private:
+                Rtt m_srtt;
+                Rtt m_rtt;
+                RttEstimator m_rttEstimator;
 
-  static const double ALPHA;
-};
+                static const double ALPHA;
+            };
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief Strategy information for each face in a namespace
-*/
-class FaceInfo
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+            /** \brief Strategy information for each face in a namespace
+             */
+            class FaceInfo {
+            public:
 
-  FaceInfo();
+                class Error : public std::runtime_error {
+                public:
 
-  ~FaceInfo();
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-  void
-  setTimeoutEvent(const scheduler::EventId& id, const Name& interestName);
+                FaceInfo();
 
-  void
-  setMeasurementExpirationEventId(const scheduler::EventId& id)
-  {
-    m_measurementExpirationId = id;
-  }
+                ~FaceInfo();
 
-  const scheduler::EventId&
-  getMeasurementExpirationEventId()
-  {
-    return m_measurementExpirationId;
-  }
+                void
+                setTimeoutEvent(const scheduler::EventId& id, const Name& interestName);
 
-  void
-  cancelTimeoutEvent(const Name& prefix);
+                void
+                setMeasurementExpirationEventId(const scheduler::EventId& id) {
+                    m_measurementExpirationId = id;
+                }
 
-  bool
-  isTimeoutScheduled() const
-  {
-    return m_isTimeoutScheduled;
-  }
+                const scheduler::EventId&
+                getMeasurementExpirationEventId() {
+                    return m_measurementExpirationId;
+                }
 
-  void
-  recordRtt(const shared_ptr<pit::Entry>& pitEntry, const Face& inFace);
+                void
+                cancelTimeoutEvent(const Name& prefix);
 
-  void
-  recordTimeout(const Name& interestName);
+                bool
+                isTimeoutScheduled() const {
+                    return m_isTimeoutScheduled;
+                }
 
-  bool
-  isTimeout() const
-  {
-    return getRtt() == RttStats::RTT_TIMEOUT;
-  }
+                void
+                recordRtt(const shared_ptr<pit::Entry>& pitEntry, const Face& inFace);
 
-  RttEstimator::Duration
-  computeRto() const
-  {
-    return m_rttStats.computeRto();
-  }
+                void
+                recordTimeout(const Name& interestName);
 
-  RttStats::Rtt
-  getRtt() const
-  {
-    return m_rttStats.getRtt();
-  }
+                bool
+                isTimeout() const {
+                    return getRtt() == RttStats::RTT_TIMEOUT;
+                }
 
-  RttStats::Rtt
-  getSrtt() const
-  {
-    return m_rttStats.getSrtt();
-  }
+                RttEstimator::Duration
+                computeRto() const {
+                    return m_rttStats.computeRto();
+                }
 
-  bool
-  hasSrttMeasurement() const
-  {
-    return getSrtt() != RttStats::RTT_NO_MEASUREMENT;
-  }
+                RttStats::Rtt
+                getRtt() const {
+                    return m_rttStats.getRtt();
+                }
 
-private:
-  void
-  cancelTimeoutEvent();
+                RttStats::Rtt
+                getSrtt() const {
+                    return m_rttStats.getSrtt();
+                }
 
-  bool
-  doesNameMatchLastInterest(const Name& name);
+                bool
+                hasSrttMeasurement() const {
+                    return getSrtt() != RttStats::RTT_NO_MEASUREMENT;
+                }
 
-private:
-  RttStats m_rttStats;
-  Name m_lastInterestName;
+            private:
+                void
+                cancelTimeoutEvent();
 
-  // Timeout associated with measurement
-  scheduler::EventId m_measurementExpirationId;
+                bool
+                doesNameMatchLastInterest(const Name& name);
 
-  // RTO associated with Interest
-  scheduler::EventId m_timeoutEventId;
-  bool m_isTimeoutScheduled;
-};
+            private:
+                RttStats m_rttStats;
+                Name m_lastInterestName;
 
-typedef std::unordered_map<face::FaceId, FaceInfo> FaceInfoTable;
+                // Timeout associated with measurement
+                scheduler::EventId m_measurementExpirationId;
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+                // RTO associated with Interest
+                scheduler::EventId m_timeoutEventId;
+                bool m_isTimeoutScheduled;
+            };
 
-/** \brief stores stategy information about each face in this namespace
- */
-class NamespaceInfo : public StrategyInfo
-{
-public:
-  NamespaceInfo();
+            typedef std::unordered_map<face::FaceId, FaceInfo> FaceInfoTable;
 
-  static constexpr int
-  getTypeId()
-  {
-    return 1030;
-  }
+            ////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////
 
-  FaceInfo&
-  getOrCreateFaceInfo(const fib::Entry& fibEntry, const Face& face);
+            /** \brief stores stategy information about each face in this namespace
+             */
+            class NamespaceInfo : public StrategyInfo {
+            public:
+                NamespaceInfo();
 
-  FaceInfo*
-  getFaceInfo(const fib::Entry& fibEntry, const Face& face);
+                static constexpr int
+                getTypeId() {
+                    return 1030;
+                }
 
-  void
-  expireFaceInfo(nfd::face::FaceId faceId);
+                FaceInfo&
+                getOrCreateFaceInfo(const fib::Entry& fibEntry, const Face& face);
 
-  void
-  extendFaceInfoLifetime(FaceInfo& info, const Face& face);
+                FaceInfo*
+                getFaceInfo(const fib::Entry& fibEntry, const Face& face);
 
-  FaceInfo&
-  get(nfd::face::FaceId faceId)
-  {
-    return m_fit.at(faceId);
-  }
+                void
+                expireFaceInfo(nfd::face::FaceId faceId);
 
-  FaceInfoTable::iterator
-  find(nfd::face::FaceId faceId)
-  {
-    return m_fit.find(faceId);
-  }
+                void
+                extendFaceInfoLifetime(FaceInfo& info, const Face& face);
 
-  FaceInfoTable::iterator
-  end()
-  {
-    return m_fit.end();
-  }
+                FaceInfo&
+                get(nfd::face::FaceId faceId) {
+                    return m_fit.at(faceId);
+                }
 
-  const FaceInfoTable::iterator
-  insert(nfd::face::FaceId faceId)
-  {
-    const auto& pair = m_fit.insert(std::make_pair(faceId, FaceInfo()));
-    return pair.first;
-  }
+                FaceInfoTable::iterator
+                find(nfd::face::FaceId faceId) {
+                    return m_fit.find(faceId);
+                }
 
-  bool
-  isProbingDue() const
-  {
-    return m_isProbingDue;
-  }
+                FaceInfoTable::iterator
+                end() {
+                    return m_fit.end();
+                }
 
-  void
-  setIsProbingDue(bool isProbingDue)
-  {
-    m_isProbingDue = isProbingDue;
-  }
+                const FaceInfoTable::iterator
+                insert(nfd::face::FaceId faceId) {
+                    const auto& pair = m_fit.insert(std::make_pair(faceId, FaceInfo()));
+                    return pair.first;
+                }
 
-  bool
-  isFirstProbeScheduled() const
-  {
-    return m_hasFirstProbeBeenScheduled;
-  }
+                bool
+                isProbingDue() const {
+                    return m_isProbingDue;
+                }
 
-  void
-  setHasFirstProbeBeenScheduled(bool hasBeenScheduled)
-  {
-    m_hasFirstProbeBeenScheduled = hasBeenScheduled;
-  }
+                void
+                setIsProbingDue(bool isProbingDue) {
+                    m_isProbingDue = isProbingDue;
+                }
 
-private:
-  FaceInfoTable m_fit;
+                bool
+                isFirstProbeScheduled() const {
+                    return m_hasFirstProbeBeenScheduled;
+                }
 
-  bool m_isProbingDue;
-  bool m_hasFirstProbeBeenScheduled;
-};
+                void
+                setHasFirstProbeBeenScheduled(bool hasBeenScheduled) {
+                    m_hasFirstProbeBeenScheduled = hasBeenScheduled;
+                }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+            private:
+                FaceInfoTable m_fit;
 
-/** \brief Helper class to retrieve and create strategy measurements
- */
-class AsfMeasurements : noncopyable
-{
-public:
-  explicit
-  AsfMeasurements(MeasurementsAccessor& measurements);
+                bool m_isProbingDue;
+                bool m_hasFirstProbeBeenScheduled;
+            };
 
-  FaceInfo*
-  getFaceInfo(const fib::Entry& fibEntry, const Interest& interest, const Face& face);
+            ////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////
 
-  FaceInfo&
-  getOrCreateFaceInfo(const fib::Entry& fibEntry, const Interest& interest, const Face& face);
+            /** \brief Helper class to retrieve and create strategy measurements
+             */
+            class AsfMeasurements : noncopyable {
+            public:
+                explicit
+                AsfMeasurements(MeasurementsAccessor& measurements);
 
-  NamespaceInfo*
-  getNamespaceInfo(const Name& prefix);
+                FaceInfo*
+                getFaceInfo(const fib::Entry& fibEntry, const Interest& interest, const Face& face);
 
-  NamespaceInfo&
-  getOrCreateNamespaceInfo(const fib::Entry& fibEntry, const Interest& interest);
+                FaceInfo&
+                getOrCreateFaceInfo(const fib::Entry& fibEntry, const Interest& interest, const Face& face);
 
-private:
-  void
-  extendLifetime(measurements::Entry& me);
+                NamespaceInfo*
+                getNamespaceInfo(const Name& prefix);
 
-public:
-  static constexpr time::microseconds MEASUREMENTS_LIFETIME = time::seconds(300);
+                NamespaceInfo&
+                getOrCreateNamespaceInfo(const fib::Entry& fibEntry, const Interest& interest);
 
-private:
-  MeasurementsAccessor& m_measurements;
-};
+            private:
+                void
+                extendLifetime(measurements::Entry& me);
 
-} // namespace asf
-} // namespace fw
+            public:
+                static constexpr time::microseconds MEASUREMENTS_LIFETIME = time::seconds(300);
+
+            private:
+                MeasurementsAccessor& m_measurements;
+            };
+
+        } // namespace asf
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_ASF_MEASUREMENTS_HPP

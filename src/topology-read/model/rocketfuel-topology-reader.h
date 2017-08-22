@@ -27,104 +27,103 @@
 namespace ns3 {
 
 
-// ------------------------------------------------------------
-// --------------------------------------------
-/**
- * \ingroup topology
- *
- * \brief Topology file reader (Rocketfuel-format type).
- *
- * http://www.cs.washington.edu/research/networking/rocketfuel/
- *
- * May 2nd, 2010: Currently only support "weights" file and "cch" file.
- * http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
- * http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
- */
-class RocketfuelTopologyReader : public TopologyReader
-{
-public:
-  RocketfuelTopologyReader ();
-  virtual ~RocketfuelTopologyReader ();
+    // ------------------------------------------------------------
+    // --------------------------------------------
 
-  /**
-   * \brief Main topology reading function.
-   *
-   * This method opens an input stream and reads the Rocketfuel-format file.
-   * Every row represents a topology link (the ids of a couple of nodes),
-   * so the input file is read line by line to figure out how many links
-   * and nodes are in the topology.
-   *
-   * \return The container of the nodes created (or empty container if there was an error)
-   */
-  virtual NodeContainer Read (void);
+    /**
+     * \ingroup topology
+     *
+     * \brief Topology file reader (Rocketfuel-format type).
+     *
+     * http://www.cs.washington.edu/research/networking/rocketfuel/
+     *
+     * May 2nd, 2010: Currently only support "weights" file and "cch" file.
+     * http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
+     * http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
+     */
+    class RocketfuelTopologyReader : public TopologyReader {
+    public:
+        RocketfuelTopologyReader();
+        virtual ~RocketfuelTopologyReader();
 
-private:
-  /**
-   * \brief Topology read function from a file containing the nodes map.
-   *
-   * Parser for the *.cch file available at:
-   * http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
-   *
-   * \param [in] argc Argument counter.
-   * \param [in] argv Argument vector.
-   * \return The container of the nodes created (or empty container if there was an error).
-   */
-  NodeContainer GenerateFromMapsFile (int argc, char *argv[]);
+        /**
+         * \brief Main topology reading function.
+         *
+         * This method opens an input stream and reads the Rocketfuel-format file.
+         * Every row represents a topology link (the ids of a couple of nodes),
+         * so the input file is read line by line to figure out how many links
+         * and nodes are in the topology.
+         *
+         * \return The container of the nodes created (or empty container if there was an error)
+         */
+        virtual NodeContainer Read(void);
 
-  /**
-   * \brief Topology read function from a file containing the nodes weights.
-   *
-   * Parser for the weights.* file available at:
-   * http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
-   *
-   * \param [in] argc Argument counter.
-   * \param [in] argv Argument vector.
-   * \return The container of the nodes created (or empty container if there was an error).
-   */
-  NodeContainer GenerateFromWeightsFile (int argc, char *argv[]);
+    private:
+        /**
+         * \brief Topology read function from a file containing the nodes map.
+         *
+         * Parser for the *.cch file available at:
+         * http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
+         *
+         * \param [in] argc Argument counter.
+         * \param [in] argv Argument vector.
+         * \return The container of the nodes created (or empty container if there was an error).
+         */
+        NodeContainer GenerateFromMapsFile(int argc, char *argv[]);
 
-  /**
-   * \brief Enum of the possible file types.
-   */
-  enum RF_FileType
-  {
-    RF_MAPS,
-    RF_WEIGHTS,
-    RF_UNKNOWN
-  };
+        /**
+         * \brief Topology read function from a file containing the nodes weights.
+         *
+         * Parser for the weights.* file available at:
+         * http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
+         *
+         * \param [in] argc Argument counter.
+         * \param [in] argv Argument vector.
+         * \return The container of the nodes created (or empty container if there was an error).
+         */
+        NodeContainer GenerateFromWeightsFile(int argc, char *argv[]);
 
-
-  /**
-   * \brief Classifies the file type according to its content.
-   *
-   * \return The file type (RF_MAPS, RF_WEIGHTS, or RF_UNKNOWN)
-   */
-  enum RF_FileType GetFileType (const char *);
-
-  int m_linksNumber; //!< Number of links.
-  int m_nodesNumber; //!< Number of nodes.
-  std::map<std::string, Ptr<Node> > m_nodeMap; //!< Map of the nodes (name, node).
-
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   */
-  RocketfuelTopologyReader (const RocketfuelTopologyReader&);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse.
-   * \returns
-   */
-  RocketfuelTopologyReader& operator= (const RocketfuelTopologyReader&);
+        /**
+         * \brief Enum of the possible file types.
+         */
+        enum RF_FileType {
+            RF_MAPS,
+            RF_WEIGHTS,
+            RF_UNKNOWN
+        };
 
 
-  // end class RocketfuelTopologyReader
-};
+        /**
+         * \brief Classifies the file type according to its content.
+         *
+         * \return The file type (RF_MAPS, RF_WEIGHTS, or RF_UNKNOWN)
+         */
+        enum RF_FileType GetFileType(const char *);
 
-// end namespace ns3
+        int m_linksNumber; //!< Number of links.
+        int m_nodesNumber; //!< Number of nodes.
+        std::map<std::string, Ptr<Node> > m_nodeMap; //!< Map of the nodes (name, node).
+
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         */
+        RocketfuelTopologyReader(const RocketfuelTopologyReader&);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse.
+         * \returns
+         */
+        RocketfuelTopologyReader& operator=(const RocketfuelTopologyReader&);
+
+
+        // end class RocketfuelTopologyReader
+    };
+
+    // end namespace ns3
 };
 
 

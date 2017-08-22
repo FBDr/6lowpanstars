@@ -22,32 +22,30 @@
 #include "ns3/log.h"
 #include "packet-socket.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PacketSocketFactory");
-
-NS_OBJECT_ENSURE_REGISTERED (PacketSocketFactory);
-
-TypeId 
-PacketSocketFactory::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PacketSocketFactory")
-    .SetParent<SocketFactory> ()
-    .SetGroupName("Network");
-  return tid;
-}
 
-PacketSocketFactory::PacketSocketFactory ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("PacketSocketFactory");
 
-Ptr<Socket> PacketSocketFactory::CreateSocket (void)
-{
-  NS_LOG_FUNCTION (this);
-  Ptr<Node> node = GetObject<Node> ();
-  Ptr<PacketSocket> socket = CreateObject<PacketSocket> ();
-  socket->SetNode (node);
-  return socket;
-} 
+    NS_OBJECT_ENSURE_REGISTERED(PacketSocketFactory);
+
+    TypeId
+    PacketSocketFactory::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PacketSocketFactory")
+                .SetParent<SocketFactory> ()
+                .SetGroupName("Network");
+        return tid;
+    }
+
+    PacketSocketFactory::PacketSocketFactory() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    Ptr<Socket> PacketSocketFactory::CreateSocket(void) {
+        NS_LOG_FUNCTION(this);
+        Ptr<Node> node = GetObject<Node> ();
+        Ptr<PacketSocket> socket = CreateObject<PacketSocket> ();
+        socket->SetNode(node);
+        return socket;
+    }
 } // namespace ns3

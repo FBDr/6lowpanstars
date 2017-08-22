@@ -30,148 +30,132 @@
 #include <ndn-cxx/util/dummy-client-face.hpp>
 
 namespace nfd {
-namespace rib {
-namespace tests {
+    namespace rib {
+        namespace tests {
 
-inline bool
-compareNameFaceIdCostAction(const FibUpdate& lhs, const FibUpdate& rhs)
-{
-  if (lhs.name < rhs.name) {
-    return true;
-  }
-  else if (lhs.name == rhs.name) {
-    if (lhs.faceId < rhs.faceId) {
-      return true;
-    }
-    else if (lhs.faceId == rhs.faceId) {
-      if (lhs.cost < rhs.cost) {
-        return true;
-      }
-      else if (lhs.cost == rhs.cost) {
-        return lhs.action < rhs.action;
-      }
-    }
-  }
+            inline bool
+            compareNameFaceIdCostAction(const FibUpdate& lhs, const FibUpdate& rhs) {
+                if (lhs.name < rhs.name) {
+                    return true;
+                } else if (lhs.name == rhs.name) {
+                    if (lhs.faceId < rhs.faceId) {
+                        return true;
+                    } else if (lhs.faceId == rhs.faceId) {
+                        if (lhs.cost < rhs.cost) {
+                            return true;
+                        } else if (lhs.cost == rhs.cost) {
+                            return lhs.action < rhs.action;
+                        }
+                    }
+                }
 
-  return false;
-}
+                return false;
+            }
 
-class FibUpdatesFixture : public nfd::tests::IdentityManagementFixture
-{
-public:
-  FibUpdatesFixture()
-    : face(getGlobalIoService(), m_keyChain)
-    , controller(face, m_keyChain)
-    , fibUpdater(rib, controller)
-  {
-  }
+            class FibUpdatesFixture : public nfd::tests::IdentityManagementFixture {
+            public:
 
-  void
-  insertRoute(const Name& name, uint64_t faceId, uint64_t origin, uint64_t cost, uint64_t flags)
-  {
-    Route route = createRoute(faceId, origin, cost, flags);
+                FibUpdatesFixture()
+                : face(getGlobalIoService(), m_keyChain)
+                , controller(face, m_keyChain)
+                , fibUpdater(rib, controller) {
+                }
 
-    RibUpdate update;
-    update.setAction(RibUpdate::REGISTER)
-          .setName(name)
-          .setRoute(route);
+                void
+                insertRoute(const Name& name, uint64_t faceId, uint64_t origin, uint64_t cost, uint64_t flags) {
+                    Route route = createRoute(faceId, origin, cost, flags);
 
-    simulateSuccessfulResponse(update);
-  }
+                    RibUpdate update;
+                    update.setAction(RibUpdate::REGISTER)
+                            .setName(name)
+                            .setRoute(route);
 
-  void
-  eraseRoute(const Name& name, uint64_t faceId, uint64_t origin)
-  {
-    Route route = createRoute(faceId, origin, 0, 0);
+                    simulateSuccessfulResponse(update);
+                }
 
-    RibUpdate update;
-    update.setAction(RibUpdate::UNREGISTER)
-          .setName(name)
-          .setRoute(route);
+                void
+                eraseRoute(const Name& name, uint64_t faceId, uint64_t origin) {
+                    Route route = createRoute(faceId, origin, 0, 0);
 
-    simulateSuccessfulResponse(update);
-  }
+                    RibUpdate update;
+                    update.setAction(RibUpdate::UNREGISTER)
+                            .setName(name)
+                            .setRoute(route);
 
-  void
-  onSendBatchFromQueue(const RibUpdateBatch& batch)
-  {
-    Rib::UpdateSuccessCallback managerCallback = bind(&FibUpdatesFixture::onSuccess, this);
+                    simulateSuccessfulResponse(update);
+                }
 
-    // Only receive callback after the first send
-    rib.m_onSendBatchFromQueue = nullptr;
+                void
+                onSendBatchFromQueue(const RibUpdateBatch& batch) {
+                    Rib::UpdateSuccessCallback managerCallback = bind(&FibUpdatesFixture::onSuccess, this);
 
-    rib.onFibUpdateSuccess(batch, fibUpdater.m_inheritedRoutes, managerCallback);
-  }
+                    // Only receive callback after the first send
+                    rib.m_onSendBatchFromQueue = nullptr;
 
-  void
-  destroyFace(uint64_t faceId)
-  {
-    rib.m_onSendBatchFromQueue = bind(&FibUpdatesFixture::onSendBatchFromQueue, this, _1);
+                    rib.onFibUpdateSuccess(batch, fibUpdater.m_inheritedRoutes, managerCallback);
+                }
 
-    rib.beginRemoveFace(faceId);
-  }
+                void
+                destroyFace(uint64_t faceId) {
+                    rib.m_onSendBatchFromQueue = bind(&FibUpdatesFixture::onSendBatchFromQueue, this, _1);
 
-  void
-  simulateSuccessfulResponse(const RibUpdate& update)
-  {
-    Rib::UpdateSuccessCallback managerCallback = bind(&FibUpdatesFixture::onSuccess, this);
+                    rib.beginRemoveFace(faceId);
+                }
 
-    rib.beginApplyUpdate(update, managerCallback, nullptr);
+                void
+                simulateSuccessfulResponse(const RibUpdate& update) {
+                    Rib::UpdateSuccessCallback managerCallback = bind(&FibUpdatesFixture::onSuccess, this);
 
-    RibUpdateBatch batch(update.getRoute().faceId);
-    batch.add(update);
+                    rib.beginApplyUpdate(update, managerCallback, nullptr);
 
-    // Simulate a successful response from NFD
-    rib.onFibUpdateSuccess(batch, fibUpdater.m_inheritedRoutes, managerCallback);
-  }
+                    RibUpdateBatch batch(update.getRoute().faceId);
+                    batch.add(update);
 
-  void
-  onSuccess()
-  {
-  }
+                    // Simulate a successful response from NFD
+                    rib.onFibUpdateSuccess(batch, fibUpdater.m_inheritedRoutes, managerCallback);
+                }
 
-  void
-  onFailure()
-  {
-    BOOST_FAIL("FibUpdate failed");
-  }
+                void
+                onSuccess() {
+                }
 
-  const FibUpdater::FibUpdateList&
-  getFibUpdates()
-  {
-    fibUpdates.clear();
-    fibUpdates = fibUpdater.m_updatesForBatchFaceId;
-    fibUpdates.insert(fibUpdates.end(), fibUpdater.m_updatesForNonBatchFaceId.begin(),
-                                        fibUpdater.m_updatesForNonBatchFaceId.end());
+                void
+                onFailure() {
+                    BOOST_FAIL("FibUpdate failed");
+                }
 
-    return fibUpdates;
-  }
+                const FibUpdater::FibUpdateList&
+                getFibUpdates() {
+                    fibUpdates.clear();
+                    fibUpdates = fibUpdater.m_updatesForBatchFaceId;
+                    fibUpdates.insert(fibUpdates.end(), fibUpdater.m_updatesForNonBatchFaceId.begin(),
+                            fibUpdater.m_updatesForNonBatchFaceId.end());
 
+                    return fibUpdates;
+                }
 
-  FibUpdater::FibUpdateList
-  getSortedFibUpdates()
-  {
-    FibUpdater::FibUpdateList updates = getFibUpdates();
-    updates.sort(&compareNameFaceIdCostAction);
-    return updates;
-  }
+                FibUpdater::FibUpdateList
+                getSortedFibUpdates() {
+                    FibUpdater::FibUpdateList updates = getFibUpdates();
+                    updates.sort(&compareNameFaceIdCostAction);
+                    return updates;
+                }
 
-  void
-  clearFibUpdates()
-  {
-    fibUpdater.m_updatesForBatchFaceId.clear();
-    fibUpdater.m_updatesForNonBatchFaceId.clear();
-  }
+                void
+                clearFibUpdates() {
+                    fibUpdater.m_updatesForBatchFaceId.clear();
+                    fibUpdater.m_updatesForNonBatchFaceId.clear();
+                }
 
-public:
-  ndn::util::DummyClientFace face;
-  ndn::nfd::Controller controller;
+            public:
+                ndn::util::DummyClientFace face;
+                ndn::nfd::Controller controller;
 
-  Rib rib;
-  FibUpdater fibUpdater;
-  FibUpdater::FibUpdateList fibUpdates;
-};
+                Rib rib;
+                FibUpdater fibUpdater;
+                FibUpdater::FibUpdateList fibUpdates;
+            };
 
-} // namespace tests
-} // namespace rib
+        } // namespace tests
+    } // namespace rib
 } // namespace nfd

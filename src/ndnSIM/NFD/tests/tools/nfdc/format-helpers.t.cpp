@@ -28,55 +28,52 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
-namespace tests {
+    namespace tools {
+        namespace nfdc {
+            namespace tests {
 
-using boost::test_tools::output_test_stream;
+                using boost::test_tools::output_test_stream;
 
-BOOST_AUTO_TEST_SUITE(Nfdc)
-BOOST_AUTO_TEST_SUITE(TestFormatHelpers)
+                BOOST_AUTO_TEST_SUITE(Nfdc)
+                BOOST_AUTO_TEST_SUITE(TestFormatHelpers)
 
-BOOST_AUTO_TEST_SUITE(Xml)
+                BOOST_AUTO_TEST_SUITE(Xml)
 
-BOOST_AUTO_TEST_CASE(TextEscaping)
-{
-  output_test_stream os;
-  os << xml::Text{"\"less than\" & 'greater than' surround XML <element> tag name"};
+                BOOST_AUTO_TEST_CASE(TextEscaping) {
+                    output_test_stream os;
+                    os << xml::Text{"\"less than\" & 'greater than' surround XML <element> tag name"};
 
-  BOOST_CHECK(os.is_equal("&quot;less than&quot; &amp; &apos;greater than&apos;"
-                          " surround XML &lt;element&gt; tag name"));
-}
+                    BOOST_CHECK(os.is_equal("&quot;less than&quot; &amp; &apos;greater than&apos;"
+                            " surround XML &lt;element&gt; tag name"));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // Xml
+                BOOST_AUTO_TEST_SUITE_END() // Xml
 
-BOOST_AUTO_TEST_SUITE(Text)
+                BOOST_AUTO_TEST_SUITE(Text)
 
-BOOST_AUTO_TEST_CASE(Space)
-{
-  output_test_stream os;
-  os << 'A' << text::Spaces{-1} << 'B' << text::Spaces{0} << 'C' << text::Spaces{5} << 'D';
+                BOOST_AUTO_TEST_CASE(Space) {
+                    output_test_stream os;
+                    os << 'A' << text::Spaces{-1} << 'B' << text::Spaces{0} << 'C' << text::Spaces{5} << 'D';
 
-  BOOST_CHECK(os.is_equal("ABC     D"));
-}
+                    BOOST_CHECK(os.is_equal("ABC     D"));
+                }
 
-BOOST_AUTO_TEST_CASE(Sep)
-{
-  output_test_stream os;
-  text::Separator sep(",");
-  for (int i = 1; i <= 3; ++i) {
-    os << sep << i;
-  }
+                BOOST_AUTO_TEST_CASE(Sep) {
+                    output_test_stream os;
+                    text::Separator sep(",");
+                    for (int i = 1; i <= 3; ++i) {
+                        os << sep << i;
+                    }
 
-  BOOST_CHECK(os.is_equal("1,2,3"));
-}
+                    BOOST_CHECK(os.is_equal("1,2,3"));
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // Text
+                BOOST_AUTO_TEST_SUITE_END() // Text
 
-BOOST_AUTO_TEST_SUITE_END() // TestFormatHelpers
-BOOST_AUTO_TEST_SUITE_END() // Nfdc
+                BOOST_AUTO_TEST_SUITE_END() // TestFormatHelpers
+                BOOST_AUTO_TEST_SUITE_END() // Nfdc
 
-} // namespace tests
-} // namespace nfdc
-} // namespace tools
+            } // namespace tests
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

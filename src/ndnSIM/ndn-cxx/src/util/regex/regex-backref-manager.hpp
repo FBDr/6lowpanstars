@@ -30,67 +30,60 @@
 
 namespace ndn {
 
-class RegexMatcher;
+    class RegexMatcher;
 
-class RegexBackrefManager
-{
-public:
-  RegexBackrefManager()
-  {
-  }
+    class RegexBackrefManager {
+    public:
 
-  virtual
-  ~RegexBackrefManager();
+        RegexBackrefManager() {
+        }
 
-  size_t
-  pushRef(const shared_ptr<RegexMatcher>& matcher);
+        virtual
+        ~RegexBackrefManager();
 
-  void
-  popRef();
+        size_t
+        pushRef(const shared_ptr<RegexMatcher>& matcher);
 
-  size_t
-  size();
+        void
+        popRef();
 
-  const shared_ptr<RegexMatcher>&
-  getBackref(size_t backrefNo);
+        size_t
+        size();
 
-private:
-  std::vector<shared_ptr<RegexMatcher> > m_backrefs;
-};
+        const shared_ptr<RegexMatcher>&
+        getBackref(size_t backrefNo);
 
+    private:
+        std::vector<shared_ptr<RegexMatcher> > m_backrefs;
+    };
 
-inline
-RegexBackrefManager::~RegexBackrefManager()
-{
-  m_backrefs.clear();
-}
+    inline
+    RegexBackrefManager::~RegexBackrefManager() {
+        m_backrefs.clear();
+    }
 
-inline size_t
-RegexBackrefManager::pushRef(const shared_ptr<RegexMatcher>& matcher)
-{
-  size_t last = m_backrefs.size();
-  m_backrefs.push_back(matcher);
+    inline size_t
+    RegexBackrefManager::pushRef(const shared_ptr<RegexMatcher>& matcher) {
+        size_t last = m_backrefs.size();
+        m_backrefs.push_back(matcher);
 
-  return last;
-}
+        return last;
+    }
 
-inline void
-RegexBackrefManager::popRef()
-{
-  m_backrefs.pop_back();
-}
+    inline void
+    RegexBackrefManager::popRef() {
+        m_backrefs.pop_back();
+    }
 
-inline size_t
-RegexBackrefManager::size()
-{
-  return m_backrefs.size();
-}
+    inline size_t
+    RegexBackrefManager::size() {
+        return m_backrefs.size();
+    }
 
-inline const shared_ptr<RegexMatcher>&
-RegexBackrefManager::getBackref(size_t backrefNo)
-{
-  return m_backrefs[backrefNo];
-}
+    inline const shared_ptr<RegexMatcher>&
+    RegexBackrefManager::getBackref(size_t backrefNo) {
+        return m_backrefs[backrefNo];
+    }
 
 
 } // namespace ndn

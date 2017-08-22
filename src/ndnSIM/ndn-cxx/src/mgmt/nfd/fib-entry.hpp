@@ -27,129 +27,122 @@
 #include <list>
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/** @ingroup management
- */
-class NextHopRecord
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /** @ingroup management
+         */
+        class NextHopRecord {
+        public:
 
-  NextHopRecord();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  NextHopRecord(const Block& block);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  uint64_t
-  getFaceId() const
-  {
-    return m_faceId;
-  }
+            NextHopRecord();
 
-  NextHopRecord&
-  setFaceId(uint64_t faceId);
+            explicit
+            NextHopRecord(const Block& block);
 
-  uint64_t
-  getCost() const
-  {
-    return m_cost;
-  }
+            uint64_t
+            getFaceId() const {
+                return m_faceId;
+            }
 
-  NextHopRecord&
-  setCost(uint64_t cost);
+            NextHopRecord&
+            setFaceId(uint64_t faceId);
 
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& block) const;
+            uint64_t
+            getCost() const {
+                return m_cost;
+            }
 
-  const Block&
-  wireEncode() const;
+            NextHopRecord&
+            setCost(uint64_t cost);
 
-  void
-  wireDecode(const Block& wire);
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& block) const;
 
-private:
-  uint64_t m_faceId;
-  uint64_t m_cost;
+            const Block&
+            wireEncode() const;
 
-  mutable Block m_wire;
-};
+            void
+            wireDecode(const Block& wire);
 
-/** @ingroup management
- */
-class FibEntry
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        private:
+            uint64_t m_faceId;
+            uint64_t m_cost;
 
-  FibEntry();
+            mutable Block m_wire;
+        };
 
-  explicit
-  FibEntry(const Block& block);
+        /** @ingroup management
+         */
+        class FibEntry {
+        public:
 
-  const Name&
-  getPrefix() const
-  {
-    return m_prefix;
-  }
+            class Error : public tlv::Error {
+            public:
 
-  FibEntry&
-  setPrefix(const Name& prefix);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  const std::list<NextHopRecord>&
-  getNextHopRecords() const
-  {
-    return m_nextHopRecords;
-  }
+            FibEntry();
 
-  FibEntry&
-  addNextHopRecord(const NextHopRecord& nextHopRecord);
+            explicit
+            FibEntry(const Block& block);
 
-  template<typename T>
-  FibEntry&
-  setNextHopRecords(const T& begin, const T& end)
-  {
-    m_nextHopRecords.clear();
-    m_nextHopRecords.assign(begin, end);
-    m_wire.reset();
-    return *this;
-  }
+            const Name&
+            getPrefix() const {
+                return m_prefix;
+            }
 
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& block) const;
+            FibEntry&
+            setPrefix(const Name& prefix);
 
-  const Block&
-  wireEncode() const;
+            const std::list<NextHopRecord>&
+            getNextHopRecords() const {
+                return m_nextHopRecords;
+            }
 
-  void
-  wireDecode(const Block& wire);
+            FibEntry&
+            addNextHopRecord(const NextHopRecord& nextHopRecord);
 
-private:
-  Name m_prefix;
-  std::list<NextHopRecord> m_nextHopRecords;
+            template<typename T>
+            FibEntry&
+            setNextHopRecords(const T& begin, const T& end) {
+                m_nextHopRecords.clear();
+                m_nextHopRecords.assign(begin, end);
+                m_wire.reset();
+                return *this;
+            }
 
-  mutable Block m_wire;
-};
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& block) const;
 
-} // namespace nfd
+            const Block&
+            wireEncode() const;
+
+            void
+            wireDecode(const Block& wire);
+
+        private:
+            Name m_prefix;
+            std::list<NextHopRecord> m_nextHopRecords;
+
+            mutable Block m_wire;
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FIB_ENTRY_HPP

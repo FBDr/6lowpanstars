@@ -32,71 +32,65 @@
 
 namespace ndn {
 
-/**
- * @brief stores information about a prefix registered in NDN forwarder
- */
-class RegisteredPrefix : noncopyable
-{
-public:
-  RegisteredPrefix(const Name& prefix,
-                   shared_ptr<InterestFilterRecord> filter,
-                   const nfd::CommandOptions& options)
-    : m_prefix(prefix)
-    , m_filter(filter)
-    , m_options(options)
-  {
-  }
+    /**
+     * @brief stores information about a prefix registered in NDN forwarder
+     */
+    class RegisteredPrefix : noncopyable {
+    public:
 
-  const Name&
-  getPrefix() const
-  {
-    return m_prefix;
-  }
+        RegisteredPrefix(const Name& prefix,
+                shared_ptr<InterestFilterRecord> filter,
+                const nfd::CommandOptions& options)
+        : m_prefix(prefix)
+        , m_filter(filter)
+        , m_options(options) {
+        }
 
-  const shared_ptr<InterestFilterRecord>&
-  getFilter() const
-  {
-    return m_filter;
-  }
+        const Name&
+        getPrefix() const {
+            return m_prefix;
+        }
 
-  const nfd::CommandOptions&
-  getCommandOptions() const
-  {
-    return m_options;
-  }
+        const shared_ptr<InterestFilterRecord>&
+        getFilter() const {
+            return m_filter;
+        }
 
-private:
-  Name m_prefix;
-  shared_ptr<InterestFilterRecord> m_filter;
-  nfd::CommandOptions m_options;
-};
+        const nfd::CommandOptions&
+        getCommandOptions() const {
+            return m_options;
+        }
 
-/**
- * @brief Opaque type to identify a RegisteredPrefix
- */
-class RegisteredPrefixId;
+    private:
+        Name m_prefix;
+        shared_ptr<InterestFilterRecord> m_filter;
+        nfd::CommandOptions m_options;
+    };
 
-/**
- * @brief Functor to match RegisteredPrefixId
- */
-class MatchRegisteredPrefixId
-{
-public:
-  explicit
-  MatchRegisteredPrefixId(const RegisteredPrefixId* registeredPrefixId)
-    : m_id(registeredPrefixId)
-  {
-  }
+    /**
+     * @brief Opaque type to identify a RegisteredPrefix
+     */
+    class RegisteredPrefixId;
 
-  bool
-  operator()(const shared_ptr<RegisteredPrefix>& registeredPrefix) const
-  {
-    return reinterpret_cast<const RegisteredPrefixId*>(registeredPrefix.get()) == m_id;
-  }
+    /**
+     * @brief Functor to match RegisteredPrefixId
+     */
+    class MatchRegisteredPrefixId {
+    public:
 
-private:
-  const RegisteredPrefixId* m_id;
-};
+        explicit
+        MatchRegisteredPrefixId(const RegisteredPrefixId* registeredPrefixId)
+        : m_id(registeredPrefixId) {
+        }
+
+        bool
+        operator()(const shared_ptr<RegisteredPrefix>& registeredPrefix) const {
+            return reinterpret_cast<const RegisteredPrefixId*> (registeredPrefix.get()) == m_id;
+        }
+
+    private:
+        const RegisteredPrefixId* m_id;
+    };
 
 } // namespace ndn
 

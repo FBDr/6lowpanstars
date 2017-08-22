@@ -28,65 +28,62 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup propagation
+     *
+     * \brief this class implements the Okumura Hata propagation loss model
+     * 
+     * this class implements the Okumura Hata propagation loss model,
+     * which is used to model open area pathloss for distances > 1 Km
+     * and frequencies ranging from 150 MHz to 2.0 GHz. 
+     * For more information about the model, please see
+     * the propagation module documentation in .rst format.
+     */
+    class OkumuraHataPropagationLossModel : public PropagationLossModel {
+    public:
 
-/**
- * \ingroup propagation
- *
- * \brief this class implements the Okumura Hata propagation loss model
- * 
- * this class implements the Okumura Hata propagation loss model,
- * which is used to model open area pathloss for distances > 1 Km
- * and frequencies ranging from 150 MHz to 2.0 GHz. 
- * For more information about the model, please see
- * the propagation module documentation in .rst format.
- */
-class OkumuraHataPropagationLossModel : public PropagationLossModel
-{
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-public:
+        OkumuraHataPropagationLossModel();
+        virtual ~OkumuraHataPropagationLossModel();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+        /** 
+         * \param a the first mobility model
+         * \param b the second mobility model
+         * 
+         * \return the loss in dBm for the propagation between
+         * the two given mobility models
+         */
+        double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  OkumuraHataPropagationLossModel ();
-  virtual ~OkumuraHataPropagationLossModel ();
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         */
+        OkumuraHataPropagationLossModel(const OkumuraHataPropagationLossModel &);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         * \returns
+         */
+        OkumuraHataPropagationLossModel & operator=(const OkumuraHataPropagationLossModel &);
 
-  /** 
-   * \param a the first mobility model
-   * \param b the second mobility model
-   * 
-   * \return the loss in dBm for the propagation between
-   * the two given mobility models
-   */
-  double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        virtual double DoCalcRxPower(double txPowerDbm,
+                Ptr<MobilityModel> a,
+                Ptr<MobilityModel> b) const;
+        virtual int64_t DoAssignStreams(int64_t stream);
 
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   */
-  OkumuraHataPropagationLossModel (const OkumuraHataPropagationLossModel &);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   * \returns
-   */
-  OkumuraHataPropagationLossModel & operator = (const OkumuraHataPropagationLossModel &);
-
-  virtual double DoCalcRxPower (double txPowerDbm,
-                                Ptr<MobilityModel> a,
-                                Ptr<MobilityModel> b) const;
-  virtual int64_t DoAssignStreams (int64_t stream);
-  
-  EnvironmentType m_environment;  //!< Environment Scenario
-  CitySize m_citySize;  //!< Size of the city
-  double m_frequency; //!< frequency in Hz
-};
+        EnvironmentType m_environment; //!< Environment Scenario
+        CitySize m_citySize; //!< Size of the city
+        double m_frequency; //!< frequency in Hz
+    };
 
 } // namespace ns3
 

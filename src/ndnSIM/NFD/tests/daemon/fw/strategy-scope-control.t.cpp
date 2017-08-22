@@ -43,254 +43,249 @@
 #include <boost/mpl/vector.hpp>
 
 namespace nfd {
-namespace fw {
-namespace tests {
+    namespace fw {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-template<typename S>
-class StrategyScopeControlFixture : public UnitTestTimeFixture
-{
-public:
-  StrategyScopeControlFixture()
-    : limitedIo(this)
-    , nStrategyActions(0)
-    , strategy(choose<StrategyTester<S>>(forwarder))
-    , fib(forwarder.getFib())
-    , pit(forwarder.getPit())
-    , nonLocalFace1(make_shared<DummyFace>("dummy://1", "dummy://1", ndn::nfd::FACE_SCOPE_NON_LOCAL))
-    , nonLocalFace2(make_shared<DummyFace>("dummy://2", "dummy://2", ndn::nfd::FACE_SCOPE_NON_LOCAL))
-    , localFace3(make_shared<DummyFace>("dummy://3", "dummy://3", ndn::nfd::FACE_SCOPE_LOCAL))
-    , localFace4(make_shared<DummyFace>("dummy://4", "dummy://4", ndn::nfd::FACE_SCOPE_LOCAL))
-  {
-    this->strategy.afterAction.connect([this] {
-      limitedIo.afterOp();
-      ++nStrategyActions;
-    });
+            template<typename S>
+            class StrategyScopeControlFixture : public UnitTestTimeFixture {
+            public:
 
-    forwarder.addFace(nonLocalFace1);
-    forwarder.addFace(nonLocalFace2);
-    forwarder.addFace(localFace3);
-    forwarder.addFace(localFace4);
-  }
+                StrategyScopeControlFixture()
+                : limitedIo(this)
+                , nStrategyActions(0)
+                , strategy(choose<StrategyTester<S>>(forwarder))
+                , fib(forwarder.getFib())
+                , pit(forwarder.getPit())
+                , nonLocalFace1(make_shared<DummyFace>("dummy://1", "dummy://1", ndn::nfd::FACE_SCOPE_NON_LOCAL))
+                , nonLocalFace2(make_shared<DummyFace>("dummy://2", "dummy://2", ndn::nfd::FACE_SCOPE_NON_LOCAL))
+                , localFace3(make_shared<DummyFace>("dummy://3", "dummy://3", ndn::nfd::FACE_SCOPE_LOCAL))
+                , localFace4(make_shared<DummyFace>("dummy://4", "dummy://4", ndn::nfd::FACE_SCOPE_LOCAL)) {
+                    this->strategy.afterAction.connect([this] {
+                        limitedIo.afterOp();
+                        ++nStrategyActions;
+                    });
 
-  /** \brief execute f and wait for a number of strategy actions
-   *  \note The actions may occur either during f() invocation or afterwards.
-   */
-  void
-  waitForStrategyAction(const std::function<void()>& f, int nExpectedActions = 1)
-  {
-    nStrategyActions = 0;
-    f();
-    if (nStrategyActions < nExpectedActions) {
-      BOOST_REQUIRE_EQUAL(limitedIo.run(nExpectedActions - nStrategyActions, LimitedIo::UNLIMITED_TIME),
-                          LimitedIo::EXCEED_OPS);
-    }
-    // A correctly implemented strategy is required to invoke reject pending Interest action
-    // if it decides to not forward an Interest. If a test case is stuck in an endless loop within
-    // this function, check that rejectPendingInterest is invoked under proper condition.
-  }
+                    forwarder.addFace(nonLocalFace1);
+                    forwarder.addFace(nonLocalFace2);
+                    forwarder.addFace(localFace3);
+                    forwarder.addFace(localFace4);
+                }
 
-public:
-  LimitedIo limitedIo;
-  int nStrategyActions;
+                /** \brief execute f and wait for a number of strategy actions
+                 *  \note The actions may occur either during f() invocation or afterwards.
+                 */
+                void
+                waitForStrategyAction(const std::function<void()>& f, int nExpectedActions = 1) {
+                    nStrategyActions = 0;
+                    f();
+                    if (nStrategyActions < nExpectedActions) {
+                        BOOST_REQUIRE_EQUAL(limitedIo.run(nExpectedActions - nStrategyActions, LimitedIo::UNLIMITED_TIME),
+                                LimitedIo::EXCEED_OPS);
+                    }
+                    // A correctly implemented strategy is required to invoke reject pending Interest action
+                    // if it decides to not forward an Interest. If a test case is stuck in an endless loop within
+                    // this function, check that rejectPendingInterest is invoked under proper condition.
+                }
 
-  Forwarder forwarder;
-  StrategyTester<S>& strategy;
-  Fib& fib;
-  Pit& pit;
+            public:
+                LimitedIo limitedIo;
+                int nStrategyActions;
 
-  shared_ptr<Face> nonLocalFace1;
-  shared_ptr<Face> nonLocalFace2;
-  shared_ptr<Face> localFace3;
-  shared_ptr<Face> localFace4;
-};
+                Forwarder forwarder;
+                StrategyTester<S>& strategy;
+                Fib& fib;
+                Pit& pit;
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_AUTO_TEST_SUITE(TestStrategyScopeControl)
+                shared_ptr<Face> nonLocalFace1;
+                shared_ptr<Face> nonLocalFace2;
+                shared_ptr<Face> localFace3;
+                shared_ptr<Face> localFace4;
+            };
 
-template<typename S, bool WillSendNackNoRoute, bool CanProcessNack>
-class Test
-{
-public:
-  using Strategy = S;
+            BOOST_AUTO_TEST_SUITE(Fw)
+            BOOST_AUTO_TEST_SUITE(TestStrategyScopeControl)
 
-  static bool
-  willSendNackNoRoute()
-  {
-    return WillSendNackNoRoute;
-  }
+            template<typename S, bool WillSendNackNoRoute, bool CanProcessNack>
+            class Test {
+            public:
+                using Strategy = S;
 
-  static bool
-  canProcessNack()
-  {
-    return CanProcessNack;
-  }
-};
+                static bool
+                willSendNackNoRoute() {
+                    return WillSendNackNoRoute;
+                }
 
-using Tests = boost::mpl::vector<
-  Test<AccessStrategy, false, false>,
-  Test<BestRouteStrategy, false, false>,
-  Test<BestRouteStrategy2, true, true>,
-  Test<MulticastStrategy, false, false>,
-  Test<NccStrategy, false, false>
->;
+                static bool
+                canProcessNack() {
+                    return CanProcessNack;
+                }
+            };
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
-  fibEntry->addNextHop(*this->localFace4, 10);
+            using Tests = boost::mpl::vector<
+                    Test<AccessStrategy, false, false>,
+                    Test<BestRouteStrategy, false, false>,
+                    Test<BestRouteStrategy2, true, true>,
+                    Test<MulticastStrategy, false, false>,
+                    Test<NccStrategy, false, false>
+                    >;
 
-  shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
+                fibEntry->addNextHop(*this->localFace4, 10);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); });
+                shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
 
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 1);
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); });
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToNonLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
-  fibEntry->addNextHop(*this->nonLocalFace2, 10);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 1);
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToNonLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
+                fibEntry->addNextHop(*this->nonLocalFace2, 10);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); },
-    1 + T::willSendNackNoRoute());
+                shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
 
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 1);
-  if (T::willSendNackNoRoute()) {
-    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
-    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
-  }
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); },
+                1 + T::willSendNackNoRoute());
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToLocalAndNonLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
-  fibEntry->addNextHop(*this->nonLocalFace2, 10);
-  fibEntry->addNextHop(*this->localFace4, 20);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 1);
+                if (T::willSendNackNoRoute()) {
+                    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
+                    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
+                }
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostInterestToLocalAndNonLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
+                fibEntry->addNextHop(*this->nonLocalFace2, 10);
+                fibEntry->addNextHop(*this->localFace4, 20);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); });
+                shared_ptr<Interest> interest = makeInterest("/localhost/A/1");
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
 
-  BOOST_REQUIRE_EQUAL(this->strategy.sendInterestHistory.size(), 1);
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.back().outFaceId, this->localFace4->getId());
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveInterest(*this->localFace3, *interest, pitEntry); });
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopInterestToNonLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
-  fibEntry->addNextHop(*this->nonLocalFace2, 10);
+                BOOST_REQUIRE_EQUAL(this->strategy.sendInterestHistory.size(), 1);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.back().outFaceId, this->localFace4->getId());
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhop/A/1");
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopInterestToNonLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
+                fibEntry->addNextHop(*this->nonLocalFace2, 10);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveInterest(*this->nonLocalFace1, *interest, pitEntry); },
-    1 + T::willSendNackNoRoute());
+                shared_ptr<Interest> interest = makeInterest("/localhop/A/1");
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
 
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 1);
-  if (T::willSendNackNoRoute()) {
-    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
-    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
-  }
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveInterest(*this->nonLocalFace1, *interest, pitEntry); },
+                1 + T::willSendNackNoRoute());
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopInterestToNonLocalAndLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
-  fibEntry->addNextHop(*this->nonLocalFace2, 10);
-  fibEntry->addNextHop(*this->localFace4, 20);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 1);
+                if (T::willSendNackNoRoute()) {
+                    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
+                    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
+                }
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhop/A/1");
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopInterestToNonLocalAndLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
+                fibEntry->addNextHop(*this->nonLocalFace2, 10);
+                fibEntry->addNextHop(*this->localFace4, 20);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveInterest(*this->nonLocalFace1, *interest, pitEntry); });
+                shared_ptr<Interest> interest = makeInterest("/localhop/A/1");
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
 
-  BOOST_REQUIRE_EQUAL(this->strategy.sendInterestHistory.size(), 1);
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.back().outFaceId, this->localFace4->getId());
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveInterest(*this->nonLocalFace1, *interest, pitEntry); });
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostNackToNonLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
-  fibEntry->addNextHop(*this->localFace4, 10);
-  fibEntry->addNextHop(*this->nonLocalFace2, 20);
+                BOOST_REQUIRE_EQUAL(this->strategy.sendInterestHistory.size(), 1);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.back().outFaceId, this->localFace4->getId());
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.size(), 0);
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhost/A/1", 1460);
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
-  lp::Nack nack = makeNack("/localhost/A/1", 1460, lp::NackReason::NO_ROUTE);
-  pitEntry->insertOrUpdateOutRecord(*this->localFace4, *interest)->setIncomingNack(nack);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhostNackToNonLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhost/A").first;
+                fibEntry->addNextHop(*this->localFace4, 10);
+                fibEntry->addNextHop(*this->nonLocalFace2, 20);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveNack(*this->localFace4, nack, pitEntry); },
-    T::canProcessNack());
+                shared_ptr<Interest> interest = makeInterest("/localhost/A/1", 1460);
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->localFace3, *interest);
+                lp::Nack nack = makeNack("/localhost/A/1", 1460, lp::NackReason::NO_ROUTE);
+                pitEntry->insertOrUpdateOutRecord(*this->localFace4, *interest)->setIncomingNack(nack);
 
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
-  if (T::canProcessNack()) {
-    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
-    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
-  }
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveNack(*this->localFace4, nack, pitEntry); },
+                T::canProcessNack());
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopNackToNonLocal,
-                                 T, Tests, StrategyScopeControlFixture<typename T::Strategy>)
-{
-  fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
-  fibEntry->addNextHop(*this->localFace4, 10);
-  fibEntry->addNextHop(*this->nonLocalFace2, 20);
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
+                if (T::canProcessNack()) {
+                    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
+                    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
+                }
+            }
 
-  shared_ptr<Interest> interest = makeInterest("/localhop/A/1", 1377);
-  shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
-  pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
-  lp::Nack nack = makeNack("/localhop/A/1", 1377, lp::NackReason::NO_ROUTE);
-  pitEntry->insertOrUpdateOutRecord(*this->localFace4, *interest)->setIncomingNack(nack);
+            BOOST_FIXTURE_TEST_CASE_TEMPLATE(LocalhopNackToNonLocal,
+                    T, Tests, StrategyScopeControlFixture<typename T::Strategy>) {
+                fib::Entry* fibEntry = this->fib.insert("/localhop/A").first;
+                fibEntry->addNextHop(*this->localFace4, 10);
+                fibEntry->addNextHop(*this->nonLocalFace2, 20);
 
-  this->waitForStrategyAction(
-    [&] { this->strategy.afterReceiveNack(*this->localFace4, nack, pitEntry); },
-    T::canProcessNack());
+                shared_ptr<Interest> interest = makeInterest("/localhop/A/1", 1377);
+                shared_ptr<pit::Entry> pitEntry = this->pit.insert(*interest).first;
+                pitEntry->insertOrUpdateInRecord(*this->nonLocalFace1, *interest);
+                lp::Nack nack = makeNack("/localhop/A/1", 1377, lp::NackReason::NO_ROUTE);
+                pitEntry->insertOrUpdateOutRecord(*this->localFace4, *interest)->setIncomingNack(nack);
 
-  BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
-  BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
-  if (T::canProcessNack()) {
-    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
-    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
-  }
-}
+                this->waitForStrategyAction(
+                        [&] {
+                            this->strategy.afterReceiveNack(*this->localFace4, nack, pitEntry); },
+                T::canProcessNack());
 
-BOOST_AUTO_TEST_SUITE_END() // TestStrategyScopeControl
-BOOST_AUTO_TEST_SUITE_END() // Fw
+                BOOST_CHECK_EQUAL(this->strategy.sendInterestHistory.size(), 0);
+                BOOST_CHECK_EQUAL(this->strategy.rejectPendingInterestHistory.size(), 0);
+                if (T::canProcessNack()) {
+                    BOOST_REQUIRE_EQUAL(this->strategy.sendNackHistory.size(), 1);
+                    BOOST_CHECK_EQUAL(this->strategy.sendNackHistory.back().header.getReason(), lp::NackReason::NO_ROUTE);
+                }
+            }
 
-} // namespace tests
-} // namespace fw
+            BOOST_AUTO_TEST_SUITE_END() // TestStrategyScopeControl
+            BOOST_AUTO_TEST_SUITE_END() // Fw
+
+        } // namespace tests
+    } // namespace fw
 } // namespace nfd

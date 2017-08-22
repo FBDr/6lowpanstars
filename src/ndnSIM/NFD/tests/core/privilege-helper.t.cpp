@@ -28,37 +28,37 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TestPrivilegeHelper, BaseFixture)
+        BOOST_FIXTURE_TEST_SUITE(TestPrivilegeHelper, BaseFixture)
 
-BOOST_AUTO_TEST_CASE(DropRaise)
-{
+        BOOST_AUTO_TEST_CASE(DropRaise) {
 #ifdef HAVE_PRIVILEGE_DROP_AND_ELEVATE
-  SKIP_IF_NOT_SUPERUSER();
+            SKIP_IF_NOT_SUPERUSER();
 
-  // The following assumes that nobody/nogroup is present on the test system
-  BOOST_CHECK_NO_THROW(PrivilegeHelper::initialize("nobody", "nogroup"));
-  BOOST_CHECK_EQUAL(::geteuid(), 0);
+            // The following assumes that nobody/nogroup is present on the test system
+            BOOST_CHECK_NO_THROW(PrivilegeHelper::initialize("nobody", "nogroup"));
+            BOOST_CHECK_EQUAL(::geteuid(), 0);
 
-  BOOST_CHECK_NO_THROW(PrivilegeHelper::drop());
-  BOOST_CHECK_NE(::geteuid(), 0);
+            BOOST_CHECK_NO_THROW(PrivilegeHelper::drop());
+            BOOST_CHECK_NE(::geteuid(), 0);
 
-  // separate runElevated case to improve log reporting (otherwise output is unreadable)
-  BOOST_CHECK_NO_THROW(PrivilegeHelper::runElevated([]{}));
-  PrivilegeHelper::runElevated([] {
-    BOOST_CHECK_EQUAL(::geteuid(), 0);
-  });
-  BOOST_CHECK_NE(::geteuid(), 0);
+            // separate runElevated case to improve log reporting (otherwise output is unreadable)
+            BOOST_CHECK_NO_THROW(PrivilegeHelper::runElevated([] {
+            }));
+            PrivilegeHelper::runElevated([] {
+                BOOST_CHECK_EQUAL(::geteuid(), 0);
+            });
+            BOOST_CHECK_NE(::geteuid(), 0);
 
-  BOOST_CHECK_NO_THROW(PrivilegeHelper::raise());
-  BOOST_CHECK_EQUAL(::geteuid(), 0);
+            BOOST_CHECK_NO_THROW(PrivilegeHelper::raise());
+            BOOST_CHECK_EQUAL(::geteuid(), 0);
 #else
-  BOOST_TEST_MESSAGE("Dropping/raising privileges not supported on this platform, skipping");
+            BOOST_TEST_MESSAGE("Dropping/raising privileges not supported on this platform, skipping");
 #endif // HAVE_PRIVILEGE_DROP_AND_ELEVATE
-}
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

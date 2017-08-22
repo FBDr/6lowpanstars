@@ -48,95 +48,94 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("Test-block-ack");
+NS_LOG_COMPONENT_DEFINE("Test-block-ack");
 
-int main (int argc, char const* argv[])
-{
-  LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("BlockAckManager", LOG_LEVEL_INFO);
- 
-  Ptr<Node> sta = CreateObject<Node> ();
-  Ptr<Node> ap = CreateObject<Node> ();
+int main(int argc, char const* argv[]) {
+    LogComponentEnable("EdcaTxopN", LOG_LEVEL_DEBUG);
+    LogComponentEnable("BlockAckManager", LOG_LEVEL_INFO);
 
-  YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
-  YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
-  phy.SetChannel (channel.Create ());
+    Ptr<Node> sta = CreateObject<Node> ();
+    Ptr<Node> ap = CreateObject<Node> ();
 
-  WifiHelper wifi = WifiHelper::Default ();
-  QosWifiMacHelper mac = QosWifiMacHelper::Default ();
-  /* disable fragmentation */
-  wifi.SetRemoteStationManager ("ns3::AarfWifiManager", "FragmentationThreshold", UintegerValue (2500));
+    YansWifiChannelHelper channel = YansWifiChannelHelper::Default();
+    YansWifiPhyHelper phy = YansWifiPhyHelper::Default();
+    phy.SetChannel(channel.Create());
 
-  Ssid ssid ("My-network");
+    WifiHelper wifi = WifiHelper::Default();
+    QosWifiMacHelper mac = QosWifiMacHelper::Default();
+    /* disable fragmentation */
+    wifi.SetRemoteStationManager("ns3::AarfWifiManager", "FragmentationThreshold", UintegerValue(2500));
 
-  mac.SetType ("ns3::StaWifiMac",
-               "Ssid", SsidValue (ssid),
-               "ActiveProbing", BooleanValue (false));
-  /* setting blockack threshold for sta's BE queue */
-  mac.SetBlockAckThresholdForAc (AC_BE, 2);
-  /* setting block inactivity timeout to 3*1024 = 3072 microseconds */ 
-  //mac.SetBlockAckInactivityTimeoutForAc (AC_BE, 3);
-  NetDeviceContainer staDevice = wifi.Install (phy, mac, sta);
+    Ssid ssid("My-network");
 
-  mac.SetType ("ns3::ApWifiMac",
-               "Ssid", SsidValue (ssid));
-  mac.SetBlockAckThresholdForAc (AC_BE, 0);
-  NetDeviceContainer apDevice = wifi.Install (phy, mac, ap);
+    mac.SetType("ns3::StaWifiMac",
+            "Ssid", SsidValue(ssid),
+            "ActiveProbing", BooleanValue(false));
+    /* setting blockack threshold for sta's BE queue */
+    mac.SetBlockAckThresholdForAc(AC_BE, 2);
+    /* setting block inactivity timeout to 3*1024 = 3072 microseconds */
+    //mac.SetBlockAckInactivityTimeoutForAc (AC_BE, 3);
+    NetDeviceContainer staDevice = wifi.Install(phy, mac, sta);
 
-  /* Setting mobility model */
-  MobilityHelper mobility;
+    mac.SetType("ns3::ApWifiMac",
+            "Ssid", SsidValue(ssid));
+    mac.SetBlockAckThresholdForAc(AC_BE, 0);
+    NetDeviceContainer apDevice = wifi.Install(phy, mac, ap);
 
-  mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
-                                 "MinX", DoubleValue (0.0),
-                                 "MinY", DoubleValue (0.0),
-                                 "DeltaX", DoubleValue (5.0),
-                                 "DeltaY", DoubleValue (10.0),
-                                 "GridWidth", UintegerValue (3),
-                                 "LayoutType", StringValue ("RowFirst"));
+    /* Setting mobility model */
+    MobilityHelper mobility;
 
-  mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-                             "Bounds", RectangleValue (Rectangle (-50, 50, -50, 50)));
-  mobility.Install (sta);
+    mobility.SetPositionAllocator("ns3::GridPositionAllocator",
+            "MinX", DoubleValue(0.0),
+            "MinY", DoubleValue(0.0),
+            "DeltaX", DoubleValue(5.0),
+            "DeltaY", DoubleValue(10.0),
+            "GridWidth", UintegerValue(3),
+            "LayoutType", StringValue("RowFirst"));
 
-  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-  mobility.Install (ap);
+    mobility.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+            "Bounds", RectangleValue(Rectangle(-50, 50, -50, 50)));
+    mobility.Install(sta);
 
-  /* Internet stack*/
-  InternetStackHelper stack;
-  stack.Install (sta);
-  stack.Install (ap);
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    mobility.Install(ap);
 
-  Ipv4AddressHelper address;
+    /* Internet stack*/
+    InternetStackHelper stack;
+    stack.Install(sta);
+    stack.Install(ap);
 
-  address.SetBase ("192.168.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer staIf;
-  Ipv4InterfaceContainer apIf;
-  staIf = address.Assign (staDevice);
-  apIf = address.Assign (apDevice);
+    Ipv4AddressHelper address;
 
-  /* Setting applications */
+    address.SetBase("192.168.1.0", "255.255.255.0");
+    Ipv4InterfaceContainer staIf;
+    Ipv4InterfaceContainer apIf;
+    staIf = address.Assign(staDevice);
+    apIf = address.Assign(apDevice);
 
-  uint16_t port = 9;
+    /* Setting applications */
 
-  DataRate dataRate ("1Mb/s");
-  OnOffHelper onOff ("ns3::UdpSocketFactory", Address (InetSocketAddress (apIf.GetAddress (0), port)));
-  onOff.SetAttribute ("DataRate", DataRateValue (dataRate));
-  onOff.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.01]"));
-  onOff.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=8]"));
-  onOff.SetAttribute ("PacketSize", UintegerValue (50));
+    uint16_t port = 9;
 
-  ApplicationContainer staApps = onOff.Install (sta);
+    DataRate dataRate("1Mb/s");
+    OnOffHelper onOff("ns3::UdpSocketFactory", Address(InetSocketAddress(apIf.GetAddress(0), port)));
+    onOff.SetAttribute("DataRate", DataRateValue(dataRate));
+    onOff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=0.01]"));
+    onOff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=8]"));
+    onOff.SetAttribute("PacketSize", UintegerValue(50));
 
-  staApps.Start (Seconds (1.0));
-  staApps.Stop (Seconds (10.0));
+    ApplicationContainer staApps = onOff.Install(sta);
 
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+    staApps.Start(Seconds(1.0));
+    staApps.Stop(Seconds(10.0));
 
-  Simulator::Stop (Seconds (10.0));
+    Ipv4GlobalRoutingHelper::PopulateRoutingTables();
 
-  phy.EnablePcap ("test-blockack-2", ap->GetId (), 0);
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Stop(Seconds(10.0));
 
-  return 0;
+    phy.EnablePcap("test-blockack-2", ap->GetId(), 0);
+    Simulator::Run();
+    Simulator::Destroy();
+
+    return 0;
 }

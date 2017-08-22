@@ -21,100 +21,87 @@
 #include "ampdu-subframe-header.h"
 #include "ns3/address-utils.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (AmpduSubframeHeader);
-
-TypeId
-AmpduSubframeHeader::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::AmpduSubframeHeader")
-    .SetParent<Header> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<AmpduSubframeHeader> ()
-  ;
-  return tid;
-}
 
-TypeId
-AmpduSubframeHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(AmpduSubframeHeader);
 
-AmpduSubframeHeader::AmpduSubframeHeader ()
-  : m_length (0)
-{
-}
+    TypeId
+    AmpduSubframeHeader::GetTypeId() {
+        static TypeId tid = TypeId("ns3::AmpduSubframeHeader")
+                .SetParent<Header> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<AmpduSubframeHeader> ()
+                ;
+        return tid;
+    }
 
-AmpduSubframeHeader::~AmpduSubframeHeader ()
-{
-}
+    TypeId
+    AmpduSubframeHeader::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-uint32_t
-AmpduSubframeHeader::GetSerializedSize () const
-{
-  return (2 + 1 + 1);
-}
+    AmpduSubframeHeader::AmpduSubframeHeader()
+            : m_length(0) {
+    }
 
-void
-AmpduSubframeHeader::Serialize (Buffer::Iterator i) const
-{
-  i.WriteHtolsbU16 (m_length);
-  i.WriteU8 (m_crc);
-  i.WriteU8 (m_sig);
-}
+    AmpduSubframeHeader::~AmpduSubframeHeader() {
+    }
 
-uint32_t
-AmpduSubframeHeader::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-  m_length = i.ReadLsbtohU16 ();
-  m_crc = i.ReadU8 ();
-  m_sig = i.ReadU8 ();
-  return i.GetDistanceFrom (start);
-}
+    uint32_t
+    AmpduSubframeHeader::GetSerializedSize() const {
+        return (2 + 1 + 1);
+    }
 
-void
-AmpduSubframeHeader::Print (std::ostream &os) const
-{
-  os << "length = " << m_length << ", CRC = " << m_crc << ", Signature = " << m_sig;
-}
+    void
+    AmpduSubframeHeader::Serialize(Buffer::Iterator i) const {
+        i.WriteHtolsbU16(m_length);
+        i.WriteU8(m_crc);
+        i.WriteU8(m_sig);
+    }
 
-void
-AmpduSubframeHeader::SetCrc (uint8_t crc)
-{
-  m_crc = crc;
-}
+    uint32_t
+    AmpduSubframeHeader::Deserialize(Buffer::Iterator start) {
+        Buffer::Iterator i = start;
+        m_length = i.ReadLsbtohU16();
+        m_crc = i.ReadU8();
+        m_sig = i.ReadU8();
+        return i.GetDistanceFrom(start);
+    }
 
-void
-AmpduSubframeHeader::SetSig ()
-{
-  m_sig = 0x4E;
-}
+    void
+    AmpduSubframeHeader::Print(std::ostream & os) const {
+        os << "length = " << m_length << ", CRC = " << m_crc << ", Signature = " << m_sig;
+    }
 
-void
-AmpduSubframeHeader::SetLength (uint16_t length)
-{
-  m_length = length;
-}
+    void
+    AmpduSubframeHeader::SetCrc(uint8_t crc) {
+        m_crc = crc;
+    }
 
-uint8_t
-AmpduSubframeHeader::GetCrc (void) const
-{
-  return m_crc;
-}
+    void
+    AmpduSubframeHeader::SetSig() {
+        m_sig = 0x4E;
+    }
 
-uint8_t
-AmpduSubframeHeader::GetSig (void) const
-{
-  return m_sig;
-}
+    void
+    AmpduSubframeHeader::SetLength(uint16_t length) {
+        m_length = length;
+    }
 
-uint16_t
-AmpduSubframeHeader::GetLength (void) const
-{
-  return m_length;
-}
+    uint8_t
+    AmpduSubframeHeader::GetCrc(void) const {
+        return m_crc;
+    }
+
+    uint8_t
+    AmpduSubframeHeader::GetSig(void) const {
+        return m_sig;
+    }
+
+    uint16_t
+    AmpduSubframeHeader::GetLength(void) const {
+        return m_length;
+    }
 
 } //namespace ns3

@@ -28,26 +28,25 @@
 
 namespace ns3 {
 
-/**
- * \ingroup energy
- * \brief Creates a LiIonEnergySource  object.
- *
- */
-class LiIonEnergySourceHelper: public EnergySourceHelper
-{
-public:
-  LiIonEnergySourceHelper ();
-  ~LiIonEnergySourceHelper ();
+    /**
+     * \ingroup energy
+     * \brief Creates a LiIonEnergySource  object.
+     *
+     */
+    class LiIonEnergySourceHelper : public EnergySourceHelper {
+    public:
+        LiIonEnergySourceHelper();
+        ~LiIonEnergySourceHelper();
 
-  void Set (std::string name, const AttributeValue &v);
+        void Set(std::string name, const AttributeValue &v);
 
-private:
-  virtual Ptr<EnergySource> DoInstall (Ptr<Node> node) const;
+    private:
+        virtual Ptr<EnergySource> DoInstall(Ptr<Node> node) const;
 
-private:
-  ObjectFactory m_liIonEnergySource;
+    private:
+        ObjectFactory m_liIonEnergySource;
 
-};
+    };
 
 } // namespace ns3
 

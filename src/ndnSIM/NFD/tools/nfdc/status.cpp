@@ -34,130 +34,126 @@
 #include <ndn-cxx/security/validator-null.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-int
-reportStatus(ExecuteContext& ctx, const StatusReportOptions& options)
-{
-  unique_ptr<Validator> validator = make_unique<ndn::ValidatorNull>();
-  CommandOptions ctrlOptions;
+            int
+            reportStatus(ExecuteContext& ctx, const StatusReportOptions& options) {
+                unique_ptr<Validator> validator = make_unique<ndn::ValidatorNull>();
+                CommandOptions ctrlOptions;
 
-  StatusReport report;
+                StatusReport report;
 
-  if (options.wantForwarderGeneral) {
-    auto nfdIdCollector = make_unique<NfdIdCollector>(std::move(validator));
-    auto forwarderGeneralModule = make_unique<ForwarderGeneralModule>();
-    forwarderGeneralModule->setNfdIdCollector(*nfdIdCollector);
-    report.sections.push_back(std::move(forwarderGeneralModule));
-    validator = std::move(nfdIdCollector);
-  }
+                if (options.wantForwarderGeneral) {
+                    auto nfdIdCollector = make_unique<NfdIdCollector>(std::move(validator));
+                    auto forwarderGeneralModule = make_unique<ForwarderGeneralModule>();
+                    forwarderGeneralModule->setNfdIdCollector(*nfdIdCollector);
+                    report.sections.push_back(std::move(forwarderGeneralModule));
+                    validator = std::move(nfdIdCollector);
+                }
 
-  if (options.wantChannels) {
-    report.sections.push_back(make_unique<ChannelModule>());
-  }
+                if (options.wantChannels) {
+                    report.sections.push_back(make_unique<ChannelModule>());
+                }
 
-  if (options.wantFaces) {
-    report.sections.push_back(make_unique<FaceModule>());
-  }
+                if (options.wantFaces) {
+                    report.sections.push_back(make_unique<FaceModule>());
+                }
 
-  if (options.wantFib) {
-    report.sections.push_back(make_unique<FibModule>());
-  }
+                if (options.wantFib) {
+                    report.sections.push_back(make_unique<FibModule>());
+                }
 
-  if (options.wantRib) {
-    report.sections.push_back(make_unique<RibModule>());
-  }
+                if (options.wantRib) {
+                    report.sections.push_back(make_unique<RibModule>());
+                }
 
-  if (options.wantStrategyChoice) {
-    report.sections.push_back(make_unique<StrategyChoiceModule>());
-  }
+                if (options.wantStrategyChoice) {
+                    report.sections.push_back(make_unique<StrategyChoiceModule>());
+                }
 
-  uint32_t code = report.collect(ctx.face, ctx.keyChain, *validator, ctrlOptions);
-  if (code != 0) {
-    // Give a simple error code for end user.
-    // Technical support personnel:
-    // 1. get the exact command from end user
-    // 2. code div 1000000 is zero-based section index
-    // 3. code mod 1000000 is a Controller.fetch error code
-    std::cerr << "Error while collecting status report (" << code << ").\n";
-    return 1;
-  }
+                uint32_t code = report.collect(ctx.face, ctx.keyChain, *validator, ctrlOptions);
+                if (code != 0) {
+                    // Give a simple error code for end user.
+                    // Technical support personnel:
+                    // 1. get the exact command from end user
+                    // 2. code div 1000000 is zero-based section index
+                    // 3. code mod 1000000 is a Controller.fetch error code
+                    std::cerr << "Error while collecting status report (" << code << ").\n";
+                    return 1;
+                }
 
-  switch (options.output) {
-    case ReportFormat::XML:
-      report.formatXml(std::cout);
-      break;
-    case ReportFormat::TEXT:
-      report.formatText(std::cout);
-      break;
-  }
-  return 0;
-}
+                switch (options.output) {
+                    case ReportFormat::XML:
+                        report.formatXml(std::cout);
+                        break;
+                    case ReportFormat::TEXT:
+                        report.formatText(std::cout);
+                        break;
+                }
+                return 0;
+            }
 
-/** \brief single-section status command
- */
-static int
-reportStatusSingleSection(ExecuteContext& ctx, bool StatusReportOptions::*wantSection)
-{
-  StatusReportOptions options;
-  options.*wantSection = true;
-  return reportStatus(ctx, options);
-}
+            /** \brief single-section status command
+             */
+            static int
+            reportStatusSingleSection(ExecuteContext& ctx, bool StatusReportOptions::*wantSection) {
+                StatusReportOptions options;
+                options.*wantSection = true;
+                return reportStatus(ctx, options);
+            }
 
-/** \brief the 'status report' command
- */
-static int
-reportStatusComprehensive(ExecuteContext& ctx)
-{
-  StatusReportOptions options;
-  options.output = ctx.args.get<ReportFormat>("format", ReportFormat::TEXT);
-  options.wantForwarderGeneral = options.wantChannels = options.wantFaces =
-    options.wantFib = options.wantRib = options.wantStrategyChoice = true;
-  return reportStatus(ctx, options);
-}
+            /** \brief the 'status report' command
+             */
+            static int
+            reportStatusComprehensive(ExecuteContext& ctx) {
+                StatusReportOptions options;
+                options.output = ctx.args.get<ReportFormat>("format", ReportFormat::TEXT);
+                options.wantForwarderGeneral = options.wantChannels = options.wantFaces =
+                        options.wantFib = options.wantRib = options.wantStrategyChoice = true;
+                return reportStatus(ctx, options);
+            }
 
-void
-registerStatusCommands(CommandParser& parser)
-{
-  CommandDefinition defStatusReport("status", "report");
-  defStatusReport
-    .setTitle("print NFD status report")
-    .addArg("format", ArgValueType::REPORT_FORMAT, Required::NO, Positional::YES);
-  parser.addCommand(defStatusReport, &reportStatusComprehensive);
+            void
+            registerStatusCommands(CommandParser& parser) {
+                CommandDefinition defStatusReport("status", "report");
+                defStatusReport
+                        .setTitle("print NFD status report")
+                        .addArg("format", ArgValueType::REPORT_FORMAT, Required::NO, Positional::YES);
+                parser.addCommand(defStatusReport, &reportStatusComprehensive);
 
-  CommandDefinition defStatusShow("status", "show");
-  defStatusShow
-    .setTitle("print general status");
-  parser.addCommand(defStatusShow, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantForwarderGeneral));
-  parser.addAlias("status", "show", "list");
+                CommandDefinition defStatusShow("status", "show");
+                defStatusShow
+                        .setTitle("print general status");
+                parser.addCommand(defStatusShow, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantForwarderGeneral));
+                parser.addAlias("status", "show", "list");
 
-  CommandDefinition defFaceList("face", "list");
-  defFaceList
-    .setTitle("print face list");
-  parser.addCommand(defFaceList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantFaces));
+                CommandDefinition defFaceList("face", "list");
+                defFaceList
+                        .setTitle("print face list");
+                parser.addCommand(defFaceList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantFaces));
 
-  CommandDefinition defChannelList("channel", "list");
-  defChannelList
-    .setTitle("print channel list");
-  parser.addCommand(defChannelList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantChannels));
+                CommandDefinition defChannelList("channel", "list");
+                defChannelList
+                        .setTitle("print channel list");
+                parser.addCommand(defChannelList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantChannels));
 
-  CommandDefinition defStrategyList("strategy", "list");
-  defStrategyList
-    .setTitle("print strategy choices");
-  parser.addCommand(defStrategyList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantStrategyChoice));
+                CommandDefinition defStrategyList("strategy", "list");
+                defStrategyList
+                        .setTitle("print strategy choices");
+                parser.addCommand(defStrategyList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantStrategyChoice));
 
-  CommandDefinition defFibList("fib", "list");
-  defFibList
-    .setTitle("print FIB entries");
-  parser.addCommand(defFibList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantFib));
+                CommandDefinition defFibList("fib", "list");
+                defFibList
+                        .setTitle("print FIB entries");
+                parser.addCommand(defFibList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantFib));
 
-  CommandDefinition defRouteList("route", "list");
-  defRouteList
-    .setTitle("print RIB entries");
-  parser.addCommand(defRouteList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantRib));
-}
+                CommandDefinition defRouteList("route", "list");
+                defRouteList
+                        .setTitle("print RIB entries");
+                parser.addCommand(defRouteList, bind(&reportStatusSingleSection, _1, &StatusReportOptions::wantRib));
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd

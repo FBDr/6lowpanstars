@@ -26,48 +26,47 @@
 
 namespace ns3 {
 
-/**
- * \ingroup aggregator
- *
- * Base class for data collection framework objects.
- *
- * All data collection objects have 1) a string name, and 2) enabled
- * or disabled status.
- */
-class DataCollectionObject : public Object
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \ingroup aggregator
+     *
+     * Base class for data collection framework objects.
+     *
+     * All data collection objects have 1) a string name, and 2) enabled
+     * or disabled status.
+     */
+    class DataCollectionObject : public Object {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId();
 
-  DataCollectionObject ();
-  virtual ~DataCollectionObject ();
+        DataCollectionObject();
+        virtual ~DataCollectionObject();
 
-  /// Set the status of an individual object.
-  void Enable (void);
-  /// Unset the status of an individual object.
-  void Disable (void);
+        /// Set the status of an individual object.
+        void Enable(void);
+        /// Unset the status of an individual object.
+        void Disable(void);
 
-  /// Check the status of an individual object.
-  virtual bool IsEnabled (void) const;
+        /// Check the status of an individual object.
+        virtual bool IsEnabled(void) const;
 
-  /// Get the object's name.
-  std::string GetName (void) const;
+        /// Get the object's name.
+        std::string GetName(void) const;
 
-  /// Set the object's name.  All spaces are replaced by underscores.
-  void SetName (std::string name);
+        /// Set the object's name.  All spaces are replaced by underscores.
+        void SetName(std::string name);
 
-protected:
-  /// Object's activation state.
-  bool m_enabled;
+    protected:
+        /// Object's activation state.
+        bool m_enabled;
 
-  /// Name of the object within the data collection framework
-  std::string m_name;
+        /// Name of the object within the data collection framework
+        std::string m_name;
 
-};
+    };
 
 } // namespace ns3
 

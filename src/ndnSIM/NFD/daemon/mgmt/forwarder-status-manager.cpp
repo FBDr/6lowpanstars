@@ -29,56 +29,53 @@
 
 namespace nfd {
 
-static const time::milliseconds STATUS_FRESHNESS(5000);
+    static const time::milliseconds STATUS_FRESHNESS(5000);
 
-ForwarderStatusManager::ForwarderStatusManager(Forwarder& forwarder, Dispatcher& dispatcher)
-  : m_forwarder(forwarder)
-  , m_dispatcher(dispatcher)
-  , m_startTimestamp(time::system_clock::now())
-{
-  m_dispatcher.addStatusDataset("status/general", ndn::mgmt::makeAcceptAllAuthorization(),
-                                bind(&ForwarderStatusManager::listGeneralStatus, this, _1, _2, _3));
-}
+    ForwarderStatusManager::ForwarderStatusManager(Forwarder& forwarder, Dispatcher& dispatcher)
+    : m_forwarder(forwarder)
+    , m_dispatcher(dispatcher)
+    , m_startTimestamp(time::system_clock::now()) {
+        m_dispatcher.addStatusDataset("status/general", ndn::mgmt::makeAcceptAllAuthorization(),
+                bind(&ForwarderStatusManager::listGeneralStatus, this, _1, _2, _3));
+    }
 
-ndn::nfd::ForwarderStatus
-ForwarderStatusManager::collectGeneralStatus()
-{
-  ndn::nfd::ForwarderStatus status;
+    ndn::nfd::ForwarderStatus
+    ForwarderStatusManager::collectGeneralStatus() {
+        ndn::nfd::ForwarderStatus status;
 
-  status.setNfdVersion(NFD_VERSION_BUILD_STRING);
-  status.setStartTimestamp(m_startTimestamp);
-  status.setCurrentTimestamp(time::system_clock::now());
+        status.setNfdVersion(NFD_VERSION_BUILD_STRING);
+        status.setStartTimestamp(m_startTimestamp);
+        status.setCurrentTimestamp(time::system_clock::now());
 
-  status.setNNameTreeEntries(m_forwarder.getNameTree().size());
-  status.setNFibEntries(m_forwarder.getFib().size());
-  status.setNPitEntries(m_forwarder.getPit().size());
-  status.setNMeasurementsEntries(m_forwarder.getMeasurements().size());
-  status.setNCsEntries(m_forwarder.getCs().size());
+        status.setNNameTreeEntries(m_forwarder.getNameTree().size());
+        status.setNFibEntries(m_forwarder.getFib().size());
+        status.setNPitEntries(m_forwarder.getPit().size());
+        status.setNMeasurementsEntries(m_forwarder.getMeasurements().size());
+        status.setNCsEntries(m_forwarder.getCs().size());
 
-  const ForwarderCounters& counters = m_forwarder.getCounters();
-  status.setNInInterests(counters.nInInterests)
-        .setNOutInterests(counters.nOutInterests)
-        .setNInDatas(counters.nInData)
-        .setNOutDatas(counters.nOutData)
-        .setNInNacks(counters.nInNacks)
-        .setNOutNacks(counters.nOutNacks);
+        const ForwarderCounters& counters = m_forwarder.getCounters();
+        status.setNInInterests(counters.nInInterests)
+                .setNOutInterests(counters.nOutInterests)
+                .setNInDatas(counters.nInData)
+                .setNOutDatas(counters.nOutData)
+                .setNInNacks(counters.nInNacks)
+                .setNOutNacks(counters.nOutNacks);
 
-  return status;
-}
+        return status;
+    }
 
-void
-ForwarderStatusManager::listGeneralStatus(const Name& topPrefix, const Interest& interest,
-                                          ndn::mgmt::StatusDatasetContext& context)
-{
-  context.setExpiry(STATUS_FRESHNESS);
+    void
+    ForwarderStatusManager::listGeneralStatus(const Name& topPrefix, const Interest& interest,
+            ndn::mgmt::StatusDatasetContext& context) {
+        context.setExpiry(STATUS_FRESHNESS);
 
-  auto status = this->collectGeneralStatus();
-  const Block& wire = status.wireEncode();
-  wire.parse();
-  for (const auto& subblock : wire.elements()) {
-    context.append(subblock);
-  }
-  context.end();
-}
+        auto status = this->collectGeneralStatus();
+        const Block& wire = status.wireEncode();
+        wire.parse();
+        for (const auto& subblock : wire.elements()) {
+            context.append(subblock);
+        }
+        context.end();
+    }
 
 } // namespace nfd

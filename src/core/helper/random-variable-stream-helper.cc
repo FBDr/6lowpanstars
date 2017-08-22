@@ -23,24 +23,23 @@
 #include "ns3/assert.h"
 #include "random-variable-stream-helper.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("RandomVariableStreamHelper");
-
-int64_t RandomVariableStreamHelper::AssignStreams (std::string path, int64_t stream)
+namespace ns3
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  NS_ASSERT (stream >= 0);
-  Config::MatchContainer mc = Config::LookupMatches (path);
-  int64_t i = 0;
-  for (Config::MatchContainer::Iterator mci = mc.Begin (); mci != mc.End (); ++mci, ++i)
-    {
-      PointerValue ptr = mc.Get (i);
-      Ptr<RandomVariableStream> rvs = ptr.Get<RandomVariableStream> ();
-      NS_LOG_DEBUG ("RandomVariableStream found: " << rvs << "; setting stream to " << (stream + i));
-      rvs->SetStream (stream + i);
+
+    NS_LOG_COMPONENT_DEFINE("RandomVariableStreamHelper");
+
+    int64_t RandomVariableStreamHelper::AssignStreams(std::string path, int64_t stream) {
+        NS_LOG_FUNCTION_NOARGS();
+        NS_ASSERT(stream >= 0);
+        Config::MatchContainer mc = Config::LookupMatches(path);
+        int64_t i = 0;
+        for (Config::MatchContainer::Iterator mci = mc.Begin(); mci != mc.End(); ++mci, ++i) {
+            PointerValue ptr = mc.Get(i);
+            Ptr<RandomVariableStream> rvs = ptr.Get<RandomVariableStream> ();
+            NS_LOG_DEBUG("RandomVariableStream found: " << rvs << "; setting stream to " << (stream + i));
+            rvs->SetStream(stream + i);
+        }
+        return i;
     }
-  return i;
-}
 
 } // namespace ns3

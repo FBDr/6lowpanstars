@@ -34,99 +34,96 @@
 
 namespace ns3 {
 
+    /**
+     *
+     * This minimal SpectrumPhy implemetation calculates the SINR with
+     * respect to the strongest signal for a given point. The original
+     * purpose of this class is to be used to generate a
+     * Radio Environment Map (REM) by locating several instances in a grid
+     * fashion, and connecting them to the channel only for a very short
+     * amount of time. 
+     *
+     * The assumption on which this class works is that the system
+     * being considered is an infrastructured radio access network using
+     * FDD, hence all signals will be transmitted simultaneously. 
+     */
+    class RemSpectrumPhy : public SpectrumPhy {
+    public:
+        RemSpectrumPhy();
+        virtual ~RemSpectrumPhy();
 
-/**
- *
- * This minimal SpectrumPhy implemetation calculates the SINR with
- * respect to the strongest signal for a given point. The original
- * purpose of this class is to be used to generate a
- * Radio Environment Map (REM) by locating several instances in a grid
- * fashion, and connecting them to the channel only for a very short
- * amount of time. 
- *
- * The assumption on which this class works is that the system
- * being considered is an infrastructured radio access network using
- * FDD, hence all signals will be transmitted simultaneously. 
- */
-class RemSpectrumPhy : public SpectrumPhy
-{
+        // inherited from Object
+        void DoDispose();
+        static TypeId GetTypeId(void);
 
-public:
-  RemSpectrumPhy ();
-  virtual ~RemSpectrumPhy ();
+        // inherited from SpectrumPhy
+        void SetChannel(Ptr<SpectrumChannel> c);
+        void SetMobility(Ptr<MobilityModel> m);
+        void SetDevice(Ptr<NetDevice> d);
+        Ptr<MobilityModel> GetMobility();
+        Ptr<NetDevice> GetDevice() const;
+        Ptr<const SpectrumModel> GetRxSpectrumModel() const;
+        Ptr<AntennaModel> GetRxAntenna();
+        void StartRx(Ptr<SpectrumSignalParameters> params);
 
-  // inherited from Object
-  void DoDispose ();
-  static TypeId GetTypeId (void);
+        /** 
+         * set the RX spectrum model to be used
+         * 
+         * \param m 
+         */
+        void SetRxSpectrumModel(Ptr<const SpectrumModel> m);
 
-  // inherited from SpectrumPhy
-  void SetChannel (Ptr<SpectrumChannel> c);
-  void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice () const;
-  Ptr<const SpectrumModel> GetRxSpectrumModel () const;
-  Ptr<AntennaModel> GetRxAntenna ();
-  void StartRx (Ptr<SpectrumSignalParameters> params);
+        /** 
+         * 
+         * \return the Signal to Noise Ratio calculated 
+         */
+        double GetSinr(double noisePower);
 
-  /** 
-   * set the RX spectrum model to be used
-   * 
-   * \param m 
-   */
-  void SetRxSpectrumModel (Ptr<const SpectrumModel> m);
+        /**
+         * make StartRx a no-op from now on, and mark instance as inactive
+         *
+         */
+        void Deactivate();
 
-  /** 
-   * 
-   * \return the Signal to Noise Ratio calculated 
-   */
-  double GetSinr (double noisePower);
+        /** 
+         * 
+         * \return true if active
+         */
+        bool IsActive();
 
-  /**
-   * make StartRx a no-op from now on, and mark instance as inactive
-   *
-   */
-  void Deactivate ();
+        /** 
+         * Reset the SINR calculator
+         * 
+         */
+        void Reset();
 
-  /** 
-   * 
-   * \return true if active
-   */
-  bool IsActive ();
+        /**
+         * set usage of DataChannel
+         *
+         * \param value if true, data channel signal will be processed, control signal otherwise
+         */
+        void SetUseDataChannel(bool value);
 
-  /** 
-   * Reset the SINR calculator
-   * 
-   */
-  void Reset ();
+        /**
+         * set RB Id
+         *
+         * \param rbId Resource Block Id which will be processed
+         */
+        void SetRbId(int32_t rbId);
 
-  /**
-   * set usage of DataChannel
-   *
-   * \param value if true, data channel signal will be processed, control signal otherwise
-   */
-  void SetUseDataChannel (bool value);
+    private:
+        Ptr<MobilityModel> m_mobility;
+        Ptr<const SpectrumModel> m_rxSpectrumModel;
 
-  /**
-   * set RB Id
-   *
-   * \param rbId Resource Block Id which will be processed
-   */
-  void SetRbId (int32_t rbId);
+        double m_referenceSignalPower;
+        double m_sumPower;
 
-private:
-  Ptr<MobilityModel> m_mobility;
-  Ptr<const SpectrumModel> m_rxSpectrumModel;
+        bool m_active;
 
-  double m_referenceSignalPower;
-  double m_sumPower;
+        bool m_useDataChannel;
+        int32_t m_rbId;
 
-  bool m_active;
-
-  bool m_useDataChannel;
-  int32_t m_rbId;
-
-};
+    };
 
 
 

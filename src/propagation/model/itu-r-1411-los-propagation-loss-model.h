@@ -27,72 +27,69 @@
 
 namespace ns3 {
 
+    /**
+     * \ingroup propagation
+     *
+     * \brief the ITU-R 1411 LOS propagation model
+     * 
+     * This class implements the ITU-R 1411 LOS propagation model for
+     * Line-of-Sight (LoS) short range outdoor communication in the
+     * frequency range 300 MHz to 100 GHz.  
+     * For more information about the model, please see
+     * the propagation module documentation in .rst format.
+     */
+    class ItuR1411LosPropagationLossModel : public PropagationLossModel {
+    public:
 
-/**
- * \ingroup propagation
- *
- * \brief the ITU-R 1411 LOS propagation model
- * 
- * This class implements the ITU-R 1411 LOS propagation model for
- * Line-of-Sight (LoS) short range outdoor communication in the
- * frequency range 300 MHz to 100 GHz.  
- * For more information about the model, please see
- * the propagation module documentation in .rst format.
- */
-class ItuR1411LosPropagationLossModel : public PropagationLossModel
-{
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
 
-public:
+        ItuR1411LosPropagationLossModel();
+        virtual ~ItuR1411LosPropagationLossModel();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+        /** 
+         * Set the operating frequency
+         * 
+         * \param freq the frequency in Hz
+         */
+        void SetFrequency(double freq);
 
-  ItuR1411LosPropagationLossModel ();
-  virtual ~ItuR1411LosPropagationLossModel ();
+        /** 
+         * 
+         * 
+         * \param a the first mobility model
+         * \param b the second mobility model
+         * 
+         * \return the loss in dBm for the propagation between
+         * the two given mobility models
+         */
+        double GetLoss(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  /** 
-   * Set the operating frequency
-   * 
-   * \param freq the frequency in Hz
-   */
-  void SetFrequency (double freq);
+    private:
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         */
+        ItuR1411LosPropagationLossModel(const ItuR1411LosPropagationLossModel &);
+        /**
+         * \brief Copy constructor
+         *
+         * Defined and unimplemented to avoid misuse
+         * \returns
+         */
+        ItuR1411LosPropagationLossModel & operator=(const ItuR1411LosPropagationLossModel &);
 
-  /** 
-   * 
-   * 
-   * \param a the first mobility model
-   * \param b the second mobility model
-   * 
-   * \return the loss in dBm for the propagation between
-   * the two given mobility models
-   */
-  double GetLoss (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+        virtual double DoCalcRxPower(double txPowerDbm,
+                Ptr<MobilityModel> a,
+                Ptr<MobilityModel> b) const;
+        virtual int64_t DoAssignStreams(int64_t stream);
 
-private:
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   */
-  ItuR1411LosPropagationLossModel (const ItuR1411LosPropagationLossModel &);
-  /**
-   * \brief Copy constructor
-   *
-   * Defined and unimplemented to avoid misuse
-   * \returns
-   */
-  ItuR1411LosPropagationLossModel & operator = (const ItuR1411LosPropagationLossModel &);
-
-  virtual double DoCalcRxPower (double txPowerDbm,
-                                Ptr<MobilityModel> a,
-                                Ptr<MobilityModel> b) const;
-  virtual int64_t DoAssignStreams (int64_t stream);
-  
-  double m_lambda; //!< wavelength
-};
+        double m_lambda; //!< wavelength
+    };
 
 } // namespace ns3
 

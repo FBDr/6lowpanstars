@@ -30,154 +30,152 @@
 #include <ndn-cxx/mgmt/nfd/controller.hpp>
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-class LegacyNfdc : noncopyable
-{
-public:
-  static const time::milliseconds DEFAULT_EXPIRATION_PERIOD;
-  static const uint64_t DEFAULT_COST;
+            class LegacyNfdc : noncopyable {
+            public:
+                static const time::milliseconds DEFAULT_EXPIRATION_PERIOD;
+                static const uint64_t DEFAULT_COST;
 
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+                class Error : public std::runtime_error {
+                public:
 
-  LegacyNfdc(Face& face, KeyChain& keyChain);
+                    explicit
+                    Error(const std::string& what)
+                    : std::runtime_error(what) {
+                    }
+                };
 
-  bool
-  dispatch(const std::string& cmd);
+                LegacyNfdc(Face& face, KeyChain& keyChain);
 
-  /**
-   * \brief Adds a nexthop to a FIB entry
-   *
-   * If the FIB entry does not exist, it is inserted automatically
-   *
-   * cmd format:
-   *  [-c cost]  name faceId|faceUri
-   *
-   */
-  void
-  fibAddNextHop();
+                bool
+                dispatch(const std::string& cmd);
 
-  /**
-   * \brief Removes a nexthop from an existing FIB entry
-   *
-   * If the last nexthop record in a FIB entry is removed, the FIB entry is also deleted
-   *
-   * cmd format:
-   *  name faceId
-   *
-   */
-  void
-  fibRemoveNextHop();
+                /**
+                 * \brief Adds a nexthop to a FIB entry
+                 *
+                 * If the FIB entry does not exist, it is inserted automatically
+                 *
+                 * cmd format:
+                 *  [-c cost]  name faceId|faceUri
+                 *
+                 */
+                void
+                fibAddNextHop();
 
-  /**
-   * \brief Registers name to the given faceId or faceUri
-   *
-   * cmd format:
-   *  [-I] [-C] [-c cost] name faceId|faceUri
-   */
-  void
-  ribRegisterPrefix();
+                /**
+                 * \brief Removes a nexthop from an existing FIB entry
+                 *
+                 * If the last nexthop record in a FIB entry is removed, the FIB entry is also deleted
+                 *
+                 * cmd format:
+                 *  name faceId
+                 *
+                 */
+                void
+                fibRemoveNextHop();
 
-  /**
-   * \brief Unregisters name from the given faceId/faceUri
-   *
-   * cmd format:
-   *  name faceId/faceUri
-   */
-  void
-  ribUnregisterPrefix();
+                /**
+                 * \brief Registers name to the given faceId or faceUri
+                 *
+                 * cmd format:
+                 *  [-I] [-C] [-c cost] name faceId|faceUri
+                 */
+                void
+                ribRegisterPrefix();
 
-  /**
-   * \brief Creates new face
-   *
-   * This command allows creation of UDP unicast and TCP faces only
-   *
-   * cmd format:
-   *  uri
-   *
-   */
-  void
-  faceCreate();
+                /**
+                 * \brief Unregisters name from the given faceId/faceUri
+                 *
+                 * cmd format:
+                 *  name faceId/faceUri
+                 */
+                void
+                ribUnregisterPrefix();
 
-  /**
-   * \brief Destroys face
-   *
-   * cmd format:
-   *  faceId|faceUri
-   *
-   */
-  void
-  faceDestroy();
+                /**
+                 * \brief Creates new face
+                 *
+                 * This command allows creation of UDP unicast and TCP faces only
+                 *
+                 * cmd format:
+                 *  uri
+                 *
+                 */
+                void
+                faceCreate();
 
-  /**
-   * \brief Sets the strategy for a namespace
-   *
-   * cmd format:
-   *  name strategy
-   *
-   */
-  void
-  strategyChoiceSet();
+                /**
+                 * \brief Destroys face
+                 *
+                 * cmd format:
+                 *  faceId|faceUri
+                 *
+                 */
+                void
+                faceDestroy();
 
-  /**
-   * \brief Unset the strategy for a namespace
-   *
-   * cmd format:
-   *  name strategy
-   *
-   */
-  void
-  strategyChoiceUnset();
+                /**
+                 * \brief Sets the strategy for a namespace
+                 *
+                 * cmd format:
+                 *  name strategy
+                 *
+                 */
+                void
+                strategyChoiceSet();
 
-private:
-  void
-  onSuccess(const ndn::nfd::ControlParameters& commandSuccessResult,
-            const std::string& message);
+                /**
+                 * \brief Unset the strategy for a namespace
+                 *
+                 * cmd format:
+                 *  name strategy
+                 *
+                 */
+                void
+                strategyChoiceUnset();
 
-  void
-  onError(const ndn::nfd::ControlResponse& response, const std::string& message);
+            private:
+                void
+                onSuccess(const ndn::nfd::ControlParameters& commandSuccessResult,
+                        const std::string& message);
 
-  void
-  onCanonizeFailure(const std::string& reason);
+                void
+                onError(const ndn::nfd::ControlResponse& response, const std::string& message);
 
-  void
-  startFaceCreate(const ndn::util::FaceUri& canonicalUri);
+                void
+                onCanonizeFailure(const std::string& reason);
 
-  void
-  onObtainFaceIdFailure(const std::string& message);
+                void
+                startFaceCreate(const ndn::util::FaceUri& canonicalUri);
 
-public:
-  std::vector<std::string> m_commandLineArguments; // positional arguments
-  uint64_t m_flags;
-  uint64_t m_cost;
-  uint64_t m_faceId;
-  uint64_t m_origin;
-  time::milliseconds m_expires;
-  std::string m_name;
-  ndn::nfd::FacePersistency m_facePersistency;
+                void
+                onObtainFaceIdFailure(const std::string& message);
 
-private:
-  Face& m_face;
-  ndn::nfd::Controller m_controller;
-};
+            public:
+                std::vector<std::string> m_commandLineArguments; // positional arguments
+                uint64_t m_flags;
+                uint64_t m_cost;
+                uint64_t m_faceId;
+                uint64_t m_origin;
+                time::milliseconds m_expires;
+                std::string m_name;
+                ndn::nfd::FacePersistency m_facePersistency;
 
-void
-legacyNfdcUsage();
+            private:
+                Face& m_face;
+                ndn::nfd::Controller m_controller;
+            };
 
-int
-legacyNfdcMain(ExecuteContext& ctx);
+            void
+            legacyNfdcUsage();
 
-} // namespace nfdc
-} // namespace tools
+            int
+            legacyNfdcMain(ExecuteContext& ctx);
+
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_LEGACY_NFDC_HPP

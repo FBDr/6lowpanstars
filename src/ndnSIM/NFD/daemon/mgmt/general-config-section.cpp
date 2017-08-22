@@ -31,76 +31,62 @@
 
 namespace nfd {
 
-namespace general {
+    namespace general {
 
-NFD_LOG_INIT("GeneralConfigSection");
+        NFD_LOG_INIT("GeneralConfigSection");
 
-static void
-onConfig(const ConfigSection& configSection,
-         bool isDryRun,
-         const std::string& filename)
-{
-  // general
-  // {
-  //    ; user "ndn-user"
-  //    ; group "ndn-user"
-  // }
+        static void
+        onConfig(const ConfigSection& configSection,
+                bool isDryRun,
+                const std::string& filename) {
+            // general
+            // {
+            //    ; user "ndn-user"
+            //    ; group "ndn-user"
+            // }
 
-  std::string user;
-  std::string group;
+            std::string user;
+            std::string group;
 
-  for (ConfigSection::const_iterator i = configSection.begin();
-       i != configSection.end();
-       ++i)
-    {
-      if (i->first == "user")
-        {
-          try
-            {
-              user = i->second.get_value<std::string>("user");
+            for (ConfigSection::const_iterator i = configSection.begin();
+                    i != configSection.end();
+                    ++i) {
+                if (i->first == "user") {
+                    try {
+                        user = i->second.get_value<std::string>("user");
 
-              if (user.empty())
-                {
-                  BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"user\""
-                                                          " in \"general\" section"));
+                        if (user.empty()) {
+                            BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"user\""
+                                    " in \"general\" section"));
+                        }
+                    } catch (const boost::property_tree::ptree_error& error) {
+                        BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"user\""
+                                " in \"general\" section"));
+                    }
+                } else if (i->first == "group") {
+                    try {
+                        group = i->second.get_value<std::string>("group");
+
+                        if (group.empty()) {
+                            BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"group\""
+                                    " in \"general\" section"));
+                        }
+                    } catch (const boost::property_tree::ptree_error& error) {
+                        BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"group\""
+                                " in \"general\" section"));
+                    }
                 }
             }
-          catch (const boost::property_tree::ptree_error& error)
-            {
-              BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"user\""
-                                                      " in \"general\" section"));
-            }
+            NFD_LOG_TRACE("using user \"" << user << "\" group \"" << group << "\"");
+
+            PrivilegeHelper::initialize(user, group);
         }
-      else if (i->first == "group")
-        {
-          try
-            {
-              group = i->second.get_value<std::string>("group");
 
-              if (group.empty())
-                {
-                  BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"group\""
-                                                          " in \"general\" section"));
-                }
-            }
-          catch (const boost::property_tree::ptree_error& error)
-            {
-              BOOST_THROW_EXCEPTION(ConfigFile::Error("Invalid value for \"group\""
-                                                      " in \"general\" section"));
-            }
+        void
+        setConfigFile(ConfigFile& configFile) {
+            configFile.addSectionHandler("general", &onConfig);
         }
-    }
-  NFD_LOG_TRACE("using user \"" << user << "\" group \"" << group << "\"");
 
-  PrivilegeHelper::initialize(user, group);
-}
-
-void
-setConfigFile(ConfigFile& configFile)
-{
-  configFile.addSectionHandler("general", &onConfig);
-}
-
-} // namespace general
+    } // namespace general
 
 } // namespace nfd

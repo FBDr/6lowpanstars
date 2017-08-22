@@ -22,142 +22,125 @@
 #include "sec-public-info.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-SecPublicInfo::SecPublicInfo(const std::string& location)
-  : m_location(location)
-{
-}
+        SecPublicInfo::SecPublicInfo(const std::string& location)
+        : m_location(location) {
+        }
 
-SecPublicInfo::~SecPublicInfo()
-{
-}
+        SecPublicInfo::~SecPublicInfo() {
+        }
 
-std::string
-SecPublicInfo::getPibLocator()
-{
-  return this->getScheme() + ":" + m_location;
-}
+        std::string
+        SecPublicInfo::getPibLocator() {
+            return this->getScheme() + ":" + m_location;
+        }
 
-void
-SecPublicInfo::addPublicKey(const Name& keyName, KeyType keyType, const v1::PublicKey& publicKey)
-{
-  addKey(keyName, publicKey);
-}
+        void
+        SecPublicInfo::addPublicKey(const Name& keyName, KeyType keyType, const v1::PublicKey& publicKey) {
+            addKey(keyName, publicKey);
+        }
 
-void
-SecPublicInfo::setDefaultIdentity(const Name& identityName)
-{
-  setDefaultIdentityInternal(identityName);
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::setDefaultIdentity(const Name& identityName) {
+            setDefaultIdentityInternal(identityName);
+            refreshDefaultCertificate();
+        }
 
-void
-SecPublicInfo::setDefaultKeyNameForIdentity(const Name& keyName)
-{
-  setDefaultKeyNameForIdentityInternal(keyName);
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::setDefaultKeyNameForIdentity(const Name& keyName) {
+            setDefaultKeyNameForIdentityInternal(keyName);
+            refreshDefaultCertificate();
+        }
 
-void
-SecPublicInfo::setDefaultCertificateNameForKey(const Name& certificateName)
-{
-  setDefaultCertificateNameForKeyInternal(certificateName);
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::setDefaultCertificateNameForKey(const Name& certificateName) {
+            setDefaultCertificateNameForKeyInternal(certificateName);
+            refreshDefaultCertificate();
+        }
 
-Name
-SecPublicInfo::getDefaultCertificateNameForIdentity(const Name& identityName)
-{
-  return getDefaultCertificateNameForKey(getDefaultKeyNameForIdentity(identityName));
-}
+        Name
+        SecPublicInfo::getDefaultCertificateNameForIdentity(const Name& identityName) {
+            return getDefaultCertificateNameForKey(getDefaultKeyNameForIdentity(identityName));
+        }
 
-Name
-SecPublicInfo::getDefaultCertificateName()
-{
-  if (m_defaultCertificate == nullptr)
-    refreshDefaultCertificate();
+        Name
+        SecPublicInfo::getDefaultCertificateName() {
+            if (m_defaultCertificate == nullptr)
+                refreshDefaultCertificate();
 
-  if (m_defaultCertificate == nullptr)
-    BOOST_THROW_EXCEPTION(Error("No default certificate is set"));
+            if (m_defaultCertificate == nullptr)
+                BOOST_THROW_EXCEPTION(Error("No default certificate is set"));
 
-  return m_defaultCertificate->getName();
-}
+            return m_defaultCertificate->getName();
+        }
 
-Name
-SecPublicInfo::getNewKeyName(const Name& identityName, bool useKsk)
-{
-  std::ostringstream oss;
+        Name
+        SecPublicInfo::getNewKeyName(const Name& identityName, bool useKsk) {
+            std::ostringstream oss;
 
-  if (useKsk)
-    oss << "ksk-";
-  else
-    oss << "dsk-";
+            if (useKsk)
+                oss << "ksk-";
+            else
+                oss << "dsk-";
 
-  oss << time::toUnixTimestamp(time::system_clock::now()).count();
+            oss << time::toUnixTimestamp(time::system_clock::now()).count();
 
-  Name keyName = Name(identityName).append(oss.str());
+            Name keyName = Name(identityName).append(oss.str());
 
-  if (doesPublicKeyExist(keyName))
-    BOOST_THROW_EXCEPTION(Error("Key name already exists: " + keyName.toUri()));
+            if (doesPublicKeyExist(keyName))
+                BOOST_THROW_EXCEPTION(Error("Key name already exists: " + keyName.toUri()));
 
-  return keyName;
-}
+            return keyName;
+        }
 
-void
-SecPublicInfo::addCertificateAsKeyDefault(const v1::IdentityCertificate& certificate)
-{
-  addCertificate(certificate);
-  setDefaultCertificateNameForKeyInternal(certificate.getName());
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::addCertificateAsKeyDefault(const v1::IdentityCertificate& certificate) {
+            addCertificate(certificate);
+            setDefaultCertificateNameForKeyInternal(certificate.getName());
+            refreshDefaultCertificate();
+        }
 
-void
-SecPublicInfo::addCertificateAsIdentityDefault(const v1::IdentityCertificate& certificate)
-{
-  addCertificate(certificate);
-  Name certName = certificate.getName();
-  Name keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(certName);
-  setDefaultKeyNameForIdentityInternal(keyName);
-  setDefaultCertificateNameForKeyInternal(certName);
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::addCertificateAsIdentityDefault(const v1::IdentityCertificate& certificate) {
+            addCertificate(certificate);
+            Name certName = certificate.getName();
+            Name keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(certName);
+            setDefaultKeyNameForIdentityInternal(keyName);
+            setDefaultCertificateNameForKeyInternal(certName);
+            refreshDefaultCertificate();
+        }
 
-void
-SecPublicInfo::addCertificateAsSystemDefault(const v1::IdentityCertificate& certificate)
-{
-  addCertificate(certificate);
-  Name certName = certificate.getName();
-  Name keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(certName);
-  setDefaultIdentityInternal(keyName.getPrefix(-1));
-  setDefaultKeyNameForIdentityInternal(keyName);
-  setDefaultCertificateNameForKeyInternal(certName);
-  refreshDefaultCertificate();
-}
+        void
+        SecPublicInfo::addCertificateAsSystemDefault(const v1::IdentityCertificate& certificate) {
+            addCertificate(certificate);
+            Name certName = certificate.getName();
+            Name keyName = v1::IdentityCertificate::certificateNameToPublicKeyName(certName);
+            setDefaultIdentityInternal(keyName.getPrefix(-1));
+            setDefaultKeyNameForIdentityInternal(keyName);
+            setDefaultCertificateNameForKeyInternal(certName);
+            refreshDefaultCertificate();
+        }
 
-shared_ptr<v1::IdentityCertificate>
-SecPublicInfo::defaultCertificate()
-{
-  return getDefaultCertificate();
-}
+        shared_ptr<v1::IdentityCertificate>
+        SecPublicInfo::defaultCertificate() {
+            return getDefaultCertificate();
+        }
 
-shared_ptr<v1::IdentityCertificate>
-SecPublicInfo::getDefaultCertificate()
-{
-  return m_defaultCertificate;
-}
+        shared_ptr<v1::IdentityCertificate>
+        SecPublicInfo::getDefaultCertificate() {
+            return m_defaultCertificate;
+        }
 
-void
-SecPublicInfo::refreshDefaultCertificate()
-{
-  try {
-    Name certName = getDefaultCertificateNameForIdentity(getDefaultIdentity());
-    m_defaultCertificate = getCertificate(certName);
-  }
-  catch (SecPublicInfo::Error&) {
-    m_defaultCertificate.reset();
-  }
-}
+        void
+        SecPublicInfo::refreshDefaultCertificate() {
+            try {
+                Name certName = getDefaultCertificateNameForIdentity(getDefaultIdentity());
+                m_defaultCertificate = getCertificate(certName);
+            } catch (SecPublicInfo::Error&) {
+                m_defaultCertificate.reset();
+            }
+        }
 
-} // namespace security
+    } // namespace security
 } // namespace ndn

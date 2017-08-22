@@ -24,114 +24,114 @@
 #include "ns3/mesh-wifi-interface-mac-plugin.h"
 
 namespace ns3 {
-class MeshWifiInterfaceMac;
-namespace dot11s {
-class PeerManagementProtocol;
-class IeConfiguration;
-class IePeerManagement;
-class PeerManagementProtocol;
-/**
- * \ingroup dot11s
- *
- * \brief This is plugin to Mesh WiFi MAC, which implements
- * interface to dot11s peer management protocol: it takes proper
- * frames from MAC-layer, extracts peer link management information
- * element and mesh configuration element and passes it to main part
- * of protocol
- */
-class PeerManagementProtocolMac : public MeshWifiInterfaceMacPlugin
-{
-public:
-  PeerManagementProtocolMac (uint32_t interface, Ptr<PeerManagementProtocol> protocol);
-  ~PeerManagementProtocolMac ();
-  
-  // Inherited from plugin abstract class
-  void SetParent (Ptr<MeshWifiInterfaceMac> parent);
-  bool Receive (Ptr<Packet> packet, const WifiMacHeader & header);
-  bool UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & header, Mac48Address from, Mac48Address to);
-  void UpdateBeacon (MeshWifiBeacon & beacon) const;
-  int64_t AssignStreams (int64_t stream);
-  ///\name Statistics
-  // \{
-  void Report (std::ostream &) const;
-  void ResetStats ();
-  uint32_t GetLinkMetric (Mac48Address peerAddress);
-  // \}
+    class MeshWifiInterfaceMac;
+    namespace dot11s {
+        class PeerManagementProtocol;
+        class IeConfiguration;
+        class IePeerManagement;
+        class PeerManagementProtocol;
 
-private:
-  PeerManagementProtocolMac& operator= (const PeerManagementProtocolMac &);
-  PeerManagementProtocolMac (const PeerManagementProtocolMac &);
+        /**
+         * \ingroup dot11s
+         *
+         * \brief This is plugin to Mesh WiFi MAC, which implements
+         * interface to dot11s peer management protocol: it takes proper
+         * frames from MAC-layer, extracts peer link management information
+         * element and mesh configuration element and passes it to main part
+         * of protocol
+         */
+        class PeerManagementProtocolMac : public MeshWifiInterfaceMacPlugin {
+        public:
+            PeerManagementProtocolMac(uint32_t interface, Ptr<PeerManagementProtocol> protocol);
+            ~PeerManagementProtocolMac();
 
-  friend class PeerManagementProtocol;
-  friend class PeerLink;
-  ///\name Create peer link management frames
-  // \{
-  /**
-   * \brief This structure keeps all fields in peer link management frame,
-   * which are not subclasses of WifiInformationElement
-   */
-  struct PlinkFrameStart
-  {
-    uint8_t subtype;
-    uint16_t aid;
-    SupportedRates rates;
-    uint16_t qos;
-  };
-  Ptr<Packet> CreatePeerLinkOpenFrame ();
-  Ptr<Packet> CreatePeerLinkConfirmFrame ();
-  Ptr<Packet> CreatePeerLinkCloseFrame ();
-  /// Parses the start of the frame, where no WifiInformationElements exist
-  PlinkFrameStart ParsePlinkFrame (Ptr<const Packet> packet);
-  // \}
-  ///  Closes link when a proper number of successive transmissions have failed
-  void TxError (WifiMacHeader const &hdr);
-  void TxOk (WifiMacHeader const &hdr);
-  /// BCA functionality
-  void SetBeaconShift (Time shift);
-  void SetPeerManagerProtcol (Ptr<PeerManagementProtocol> protocol);
-  void SendPeerLinkManagementFrame (
-    Mac48Address peerAddress,
-    Mac48Address peerMpAddress,
-    uint16_t aid,
-    IePeerManagement peerElement,
-    IeConfiguration meshConfig
-    );
-  ///\brief debug only, used to print established links
-  Mac48Address GetAddress () const;
-  ///\name Statistics
-  // \{
-  struct Statistics
-  {
-    uint16_t txOpen;
-    uint16_t txConfirm;
-    uint16_t txClose;
-    uint16_t rxOpen;
-    uint16_t rxConfirm;
-    uint16_t rxClose;
-    uint16_t dropped;
-    uint16_t brokenMgt;
-    uint16_t txMgt;
-    uint32_t txMgtBytes;
-    uint16_t rxMgt;
-    uint32_t rxMgtBytes;
-    uint16_t beaconShift;
+            // Inherited from plugin abstract class
+            void SetParent(Ptr<MeshWifiInterfaceMac> parent);
+            bool Receive(Ptr<Packet> packet, const WifiMacHeader & header);
+            bool UpdateOutcomingFrame(Ptr<Packet> packet, WifiMacHeader & header, Mac48Address from, Mac48Address to);
+            void UpdateBeacon(MeshWifiBeacon & beacon) const;
+            int64_t AssignStreams(int64_t stream);
+            ///\name Statistics
+            // \{
+            void Report(std::ostream &) const;
+            void ResetStats();
+            uint32_t GetLinkMetric(Mac48Address peerAddress);
+            // \}
 
-    Statistics ();
-    void Print (std::ostream & os) const;
-  };
+        private:
+            PeerManagementProtocolMac& operator=(const PeerManagementProtocolMac &);
+            PeerManagementProtocolMac(const PeerManagementProtocolMac &);
 
-private:
-  struct Statistics m_stats;
-  ///\}
-  ///\name Information about MAC and protocol:
-  // \{
-  Ptr<MeshWifiInterfaceMac> m_parent;
-  uint32_t m_ifIndex;
-  Ptr<PeerManagementProtocol> m_protocol;
-  // \}
-};
+            friend class PeerManagementProtocol;
+            friend class PeerLink;
+            ///\name Create peer link management frames
+            // \{
 
-} // namespace dot11s
+            /**
+             * \brief This structure keeps all fields in peer link management frame,
+             * which are not subclasses of WifiInformationElement
+             */
+            struct PlinkFrameStart {
+                uint8_t subtype;
+                uint16_t aid;
+                SupportedRates rates;
+                uint16_t qos;
+            };
+            Ptr<Packet> CreatePeerLinkOpenFrame();
+            Ptr<Packet> CreatePeerLinkConfirmFrame();
+            Ptr<Packet> CreatePeerLinkCloseFrame();
+            /// Parses the start of the frame, where no WifiInformationElements exist
+            PlinkFrameStart ParsePlinkFrame(Ptr<const Packet> packet);
+            // \}
+            ///  Closes link when a proper number of successive transmissions have failed
+            void TxError(WifiMacHeader const &hdr);
+            void TxOk(WifiMacHeader const &hdr);
+            /// BCA functionality
+            void SetBeaconShift(Time shift);
+            void SetPeerManagerProtcol(Ptr<PeerManagementProtocol> protocol);
+            void SendPeerLinkManagementFrame(
+                    Mac48Address peerAddress,
+                    Mac48Address peerMpAddress,
+                    uint16_t aid,
+                    IePeerManagement peerElement,
+                    IeConfiguration meshConfig
+                    );
+            ///\brief debug only, used to print established links
+            Mac48Address GetAddress() const;
+            ///\name Statistics
+            // \{
+
+            struct Statistics {
+                uint16_t txOpen;
+                uint16_t txConfirm;
+                uint16_t txClose;
+                uint16_t rxOpen;
+                uint16_t rxConfirm;
+                uint16_t rxClose;
+                uint16_t dropped;
+                uint16_t brokenMgt;
+                uint16_t txMgt;
+                uint32_t txMgtBytes;
+                uint16_t rxMgt;
+                uint32_t rxMgtBytes;
+                uint16_t beaconShift;
+
+                Statistics();
+                void Print(std::ostream & os) const;
+            };
+
+        private:
+            struct Statistics m_stats;
+            ///\}
+            ///\name Information about MAC and protocol:
+            // \{
+            Ptr<MeshWifiInterfaceMac> m_parent;
+            uint32_t m_ifIndex;
+            Ptr<PeerManagementProtocol> m_protocol;
+            // \}
+        };
+
+    } // namespace dot11s
 } // namespace ns3
 
 #endif /* PEER_MANAGEMENT_PROTOCOL_MAC_H */

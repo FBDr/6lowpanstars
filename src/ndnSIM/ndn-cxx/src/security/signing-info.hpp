@@ -28,163 +28,157 @@
 
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief Signing parameters passed to KeyChain
- */
-class SigningInfo
-{
-public:
-  class Error : public std::runtime_error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : std::runtime_error(what)
-    {
-    }
-  };
+        /**
+         * @brief Signing parameters passed to KeyChain
+         */
+        class SigningInfo {
+        public:
 
-  enum SignerType {
-    /// @brief no signer is specified, use default setting or follow the trust schema
-    SIGNER_TYPE_NULL = 0,
-    /// @brief signer is an identity, use its default key and default certificate
-    SIGNER_TYPE_ID = 1,
-    /// @brief signer is a key, use its default certificate
-    SIGNER_TYPE_KEY = 2,
-    /// @brief signer is a certificate, use it directly
-    SIGNER_TYPE_CERT = 3,
-    /// @brief use sha256 digest, no signer needs to be specified
-    SIGNER_TYPE_SHA256 = 4
-  };
+            class Error : public std::runtime_error {
+            public:
 
-public:
-  /**
-   * @brief Constructor
-   *
-   * @param signerType The type of signer
-   * @param signerName The name of signer; interpretation differs per signerType
-   * @param signatureInfo A semi-prepared SignatureInfo which contains other information except
-   *                      SignatureType and KeyLocator.  If SignatureType and KeyLocator are
-   *                      specified, they may be overwritten by KeyChain.
-   */
-  explicit
-  SigningInfo(SignerType signerType = SIGNER_TYPE_NULL,
-              const Name& signerName = EMPTY_NAME,
-              const SignatureInfo& signatureInfo = EMPTY_SIGNATURE_INFO);
+                explicit
+                Error(const std::string& what)
+                : std::runtime_error(what) {
+                }
+            };
 
-  /**
-   * @brief Construct SigningInfo from its string representation
-   *
-   * @param signingStr The representative signing string for SigningInfo signing method
-   *
-   * Structure of the representative string is as follows:
-   * - default signing: "" (empty string)
-   * - signing with a default certificate of a default key for the identity: `id:/my-identity`
-   * - signing with a default certificate of the key: `key:/my-identity/ksk-1`
-   * - signing with the certificate: `cert:/my-identity/KEY/ksk-1/ID-CERT/%FD%01`
-   * - signing with sha256 digest: `id:/localhost/identity/digest-sha256`
-   */
-  explicit
-  SigningInfo(const std::string& signingStr);
+            enum SignerType {
+                /// @brief no signer is specified, use default setting or follow the trust schema
+                SIGNER_TYPE_NULL = 0,
+                /// @brief signer is an identity, use its default key and default certificate
+                SIGNER_TYPE_ID = 1,
+                /// @brief signer is a key, use its default certificate
+                SIGNER_TYPE_KEY = 2,
+                /// @brief signer is a certificate, use it directly
+                SIGNER_TYPE_CERT = 3,
+                /// @brief use sha256 digest, no signer needs to be specified
+                SIGNER_TYPE_SHA256 = 4
+            };
 
-  /**
-   * @brief Set signer as an identity with name @p identity
-   * @post Change the signerType to SIGNER_TYPE_ID
-   */
-  void
-  setSigningIdentity(const Name& identity);
+        public:
+            /**
+             * @brief Constructor
+             *
+             * @param signerType The type of signer
+             * @param signerName The name of signer; interpretation differs per signerType
+             * @param signatureInfo A semi-prepared SignatureInfo which contains other information except
+             *                      SignatureType and KeyLocator.  If SignatureType and KeyLocator are
+             *                      specified, they may be overwritten by KeyChain.
+             */
+            explicit
+            SigningInfo(SignerType signerType = SIGNER_TYPE_NULL,
+                    const Name& signerName = EMPTY_NAME,
+                    const SignatureInfo& signatureInfo = EMPTY_SIGNATURE_INFO);
 
-  /**
-   * @brief Set signer as a key with name @p keyName
-   * @post Change the signerType to SIGNER_TYPE_KEY
-   */
-  void
-  setSigningKeyName(const Name& keyName);
+            /**
+             * @brief Construct SigningInfo from its string representation
+             *
+             * @param signingStr The representative signing string for SigningInfo signing method
+             *
+             * Structure of the representative string is as follows:
+             * - default signing: "" (empty string)
+             * - signing with a default certificate of a default key for the identity: `id:/my-identity`
+             * - signing with a default certificate of the key: `key:/my-identity/ksk-1`
+             * - signing with the certificate: `cert:/my-identity/KEY/ksk-1/ID-CERT/%FD%01`
+             * - signing with sha256 digest: `id:/localhost/identity/digest-sha256`
+             */
+            explicit
+            SigningInfo(const std::string& signingStr);
 
-  /**
-   * @brief Set signer as a certificate with name @p certificateName
-   * @post Change the signerType to SIGNER_TYPE_CERT
-   */
-  void
-  setSigningCertName(const Name& certificateName);
+            /**
+             * @brief Set signer as an identity with name @p identity
+             * @post Change the signerType to SIGNER_TYPE_ID
+             */
+            void
+            setSigningIdentity(const Name& identity);
 
-  /**
-   * @brief Set Sha256 as the signing method
-   * @post Reset signerName, also change the signerType to SIGNER_TYPE_SHA256
-   */
-  void
-  setSha256Signing();
+            /**
+             * @brief Set signer as a key with name @p keyName
+             * @post Change the signerType to SIGNER_TYPE_KEY
+             */
+            void
+            setSigningKeyName(const Name& keyName);
 
-  /**
-   * @return Type of the signer
-   */
-  SignerType
-  getSignerType() const
-  {
-    return m_type;
-  }
+            /**
+             * @brief Set signer as a certificate with name @p certificateName
+             * @post Change the signerType to SIGNER_TYPE_CERT
+             */
+            void
+            setSigningCertName(const Name& certificateName);
 
-  /**
-   * @return Name of signer; interpretation differs per signerType
-   */
-  const Name&
-  getSignerName() const
-  {
-    return m_name;
-  }
+            /**
+             * @brief Set Sha256 as the signing method
+             * @post Reset signerName, also change the signerType to SIGNER_TYPE_SHA256
+             */
+            void
+            setSha256Signing();
 
-  /**
-   * @brief Set the digest algorithm for public key operations
-   */
-  void
-  setDigestAlgorithm(const DigestAlgorithm& algorithm)
-  {
-    m_digestAlgorithm = algorithm;
-  }
+            /**
+             * @return Type of the signer
+             */
+            SignerType
+            getSignerType() const {
+                return m_type;
+            }
 
-  /**
-   * @return The digest algorithm for public key operations
-   */
-  DigestAlgorithm
-  getDigestAlgorithm() const
-  {
-    return m_digestAlgorithm;
-  }
+            /**
+             * @return Name of signer; interpretation differs per signerType
+             */
+            const Name&
+            getSignerName() const {
+                return m_name;
+            }
 
-  /**
-   * @brief Set a semi-prepared SignatureInfo;
-   */
-  void
-  setSignatureInfo(const SignatureInfo& signatureInfo);
+            /**
+             * @brief Set the digest algorithm for public key operations
+             */
+            void
+            setDigestAlgorithm(const DigestAlgorithm& algorithm) {
+                m_digestAlgorithm = algorithm;
+            }
 
-  /**
-   * @return Semi-prepared SignatureInfo
-   */
-  const SignatureInfo&
-  getSignatureInfo() const
-  {
-    return m_info;
-  }
+            /**
+             * @return The digest algorithm for public key operations
+             */
+            DigestAlgorithm
+            getDigestAlgorithm() const {
+                return m_digestAlgorithm;
+            }
 
-public:
-  static const Name EMPTY_NAME;
-  static const SignatureInfo EMPTY_SIGNATURE_INFO;
+            /**
+             * @brief Set a semi-prepared SignatureInfo;
+             */
+            void
+            setSignatureInfo(const SignatureInfo& signatureInfo);
 
-private:
-  SignerType m_type;
-  Name m_name;
+            /**
+             * @return Semi-prepared SignatureInfo
+             */
+            const SignatureInfo&
+            getSignatureInfo() const {
+                return m_info;
+            }
 
-  DigestAlgorithm m_digestAlgorithm;
+        public:
+            static const Name EMPTY_NAME;
+            static const SignatureInfo EMPTY_SIGNATURE_INFO;
 
-  SignatureInfo m_info;
-};
+        private:
+            SignerType m_type;
+            Name m_name;
 
-std::ostream&
-operator<<(std::ostream& os, const SigningInfo& si);
+            DigestAlgorithm m_digestAlgorithm;
 
-} // namespace security
+            SignatureInfo m_info;
+        };
+
+        std::ostream&
+        operator<<(std::ostream& os, const SigningInfo& si);
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_SIGNING_INFO_HPP

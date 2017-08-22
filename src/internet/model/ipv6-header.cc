@@ -25,164 +25,144 @@
 #include "ns3/address-utils.h"
 #include "ipv6-header.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Ipv6Header");
-
-NS_OBJECT_ENSURE_REGISTERED (Ipv6Header);
-
-Ipv6Header::Ipv6Header ()
-  : m_version (6),
-    m_trafficClass (0),
-    m_flowLabel (1),
-    m_payloadLength (0),
-    m_nextHeader (0),
-    m_hopLimit (0)
+namespace ns3
 {
-  SetSourceAddress (Ipv6Address ("::"));
-  SetDestinationAddress (Ipv6Address ("::"));
-}
 
-void Ipv6Header::SetTrafficClass (uint8_t traffic)
-{
-  m_trafficClass = traffic;
-}
+    NS_LOG_COMPONENT_DEFINE("Ipv6Header");
 
-uint8_t Ipv6Header::GetTrafficClass () const
-{
-  return m_trafficClass;
-}
+    NS_OBJECT_ENSURE_REGISTERED(Ipv6Header);
 
-void Ipv6Header::SetFlowLabel (uint32_t flow)
-{
-  m_flowLabel = flow;
-}
+    Ipv6Header::Ipv6Header()
+            : m_version(6),
+            m_trafficClass(0),
+            m_flowLabel(1),
+            m_payloadLength(0),
+            m_nextHeader(0),
+            m_hopLimit(0) {
+        SetSourceAddress(Ipv6Address("::"));
+        SetDestinationAddress(Ipv6Address("::"));
+    }
 
-uint32_t Ipv6Header::GetFlowLabel () const
-{
-  return m_flowLabel;
-}
+    void Ipv6Header::SetTrafficClass(uint8_t traffic) {
+        m_trafficClass = traffic;
+    }
 
-void Ipv6Header::SetPayloadLength (uint16_t len)
-{
-  m_payloadLength = len;
-}
+    uint8_t Ipv6Header::GetTrafficClass() const {
+        return m_trafficClass;
+    }
 
-uint16_t Ipv6Header::GetPayloadLength () const
-{
-  return m_payloadLength;
-}
+    void Ipv6Header::SetFlowLabel(uint32_t flow) {
+        m_flowLabel = flow;
+    }
 
-void Ipv6Header::SetNextHeader (uint8_t next)
-{
-  m_nextHeader = next;
-}
+    uint32_t Ipv6Header::GetFlowLabel() const {
+        return m_flowLabel;
+    }
 
-uint8_t Ipv6Header::GetNextHeader () const
-{
-  return m_nextHeader;
-}
+    void Ipv6Header::SetPayloadLength(uint16_t len) {
+        m_payloadLength = len;
+    }
 
-void Ipv6Header::SetHopLimit (uint8_t limit)
-{
-  m_hopLimit = limit;
-}
+    uint16_t Ipv6Header::GetPayloadLength() const {
+        return m_payloadLength;
+    }
 
-uint8_t Ipv6Header::GetHopLimit () const
-{
-  return m_hopLimit;
-}
+    void Ipv6Header::SetNextHeader(uint8_t next) {
+        m_nextHeader = next;
+    }
 
-void Ipv6Header::SetSourceAddress (Ipv6Address src)
-{
-  m_sourceAddress = src;
-}
+    uint8_t Ipv6Header::GetNextHeader() const {
+        return m_nextHeader;
+    }
 
-Ipv6Address Ipv6Header::GetSourceAddress () const
-{
-  return m_sourceAddress;
-}
+    void Ipv6Header::SetHopLimit(uint8_t limit) {
+        m_hopLimit = limit;
+    }
 
-void Ipv6Header::SetDestinationAddress (Ipv6Address dst)
-{
-  m_destinationAddress = dst;
-}
+    uint8_t Ipv6Header::GetHopLimit() const {
+        return m_hopLimit;
+    }
 
-Ipv6Address Ipv6Header::GetDestinationAddress () const
-{
-  return m_destinationAddress;
-}
+    void Ipv6Header::SetSourceAddress(Ipv6Address src) {
+        m_sourceAddress = src;
+    }
 
-TypeId Ipv6Header::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::Ipv6Header")
-    .SetParent<Header> ()
-    .SetGroupName ("Internet")
-    .AddConstructor<Ipv6Header> ()
-  ;
-  return tid;
-}
+    Ipv6Address Ipv6Header::GetSourceAddress() const {
+        return m_sourceAddress;
+    }
 
-TypeId Ipv6Header::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    void Ipv6Header::SetDestinationAddress(Ipv6Address dst) {
+        m_destinationAddress = dst;
+    }
 
-void Ipv6Header::Print (std::ostream& os) const
-{
-  os << "("
-  "Version " << m_version << " "
-     << "Traffic class 0x" << std::hex << m_trafficClass << std::dec << " "
-     << "Flow Label 0x" << std::hex << m_flowLabel << std::dec << " "
-     << "Payload Length " << m_payloadLength << " "
-     << "Next Header " << std::dec << (uint32_t) m_nextHeader << " "
-     << "Hop Limit " << std::dec << (uint32_t)m_hopLimit << " )"
-     <<  m_sourceAddress << " > " <<  m_destinationAddress
-  ;
-}
+    Ipv6Address Ipv6Header::GetDestinationAddress() const {
+        return m_destinationAddress;
+    }
 
-uint32_t Ipv6Header::GetSerializedSize () const
-{
-  return 10 * 4;
-}
+    TypeId Ipv6Header::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Ipv6Header")
+                .SetParent<Header> ()
+                .SetGroupName("Internet")
+                .AddConstructor<Ipv6Header> ()
+                ;
+        return tid;
+    }
 
-void Ipv6Header::Serialize (Buffer::Iterator start) const
-{
-  Buffer::Iterator i = start;
-  uint32_t vTcFl = 0; /* version, Traffic Class and Flow Label fields */
+    TypeId Ipv6Header::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-  vTcFl= (6 << 28) | (m_trafficClass << 20) | (m_flowLabel);
+    void Ipv6Header::Print(std::ostream & os) const {
+        os << "("
+                "Version " << m_version << " "
+                << "Traffic class 0x" << std::hex << m_trafficClass << std::dec << " "
+                << "Flow Label 0x" << std::hex << m_flowLabel << std::dec << " "
+                << "Payload Length " << m_payloadLength << " "
+                << "Next Header " << std::dec << (uint32_t) m_nextHeader << " "
+                << "Hop Limit " << std::dec << (uint32_t) m_hopLimit << " )"
+                << m_sourceAddress << " > " << m_destinationAddress
+                ;
+    }
 
-  i.WriteHtonU32 (vTcFl);
-  i.WriteHtonU16 (m_payloadLength);
-  i.WriteU8 (m_nextHeader);
-  i.WriteU8 (m_hopLimit);
+    uint32_t Ipv6Header::GetSerializedSize() const {
+        return 10 * 4;
+    }
 
-  WriteTo (i, m_sourceAddress);
-  WriteTo (i, m_destinationAddress);
-}
+    void Ipv6Header::Serialize(Buffer::Iterator start) const {
+        Buffer::Iterator i = start;
+        uint32_t vTcFl = 0; /* version, Traffic Class and Flow Label fields */
 
-uint32_t Ipv6Header::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-  uint32_t vTcFl = 0;
+        vTcFl = (6 << 28) | (m_trafficClass << 20) | (m_flowLabel);
 
-  vTcFl = i.ReadNtohU32 ();
-  m_version = vTcFl >> 28;
+        i.WriteHtonU32(vTcFl);
+        i.WriteHtonU16(m_payloadLength);
+        i.WriteU8(m_nextHeader);
+        i.WriteU8(m_hopLimit);
 
-  NS_ASSERT ((m_version) == 6);
+        WriteTo(i, m_sourceAddress);
+        WriteTo(i, m_destinationAddress);
+    }
 
-  m_trafficClass = (uint8_t)((vTcFl >> 20) & 0x000000ff);
-  m_flowLabel = vTcFl & 0xfff00000;
-  m_payloadLength = i.ReadNtohU16 ();
-  m_nextHeader = i.ReadU8 ();
-  m_hopLimit = i.ReadU8 ();
+    uint32_t Ipv6Header::Deserialize(Buffer::Iterator start) {
+        Buffer::Iterator i = start;
+        uint32_t vTcFl = 0;
 
-  ReadFrom (i, m_sourceAddress);
-  ReadFrom (i, m_destinationAddress);
+        vTcFl = i.ReadNtohU32();
+        m_version = vTcFl >> 28;
 
-  return GetSerializedSize ();
-}
+        NS_ASSERT((m_version) == 6);
+
+        m_trafficClass = (uint8_t) ((vTcFl >> 20) & 0x000000ff);
+        m_flowLabel = vTcFl & 0xfff00000;
+        m_payloadLength = i.ReadNtohU16();
+        m_nextHeader = i.ReadU8();
+        m_hopLimit = i.ReadU8();
+
+        ReadFrom(i, m_sourceAddress);
+        ReadFrom(i, m_destinationAddress);
+
+        return GetSerializedSize();
+    }
 
 } /* namespace ns3 */
 

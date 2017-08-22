@@ -23,36 +23,31 @@
 
 namespace ndn {
 
-BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Signature>));
-static_assert(std::is_base_of<tlv::Error, Signature::Error>::value,
-              "Signature::Error must inherit from tlv::Error");
+    BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Signature>));
+    static_assert(std::is_base_of<tlv::Error, Signature::Error>::value,
+            "Signature::Error must inherit from tlv::Error");
 
-Signature::Signature(const Block& info, const Block& value)
-  : m_info(info)
-  , m_value(value)
-{
-}
+    Signature::Signature(const Block& info, const Block& value)
+    : m_info(info)
+    , m_value(value) {
+    }
 
+    Signature::Signature(const SignatureInfo& info, const Block& value)
+    : m_info(info)
+    , m_value(value) {
+    }
 
-Signature::Signature(const SignatureInfo& info, const Block& value)
-  : m_info(info)
-  , m_value(value)
-{
-}
+    void
+    Signature::setInfo(const Block& info) {
+        m_info = SignatureInfo(info);
+    }
 
-void
-Signature::setInfo(const Block& info)
-{
-  m_info = SignatureInfo(info);
-}
-
-void
-Signature::setValue(const Block& value)
-{
-  if (value.type() != tlv::SignatureValue) {
-    BOOST_THROW_EXCEPTION(Error("The supplied block is not SignatureValue"));
-  }
-  m_value = value;
-}
+    void
+    Signature::setValue(const Block& value) {
+        if (value.type() != tlv::SignatureValue) {
+            BOOST_THROW_EXCEPTION(Error("The supplied block is not SignatureValue"));
+        }
+        m_value = value;
+    }
 
 } // namespace ndn

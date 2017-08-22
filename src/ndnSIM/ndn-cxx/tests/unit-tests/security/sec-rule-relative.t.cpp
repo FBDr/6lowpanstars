@@ -23,46 +23,45 @@
 #include "identity-management-fixture.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-using namespace ndn::tests;
+            using namespace ndn::tests;
 
-BOOST_FIXTURE_TEST_SUITE(SecuritySecRuleRelative, IdentityManagementFixture)
+            BOOST_FIXTURE_TEST_SUITE(SecuritySecRuleRelative, IdentityManagementFixture)
 
-BOOST_AUTO_TEST_CASE(SecRuleRelativeTest)
-{
-  Name rsaIdentity("/SecurityTestSecRule/Basic/Rsa");
-  BOOST_REQUIRE(addIdentity(rsaIdentity, RsaKeyParams()));
-  Name ecdsaIdentity("/SecurityTestSecRule/Basic/Ecdsa");
-  BOOST_REQUIRE(addIdentity(ecdsaIdentity, EcdsaKeyParams()));
+            BOOST_AUTO_TEST_CASE(SecRuleRelativeTest) {
+                Name rsaIdentity("/SecurityTestSecRule/Basic/Rsa");
+                BOOST_REQUIRE(addIdentity(rsaIdentity, RsaKeyParams()));
+                Name ecdsaIdentity("/SecurityTestSecRule/Basic/Ecdsa");
+                BOOST_REQUIRE(addIdentity(ecdsaIdentity, EcdsaKeyParams()));
 
-  Name dataName("SecurityTestSecRule/Basic");
-  Data rsaData(dataName);
-  m_keyChain.sign(rsaData,
-                  security::SigningInfo(security::SigningInfo::SIGNER_TYPE_ID,
-                                        rsaIdentity));
-  Data ecdsaData(dataName);
-  m_keyChain.sign(ecdsaData,
-                  security::SigningInfo(security::SigningInfo::SIGNER_TYPE_ID,
-                                        ecdsaIdentity));
-  Data sha256Data(dataName);
-  m_keyChain.sign(sha256Data, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
+                Name dataName("SecurityTestSecRule/Basic");
+                Data rsaData(dataName);
+                m_keyChain.sign(rsaData,
+                        security::SigningInfo(security::SigningInfo::SIGNER_TYPE_ID,
+                        rsaIdentity));
+                Data ecdsaData(dataName);
+                m_keyChain.sign(ecdsaData,
+                        security::SigningInfo(security::SigningInfo::SIGNER_TYPE_ID,
+                        ecdsaIdentity));
+                Data sha256Data(dataName);
+                m_keyChain.sign(sha256Data, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
 
-  SecRuleRelative rule("^(<SecurityTestSecRule><Basic>)$",
-                       "^(<SecurityTestSecRule><Basic>)<><KEY><><>$",
-                       "==", "\\1", "\\1", true);
-  BOOST_CHECK(rule.satisfy(rsaData));
-  BOOST_CHECK(rule.satisfy(ecdsaData));
-  BOOST_CHECK_EQUAL(rule.satisfy(sha256Data), false);
+                SecRuleRelative rule("^(<SecurityTestSecRule><Basic>)$",
+                        "^(<SecurityTestSecRule><Basic>)<><KEY><><>$",
+                        "==", "\\1", "\\1", true);
+                BOOST_CHECK(rule.satisfy(rsaData));
+                BOOST_CHECK(rule.satisfy(ecdsaData));
+                BOOST_CHECK_EQUAL(rule.satisfy(sha256Data), false);
 
-  BOOST_CHECK(rule.matchSignerName(rsaData));
-  BOOST_CHECK(rule.matchSignerName(ecdsaData));
-  BOOST_CHECK_EQUAL(rule.matchSignerName(sha256Data), false);
-}
+                BOOST_CHECK(rule.matchSignerName(rsaData));
+                BOOST_CHECK(rule.matchSignerName(ecdsaData));
+                BOOST_CHECK_EQUAL(rule.matchSignerName(sha256Data), false);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

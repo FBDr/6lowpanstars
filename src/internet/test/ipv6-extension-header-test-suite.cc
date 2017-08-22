@@ -35,22 +35,22 @@ using namespace ns3;
 // ===========================================================================
 class TestEmptyOptionField : public TestCase
 {
-public:
-  TestEmptyOptionField () : TestCase ("TestEmptyOptionField") {}
+    public :
+    TestEmptyOptionField() : TestCase("TestEmptyOptionField")
+    {}
 
-  virtual void DoRun ()
-  {
-    Ipv6ExtensionDestinationHeader header;
-    NS_TEST_EXPECT_MSG_EQ (header.GetSerializedSize () % 8, 0, "length of extension header is not a multiple of 8");
+    virtual void DoRun()
+    {
+        Ipv6ExtensionDestinationHeader header;
+        NS_TEST_EXPECT_MSG_EQ(header.GetSerializedSize() % 8, 0, "length of extension header is not a multiple of 8");
 
-    Buffer buf;
-    buf.AddAtStart (header.GetSerializedSize ());
-    header.Serialize (buf.Begin ());
+        Buffer buf;
+        buf.AddAtStart(header.GetSerializedSize());
+        header.Serialize(buf.Begin());
 
-    const uint8_t* data = buf.PeekData ();
-    NS_TEST_EXPECT_MSG_EQ (*(data+2), 1, "padding is missing"); //expecting a padN header
-  }
-};
+        const uint8_t* data = buf.PeekData();
+        NS_TEST_EXPECT_MSG_EQ(*(data + 2), 1, "padding is missing"); //expecting a padN header
+    }};
 
 // ===========================================================================
 // An option without alignment requirement must not be padded
@@ -64,44 +64,43 @@ public:
 // ===========================================================================
 class OptionWithoutAlignmentHeader : public Ipv6OptionHeader
 {
-public:
-  static const uint8_t TYPE = 42;
-  virtual uint32_t GetSerializedSize () const
-  {
-    return 4;
-  }
+    public :
+    static const uint8_t TYPE = 42;
+    virtual uint32_t GetSerializedSize() const
+    {
+        return 4;
+    }
 
-  virtual void Serialize (Buffer::Iterator start) const
-  {
-    start.WriteU8 (TYPE);
-    start.WriteU8 (GetSerializedSize ()-2);
-    start.WriteU16 (0);
-  }
-};
+    virtual void Serialize(Buffer::Iterator start) const
+    {
+        start.WriteU8(TYPE);
+        start.WriteU8(GetSerializedSize() - 2);
+        start.WriteU16(0);
+    }};
 
 
 class TestOptionWithoutAlignment : public TestCase
 {
-public:
-  TestOptionWithoutAlignment () : TestCase ("TestOptionWithoutAlignment") {}
+    public :
+    TestOptionWithoutAlignment() : TestCase("TestOptionWithoutAlignment")
+    {}
 
-  virtual void DoRun ()
-  {
-    Ipv6ExtensionDestinationHeader header;
-    OptionWithoutAlignmentHeader optionHeader;
-    header.AddOption (optionHeader);
+    virtual void DoRun()
+    {
+        Ipv6ExtensionDestinationHeader header;
+        OptionWithoutAlignmentHeader optionHeader;
+        header.AddOption(optionHeader);
 
 
-    NS_TEST_EXPECT_MSG_EQ (header.GetSerializedSize () % 8, 0, "length of extension header is not a multiple of 8");
+        NS_TEST_EXPECT_MSG_EQ(header.GetSerializedSize() % 8, 0, "length of extension header is not a multiple of 8");
 
-    Buffer buf;
-    buf.AddAtStart (header.GetSerializedSize ());
-    header.Serialize (buf.Begin ());
+        Buffer buf;
+        buf.AddAtStart(header.GetSerializedSize());
+        header.Serialize(buf.Begin());
 
-    const uint8_t* data = buf.PeekData ();
-    NS_TEST_EXPECT_MSG_EQ (*(data+2), OptionWithoutAlignmentHeader::TYPE, "option without alignment is not first in header field");
-  }
-};
+        const uint8_t* data = buf.PeekData();
+        NS_TEST_EXPECT_MSG_EQ(*(data + 2), OptionWithoutAlignmentHeader::TYPE, "option without alignment is not first in header field");
+    }};
 
 // ===========================================================================
 // An option with alignment requirement must be padded accordingly (padding to
@@ -120,53 +119,52 @@ public:
 // ===========================================================================
 class OptionWithAlignmentHeader : public Ipv6OptionHeader
 {
-public:
-  static const uint8_t TYPE = 73;
-  virtual uint32_t GetSerializedSize () const
-  {
-    return 4;
-  }
+    public :
+    static const uint8_t TYPE = 73;
+    virtual uint32_t GetSerializedSize() const
+    {
+        return 4;
+    }
 
-  virtual void Serialize (Buffer::Iterator start) const
-  {
-    start.WriteU8 (TYPE);
-    start.WriteU8 (GetSerializedSize ()-2);
-    start.WriteU16 (0);
-  }
+    virtual void Serialize(Buffer::Iterator start) const
+    {
+        start.WriteU8(TYPE);
+        start.WriteU8(GetSerializedSize() - 2);
+        start.WriteU16(0);
+    }
 
-  virtual Alignment GetAlignment () const
-  {
-    return (Alignment){ 4,0};
-  }
-};
+    virtual Alignment GetAlignment() const
+    {
+        return (Alignment){ 4, 0};
+    }};
 
 
 class TestOptionWithAlignment : public TestCase
 {
-public:
-  TestOptionWithAlignment () : TestCase ("TestOptionWithAlignment") {}
+    public :
+    TestOptionWithAlignment() : TestCase("TestOptionWithAlignment")
+    {}
 
-  virtual void DoRun ()
-  {
-    Ipv6ExtensionDestinationHeader header;
-    OptionWithAlignmentHeader optionHeader;
-    header.AddOption (optionHeader);
-    Ipv6OptionJumbogramHeader jumboHeader; //has an alignment of 4n+2
-    header.AddOption (jumboHeader);
+    virtual void DoRun()
+    {
+        Ipv6ExtensionDestinationHeader header;
+        OptionWithAlignmentHeader optionHeader;
+        header.AddOption(optionHeader);
+        Ipv6OptionJumbogramHeader jumboHeader; //has an alignment of 4n+2
+        header.AddOption(jumboHeader);
 
-    NS_TEST_EXPECT_MSG_EQ (header.GetSerializedSize () % 8, 0, "length of extension header is not a multiple of 8");
+        NS_TEST_EXPECT_MSG_EQ(header.GetSerializedSize() % 8, 0, "length of extension header is not a multiple of 8");
 
-    Buffer buf;
-    buf.AddAtStart (header.GetSerializedSize ());
-    header.Serialize (buf.Begin ());
+        Buffer buf;
+        buf.AddAtStart(header.GetSerializedSize());
+        header.Serialize(buf.Begin());
 
-    const uint8_t* data = buf.PeekData ();
-    NS_TEST_EXPECT_MSG_EQ (*(data+2), 1, "padding is missing"); //expecting a padN header
-    NS_TEST_EXPECT_MSG_EQ (*(data+4), OptionWithAlignmentHeader::TYPE, "option with alignment is not padded correctly");
-    NS_TEST_EXPECT_MSG_EQ (*(data+8), 1, "padding is missing"); //expecting a padN header
-    NS_TEST_EXPECT_MSG_EQ (*(data+10), jumboHeader.GetType (), "option with alignment is not padded correctly");
-  }
-};
+        const uint8_t* data = buf.PeekData();
+        NS_TEST_EXPECT_MSG_EQ(*(data + 2), 1, "padding is missing"); //expecting a padN header
+        NS_TEST_EXPECT_MSG_EQ(*(data + 4), OptionWithAlignmentHeader::TYPE, "option with alignment is not padded correctly");
+        NS_TEST_EXPECT_MSG_EQ(*(data + 8), 1, "padding is missing"); //expecting a padN header
+        NS_TEST_EXPECT_MSG_EQ(*(data + 10), jumboHeader.GetType(), "option with alignment is not padded correctly");
+    }};
 
 // ===========================================================================
 // An option with an alignment that exactly matches the gap must not be padded
@@ -186,41 +184,40 @@ public:
 
 class TestFulfilledAlignment : public TestCase
 {
-public:
-  TestFulfilledAlignment () : TestCase ("TestCorrectAlignment") {}
+    public :
+    TestFulfilledAlignment() : TestCase("TestCorrectAlignment")
+    {}
 
-  virtual void DoRun ()
-  {
-    Ipv6ExtensionDestinationHeader header;
-    Ipv6OptionJumbogramHeader jumboHeader; //has an alignment of 4n+2
-    header.AddOption (jumboHeader);
-    OptionWithAlignmentHeader optionHeader;
-    header.AddOption (optionHeader);
+    virtual void DoRun()
+    {
+        Ipv6ExtensionDestinationHeader header;
+        Ipv6OptionJumbogramHeader jumboHeader; //has an alignment of 4n+2
+        header.AddOption(jumboHeader);
+        OptionWithAlignmentHeader optionHeader;
+        header.AddOption(optionHeader);
 
-    NS_TEST_EXPECT_MSG_EQ (header.GetSerializedSize () % 8, 0, "length of extension header is not a multiple of 8");
+        NS_TEST_EXPECT_MSG_EQ(header.GetSerializedSize() % 8, 0, "length of extension header is not a multiple of 8");
 
-    Buffer buf;
-    buf.AddAtStart (header.GetSerializedSize ());
-    header.Serialize (buf.Begin ());
+        Buffer buf;
+        buf.AddAtStart(header.GetSerializedSize());
+        header.Serialize(buf.Begin());
 
-    const uint8_t* data = buf.PeekData ();
-    NS_TEST_EXPECT_MSG_EQ (*(data+2), jumboHeader.GetType (), "option with fulfilled alignment is padded anyway");
-    NS_TEST_EXPECT_MSG_EQ (*(data+8), OptionWithAlignmentHeader::TYPE, "option with fulfilled alignment is padded anyway");
-  }
-};
+        const uint8_t* data = buf.PeekData();
+        NS_TEST_EXPECT_MSG_EQ(*(data + 2), jumboHeader.GetType(), "option with fulfilled alignment is padded anyway");
+        NS_TEST_EXPECT_MSG_EQ(*(data + 8), OptionWithAlignmentHeader::TYPE, "option with fulfilled alignment is padded anyway");
+    }};
 
 class Ipv6ExtensionHeaderTestSuite : public TestSuite
 {
-public:
-  Ipv6ExtensionHeaderTestSuite ()
-    : TestSuite ("ipv6-extension-header", UNIT)
-  {
-    AddTestCase (new TestEmptyOptionField, TestCase::QUICK);
-    AddTestCase (new TestOptionWithoutAlignment, TestCase::QUICK);
-    AddTestCase (new TestOptionWithAlignment, TestCase::QUICK);
-    AddTestCase (new TestFulfilledAlignment, TestCase::QUICK);
+    public :
+    Ipv6ExtensionHeaderTestSuite()
+    : TestSuite("ipv6-extension-header", UNIT)
+    {
+        AddTestCase(new TestEmptyOptionField, TestCase::QUICK);
+        AddTestCase(new TestOptionWithoutAlignment, TestCase::QUICK);
+        AddTestCase(new TestOptionWithAlignment, TestCase::QUICK);
+        AddTestCase(new TestFulfilledAlignment, TestCase::QUICK);
 
-  }
-};
+    }};
 
 static Ipv6ExtensionHeaderTestSuite ipv6ExtensionHeaderTestSuite;

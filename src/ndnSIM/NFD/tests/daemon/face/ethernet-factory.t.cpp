@@ -29,64 +29,58 @@
 #include "network-interface-fixture.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-using nfd::face::tests::NetworkInterfaceFixture;
+        using nfd::face::tests::NetworkInterfaceFixture;
 
-BOOST_AUTO_TEST_SUITE(Face)
-BOOST_FIXTURE_TEST_SUITE(TestEthernetFactory, NetworkInterfaceFixture)
+        BOOST_AUTO_TEST_SUITE(Face)
+        BOOST_FIXTURE_TEST_SUITE(TestEthernetFactory, NetworkInterfaceFixture)
 
-BOOST_AUTO_TEST_CASE(GetChannels)
-{
-  EthernetFactory factory;
+        BOOST_AUTO_TEST_CASE(GetChannels) {
+            EthernetFactory factory;
 
-  auto channels = factory.getChannels();
-  BOOST_CHECK_EQUAL(channels.empty(), true);
-}
+            auto channels = factory.getChannels();
+            BOOST_CHECK_EQUAL(channels.empty(), true);
+        }
 
-BOOST_AUTO_TEST_CASE(MulticastFacesMap)
-{
-  SKIP_IF_NETWORK_INTERFACE_COUNT_LT(1);
+        BOOST_AUTO_TEST_CASE(MulticastFacesMap) {
+            SKIP_IF_NETWORK_INTERFACE_COUNT_LT(1);
 
-  EthernetFactory factory;
-  auto face1 = factory.createMulticastFace(m_interfaces.front(), ethernet::getBroadcastAddress());
-  auto face1bis = factory.createMulticastFace(m_interfaces.front(), ethernet::getBroadcastAddress());
-  BOOST_CHECK_EQUAL(face1, face1bis);
+            EthernetFactory factory;
+            auto face1 = factory.createMulticastFace(m_interfaces.front(), ethernet::getBroadcastAddress());
+            auto face1bis = factory.createMulticastFace(m_interfaces.front(), ethernet::getBroadcastAddress());
+            BOOST_CHECK_EQUAL(face1, face1bis);
 
-  auto face2 = factory.createMulticastFace(m_interfaces.front(), ethernet::getDefaultMulticastAddress());
-  BOOST_CHECK_NE(face1, face2);
+            auto face2 = factory.createMulticastFace(m_interfaces.front(), ethernet::getDefaultMulticastAddress());
+            BOOST_CHECK_NE(face1, face2);
 
-  SKIP_IF_NETWORK_INTERFACE_COUNT_LT(2);
+            SKIP_IF_NETWORK_INTERFACE_COUNT_LT(2);
 
-  auto face3 = factory.createMulticastFace(m_interfaces.back(), ethernet::getBroadcastAddress());
-  BOOST_CHECK_NE(face1, face3);
-}
+            auto face3 = factory.createMulticastFace(m_interfaces.back(), ethernet::getBroadcastAddress());
+            BOOST_CHECK_NE(face1, face3);
+        }
 
-BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate)
-{
-  EthernetFactory factory;
+        BOOST_AUTO_TEST_CASE(UnsupportedFaceCreate) {
+            EthernetFactory factory;
 
-  createFace(factory,
-             FaceUri("ether://[08:00:27:01:01:01]"),
-             ndn::nfd::FACE_PERSISTENCY_PERMANENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("ether://[08:00:27:01:01:01]"),
+                    ndn::nfd::FACE_PERSISTENCY_PERMANENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("ether://[08:00:27:01:01:01]"),
-             ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+            createFace(factory,
+                    FaceUri("ether://[08:00:27:01:01:01]"),
+                    ndn::nfd::FACE_PERSISTENCY_ON_DEMAND,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
 
-  createFace(factory,
-             FaceUri("ether://[08:00:27:01:01:01]"),
-             ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-             false,
-             {CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
-}
+            createFace(factory,
+                    FaceUri("ether://[08:00:27:01:01:01]"),
+                    ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                    false,{CreateFaceExpectedResult::FAILURE, 406, "Unsupported protocol"});
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // TestEthernetFactory
-BOOST_AUTO_TEST_SUITE_END() // Face
+        BOOST_AUTO_TEST_SUITE_END() // TestEthernetFactory
+        BOOST_AUTO_TEST_SUITE_END() // Face
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

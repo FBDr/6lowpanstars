@@ -24,82 +24,77 @@
 
 namespace ns3 {
 
-/// @cond include_hidden
+    /// @cond include_hidden
 
-template<>
-struct EventMemberImplObjTraits<std::function<void()>> {
-  typedef std::function<void()> T;
-  static T&
-  GetReference(T& p)
-  {
-    return p;
-  }
-};
+    template<>
+    struct EventMemberImplObjTraits<std::function<void()>> {
+        typedef std::function<void() > T;
 
-/// @endcond
+        static T &
+                GetReference(T & p) {
+            return p;
+        }
+    };
+
+    /// @endcond
 
 } // namespace ns3
 
 namespace ndn {
-namespace util {
-namespace scheduler {
+    namespace util {
+        namespace scheduler {
 
-Scheduler::Scheduler(boost::asio::io_service& ioService)
-  : m_scheduledEvent(m_events.end())
-{
-}
+            Scheduler::Scheduler(boost::asio::io_service& ioService)
+            : m_scheduledEvent(m_events.end()) {
+            }
 
-Scheduler::~Scheduler()
-{
-  cancelAllEvents();
-}
+            Scheduler::~Scheduler() {
+                cancelAllEvents();
+            }
 
-EventId
-Scheduler::scheduleEvent(const time::nanoseconds& after, const Event& event)
-{
-  EventId eventId = std::make_shared<ns3::EventId>();
-  weak_ptr<ns3::EventId> eventWeak = eventId;
-  std::function<void()> eventWithCleanup = [this, event, eventWeak] () {
-    event();
-    shared_ptr<ns3::EventId> eventId = eventWeak.lock();
-    if (eventId != nullptr) {
-      this->m_events.erase(eventId); // remove the event from the set after it is executed
-    }
-  };
+            EventId
+            Scheduler::scheduleEvent(const time::nanoseconds& after, const Event& event) {
+                EventId eventId = std::make_shared<ns3::EventId>();
+                weak_ptr<ns3::EventId> eventWeak = eventId;
+                std::function<void() > eventWithCleanup = [this, event, eventWeak] () {
+                    event();
+                    shared_ptr<ns3::EventId> eventId = eventWeak.lock();
+                    if (eventId != nullptr) {
+                        this->m_events.erase(eventId); // remove the event from the set after it is executed
+                    }
+                };
 
-  ns3::EventId id = ns3::Simulator::Schedule(ns3::NanoSeconds(after.count()),
-                                             &std::function<void()>::operator(), eventWithCleanup);
-  *eventId = std::move(id);
-  m_events.insert(eventId);
+                ns3::EventId id = ns3::Simulator::Schedule(ns3::NanoSeconds(after.count()),
+                        &std::function<void()>::operator(), eventWithCleanup);
+                *eventId = std::move(id);
+                m_events.insert(eventId);
 
-  return eventId;
-}
+                return eventId;
+            }
 
-void
-Scheduler::cancelEvent(const EventId& eventId)
-{
-  if (eventId != nullptr) {
-    ns3::Simulator::Remove(*eventId);
-    const_cast<EventId&>(eventId).reset();
-    m_events.erase(eventId);
-  }
-}
+            void
+            Scheduler::cancelEvent(const EventId& eventId) {
+                if (eventId != nullptr) {
+                    ns3::Simulator::Remove(*eventId);
+                    const_cast<EventId&> (eventId).reset();
+                    m_events.erase(eventId);
+                }
+            }
 
-void
-Scheduler::cancelAllEvents()
-{
-  for (auto i = m_events.begin(); i != m_events.end(); ) {
-    auto next = i;
-    ++next; // ns3::Simulator::Remove can call cancelEvent
-    if ((*i) != nullptr) {
-      ns3::Simulator::Remove((**i));
-      const_cast<EventId&>(*i).reset();
-    }
-    i = next;
-  }
-  m_events.clear();
-}
+            void
+            Scheduler::cancelAllEvents() {
+                for (auto i = m_events.begin(); i != m_events.end();) {
+                    auto next = i;
+                    ++next; // ns3::Simulator::Remove can call cancelEvent
+                    if ((*i) != nullptr) {
+                        ns3::Simulator::Remove((**i));
+                        const_cast<EventId&> (*i).reset();
+                    }
+                    i = next;
+                }
+                m_events.clear();
+            }
 
-} // namespace scheduler
-} // namespace util
+        } // namespace scheduler
+    } // namespace util
 } // namespace ndn

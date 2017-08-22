@@ -31,236 +31,228 @@
 #include "conf/common.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief The validator which can be set up via a configuration file.
- */
-class ValidatorConfig : public Validator
-{
-public:
-  class Error : public Validator::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : Validator::Error(what)
-    {
-    }
-  };
+        /**
+         * @brief The validator which can be set up via a configuration file.
+         */
+        class ValidatorConfig : public Validator {
+        public:
 
-  /**
-   * @note  When both certificate cache and face are not supplied, no cache will be used.
-   *        However, if only face is supplied, a default cache will be created and used.
-   */
-  explicit
-  ValidatorConfig(Face* face = nullptr,
-                  const shared_ptr<CertificateCache>& certificateCache = DEFAULT_CERTIFICATE_CACHE,
-                  const time::milliseconds& graceInterval = DEFAULT_GRACE_INTERVAL,
-                  const size_t stepLimit = 10,
-                  const size_t maxTrackedKeys = 1000,
-                  const time::system_clock::Duration& keyTimestampTtl = DEFAULT_KEY_TIMESTAMP_TTL);
+            class Error : public Validator::Error {
+            public:
 
-  /// @deprecated Use the constructor taking Face* as parameter.
-  explicit
-  ValidatorConfig(Face& face,
-                  const shared_ptr<CertificateCache>& certificateCache = DEFAULT_CERTIFICATE_CACHE,
-                  const time::milliseconds& graceInterval = DEFAULT_GRACE_INTERVAL,
-                  const size_t stepLimit = 10,
-                  const size_t maxTrackedKeys = 1000,
-                  const time::system_clock::Duration& keyTimestampTtl = DEFAULT_KEY_TIMESTAMP_TTL);
+                explicit
+                Error(const std::string& what)
+                : Validator::Error(what) {
+                }
+            };
 
-  void
-  load(const std::string& filename);
+            /**
+             * @note  When both certificate cache and face are not supplied, no cache will be used.
+             *        However, if only face is supplied, a default cache will be created and used.
+             */
+            explicit
+            ValidatorConfig(Face* face = nullptr,
+                    const shared_ptr<CertificateCache>& certificateCache = DEFAULT_CERTIFICATE_CACHE,
+                    const time::milliseconds& graceInterval = DEFAULT_GRACE_INTERVAL,
+                    const size_t stepLimit = 10,
+                    const size_t maxTrackedKeys = 1000,
+                    const time::system_clock::Duration& keyTimestampTtl = DEFAULT_KEY_TIMESTAMP_TTL);
 
-  void
-  load(const std::string& input, const std::string& filename);
+            /// @deprecated Use the constructor taking Face* as parameter.
+            explicit
+            ValidatorConfig(Face& face,
+                    const shared_ptr<CertificateCache>& certificateCache = DEFAULT_CERTIFICATE_CACHE,
+                    const time::milliseconds& graceInterval = DEFAULT_GRACE_INTERVAL,
+                    const size_t stepLimit = 10,
+                    const size_t maxTrackedKeys = 1000,
+                    const time::system_clock::Duration& keyTimestampTtl = DEFAULT_KEY_TIMESTAMP_TTL);
 
-  void
-  load(std::istream& input, const std::string& filename);
+            void
+            load(const std::string& filename);
 
-  void
-  load(const security::conf::ConfigSection& configSection,
-       const std::string& filename);
+            void
+            load(const std::string& input, const std::string& filename);
 
-  void
-  reset();
+            void
+            load(std::istream& input, const std::string& filename);
 
-  bool
-  isEmpty();
+            void
+            load(const security::conf::ConfigSection& configSection,
+                    const std::string& filename);
 
-protected:
-  virtual void
-  checkPolicy(const Data& data,
-              int nSteps,
-              const OnDataValidated& onValidated,
-              const OnDataValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest>>& nextSteps) override;
+            void
+            reset();
 
-  virtual void
-  checkPolicy(const Interest& interest,
-              int nSteps,
-              const OnInterestValidated& onValidated,
-              const OnInterestValidationFailed& onValidationFailed,
-              std::vector<shared_ptr<ValidationRequest>>& nextSteps) override;
+            bool
+            isEmpty();
 
-private:
-  template<class Packet, class OnValidated, class OnFailed>
-  void
-  checkSignature(const Packet& packet,
-                 const Signature& signature,
-                 size_t nSteps,
-                 const OnValidated& onValidated,
-                 const OnFailed& onValidationFailed,
-                 std::vector<shared_ptr<ValidationRequest>>& nextSteps);
+        protected:
+            virtual void
+            checkPolicy(const Data& data,
+                    int nSteps,
+                    const OnDataValidated& onValidated,
+                    const OnDataValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest>>&nextSteps) override;
 
-  void
-  checkTimestamp(const shared_ptr<const Interest>& interest,
-                 const Name& keyName,
-                 const OnInterestValidated& onValidated,
-                 const OnInterestValidationFailed& onValidationFailed);
+            virtual void
+            checkPolicy(const Interest& interest,
+                    int nSteps,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest>>&nextSteps) override;
 
-  template<class Packet, class OnValidated, class OnFailed>
-  void
-  onCertValidated(const shared_ptr<const Data>& signCertificate,
-                  const shared_ptr<const Packet>& packet,
-                  const OnValidated& onValidated,
-                  const OnFailed& onValidationFailed);
+        private:
+            template<class Packet, class OnValidated, class OnFailed>
+            void
+            checkSignature(const Packet& packet,
+                    const Signature& signature,
+                    size_t nSteps,
+                    const OnValidated& onValidated,
+                    const OnFailed& onValidationFailed,
+                    std::vector<shared_ptr<ValidationRequest>>&nextSteps);
 
-  template<class Packet, class OnFailed>
-  void
-  onCertFailed(const shared_ptr<const Data>& signCertificate,
-               const std::string& failureInfo,
-               const shared_ptr<const Packet>& packet,
-               const OnFailed& onValidationFailed);
+            void
+            checkTimestamp(const shared_ptr<const Interest>& interest,
+                    const Name& keyName,
+                    const OnInterestValidated& onValidated,
+                    const OnInterestValidationFailed& onValidationFailed);
 
-  void
-  onConfigRule(const security::conf::ConfigSection& section,
-               const std::string& filename);
+            template<class Packet, class OnValidated, class OnFailed>
+            void
+            onCertValidated(const shared_ptr<const Data>& signCertificate,
+                    const shared_ptr<const Packet>& packet,
+                    const OnValidated& onValidated,
+                    const OnFailed& onValidationFailed);
 
-  void
-  onConfigTrustAnchor(const security::conf::ConfigSection& section,
-                      const std::string& filename);
+            template<class Packet, class OnFailed>
+            void
+            onCertFailed(const shared_ptr<const Data>& signCertificate,
+                    const std::string& failureInfo,
+                    const shared_ptr<const Packet>& packet,
+                    const OnFailed& onValidationFailed);
 
-  time::nanoseconds
-  getRefreshPeriod(std::string refreshString);
+            void
+            onConfigRule(const security::conf::ConfigSection& section,
+                    const std::string& filename);
 
-  time::nanoseconds
-  getDefaultRefreshPeriod();
+            void
+            onConfigTrustAnchor(const security::conf::ConfigSection& section,
+                    const std::string& filename);
 
-  void
-  refreshAnchors();
+            time::nanoseconds
+            getRefreshPeriod(std::string refreshString);
 
-  void
-  cleanOldKeys();
+            time::nanoseconds
+            getDefaultRefreshPeriod();
 
-  class TrustAnchorContainer
-  {
-  public:
-    const std::list<shared_ptr<v1::IdentityCertificate>>&
-    getAll() const
-    {
-      return m_certificates;
-    }
+            void
+            refreshAnchors();
 
-    void
-    add(shared_ptr<v1::IdentityCertificate> certificate)
-    {
-      m_certificates.push_back(certificate);
-    }
+            void
+            cleanOldKeys();
 
-  protected:
-    std::list<shared_ptr<v1::IdentityCertificate>> m_certificates;
-  };
+            class TrustAnchorContainer {
+            public:
 
-  class DynamicTrustAnchorContainer : public TrustAnchorContainer
-  {
-  public:
-    DynamicTrustAnchorContainer(const boost::filesystem::path& path, bool isDir,
-                                time::nanoseconds refreshPeriod)
-      : m_path(path)
-      , m_isDir(isDir)
-      , m_refreshPeriod(refreshPeriod)
-    {
-    }
+                const std::list<shared_ptr<v1::IdentityCertificate>>&
+                getAll() const {
+                    return m_certificates;
+                }
 
-    void
-    setLastRefresh(const time::system_clock::TimePoint& lastRefresh)
-    {
-      m_lastRefresh = lastRefresh;
-    }
+                void
+                add(shared_ptr<v1::IdentityCertificate> certificate) {
+                    m_certificates.push_back(certificate);
+                }
 
-    const time::system_clock::TimePoint&
-    getLastRefresh() const
-    {
-      return m_lastRefresh;
-    }
+            protected:
+                std::list<shared_ptr<v1::IdentityCertificate>> m_certificates;
+            };
 
-    const time::nanoseconds&
-    getRefreshPeriod() const
-    {
-      return m_refreshPeriod;
-    }
+            class DynamicTrustAnchorContainer : public TrustAnchorContainer {
+            public:
 
-    void
-    refresh();
+                DynamicTrustAnchorContainer(const boost::filesystem::path& path, bool isDir,
+                        time::nanoseconds refreshPeriod)
+                : m_path(path)
+                , m_isDir(isDir)
+                , m_refreshPeriod(refreshPeriod) {
+                }
 
-  private:
-    boost::filesystem::path m_path;
-    bool m_isDir;
+                void
+                setLastRefresh(const time::system_clock::TimePoint& lastRefresh) {
+                    m_lastRefresh = lastRefresh;
+                }
 
-    time::system_clock::TimePoint m_lastRefresh;
-    time::nanoseconds m_refreshPeriod;
-  };
+                const time::system_clock::TimePoint&
+                getLastRefresh() const {
+                    return m_lastRefresh;
+                }
 
-  static inline bool
-  compareDynamicContainer(const DynamicTrustAnchorContainer& containerA,
-                          const DynamicTrustAnchorContainer& containerB)
-  {
-    return (containerA.getLastRefresh() < containerB.getLastRefresh());
-  }
+                const time::nanoseconds&
+                getRefreshPeriod() const {
+                    return m_refreshPeriod;
+                }
 
-public:
-  static const shared_ptr<CertificateCache> DEFAULT_CERTIFICATE_CACHE;
-  static const time::milliseconds DEFAULT_GRACE_INTERVAL;
-  static const time::system_clock::Duration DEFAULT_KEY_TIMESTAMP_TTL;
+                void
+                refresh();
+
+            private:
+                boost::filesystem::path m_path;
+                bool m_isDir;
+
+                time::system_clock::TimePoint m_lastRefresh;
+                time::nanoseconds m_refreshPeriod;
+            };
+
+            static inline bool
+            compareDynamicContainer(const DynamicTrustAnchorContainer& containerA,
+                    const DynamicTrustAnchorContainer& containerB) {
+                return (containerA.getLastRefresh() < containerB.getLastRefresh());
+            }
+
+        public:
+            static const shared_ptr<CertificateCache> DEFAULT_CERTIFICATE_CACHE;
+            static const time::milliseconds DEFAULT_GRACE_INTERVAL;
+            static const time::system_clock::Duration DEFAULT_KEY_TIMESTAMP_TTL;
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  typedef security::conf::Rule<Interest> InterestRule;
-  typedef security::conf::Rule<Data>     DataRule;
-  typedef std::vector<shared_ptr<InterestRule>> InterestRuleList;
-  typedef std::vector<shared_ptr<DataRule>>     DataRuleList;
-  typedef std::map<Name, shared_ptr<v1::IdentityCertificate>> AnchorList;
-  typedef std::list<DynamicTrustAnchorContainer> DynamicContainers; // sorted by m_lastRefresh
-  typedef std::list<shared_ptr<v1::IdentityCertificate>> CertificateList;
+            typedef security::conf::Rule<Interest> InterestRule;
+            typedef security::conf::Rule<Data> DataRule;
+            typedef std::vector<shared_ptr<InterestRule>> InterestRuleList;
+            typedef std::vector<shared_ptr<DataRule>> DataRuleList;
+            typedef std::map<Name, shared_ptr<v1::IdentityCertificate>> AnchorList;
+            typedef std::list<DynamicTrustAnchorContainer> DynamicContainers; // sorted by m_lastRefresh
+            typedef std::list<shared_ptr<v1::IdentityCertificate>> CertificateList;
 
-  /**
-   * @brief gives whether validation should be preformed
-   *
-   * If false, no validation occurs, and any packet is considered validated immediately.
-   */
-  bool m_shouldValidate;
+            /**
+             * @brief gives whether validation should be preformed
+             *
+             * If false, no validation occurs, and any packet is considered validated immediately.
+             */
+            bool m_shouldValidate;
 
-  size_t m_stepLimit;
-  shared_ptr<CertificateCache> m_certificateCache;
+            size_t m_stepLimit;
+            shared_ptr<CertificateCache> m_certificateCache;
 
-  InterestRuleList m_interestRules;
-  DataRuleList m_dataRules;
+            InterestRuleList m_interestRules;
+            DataRuleList m_dataRules;
 
-  AnchorList m_anchors;
-  TrustAnchorContainer m_staticContainer;
-  DynamicContainers m_dynamicContainers;
+            AnchorList m_anchors;
+            TrustAnchorContainer m_staticContainer;
+            DynamicContainers m_dynamicContainers;
 
-  time::milliseconds m_graceInterval;
-  size_t m_maxTrackedKeys;
-  typedef std::map<Name, time::system_clock::TimePoint> LastTimestampMap;
-  LastTimestampMap m_lastTimestamp;
-  const time::system_clock::Duration& m_keyTimestampTtl;
-};
+            time::milliseconds m_graceInterval;
+            size_t m_maxTrackedKeys;
+            typedef std::map<Name, time::system_clock::TimePoint> LastTimestampMap;
+            LastTimestampMap m_lastTimestamp;
+            const time::system_clock::Duration& m_keyTimestampTtl;
+        };
 
-} // namespace security
+    } // namespace security
 
-using security::ValidatorConfig;
+    using security::ValidatorConfig;
 
 } // namespace ndn
 

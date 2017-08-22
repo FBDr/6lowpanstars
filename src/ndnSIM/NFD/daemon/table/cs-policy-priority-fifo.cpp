@@ -27,139 +27,124 @@
 #include "cs.hpp"
 
 namespace nfd {
-namespace cs {
-namespace priority_fifo {
+    namespace cs {
+        namespace priority_fifo {
 
-const std::string PriorityFifoPolicy::POLICY_NAME = "priority_fifo";
-NFD_REGISTER_CS_POLICY(PriorityFifoPolicy);
+            const std::string PriorityFifoPolicy::POLICY_NAME = "priority_fifo";
+            NFD_REGISTER_CS_POLICY(PriorityFifoPolicy);
 
-PriorityFifoPolicy::PriorityFifoPolicy()
-  : Policy(POLICY_NAME)
-{
-}
+            PriorityFifoPolicy::PriorityFifoPolicy()
+            : Policy(POLICY_NAME) {
+            }
 
-PriorityFifoPolicy::~PriorityFifoPolicy()
-{
-  for (auto entryInfoMapPair : m_entryInfoMap) {
-    delete entryInfoMapPair.second;
-  }
-}
+            PriorityFifoPolicy::~PriorityFifoPolicy() {
+                for (auto entryInfoMapPair : m_entryInfoMap) {
+                    delete entryInfoMapPair.second;
+                }
+            }
 
-void
-PriorityFifoPolicy::doAfterInsert(iterator i)
-{
-  this->attachQueue(i);
-  this->evictEntries();
-}
+            void
+            PriorityFifoPolicy::doAfterInsert(iterator i) {
+                this->attachQueue(i);
+                this->evictEntries();
+            }
 
-void
-PriorityFifoPolicy::doAfterRefresh(iterator i)
-{
-  this->detachQueue(i);
-  this->attachQueue(i);
-}
+            void
+            PriorityFifoPolicy::doAfterRefresh(iterator i) {
+                this->detachQueue(i);
+                this->attachQueue(i);
+            }
 
-void
-PriorityFifoPolicy::doBeforeErase(iterator i)
-{
-  this->detachQueue(i);
-}
+            void
+            PriorityFifoPolicy::doBeforeErase(iterator i) {
+                this->detachQueue(i);
+            }
 
-void
-PriorityFifoPolicy::doBeforeUse(iterator i)
-{
-  BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
-}
+            void
+            PriorityFifoPolicy::doBeforeUse(iterator i) {
+                BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
+            }
 
-void
-PriorityFifoPolicy::evictEntries()
-{
-  BOOST_ASSERT(this->getCs() != nullptr);
+            void
+            PriorityFifoPolicy::evictEntries() {
+                BOOST_ASSERT(this->getCs() != nullptr);
 
-  while (this->getCs()->size() > this->getLimit()) {
-    this->evictOne();
-  }
-}
+                while (this->getCs()->size() > this->getLimit()) {
+                    this->evictOne();
+                }
+            }
 
-void
-PriorityFifoPolicy::evictOne()
-{
-  BOOST_ASSERT(!m_queues[QUEUE_UNSOLICITED].empty() ||
-               !m_queues[QUEUE_STALE].empty() ||
-               !m_queues[QUEUE_FIFO].empty());
+            void
+            PriorityFifoPolicy::evictOne() {
+                BOOST_ASSERT(!m_queues[QUEUE_UNSOLICITED].empty() ||
+                        !m_queues[QUEUE_STALE].empty() ||
+                        !m_queues[QUEUE_FIFO].empty());
 
-  iterator i;
-  if (!m_queues[QUEUE_UNSOLICITED].empty()) {
-    i = m_queues[QUEUE_UNSOLICITED].front();
-  }
-  else if (!m_queues[QUEUE_STALE].empty()) {
-    i = m_queues[QUEUE_STALE].front();
-  }
-  else if (!m_queues[QUEUE_FIFO].empty()) {
-    i = m_queues[QUEUE_FIFO].front();
-  }
+                iterator i;
+                if (!m_queues[QUEUE_UNSOLICITED].empty()) {
+                    i = m_queues[QUEUE_UNSOLICITED].front();
+                } else if (!m_queues[QUEUE_STALE].empty()) {
+                    i = m_queues[QUEUE_STALE].front();
+                } else if (!m_queues[QUEUE_FIFO].empty()) {
+                    i = m_queues[QUEUE_FIFO].front();
+                }
 
-  this->detachQueue(i);
-  this->emitSignal(beforeEvict, i);
-}
+                this->detachQueue(i);
+                this->emitSignal(beforeEvict, i);
+            }
 
-void
-PriorityFifoPolicy::attachQueue(iterator i)
-{
-  BOOST_ASSERT(m_entryInfoMap.find(i) == m_entryInfoMap.end());
+            void
+            PriorityFifoPolicy::attachQueue(iterator i) {
+                BOOST_ASSERT(m_entryInfoMap.find(i) == m_entryInfoMap.end());
 
-  EntryInfo* entryInfo = new EntryInfo();
-  if (i->isUnsolicited()) {
-    entryInfo->queueType = QUEUE_UNSOLICITED;
-  }
-  else if (i->isStale()) {
-    entryInfo->queueType = QUEUE_STALE;
-  }
-  else {
-    entryInfo->queueType = QUEUE_FIFO;
+                EntryInfo* entryInfo = new EntryInfo();
+                if (i->isUnsolicited()) {
+                    entryInfo->queueType = QUEUE_UNSOLICITED;
+                } else if (i->isStale()) {
+                    entryInfo->queueType = QUEUE_STALE;
+                } else {
+                    entryInfo->queueType = QUEUE_FIFO;
 
-    if (i->canStale()) {
-      entryInfo->moveStaleEventId = scheduler::schedule(i->getData().getFreshnessPeriod(),
-                                              bind(&PriorityFifoPolicy::moveToStaleQueue, this, i));
-    }
-  }
+                    if (i->canStale()) {
+                        entryInfo->moveStaleEventId = scheduler::schedule(i->getData().getFreshnessPeriod(),
+                                bind(&PriorityFifoPolicy::moveToStaleQueue, this, i));
+                    }
+                }
 
-  Queue& queue = m_queues[entryInfo->queueType];
-  entryInfo->queueIt = queue.insert(queue.end(), i);
-  m_entryInfoMap[i] = entryInfo;
-}
+                Queue& queue = m_queues[entryInfo->queueType];
+                entryInfo->queueIt = queue.insert(queue.end(), i);
+                m_entryInfoMap[i] = entryInfo;
+            }
 
-void
-PriorityFifoPolicy::detachQueue(iterator i)
-{
-  BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
+            void
+            PriorityFifoPolicy::detachQueue(iterator i) {
+                BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
 
-  EntryInfo* entryInfo = m_entryInfoMap[i];
-  if (entryInfo->queueType == QUEUE_FIFO) {
-    scheduler::cancel(entryInfo->moveStaleEventId);
-  }
+                EntryInfo* entryInfo = m_entryInfoMap[i];
+                if (entryInfo->queueType == QUEUE_FIFO) {
+                    scheduler::cancel(entryInfo->moveStaleEventId);
+                }
 
-  m_queues[entryInfo->queueType].erase(entryInfo->queueIt);
-  m_entryInfoMap.erase(i);
-  delete entryInfo;
-}
+                m_queues[entryInfo->queueType].erase(entryInfo->queueIt);
+                m_entryInfoMap.erase(i);
+                delete entryInfo;
+            }
 
-void
-PriorityFifoPolicy::moveToStaleQueue(iterator i)
-{
-  BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
+            void
+            PriorityFifoPolicy::moveToStaleQueue(iterator i) {
+                BOOST_ASSERT(m_entryInfoMap.find(i) != m_entryInfoMap.end());
 
-  EntryInfo* entryInfo = m_entryInfoMap[i];
-  BOOST_ASSERT(entryInfo->queueType == QUEUE_FIFO);
+                EntryInfo* entryInfo = m_entryInfoMap[i];
+                BOOST_ASSERT(entryInfo->queueType == QUEUE_FIFO);
 
-  m_queues[QUEUE_FIFO].erase(entryInfo->queueIt);
+                m_queues[QUEUE_FIFO].erase(entryInfo->queueIt);
 
-  entryInfo->queueType = QUEUE_STALE;
-  Queue& queue = m_queues[QUEUE_STALE];
-  entryInfo->queueIt = queue.insert(queue.end(), i);
-  m_entryInfoMap[i] = entryInfo;
-}
+                entryInfo->queueType = QUEUE_STALE;
+                Queue& queue = m_queues[QUEUE_STALE];
+                entryInfo->queueIt = queue.insert(queue.end(), i);
+                m_entryInfoMap[i] = entryInfo;
+            }
 
-} // namespace priority_fifo
-} // namespace cs
+        } // namespace priority_fifo
+    } // namespace cs
 } // namespace nfd

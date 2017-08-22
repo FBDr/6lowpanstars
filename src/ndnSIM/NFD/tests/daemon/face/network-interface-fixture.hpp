@@ -32,30 +32,28 @@
 #include "test-common.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-class NetworkInterfaceFixture : public nfd::tests::BaseFixture
-{
-protected:
-  NetworkInterfaceFixture()
-  {
-    for (const auto& netif : listNetworkInterfaces()) {
-      if (!netif.isLoopback() && netif.isUp()) {
-        try {
-          face::EthernetTransport transport(netif, ethernet::getBroadcastAddress());
-          m_interfaces.push_back(netif);
-        }
-        catch (const face::EthernetTransport::Error&) {
-          // pass
-        }
-      }
-    }
-  }
+            class NetworkInterfaceFixture : public nfd::tests::BaseFixture {
+            protected:
 
-protected:
-  std::vector<NetworkInterfaceInfo> m_interfaces;
-};
+                NetworkInterfaceFixture() {
+                    for (const auto& netif : listNetworkInterfaces()) {
+                        if (!netif.isLoopback() && netif.isUp()) {
+                            try {
+                                face::EthernetTransport transport(netif, ethernet::getBroadcastAddress());
+                                m_interfaces.push_back(netif);
+                            } catch (const face::EthernetTransport::Error&) {
+                                // pass
+                            }
+                        }
+                    }
+                }
+
+            protected:
+                std::vector<NetworkInterfaceInfo> m_interfaces;
+            };
 
 #define SKIP_IF_NETWORK_INTERFACE_COUNT_LT(n) \
   do {                                        \
@@ -66,8 +64,8 @@ protected:
     }                                         \
   } while (false)
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_NETWORK_INTERFACE_FIXTURE_HPP

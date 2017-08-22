@@ -40,212 +40,203 @@
 #include <ndn-cxx/mgmt/nfd/strategy-choice.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class StrategyChoiceManagerFixture : public NfdManagerCommonFixture
-{
-public:
-  StrategyChoiceManagerFixture()
-    : m_strategyChoice(m_forwarder.getStrategyChoice())
-    , m_manager(m_strategyChoice, m_dispatcher, *m_authenticator)
-  {
-    setTopPrefix();
-    setPrivilege("strategy-choice");
-  }
+        class StrategyChoiceManagerFixture : public NfdManagerCommonFixture {
+        public:
 
-public:
-  void
-  installStrategy(const Name& strategyName)
-  {
-    install<DummyStrategy>(m_forwarder, strategyName);
-  }
+            StrategyChoiceManagerFixture()
+            : m_strategyChoice(m_forwarder.getStrategyChoice())
+            , m_manager(m_strategyChoice, m_dispatcher, *m_authenticator) {
+                setTopPrefix();
+                setPrivilege("strategy-choice");
+            }
 
-  const Name&
-  findStrategy(const Name& name)
-  {
-    return m_strategyChoice.findEffectiveStrategy(name).getName();
-  }
+        public:
 
-  ControlParameters
-  makeParameters(const Name& name, const Name& strategy)
-  {
-    return ControlParameters().setName(name).setStrategy(strategy);
-  }
+            void
+            installStrategy(const Name& strategyName) {
+                install<DummyStrategy>(m_forwarder, strategyName);
+            }
 
-protected:
-  StrategyChoice& m_strategyChoice;
-  StrategyChoiceManager m_manager;
-};
+            const Name&
+            findStrategy(const Name& name) {
+                return m_strategyChoice.findEffectiveStrategy(name).getName();
+            }
 
-BOOST_AUTO_TEST_SUITE(Mgmt)
-BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceManager, StrategyChoiceManagerFixture)
+            ControlParameters
+            makeParameters(const Name& name, const Name& strategy) {
+                return ControlParameters().setName(name).setStrategy(strategy);
+            }
 
-BOOST_AUTO_TEST_CASE(SetStrategy)
-{
-  auto testSetStrategy = [this] (const ControlParameters& parameters) -> Name {
-    m_responses.clear();
-    auto command = makeControlCommandRequest("/localhost/nfd/strategy-choice/set", parameters);
-    receiveInterest(command);
-    return command->getName();
-  };
+        protected:
+            StrategyChoice& m_strategyChoice;
+            StrategyChoiceManager m_manager;
+        };
 
-  installStrategy("/localhost/nfd/strategy/test-strategy-a");
-  installStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%01"); // version 1
-  installStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%02"); // version 2
+        BOOST_AUTO_TEST_SUITE(Mgmt)
+        BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceManager, StrategyChoiceManagerFixture)
 
-  auto parametersA  = makeParameters("test", "/localhost/nfd/strategy/test-strategy-a");
-  auto parametersB  = makeParameters("test", "/localhost/nfd/strategy/test-strategy-b");
-  auto parametersC1 = makeParameters("test", "/localhost/nfd/strategy/test-strategy-c/%FD%01");
-  auto parametersC  = makeParameters("test", "/localhost/nfd/strategy/test-strategy-c");
+        BOOST_AUTO_TEST_CASE(SetStrategy) {
+            auto testSetStrategy = [this] (const ControlParameters & parameters) -> Name {
+                m_responses.clear();
+                auto command = makeControlCommandRequest("/localhost/nfd/strategy-choice/set", parameters);
+                receiveInterest(command);
+                return command->getName();
+            };
 
-  auto commandNameA = testSetStrategy(parametersA); // succeed
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandNameA, makeResponse(200, "OK", parametersA)),
+            installStrategy("/localhost/nfd/strategy/test-strategy-a");
+            installStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%01"); // version 1
+            installStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%02"); // version 2
+
+            auto parametersA = makeParameters("test", "/localhost/nfd/strategy/test-strategy-a");
+            auto parametersB = makeParameters("test", "/localhost/nfd/strategy/test-strategy-b");
+            auto parametersC1 = makeParameters("test", "/localhost/nfd/strategy/test-strategy-c/%FD%01");
+            auto parametersC = makeParameters("test", "/localhost/nfd/strategy/test-strategy-c");
+
+            auto commandNameA = testSetStrategy(parametersA); // succeed
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandNameA, makeResponse(200, "OK", parametersA)),
                     CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-a");
+            BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-a");
 
-  auto commandNameB = testSetStrategy(parametersB); // not installed
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandNameB, ControlResponse(504, "Unsupported strategy")),
+            auto commandNameB = testSetStrategy(parametersB); // not installed
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandNameB, ControlResponse(504, "Unsupported strategy")),
                     CheckResponseResult::OK);
 
-  auto commandNameC1 = testSetStrategy(parametersC1); // specified version
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandNameC1, makeResponse(200, "OK", parametersC1)),
+            auto commandNameC1 = testSetStrategy(parametersC1); // specified version
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandNameC1, makeResponse(200, "OK", parametersC1)),
                     CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-c/%FD%01");
+            BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-c/%FD%01");
 
-  auto commandNameC = testSetStrategy(parametersC); // latest version
-  parametersC.setStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%02"); // change to latest
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandNameC, makeResponse(200, "OK", parametersC)),
+            auto commandNameC = testSetStrategy(parametersC); // latest version
+            parametersC.setStrategy("/localhost/nfd/strategy/test-strategy-c/%FD%02"); // change to latest
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandNameC, makeResponse(200, "OK", parametersC)),
                     CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-c/%FD%02");
-}
+            BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-c/%FD%02");
+        }
 
-BOOST_AUTO_TEST_CASE(UnsetStrategy)
-{
-  auto testUnsetStrategy = [this] (const ControlParameters& parameters) -> Name {
-    m_responses.clear();
-    auto command = makeControlCommandRequest("/localhost/nfd/strategy-choice/unset", parameters);
-    receiveInterest(command);
-    return command->getName();
-  };
+        BOOST_AUTO_TEST_CASE(UnsetStrategy) {
+            auto testUnsetStrategy = [this] (const ControlParameters & parameters) -> Name {
+                m_responses.clear();
+                auto command = makeControlCommandRequest("/localhost/nfd/strategy-choice/unset", parameters);
+                receiveInterest(command);
+                return command->getName();
+            };
 
-  installStrategy("/localhost/nfd/strategy/test-strategy-a");
-  installStrategy("/localhost/nfd/strategy/test-strategy-b");
-  installStrategy("/localhost/nfd/strategy/test-strategy-c");
+            installStrategy("/localhost/nfd/strategy/test-strategy-a");
+            installStrategy("/localhost/nfd/strategy/test-strategy-b");
+            installStrategy("/localhost/nfd/strategy/test-strategy-c");
 
-  BOOST_CHECK(m_strategyChoice.insert("ndn:/", "/localhost/nfd/strategy/test-strategy-a")); // root
-  BOOST_CHECK(m_strategyChoice.insert("/test", "/localhost/nfd/strategy/test-strategy-b")); // test
-  BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a");
+            BOOST_CHECK(m_strategyChoice.insert("ndn:/", "/localhost/nfd/strategy/test-strategy-a")); // root
+            BOOST_CHECK(m_strategyChoice.insert("/test", "/localhost/nfd/strategy/test-strategy-b")); // test
+            BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a");
 
-  auto parametersRoot = ControlParameters().setName("ndn:/"); // root prefix
-  auto parametersNone = ControlParameters().setName("/none"); // no such entry
-  auto parametersTest = ControlParameters().setName("/test"); // has such entry
+            auto parametersRoot = ControlParameters().setName("ndn:/"); // root prefix
+            auto parametersNone = ControlParameters().setName("/none"); // no such entry
+            auto parametersTest = ControlParameters().setName("/test"); // has such entry
 
-  BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a"); // root
-  auto commandRootName = testUnsetStrategy(parametersRoot);
-  auto expectedResponse = ControlResponse(400, "failed in validating parameters");
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandRootName, expectedResponse), CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a"); // keep as root
+            BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a"); // root
+            auto commandRootName = testUnsetStrategy(parametersRoot);
+            auto expectedResponse = ControlResponse(400, "failed in validating parameters");
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandRootName, expectedResponse), CheckResponseResult::OK);
+            BOOST_CHECK_EQUAL(findStrategy("/"), "/localhost/nfd/strategy/test-strategy-a"); // keep as root
 
-  BOOST_CHECK_EQUAL(findStrategy("/none"), "/localhost/nfd/strategy/test-strategy-a"); // root
-  auto commandNoneName = testUnsetStrategy(parametersNone);
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandNoneName, makeResponse(200, "OK", parametersNone)),
+            BOOST_CHECK_EQUAL(findStrategy("/none"), "/localhost/nfd/strategy/test-strategy-a"); // root
+            auto commandNoneName = testUnsetStrategy(parametersNone);
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandNoneName, makeResponse(200, "OK", parametersNone)),
                     CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/none"), "/localhost/nfd/strategy/test-strategy-a"); // root
+            BOOST_CHECK_EQUAL(findStrategy("/none"), "/localhost/nfd/strategy/test-strategy-a"); // root
 
-  BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-b"); // self
-  auto commandTestName = testUnsetStrategy(parametersTest);
-  BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
-  BOOST_CHECK_EQUAL(checkResponse(0, commandTestName, makeResponse(200, "OK", parametersTest)),
+            BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-b"); // self
+            auto commandTestName = testUnsetStrategy(parametersTest);
+            BOOST_REQUIRE_EQUAL(m_responses.size(), 1);
+            BOOST_CHECK_EQUAL(checkResponse(0, commandTestName, makeResponse(200, "OK", parametersTest)),
                     CheckResponseResult::OK);
-  BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-a"); // parent
-}
+            BOOST_CHECK_EQUAL(findStrategy("/test"), "/localhost/nfd/strategy/test-strategy-a"); // parent
+        }
 
-// @todo Remove when ndn::nfd::StrategyChoice implements operator!= and operator<<
-class StrategyChoice : public ndn::nfd::StrategyChoice
-{
-public:
-  StrategyChoice() = default;
+        // @todo Remove when ndn::nfd::StrategyChoice implements operator!= and operator<<
 
-  StrategyChoice(const ndn::nfd::StrategyChoice& entry)
-    : ndn::nfd::StrategyChoice(entry)
-  {
-  }
-};
+        class StrategyChoice : public ndn::nfd::StrategyChoice {
+        public:
+            StrategyChoice() = default;
 
-bool
-operator!=(const StrategyChoice& left, const StrategyChoice& right)
-{
-  return left.getName() != right.getName() || left.getStrategy() != right.getStrategy();
-}
+            StrategyChoice(const ndn::nfd::StrategyChoice& entry)
+            : ndn::nfd::StrategyChoice(entry) {
+            }
+        };
 
-std::ostream&
-operator<<(std::ostream &os, const StrategyChoice& entry)
-{
-  os << "[ " << entry.getName() << ", " << entry.getStrategy() << " ]";
-  return os;
-}
+        bool
+        operator!=(const StrategyChoice& left, const StrategyChoice& right) {
+            return left.getName() != right.getName() || left.getStrategy() != right.getStrategy();
+        }
 
-BOOST_AUTO_TEST_CASE(StrategyChoiceDataset)
-{
-  size_t nPreInsertedStrategies = m_strategyChoice.size(); // the best-route strategy
-  std::set<Name> actualNames, actualStrategies;
-  for (const auto& entry : m_strategyChoice) {
-    actualNames.insert(entry.getPrefix());
-    actualStrategies.insert(entry.getStrategyName());
-  }
+        std::ostream&
+        operator<<(std::ostream &os, const StrategyChoice& entry) {
+            os << "[ " << entry.getName() << ", " << entry.getStrategy() << " ]";
+            return os;
+        }
 
-  std::uniform_int_distribution<uint64_t> dist;
-  size_t nEntries = 1024;
-  for (size_t i = 0 ; i < nEntries ; i++) {
-    auto name = Name("test-name").appendSegment(i);
-    auto strategy = Name("test-strategy").appendSegment(dist(getGlobalRng()));
-    auto entry = ndn::nfd::StrategyChoice().setName(name).setStrategy(strategy);
-    actualNames.insert(name);
-    actualStrategies.insert(strategy);
-    installStrategy(strategy);
-    m_strategyChoice.insert(name, strategy);
-  }
-  nEntries += nPreInsertedStrategies;
+        BOOST_AUTO_TEST_CASE(StrategyChoiceDataset) {
+            size_t nPreInsertedStrategies = m_strategyChoice.size(); // the best-route strategy
+            std::set<Name> actualNames, actualStrategies;
+            for (const auto& entry : m_strategyChoice) {
+                actualNames.insert(entry.getPrefix());
+                actualStrategies.insert(entry.getStrategyName());
+            }
 
-  receiveInterest(makeInterest("/localhost/nfd/strategy-choice/list"));
+            std::uniform_int_distribution<uint64_t> dist;
+            size_t nEntries = 1024;
+            for (size_t i = 0; i < nEntries; i++) {
+                auto name = Name("test-name").appendSegment(i);
+                auto strategy = Name("test-strategy").appendSegment(dist(getGlobalRng()));
+                auto entry = ndn::nfd::StrategyChoice().setName(name).setStrategy(strategy);
+                actualNames.insert(name);
+                actualStrategies.insert(strategy);
+                installStrategy(strategy);
+                m_strategyChoice.insert(name, strategy);
+            }
+            nEntries += nPreInsertedStrategies;
 
-  Block content;
-  BOOST_CHECK_NO_THROW(content = concatenateResponses());
-  BOOST_CHECK_NO_THROW(content.parse());
-  BOOST_CHECK_EQUAL(content.elements().size(), nEntries);
+            receiveInterest(makeInterest("/localhost/nfd/strategy-choice/list"));
 
-  std::vector<StrategyChoice> receivedRecords, expectedRecords;
-  for (size_t idx = 0; idx < nEntries; ++idx) {
-    BOOST_TEST_MESSAGE("processing element: " << idx);
+            Block content;
+            BOOST_CHECK_NO_THROW(content = concatenateResponses());
+            BOOST_CHECK_NO_THROW(content.parse());
+            BOOST_CHECK_EQUAL(content.elements().size(), nEntries);
 
-    StrategyChoice decodedEntry;
-    BOOST_REQUIRE_NO_THROW(decodedEntry.wireDecode(content.elements()[idx]));
-    receivedRecords.push_back(decodedEntry);
+            std::vector<StrategyChoice> receivedRecords, expectedRecords;
+            for (size_t idx = 0; idx < nEntries; ++idx) {
+                BOOST_TEST_MESSAGE("processing element: " << idx);
 
-    actualNames.erase(decodedEntry.getName());
-    actualStrategies.erase(decodedEntry.getStrategy());
+                StrategyChoice decodedEntry;
+                BOOST_REQUIRE_NO_THROW(decodedEntry.wireDecode(content.elements()[idx]));
+                receivedRecords.push_back(decodedEntry);
 
-    auto result = m_strategyChoice.get(decodedEntry.getName());
-    BOOST_REQUIRE(result.first);
+                actualNames.erase(decodedEntry.getName());
+                actualStrategies.erase(decodedEntry.getStrategy());
 
-    auto record = StrategyChoice().setName(decodedEntry.getName()).setStrategy(result.second);
-    expectedRecords.push_back(record);
-  }
+                auto result = m_strategyChoice.get(decodedEntry.getName());
+                BOOST_REQUIRE(result.first);
 
-  BOOST_CHECK_EQUAL(actualNames.size(), 0);
-  BOOST_CHECK_EQUAL(actualStrategies.size(), 0);
-  BOOST_CHECK_EQUAL_COLLECTIONS(receivedRecords.begin(), receivedRecords.end(),
-                                expectedRecords.begin(), expectedRecords.end());
-}
+                auto record = StrategyChoice().setName(decodedEntry.getName()).setStrategy(result.second);
+                expectedRecords.push_back(record);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestStrategyChoiceManager
-BOOST_AUTO_TEST_SUITE_END() // Mgmt
+            BOOST_CHECK_EQUAL(actualNames.size(), 0);
+            BOOST_CHECK_EQUAL(actualStrategies.size(), 0);
+            BOOST_CHECK_EQUAL_COLLECTIONS(receivedRecords.begin(), receivedRecords.end(),
+                    expectedRecords.begin(), expectedRecords.end());
+        }
 
-} // namespace tests
+        BOOST_AUTO_TEST_SUITE_END() // TestStrategyChoiceManager
+        BOOST_AUTO_TEST_SUITE_END() // Mgmt
+
+    } // namespace tests
 } // namespace nfd

@@ -25,12 +25,13 @@
 #include <iostream>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3 {
+namespace ns3
+{
     NS_LOG_COMPONENT_DEFINE("CoapPacketTag");
 
     CoapPacketTag::CoapPacketTag()
-    : m_seq(0), m_req(0),
-    m_ts(Simulator::Now().GetTimeStep()) {
+            : m_seq(0), m_req(0),
+            m_ts(Simulator::Now().GetTimeStep()) {
         NS_LOG_FUNCTION(this);
     }
 

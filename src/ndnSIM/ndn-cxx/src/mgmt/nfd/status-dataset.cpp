@@ -23,140 +23,121 @@
 #include "../../util/concepts.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-StatusDataset::StatusDataset(const PartialName& datasetName)
-  : m_datasetName(datasetName)
-{
-}
+        StatusDataset::StatusDataset(const PartialName& datasetName)
+        : m_datasetName(datasetName) {
+        }
 
-Name
-StatusDataset::getDatasetPrefix(const Name& prefix) const
-{
-  Name name;
-  name.append(prefix).append(m_datasetName);
-  this->addParameters(name);
-  return name;
-}
+        Name
+        StatusDataset::getDatasetPrefix(const Name& prefix) const {
+            Name name;
+            name.append(prefix).append(m_datasetName);
+            this->addParameters(name);
+            return name;
+        }
 
-void
-StatusDataset::addParameters(Name& name) const
-{
-}
+        void
+        StatusDataset::addParameters(Name& name) const {
+        }
 
-/**
- * \brief parses elements into a vector of T
- * \tparam T element type
- * \param payload pointer to a buffer of zero or more blocks of decodable by T
- * \return a vector of T
- * \throw tlv::Error cannot parse payload
- */
-template<typename T>
-static std::vector<T>
-parseDatasetVector(ConstBufferPtr payload)
-{
-  BOOST_CONCEPT_ASSERT((WireDecodable<T>));
+        /**
+         * \brief parses elements into a vector of T
+         * \tparam T element type
+         * \param payload pointer to a buffer of zero or more blocks of decodable by T
+         * \return a vector of T
+         * \throw tlv::Error cannot parse payload
+         */
+        template<typename T>
+        static std::vector<T>
+        parseDatasetVector(ConstBufferPtr payload) {
+            BOOST_CONCEPT_ASSERT((WireDecodable<T>));
 
-  std::vector<T> result;
+            std::vector<T> result;
 
-  size_t offset = 0;
-  while (offset < payload->size()) {
-    bool isOk = false;
-    Block block;
-    std::tie(isOk, block) = Block::fromBuffer(payload, offset);
-    if (!isOk) {
-      BOOST_THROW_EXCEPTION(StatusDataset::ParseResultError("cannot decode Block"));
-    }
+            size_t offset = 0;
+            while (offset < payload->size()) {
+                bool isOk = false;
+                Block block;
+                std::tie(isOk, block) = Block::fromBuffer(payload, offset);
+                if (!isOk) {
+                    BOOST_THROW_EXCEPTION(StatusDataset::ParseResultError("cannot decode Block"));
+                }
 
-    offset += block.size();
-    result.emplace_back(block);
-  }
+                offset += block.size();
+                result.emplace_back(block);
+            }
 
-  return result;
-}
+            return result;
+        }
 
-ForwarderGeneralStatusDataset::ForwarderGeneralStatusDataset()
-  : StatusDataset("status/general")
-{
-}
+        ForwarderGeneralStatusDataset::ForwarderGeneralStatusDataset()
+        : StatusDataset("status/general") {
+        }
 
-ForwarderGeneralStatusDataset::ResultType
-ForwarderGeneralStatusDataset::parseResult(ConstBufferPtr payload) const
-{
-  return ForwarderStatus(Block(tlv::Content, payload));
-}
+        ForwarderGeneralStatusDataset::ResultType
+        ForwarderGeneralStatusDataset::parseResult(ConstBufferPtr payload) const {
+            return ForwarderStatus(Block(tlv::Content, payload));
+        }
 
-FaceDatasetBase::FaceDatasetBase(const PartialName& datasetName)
-  : StatusDataset(datasetName)
-{
-}
+        FaceDatasetBase::FaceDatasetBase(const PartialName& datasetName)
+        : StatusDataset(datasetName) {
+        }
 
-FaceDatasetBase::ResultType
-FaceDatasetBase::parseResult(ConstBufferPtr payload) const
-{
-  return parseDatasetVector<FaceStatus>(payload);
-}
+        FaceDatasetBase::ResultType
+        FaceDatasetBase::parseResult(ConstBufferPtr payload) const {
+            return parseDatasetVector<FaceStatus>(payload);
+        }
 
-FaceDataset::FaceDataset()
-  : FaceDatasetBase("faces/list")
-{
-}
+        FaceDataset::FaceDataset()
+        : FaceDatasetBase("faces/list") {
+        }
 
-FaceQueryDataset::FaceQueryDataset(const FaceQueryFilter& filter)
-  : FaceDatasetBase("faces/query")
-  , m_filter(filter)
-{
-}
+        FaceQueryDataset::FaceQueryDataset(const FaceQueryFilter& filter)
+        : FaceDatasetBase("faces/query")
+        , m_filter(filter) {
+        }
 
-void
-FaceQueryDataset::addParameters(Name& name) const
-{
-  name.append(m_filter.wireEncode());
-}
+        void
+        FaceQueryDataset::addParameters(Name& name) const {
+            name.append(m_filter.wireEncode());
+        }
 
-ChannelDataset::ChannelDataset()
-  : StatusDataset("faces/channels")
-{
-}
+        ChannelDataset::ChannelDataset()
+        : StatusDataset("faces/channels") {
+        }
 
-ChannelDataset::ResultType
-ChannelDataset::parseResult(ConstBufferPtr payload) const
-{
-  return parseDatasetVector<ChannelStatus>(payload);
-}
+        ChannelDataset::ResultType
+        ChannelDataset::parseResult(ConstBufferPtr payload) const {
+            return parseDatasetVector<ChannelStatus>(payload);
+        }
 
-FibDataset::FibDataset()
-  : StatusDataset("fib/list")
-{
-}
+        FibDataset::FibDataset()
+        : StatusDataset("fib/list") {
+        }
 
-FibDataset::ResultType
-FibDataset::parseResult(ConstBufferPtr payload) const
-{
-  return parseDatasetVector<FibEntry>(payload);
-}
+        FibDataset::ResultType
+        FibDataset::parseResult(ConstBufferPtr payload) const {
+            return parseDatasetVector<FibEntry>(payload);
+        }
 
-StrategyChoiceDataset::StrategyChoiceDataset()
-  : StatusDataset("strategy-choice/list")
-{
-}
+        StrategyChoiceDataset::StrategyChoiceDataset()
+        : StatusDataset("strategy-choice/list") {
+        }
 
-StrategyChoiceDataset::ResultType
-StrategyChoiceDataset::parseResult(ConstBufferPtr payload) const
-{
-  return parseDatasetVector<StrategyChoice>(payload);
-}
+        StrategyChoiceDataset::ResultType
+        StrategyChoiceDataset::parseResult(ConstBufferPtr payload) const {
+            return parseDatasetVector<StrategyChoice>(payload);
+        }
 
-RibDataset::RibDataset()
-  : StatusDataset("rib/list")
-{
-}
+        RibDataset::RibDataset()
+        : StatusDataset("rib/list") {
+        }
 
-RibDataset::ResultType
-RibDataset::parseResult(ConstBufferPtr payload) const
-{
-  return parseDatasetVector<RibEntry>(payload);
-}
+        RibDataset::ResultType
+        RibDataset::parseResult(ConstBufferPtr payload) const {
+            return parseDatasetVector<RibEntry>(payload);
+        }
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace ndn

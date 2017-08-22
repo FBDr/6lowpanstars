@@ -34,69 +34,75 @@
 #include <string>
 
 namespace websocketpp {
-namespace transport {
-/// Debug transport policy that is used for various mocking and stubbing duties
-/// in unit tests.
-namespace debug {
+    namespace transport {
+        /// Debug transport policy that is used for various mocking and stubbing duties
+        /// in unit tests.
+        namespace debug {
 
-/// debug transport errors
-namespace error {
-enum value {
-    /// Catch-all error for transport policy errors that don't fit in other
-    /// categories
-    general = 1,
+            /// debug transport errors
+            namespace error {
 
-    /// not implemented
-    not_implemented,
-    
-    invalid_num_bytes,
-    
-    double_read
-};
+                enum value {
+                    /// Catch-all error for transport policy errors that don't fit in other
+                    /// categories
+                    general = 1,
 
-/// debug transport error category
-class category : public lib::error_category {
-    public:
-    category() {}
+                    /// not implemented
+                    not_implemented,
 
-    char const * name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
-        return "websocketpp.transport.debug";
-    }
+                    invalid_num_bytes,
 
-    std::string message(int value) const {
-        switch(value) {
-            case general:
-                return "Generic stub transport policy error";
-            case not_implemented:
-                return "feature not implemented";
-            case invalid_num_bytes:
-                return "Invalid number of bytes";
-            case double_read:
-                return "Read while another read was outstanding";
-            default:
-                return "Unknown";
-        }
-    }
-};
+                    double_read
+                };
 
-/// Get a reference to a static copy of the debug transport error category
-inline lib::error_category const & get_category() {
-    static category instance;
-    return instance;
-}
+                /// debug transport error category
 
-/// Get an error code with the given value and the debug transport category
-inline lib::error_code make_error_code(error::value e) {
-    return lib::error_code(static_cast<int>(e), get_category());
-}
+                class category : public lib::error_category {
+                public:
 
-} // namespace error
-} // namespace debug
-} // namespace transport
+                    category() {
+                    }
+
+                    char const * name() const _WEBSOCKETPP_NOEXCEPT_TOKEN_ {
+                        return "websocketpp.transport.debug";
+                    }
+
+                    std::string message(int value) const {
+                        switch (value) {
+                            case general:
+                                return "Generic stub transport policy error";
+                            case not_implemented:
+                                return "feature not implemented";
+                            case invalid_num_bytes:
+                                return "Invalid number of bytes";
+                            case double_read:
+                                return "Read while another read was outstanding";
+                            default:
+                                return "Unknown";
+                        }
+                    }
+                };
+
+                /// Get a reference to a static copy of the debug transport error category
+
+                inline lib::error_category const & get_category() {
+                    static category instance;
+                    return instance;
+                }
+
+                /// Get an error code with the given value and the debug transport category
+
+                inline lib::error_code make_error_code(error::value e) {
+                    return lib::error_code(static_cast<int> (e), get_category());
+                }
+
+            } // namespace error
+        } // namespace debug
+    } // namespace transport
 } // namespace websocketpp
+
 _WEBSOCKETPP_ERROR_CODE_ENUM_NS_START_
-template<> struct is_error_code_enum<websocketpp::transport::debug::error::value>
-{
+template<> struct is_error_code_enum<websocketpp::transport::debug::error::value> {
     static bool const value = true;
 };
 _WEBSOCKETPP_ERROR_CODE_ENUM_NS_END_

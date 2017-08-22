@@ -29,117 +29,111 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace cs {
+    namespace cs {
 
-/** \brief represents a base class for CS entry
- */
-class Entry
-{
-public: // exposed through ContentStore enumeration
-  /** \return the stored Data
-   *  \pre hasData()
-   */
-  const Data&
-  getData() const
-  {
-    BOOST_ASSERT(this->hasData());
-    return *m_data;
-  }
+        /** \brief represents a base class for CS entry
+         */
+        class Entry {
+        public: // exposed through ContentStore enumeration
 
-  /** \return Name of the stored Data
-   *  \pre hasData()
-   */
-  const Name&
-  getName() const
-  {
-    BOOST_ASSERT(this->hasData());
-    return m_data->getName();
-  }
+            /** \return the stored Data
+             *  \pre hasData()
+             */
+            const Data&
+            getData() const {
+                BOOST_ASSERT(this->hasData());
+                return *m_data;
+            }
 
-  /** \return full name (including implicit digest) of the stored Data
-   *  \pre hasData()
-   */
-  const Name&
-  getFullName() const
-  {
-    BOOST_ASSERT(this->hasData());
-    return m_data->getFullName();
-  }
+            /** \return Name of the stored Data
+             *  \pre hasData()
+             */
+            const Name&
+            getName() const {
+                BOOST_ASSERT(this->hasData());
+                return m_data->getName();
+            }
 
-  /** \return whether the stored Data is unsolicited
-   *  \pre hasData()
-   */
-  bool
-  isUnsolicited() const
-  {
-    BOOST_ASSERT(this->hasData());
-    return m_isUnsolicited;
-  }
+            /** \return full name (including implicit digest) of the stored Data
+             *  \pre hasData()
+             */
+            const Name&
+            getFullName() const {
+                BOOST_ASSERT(this->hasData());
+                return m_data->getFullName();
+            }
 
-  /** \return the absolute time when the stored Data becomes expired
-   *  \retval time::steady_clock::TimePoint::max() if the stored Data never expires
-   *  \pre hasData()
-   */
-  const time::steady_clock::TimePoint&
-  getStaleTime() const
-  {
-    BOOST_ASSERT(this->hasData());
-    return m_staleTime;
-  }
+            /** \return whether the stored Data is unsolicited
+             *  \pre hasData()
+             */
+            bool
+            isUnsolicited() const {
+                BOOST_ASSERT(this->hasData());
+                return m_isUnsolicited;
+            }
 
-  /** \brief checks if the stored Data is stale now
-   *  \pre hasData()
-   */
-  bool
-  isStale() const;
+            /** \return the absolute time when the stored Data becomes expired
+             *  \retval time::steady_clock::TimePoint::max() if the stored Data never expires
+             *  \pre hasData()
+             */
+            const time::steady_clock::TimePoint&
+            getStaleTime() const {
+                BOOST_ASSERT(this->hasData());
+                return m_staleTime;
+            }
 
-  /** \brief determines whether Interest can be satisified by the stored Data
-   *  \note ChildSelector is not considered
-   *  \pre hasData()
-   */
-  bool
-  canSatisfy(const Interest& interest) const;
+            /** \brief checks if the stored Data is stale now
+             *  \pre hasData()
+             */
+            bool
+            isStale() const;
 
-public: // used by generic ContentStore implementation
-  /** \return true if a Data packet is stored
-   */
-  bool
-  hasData() const
-  {
-    return m_data != nullptr;
-  }
+            /** \brief determines whether Interest can be satisified by the stored Data
+             *  \note ChildSelector is not considered
+             *  \pre hasData()
+             */
+            bool
+            canSatisfy(const Interest& interest) const;
 
-  /** \brief replaces the stored Data
-   */
-  void
-  setData(shared_ptr<const Data> data, bool isUnsolicited);
+        public: // used by generic ContentStore implementation
 
-  /** \brief replaces the stored Data
-   */
-  void
-  setData(const Data& data, bool isUnsolicited)
-  {
-    this->setData(data.shared_from_this(), isUnsolicited);
-  }
+            /** \return true if a Data packet is stored
+             */
+            bool
+            hasData() const {
+                return m_data != nullptr;
+            }
 
-  /** \brief refreshes stale time relative to current time
-   */
-  void
-  updateStaleTime();
+            /** \brief replaces the stored Data
+             */
+            void
+            setData(shared_ptr<const Data> data, bool isUnsolicited);
 
-  /** \brief clears the entry
-   *  \post !hasData()
-   */
-  void
-  reset();
+            /** \brief replaces the stored Data
+             */
+            void
+            setData(const Data& data, bool isUnsolicited) {
+                this->setData(data.shared_from_this(), isUnsolicited);
+            }
 
-private:
-  shared_ptr<const Data> m_data;
-  bool m_isUnsolicited;
-  time::steady_clock::TimePoint m_staleTime;
-};
+            /** \brief refreshes stale time relative to current time
+             */
+            void
+            updateStaleTime();
 
-} // namespace cs
+            /** \brief clears the entry
+             *  \post !hasData()
+             */
+            void
+            reset();
+
+        private:
+            shared_ptr<const Data> m_data;
+            bool m_isUnsolicited;
+            time::steady_clock::TimePoint m_staleTime;
+        };
+
+    } // namespace cs
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_CS_ENTRY_HPP

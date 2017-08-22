@@ -28,17 +28,16 @@
 
 namespace nfd {
 
-bool
-NetworkRegionTable::isInProducerRegion(const Link& link) const
-{
-  for (const Name& regionName : *this) {
-    for (const Name& delegationName : boost::adaptors::values(link.getDelegations())) {
-      if (delegationName.isPrefixOf(regionName)) {
-        return true;
-      }
+    bool
+    NetworkRegionTable::isInProducerRegion(const Link& link) const {
+        for (const Name& regionName : * this) {
+            for (const Name& delegationName : boost::adaptors::values(link.getDelegations())) {
+                if (delegationName.isPrefixOf(regionName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-  }
-  return false;
-}
 
 } // namespace nfd

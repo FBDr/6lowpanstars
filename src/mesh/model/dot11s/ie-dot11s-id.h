@@ -26,40 +26,40 @@
 #include "ns3/mesh-information-element-vector.h"
 
 namespace ns3 {
-namespace dot11s {
-/**
- * \brief a IEEE 802.11s Mesh ID 7.3.287 of 802.11s draft 3.0
- * \see attribute_IeMeshId
- */
-class IeMeshId : public WifiInformationElement
-{
-public:
-  // broadcast meshId
-  IeMeshId ();
-  IeMeshId (std::string s);
+    namespace dot11s {
 
-  bool IsEqual (IeMeshId const &o) const;
-  bool IsBroadcast (void) const;
-  //uint32_t GetLength (void) const;
-  char *PeekString (void) const;
+        /**
+         * \brief a IEEE 802.11s Mesh ID 7.3.287 of 802.11s draft 3.0
+         * \see attribute_IeMeshId
+         */
+        class IeMeshId : public WifiInformationElement {
+        public:
+            // broadcast meshId
+            IeMeshId();
+            IeMeshId(std::string s);
 
-  // Inherited from WifiInformationElement
-  virtual WifiInformationElementId ElementId () const;
-  virtual void SerializeInformationField (Buffer::Iterator i) const;
-  virtual uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
-  virtual void Print (std::ostream& os) const;
-  virtual uint8_t GetInformationFieldSize () const;
+            bool IsEqual(IeMeshId const &o) const;
+            bool IsBroadcast(void) const;
+            //uint32_t GetLength (void) const;
+            char *PeekString(void) const;
 
-private:
-  uint8_t m_meshId[33];
-  friend bool operator== (const IeMeshId & a, const IeMeshId & b);
+            // Inherited from WifiInformationElement
+            virtual WifiInformationElementId ElementId() const;
+            virtual void SerializeInformationField(Buffer::Iterator i) const;
+            virtual uint8_t DeserializeInformationField(Buffer::Iterator start, uint8_t length);
+            virtual void Print(std::ostream& os) const;
+            virtual uint8_t GetInformationFieldSize() const;
 
-};
+        private:
+            uint8_t m_meshId[33];
+            friend bool operator==(const IeMeshId & a, const IeMeshId & b);
 
-std::ostream &operator << (std::ostream &os, const IeMeshId &meshId);
+        };
 
-ATTRIBUTE_HELPER_HEADER (IeMeshId);
-  
-} // namespace dot11s
+        std::ostream &operator<<(std::ostream &os, const IeMeshId &meshId);
+
+        ATTRIBUTE_HELPER_HEADER(IeMeshId);
+
+    } // namespace dot11s
 } // namespace ns3
 #endif /* MESH_ID_H */

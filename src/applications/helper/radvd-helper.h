@@ -34,81 +34,80 @@
 
 namespace ns3 {
 
-/**
- * \ingroup radvd
- * \class RadvdHelper
- * \brief Radvd application helper.
- */
-class RadvdHelper
-{
-public:
-  /**
-   * \brief Constructor.
-   */
-  RadvdHelper ();
+    /**
+     * \ingroup radvd
+     * \class RadvdHelper
+     * \brief Radvd application helper.
+     */
+    class RadvdHelper {
+    public:
+        /**
+         * \brief Constructor.
+         */
+        RadvdHelper();
 
-  /**
-   * \brief Add a new prefix to be announced through an interface.
-   * \param interface outgoing interface
-   * \param prefix announced IPv6 prefix
-   * \param prefixLength announced IPv6 prefix length
-   */
-  void AddAnnouncedPrefix (uint32_t interface, Ipv6Address prefix, uint32_t prefixLength);
+        /**
+         * \brief Add a new prefix to be announced through an interface.
+         * \param interface outgoing interface
+         * \param prefix announced IPv6 prefix
+         * \param prefixLength announced IPv6 prefix length
+         */
+        void AddAnnouncedPrefix(uint32_t interface, Ipv6Address prefix, uint32_t prefixLength);
 
-  /**
-   * \brief Enable the router as default router for the interface.
-   * The effect is to set the Router Lifetime to the default value (30 minutes)
-   * \param interface outgoing interface
-   */
-  void EnableDefaultRouterForInterface (uint32_t interface);
+        /**
+         * \brief Enable the router as default router for the interface.
+         * The effect is to set the Router Lifetime to the default value (30 minutes)
+         * \param interface outgoing interface
+         */
+        void EnableDefaultRouterForInterface(uint32_t interface);
 
-  /**
-   * \brief Disable the router as default router for the interface.
-   * The effect is to set the Router Lifetime to zero
-   * \param interface outgoing interface
-   */
-  void DisableDefaultRouterForInterface (uint32_t interface);
+        /**
+         * \brief Disable the router as default router for the interface.
+         * The effect is to set the Router Lifetime to zero
+         * \param interface outgoing interface
+         */
+        void DisableDefaultRouterForInterface(uint32_t interface);
 
-  /**
-   * \brief Get the low-level RadvdInterface specification for an interface.
-   * This method is provided to enable fine-grain parameter setup.
-   * \param interface outgoing interface
-   * \returns the RadvdInterface
-   */
-  Ptr<RadvdInterface> GetRadvdInterface (uint32_t interface);
+        /**
+         * \brief Get the low-level RadvdInterface specification for an interface.
+         * This method is provided to enable fine-grain parameter setup.
+         * \param interface outgoing interface
+         * \returns the RadvdInterface
+         */
+        Ptr<RadvdInterface> GetRadvdInterface(uint32_t interface);
 
-  /**
-   * \brief Clear the stored Prefixes
-   */
-  void ClearPrefixes ();
+        /**
+         * \brief Clear the stored Prefixes
+         */
+        void ClearPrefixes();
 
-  /**
-   * \brief Set some attributes.
-   * \param name attribute name
-   * \param value attribute value
-   */
-  void SetAttribute (std::string name, const AttributeValue& value);
+        /**
+         * \brief Set some attributes.
+         * \param name attribute name
+         * \param value attribute value
+         */
+        void SetAttribute(std::string name, const AttributeValue& value);
 
-  /**
-   * \brief Install the application in a Node.
-   * \param node the Node
-   * \return application container
-   */
-  ApplicationContainer Install (Ptr<Node> node);
+        /**
+         * \brief Install the application in a Node.
+         * \param node the Node
+         * \return application container
+         */
+        ApplicationContainer Install(Ptr<Node> node);
 
-private:
-  /**
-   * \brief An object factory.
-   */
-  ObjectFactory m_factory;
+    private:
+        /**
+         * \brief An object factory.
+         */
+        ObjectFactory m_factory;
 
-  /// Container: interface index, RadvdInterface
-  typedef std::map<uint32_t, Ptr<RadvdInterface> > RadvdInterfaceMap;
-  /// Container Iterator: interface index, RadvdInterface
-  typedef std::map<uint32_t, Ptr<RadvdInterface> >::iterator RadvdInterfaceMapI;
+        /// Container: interface index, RadvdInterface
+        typedef std::map<uint32_t, Ptr<RadvdInterface> > RadvdInterfaceMap;
+        /// Container Iterator: interface index, RadvdInterface
+        typedef std::map<uint32_t, Ptr<RadvdInterface> >::iterator RadvdInterfaceMapI;
 
-  RadvdInterfaceMap m_radvdInterfaces; //!< RadvdInterface(s)
-};
+        RadvdInterfaceMap m_radvdInterfaces; //!< RadvdInterface(s)
+    };
 
 } /* namespace ns3 */
 

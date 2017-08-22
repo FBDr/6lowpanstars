@@ -34,38 +34,32 @@ using namespace ns3;
  */
 class LrWpanSpectrumValueHelperTestCase : public TestCase
 {
-public:
-  LrWpanSpectrumValueHelperTestCase ();
-  virtual ~LrWpanSpectrumValueHelperTestCase ();
+    public :
+    LrWpanSpectrumValueHelperTestCase();
+    virtual ~LrWpanSpectrumValueHelperTestCase();
 
 private:
-  virtual void DoRun (void);
-};
+    virtual void DoRun(void);};
 
-LrWpanSpectrumValueHelperTestCase::LrWpanSpectrumValueHelperTestCase ()
-  : TestCase ("Test the 802.15.4 SpectrumValue helper class")
-{
+LrWpanSpectrumValueHelperTestCase::LrWpanSpectrumValueHelperTestCase()
+: TestCase("Test the 802.15.4 SpectrumValue helper class") {
 }
 
-LrWpanSpectrumValueHelperTestCase::~LrWpanSpectrumValueHelperTestCase ()
-{
+LrWpanSpectrumValueHelperTestCase::~LrWpanSpectrumValueHelperTestCase() {
 }
 
 void
-LrWpanSpectrumValueHelperTestCase::DoRun (void)
-{
-  LrWpanSpectrumValueHelper helper;
-  Ptr<SpectrumValue> value;
-  double pwrWatts;
-  for (uint32_t chan = 11; chan <= 26; chan++)
-    {
-      // 50dBm = 100 W, -50dBm = 0.01 mW
-      for (double pwrdBm = -50; pwrdBm < 50; pwrdBm += 10)
-        {
-          value = helper.CreateTxPowerSpectralDensity (pwrdBm, chan);
-          pwrWatts = pow (10.0, pwrdBm / 10.0) / 1000;
-          // Test that average power calculation is within +/- 25% of expected
-          NS_TEST_ASSERT_MSG_EQ_TOL (helper.TotalAvgPower (value, chan), pwrWatts, pwrWatts / 4.0, "Not equal for channel " << chan << " pwrdBm " << pwrdBm);
+LrWpanSpectrumValueHelperTestCase::DoRun(void) {
+    LrWpanSpectrumValueHelper helper;
+    Ptr<SpectrumValue> value;
+    double pwrWatts;
+    for (uint32_t chan = 11; chan <= 26; chan++) {
+        // 50dBm = 100 W, -50dBm = 0.01 mW
+        for (double pwrdBm = -50; pwrdBm < 50; pwrdBm += 10) {
+            value = helper.CreateTxPowerSpectralDensity(pwrdBm, chan);
+            pwrWatts = pow(10.0, pwrdBm / 10.0) / 1000;
+            // Test that average power calculation is within +/- 25% of expected
+            NS_TEST_ASSERT_MSG_EQ_TOL(helper.TotalAvgPower(value, chan), pwrWatts, pwrWatts / 4.0, "Not equal for channel " << chan << " pwrdBm " << pwrdBm);
         }
     }
 }
@@ -78,14 +72,12 @@ LrWpanSpectrumValueHelperTestCase::DoRun (void)
  */
 class LrWpanSpectrumValueHelperTestSuite : public TestSuite
 {
-public:
-  LrWpanSpectrumValueHelperTestSuite ();
-};
+    public :
+    LrWpanSpectrumValueHelperTestSuite();};
 
-LrWpanSpectrumValueHelperTestSuite::LrWpanSpectrumValueHelperTestSuite ()
-  : TestSuite ("lr-wpan-spectrum-value-helper", UNIT)
-{
-  AddTestCase (new LrWpanSpectrumValueHelperTestCase, TestCase::QUICK);
+LrWpanSpectrumValueHelperTestSuite::LrWpanSpectrumValueHelperTestSuite()
+: TestSuite("lr-wpan-spectrum-value-helper", UNIT) {
+    AddTestCase(new LrWpanSpectrumValueHelperTestCase, TestCase::QUICK);
 }
 
 static LrWpanSpectrumValueHelperTestSuite g_lrWpanSpectrumValueHelperTestSuite; //!< Static variable for test initialization

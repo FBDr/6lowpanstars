@@ -29,78 +29,76 @@
 
 namespace ns3 {
 
-class SimpleNetDevice;
-class Packet;
+    class SimpleNetDevice;
+    class Packet;
 
-/**
- * \ingroup channel
- * \brief A Error channel, introducing deterministic delays on even/odd packets. Used for testing
- */
-class ErrorChannelSixlow : public SimpleChannel
-{
-public:
-  static TypeId GetTypeId (void);
-  ErrorChannelSixlow ();
+    /**
+     * \ingroup channel
+     * \brief A Error channel, introducing deterministic delays on even/odd packets. Used for testing
+     */
+    class ErrorChannelSixlow : public SimpleChannel {
+    public:
+        static TypeId GetTypeId(void);
+        ErrorChannelSixlow();
 
-  virtual void Send (Ptr<Packet> p, uint16_t protocol, Mac48Address to, Mac48Address from,
-                     Ptr<SimpleNetDevice> sender);
+        virtual void Send(Ptr<Packet> p, uint16_t protocol, Mac48Address to, Mac48Address from,
+                Ptr<SimpleNetDevice> sender);
 
-  virtual void Add (Ptr<SimpleNetDevice> device);
+        virtual void Add(Ptr<SimpleNetDevice> device);
 
-  // inherited from ns3::Channel
-  virtual uint32_t GetNDevices (void) const;
-  virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
+        // inherited from ns3::Channel
+        virtual uint32_t GetNDevices(void) const;
+        virtual Ptr<NetDevice> GetDevice(uint32_t i) const;
 
-  /**
-   * \brief Set the delay for the odd packets (even ones are not delayed)
-   * \param delay Delay for the odd packets.
-   */
-  void SetJumpingTime (Time delay);
+        /**
+         * \brief Set the delay for the odd packets (even ones are not delayed)
+         * \param delay Delay for the odd packets.
+         */
+        void SetJumpingTime(Time delay);
 
-  /**
-   * \brief Set if the odd packets are delayed (even ones are not delayed ever)
-   * \param mode true if the odd packets should be delayed.
-   */
-  void SetJumpingMode (bool mode);
+        /**
+         * \brief Set if the odd packets are delayed (even ones are not delayed ever)
+         * \param mode true if the odd packets should be delayed.
+         */
+        void SetJumpingMode(bool mode);
 
-  /**
-   * \brief Set the delay for the odd duplicate packets (even ones are not duplicated)
-   * \param delay Delay for the odd packets.
-   */
-  void SetDuplicateTime (Time delay);
+        /**
+         * \brief Set the delay for the odd duplicate packets (even ones are not duplicated)
+         * \param delay Delay for the odd packets.
+         */
+        void SetDuplicateTime(Time delay);
 
-  /**
-   * \brief Set if the odd packets are duplicated (even ones are not duplicated ever)
-   * \param mode true if the odd packets should be duplicated.
-   */
-  void SetDuplicateMode (bool mode);
+        /**
+         * \brief Set if the odd packets are duplicated (even ones are not duplicated ever)
+         * \param mode true if the odd packets should be duplicated.
+         */
+        void SetDuplicateMode(bool mode);
 
-private:
-  std::vector<Ptr<SimpleNetDevice> > m_devices;
-  Time m_jumpingTime;
-  uint8_t m_jumpingState;
-  bool m_jumping;
-  Time m_duplicateTime;
-  bool m_duplicate;
-  uint8_t m_duplicateState;
-};
+    private:
+        std::vector<Ptr<SimpleNetDevice> > m_devices;
+        Time m_jumpingTime;
+        uint8_t m_jumpingState;
+        bool m_jumping;
+        Time m_duplicateTime;
+        bool m_duplicate;
+        uint8_t m_duplicateState;
+    };
 
-class BinaryErrorSixlowModel : public ErrorModel
-{
-public:
-  static TypeId GetTypeId (void);
+    class BinaryErrorSixlowModel : public ErrorModel {
+    public:
+        static TypeId GetTypeId(void);
 
-  BinaryErrorSixlowModel ();
-  virtual ~BinaryErrorSixlowModel ();
-  void Reset (void);
+        BinaryErrorSixlowModel();
+        virtual ~BinaryErrorSixlowModel();
+        void Reset(void);
 
-private:
-  virtual bool DoCorrupt (Ptr<Packet> p);
-  virtual void DoReset (void);
+    private:
+        virtual bool DoCorrupt(Ptr<Packet> p);
+        virtual void DoReset(void);
 
-  uint8_t m_counter;
+        uint8_t m_counter;
 
-};
+    };
 
 } // namespace ns3
 

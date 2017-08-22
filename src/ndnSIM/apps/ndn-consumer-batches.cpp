@@ -32,68 +32,63 @@
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerBatches");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED(ConsumerBatches);
+        NS_OBJECT_ENSURE_REGISTERED(ConsumerBatches);
 
-TypeId
-ConsumerBatches::GetTypeId(void)
-{
-  static TypeId tid =
-    TypeId("ns3::ndn::ConsumerBatches")
-      .SetGroupName("Ndn")
-      .SetParent<Consumer>()
-      .AddConstructor<ConsumerBatches>()
+        TypeId
+        ConsumerBatches::GetTypeId(void) {
+            static TypeId tid =
+                    TypeId("ns3::ndn::ConsumerBatches")
+                    .SetGroupName("Ndn")
+                    .SetParent<Consumer>()
+                    .AddConstructor<ConsumerBatches>()
 
-      .AddAttribute("Batches",
+                    .AddAttribute("Batches",
                     "Batches to schedule. Should be vector, containing pairs of time and amount",
                     // TypeId::ATTR_SET,
                     StringValue(""), MakeBatchesAccessor(&ConsumerBatches::m_batches),
                     MakeBatchesChecker());
 
-  return tid;
-}
+            return tid;
+        }
 
-ConsumerBatches::ConsumerBatches()
-  : m_initial(true)
-{
-}
+        ConsumerBatches::ConsumerBatches()
+        : m_initial(true) {
+        }
 
-void
-ConsumerBatches::StartApplication()
-{
-  Consumer::StartApplication();
+        void
+        ConsumerBatches::StartApplication() {
+            Consumer::StartApplication();
 
-  // std::cout << "Batches: " << batches << "\n";
-  for (Batches::const_iterator i = m_batches.begin(); i != m_batches.end(); i++) {
-    Simulator::ScheduleWithContext(GetNode()->GetId(), std::get<0>(*i), &ConsumerBatches::AddBatch,
-                                   this, std::get<1>(*i));
-  }
-}
+            // std::cout << "Batches: " << batches << "\n";
+            for (Batches::const_iterator i = m_batches.begin(); i != m_batches.end(); i++) {
+                Simulator::ScheduleWithContext(GetNode()->GetId(), std::get<0>(*i), &ConsumerBatches::AddBatch,
+                        this, std::get<1>(*i));
+            }
+        }
 
-void
-ConsumerBatches::AddBatch(uint32_t amount)
-{
-  // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
-  m_seqMax += amount;
-  m_rtt->ClearSent(); // this is important, otherwise RTT estimation for the new batch will be
-                      // affected by previous batch history
-  m_initial = true;
-  ScheduleNextPacket();
-}
+        void
+        ConsumerBatches::AddBatch(uint32_t amount) {
+            // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
+            m_seqMax += amount;
+            m_rtt->ClearSent(); // this is important, otherwise RTT estimation for the new batch will be
+            // affected by previous batch history
+            m_initial = true;
+            ScheduleNextPacket();
+        }
 
-void
-ConsumerBatches::ScheduleNextPacket()
-{
-  if (!m_sendEvent.IsRunning()) {
-    Time delay = Seconds(0);
-    if (!m_initial)
-      delay = m_rtt->RetransmitTimeout();
+        void
+        ConsumerBatches::ScheduleNextPacket() {
+            if (!m_sendEvent.IsRunning()) {
+                Time delay = Seconds(0);
+                if (!m_initial)
+                    delay = m_rtt->RetransmitTimeout();
 
-    m_initial = false;
-    m_sendEvent = Simulator::Schedule(delay, &Consumer::SendPacket, this);
-  }
-}
+                m_initial = false;
+                m_sendEvent = Simulator::Schedule(delay, &Consumer::SendPacket, this);
+            }
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

@@ -29,14 +29,14 @@
 #include "core/common.hpp"
 
 namespace nfd {
-namespace udp {
+    namespace udp {
 
-/** \brief computes maximum payload size in a UDP packet
- */
-ssize_t
-computeMtu(const boost::asio::ip::udp::endpoint& localEndpoint);
+        /** \brief computes maximum payload size in a UDP packet
+         */
+        ssize_t
+        computeMtu(const boost::asio::ip::udp::endpoint& localEndpoint);
 
-} // namespace udp
+    } // namespace udp
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_UDP_PROTOCOL_HPP

@@ -31,72 +31,67 @@ using namespace ns3;
 /**
  * Test 1.1 Uplink Power Control
  */
-class LteUplinkPowerControlTestSuite : public TestSuite
-{
+class LteUplinkPowerControlTestSuite : public TestSuite {
 public:
-  LteUplinkPowerControlTestSuite ();
+    LteUplinkPowerControlTestSuite();
 };
 
-class LteUplinkPowerControlTestCase : public TestCase
-{
+class LteUplinkPowerControlTestCase : public TestCase {
 public:
-  LteUplinkPowerControlTestCase (std::string name);
-  virtual ~LteUplinkPowerControlTestCase ();
+    LteUplinkPowerControlTestCase(std::string name);
+    virtual ~LteUplinkPowerControlTestCase();
 
-  void TeleportUe (uint32_t x, uint32_t y,
-                   double expectedPuschTxPower, double expectedPucchTxPower, double expectedSrsTxPower);
+    void TeleportUe(uint32_t x, uint32_t y,
+            double expectedPuschTxPower, double expectedPucchTxPower, double expectedSrsTxPower);
 
-  void SetTpcConfiguration (uint32_t tpc, uint32_t tpcNum,
-                            double expectedPuschTxPower, double expectedPucchTxPower, double expectedSrsTxPower);
+    void SetTpcConfiguration(uint32_t tpc, uint32_t tpcNum,
+            double expectedPuschTxPower, double expectedPucchTxPower, double expectedSrsTxPower);
 
-  void PuschTxPowerTrace (uint16_t cellId, uint16_t rnti, double txPower);
-  void PucchTxPowerTrace (uint16_t cellId, uint16_t rnti, double txPower);
-  void SrsTxPowerTrace (uint16_t cellId, uint16_t rnti, double txPower);
+    void PuschTxPowerTrace(uint16_t cellId, uint16_t rnti, double txPower);
+    void PucchTxPowerTrace(uint16_t cellId, uint16_t rnti, double txPower);
+    void SrsTxPowerTrace(uint16_t cellId, uint16_t rnti, double txPower);
 
 protected:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 
-  Ptr<MobilityModel> m_ueMobility;
-  Time m_teleportTime;
+    Ptr<MobilityModel> m_ueMobility;
+    Time m_teleportTime;
 
-  double m_expectedPuschTxPower;
-  double m_expectedPucchTxPower;
-  double m_expectedSrsTxPower;
+    double m_expectedPuschTxPower;
+    double m_expectedPucchTxPower;
+    double m_expectedSrsTxPower;
 
-  Ptr<LteUePowerControl> m_ueUpc;
-  bool m_accumulatedMode;
+    Ptr<LteUePowerControl> m_ueUpc;
+    bool m_accumulatedMode;
 
-  Ptr<LteFfrSimple> m_ffrSimple;
+    Ptr<LteFfrSimple> m_ffrSimple;
 };
 
-class LteUplinkOpenLoopPowerControlTestCase : public LteUplinkPowerControlTestCase
-{
+class LteUplinkOpenLoopPowerControlTestCase : public LteUplinkPowerControlTestCase {
 public:
-  LteUplinkOpenLoopPowerControlTestCase (std::string name);
-  virtual ~LteUplinkOpenLoopPowerControlTestCase ();
+    LteUplinkOpenLoopPowerControlTestCase(std::string name);
+    virtual ~LteUplinkOpenLoopPowerControlTestCase();
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 };
 
-class LteUplinkClosedLoopPowerControlAbsoluteModeTestCase : public LteUplinkPowerControlTestCase
-{
+class LteUplinkClosedLoopPowerControlAbsoluteModeTestCase : public LteUplinkPowerControlTestCase {
 public:
-  LteUplinkClosedLoopPowerControlAbsoluteModeTestCase (std::string name);
-  virtual ~LteUplinkClosedLoopPowerControlAbsoluteModeTestCase ();
+    LteUplinkClosedLoopPowerControlAbsoluteModeTestCase(std::string name);
+    virtual ~LteUplinkClosedLoopPowerControlAbsoluteModeTestCase();
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 };
 
-class LteUplinkClosedLoopPowerControlAccumulatedModeTestCase : public LteUplinkPowerControlTestCase
-{
+class LteUplinkClosedLoopPowerControlAccumulatedModeTestCase : public LteUplinkPowerControlTestCase {
 public:
-  LteUplinkClosedLoopPowerControlAccumulatedModeTestCase (std::string name);
-  virtual ~LteUplinkClosedLoopPowerControlAccumulatedModeTestCase ();
+    LteUplinkClosedLoopPowerControlAccumulatedModeTestCase(std::string name);
+    virtual ~LteUplinkClosedLoopPowerControlAccumulatedModeTestCase();
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 };
 
 #endif /* LTE_TEST_UPLINK_POWER_CONTROL_H */

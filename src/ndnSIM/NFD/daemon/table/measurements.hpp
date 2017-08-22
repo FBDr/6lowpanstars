@@ -31,137 +31,132 @@
 
 namespace nfd {
 
-namespace fib {
-class Entry;
-} // namespace fib
+    namespace fib {
+        class Entry;
+    } // namespace fib
 
-namespace pit {
-class Entry;
-} // namespace pit
+    namespace pit {
+        class Entry;
+    } // namespace pit
 
-namespace measurements {
+    namespace measurements {
 
-/** \brief a predicate that accepts or rejects an entry
- */
-typedef std::function<bool(const Entry&)> EntryPredicate;
+        /** \brief a predicate that accepts or rejects an entry
+         */
+        typedef std::function<bool(const Entry&) > EntryPredicate;
 
-/** \brief an \p EntryPredicate that accepts any entry
- */
-class AnyEntry
-{
-public:
-  bool
-  operator()(const Entry& entry) const
-  {
-    return true;
-  }
-};
+        /** \brief an \p EntryPredicate that accepts any entry
+         */
+        class AnyEntry {
+        public:
 
-/** \brief an \p EntryPredicate that accepts an entry if it has StrategyInfo of type T
- */
-template<typename T>
-class EntryWithStrategyInfo
-{
-public:
-  bool
-  operator()(const Entry& entry) const
-  {
-    return entry.getStrategyInfo<T>() != nullptr;
-  }
-};
+            bool
+            operator()(const Entry& entry) const {
+                return true;
+            }
+        };
 
-/** \brief represents the Measurements table
- */
-class Measurements : noncopyable
-{
-public:
-  explicit
-  Measurements(NameTree& nametree);
+        /** \brief an \p EntryPredicate that accepts an entry if it has StrategyInfo of type T
+         */
+        template<typename T>
+        class EntryWithStrategyInfo {
+        public:
 
-  /** \brief find or insert a Measurements entry for \p name
-   */
-  Entry&
-  get(const Name& name);
+            bool
+            operator()(const Entry& entry) const {
+                return entry.getStrategyInfo<T>() != nullptr;
+            }
+        };
 
-  /** \brief find or insert a Measurements entry for \p fibEntry.getPrefix()
-   */
-  Entry&
-  get(const fib::Entry& fibEntry);
+        /** \brief represents the Measurements table
+         */
+        class Measurements : noncopyable {
+        public:
+            explicit
+            Measurements(NameTree& nametree);
 
-  /** \brief find or insert a Measurements entry for \p pitEntry.getName()
-   */
-  Entry&
-  get(const pit::Entry& pitEntry);
+            /** \brief find or insert a Measurements entry for \p name
+             */
+            Entry&
+            get(const Name& name);
 
-  /** \brief find or insert a Measurements entry for child's parent
-   *  \retval nullptr if child is the root entry
-   */
-  Entry*
-  getParent(const Entry& child);
+            /** \brief find or insert a Measurements entry for \p fibEntry.getPrefix()
+             */
+            Entry&
+            get(const fib::Entry& fibEntry);
 
-  /** \brief perform a longest prefix match for \p name
-   */
-  Entry*
-  findLongestPrefixMatch(const Name& name,
-                         const EntryPredicate& pred = AnyEntry()) const;
+            /** \brief find or insert a Measurements entry for \p pitEntry.getName()
+             */
+            Entry&
+            get(const pit::Entry& pitEntry);
 
-  /** \brief perform a longest prefix match for \p pitEntry.getName()
-   */
-  Entry*
-  findLongestPrefixMatch(const pit::Entry& pitEntry,
-                         const EntryPredicate& pred = AnyEntry()) const;
+            /** \brief find or insert a Measurements entry for child's parent
+             *  \retval nullptr if child is the root entry
+             */
+            Entry*
+            getParent(const Entry& child);
 
-  /** \brief perform an exact match
-   */
-  Entry*
-  findExactMatch(const Name& name) const;
+            /** \brief perform a longest prefix match for \p name
+             */
+            Entry*
+            findLongestPrefixMatch(const Name& name,
+                    const EntryPredicate& pred = AnyEntry()) const;
 
-  static time::nanoseconds
-  getInitialLifetime();
+            /** \brief perform a longest prefix match for \p pitEntry.getName()
+             */
+            Entry*
+            findLongestPrefixMatch(const pit::Entry& pitEntry,
+                    const EntryPredicate& pred = AnyEntry()) const;
 
-  /** \brief extend lifetime of an entry
-   *
-   *  The entry will be kept until at least now()+lifetime.
-   */
-  void
-  extendLifetime(Entry& entry, const time::nanoseconds& lifetime);
+            /** \brief perform an exact match
+             */
+            Entry*
+            findExactMatch(const Name& name) const;
 
-  size_t
-  size() const;
+            static time::nanoseconds
+            getInitialLifetime();
 
-private:
-  void
-  cleanup(Entry& entry);
+            /** \brief extend lifetime of an entry
+             *
+             *  The entry will be kept until at least now()+lifetime.
+             */
+            void
+            extendLifetime(Entry& entry, const time::nanoseconds& lifetime);
 
-  Entry&
-  get(name_tree::Entry& nte);
+            size_t
+            size() const;
 
-  /** \tparam K a parameter acceptable to NameTree::findLongestPrefixMatch
-   */
-  template<typename K>
-  Entry*
-  findLongestPrefixMatchImpl(const K& key, const EntryPredicate& pred) const;
+        private:
+            void
+            cleanup(Entry& entry);
 
-private:
-  NameTree& m_nameTree;
-  size_t m_nItems;
-};
+            Entry&
+            get(name_tree::Entry& nte);
 
-inline time::nanoseconds
-Measurements::getInitialLifetime()
-{
-  return time::seconds(4);
-}
+            /** \tparam K a parameter acceptable to NameTree::findLongestPrefixMatch
+             */
+            template<typename K>
+            Entry*
+            findLongestPrefixMatchImpl(const K& key, const EntryPredicate& pred) const;
 
-inline size_t
-Measurements::size() const
-{
-  return m_nItems;
-}
+        private:
+            NameTree& m_nameTree;
+            size_t m_nItems;
+        };
 
-} // namespace measurements
+        inline time::nanoseconds
+        Measurements::getInitialLifetime() {
+            return time::seconds(4);
+        }
 
-using measurements::Measurements;
+        inline size_t
+        Measurements::size() const {
+            return m_nItems;
+        }
+
+    } // namespace measurements
+
+    using measurements::Measurements;
 
 } // namespace nfd
 

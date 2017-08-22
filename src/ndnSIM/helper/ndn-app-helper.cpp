@@ -31,101 +31,90 @@
 NS_LOG_COMPONENT_DEFINE("ndn.AppHelper");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-AppHelper::AppHelper(const std::string& app)
-{
-  m_factory.SetTypeId(app);
-}
+        AppHelper::AppHelper(const std::string& app) {
+            m_factory.SetTypeId(app);
+        }
 
-void
-AppHelper::SetPrefix(const std::string& prefix)
-{
-  m_factory.Set("Prefix", StringValue(prefix));
-}
+        void
+        AppHelper::SetPrefix(const std::string& prefix) {
+            m_factory.Set("Prefix", StringValue(prefix));
+        }
 
-void
-AppHelper::SetAttribute(std::string name, const AttributeValue& value)
-{
-  m_factory.Set(name, value);
-}
+        void
+        AppHelper::SetAttribute(std::string name, const AttributeValue& value) {
+            m_factory.Set(name, value);
+        }
 
-ApplicationContainer
-AppHelper::Install(Ptr<Node> node)
-{
-  ApplicationContainer apps;
-  Ptr<Application> app = InstallPriv(node);
-  if (app != 0)
-    apps.Add(app);
+        ApplicationContainer
+        AppHelper::Install(Ptr<Node> node) {
+            ApplicationContainer apps;
+            Ptr<Application> app = InstallPriv(node);
+            if (app != 0)
+                apps.Add(app);
 
-  return apps;
-}
+            return apps;
+        }
 
-ApplicationContainer
-AppHelper::Install(std::string nodeName)
-{
-  Ptr<Node> node = Names::Find<Node>(nodeName);
-  return Install(node);
-}
+        ApplicationContainer
+        AppHelper::Install(std::string nodeName) {
+            Ptr<Node> node = Names::Find<Node>(nodeName);
+            return Install(node);
+        }
 
-ApplicationContainer
-AppHelper::Install(NodeContainer c)
-{
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
-    Ptr<Application> app = InstallPriv(*i);
-    if (app != 0)
-      apps.Add(app);
-  }
+        ApplicationContainer
+        AppHelper::Install(NodeContainer c) {
+            ApplicationContainer apps;
+            for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+                Ptr<Application> app = InstallPriv(*i);
+                if (app != 0)
+                    apps.Add(app);
+            }
 
-  return apps;
-}
+            return apps;
+        }
 
-Ptr<Application>
-AppHelper::InstallPriv(Ptr<Node> node)
-{
+        Ptr<Application>
+        AppHelper::InstallPriv(Ptr<Node> node) {
 #ifdef NS3_MPI
-  if (MpiInterface::IsEnabled() && node->GetSystemId() != MpiInterface::GetSystemId()) {
-    // don't create an app if MPI is enabled and node is not in the correct partition
-    return 0;
-  }
+            if (MpiInterface::IsEnabled() && node->GetSystemId() != MpiInterface::GetSystemId()) {
+                // don't create an app if MPI is enabled and node is not in the correct partition
+                return 0;
+            }
 #endif
 
-  Ptr<Application> app = m_factory.Create<Application>();
-  node->AddApplication(app);
+            Ptr<Application> app = m_factory.Create<Application>();
+            node->AddApplication(app);
 
-  return app;
-}
+            return app;
+        }
 
-////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
 
-FactoryCallbackApp::FactoryCallbackApp(const FactoryCallback& factory)
-  : m_factory(factory)
-{
-}
+        FactoryCallbackApp::FactoryCallbackApp(const FactoryCallback& factory)
+        : m_factory(factory) {
+        }
 
-ApplicationContainer
-FactoryCallbackApp::Install(Ptr<Node> node, const FactoryCallback& factory)
-{
-  ApplicationContainer apps;
-  auto app = CreateObject<FactoryCallbackApp>(factory);
-  node->AddApplication(app);
-  apps.Add(app);
-  return apps;
-}
+        ApplicationContainer
+        FactoryCallbackApp::Install(Ptr<Node> node, const FactoryCallback& factory) {
+            ApplicationContainer apps;
+            auto app = CreateObject<FactoryCallbackApp>(factory);
+            node->AddApplication(app);
+            apps.Add(app);
+            return apps;
+        }
 
-void
-FactoryCallbackApp::StartApplication()
-{
-  m_impl = m_factory();
-}
+        void
+        FactoryCallbackApp::StartApplication() {
+            m_impl = m_factory();
+        }
 
-void
-FactoryCallbackApp::StopApplication()
-{
-  m_impl.reset();
-}
+        void
+        FactoryCallbackApp::StopApplication() {
+            m_impl.reset();
+        }
 
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

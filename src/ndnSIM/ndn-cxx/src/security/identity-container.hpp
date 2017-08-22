@@ -26,69 +26,69 @@
 #include "identity.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibImpl;
+        class PibImpl;
 
-/// @brief A handler to search or enumerate identities in PIB.
-class IdentityContainer
-{
-public:
-  class const_iterator
-  {
-  public:
-    friend class IdentityContainer;
+        /// @brief A handler to search or enumerate identities in PIB.
 
-  public:
-    Identity
-    operator*();
+        class IdentityContainer {
+        public:
 
-    const_iterator&
-    operator++();
+            class const_iterator {
+            public:
+                friend class IdentityContainer;
 
-    const_iterator
-    operator++(int);
+            public:
+                Identity
+                operator*();
 
-    bool
-    operator==(const const_iterator& other);
+                const_iterator&
+                operator++();
 
-    bool
-    operator!=(const const_iterator& other);
+                const_iterator
+                operator++(int);
 
-  private:
-    const_iterator(std::set<Name>::const_iterator it, shared_ptr<PibImpl> impl);
+                bool
+                operator==(const const_iterator& other);
 
-  private:
-    Name m_identity;
-    std::set<Name>::const_iterator m_it;
-    shared_ptr<PibImpl> m_impl;
-  };
+                bool
+                operator!=(const const_iterator& other);
 
-  typedef const_iterator iterator;
+            private:
+                const_iterator(std::set<Name>::const_iterator it, shared_ptr<PibImpl> impl);
 
-public:
-  IdentityContainer();
+            private:
+                Name m_identity;
+                std::set<Name>::const_iterator m_it;
+                shared_ptr<PibImpl> m_impl;
+            };
 
-  IdentityContainer(std::set<Name>&& identities, shared_ptr<PibImpl> impl);
+            typedef const_iterator iterator;
 
-  const_iterator
-  begin() const;
+        public:
+            IdentityContainer();
 
-  const_iterator
-  end() const;
+            IdentityContainer(std::set<Name>&& identities, shared_ptr<PibImpl> impl);
 
-  const_iterator
-  find(const Name& keyId) const;
+            const_iterator
+            begin() const;
 
-  size_t
-  size() const;
+            const_iterator
+            end() const;
 
-private:
-  std::set<Name> m_identities;
-  shared_ptr<PibImpl> m_impl;
-};
+            const_iterator
+            find(const Name& keyId) const;
 
-} // namespace security
+            size_t
+            size() const;
+
+        private:
+            std::set<Name> m_identities;
+            shared_ptr<PibImpl> m_impl;
+        };
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_IDENTITY_CONTAINER_HPP

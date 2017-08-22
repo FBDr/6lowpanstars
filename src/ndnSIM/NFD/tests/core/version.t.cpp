@@ -30,33 +30,31 @@
 #include <stdio.h>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-BOOST_AUTO_TEST_SUITE(TestVersion)
+        BOOST_AUTO_TEST_SUITE(TestVersion)
 
-BOOST_AUTO_TEST_CASE(VersionNumber)
-{
-  BOOST_TEST_MESSAGE("NFD_VERSION = " + to_string(NFD_VERSION));
+        BOOST_AUTO_TEST_CASE(VersionNumber) {
+            BOOST_TEST_MESSAGE("NFD_VERSION = " + to_string(NFD_VERSION));
 
-  BOOST_CHECK_EQUAL(NFD_VERSION, NFD_VERSION_MAJOR * 1000000 +
-                                 NFD_VERSION_MINOR * 1000 +
-                                 NFD_VERSION_PATCH);
-}
+            BOOST_CHECK_EQUAL(NFD_VERSION, NFD_VERSION_MAJOR * 1000000 +
+                    NFD_VERSION_MINOR * 1000 +
+                    NFD_VERSION_PATCH);
+        }
 
-BOOST_AUTO_TEST_CASE(VersionString)
-{
-  BOOST_TEST_MESSAGE("NFD_VERSION_STRING = " NFD_VERSION_STRING);
+        BOOST_AUTO_TEST_CASE(VersionString) {
+            BOOST_TEST_MESSAGE("NFD_VERSION_STRING = " NFD_VERSION_STRING);
 
-  BOOST_STATIC_ASSERT(NFD_VERSION_MAJOR < 1000);
-  BOOST_STATIC_ASSERT(NFD_VERSION_MINOR < 1000);
-  BOOST_STATIC_ASSERT(NFD_VERSION_PATCH < 1000);
-  char buf[12];
-  ::snprintf(buf, sizeof(buf), "%d.%d.%d", NFD_VERSION_MAJOR, NFD_VERSION_MINOR, NFD_VERSION_PATCH);
+            BOOST_STATIC_ASSERT(NFD_VERSION_MAJOR < 1000);
+            BOOST_STATIC_ASSERT(NFD_VERSION_MINOR < 1000);
+            BOOST_STATIC_ASSERT(NFD_VERSION_PATCH < 1000);
+            char buf[12];
+            ::snprintf(buf, sizeof (buf), "%d.%d.%d", NFD_VERSION_MAJOR, NFD_VERSION_MINOR, NFD_VERSION_PATCH);
 
-  BOOST_CHECK_EQUAL(NFD_VERSION_STRING, buf);
-}
+            BOOST_CHECK_EQUAL(NFD_VERSION_STRING, buf);
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

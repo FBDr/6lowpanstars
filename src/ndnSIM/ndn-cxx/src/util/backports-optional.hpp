@@ -50,259 +50,233 @@
 
 namespace ndn {
 
-template<typename T>
-class optional;
+    template<typename T>
+    class optional;
 
-struct in_place_t
-{
-};
-constexpr in_place_t in_place{};
+    struct in_place_t {
+    };
+    constexpr in_place_t in_place{};
 
-class nullopt_t
-{
-public:
-  constexpr explicit
-  nullopt_t(int)
-  {
-  }
-};
-constexpr nullopt_t nullopt(0);
+    class nullopt_t {
+    public:
+
+        constexpr explicit
+        nullopt_t(int) {
+        }
+    };
+    constexpr nullopt_t nullopt(0);
 
 #if BOOST_VERSION >= 105600
-using boost::bad_optional_access;
+    using boost::bad_optional_access;
 #else
-class bad_optional_access : public std::logic_error
-{
-public:
-  bad_optional_access()
-    : std::logic_error("bad optional access")
-  {
-  }
-};
+
+class bad_optional_access : public std::logic_error {
+    public:
+
+        bad_optional_access()
+        : std::logic_error("bad optional access") {
+        }
+    };
 #endif
 
-template<typename T>
-constexpr bool
-operator==(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator==(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-constexpr bool
-operator!=(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator!=(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-constexpr bool
-operator<(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator<(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-constexpr bool
-operator<=(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator<=(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-constexpr bool
-operator>(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator>(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-constexpr bool
-operator>=(const optional<T>& lhs, const optional<T>& rhs);
+    template<typename T>
+    constexpr bool
+    operator>=(const optional<T>& lhs, const optional<T>& rhs);
 
-template<typename T>
-class optional
-{
-public:
-  static_assert(!std::is_same<typename std::remove_cv<T>::type, in_place_t>::value &&
+    template<typename T>
+    class optional {
+    public:
+        static_assert(!std::is_same<typename std::remove_cv<T>::type, in_place_t>::value &&
                 !std::is_same<typename std::remove_cv<T>::type, nullopt_t>::value &&
                 !std::is_reference<T>::value,
                 "Invalid instantiation of optional<T>");
 
-  typedef T value_type;
+        typedef T value_type;
 
-  constexpr
-  optional() noexcept
-  {
-  }
+        constexpr
+        optional() noexcept {
+        }
 
-  constexpr
-  optional(nullopt_t) noexcept
-  {
-  }
+        constexpr
+        optional(nullopt_t) noexcept {
+        }
 
-  constexpr
-  optional(const T& value)
-    : m_boostOptional(value)
-  {
-  }
+        constexpr
+        optional(const T& value)
+        : m_boostOptional(value) {
+        }
 
-  template<typename... Args>
-  constexpr explicit
-  optional(in_place_t, Args&&... args)
-    : m_boostOptional(boost::in_place<T>(std::forward<Args>(args)...))
-  {
-  }
+        template<typename... Args>
+        constexpr explicit
+        optional(in_place_t, Args&&... args)
+        : m_boostOptional(boost::in_place<T>(std::forward<Args>(args)...)) {
+        }
 
-  optional&
-  operator=(nullopt_t) noexcept
-  {
-    m_boostOptional = boost::none;
-    return *this;
-  }
+        optional&
+                operator=(nullopt_t) noexcept {
+            m_boostOptional = boost::none;
+            return *this;
+        }
 
-  optional&
-  operator=(const optional& other)
-  {
-    m_boostOptional = other.m_boostOptional;
-    return *this;
-  }
+        optional&
+                operator=(const optional& other) {
+            m_boostOptional = other.m_boostOptional;
+            return *this;
+        }
 
-  template<typename U,
-           typename = typename std::enable_if<std::is_same<typename std::decay<U>::type, T>::value>::type>
-  optional&
-  operator=(U&& value)
-  {
-    m_boostOptional = std::forward<U>(value);
-    return *this;
-  }
+        template<typename U,
+        typename = typename std::enable_if<std::is_same<typename std::decay<U>::type, T>::value>::type>
+        optional&
+        operator=(U&& value) {
+            m_boostOptional = std::forward<U>(value);
+            return *this;
+        }
 
-public: // observers
-  constexpr const T*
-  operator->() const
-  {
-    return m_boostOptional.get_ptr();
-  }
+    public: // observers
 
-  T*
-  operator->()
-  {
-    return m_boostOptional.get_ptr();
-  }
+        constexpr const T*
+        operator->() const {
+            return m_boostOptional.get_ptr();
+        }
 
-  constexpr const T&
-  operator*() const
-  {
-    return m_boostOptional.get();
-  }
+        T*
+        operator->() {
+            return m_boostOptional.get_ptr();
+        }
 
-  T&
-  operator*()
-  {
-    return m_boostOptional.get();
-  }
+        constexpr const T&
+        operator*() const {
+            return m_boostOptional.get();
+        }
 
-  constexpr explicit
-  operator bool() const noexcept
-  {
-    return static_cast<bool>(m_boostOptional);
-  }
+        T&
+        operator*() {
+            return m_boostOptional.get();
+        }
 
-  const T&
-  value() const
-  {
-    return const_cast<optional*>(this)->value();
-  }
+        constexpr explicit
+        operator bool() const noexcept {
+            return static_cast<bool> (m_boostOptional);
+        }
 
-  T&
-  value()
-  {
+        const T&
+        value() const {
+            return const_cast<optional*> (this)->value();
+        }
+
+        T&
+        value() {
 #if BOOST_VERSION >= 105600
-    return m_boostOptional.value();
+            return m_boostOptional.value();
 #else
-    if (!m_boostOptional) {
-      BOOST_THROW_EXCEPTION(bad_optional_access());
+            if (!m_boostOptional) {
+                BOOST_THROW_EXCEPTION(bad_optional_access());
+            }
+            return m_boostOptional.get();
+#endif
+        }
+
+        template<typename U>
+        constexpr T
+        value_or(U&& default_value) const {
+#if BOOST_VERSION >= 105600
+            return m_boostOptional.value_or(default_value);
+#else
+            return m_boostOptional.get_value_or(default_value);
+#endif
+        }
+
+    public: // modifiers
+
+        void
+        swap(optional& other) {
+            boost::swap(m_boostOptional, other.m_boostOptional);
+        }
+
+        template<typename... Args>
+        void
+        emplace(Args&&... args) {
+            m_boostOptional = boost::in_place<T>(std::forward<Args>(args)...);
+        }
+
+    private:
+        boost::optional<T> m_boostOptional;
+
+        friend bool operator==<T>(const optional<T>&, const optional<T>&);
+        friend bool operator!=<T>(const optional<T>&, const optional<T>&);
+        friend bool operator< <T>(const optional<T>&, const optional<T>&);
+        friend bool operator<=<T>(const optional<T>&, const optional<T>&);
+        friend bool operator> <T>(const optional<T>&, const optional<T>&);
+        friend bool operator>=<T>(const optional<T>&, const optional<T>&);
+    };
+
+    template<typename T>
+    constexpr bool
+    operator==(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator==(lhs.m_boostOptional, rhs.m_boostOptional);
     }
-    return m_boostOptional.get();
-#endif
-  }
 
-  template<typename U>
-  constexpr T
-  value_or(U&& default_value) const
-  {
-#if BOOST_VERSION >= 105600
-    return m_boostOptional.value_or(default_value);
-#else
-    return m_boostOptional.get_value_or(default_value);
-#endif
-  }
+    template<typename T>
+    constexpr bool
+    operator!=(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator!=(lhs.m_boostOptional, rhs.m_boostOptional);
+    }
 
-public: // modifiers
-  void
-  swap(optional& other)
-  {
-    boost::swap(m_boostOptional, other.m_boostOptional);
-  }
+    template<typename T>
+    constexpr bool
+    operator<(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator<(lhs.m_boostOptional, rhs.m_boostOptional);
+    }
 
-  template<typename... Args>
-  void
-  emplace(Args&&... args)
-  {
-    m_boostOptional = boost::in_place<T>(std::forward<Args>(args)...);
-  }
+    template<typename T>
+    constexpr bool
+    operator<=(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator<=(lhs.m_boostOptional, rhs.m_boostOptional);
+    }
 
-private:
-  boost::optional<T> m_boostOptional;
+    template<typename T>
+    constexpr bool
+    operator>(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator>(lhs.m_boostOptional, rhs.m_boostOptional);
+    }
 
-  friend bool operator==<T>(const optional<T>&, const optional<T>&);
-  friend bool operator!=<T>(const optional<T>&, const optional<T>&);
-  friend bool operator< <T>(const optional<T>&, const optional<T>&);
-  friend bool operator<=<T>(const optional<T>&, const optional<T>&);
-  friend bool operator> <T>(const optional<T>&, const optional<T>&);
-  friend bool operator>=<T>(const optional<T>&, const optional<T>&);
-};
+    template<typename T>
+    constexpr bool
+    operator>=(const optional<T>& lhs, const optional<T>& rhs) {
+        return operator>=(lhs.m_boostOptional, rhs.m_boostOptional);
+    }
 
-template<typename T>
-constexpr bool
-operator==(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator==(lhs.m_boostOptional, rhs.m_boostOptional);
-}
+    template<typename T>
+    constexpr optional<typename std::decay<T>::type>
+    make_optional(T&& value) {
+        return optional<typename std::decay<T>::type > (std::forward<T>(value));
+    }
 
-template<typename T>
-constexpr bool
-operator!=(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator!=(lhs.m_boostOptional, rhs.m_boostOptional);
-}
-
-template<typename T>
-constexpr bool
-operator<(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator<(lhs.m_boostOptional, rhs.m_boostOptional);
-}
-
-template<typename T>
-constexpr bool
-operator<=(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator<=(lhs.m_boostOptional, rhs.m_boostOptional);
-}
-
-template<typename T>
-constexpr bool
-operator>(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator>(lhs.m_boostOptional, rhs.m_boostOptional);
-}
-
-template<typename T>
-constexpr bool
-operator>=(const optional<T>& lhs, const optional<T>& rhs)
-{
-  return operator>=(lhs.m_boostOptional, rhs.m_boostOptional);
-}
-
-template<typename T>
-constexpr optional<typename std::decay<T>::type>
-make_optional(T&& value)
-{
-  return optional<typename std::decay<T>::type>(std::forward<T>(value));
-}
-
-template<typename T, typename... Args>
-constexpr optional<T>
-make_optional(Args&&... args)
-{
-  return optional<T>(in_place, std::forward<Args>(args)...);
-}
+    template<typename T, typename... Args>
+    constexpr optional<T>
+    make_optional(Args&&... args) {
+        return optional<T>(in_place, std::forward<Args>(args)...);
+    }
 
 } // namespace ndn
 

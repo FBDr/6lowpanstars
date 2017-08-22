@@ -25,57 +25,55 @@
 
 namespace ns3 {
 
-class Tag;
+    class Tag;
 
+    /**
+     * Tag used to define the RNTI and EPS bearer ID for packets
+     * interchanged between the EpcEnbApplication and the LteEnbNetDevice 
+     */
 
-/**
- * Tag used to define the RNTI and EPS bearer ID for packets
- * interchanged between the EpcEnbApplication and the LteEnbNetDevice 
- */
+    class EpsBearerTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-class EpsBearerTag : public Tag
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+        /**
+         * Create an empty EpsBearerTag
+         */
+        EpsBearerTag();
 
-  /**
-   * Create an empty EpsBearerTag
-   */
-  EpsBearerTag ();
+        /**
+         * Create a EpsBearerTag with the given RNTI and bearer id
+         */
+        EpsBearerTag(uint16_t rnti, uint8_t bid);
 
-  /**
-   * Create a EpsBearerTag with the given RNTI and bearer id
-   */
-  EpsBearerTag (uint16_t  rnti, uint8_t bid);
-  
-  /**
-   * Set the RNTI to the given value.
-   *
-   * @param rnti the value of the RNTI to set
-   */
-  void SetRnti (uint16_t rnti);
+        /**
+         * Set the RNTI to the given value.
+         *
+         * @param rnti the value of the RNTI to set
+         */
+        void SetRnti(uint16_t rnti);
 
-  /**
-   * Set the bearer id to the given value.
-   *
-   * @param bid the value of the RNTI to set
-   */
-  void SetBid (uint8_t bid);
+        /**
+         * Set the bearer id to the given value.
+         *
+         * @param bid the value of the RNTI to set
+         */
+        void SetBid(uint8_t bid);
 
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Print(std::ostream &os) const;
 
-  uint16_t GetRnti (void) const;
-  uint8_t GetBid (void) const;
+        uint16_t GetRnti(void) const;
+        uint8_t GetBid(void) const;
 
-private:
-  uint16_t m_rnti;
-  uint8_t m_bid;
+    private:
+        uint16_t m_rnti;
+        uint8_t m_bid;
 
-};
+    };
 
 
 

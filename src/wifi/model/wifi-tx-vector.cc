@@ -22,153 +22,133 @@
 #include "ns3/wifi-tx-vector.h"
 #include "ns3/fatal-error.h"
 
-namespace ns3 {
-
-WifiTxVector::WifiTxVector ()
-  : m_retries (0),
-    m_shortGuardInterval (false),
-    m_nss (1),
-    m_ness (0),
-    m_aggregation (false),
-    m_stbc (false),
-    m_modeInitialized (false),
-    m_txPowerLevelInitialized (false)
+namespace ns3
 {
-}
 
-WifiTxVector::WifiTxVector (WifiMode mode, uint8_t powerLevel, uint8_t retries,
-                            bool shortGuardInterval, uint8_t nss, uint8_t ness,
-                            bool aggregation, bool stbc)
-  : m_mode (mode),
-    m_txPowerLevel (powerLevel),
-    m_retries (retries),
-    m_shortGuardInterval (shortGuardInterval),
-    m_nss (nss),
-    m_ness (ness),
-    m_aggregation (aggregation),
-    m_stbc (stbc),
-    m_modeInitialized (true),
-    m_txPowerLevelInitialized (true)
-{
-}
-
-WifiMode
-WifiTxVector::GetMode (void) const
-{
-  if (!m_modeInitialized)
-    {
-      NS_FATAL_ERROR ("WifiTxVector mode must be set before using");
+    WifiTxVector::WifiTxVector()
+            : m_retries(0),
+            m_shortGuardInterval(false),
+            m_nss(1),
+            m_ness(0),
+            m_aggregation(false),
+            m_stbc(false),
+            m_modeInitialized(false),
+            m_txPowerLevelInitialized(false) {
     }
-  return m_mode;
-}
 
-uint8_t
-WifiTxVector::GetTxPowerLevel (void) const
-{
-  if (!m_txPowerLevelInitialized)
-    {
-      NS_FATAL_ERROR ("WifiTxVector txPowerLevel must be set before using");
+    WifiTxVector::WifiTxVector(WifiMode mode, uint8_t powerLevel, uint8_t retries,
+            bool shortGuardInterval, uint8_t nss, uint8_t ness,
+            bool aggregation, bool stbc)
+            : m_mode(mode),
+            m_txPowerLevel(powerLevel),
+            m_retries(retries),
+            m_shortGuardInterval(shortGuardInterval),
+            m_nss(nss),
+            m_ness(ness),
+            m_aggregation(aggregation),
+            m_stbc(stbc),
+            m_modeInitialized(true),
+            m_txPowerLevelInitialized(true) {
     }
-  return m_txPowerLevel;
-}
 
-uint8_t
-WifiTxVector::GetRetries (void) const
-{
-  return m_retries;
-}
+    WifiMode
+    WifiTxVector::GetMode(void) const {
+        if (!m_modeInitialized) {
+            NS_FATAL_ERROR("WifiTxVector mode must be set before using");
+        }
+        return m_mode;
+    }
 
-bool
-WifiTxVector::IsShortGuardInterval (void) const
-{
-  return m_shortGuardInterval;
-}
+    uint8_t
+    WifiTxVector::GetTxPowerLevel(void) const {
+        if (!m_txPowerLevelInitialized) {
+            NS_FATAL_ERROR("WifiTxVector txPowerLevel must be set before using");
+        }
+        return m_txPowerLevel;
+    }
 
-uint8_t
-WifiTxVector::GetNss (void) const
-{
-  return m_nss;
-}
+    uint8_t
+    WifiTxVector::GetRetries(void) const {
+        return m_retries;
+    }
 
-uint8_t
-WifiTxVector::GetNess (void) const
-{
-  return m_ness;
-}
+    bool
+    WifiTxVector::IsShortGuardInterval(void) const {
+        return m_shortGuardInterval;
+    }
 
-bool
-WifiTxVector::IsAggregation (void) const
-{
-  return m_aggregation;
-}
+    uint8_t
+    WifiTxVector::GetNss(void) const {
+        return m_nss;
+    }
 
-bool
-WifiTxVector::IsStbc (void) const
-{
-  return m_stbc;
-}
+    uint8_t
+    WifiTxVector::GetNess(void) const {
+        return m_ness;
+    }
 
-void
-WifiTxVector::SetMode (WifiMode mode)
-{
-  m_mode = mode;
-  m_modeInitialized = true;
-}
+    bool
+    WifiTxVector::IsAggregation(void) const {
+        return m_aggregation;
+    }
 
-void
-WifiTxVector::SetTxPowerLevel (uint8_t powerlevel)
-{
-  m_txPowerLevel = powerlevel;
-  m_txPowerLevelInitialized = true;
-}
+    bool
+    WifiTxVector::IsStbc(void) const {
+        return m_stbc;
+    }
 
-void
-WifiTxVector::SetRetries (uint8_t retries)
-{
-  m_retries = retries;
-}
+    void
+    WifiTxVector::SetMode(WifiMode mode) {
+        m_mode = mode;
+        m_modeInitialized = true;
+    }
 
-void
-WifiTxVector::SetShortGuardInterval (bool guardinterval)
-{
-  m_shortGuardInterval = guardinterval;
-}
+    void
+    WifiTxVector::SetTxPowerLevel(uint8_t powerlevel) {
+        m_txPowerLevel = powerlevel;
+        m_txPowerLevelInitialized = true;
+    }
 
-void
-WifiTxVector::SetNss (uint8_t nss)
-{
-  m_nss = nss;
-}
+    void
+    WifiTxVector::SetRetries(uint8_t retries) {
+        m_retries = retries;
+    }
 
-void
-WifiTxVector::SetNess (uint8_t ness)
-{
-  m_ness = ness;
-}
+    void
+    WifiTxVector::SetShortGuardInterval(bool guardinterval) {
+        m_shortGuardInterval = guardinterval;
+    }
 
-void
-WifiTxVector::SetAggregation (bool aggregation)
-{
-  m_aggregation = aggregation;
-}
+    void
+    WifiTxVector::SetNss(uint8_t nss) {
+        m_nss = nss;
+    }
 
-void
-WifiTxVector::SetStbc (bool stbc)
-{
-  m_stbc = stbc;
-}
+    void
+    WifiTxVector::SetNess(uint8_t ness) {
+        m_ness = ness;
+    }
 
-std::ostream & operator << ( std::ostream &os, const WifiTxVector &v)
-{
-  os << "mode: " << v.GetMode () <<
-    " txpwrlvl: " << (uint32_t)v.GetTxPowerLevel () <<
-    " retries: " << (uint32_t)v.GetRetries () <<
-    " Short GI: " << v.IsShortGuardInterval () <<
-    " Nss: " << (uint32_t)v.GetNss () <<
-    " Ness: " << (uint32_t)v.GetNess () <<
-    " MPDU aggregation: " << v.IsAggregation () <<
-    " STBC: " << v.IsStbc ();
-  return os;
-}
+    void
+    WifiTxVector::SetAggregation(bool aggregation) {
+        m_aggregation = aggregation;
+    }
+
+    void
+    WifiTxVector::SetStbc(bool stbc) {
+        m_stbc = stbc;
+    }
+
+    std::ostream & operator << (std::ostream &os, const WifiTxVector & v) {
+        os << "mode: " << v.GetMode() <<
+                " txpwrlvl: " << (uint32_t) v.GetTxPowerLevel() <<
+                " retries: " << (uint32_t) v.GetRetries() <<
+                " Short GI: " << v.IsShortGuardInterval() <<
+                " Nss: " << (uint32_t) v.GetNss() <<
+                " Ness: " << (uint32_t) v.GetNess() <<
+                " MPDU aggregation: " << v.IsAggregation() <<
+                " STBC: " << v.IsStbc();
+        return os;
+    }
 
 } //namespace ns3

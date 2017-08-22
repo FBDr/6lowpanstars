@@ -278,9 +278,9 @@ namespace nfd {
         //        shared_ptr<Interest> interestcopy = make_shared<Interest>(interest);
         //        shared_ptr<Name> nameWithSequence = make_shared<Name>(interestcopy->getName());
         //        nameWithSequence->appendImplicitSha256Digest(buff, size);
-        
-//        FaceUri oerie = outFace.getLocalUri();
-//        std::cout<<oerie.getScheme()<<std::endl;
+
+        //        FaceUri oerie = outFace.getLocalUri();
+        //        std::cout<<oerie.getScheme()<<std::endl;
 
 
     }

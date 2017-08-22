@@ -20,30 +20,28 @@
 
 #include "uan-noise-model.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (UanNoiseModel);
-
-TypeId UanNoiseModel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::UanNoiseModel")
-    .SetParent<Object> ()
-    .SetGroupName ("Uan")
-  ;
-  return tid;
-}
 
-void 
-UanNoiseModel::Clear (void)
-{
-}
+    NS_OBJECT_ENSURE_REGISTERED(UanNoiseModel);
 
-void 
-UanNoiseModel::DoDispose (void)
-{
-  Clear ();
-  Object::DoDispose ();
-}
+    TypeId UanNoiseModel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::UanNoiseModel")
+                .SetParent<Object> ()
+                .SetGroupName("Uan")
+                ;
+        return tid;
+    }
+
+    void
+    UanNoiseModel::Clear(void) {
+    }
+
+    void
+    UanNoiseModel::DoDispose(void) {
+        Clear();
+        Object::DoDispose();
+    }
 
 
 

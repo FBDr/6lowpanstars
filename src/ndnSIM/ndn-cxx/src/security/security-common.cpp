@@ -24,121 +24,115 @@
 
 namespace ndn {
 
-std::ostream&
-operator<<(std::ostream& os, KeyType keyType)
-{
-  switch (keyType) {
-  case KeyType::NONE:
-    os << "NONE";
-    break;
-  case KeyType::RSA:
-    os << "RSA";
-    break;
-  case KeyType::EC:
-    os << "EC";
-    break;
-  case KeyType::AES:
-    os << "AES";
-    break;
-  default:
-    os << static_cast<int>(keyType);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, KeyType keyType) {
+        switch (keyType) {
+            case KeyType::NONE:
+                os << "NONE";
+                break;
+            case KeyType::RSA:
+                os << "RSA";
+                break;
+            case KeyType::EC:
+                os << "EC";
+                break;
+            case KeyType::AES:
+                os << "AES";
+                break;
+            default:
+                os << static_cast<int> (keyType);
+                break;
+        };
+        return os;
+    }
 
-std::ostream&
-operator<<(std::ostream& os, KeyClass keyClass)
-{
-  switch (keyClass) {
-  case KeyClass::NONE:
-    os << "NONE";
-    break;
-  case KeyClass::PUBLIC:
-    os << "PUBLIC";
-    break;
-  case KeyClass::PRIVATE:
-    os << "PRIVATE";
-    break;
-  case KeyClass::SYMMETRIC:
-    os << "SYMMETRIC";
-    break;
-  default:
-    os << static_cast<int>(keyClass);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, KeyClass keyClass) {
+        switch (keyClass) {
+            case KeyClass::NONE:
+                os << "NONE";
+                break;
+            case KeyClass::PUBLIC:
+                os << "PUBLIC";
+                break;
+            case KeyClass::PRIVATE:
+                os << "PRIVATE";
+                break;
+            case KeyClass::SYMMETRIC:
+                os << "SYMMETRIC";
+                break;
+            default:
+                os << static_cast<int> (keyClass);
+                break;
+        };
+        return os;
+    }
 
-std::ostream&
-operator<<(std::ostream& os, DigestAlgorithm algorithm)
-{
-  switch (algorithm) {
-  case DigestAlgorithm::NONE:
-    os << "NONE";
-    break;
-  case DigestAlgorithm::SHA256:
-    os << "SHA256";
-    break;
-  default:
-    os << static_cast<int>(algorithm);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, DigestAlgorithm algorithm) {
+        switch (algorithm) {
+            case DigestAlgorithm::NONE:
+                os << "NONE";
+                break;
+            case DigestAlgorithm::SHA256:
+                os << "SHA256";
+                break;
+            default:
+                os << static_cast<int> (algorithm);
+                break;
+        };
+        return os;
+    }
 
-std::ostream&
-operator<<(std::ostream& os, BlockCipherAlgorithm algorithm)
-{
-  switch (algorithm) {
-  case BlockCipherAlgorithm::NONE:
-    os << "NONE";
-    break;
-  case BlockCipherAlgorithm::AES_CBC:
-    os << "AES_CBC";
-    break;
-  default:
-    os << static_cast<int>(algorithm);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, BlockCipherAlgorithm algorithm) {
+        switch (algorithm) {
+            case BlockCipherAlgorithm::NONE:
+                os << "NONE";
+                break;
+            case BlockCipherAlgorithm::AES_CBC:
+                os << "AES_CBC";
+                break;
+            default:
+                os << static_cast<int> (algorithm);
+                break;
+        };
+        return os;
+    }
 
-std::ostream&
-operator<<(std::ostream& os, CipherOperator op)
-{
-  switch (op) {
-  case CipherOperator::DECRYPT:
-    os << "DECRYPT";
-    break;
-  case CipherOperator::ENCRYPT:
-    os << "ENCRYPT";
-    break;
-  default:
-    os << static_cast<int>(op);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, CipherOperator op) {
+        switch (op) {
+            case CipherOperator::DECRYPT:
+                os << "DECRYPT";
+                break;
+            case CipherOperator::ENCRYPT:
+                os << "ENCRYPT";
+                break;
+            default:
+                os << static_cast<int> (op);
+                break;
+        };
+        return os;
+    }
 
-std::ostream&
-operator<<(std::ostream& os, AclType aclType)
-{
-  switch (aclType) {
-  case AclType::NONE:
-    os << "NONE";
-    break;
-  case AclType::PUBLIC:
-    os << "PUBLIC";
-    break;
-  case AclType::PRIVATE:
-    os << "PRIVATE";
-    break;
-  default:
-    os << static_cast<int>(aclType);
-    break;
-  };
-  return os;
-}
+    std::ostream&
+    operator<<(std::ostream& os, AclType aclType) {
+        switch (aclType) {
+            case AclType::NONE:
+                os << "NONE";
+                break;
+            case AclType::PUBLIC:
+                os << "PUBLIC";
+                break;
+            case AclType::PRIVATE:
+                os << "PRIVATE";
+                break;
+            default:
+                os << static_cast<int> (aclType);
+                break;
+        };
+        return os;
+    }
 
 } // namespace ndn

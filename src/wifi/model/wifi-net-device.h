@@ -29,143 +29,141 @@
 
 namespace ns3 {
 
-class WifiRemoteStationManager;
-class WifiChannel;
-class WifiPhy;
-class WifiMac;
+    class WifiRemoteStationManager;
+    class WifiChannel;
+    class WifiPhy;
+    class WifiMac;
 
-/**
- * \defgroup wifi Wifi Models
- *
- * This section documents the API of the ns-3 Wifi module. For a generic functional description, please refer to the ns-3 manual.
- */
+    /**
+     * \defgroup wifi Wifi Models
+     *
+     * This section documents the API of the ns-3 Wifi module. For a generic functional description, please refer to the ns-3 manual.
+     */
 
+    /**
+     * \brief Hold together all Wifi-related objects.
+     * \ingroup wifi
+     *
+     * This class holds together ns3::WifiChannel, ns3::WifiPhy,
+     * ns3::WifiMac, and, ns3::WifiRemoteStationManager.
+     */
+    class WifiNetDevice : public NetDevice {
+    public:
+        static TypeId GetTypeId(void);
 
-/**
- * \brief Hold together all Wifi-related objects.
- * \ingroup wifi
- *
- * This class holds together ns3::WifiChannel, ns3::WifiPhy,
- * ns3::WifiMac, and, ns3::WifiRemoteStationManager.
- */
-class WifiNetDevice : public NetDevice
-{
-public:
-  static TypeId GetTypeId (void);
+        WifiNetDevice();
+        virtual ~WifiNetDevice();
 
-  WifiNetDevice ();
-  virtual ~WifiNetDevice ();
-
-  /**
-   * \param mac the mac layer to use.
-   */
-  void SetMac (Ptr<WifiMac> mac);
-  /**
-   * \param phy the phy layer to use.
-   */
-  void SetPhy (Ptr<WifiPhy> phy);
-  /**
-   * \param manager the manager to use.
-   */
-  void SetRemoteStationManager (Ptr<WifiRemoteStationManager> manager);
-  /**
-   * \returns the mac we are currently using.
-   */
-  Ptr<WifiMac> GetMac (void) const;
-  /**
-   * \returns the phy we are currently using.
-   */
-  Ptr<WifiPhy> GetPhy (void) const;
-  /**
-   * \returns the remote station manager we are currently using.
-   */
-  Ptr<WifiRemoteStationManager> GetRemoteStationManager (void) const;
+        /**
+         * \param mac the mac layer to use.
+         */
+        void SetMac(Ptr<WifiMac> mac);
+        /**
+         * \param phy the phy layer to use.
+         */
+        void SetPhy(Ptr<WifiPhy> phy);
+        /**
+         * \param manager the manager to use.
+         */
+        void SetRemoteStationManager(Ptr<WifiRemoteStationManager> manager);
+        /**
+         * \returns the mac we are currently using.
+         */
+        Ptr<WifiMac> GetMac(void) const;
+        /**
+         * \returns the phy we are currently using.
+         */
+        Ptr<WifiPhy> GetPhy(void) const;
+        /**
+         * \returns the remote station manager we are currently using.
+         */
+        Ptr<WifiRemoteStationManager> GetRemoteStationManager(void) const;
 
 
-  //inherited from NetDevice base class.
-  virtual void SetIfIndex (const uint32_t index);
-  virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<Channel> GetChannel (void) const;
-  virtual void SetAddress (Address address);
-  virtual Address GetAddress (void) const;
-  virtual bool SetMtu (const uint16_t mtu);
-  virtual uint16_t GetMtu (void) const;
-  virtual bool IsLinkUp (void) const;
-  virtual void AddLinkChangeCallback (Callback<void> callback);
-  virtual bool IsBroadcast (void) const;
-  virtual Address GetBroadcast (void) const;
-  virtual bool IsMulticast (void) const;
-  virtual Address GetMulticast (Ipv4Address multicastGroup) const;
-  virtual bool IsPointToPoint (void) const;
-  virtual bool IsBridge (void) const;
-  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-  virtual Ptr<Node> GetNode (void) const;
-  virtual void SetNode (Ptr<Node> node);
-  virtual bool NeedsArp (void) const;
-  virtual void SetReceiveCallback (NetDevice::ReceiveCallback cb);
+        //inherited from NetDevice base class.
+        virtual void SetIfIndex(const uint32_t index);
+        virtual uint32_t GetIfIndex(void) const;
+        virtual Ptr<Channel> GetChannel(void) const;
+        virtual void SetAddress(Address address);
+        virtual Address GetAddress(void) const;
+        virtual bool SetMtu(const uint16_t mtu);
+        virtual uint16_t GetMtu(void) const;
+        virtual bool IsLinkUp(void) const;
+        virtual void AddLinkChangeCallback(Callback<void> callback);
+        virtual bool IsBroadcast(void) const;
+        virtual Address GetBroadcast(void) const;
+        virtual bool IsMulticast(void) const;
+        virtual Address GetMulticast(Ipv4Address multicastGroup) const;
+        virtual bool IsPointToPoint(void) const;
+        virtual bool IsBridge(void) const;
+        virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+        virtual Ptr<Node> GetNode(void) const;
+        virtual void SetNode(Ptr<Node> node);
+        virtual bool NeedsArp(void) const;
+        virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
 
-  virtual Address GetMulticast (Ipv6Address addr) const;
+        virtual Address GetMulticast(Ipv6Address addr) const;
 
-  virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
-  virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
-  virtual bool SupportsSendFrom (void) const;
-
-
-protected:
-  virtual void DoDispose (void);
-  virtual void DoInitialize (void);
-  /**
-   * Receive a packet from the lower layer and pass the
-   * packet up the stack.
-   *
-   * \param packet
-   * \param from
-   * \param to
-   */
-  void ForwardUp (Ptr<Packet> packet, Mac48Address from, Mac48Address to);
+        virtual bool SendFrom(Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
+        virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
+        virtual bool SupportsSendFrom(void) const;
 
 
-private:
-  //This value conforms to the 802.11 specification
-  static const uint16_t MAX_MSDU_SIZE = 2304;
+    protected:
+        virtual void DoDispose(void);
+        virtual void DoInitialize(void);
+        /**
+         * Receive a packet from the lower layer and pass the
+         * packet up the stack.
+         *
+         * \param packet
+         * \param from
+         * \param to
+         */
+        void ForwardUp(Ptr<Packet> packet, Mac48Address from, Mac48Address to);
 
-  /**
-   * Set that the link is up. A link is always up in ad-hoc mode.
-   * For a STA, a link is up when the STA is associated with an AP.
-   */
-  void LinkUp (void);
-  /**
-   * Set that the link is down (i.e. STA is not associated).
-   */
-  void LinkDown (void);
-  /**
-   * Return the WifiChannel this device is connected to.
-   *
-   * \return WifiChannel
-   */
-  Ptr<WifiChannel> DoGetChannel (void) const;
-  /**
-   * Complete the configuration of this Wi-Fi device by
-   * connecting all lower components (e.g. MAC, WifiRemoteStation) together.
-   */
-  void CompleteConfig (void);
 
-  Ptr<Node> m_node;
-  Ptr<WifiPhy> m_phy;
-  Ptr<WifiMac> m_mac;
-  Ptr<WifiRemoteStationManager> m_stationManager;
-  NetDevice::ReceiveCallback m_forwardUp;
-  NetDevice::PromiscReceiveCallback m_promiscRx;
+    private:
+        //This value conforms to the 802.11 specification
+        static const uint16_t MAX_MSDU_SIZE = 2304;
 
-  TracedCallback<Ptr<const Packet>, Mac48Address> m_rxLogger;
-  TracedCallback<Ptr<const Packet>, Mac48Address> m_txLogger;
+        /**
+         * Set that the link is up. A link is always up in ad-hoc mode.
+         * For a STA, a link is up when the STA is associated with an AP.
+         */
+        void LinkUp(void);
+        /**
+         * Set that the link is down (i.e. STA is not associated).
+         */
+        void LinkDown(void);
+        /**
+         * Return the WifiChannel this device is connected to.
+         *
+         * \return WifiChannel
+         */
+        Ptr<WifiChannel> DoGetChannel(void) const;
+        /**
+         * Complete the configuration of this Wi-Fi device by
+         * connecting all lower components (e.g. MAC, WifiRemoteStation) together.
+         */
+        void CompleteConfig(void);
 
-  uint32_t m_ifIndex;
-  bool m_linkUp;
-  TracedCallback<> m_linkChanges;
-  mutable uint16_t m_mtu;
-  bool m_configComplete;
-};
+        Ptr<Node> m_node;
+        Ptr<WifiPhy> m_phy;
+        Ptr<WifiMac> m_mac;
+        Ptr<WifiRemoteStationManager> m_stationManager;
+        NetDevice::ReceiveCallback m_forwardUp;
+        NetDevice::PromiscReceiveCallback m_promiscRx;
+
+        TracedCallback<Ptr<const Packet>, Mac48Address> m_rxLogger;
+        TracedCallback<Ptr<const Packet>, Mac48Address> m_txLogger;
+
+        uint32_t m_ifIndex;
+        bool m_linkUp;
+        TracedCallback<> m_linkChanges;
+        mutable uint16_t m_mtu;
+        bool m_configComplete;
+    };
 
 } //namespace ns3
 

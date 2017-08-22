@@ -31,133 +31,126 @@
 #include "../fw/install-strategy.hpp"
 
 namespace nfd {
-namespace measurements {
-namespace tests {
+    namespace measurements {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-class MeasurementsAccessorTestStrategy : public DummyStrategy
-{
-public:
-  MeasurementsAccessorTestStrategy(Forwarder& forwarder, const Name& name)
-    : DummyStrategy(forwarder, name)
-  {
-  }
+            class MeasurementsAccessorTestStrategy : public DummyStrategy {
+            public:
 
-  virtual
-  ~MeasurementsAccessorTestStrategy()
-  {
-  }
+                MeasurementsAccessorTestStrategy(Forwarder& forwarder, const Name& name)
+                : DummyStrategy(forwarder, name) {
+                }
 
-public: // accessors
-  MeasurementsAccessor&
-  getMeasurementsAccessor()
-  {
-    return this->getMeasurements();
-  }
-};
+                virtual
+                ~MeasurementsAccessorTestStrategy() {
+                }
 
-class MeasurementsAccessorFixture : public BaseFixture
-{
-protected:
-  MeasurementsAccessorFixture()
-    : strategy1(install<MeasurementsAccessorTestStrategy>(forwarder, "ndn:/strategy1"))
-    , strategy2(install<MeasurementsAccessorTestStrategy>(forwarder, "ndn:/strategy2"))
-    , measurements(forwarder.getMeasurements())
-    , accessor1(strategy1.getMeasurementsAccessor())
-    , accessor2(strategy2.getMeasurementsAccessor())
-  {
-    StrategyChoice& strategyChoice = forwarder.getStrategyChoice();
-    strategyChoice.insert("/"   , strategy1.getName());
-    strategyChoice.insert("/A"  , strategy2.getName());
-    strategyChoice.insert("/A/B", strategy1.getName());
-  }
+            public: // accessors
 
-protected:
-  Forwarder forwarder;
-  MeasurementsAccessorTestStrategy& strategy1;
-  MeasurementsAccessorTestStrategy& strategy2;
-  Measurements& measurements;
-  MeasurementsAccessor& accessor1;
-  MeasurementsAccessor& accessor2;
-};
+                MeasurementsAccessor&
+                getMeasurementsAccessor() {
+                    return this->getMeasurements();
+                }
+            };
 
-BOOST_AUTO_TEST_SUITE(Table)
-BOOST_FIXTURE_TEST_SUITE(TestMeasurementsAccessor, MeasurementsAccessorFixture)
+            class MeasurementsAccessorFixture : public BaseFixture {
+            protected:
 
-BOOST_AUTO_TEST_CASE(Get)
-{
-  BOOST_CHECK(accessor1.get("/"     ) != nullptr);
-  BOOST_CHECK(accessor1.get("/A"    ) == nullptr);
-  BOOST_CHECK(accessor1.get("/A/B"  ) != nullptr);
-  BOOST_CHECK(accessor1.get("/A/B/C") != nullptr);
-  BOOST_CHECK(accessor1.get("/A/D"  ) == nullptr);
+                MeasurementsAccessorFixture()
+                : strategy1(install<MeasurementsAccessorTestStrategy>(forwarder, "ndn:/strategy1"))
+                , strategy2(install<MeasurementsAccessorTestStrategy>(forwarder, "ndn:/strategy2"))
+                , measurements(forwarder.getMeasurements())
+                , accessor1(strategy1.getMeasurementsAccessor())
+                , accessor2(strategy2.getMeasurementsAccessor()) {
+                    StrategyChoice& strategyChoice = forwarder.getStrategyChoice();
+                    strategyChoice.insert("/", strategy1.getName());
+                    strategyChoice.insert("/A", strategy2.getName());
+                    strategyChoice.insert("/A/B", strategy1.getName());
+                }
 
-  BOOST_CHECK(accessor2.get("/"     ) == nullptr);
-  BOOST_CHECK(accessor2.get("/A"    ) != nullptr);
-  BOOST_CHECK(accessor2.get("/A/B"  ) == nullptr);
-  BOOST_CHECK(accessor2.get("/A/B/C") == nullptr);
-  BOOST_CHECK(accessor2.get("/A/D"  ) != nullptr);
-}
+            protected:
+                Forwarder forwarder;
+                MeasurementsAccessorTestStrategy& strategy1;
+                MeasurementsAccessorTestStrategy& strategy2;
+                Measurements& measurements;
+                MeasurementsAccessor& accessor1;
+                MeasurementsAccessor& accessor2;
+            };
 
-BOOST_AUTO_TEST_CASE(GetParent)
-{
-  Entry& entryRoot = measurements.get("/");
-  BOOST_CHECK(accessor1.getParent(entryRoot) == nullptr);
-  BOOST_CHECK(accessor2.getParent(entryRoot) == nullptr);
+            BOOST_AUTO_TEST_SUITE(Table)
+            BOOST_FIXTURE_TEST_SUITE(TestMeasurementsAccessor, MeasurementsAccessorFixture)
 
-  Entry& entryABC = measurements.get("/A/B/C");
-  BOOST_CHECK(accessor1.getParent(entryABC) != nullptr);
-  BOOST_CHECK(accessor2.getParent(entryABC) == nullptr);
+            BOOST_AUTO_TEST_CASE(Get) {
+                BOOST_CHECK(accessor1.get("/") != nullptr);
+                BOOST_CHECK(accessor1.get("/A") == nullptr);
+                BOOST_CHECK(accessor1.get("/A/B") != nullptr);
+                BOOST_CHECK(accessor1.get("/A/B/C") != nullptr);
+                BOOST_CHECK(accessor1.get("/A/D") == nullptr);
 
-  Entry& entryAB = measurements.get("/A/B");
-  BOOST_CHECK(accessor1.getParent(entryAB) == nullptr);
-  // whether accessor2.getParent(entryAB) can return an Entry is undefined,
-  // because strategy2 shouldn't obtain entryAB in the first place
-}
+                BOOST_CHECK(accessor2.get("/") == nullptr);
+                BOOST_CHECK(accessor2.get("/A") != nullptr);
+                BOOST_CHECK(accessor2.get("/A/B") == nullptr);
+                BOOST_CHECK(accessor2.get("/A/B/C") == nullptr);
+                BOOST_CHECK(accessor2.get("/A/D") != nullptr);
+            }
 
-BOOST_AUTO_TEST_CASE(FindLongestPrefixMatch)
-{
-  shared_ptr<Interest> interest = makeInterest("/A/B/C");
-  shared_ptr<pit::Entry> pitEntry = forwarder.getPit().insert(*interest).first;
+            BOOST_AUTO_TEST_CASE(GetParent) {
+                Entry& entryRoot = measurements.get("/");
+                BOOST_CHECK(accessor1.getParent(entryRoot) == nullptr);
+                BOOST_CHECK(accessor2.getParent(entryRoot) == nullptr);
 
-  measurements.get("/");
-  BOOST_CHECK(accessor1.findLongestPrefixMatch("/A/B") != nullptr);
-  BOOST_CHECK(accessor1.findLongestPrefixMatch(*pitEntry) != nullptr);
+                Entry& entryABC = measurements.get("/A/B/C");
+                BOOST_CHECK(accessor1.getParent(entryABC) != nullptr);
+                BOOST_CHECK(accessor2.getParent(entryABC) == nullptr);
 
-  measurements.get("/A");
-  BOOST_CHECK(accessor1.findLongestPrefixMatch("/A/B") == nullptr);
-  BOOST_CHECK(accessor1.findLongestPrefixMatch(*pitEntry) == nullptr);
-}
+                Entry& entryAB = measurements.get("/A/B");
+                BOOST_CHECK(accessor1.getParent(entryAB) == nullptr);
+                // whether accessor2.getParent(entryAB) can return an Entry is undefined,
+                // because strategy2 shouldn't obtain entryAB in the first place
+            }
 
-BOOST_AUTO_TEST_CASE(FindExactMatch)
-{
-  measurements.get("/");
-  measurements.get("/A");
-  measurements.get("/A/B");
-  measurements.get("/A/B/C");
-  measurements.get("/A/D");
+            BOOST_AUTO_TEST_CASE(FindLongestPrefixMatch) {
+                shared_ptr<Interest> interest = makeInterest("/A/B/C");
+                shared_ptr<pit::Entry> pitEntry = forwarder.getPit().insert(*interest).first;
 
-  BOOST_CHECK(accessor1.findExactMatch("/"     ) != nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/A"    ) == nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/A/B"  ) != nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/A/B/C") != nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/A/D"  ) == nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/A/E"  ) == nullptr);
-  BOOST_CHECK(accessor1.findExactMatch("/F"    ) == nullptr);
+                measurements.get("/");
+                BOOST_CHECK(accessor1.findLongestPrefixMatch("/A/B") != nullptr);
+                BOOST_CHECK(accessor1.findLongestPrefixMatch(*pitEntry) != nullptr);
 
-  BOOST_CHECK(accessor2.findExactMatch("/"     ) == nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/A"    ) != nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/A/B"  ) == nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/A/B/C") == nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/A/D"  ) != nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/A/E"  ) == nullptr);
-  BOOST_CHECK(accessor2.findExactMatch("/F"    ) == nullptr);
-}
+                measurements.get("/A");
+                BOOST_CHECK(accessor1.findLongestPrefixMatch("/A/B") == nullptr);
+                BOOST_CHECK(accessor1.findLongestPrefixMatch(*pitEntry) == nullptr);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestMeasurementsAccessor
-BOOST_AUTO_TEST_SUITE_END() // Table
+            BOOST_AUTO_TEST_CASE(FindExactMatch) {
+                measurements.get("/");
+                measurements.get("/A");
+                measurements.get("/A/B");
+                measurements.get("/A/B/C");
+                measurements.get("/A/D");
 
-} // namespace tests
-} // namespace measurements
+                BOOST_CHECK(accessor1.findExactMatch("/") != nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/A") == nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/A/B") != nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/A/B/C") != nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/A/D") == nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/A/E") == nullptr);
+                BOOST_CHECK(accessor1.findExactMatch("/F") == nullptr);
+
+                BOOST_CHECK(accessor2.findExactMatch("/") == nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/A") != nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/A/B") == nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/A/B/C") == nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/A/D") != nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/A/E") == nullptr);
+                BOOST_CHECK(accessor2.findExactMatch("/F") == nullptr);
+            }
+
+            BOOST_AUTO_TEST_SUITE_END() // TestMeasurementsAccessor
+            BOOST_AUTO_TEST_SUITE_END() // Table
+
+        } // namespace tests
+    } // namespace measurements
 } // namespace nfd

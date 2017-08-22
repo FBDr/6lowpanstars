@@ -35,36 +35,34 @@
 #include <ndn-cxx/util/dummy-client-face.hpp>
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-class FaceManagerCommandNode
-{
-public:
-  FaceManagerCommandNode(ndn::KeyChain& keyChain, uint16_t port);
+        class FaceManagerCommandNode {
+        public:
+            FaceManagerCommandNode(ndn::KeyChain& keyChain, uint16_t port);
 
-  ~FaceManagerCommandNode();
+            ~FaceManagerCommandNode();
 
-public:
-  FaceTable faceTable;
-  ndn::util::DummyClientFace face;
-  ndn::mgmt::Dispatcher dispatcher;
-  shared_ptr<CommandAuthenticator> authenticator;
-  FaceManager manager;
-};
+        public:
+            FaceTable faceTable;
+            ndn::util::DummyClientFace face;
+            ndn::mgmt::Dispatcher dispatcher;
+            shared_ptr<CommandAuthenticator> authenticator;
+            FaceManager manager;
+        };
 
-class FaceManagerCommandFixture : public IdentityManagementTimeFixture
-{
-public:
-  FaceManagerCommandFixture();
+        class FaceManagerCommandFixture : public IdentityManagementTimeFixture {
+        public:
+            FaceManagerCommandFixture();
 
-  ~FaceManagerCommandFixture();
+            ~FaceManagerCommandFixture();
 
-public:
-  FaceManagerCommandNode node1; // used to test FaceManager
-  FaceManagerCommandNode node2; // acts as a remote endpoint
-};
+        public:
+            FaceManagerCommandNode node1; // used to test FaceManager
+            FaceManagerCommandNode node2; // acts as a remote endpoint
+        };
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_MGMT_FACE_MANAGER_COMMAND_FIXTURE_HPP

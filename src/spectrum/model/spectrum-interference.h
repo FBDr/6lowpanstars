@@ -32,114 +32,111 @@ namespace ns3 {
 
 
 
-class SpectrumErrorModel;
+    class SpectrumErrorModel;
+
+    /**
+     * \ingroup spectrum
+     *
+     * This class implements a gaussian interference model, i.e., all
+     * incoming signals are added to the total interference.
+     *
+     */
+    class SpectrumInterference : public Object {
+    public:
+        SpectrumInterference();
+        virtual ~SpectrumInterference();
+
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
+
+        /**
+         * set the SpectrumErrorModel to be used.
+         *
+         * @param e
+         */
+        void SetErrorModel(Ptr<SpectrumErrorModel> e);
+
+        /**
+         * notify that the PHY is starting a RX attempt
+         *
+         * @param p the packet corresponding to the signal being RX
+         * @param rxPsd the power spectral density of the signal being RX
+         */
+        void StartRx(Ptr<const Packet> p, Ptr<const SpectrumValue> rxPsd);
+
+        /**
+         * notify that the PHY has aborted RX
+         */
+        void AbortRx();
+
+        /**
+         * notify that the RX attempt has ended. The receiving PHY must call
+         * this method upon RX end in order to:
+         * 1) know if RX was successful or not
+         * 2) free up resources that might eventually be used for the
+         * calculation of interference. Note that for this reason this
+         * method must also be called when RX is aborted.
+         *
+         *
+         * @return true if RX was successful, false otherwise
+         */
+        bool EndRx();
+
+
+        /**
+         * notify that a new signal is being perceived in the medium. This
+         * method is to be called for all incoming signal, regardless of
+         * wether they're useful signals or interferers.
+         *
+         * @param spd the power spectral density of the new signal
+         * @param duration the duration of the new signal
+         */
+        void AddSignal(Ptr<const SpectrumValue> spd, const Time duration);
+
+
+        /**
+         *
+         * @param noisePsd the Noise Power Spectral Density in power units
+         * (Watt, Pascal...) per Hz.
+         */
+        void SetNoisePowerSpectralDensity(Ptr<const SpectrumValue> noisePsd);
+
+
+    protected:
+        void DoDispose();
+
+    private:
+        void ConditionallyEvaluateChunk();
+        void DoAddSignal(Ptr<const SpectrumValue> spd);
+        void DoSubtractSignal(Ptr<const SpectrumValue> spd);
 
 
 
-/**
- * \ingroup spectrum
- *
- * This class implements a gaussian interference model, i.e., all
- * incoming signals are added to the total interference.
- *
- */
-class SpectrumInterference : public Object
-{
-public:
-  SpectrumInterference ();
-  virtual ~SpectrumInterference ();
+        bool m_receiving;
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  /**
-   * set the SpectrumErrorModel to be used.
-   *
-   * @param e
-   */
-  void SetErrorModel (Ptr<SpectrumErrorModel> e);
-
-  /**
-   * notify that the PHY is starting a RX attempt
-   *
-   * @param p the packet corresponding to the signal being RX
-   * @param rxPsd the power spectral density of the signal being RX
-   */
-  void StartRx (Ptr<const Packet> p, Ptr<const SpectrumValue> rxPsd);
-
-  /**
-   * notify that the PHY has aborted RX
-   */
-  void AbortRx ();
-
-  /**
-   * notify that the RX attempt has ended. The receiving PHY must call
-   * this method upon RX end in order to:
-   * 1) know if RX was successful or not
-   * 2) free up resources that might eventually be used for the
-   * calculation of interference. Note that for this reason this
-   * method must also be called when RX is aborted.
-   *
-   *
-   * @return true if RX was successful, false otherwise
-   */
-  bool EndRx ();
-
-
-  /**
-   * notify that a new signal is being perceived in the medium. This
-   * method is to be called for all incoming signal, regardless of
-   * wether they're useful signals or interferers.
-   *
-   * @param spd the power spectral density of the new signal
-   * @param duration the duration of the new signal
-   */
-  void AddSignal (Ptr<const SpectrumValue> spd, const Time duration);
-
-
-  /**
-   *
-   * @param noisePsd the Noise Power Spectral Density in power units
-   * (Watt, Pascal...) per Hz.
-   */
-  void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
-
-
-protected:
-  void DoDispose ();
-
-private:
-  void ConditionallyEvaluateChunk ();
-  void DoAddSignal  (Ptr<const SpectrumValue> spd);
-  void DoSubtractSignal  (Ptr<const SpectrumValue> spd);
-
-
-
-  bool m_receiving;
-
-  Ptr<const SpectrumValue> m_rxSignal; /**< stores the power spectral density of
+        Ptr<const SpectrumValue> m_rxSignal; /**< stores the power spectral density of
                                   * the signal whose RX is being
                                   * attempted
                                   */
 
-  Ptr<SpectrumValue> m_allSignals; /**< stores the spectral
+        Ptr<SpectrumValue> m_allSignals; /**< stores the spectral
                                     * power density of the sum of incoming signals;
                                     * does not include noise, includes the SPD of the signal being RX
                                     */
 
-  Ptr<const SpectrumValue> m_noise;
+        Ptr<const SpectrumValue> m_noise;
 
-  Time m_lastChangeTime;     /**< the time of the last change in
+        Time m_lastChangeTime; /**< the time of the last change in
                                 m_TotalPower */
 
-  Ptr<SpectrumErrorModel> m_errorModel;
+        Ptr<SpectrumErrorModel> m_errorModel;
 
 
 
-};
+    };
 
 
 

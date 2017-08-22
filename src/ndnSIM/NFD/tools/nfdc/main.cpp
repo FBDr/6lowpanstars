@@ -28,56 +28,52 @@
 #include "core/version.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-static int
-main(int argc, char** argv)
-{
-  std::vector<std::string> args(argv + 1, argv + argc);
+            static int
+            main(int argc, char** argv) {
+                std::vector<std::string> args(argv + 1, argv + argc);
 
-  CommandParser parser;
-  registerCommands(parser);
+                CommandParser parser;
+                registerCommands(parser);
 
-  if (args.empty() || args[0] == "-h") {
-    helpList(std::cout, parser);
-    return 0;
-  }
+                if (args.empty() || args[0] == "-h") {
+                    helpList(std::cout, parser);
+                    return 0;
+                }
 
-  if (args[0] == "-V") {
-    std::cout << NFD_VERSION_BUILD_STRING << std::endl;
-    return 0;
-  }
+                if (args[0] == "-V") {
+                    std::cout << NFD_VERSION_BUILD_STRING << std::endl;
+                    return 0;
+                }
 
-  std::string noun, verb;
-  CommandArguments ca;
-  ExecuteCommand execute;
-  try {
-    std::tie(noun, verb, ca, execute) = parser.parse(args, ParseMode::ONE_SHOT);
-  }
-  catch (const std::invalid_argument& e) {
-    std::cerr << e.what() << std::endl;
-    return 2;
-  }
+                std::string noun, verb;
+                CommandArguments ca;
+                ExecuteCommand execute;
+                try {
+                    std::tie(noun, verb, ca, execute) = parser.parse(args, ParseMode::ONE_SHOT);
+                } catch (const std::invalid_argument& e) {
+                    std::cerr << e.what() << std::endl;
+                    return 2;
+                }
 
-  try {
-    ndn::Face face;
-    ndn::KeyChain keyChain;
-    ExecuteContext ctx{noun, verb, ca, face, keyChain};
-    return execute(ctx);
-  }
-  catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    return 1;
-  }
-}
+                try {
+                    ndn::Face face;
+                    ndn::KeyChain keyChain;
+                    ExecuteContext ctx{noun, verb, ca, face, keyChain};
+                    return execute(ctx);
+                } catch (const std::exception& e) {
+                    std::cerr << e.what() << std::endl;
+                    return 1;
+                }
+            }
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 int
-main(int argc, char** argv)
-{
-  return nfd::tools::nfdc::main(argc, argv);
+main(int argc, char** argv) {
+    return nfd::tools::nfdc::main(argc, argv);
 }

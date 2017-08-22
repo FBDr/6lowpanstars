@@ -27,72 +27,68 @@
 #include "algorithm.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-const RetxSuppressionExponential::Duration RetxSuppressionExponential::DEFAULT_INITIAL_INTERVAL =
-    time::milliseconds(1);
-const float RetxSuppressionExponential::DEFAULT_MULTIPLIER = 2.0;
-const RetxSuppressionExponential::Duration RetxSuppressionExponential::DEFAULT_MAX_INTERVAL =
-    time::milliseconds(250);
+        const RetxSuppressionExponential::Duration RetxSuppressionExponential::DEFAULT_INITIAL_INTERVAL =
+                time::milliseconds(1);
+        const float RetxSuppressionExponential::DEFAULT_MULTIPLIER = 2.0;
+        const RetxSuppressionExponential::Duration RetxSuppressionExponential::DEFAULT_MAX_INTERVAL =
+                time::milliseconds(250);
 
-class RetxSuppressionExponential::PitInfo : public StrategyInfo
-{
-public:
-  static constexpr int
-  getTypeId()
-  {
-    return 1020;
-  }
+        class RetxSuppressionExponential::PitInfo : public StrategyInfo {
+        public:
 
-  explicit
-  PitInfo(const Duration& initialInterval)
-    : suppressionInterval(initialInterval)
-  {
-  }
+            static constexpr int
+            getTypeId() {
+                return 1020;
+            }
 
-public:
-  /** \brief if last transmission occurred within suppressionInterval,
-   *         retransmission will be suppressed
-   */
-  Duration suppressionInterval;
-};
+            explicit
+            PitInfo(const Duration& initialInterval)
+            : suppressionInterval(initialInterval) {
+            }
 
-RetxSuppressionExponential::RetxSuppressionExponential(const Duration& initialInterval,
-                                                       float multiplier,
-                                                       const Duration& maxInterval)
-  : m_initialInterval(initialInterval)
-  , m_multiplier(multiplier)
-  , m_maxInterval(maxInterval)
-{
-  BOOST_ASSERT(initialInterval > time::milliseconds::zero());
-  BOOST_ASSERT(multiplier >= 1.0);
-  BOOST_ASSERT(maxInterval >= initialInterval);
-}
+        public:
+            /** \brief if last transmission occurred within suppressionInterval,
+             *         retransmission will be suppressed
+             */
+            Duration suppressionInterval;
+        };
 
-RetxSuppression::Result
-RetxSuppressionExponential::decide(const Face& inFace, const Interest& interest,
-                                   pit::Entry& pitEntry) const
-{
-  bool isNewPitEntry = !hasPendingOutRecords(pitEntry);
-  if (isNewPitEntry) {
-    return NEW;
-  }
+        RetxSuppressionExponential::RetxSuppressionExponential(const Duration& initialInterval,
+                float multiplier,
+                const Duration& maxInterval)
+        : m_initialInterval(initialInterval)
+        , m_multiplier(multiplier)
+        , m_maxInterval(maxInterval) {
+            BOOST_ASSERT(initialInterval > time::milliseconds::zero());
+            BOOST_ASSERT(multiplier >= 1.0);
+            BOOST_ASSERT(maxInterval >= initialInterval);
+        }
 
-  time::steady_clock::TimePoint lastOutgoing = this->getLastOutgoing(pitEntry);
-  time::steady_clock::TimePoint now = time::steady_clock::now();
-  time::steady_clock::Duration sinceLastOutgoing = now - lastOutgoing;
+        RetxSuppression::Result
+        RetxSuppressionExponential::decide(const Face& inFace, const Interest& interest,
+                pit::Entry& pitEntry) const {
+            bool isNewPitEntry = !hasPendingOutRecords(pitEntry);
+            if (isNewPitEntry) {
+                return NEW;
+            }
 
-  PitInfo* pi = pitEntry.insertStrategyInfo<PitInfo>(m_initialInterval).first;
-  bool shouldSuppress = sinceLastOutgoing < pi->suppressionInterval;
+            time::steady_clock::TimePoint lastOutgoing = this->getLastOutgoing(pitEntry);
+            time::steady_clock::TimePoint now = time::steady_clock::now();
+            time::steady_clock::Duration sinceLastOutgoing = now - lastOutgoing;
 
-  if (shouldSuppress) {
-    return SUPPRESS;
-  }
+            PitInfo* pi = pitEntry.insertStrategyInfo<PitInfo>(m_initialInterval).first;
+            bool shouldSuppress = sinceLastOutgoing < pi->suppressionInterval;
 
-  pi->suppressionInterval = std::min(m_maxInterval,
-      time::duration_cast<Duration>(pi->suppressionInterval * m_multiplier));
-  return FORWARD;
-}
+            if (shouldSuppress) {
+                return SUPPRESS;
+            }
 
-} // namespace fw
+            pi->suppressionInterval = std::min(m_maxInterval,
+                    time::duration_cast<Duration>(pi->suppressionInterval * m_multiplier));
+            return FORWARD;
+        }
+
+    } // namespace fw
 } // namespace nfd

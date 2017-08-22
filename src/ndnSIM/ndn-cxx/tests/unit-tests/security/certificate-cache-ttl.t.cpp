@@ -27,116 +27,112 @@
 #include "../unit-test-time-fixture.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-using namespace ndn::tests;
+            using namespace ndn::tests;
 
-BOOST_AUTO_TEST_SUITE(Security)
-BOOST_AUTO_TEST_SUITE(TestCertificateCacheTtl)
+            BOOST_AUTO_TEST_SUITE(Security)
+            BOOST_AUTO_TEST_SUITE(TestCertificateCacheTtl)
 
-class CertificateCacheFixture : public UnitTestTimeFixture
-{
-public:
-  CertificateCacheFixture()
-    : scheduler(io)
-    , cache(make_shared<CertificateCacheTtl>(ref(io), time::seconds(1)))
-  {
-    cert1 = make_shared<v1::IdentityCertificate>();
-    Name certName1("/tmp/KEY/ksk-1/ID-CERT/1");
-    cert1->setName(certName1);
-    cert1->setFreshnessPeriod(time::milliseconds(500));
+            class CertificateCacheFixture : public UnitTestTimeFixture {
+            public:
 
-    cert2 = make_shared<v1::IdentityCertificate>();
-    Name certName2("/tmp/KEY/ksk-2/ID-CERT/2");
-    cert2->setName(certName2);
-    cert2->setFreshnessPeriod(time::milliseconds(1000));
+                CertificateCacheFixture()
+                : scheduler(io)
+                , cache(make_shared<CertificateCacheTtl>(ref(io), time::seconds(1))) {
+                    cert1 = make_shared<v1::IdentityCertificate>();
+                    Name certName1("/tmp/KEY/ksk-1/ID-CERT/1");
+                    cert1->setName(certName1);
+                    cert1->setFreshnessPeriod(time::milliseconds(500));
 
-    name1 = certName1.getPrefix(-1);
-    name2 = certName2.getPrefix(-1);
-  }
+                    cert2 = make_shared<v1::IdentityCertificate>();
+                    Name certName2("/tmp/KEY/ksk-2/ID-CERT/2");
+                    cert2->setName(certName2);
+                    cert2->setFreshnessPeriod(time::milliseconds(1000));
 
-public:
-  Scheduler scheduler;
+                    name1 = certName1.getPrefix(-1);
+                    name2 = certName2.getPrefix(-1);
+                }
 
-  shared_ptr<CertificateCacheTtl> cache;
+            public:
+                Scheduler scheduler;
 
-  shared_ptr<v1::IdentityCertificate> cert1;
-  shared_ptr<v1::IdentityCertificate> cert2;
+                shared_ptr<CertificateCacheTtl> cache;
 
-  Name name1;
-  Name name2;
-};
+                shared_ptr<v1::IdentityCertificate> cert1;
+                shared_ptr<v1::IdentityCertificate> cert2;
 
-BOOST_FIXTURE_TEST_CASE(Expiration, CertificateCacheFixture)
-{
-  cache->insertCertificate(cert1);
-  cache->insertCertificate(cert2);
+                Name name1;
+                Name name2;
+            };
 
-  advanceClocks(time::nanoseconds(1));
-  BOOST_CHECK_EQUAL(cache->getSize(), 2);
+            BOOST_FIXTURE_TEST_CASE(Expiration, CertificateCacheFixture) {
+                cache->insertCertificate(cert1);
+                cache->insertCertificate(cert2);
 
-  scheduler.scheduleEvent(time::milliseconds(200), [&] {
-      BOOST_CHECK_EQUAL(cache->getSize(), 2);
-      BOOST_CHECK_EQUAL(static_cast<bool>(cache->getCertificate(name1)), true);
-      BOOST_CHECK_EQUAL(static_cast<bool>(cache->getCertificate(name2)), true);
-    });
+                advanceClocks(time::nanoseconds(1));
+                BOOST_CHECK_EQUAL(cache->getSize(), 2);
 
-  advanceClocks(time::milliseconds(200));
+                scheduler.scheduleEvent(time::milliseconds(200), [&] {
+                    BOOST_CHECK_EQUAL(cache->getSize(), 2);
+                    BOOST_CHECK_EQUAL(static_cast<bool> (cache->getCertificate(name1)), true);
+                    BOOST_CHECK_EQUAL(static_cast<bool> (cache->getCertificate(name2)), true);
+                });
 
-  // cert1 should removed from the cache
-  scheduler.scheduleEvent(time::milliseconds(700), [&] {
-      BOOST_CHECK_EQUAL(static_cast<bool>(cache->getCertificate(name1)), false);
-      BOOST_CHECK_EQUAL(static_cast<bool>(cache->getCertificate(name2)), true);
-    });
+                advanceClocks(time::milliseconds(200));
 
-  advanceClocks(time::milliseconds(700));
-  BOOST_CHECK_EQUAL(cache->getSize(), 1);
+                // cert1 should removed from the cache
+                scheduler.scheduleEvent(time::milliseconds(700), [&] {
+                    BOOST_CHECK_EQUAL(static_cast<bool> (cache->getCertificate(name1)), false);
+                    BOOST_CHECK_EQUAL(static_cast<bool> (cache->getCertificate(name2)), true);
+                });
 
-  advanceClocks(time::milliseconds(700));
-  BOOST_CHECK_EQUAL(cache->getSize(), 0);
-}
+                advanceClocks(time::milliseconds(700));
+                BOOST_CHECK_EQUAL(cache->getSize(), 1);
 
-BOOST_FIXTURE_TEST_CASE(TtlRefresh, CertificateCacheFixture)
-{
-  cache->insertCertificate(cert1); // 500ms
+                advanceClocks(time::milliseconds(700));
+                BOOST_CHECK_EQUAL(cache->getSize(), 0);
+            }
 
-  advanceClocks(time::nanoseconds(1));
-  BOOST_CHECK_EQUAL(cache->getSize(), 1);
+            BOOST_FIXTURE_TEST_CASE(TtlRefresh, CertificateCacheFixture) {
+                cache->insertCertificate(cert1); // 500ms
 
-  advanceClocks(time::milliseconds(400));
-  BOOST_CHECK_EQUAL(cache->getSize(), 1);
+                advanceClocks(time::nanoseconds(1));
+                BOOST_CHECK_EQUAL(cache->getSize(), 1);
 
-    // Refresh certificate in cache
-  cache->insertCertificate(cert1); // +500ms
+                advanceClocks(time::milliseconds(400));
+                BOOST_CHECK_EQUAL(cache->getSize(), 1);
 
-  advanceClocks(time::nanoseconds(1));
-  BOOST_CHECK_EQUAL(cache->getSize(), 1);
+                // Refresh certificate in cache
+                cache->insertCertificate(cert1); // +500ms
 
-  advanceClocks(time::milliseconds(400));
-  BOOST_CHECK_EQUAL(cache->getSize(), 1);
+                advanceClocks(time::nanoseconds(1));
+                BOOST_CHECK_EQUAL(cache->getSize(), 1);
 
-  advanceClocks(time::milliseconds(200));
-  BOOST_CHECK_EQUAL(cache->getSize(), 0);
-}
+                advanceClocks(time::milliseconds(400));
+                BOOST_CHECK_EQUAL(cache->getSize(), 1);
 
-BOOST_FIXTURE_TEST_CASE(Reset, CertificateCacheFixture)
-{
-  cache->insertCertificate(cert1);
-  cache->insertCertificate(cert2);
+                advanceClocks(time::milliseconds(200));
+                BOOST_CHECK_EQUAL(cache->getSize(), 0);
+            }
 
-  advanceClocks(time::nanoseconds(1));
-  BOOST_CHECK_EQUAL(cache->getSize(), 2);
+            BOOST_FIXTURE_TEST_CASE(Reset, CertificateCacheFixture) {
+                cache->insertCertificate(cert1);
+                cache->insertCertificate(cert2);
 
-  cache->reset();
+                advanceClocks(time::nanoseconds(1));
+                BOOST_CHECK_EQUAL(cache->getSize(), 2);
 
-  advanceClocks(time::nanoseconds(1));
-  BOOST_CHECK_EQUAL(cache->getSize(), 0);
-}
+                cache->reset();
 
-BOOST_AUTO_TEST_SUITE_END() // TestCertificateCacheTtl
-BOOST_AUTO_TEST_SUITE_END() // Security
+                advanceClocks(time::nanoseconds(1));
+                BOOST_CHECK_EQUAL(cache->getSize(), 0);
+            }
 
-} // namespace tests
-} // namespace security
+            BOOST_AUTO_TEST_SUITE_END() // TestCertificateCacheTtl
+            BOOST_AUTO_TEST_SUITE_END() // Security
+
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

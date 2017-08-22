@@ -27,98 +27,87 @@
 
 namespace ndn {
 
-UnixTransport::UnixTransport(const std::string& unixSocket)
-  : m_unixSocket(unixSocket)
-{
-}
-
-UnixTransport::~UnixTransport()
-{
-}
-
-std::string
-UnixTransport::getSocketNameFromUri(const std::string& uriString)
-{
-  // Assume the default nfd.sock location.
-  std::string path = "/var/run/nfd.sock";
-
-  if (uriString.empty()) {
-    return path;
-  }
-
-  try {
-    const util::FaceUri uri(uriString);
-
-    if (uri.getScheme() != "unix") {
-      BOOST_THROW_EXCEPTION(Error("Cannot create UnixTransport from \"" +
-                                  uri.getScheme() + "\" URI"));
+    UnixTransport::UnixTransport(const std::string& unixSocket)
+    : m_unixSocket(unixSocket) {
     }
 
-    if (!uri.getPath().empty()) {
-      path = uri.getPath();
+    UnixTransport::~UnixTransport() {
     }
-  }
-  catch (const util::FaceUri::Error& error) {
-    BOOST_THROW_EXCEPTION(Error(error.what()));
-  }
 
-  return path;
-}
+    std::string
+    UnixTransport::getSocketNameFromUri(const std::string& uriString) {
+        // Assume the default nfd.sock location.
+        std::string path = "/var/run/nfd.sock";
 
-shared_ptr<UnixTransport>
-UnixTransport::create(const std::string& uri)
-{
-  return make_shared<UnixTransport>(getSocketNameFromUri(uri));
-}
+        if (uriString.empty()) {
+            return path;
+        }
 
-void
-UnixTransport::connect(boost::asio::io_service& ioService,
-                       const ReceiveCallback& receiveCallback)
-{
-  if (m_impl == nullptr) {
-    Transport::connect(ioService, receiveCallback);
+        try {
+            const util::FaceUri uri(uriString);
 
-    m_impl = make_shared<Impl>(ref(*this), ref(ioService));
-  }
+            if (uri.getScheme() != "unix") {
+                BOOST_THROW_EXCEPTION(Error("Cannot create UnixTransport from \"" +
+                        uri.getScheme() + "\" URI"));
+            }
 
-  m_impl->connect(boost::asio::local::stream_protocol::endpoint(m_unixSocket));
-}
+            if (!uri.getPath().empty()) {
+                path = uri.getPath();
+            }
+        } catch (const util::FaceUri::Error& error) {
+            BOOST_THROW_EXCEPTION(Error(error.what()));
+        }
 
-void
-UnixTransport::send(const Block& wire)
-{
-  BOOST_ASSERT(m_impl != nullptr);
-  m_impl->send(wire);
-}
+        return path;
+    }
 
-void
-UnixTransport::send(const Block& header, const Block& payload)
-{
-  BOOST_ASSERT(m_impl != nullptr);
-  m_impl->send(header, payload);
-}
+    shared_ptr<UnixTransport>
+    UnixTransport::create(const std::string& uri) {
+        return make_shared<UnixTransport>(getSocketNameFromUri(uri));
+    }
 
-void
-UnixTransport::close()
-{
-  BOOST_ASSERT(m_impl != nullptr);
-  m_impl->close();
-  m_impl.reset();
-}
+    void
+    UnixTransport::connect(boost::asio::io_service& ioService,
+            const ReceiveCallback& receiveCallback) {
+        if (m_impl == nullptr) {
+            Transport::connect(ioService, receiveCallback);
 
-void
-UnixTransport::pause()
-{
-  if (m_impl != nullptr) {
-    m_impl->pause();
-  }
-}
+            m_impl = make_shared<Impl>(ref(*this), ref(ioService));
+        }
 
-void
-UnixTransport::resume()
-{
-  BOOST_ASSERT(m_impl != nullptr);
-  m_impl->resume();
-}
+        m_impl->connect(boost::asio::local::stream_protocol::endpoint(m_unixSocket));
+    }
+
+    void
+    UnixTransport::send(const Block& wire) {
+        BOOST_ASSERT(m_impl != nullptr);
+        m_impl->send(wire);
+    }
+
+    void
+    UnixTransport::send(const Block& header, const Block& payload) {
+        BOOST_ASSERT(m_impl != nullptr);
+        m_impl->send(header, payload);
+    }
+
+    void
+    UnixTransport::close() {
+        BOOST_ASSERT(m_impl != nullptr);
+        m_impl->close();
+        m_impl.reset();
+    }
+
+    void
+    UnixTransport::pause() {
+        if (m_impl != nullptr) {
+            m_impl->pause();
+        }
+    }
+
+    void
+    UnixTransport::resume() {
+        BOOST_ASSERT(m_impl != nullptr);
+        m_impl->resume();
+    }
 
 } // namespace ndn

@@ -27,68 +27,61 @@
 #include "cs.hpp"
 
 namespace nfd {
-namespace cs {
-namespace lru {
+    namespace cs {
+        namespace lru {
 
-const std::string LruPolicy::POLICY_NAME = "lru";
-NFD_REGISTER_CS_POLICY(LruPolicy);
+            const std::string LruPolicy::POLICY_NAME = "lru";
+            NFD_REGISTER_CS_POLICY(LruPolicy);
 
-LruPolicy::LruPolicy()
-  : Policy(POLICY_NAME)
-{
-}
+            LruPolicy::LruPolicy()
+            : Policy(POLICY_NAME) {
+            }
 
-void
-LruPolicy::doAfterInsert(iterator i)
-{
-  this->insertToQueue(i, true);
-  this->evictEntries();
-}
+            void
+            LruPolicy::doAfterInsert(iterator i) {
+                this->insertToQueue(i, true);
+                this->evictEntries();
+            }
 
-void
-LruPolicy::doAfterRefresh(iterator i)
-{
-  this->insertToQueue(i, false);
-}
+            void
+            LruPolicy::doAfterRefresh(iterator i) {
+                this->insertToQueue(i, false);
+            }
 
-void
-LruPolicy::doBeforeErase(iterator i)
-{
-  m_queue.get<1>().erase(i);
-}
+            void
+            LruPolicy::doBeforeErase(iterator i) {
+                m_queue.get<1>().erase(i);
+            }
 
-void
-LruPolicy::doBeforeUse(iterator i)
-{
-  this->insertToQueue(i, false);
-}
+            void
+            LruPolicy::doBeforeUse(iterator i) {
+                this->insertToQueue(i, false);
+            }
 
-void
-LruPolicy::evictEntries()
-{
-  BOOST_ASSERT(this->getCs() != nullptr);
-  while (this->getCs()->size() > this->getLimit()) {
-    BOOST_ASSERT(!m_queue.empty());
-    iterator i = m_queue.front();
-    m_queue.pop_front();
-    this->emitSignal(beforeEvict, i);
-  }
-}
+            void
+            LruPolicy::evictEntries() {
+                BOOST_ASSERT(this->getCs() != nullptr);
+                while (this->getCs()->size() > this->getLimit()) {
+                    BOOST_ASSERT(!m_queue.empty());
+                    iterator i = m_queue.front();
+                    m_queue.pop_front();
+                    this->emitSignal(beforeEvict, i);
+                }
+            }
 
-void
-LruPolicy::insertToQueue(iterator i, bool isNewEntry)
-{
-  Queue::iterator it;
-  bool isNew = false;
-  // push_back only if iterator i does not exist
-  std::tie(it, isNew) = m_queue.push_back(i);
+            void
+            LruPolicy::insertToQueue(iterator i, bool isNewEntry) {
+                Queue::iterator it;
+                bool isNew = false;
+                // push_back only if iterator i does not exist
+                std::tie(it, isNew) = m_queue.push_back(i);
 
-  BOOST_ASSERT(isNew == isNewEntry);
-  if (!isNewEntry) {
-    m_queue.relocate(m_queue.end(), it);
-  }
-}
+                BOOST_ASSERT(isNew == isNewEntry);
+                if (!isNewEntry) {
+                    m_queue.relocate(m_queue.end(), it);
+                }
+            }
 
-} // namespace lru
-} // namespace cs
+        } // namespace lru
+    } // namespace cs
 } // namespace nfd

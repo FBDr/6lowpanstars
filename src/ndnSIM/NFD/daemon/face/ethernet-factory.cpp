@@ -29,57 +29,54 @@
 
 namespace nfd {
 
-shared_ptr<Face>
-EthernetFactory::createMulticastFace(const NetworkInterfaceInfo& interface,
-                                     const ethernet::Address& address)
-{
-  if (!address.isMulticast())
-    BOOST_THROW_EXCEPTION(Error(address.toString() + " is not a multicast address"));
+    shared_ptr<Face>
+    EthernetFactory::createMulticastFace(const NetworkInterfaceInfo& interface,
+            const ethernet::Address& address) {
+        if (!address.isMulticast())
+            BOOST_THROW_EXCEPTION(Error(address.toString() + " is not a multicast address"));
 
-  auto face = findMulticastFace(interface.name, address);
-  if (face)
-    return face;
+        auto face = findMulticastFace(interface.name, address);
+        if (face)
+            return face;
 
-  face::GenericLinkService::Options opts;
-  opts.allowFragmentation = true;
-  opts.allowReassembly = true;
+        face::GenericLinkService::Options opts;
+        opts.allowFragmentation = true;
+        opts.allowReassembly = true;
 
-  auto linkService = make_unique<face::GenericLinkService>(opts);
-  auto transport = make_unique<face::EthernetTransport>(interface, address);
-  face = make_shared<Face>(std::move(linkService), std::move(transport));
+        auto linkService = make_unique<face::GenericLinkService>(opts);
+        auto transport = make_unique<face::EthernetTransport>(interface, address);
+        face = make_shared<Face>(std::move(linkService), std::move(transport));
 
-  auto key = std::make_pair(interface.name, address);
-  m_multicastFaces[key] = face;
-  connectFaceClosedSignal(*face, [this, key] { m_multicastFaces.erase(key); });
+        auto key = std::make_pair(interface.name, address);
+        m_multicastFaces[key] = face;
+        connectFaceClosedSignal(*face, [this, key] {
+            m_multicastFaces.erase(key); });
 
-  return face;
-}
+        return face;
+    }
 
-void
-EthernetFactory::createFace(const FaceUri& uri,
-                            ndn::nfd::FacePersistency persistency,
-                            bool wantLocalFieldsEnabled,
-                            const FaceCreatedCallback& onCreated,
-                            const FaceCreationFailedCallback& onFailure)
-{
-  onFailure(406, "Unsupported protocol");
-}
+    void
+    EthernetFactory::createFace(const FaceUri& uri,
+            ndn::nfd::FacePersistency persistency,
+            bool wantLocalFieldsEnabled,
+            const FaceCreatedCallback& onCreated,
+            const FaceCreationFailedCallback& onFailure) {
+        onFailure(406, "Unsupported protocol");
+    }
 
-std::vector<shared_ptr<const Channel>>
-EthernetFactory::getChannels() const
-{
-  return {};
-}
+    std::vector<shared_ptr<const Channel>>
+    EthernetFactory::getChannels() const {
+        return {};
+    }
 
-shared_ptr<Face>
-EthernetFactory::findMulticastFace(const std::string& interfaceName,
-                                   const ethernet::Address& address) const
-{
-  auto i = m_multicastFaces.find({interfaceName, address});
-  if (i != m_multicastFaces.end())
-    return i->second;
-  else
-    return nullptr;
-}
+    shared_ptr<Face>
+    EthernetFactory::findMulticastFace(const std::string& interfaceName,
+            const ethernet::Address& address) const {
+        auto i = m_multicastFaces.find({interfaceName, address});
+        if (i != m_multicastFaces.end())
+            return i->second;
+        else
+            return nullptr;
+    }
 
 } // namespace nfd

@@ -31,205 +31,198 @@
 #include "table/measurements-accessor.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief represents a forwarding strategy
- */
-class Strategy : public enable_shared_from_this<Strategy>, noncopyable
-{
-public:
-  /** \brief construct a strategy instance
-   *  \param forwarder a reference to the Forwarder, used to enable actions and accessors.
-   *         Strategy subclasses should pass this reference,
-   *         and should not keep a reference themselves.
-   *  \param name the strategy Name.
-   *         It's recommended to include a version number as the last component.
-   */
-  Strategy(Forwarder& forwarder, const Name& name);
+        /** \brief represents a forwarding strategy
+         */
+        class Strategy : public enable_shared_from_this<Strategy>, noncopyable {
+        public:
+            /** \brief construct a strategy instance
+             *  \param forwarder a reference to the Forwarder, used to enable actions and accessors.
+             *         Strategy subclasses should pass this reference,
+             *         and should not keep a reference themselves.
+             *  \param name the strategy Name.
+             *         It's recommended to include a version number as the last component.
+             */
+            Strategy(Forwarder& forwarder, const Name& name);
 
-  virtual
-  ~Strategy();
+            virtual
+            ~Strategy();
 
-  /** \return a Name that represents the strategy program
-   */
-  const Name&
-  getName() const
-  {
-    return m_name;
-  }
+            /** \return a Name that represents the strategy program
+             */
+            const Name&
+            getName() const {
+                return m_name;
+            }
 
-public: // triggers
-  /** \brief trigger after Interest is received
-   *
-   *  The Interest:
-   *  - does not violate Scope
-   *  - is not looped
-   *  - cannot be satisfied by ContentStore
-   *  - is under a namespace managed by this strategy
-   *
-   *  The strategy should decide whether and where to forward this Interest.
-   *  - If the strategy decides to forward this Interest,
-   *    invoke this->sendInterest one or more times, either now or shortly after
-   *  - If strategy concludes that this Interest cannot be forwarded,
-   *    invoke this->rejectPendingInterest so that PIT entry will be deleted shortly
-   *
-   *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
-   *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
-   */
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) = 0;
+        public: // triggers
+            /** \brief trigger after Interest is received
+             *
+             *  The Interest:
+             *  - does not violate Scope
+             *  - is not looped
+             *  - cannot be satisfied by ContentStore
+             *  - is under a namespace managed by this strategy
+             *
+             *  The strategy should decide whether and where to forward this Interest.
+             *  - If the strategy decides to forward this Interest,
+             *    invoke this->sendInterest one or more times, either now or shortly after
+             *  - If strategy concludes that this Interest cannot be forwarded,
+             *    invoke this->rejectPendingInterest so that PIT entry will be deleted shortly
+             *
+             *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
+             *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
+             */
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) = 0;
 
-  /** \brief trigger before PIT entry is satisfied
-   *
-   *  This trigger is invoked when an incoming Data satisfies the PIT entry.
-   *  It can be invoked even if the PIT entry has already been satisfied.
-   *
-   *  In this base class this method does nothing.
-   *
-   *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
-   *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
-   */
-  virtual void
-  beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
-                        const Face& inFace, const Data& data);
+            /** \brief trigger before PIT entry is satisfied
+             *
+             *  This trigger is invoked when an incoming Data satisfies the PIT entry.
+             *  It can be invoked even if the PIT entry has already been satisfied.
+             *
+             *  In this base class this method does nothing.
+             *
+             *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
+             *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
+             */
+            virtual void
+            beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                    const Face& inFace, const Data& data);
 
-  /** \brief trigger before PIT entry expires
-   *
-   *  PIT entry expires when InterestLifetime has elapsed for all InRecords,
-   *  and it is not satisfied by an incoming Data.
-   *
-   *  This trigger is not invoked for PIT entry already satisfied.
-   *
-   *  In this base class this method does nothing.
-   *
-   *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
-   *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>,
-   *           although this isn't useful here because PIT entry would be deleted shortly after.
-   */
-  virtual void
-  beforeExpirePendingInterest(const shared_ptr<pit::Entry>& pitEntry);
+            /** \brief trigger before PIT entry expires
+             *
+             *  PIT entry expires when InterestLifetime has elapsed for all InRecords,
+             *  and it is not satisfied by an incoming Data.
+             *
+             *  This trigger is not invoked for PIT entry already satisfied.
+             *
+             *  In this base class this method does nothing.
+             *
+             *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
+             *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>,
+             *           although this isn't useful here because PIT entry would be deleted shortly after.
+             */
+            virtual void
+            beforeExpirePendingInterest(const shared_ptr<pit::Entry>& pitEntry);
 
-  /** \brief trigger after Nack is received
-   *
-   *  This trigger is invoked when an incoming Nack is received in response to
-   *  an forwarded Interest.
-   *  The Nack has been confirmed to be a response to the last Interest forwarded
-   *  to that upstream, i.e. the PIT out-record exists and has a matching Nonce.
-   *  The NackHeader has been recorded in the PIT out-record.
-   *
-   *  In this base class this method does nothing.
-   *
-   *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
-   *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
-   */
-  virtual void
-  afterReceiveNack(const Face& inFace, const lp::Nack& nack,
-                   const shared_ptr<pit::Entry>& pitEntry);
+            /** \brief trigger after Nack is received
+             *
+             *  This trigger is invoked when an incoming Nack is received in response to
+             *  an forwarded Interest.
+             *  The Nack has been confirmed to be a response to the last Interest forwarded
+             *  to that upstream, i.e. the PIT out-record exists and has a matching Nonce.
+             *  The NackHeader has been recorded in the PIT out-record.
+             *
+             *  In this base class this method does nothing.
+             *
+             *  \warning The strategy must not retain shared_ptr<pit::Entry>, otherwise undefined behavior
+             *           may occur. However, the strategy is allowed to store weak_ptr<pit::Entry>.
+             */
+            virtual void
+            afterReceiveNack(const Face& inFace, const lp::Nack& nack,
+                    const shared_ptr<pit::Entry>& pitEntry);
 
-protected: // actions
-  /** \brief send Interest to outFace
-   *  \param pitEntry PIT entry
-   *  \param outFace face through which to send out the Interest
-   *  \param interest the Interest packet
-   */
-  VIRTUAL_WITH_TESTS void
-  sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
-               const Interest& interest)
-  {
-    m_forwarder.onOutgoingInterest(pitEntry, outFace, interest);
-  }
+        protected: // actions
 
-  /** \brief send Interest to outFace
-   *  \param pitEntry PIT entry
-   *  \param outFace face through which to send out the Interest
-   *  \param wantNewNonce if true, a new Nonce will be generated,
-   *                      rather than reusing a Nonce from one of the PIT in-records
-   *  \deprecated use sendInterest(pitEntry, outFace, interest) instead
-   */
-  DEPRECATED(
-  void
-  sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
-               bool wantNewNonce = false));
+            /** \brief send Interest to outFace
+             *  \param pitEntry PIT entry
+             *  \param outFace face through which to send out the Interest
+             *  \param interest the Interest packet
+             */
+            VIRTUAL_WITH_TESTS void
+            sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
+                    const Interest& interest) {
+                m_forwarder.onOutgoingInterest(pitEntry, outFace, interest);
+            }
 
-  /** \brief decide that a pending Interest cannot be forwarded
-   *  \param pitEntry PIT entry
-   *
-   *  This shall not be called if the pending Interest has been
-   *  forwarded earlier, and does not need to be resent now.
-   */
-  VIRTUAL_WITH_TESTS void
-  rejectPendingInterest(const shared_ptr<pit::Entry>& pitEntry)
-  {
-    m_forwarder.onInterestReject(pitEntry);
-  }
+            /** \brief send Interest to outFace
+             *  \param pitEntry PIT entry
+             *  \param outFace face through which to send out the Interest
+             *  \param wantNewNonce if true, a new Nonce will be generated,
+             *                      rather than reusing a Nonce from one of the PIT in-records
+             *  \deprecated use sendInterest(pitEntry, outFace, interest) instead
+             */
+            DEPRECATED(
+                    void
+                    sendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace,
+                    bool wantNewNonce = false));
 
-  /** \brief send Nack to outFace
-   *  \param pitEntry PIT entry
-   *  \param outFace face through which to send out the Nack
-   *  \param header Nack header
-   *
-   *  The outFace must have a PIT in-record, otherwise this method has no effect.
-   */
-  VIRTUAL_WITH_TESTS void
-  sendNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace,
-           const lp::NackHeader& header)
-  {
-    m_forwarder.onOutgoingNack(pitEntry, outFace, header);
-  }
+            /** \brief decide that a pending Interest cannot be forwarded
+             *  \param pitEntry PIT entry
+             *
+             *  This shall not be called if the pending Interest has been
+             *  forwarded earlier, and does not need to be resent now.
+             */
+            VIRTUAL_WITH_TESTS void
+            rejectPendingInterest(const shared_ptr<pit::Entry>& pitEntry) {
+                m_forwarder.onInterestReject(pitEntry);
+            }
 
-  /** \brief send Nack to every face that has an in-record,
-   *         except those in \p exceptFaces
-   *  \param pitEntry PIT entry
-   *  \param header NACK header
-   *  \param exceptFaces list of faces that should be excluded from sending Nacks
-   *  \note This is not an action, but a helper that invokes the sendNack action.
-   */
-  void
-  sendNacks(const shared_ptr<pit::Entry>& pitEntry, const lp::NackHeader& header,
-            std::initializer_list<const Face*> exceptFaces = std::initializer_list<const Face*>());
+            /** \brief send Nack to outFace
+             *  \param pitEntry PIT entry
+             *  \param outFace face through which to send out the Nack
+             *  \param header Nack header
+             *
+             *  The outFace must have a PIT in-record, otherwise this method has no effect.
+             */
+            VIRTUAL_WITH_TESTS void
+            sendNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace,
+                    const lp::NackHeader& header) {
+                m_forwarder.onOutgoingNack(pitEntry, outFace, header);
+            }
 
-protected: // accessors
-  /** \brief performs a FIB lookup, considering Link object if present
-   */
-  const fib::Entry&
-  lookupFib(const pit::Entry& pitEntry) const;
+            /** \brief send Nack to every face that has an in-record,
+             *         except those in \p exceptFaces
+             *  \param pitEntry PIT entry
+             *  \param header NACK header
+             *  \param exceptFaces list of faces that should be excluded from sending Nacks
+             *  \note This is not an action, but a helper that invokes the sendNack action.
+             */
+            void
+            sendNacks(const shared_ptr<pit::Entry>& pitEntry, const lp::NackHeader& header,
+                    std::initializer_list<const Face*> exceptFaces = std::initializer_list<const Face*>());
 
-  MeasurementsAccessor&
-  getMeasurements()
-  {
-    return m_measurements;
-  }
+        protected: // accessors
+            /** \brief performs a FIB lookup, considering Link object if present
+             */
+            const fib::Entry&
+            lookupFib(const pit::Entry& pitEntry) const;
 
-  Face*
-  getFace(FaceId id) const
-  {
-    return m_forwarder.getFace(id);
-  }
+            MeasurementsAccessor&
+            getMeasurements() {
+                return m_measurements;
+            }
 
-  const FaceTable&
-  getFaceTable() const
-  {
-    return m_forwarder.getFaceTable();
-  }
+            Face*
+            getFace(FaceId id) const {
+                return m_forwarder.getFace(id);
+            }
 
-protected: // accessors
-  signal::Signal<FaceTable, Face&>& afterAddFace;
-  signal::Signal<FaceTable, Face&>& beforeRemoveFace;
+            const FaceTable&
+            getFaceTable() const {
+                return m_forwarder.getFaceTable();
+            }
 
-private:
-  Name m_name;
+        protected: // accessors
+            signal::Signal<FaceTable, Face&>& afterAddFace;
+            signal::Signal<FaceTable, Face&>& beforeRemoveFace;
 
-  /** \brief reference to the forwarder
-   *
-   *  Triggers can access forwarder indirectly via actions.
-   */
-  Forwarder& m_forwarder;
+        private:
+            Name m_name;
 
-  MeasurementsAccessor m_measurements;
-};
+            /** \brief reference to the forwarder
+             *
+             *  Triggers can access forwarder indirectly via actions.
+             */
+            Forwarder& m_forwarder;
 
-} // namespace fw
+            MeasurementsAccessor m_measurements;
+        };
+
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_STRATEGY_HPP

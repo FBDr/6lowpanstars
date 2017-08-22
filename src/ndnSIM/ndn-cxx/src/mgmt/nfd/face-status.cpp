@@ -25,354 +25,321 @@
 #include "util/concepts.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-//BOOST_CONCEPT_ASSERT((boost::EqualityComparable<FaceStatus>));
-BOOST_CONCEPT_ASSERT((WireEncodable<FaceStatus>));
-BOOST_CONCEPT_ASSERT((WireDecodable<FaceStatus>));
-static_assert(std::is_base_of<tlv::Error, FaceStatus::Error>::value,
-              "FaceStatus::Error must inherit from tlv::Error");
+        //BOOST_CONCEPT_ASSERT((boost::EqualityComparable<FaceStatus>));
+        BOOST_CONCEPT_ASSERT((WireEncodable<FaceStatus>));
+        BOOST_CONCEPT_ASSERT((WireDecodable<FaceStatus>));
+        static_assert(std::is_base_of<tlv::Error, FaceStatus::Error>::value,
+                "FaceStatus::Error must inherit from tlv::Error");
 
-FaceStatus::FaceStatus()
-  : m_hasExpirationPeriod(false)
-  , m_nInInterests(0)
-  , m_nInDatas(0)
-  , m_nInNacks(0)
-  , m_nOutInterests(0)
-  , m_nOutDatas(0)
-  , m_nOutNacks(0)
-  , m_nInBytes(0)
-  , m_nOutBytes(0)
-{
-}
+        FaceStatus::FaceStatus()
+        : m_hasExpirationPeriod(false)
+        , m_nInInterests(0)
+        , m_nInDatas(0)
+        , m_nInNacks(0)
+        , m_nOutInterests(0)
+        , m_nOutDatas(0)
+        , m_nOutNacks(0)
+        , m_nInBytes(0)
+        , m_nOutBytes(0) {
+        }
 
-FaceStatus::FaceStatus(const Block& block)
-{
-  this->wireDecode(block);
-}
+        FaceStatus::FaceStatus(const Block& block) {
+            this->wireDecode(block);
+        }
 
-template<encoding::Tag TAG>
-size_t
-FaceStatus::wireEncode(EncodingImpl<TAG>& encoder) const
-{
-  size_t totalLength = 0;
+        template<encoding::Tag TAG>
+        size_t
+        FaceStatus::wireEncode(EncodingImpl<TAG>& encoder) const {
+            size_t totalLength = 0;
 
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::Flags, m_flags);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NOutBytes, m_nOutBytes);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NInBytes, m_nInBytes);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NOutNacks, m_nOutNacks);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NOutDatas, m_nOutDatas);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NOutInterests, m_nOutInterests);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NInNacks, m_nInNacks);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NInDatas, m_nInDatas);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::NInInterests, m_nInInterests);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::LinkType, m_linkType);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::FacePersistency, m_facePersistency);
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::FaceScope, m_faceScope);
-  if (m_hasExpirationPeriod) {
-    totalLength += prependNonNegativeIntegerBlock(encoder,
-                   tlv::nfd::ExpirationPeriod, m_expirationPeriod.count());
-  }
-  totalLength += encoder.prependByteArrayBlock(tlv::nfd::LocalUri,
-                 reinterpret_cast<const uint8_t*>(m_localUri.c_str()), m_localUri.size());
-  totalLength += encoder.prependByteArrayBlock(tlv::nfd::Uri,
-                 reinterpret_cast<const uint8_t*>(m_remoteUri.c_str()), m_remoteUri.size());
-  totalLength += prependNonNegativeIntegerBlock(encoder,
-                 tlv::nfd::FaceId, m_faceId);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::Flags, m_flags);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NOutBytes, m_nOutBytes);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NInBytes, m_nInBytes);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NOutNacks, m_nOutNacks);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NOutDatas, m_nOutDatas);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NOutInterests, m_nOutInterests);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NInNacks, m_nInNacks);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NInDatas, m_nInDatas);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::NInInterests, m_nInInterests);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::LinkType, m_linkType);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::FacePersistency, m_facePersistency);
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::FaceScope, m_faceScope);
+            if (m_hasExpirationPeriod) {
+                totalLength += prependNonNegativeIntegerBlock(encoder,
+                        tlv::nfd::ExpirationPeriod, m_expirationPeriod.count());
+            }
+            totalLength += encoder.prependByteArrayBlock(tlv::nfd::LocalUri,
+                    reinterpret_cast<const uint8_t*> (m_localUri.c_str()), m_localUri.size());
+            totalLength += encoder.prependByteArrayBlock(tlv::nfd::Uri,
+                    reinterpret_cast<const uint8_t*> (m_remoteUri.c_str()), m_remoteUri.size());
+            totalLength += prependNonNegativeIntegerBlock(encoder,
+                    tlv::nfd::FaceId, m_faceId);
 
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::nfd::FaceStatus);
-  return totalLength;
-}
+            totalLength += encoder.prependVarNumber(totalLength);
+            totalLength += encoder.prependVarNumber(tlv::nfd::FaceStatus);
+            return totalLength;
+        }
 
-template size_t
-FaceStatus::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& block) const;
+        template size_t
+        FaceStatus::wireEncode<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& block) const;
 
-template size_t
-FaceStatus::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& block) const;
+        template size_t
+        FaceStatus::wireEncode<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& block) const;
 
-const Block&
-FaceStatus::wireEncode() const
-{
-  if (m_wire.hasWire())
-    return m_wire;
+        const Block&
+        FaceStatus::wireEncode() const {
+            if (m_wire.hasWire())
+                return m_wire;
 
-  EncodingEstimator estimator;
-  size_t estimatedSize = wireEncode(estimator);
+            EncodingEstimator estimator;
+            size_t estimatedSize = wireEncode(estimator);
 
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
+            EncodingBuffer buffer(estimatedSize, 0);
+            wireEncode(buffer);
 
-  m_wire = buffer.block();
-  return m_wire;
-}
+            m_wire = buffer.block();
+            return m_wire;
+        }
 
-void
-FaceStatus::wireDecode(const Block& block)
-{
-  if (block.type() != tlv::nfd::FaceStatus) {
-    BOOST_THROW_EXCEPTION(Error("expecting FaceStatus block"));
-  }
-  m_wire = block;
-  m_wire.parse();
-  Block::element_const_iterator val = m_wire.elements_begin();
+        void
+        FaceStatus::wireDecode(const Block& block) {
+            if (block.type() != tlv::nfd::FaceStatus) {
+                BOOST_THROW_EXCEPTION(Error("expecting FaceStatus block"));
+            }
+            m_wire = block;
+            m_wire.parse();
+            Block::element_const_iterator val = m_wire.elements_begin();
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::FaceId) {
-    m_faceId = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required FaceId field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::FaceId) {
+                m_faceId = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required FaceId field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::Uri) {
-    m_remoteUri.assign(reinterpret_cast<const char*>(val->value()), val->value_size());
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required Uri field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::Uri) {
+                m_remoteUri.assign(reinterpret_cast<const char*> (val->value()), val->value_size());
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required Uri field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::LocalUri) {
-    m_localUri.assign(reinterpret_cast<const char*>(val->value()), val->value_size());
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required LocalUri field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::LocalUri) {
+                m_localUri.assign(reinterpret_cast<const char*> (val->value()), val->value_size());
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required LocalUri field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::ExpirationPeriod) {
-    m_expirationPeriod = time::milliseconds(readNonNegativeInteger(*val));
-    m_hasExpirationPeriod = true;
-    ++val;
-  }
-  else {
-    m_hasExpirationPeriod = false;
-    // ExpirationPeriod is optional
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::ExpirationPeriod) {
+                m_expirationPeriod = time::milliseconds(readNonNegativeInteger(*val));
+                m_hasExpirationPeriod = true;
+                ++val;
+            } else {
+                m_hasExpirationPeriod = false;
+                // ExpirationPeriod is optional
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::FaceScope) {
-    m_faceScope = static_cast<FaceScope>(readNonNegativeInteger(*val));
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required FaceScope field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::FaceScope) {
+                m_faceScope = static_cast<FaceScope> (readNonNegativeInteger(*val));
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required FaceScope field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::FacePersistency) {
-    m_facePersistency = static_cast<FacePersistency>(readNonNegativeInteger(*val));
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required FacePersistency field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::FacePersistency) {
+                m_facePersistency = static_cast<FacePersistency> (readNonNegativeInteger(*val));
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required FacePersistency field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::LinkType) {
-    m_linkType = static_cast<LinkType>(readNonNegativeInteger(*val));
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required LinkType field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::LinkType) {
+                m_linkType = static_cast<LinkType> (readNonNegativeInteger(*val));
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required LinkType field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInInterests) {
-    m_nInInterests = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NInInterests field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInInterests) {
+                m_nInInterests = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NInInterests field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInDatas) {
-    m_nInDatas = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NInDatas field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInDatas) {
+                m_nInDatas = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NInDatas field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInNacks) {
-    m_nInNacks = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NInNacks field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInNacks) {
+                m_nInNacks = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NInNacks field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutInterests) {
-    m_nOutInterests = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NOutInterests field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutInterests) {
+                m_nOutInterests = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NOutInterests field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutDatas) {
-    m_nOutDatas = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NOutDatas field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutDatas) {
+                m_nOutDatas = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NOutDatas field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutNacks) {
-    m_nOutNacks = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NOutNacks field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutNacks) {
+                m_nOutNacks = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NOutNacks field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInBytes) {
-    m_nInBytes = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NInBytes field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NInBytes) {
+                m_nInBytes = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NInBytes field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutBytes) {
-    m_nOutBytes = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required NOutBytes field"));
-  }
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::NOutBytes) {
+                m_nOutBytes = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required NOutBytes field"));
+            }
 
-  if (val != m_wire.elements_end() && val->type() == tlv::nfd::Flags) {
-    m_flags = readNonNegativeInteger(*val);
-    ++val;
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("missing required Flags field"));
-  }
-}
+            if (val != m_wire.elements_end() && val->type() == tlv::nfd::Flags) {
+                m_flags = readNonNegativeInteger(*val);
+                ++val;
+            } else {
+                BOOST_THROW_EXCEPTION(Error("missing required Flags field"));
+            }
+        }
 
-FaceStatus&
-FaceStatus::setExpirationPeriod(const time::milliseconds& expirationPeriod)
-{
-  m_wire.reset();
-  m_expirationPeriod = expirationPeriod;
-  m_hasExpirationPeriod = true;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setExpirationPeriod(const time::milliseconds& expirationPeriod) {
+            m_wire.reset();
+            m_expirationPeriod = expirationPeriod;
+            m_hasExpirationPeriod = true;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNInInterests(uint64_t nInInterests)
-{
-  m_wire.reset();
-  m_nInInterests = nInInterests;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNInInterests(uint64_t nInInterests) {
+            m_wire.reset();
+            m_nInInterests = nInInterests;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNInDatas(uint64_t nInDatas)
-{
-  m_wire.reset();
-  m_nInDatas = nInDatas;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNInDatas(uint64_t nInDatas) {
+            m_wire.reset();
+            m_nInDatas = nInDatas;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNInNacks(uint64_t nInNacks)
-{
-  m_wire.reset();
-  m_nInNacks = nInNacks;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNInNacks(uint64_t nInNacks) {
+            m_wire.reset();
+            m_nInNacks = nInNacks;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNOutInterests(uint64_t nOutInterests)
-{
-  m_wire.reset();
-  m_nOutInterests = nOutInterests;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNOutInterests(uint64_t nOutInterests) {
+            m_wire.reset();
+            m_nOutInterests = nOutInterests;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNOutDatas(uint64_t nOutDatas)
-{
-  m_wire.reset();
-  m_nOutDatas = nOutDatas;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNOutDatas(uint64_t nOutDatas) {
+            m_wire.reset();
+            m_nOutDatas = nOutDatas;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNOutNacks(uint64_t nOutNacks)
-{
-  m_wire.reset();
-  m_nOutNacks = nOutNacks;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNOutNacks(uint64_t nOutNacks) {
+            m_wire.reset();
+            m_nOutNacks = nOutNacks;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNInBytes(uint64_t nInBytes)
-{
-  m_wire.reset();
-  m_nInBytes = nInBytes;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNInBytes(uint64_t nInBytes) {
+            m_wire.reset();
+            m_nInBytes = nInBytes;
+            return *this;
+        }
 
-FaceStatus&
-FaceStatus::setNOutBytes(uint64_t nOutBytes)
-{
-  m_wire.reset();
-  m_nOutBytes = nOutBytes;
-  return *this;
-}
+        FaceStatus&
+        FaceStatus::setNOutBytes(uint64_t nOutBytes) {
+            m_wire.reset();
+            m_nOutBytes = nOutBytes;
+            return *this;
+        }
 
-void
-FaceStatus::wireReset() const
-{
-  m_wire.reset();
-}
+        void
+        FaceStatus::wireReset() const {
+            m_wire.reset();
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const FaceStatus& status)
-{
-  os << "FaceStatus("
-     << "FaceID: " << status.getFaceId() << ",\n"
-     << "RemoteUri: " << status.getRemoteUri() << ",\n"
-     << "LocalUri: " << status.getLocalUri() << ",\n";
+        std::ostream&
+        operator<<(std::ostream& os, const FaceStatus& status) {
+            os << "FaceStatus("
+                    << "FaceID: " << status.getFaceId() << ",\n"
+                    << "RemoteUri: " << status.getRemoteUri() << ",\n"
+                    << "LocalUri: " << status.getLocalUri() << ",\n";
 
-  if (status.hasExpirationPeriod()) {
-    os << "ExpirationPeriod: " << status.getExpirationPeriod() << ",\n";
-  }
-  else {
-    os << "ExpirationPeriod: infinite,\n";
-  }
+            if (status.hasExpirationPeriod()) {
+                os << "ExpirationPeriod: " << status.getExpirationPeriod() << ",\n";
+            } else {
+                os << "ExpirationPeriod: infinite,\n";
+            }
 
-  os << "FaceScope: " << status.getFaceScope() << ",\n"
-     << "FacePersistency: " << status.getFacePersistency() << ",\n"
-     << "LinkType: " << status.getLinkType() << ",\n";
+            os << "FaceScope: " << status.getFaceScope() << ",\n"
+                    << "FacePersistency: " << status.getFacePersistency() << ",\n"
+                    << "LinkType: " << status.getLinkType() << ",\n";
 
-  auto osFlags = os.flags();
-  os << "Flags: " << std::showbase << std::hex << status.getFlags() << ",\n";
-  os.flags(osFlags);
+            auto osFlags = os.flags();
+            os << "Flags: " << std::showbase << std::hex << status.getFlags() << ",\n";
+            os.flags(osFlags);
 
-  os << "Counters: { Interests: {in: " << status.getNInInterests() << ", "
-     << "out: " << status.getNOutInterests() << "},\n"
-     << "            Data: {in: " << status.getNInDatas() << ", "
-     << "out: " << status.getNOutDatas() << "},\n"
-     << "            Nack: {in: " << status.getNInNacks() << ", "
-     << "out: " << status.getNOutNacks() << "},\n"
-     << "            bytes: {in: " << status.getNInBytes() << ", "
-     << "out: " << status.getNOutBytes() << "} }\n"
-     << ")";
-  return os;
-}
+            os << "Counters: { Interests: {in: " << status.getNInInterests() << ", "
+                    << "out: " << status.getNOutInterests() << "},\n"
+                    << "            Data: {in: " << status.getNInDatas() << ", "
+                    << "out: " << status.getNOutDatas() << "},\n"
+                    << "            Nack: {in: " << status.getNInNacks() << ", "
+                    << "out: " << status.getNOutNacks() << "},\n"
+                    << "            bytes: {in: " << status.getNInBytes() << ", "
+                    << "out: " << status.getNOutBytes() << "} }\n"
+                    << ")";
+            return os;
+        }
 
-} // namespace nfd
+    } // namespace nfd
 } // namespace ndn

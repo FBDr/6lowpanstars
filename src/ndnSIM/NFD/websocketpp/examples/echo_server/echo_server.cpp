@@ -14,10 +14,11 @@ using websocketpp::lib::bind;
 typedef server::message_ptr message_ptr;
 
 // Define a callback to handle incoming messages
+
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     std::cout << "on_message called with hdl: " << hdl.lock().get()
-              << " and message: " << msg->get_payload()
-              << std::endl;
+            << " and message: " << msg->get_payload()
+            << std::endl;
 
     // check for a special command to instruct the server to stop listening so
     // it can be cleanly exited.
@@ -30,7 +31,7 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
         s->send(hdl, msg->get_payload(), msg->get_opcode());
     } catch (const websocketpp::lib::error_code& e) {
         std::cout << "Echo failed because: " << e
-                  << "(" << e.message() << ")" << std::endl;
+                << "(" << e.message() << ")" << std::endl;
     }
 }
 
@@ -47,7 +48,7 @@ int main() {
         echo_server.init_asio();
 
         // Register our message handler
-        echo_server.set_message_handler(bind(&on_message,&echo_server,::_1,::_2));
+        echo_server.set_message_handler(bind(&on_message, &echo_server, ::_1, ::_2));
 
         // Listen on port 9002
         echo_server.listen(9002);

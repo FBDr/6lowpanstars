@@ -27,105 +27,92 @@
 #include "propagated-entry.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-void
-operator<<(std::ostream& out, PropagationStatus status)
-{
-  switch (status) {
-  case PropagationStatus::NEW:
-    out << "NEW";
-    break;
-  case PropagationStatus::PROPAGATING:
-    out << "PROPAGATING";
-    break;
-  case PropagationStatus::PROPAGATED:
-    out << "PROPAGATED";
-    break;
-  case PropagationStatus::PROPAGATE_FAIL:
-    out << "PROPAGATE_FAIL";
-    break;
-  default:
-    out << "undefined status";
-    break;
-  }
-}
+        void
+        operator<<(std::ostream& out, PropagationStatus status) {
+            switch (status) {
+                case PropagationStatus::NEW:
+                    out << "NEW";
+                    break;
+                case PropagationStatus::PROPAGATING:
+                    out << "PROPAGATING";
+                    break;
+                case PropagationStatus::PROPAGATED:
+                    out << "PROPAGATED";
+                    break;
+                case PropagationStatus::PROPAGATE_FAIL:
+                    out << "PROPAGATE_FAIL";
+                    break;
+                default:
+                    out << "undefined status";
+                    break;
+            }
+        }
 
-PropagatedEntry::PropagatedEntry()
-  : m_propagationStatus(PropagationStatus::NEW)
-{
-}
+        PropagatedEntry::PropagatedEntry()
+        : m_propagationStatus(PropagationStatus::NEW) {
+        }
 
-PropagatedEntry::PropagatedEntry(const PropagatedEntry& other)
-  : m_signingIdentity(other.m_signingIdentity)
-  , m_propagationStatus(other.m_propagationStatus)
-{
-  BOOST_ASSERT(!other.isPropagated() && !other.isPropagateFail());
-}
+        PropagatedEntry::PropagatedEntry(const PropagatedEntry& other)
+        : m_signingIdentity(other.m_signingIdentity)
+        , m_propagationStatus(other.m_propagationStatus) {
+            BOOST_ASSERT(!other.isPropagated() && !other.isPropagateFail());
+        }
 
-PropagatedEntry&
-PropagatedEntry::setSigningIdentity(const Name& identity)
-{
-  m_signingIdentity = identity;
-  return *this;
-}
+        PropagatedEntry&
+        PropagatedEntry::setSigningIdentity(const Name& identity) {
+            m_signingIdentity = identity;
+            return *this;
+        }
 
-const Name&
-PropagatedEntry::getSigningIdentity() const
-{
-  return m_signingIdentity;
-}
+        const Name&
+        PropagatedEntry::getSigningIdentity() const {
+            return m_signingIdentity;
+        }
 
-void
-PropagatedEntry::startPropagation()
-{
-  m_propagationStatus = PropagationStatus::PROPAGATING;
-}
+        void
+        PropagatedEntry::startPropagation() {
+            m_propagationStatus = PropagationStatus::PROPAGATING;
+        }
 
-void
-PropagatedEntry::succeed(const scheduler::EventId& event)
-{
-  m_propagationStatus = PropagationStatus::PROPAGATED;
-  m_rePropagateEvent = event;
-}
+        void
+        PropagatedEntry::succeed(const scheduler::EventId& event) {
+            m_propagationStatus = PropagationStatus::PROPAGATED;
+            m_rePropagateEvent = event;
+        }
 
-void
-PropagatedEntry::fail(const scheduler::EventId& event)
-{
-  m_propagationStatus = PropagationStatus::PROPAGATE_FAIL;
-  m_rePropagateEvent = event;
-}
+        void
+        PropagatedEntry::fail(const scheduler::EventId& event) {
+            m_propagationStatus = PropagationStatus::PROPAGATE_FAIL;
+            m_rePropagateEvent = event;
+        }
 
-void
-PropagatedEntry::initialize()
-{
-  m_propagationStatus = PropagationStatus::NEW;
-  m_rePropagateEvent.cancel();
-}
+        void
+        PropagatedEntry::initialize() {
+            m_propagationStatus = PropagationStatus::NEW;
+            m_rePropagateEvent.cancel();
+        }
 
-bool
-PropagatedEntry::isNew() const
-{
-  return PropagationStatus::NEW == m_propagationStatus;
-}
+        bool
+        PropagatedEntry::isNew() const {
+            return PropagationStatus::NEW == m_propagationStatus;
+        }
 
-bool
-PropagatedEntry::isPropagating() const
-{
-  return PropagationStatus::PROPAGATING == m_propagationStatus;
-}
+        bool
+        PropagatedEntry::isPropagating() const {
+            return PropagationStatus::PROPAGATING == m_propagationStatus;
+        }
 
-bool
-PropagatedEntry::isPropagated() const
-{
-  return PropagationStatus::PROPAGATED == m_propagationStatus;
-}
+        bool
+        PropagatedEntry::isPropagated() const {
+            return PropagationStatus::PROPAGATED == m_propagationStatus;
+        }
 
-bool
-PropagatedEntry::isPropagateFail() const
-{
-  return PropagationStatus::PROPAGATE_FAIL == m_propagationStatus;
-}
+        bool
+        PropagatedEntry::isPropagateFail() const {
+            return PropagationStatus::PROPAGATE_FAIL == m_propagationStatus;
+        }
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd

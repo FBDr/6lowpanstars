@@ -28,57 +28,55 @@
 #include "cryptopp.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-void
-CertificateSubjectDescription::encode(CryptoPP::BufferedTransformation& out) const
-{
-  using namespace CryptoPP;
-  // RelativeDistinguishedName ::=
-  //     SET OF AttributeTypeAndValue
-  //
-  // AttributeTypeAndValue ::= SEQUENCE {
-  //     type     AttributeType,
-  //     value    AttributeValue   }
-  //
-  // AttributeType ::= OBJECT IDENTIFIER
-  //
-  // AttributeValue ::= ANY DEFINED BY AttributeType
-  DERSequenceEncoder attributeTypeAndValue(out);
-  {
-    m_oid.encode(attributeTypeAndValue);
-    DEREncodeTextString(attributeTypeAndValue, m_value, PRINTABLE_STRING);
-  }
-  attributeTypeAndValue.MessageEnd();
-}
+            void
+            CertificateSubjectDescription::encode(CryptoPP::BufferedTransformation& out) const {
+                using namespace CryptoPP;
+                // RelativeDistinguishedName ::=
+                //     SET OF AttributeTypeAndValue
+                //
+                // AttributeTypeAndValue ::= SEQUENCE {
+                //     type     AttributeType,
+                //     value    AttributeValue   }
+                //
+                // AttributeType ::= OBJECT IDENTIFIER
+                //
+                // AttributeValue ::= ANY DEFINED BY AttributeType
+                DERSequenceEncoder attributeTypeAndValue(out);
+                {
+                    m_oid.encode(attributeTypeAndValue);
+                    DEREncodeTextString(attributeTypeAndValue, m_value, PRINTABLE_STRING);
+                }
+                attributeTypeAndValue.MessageEnd();
+            }
 
-void
-CertificateSubjectDescription::decode(CryptoPP::BufferedTransformation& in)
-{
-  using namespace CryptoPP;
-  // RelativeDistinguishedName ::=
-  //     SET OF AttributeTypeAndValue
-  //
-  // AttributeTypeAndValue ::= SEQUENCE {
-  //     type     AttributeType,
-  //     value    AttributeValue   }
-  //
-  // AttributeType ::= OBJECT IDENTIFIER
-  //
-  // AttributeValue ::= ANY DEFINED BY AttributeType
+            void
+            CertificateSubjectDescription::decode(CryptoPP::BufferedTransformation& in) {
+                using namespace CryptoPP;
+                // RelativeDistinguishedName ::=
+                //     SET OF AttributeTypeAndValue
+                //
+                // AttributeTypeAndValue ::= SEQUENCE {
+                //     type     AttributeType,
+                //     value    AttributeValue   }
+                //
+                // AttributeType ::= OBJECT IDENTIFIER
+                //
+                // AttributeValue ::= ANY DEFINED BY AttributeType
 
-  BERSequenceDecoder attributeTypeAndValue(in);
-  {
-    m_oid.decode(attributeTypeAndValue);
+                BERSequenceDecoder attributeTypeAndValue(in);
+                {
+                    m_oid.decode(attributeTypeAndValue);
 
-    /// @todo May be add more intelligent processing, since the following
-    ///       may fail if somebody encoded attribute that uses non PRINTABLE_STRING as value
-    BERDecodeTextString(attributeTypeAndValue, m_value, PRINTABLE_STRING);
-  }
-  attributeTypeAndValue.MessageEnd();
-}
+                    /// @todo May be add more intelligent processing, since the following
+                    ///       may fail if somebody encoded attribute that uses non PRINTABLE_STRING as value
+                    BERDecodeTextString(attributeTypeAndValue, m_value, PRINTABLE_STRING);
+                }
+                attributeTypeAndValue.MessageEnd();
+            }
 
-} // namespace v1
-} // namespace security
+        } // namespace v1
+    } // namespace security
 } // namespace ndn

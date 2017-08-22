@@ -29,39 +29,38 @@
 #include "base-dns.hpp"
 
 namespace ndn {
-namespace tools {
-namespace autoconfig {
+    namespace tools {
+        namespace autoconfig {
 
-/**
- * @brief Guessing home router based on DNS query with default suffix
- *
- * - Request
- *
- *     The end host sends a DNS query that is equivalent to this command:
- *
- *         dig +search +short +cmd +tries=2 +ndots=10 _ndn._udp srv
- *
- * - Response
- *
- *     The DNS server should answer with an SRV record that contains the hostname and UDP port
- *     number of the NDN router.
- */
-class GuessFromSearchDomains : public BaseDns
-{
-public:
-  /**
-   * @brief Create stage to guess home router based on DNS query with default suffix
-   * @sa Base::Base
-   */
-  GuessFromSearchDomains(Face& face, KeyChain& keyChain,
-                         const NextStageCallback& nextStageOnFailure);
+            /**
+             * @brief Guessing home router based on DNS query with default suffix
+             *
+             * - Request
+             *
+             *     The end host sends a DNS query that is equivalent to this command:
+             *
+             *         dig +search +short +cmd +tries=2 +ndots=10 _ndn._udp srv
+             *
+             * - Response
+             *
+             *     The DNS server should answer with an SRV record that contains the hostname and UDP port
+             *     number of the NDN router.
+             */
+            class GuessFromSearchDomains : public BaseDns {
+            public:
+                /**
+                 * @brief Create stage to guess home router based on DNS query with default suffix
+                 * @sa Base::Base
+                 */
+                GuessFromSearchDomains(Face& face, KeyChain& keyChain,
+                        const NextStageCallback& nextStageOnFailure);
 
-  virtual void
-  start() override;
-};
+                virtual void
+                start() override;
+            };
 
-} // namespace autoconfig
-} // namespace tools
+        } // namespace autoconfig
+    } // namespace tools
 } // namespace ndn
 
 #endif // NFD_TOOLS_NDN_AUTOCONFIG_GUESSING_FROM_SEARCH_DOMAINS_HPP

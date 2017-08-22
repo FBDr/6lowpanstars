@@ -26,37 +26,37 @@
 #include "ns3/mesh-information-element-vector.h"
 
 namespace ns3 {
-namespace dot11s {
-/**
- * \brief a IEEE 802.11s Mesh ID 7.3.2.88 of 802.11s draft 3.0
- *
- */
-class IeLinkMetricReport : public WifiInformationElement
-{
-public:
-  IeLinkMetricReport ();
-  IeLinkMetricReport (uint32_t metric);
-  void SetMetric (uint32_t metric);
-  uint32_t GetMetric ();
+    namespace dot11s {
 
-  // Inherited from WifiInformationElement
-  virtual WifiInformationElementId ElementId () const;
-  virtual void SerializeInformationField (Buffer::Iterator i) const;
-  virtual uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
-  virtual void Print (std::ostream& os) const;
-  virtual uint8_t GetInformationFieldSize () const;
+        /**
+         * \brief a IEEE 802.11s Mesh ID 7.3.2.88 of 802.11s draft 3.0
+         *
+         */
+        class IeLinkMetricReport : public WifiInformationElement {
+        public:
+            IeLinkMetricReport();
+            IeLinkMetricReport(uint32_t metric);
+            void SetMetric(uint32_t metric);
+            uint32_t GetMetric();
 
-private:
-  uint32_t m_metric;
-  friend bool operator== (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-  friend bool operator>  (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-  friend bool operator<  (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-};
+            // Inherited from WifiInformationElement
+            virtual WifiInformationElementId ElementId() const;
+            virtual void SerializeInformationField(Buffer::Iterator i) const;
+            virtual uint8_t DeserializeInformationField(Buffer::Iterator start, uint8_t length);
+            virtual void Print(std::ostream& os) const;
+            virtual uint8_t GetInformationFieldSize() const;
 
-bool operator== (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-bool operator>  (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-bool operator<  (const IeLinkMetricReport & a, const IeLinkMetricReport & b);
-std::ostream &operator << (std::ostream &os, const IeLinkMetricReport &linkMetricReport);
-} // namespace dot11s
+        private:
+            uint32_t m_metric;
+            friend bool operator==(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+            friend bool operator>(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+            friend bool operator<(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+        };
+
+        bool operator==(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+        bool operator>(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+        bool operator<(const IeLinkMetricReport & a, const IeLinkMetricReport & b);
+        std::ostream &operator<<(std::ostream &os, const IeLinkMetricReport &linkMetricReport);
+    } // namespace dot11s
 } // namespace ns3
 #endif /* METRIC_REPORT_H */

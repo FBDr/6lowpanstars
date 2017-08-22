@@ -28,27 +28,25 @@
  */
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Hash");
-
-Hasher::Hasher ()
+namespace ns3
 {
-  m_impl = Create <Hash::Function::Murmur3> ();
-  NS_ASSERT (m_impl != 0);
-}
 
-Hasher::Hasher (Ptr<Hash::Implementation> hp)
-  : m_impl (hp)
-{
-  NS_ASSERT (m_impl != 0);
-}
+    NS_LOG_COMPONENT_DEFINE("Hash");
 
-Hasher &
-Hasher::clear (void)
-{
-  m_impl->clear ();
-  return *this;
-}
+    Hasher::Hasher() {
+        m_impl = Create <Hash::Function::Murmur3> ();
+        NS_ASSERT(m_impl != 0);
+    }
 
-}  // namespace ns3
+    Hasher::Hasher(Ptr<Hash::Implementation> hp)
+            : m_impl(hp) {
+        NS_ASSERT(m_impl != 0);
+    }
+
+    Hasher &
+            Hasher::clear(void) {
+        m_impl->clear();
+        return *this;
+    }
+
+} // namespace ns3

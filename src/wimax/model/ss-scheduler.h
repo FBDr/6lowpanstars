@@ -31,45 +31,43 @@
 
 namespace ns3 {
 
-class SubscriberStationNetDevice;
-class WimaxConnection;
+    class SubscriberStationNetDevice;
+    class WimaxConnection;
 
-/**
- * \ingroup wimax
- */
-class SSScheduler : public Object
-{
+    /**
+     * \ingroup wimax
+     */
+    class SSScheduler : public Object {
+    public:
+        static TypeId GetTypeId(void);
+        SSScheduler(Ptr<SubscriberStationNetDevice> ss);
+        ~SSScheduler(void);
 
-public:
-  static TypeId GetTypeId (void);
-  SSScheduler (Ptr<SubscriberStationNetDevice> ss);
-  ~SSScheduler (void);
-
-  void SetPollMe (bool pollMe);
-  bool GetPollMe (void) const;
-  /**
-   * \return a list of packet to be sent in the next opportunity
-   * \param availableSymbols the available resources in symbols
-   * \param modulationType the used modulation
-   * \param packetType the type of packets to select from
-   * \param connection the connection from wich packets will be selected
-   */
-  Ptr<PacketBurst> Schedule (uint16_t availableSymbols,
-                             WimaxPhy::ModulationType modulationType,
-                             MacHeaderType::HeaderType packetType, Ptr<WimaxConnection> &connection);
+        void SetPollMe(bool pollMe);
+        bool GetPollMe(void) const;
+        /**
+         * \return a list of packet to be sent in the next opportunity
+         * \param availableSymbols the available resources in symbols
+         * \param modulationType the used modulation
+         * \param packetType the type of packets to select from
+         * \param connection the connection from wich packets will be selected
+         */
+        Ptr<PacketBurst> Schedule(uint16_t availableSymbols,
+                WimaxPhy::ModulationType modulationType,
+                MacHeaderType::HeaderType packetType, Ptr<WimaxConnection> &connection);
 
 
-  void DoDispose (void);
-protected:
-private:
-  SSScheduler (const SSScheduler &);
-  SSScheduler & operator= (const SSScheduler &);
+        void DoDispose(void);
+    protected:
+    private:
+        SSScheduler(const SSScheduler &);
+        SSScheduler & operator=(const SSScheduler &);
 
-  Ptr<WimaxConnection> SelectConnection (void);
-  Ptr<SubscriberStationNetDevice> m_ss;
-  bool m_pollMe;
+        Ptr<WimaxConnection> SelectConnection(void);
+        Ptr<SubscriberStationNetDevice> m_ss;
+        bool m_pollMe;
 
-};
+    };
 
 } // namespace ns3
 

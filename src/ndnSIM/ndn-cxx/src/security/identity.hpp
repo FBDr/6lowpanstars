@@ -25,170 +25,169 @@
 #include "key-container.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibImpl;
-class Pib;
-class IdentityContainer;
+        class PibImpl;
+        class Pib;
+        class IdentityContainer;
 
-/**
- * @brief represents an identity
- *
- * Identity is at the top level in PIB's Identity-Key-Certificate hierarchy.
- * An identity has a Name, and contains one or more keys, one of which is set
- * as the default key of this identity.  Properties of a key can be accessed
- * after obtaining a Key object.
- *
- * @throw PibImpl::Error when underlying implementation has non-semantic error.
- */
-class Identity
-{
-public:
-  friend class Pib;
-  friend class IdentityContainer;
-  friend class KeyChain;
+        /**
+         * @brief represents an identity
+         *
+         * Identity is at the top level in PIB's Identity-Key-Certificate hierarchy.
+         * An identity has a Name, and contains one or more keys, one of which is set
+         * as the default key of this identity.  Properties of a key can be accessed
+         * after obtaining a Key object.
+         *
+         * @throw PibImpl::Error when underlying implementation has non-semantic error.
+         */
+        class Identity {
+        public:
+            friend class Pib;
+            friend class IdentityContainer;
+            friend class KeyChain;
 
-public:
-  /**
-   * @brief Default Constructor
-   *
-   * Identity created using this default constructor is just a place holder.
-   * It must obtain an actual instance from Pib::getIdentity(...).  A typical
-   * usage would be for exception handling:
-   *
-   *   Identity id;
-   *   try {
-   *     id = pib.getIdentity(...);
-   *   }
-   *   catch (Pib::Error&) {
-   *     ...
-   *   }
-   *
-   * An Identity instance created using the constructor is invalid. Calling a
-   * member method on an invalid Identity instance may cause an std::domain_error.
-   */
-  Identity();
+        public:
+            /**
+             * @brief Default Constructor
+             *
+             * Identity created using this default constructor is just a place holder.
+             * It must obtain an actual instance from Pib::getIdentity(...).  A typical
+             * usage would be for exception handling:
+             *
+             *   Identity id;
+             *   try {
+             *     id = pib.getIdentity(...);
+             *   }
+             *   catch (Pib::Error&) {
+             *     ...
+             *   }
+             *
+             * An Identity instance created using the constructor is invalid. Calling a
+             * member method on an invalid Identity instance may cause an std::domain_error.
+             */
+            Identity();
 
-  /// @brief Get the name of the identity.
-  const Name&
-  getName() const;
+            /// @brief Get the name of the identity.
+            const Name&
+            getName() const;
 
-  /**
-   * @brief Get a key with id @p keyId.
-   *
-   * @param keyId The id of the key to get.
-   * @throw Pib::Error if the key does not exist.
-   */
-  Key
-  getKey(const name::Component& keyId) const;
+            /**
+             * @brief Get a key with id @p keyId.
+             *
+             * @param keyId The id of the key to get.
+             * @throw Pib::Error if the key does not exist.
+             */
+            Key
+            getKey(const name::Component& keyId) const;
 
-  /// @brief Get all the keys for this Identity.
-  const KeyContainer&
-  getKeys() const;
+            /// @brief Get all the keys for this Identity.
+            const KeyContainer&
+            getKeys() const;
 
-  /**
-   * @brief Get the default key for this Identity.
-   *
-   * @throws Pib::Error if the default key does not exist.
-   */
-  Key&
-  getDefaultKey() const;
+            /**
+             * @brief Get the default key for this Identity.
+             *
+             * @throws Pib::Error if the default key does not exist.
+             */
+            Key&
+            getDefaultKey() const;
 
-  /// @brief Check if the Identity instance is valid
-  operator bool() const;
+            /// @brief Check if the Identity instance is valid
+            operator bool() const;
 
-  /// @brief Check if the Identity instance is invalid
-  bool
-  operator!() const;
+            /// @brief Check if the Identity instance is invalid
+            bool
+            operator!() const;
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE: // write operations should be private
 
-  /**
-   * @brief Add a key.
-   *
-   * If the key already exists, do nothing.
-   *
-   * If no default key is set before, the new key will be set as the default key of the identity.
-   *
-   * @param publicKey The public key to add.
-   * @param keyId The key id component of the new key to add.
-   *              By default, the keyId will be set to the hash of the public key bits.
-   * @return the added key or existing key with the same key id.
-   */
-  Key
-  addKey(const v1::PublicKey& publicKey, const name::Component& keyId = EMPTY_KEY_ID);
+            /**
+             * @brief Add a key.
+             *
+             * If the key already exists, do nothing.
+             *
+             * If no default key is set before, the new key will be set as the default key of the identity.
+             *
+             * @param publicKey The public key to add.
+             * @param keyId The key id component of the new key to add.
+             *              By default, the keyId will be set to the hash of the public key bits.
+             * @return the added key or existing key with the same key id.
+             */
+            Key
+            addKey(const v1::PublicKey& publicKey, const name::Component& keyId = EMPTY_KEY_ID);
 
-  /**
-   * @brief Remove a key.
-   *
-   * @param keyId The key id component of the key to delete.
-   */
-  void
-  removeKey(const name::Component& keyId);
+            /**
+             * @brief Remove a key.
+             *
+             * @param keyId The key id component of the key to delete.
+             */
+            void
+            removeKey(const name::Component& keyId);
 
-  /**
-   * @brief Set the key with id @p keyId as the default key.
-   *
-   * @param keyId The key id component of the default key.
-   * @return The default key
-   * @throws Pib::Error if the key does not exist.
-   */
-  Key&
-  setDefaultKey(const name::Component& keyId);
+            /**
+             * @brief Set the key with id @p keyId as the default key.
+             *
+             * @param keyId The key id component of the default key.
+             * @return The default key
+             * @throws Pib::Error if the key does not exist.
+             */
+            Key&
+            setDefaultKey(const name::Component& keyId);
 
-  /**
-   * @brief Set the default key.
-   *
-   * If the key does not exist, add the key and set it as the default of the Identity.
-   * If the key exists, simply set it as the default key of the Identity.
-   *
-   * @param publicKey The public key to add.
-   * @param keyId The key id component of the default key.
-   * @return the default key
-   */
-  Key&
-  setDefaultKey(const v1::PublicKey& publicKey, const name::Component& keyId = EMPTY_KEY_ID);
+            /**
+             * @brief Set the default key.
+             *
+             * If the key does not exist, add the key and set it as the default of the Identity.
+             * If the key exists, simply set it as the default key of the Identity.
+             *
+             * @param publicKey The public key to add.
+             * @param keyId The key id component of the default key.
+             * @return the default key
+             */
+            Key&
+            setDefaultKey(const v1::PublicKey& publicKey, const name::Component& keyId = EMPTY_KEY_ID);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  /**
-   * @brief Create an Identity with @p identityName.
-   *
-   * @param identityName The name of the Identity.
-   * @param impl The backend implementation.
-   * @param needInit If true, create the identity in backend when the identity does not exist.
-   *                 Otherwise, throw Pib::Error when the identity does not exist.
-   */
-  Identity(const Name& identityName, shared_ptr<PibImpl> impl, bool needInit = false);
+            /**
+             * @brief Create an Identity with @p identityName.
+             *
+             * @param identityName The name of the Identity.
+             * @param impl The backend implementation.
+             * @param needInit If true, create the identity in backend when the identity does not exist.
+             *                 Otherwise, throw Pib::Error when the identity does not exist.
+             */
+            Identity(const Name& identityName, shared_ptr<PibImpl> impl, bool needInit = false);
 
-  /**
-   * @brief Check the validity of this instance
-   *
-   * @throws std::domain_error if the instance is invalid
-   */
-  void
-  validityCheck() const;
+            /**
+             * @brief Check the validity of this instance
+             *
+             * @throws std::domain_error if the instance is invalid
+             */
+            void
+            validityCheck() const;
 
-public:
-  /**
-   * @brief The default value of keyId when add a new key.
-   *
-   * An empty keyId implies that the key digest should be used as the actual keyId.
-   */
-  static const name::Component EMPTY_KEY_ID;
+        public:
+            /**
+             * @brief The default value of keyId when add a new key.
+             *
+             * An empty keyId implies that the key digest should be used as the actual keyId.
+             */
+            static const name::Component EMPTY_KEY_ID;
 
-private:
-  Name m_name;
+        private:
+            Name m_name;
 
-  mutable bool m_hasDefaultKey;
-  mutable Key m_defaultKey;
+            mutable bool m_hasDefaultKey;
+            mutable Key m_defaultKey;
 
-  mutable bool m_needRefreshKeys;
-  mutable KeyContainer m_keys;
+            mutable bool m_needRefreshKeys;
+            mutable KeyContainer m_keys;
 
-  shared_ptr<PibImpl> m_impl;
-};
+            shared_ptr<PibImpl> m_impl;
+        };
 
-} // namespace security
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_IDENTITY_HPP

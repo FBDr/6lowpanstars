@@ -33,138 +33,135 @@
 #include <unordered_map>
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief Access Router Strategy version 1
- *
- *  This strategy is designed for the last hop on the NDN testbed,
- *  where each nexthop connects to a laptop, links are lossy, and FIB is mostly correct.
- *
- *  1. Multicast the first Interest to all nexthops.
- *  2. When Data comes back, remember last working nexthop of the prefix;
- *     the granularity of this knowledge is the parent of Data Name.
- *  3. Forward subsequent Interests to the last working nexthop.
- *     If it doesn't respond, multicast again.
- */
-class AccessStrategy : public Strategy
-{
-public:
-  explicit
-  AccessStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        /** \brief Access Router Strategy version 1
+         *
+         *  This strategy is designed for the last hop on the NDN testbed,
+         *  where each nexthop connects to a laptop, links are lossy, and FIB is mostly correct.
+         *
+         *  1. Multicast the first Interest to all nexthops.
+         *  2. When Data comes back, remember last working nexthop of the prefix;
+         *     the granularity of this knowledge is the parent of Data Name.
+         *  3. Forward subsequent Interests to the last working nexthop.
+         *     If it doesn't respond, multicast again.
+         */
+        class AccessStrategy : public Strategy {
+        public:
+            explicit
+            AccessStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-public: // triggers
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+        public: // triggers
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-  virtual void
-  beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
-                        const Face& inFace, const Data& data) override;
+            virtual void
+            beforeSatisfyInterest(const shared_ptr<pit::Entry>& pitEntry,
+                    const Face& inFace, const Data& data) override;
 
-private: // StrategyInfo
-  /** \brief StrategyInfo on PIT entry
-   */
-  class PitInfo : public StrategyInfo
-  {
-  public:
-    static constexpr int
-    getTypeId()
-    {
-      return 1010;
-    }
+        private: // StrategyInfo
 
-  public:
-    scheduler::ScopedEventId rtoTimer;
-  };
+            /** \brief StrategyInfo on PIT entry
+             */
+            class PitInfo : public StrategyInfo {
+            public:
 
-  /** \brief StrategyInfo in measurements table
-   */
-  class MtInfo : public StrategyInfo
-  {
-  public:
-    static constexpr int
-    getTypeId()
-    {
-      return 1011;
-    }
+                static constexpr int
+                getTypeId() {
+                    return 1010;
+                }
 
-    MtInfo();
+            public:
+                scheduler::ScopedEventId rtoTimer;
+            };
 
-  public:
-    FaceId lastNexthop;
-    RttEstimator rtt;
-  };
+            /** \brief StrategyInfo in measurements table
+             */
+            class MtInfo : public StrategyInfo {
+            public:
 
-  /** \brief find per-prefix measurements for Interest
-   */
-  std::tuple<Name, MtInfo*>
-  findPrefixMeasurements(const pit::Entry& pitEntry);
+                static constexpr int
+                getTypeId() {
+                    return 1011;
+                }
 
-  /** \brief get or create pre-prefix measurements for incoming Data
-   *  \note This function creates MtInfo but doesn't update it.
-   */
-  MtInfo*
-  addPrefixMeasurements(const Data& data);
+                MtInfo();
 
-  /** \brief global per-face StrategyInfo
-   */
-  class FaceInfo
-  {
-  public:
-    FaceInfo();
+            public:
+                FaceId lastNexthop;
+                RttEstimator rtt;
+            };
 
-  public:
-    RttEstimator rtt;
-  };
+            /** \brief find per-prefix measurements for Interest
+             */
+            std::tuple<Name, MtInfo*>
+            findPrefixMeasurements(const pit::Entry& pitEntry);
 
-  typedef std::unordered_map<FaceId, FaceInfo> FaceInfoTable;
+            /** \brief get or create pre-prefix measurements for incoming Data
+             *  \note This function creates MtInfo but doesn't update it.
+             */
+            MtInfo*
+            addPrefixMeasurements(const Data& data);
 
-  void
-  removeFaceInfo(const Face& face);
+            /** \brief global per-face StrategyInfo
+             */
+            class FaceInfo {
+            public:
+                FaceInfo();
 
-private: // forwarding procedures
-  void
-  afterReceiveNewInterest(const Face& inFace, const Interest& interest,
-                          const shared_ptr<pit::Entry>& pitEntry);
+            public:
+                RttEstimator rtt;
+            };
 
-  void
-  afterReceiveRetxInterest(const Face& inFace, const Interest& interest,
-                           const shared_ptr<pit::Entry>& pitEntry);
+            typedef std::unordered_map<FaceId, FaceInfo> FaceInfoTable;
 
-  /** \brief send to last working nexthop
-   *  \return whether an Interest is sent
-   */
-  bool
-  sendToLastNexthop(const Face& inFace, const Interest& interest,
+            void
+            removeFaceInfo(const Face& face);
+
+        private: // forwarding procedures
+            void
+            afterReceiveNewInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry);
+
+            void
+            afterReceiveRetxInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry);
+
+            /** \brief send to last working nexthop
+             *  \return whether an Interest is sent
+             */
+            bool
+            sendToLastNexthop(const Face& inFace, const Interest& interest,
                     const shared_ptr<pit::Entry>& pitEntry, MtInfo& mi,
                     const fib::Entry& fibEntry);
 
-  void
-  afterRtoTimeout(weak_ptr<pit::Entry> pitWeak, FaceId inFaceId, FaceId firstOutFaceId);
+            void
+            afterRtoTimeout(weak_ptr<pit::Entry> pitWeak, FaceId inFaceId, FaceId firstOutFaceId);
 
-  /** \brief multicast to all nexthops
-   *  \param exceptFace don't forward to this face; also, inFace is always excluded
-   *  \return how many Interests are sent
-   */
-  int
-  multicast(const Face& inFace, const Interest& interest,
-            const shared_ptr<pit::Entry>& pitEntry, const fib::Entry& fibEntry,
-            FaceId exceptFace = face::INVALID_FACEID);
+            /** \brief multicast to all nexthops
+             *  \param exceptFace don't forward to this face; also, inFace is always excluded
+             *  \return how many Interests are sent
+             */
+            int
+            multicast(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry, const fib::Entry& fibEntry,
+                    FaceId exceptFace = face::INVALID_FACEID);
 
-  void
-  updateMeasurements(const Face& inFace, const Data& data,
-                     const RttEstimator::Duration& rtt);
+            void
+            updateMeasurements(const Face& inFace, const Data& data,
+                    const RttEstimator::Duration& rtt);
 
-public:
-  static const Name STRATEGY_NAME;
+        public:
+            static const Name STRATEGY_NAME;
 
-private:
-  FaceInfoTable m_fit;
-  RetxSuppressionFixed m_retxSuppression;
-  signal::ScopedConnection m_removeFaceInfoConn;
-};
+        private:
+            FaceInfoTable m_fit;
+            RetxSuppressionFixed m_retxSuppression;
+            signal::ScopedConnection m_removeFaceInfoConn;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_ACCESS_STRATEGY_HPP

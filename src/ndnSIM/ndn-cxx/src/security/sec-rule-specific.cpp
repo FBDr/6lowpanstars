@@ -28,75 +28,63 @@
 
 namespace ndn {
 
-SecRuleSpecific::SecRuleSpecific(shared_ptr<Regex> dataRegex,
-                                 shared_ptr<Regex> signerRegex)
-  : SecRule(true)
-  , m_dataRegex(dataRegex)
-  , m_signerRegex(signerRegex)
-  , m_isExempted(false)
-{
-}
-
-SecRuleSpecific::SecRuleSpecific(shared_ptr<Regex> dataRegex)
-  : SecRule(true)
-  , m_dataRegex(dataRegex)
-  , m_isExempted(true)
-{
-}
-
-SecRuleSpecific::SecRuleSpecific(const SecRuleSpecific& rule)
-  : SecRule(true)
-  , m_dataRegex(rule.m_dataRegex)
-  , m_signerRegex(rule.m_signerRegex)
-  , m_isExempted(rule.m_isExempted)
-{
-}
-
-bool
-SecRuleSpecific::matchDataName(const Data& data)
-{
-  return m_dataRegex->match(data.getName());
-}
-
-bool
-SecRuleSpecific::matchSignerName(const Data& data)
-{
-  if (m_isExempted)
-    return true;
-
-  try
-    {
-      if (!data.getSignature().hasKeyLocator())
-        return false;
-
-      const KeyLocator& keyLocator = data.getSignature().getKeyLocator();
-      if (keyLocator.getType() != KeyLocator::KeyLocator_Name)
-        return false;
-
-      const Name& signerName = keyLocator.getName();
-      return m_signerRegex->match(signerName);
+    SecRuleSpecific::SecRuleSpecific(shared_ptr<Regex> dataRegex,
+            shared_ptr<Regex> signerRegex)
+    : SecRule(true)
+    , m_dataRegex(dataRegex)
+    , m_signerRegex(signerRegex)
+    , m_isExempted(false) {
     }
-  catch (tlv::Error& e)
-    {
-      return false;
-    }
-  catch (RegexMatcher::Error& e)
-    {
-      return false;
-    }
-}
 
-bool
-SecRuleSpecific::satisfy(const Data& data)
-{
-  return (matchDataName(data) && matchSignerName(data)) ? true : false;
-}
+    SecRuleSpecific::SecRuleSpecific(shared_ptr<Regex> dataRegex)
+    : SecRule(true)
+    , m_dataRegex(dataRegex)
+    , m_isExempted(true) {
+    }
 
-bool
-SecRuleSpecific::satisfy(const Name& dataName, const Name& signerName)
-{
-  bool isSignerMatched = m_isExempted || m_signerRegex->match(signerName);
-  return m_dataRegex->match(dataName) && isSignerMatched;
-}
+    SecRuleSpecific::SecRuleSpecific(const SecRuleSpecific& rule)
+    : SecRule(true)
+    , m_dataRegex(rule.m_dataRegex)
+    , m_signerRegex(rule.m_signerRegex)
+    , m_isExempted(rule.m_isExempted) {
+    }
+
+    bool
+    SecRuleSpecific::matchDataName(const Data& data) {
+        return m_dataRegex->match(data.getName());
+    }
+
+    bool
+    SecRuleSpecific::matchSignerName(const Data& data) {
+        if (m_isExempted)
+            return true;
+
+        try {
+            if (!data.getSignature().hasKeyLocator())
+                return false;
+
+            const KeyLocator& keyLocator = data.getSignature().getKeyLocator();
+            if (keyLocator.getType() != KeyLocator::KeyLocator_Name)
+                return false;
+
+            const Name& signerName = keyLocator.getName();
+            return m_signerRegex->match(signerName);
+        } catch (tlv::Error& e) {
+            return false;
+        } catch (RegexMatcher::Error& e) {
+            return false;
+        }
+    }
+
+    bool
+    SecRuleSpecific::satisfy(const Data& data) {
+        return (matchDataName(data) && matchSignerName(data)) ? true : false;
+    }
+
+    bool
+    SecRuleSpecific::satisfy(const Name& dataName, const Name& signerName) {
+        bool isSignerMatched = m_isExempted || m_signerRegex->match(signerName);
+        return m_dataRegex->match(dataName) && isSignerMatched;
+    }
 
 } // namespace ndn

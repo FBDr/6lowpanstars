@@ -30,72 +30,71 @@
 #include <ndn-cxx/util/scheduler.hpp>
 
 namespace nfd {
-namespace scheduler {
+    namespace scheduler {
 
-using ndn::Scheduler;
+        using ndn::Scheduler;
 
-/** \class EventId
- *  \brief Opaque type (shared_ptr) representing ID of a scheduled event
- */
-using ndn::EventId;
+        /** \class EventId
+         *  \brief Opaque type (shared_ptr) representing ID of a scheduled event
+         */
+        using ndn::EventId;
 
-/** \brief schedule an event
- */
-EventId
-schedule(const time::nanoseconds& after, const Scheduler::Event& event);
+        /** \brief schedule an event
+         */
+        EventId
+        schedule(const time::nanoseconds& after, const Scheduler::Event& event);
 
-/** \brief cancel a scheduled event
- */
-void
-cancel(const EventId& eventId);
+        /** \brief cancel a scheduled event
+         */
+        void
+        cancel(const EventId& eventId);
 
-Scheduler&
-getGlobalScheduler();
+        Scheduler&
+        getGlobalScheduler();
 
-/** \brief cancels an event automatically upon destruction
- */
-class ScopedEventId : noncopyable
-{
-public:
-  ScopedEventId();
+        /** \brief cancels an event automatically upon destruction
+         */
+        class ScopedEventId : noncopyable {
+        public:
+            ScopedEventId();
 
-  /** \brief implicit constructor from EventId
-   *  \param event the event to be cancelled upon destruction
-   */
-  ScopedEventId(const EventId& event);
+            /** \brief implicit constructor from EventId
+             *  \param event the event to be cancelled upon destruction
+             */
+            ScopedEventId(const EventId& event);
 
-  /** \brief move constructor
-   */
-  ScopedEventId(ScopedEventId&& other);
+            /** \brief move constructor
+             */
+            ScopedEventId(ScopedEventId&& other);
 
-  /** \brief assigns an event
-   *
-   *  If a different event has been assigned to this instance previously,
-   *  that event will be cancelled immediately.
-   */
-  ScopedEventId&
-  operator=(const EventId& event);
+            /** \brief assigns an event
+             *
+             *  If a different event has been assigned to this instance previously,
+             *  that event will be cancelled immediately.
+             */
+            ScopedEventId&
+                    operator=(const EventId& event);
 
-  /** \brief cancels the event
-   */
-  ~ScopedEventId();
+            /** \brief cancels the event
+             */
+            ~ScopedEventId();
 
-  /** \brief cancels the event manually
-   */
-  void
-  cancel();
+            /** \brief cancels the event manually
+             */
+            void
+            cancel();
 
-  /** \brief releases the event so that it won't be disconnected
-   *         when this ScopedEventId is destructed
-   */
-  void
-  release();
+            /** \brief releases the event so that it won't be disconnected
+             *         when this ScopedEventId is destructed
+             */
+            void
+            release();
 
-private:
-  EventId m_event;
-};
+        private:
+            EventId m_event;
+        };
 
-} // namespace scheduler
+    } // namespace scheduler
 
 } // namespace nfd
 

@@ -25,142 +25,131 @@
 #include <boost/lexical_cast.hpp>
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-class BlockCipher::Impl
-{
-public:
-  Impl()
-    : m_cipher(BIO_new(BIO_f_cipher()))
-    , m_sink(BIO_new(BIO_s_mem()))
-  {
-    BIO_push(m_cipher, m_sink);
-  }
+            class BlockCipher::Impl {
+            public:
 
-  ~Impl()
-  {
-    BIO_free_all(m_cipher);
-  }
+                Impl()
+                : m_cipher(BIO_new(BIO_f_cipher()))
+                , m_sink(BIO_new(BIO_s_mem())) {
+                    BIO_push(m_cipher, m_sink);
+                }
 
-public:
-  BIO* m_cipher;
-  BIO* m_sink; // BIO_f_cipher alone does not work without a sink
-};
+                ~Impl() {
+                    BIO_free_all(m_cipher);
+                }
 
-BlockCipher::BlockCipher(BlockCipherAlgorithm algo, CipherOperator op,
-                         const uint8_t* key, size_t keyLen,
-                         const uint8_t* iv, size_t ivLen)
-  : m_impl(new Impl)
-{
-  switch (algo) {
-  case BlockCipherAlgorithm::AES_CBC:
-    initializeAesCbc(key, keyLen, iv, ivLen, op);
-    break;
-  default:
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Cipher algorithm " +
+            public:
+                BIO* m_cipher;
+                BIO* m_sink; // BIO_f_cipher alone does not work without a sink
+            };
+
+            BlockCipher::BlockCipher(BlockCipherAlgorithm algo, CipherOperator op,
+                    const uint8_t* key, size_t keyLen,
+                    const uint8_t* iv, size_t ivLen)
+            : m_impl(new Impl) {
+                switch (algo) {
+                    case BlockCipherAlgorithm::AES_CBC:
+                        initializeAesCbc(key, keyLen, iv, ivLen, op);
+                        break;
+                    default:
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Cipher algorithm " +
                                 boost::lexical_cast<std::string>(algo) + " is not supported"));
-  }
-}
+                }
+            }
 
-void
-BlockCipher::preTransform()
-{
-  fillOutputBuffer();
-}
+            void
+            BlockCipher::preTransform() {
+                fillOutputBuffer();
+            }
 
-size_t
-BlockCipher::convert(const uint8_t* data, size_t dataLen)
-{
-  if (dataLen == 0)
-    return 0;
+            size_t
+            BlockCipher::convert(const uint8_t* data, size_t dataLen) {
+                if (dataLen == 0)
+                    return 0;
 
-  int wLen = BIO_write(m_impl->m_cipher, data, dataLen);
+                int wLen = BIO_write(m_impl->m_cipher, data, dataLen);
 
-  if (wLen <= 0) { // fail to write data
-    if (!BIO_should_retry(m_impl->m_cipher)) {
-      // we haven't written everything but some error happens, and we cannot retry
-      BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
-    }
-    return 0;
-  }
-  else { // update number of bytes written
-    fillOutputBuffer();
-    return wLen;
-  }
-}
+                if (wLen <= 0) { // fail to write data
+                    if (!BIO_should_retry(m_impl->m_cipher)) {
+                        // we haven't written everything but some error happens, and we cannot retry
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to accept more input"));
+                    }
+                    return 0;
+                } else { // update number of bytes written
+                    fillOutputBuffer();
+                    return wLen;
+                }
+            }
 
-void
-BlockCipher::finalize()
-{
-  if (BIO_flush(m_impl->m_cipher) != 1)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to flush"));
+            void
+            BlockCipher::finalize() {
+                if (BIO_flush(m_impl->m_cipher) != 1)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Failed to flush"));
 
-  while (!isConverterEmpty()) {
-    fillOutputBuffer();
-    while (!isOutputBufferEmpty()) {
-      flushOutputBuffer();
-    }
-  }
-}
+                while (!isConverterEmpty()) {
+                    fillOutputBuffer();
+                    while (!isOutputBufferEmpty()) {
+                        flushOutputBuffer();
+                    }
+                }
+            }
 
-void
-BlockCipher::fillOutputBuffer()
-{
-  int nRead = BIO_pending(m_impl->m_sink);
-  if (nRead <= 0)
-    return;
+            void
+            BlockCipher::fillOutputBuffer() {
+                int nRead = BIO_pending(m_impl->m_sink);
+                if (nRead <= 0)
+                    return;
 
-  // there is something to read from BIO
-  auto buffer = make_unique<OBuffer>(nRead);
-  int rLen = BIO_read(m_impl->m_sink, &(*buffer)[0], nRead);
-  if (rLen < 0)
-    return;
+                // there is something to read from BIO
+                auto buffer = make_unique<OBuffer>(nRead);
+                int rLen = BIO_read(m_impl->m_sink, &(*buffer)[0], nRead);
+                if (rLen < 0)
+                    return;
 
-  if (rLen < nRead)
-    buffer->erase(buffer->begin() + rLen, buffer->end());
-  setOutputBuffer(std::move(buffer));
-}
+                if (rLen < nRead)
+                    buffer->erase(buffer->begin() + rLen, buffer->end());
+                setOutputBuffer(std::move(buffer));
+            }
 
-bool
-BlockCipher::isConverterEmpty() const
-{
-  return (BIO_pending(m_impl->m_sink) <= 0);
-}
+            bool
+            BlockCipher::isConverterEmpty() const {
+                return (BIO_pending(m_impl->m_sink) <= 0);
+            }
 
-void
-BlockCipher::initializeAesCbc(const uint8_t* key, size_t keyLen,
-                              const uint8_t* iv, size_t ivLen,
-                              CipherOperator op)
-{
-  if (keyLen != ivLen)
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Key length must be the same as IV length"));
+            void
+            BlockCipher::initializeAesCbc(const uint8_t* key, size_t keyLen,
+                    const uint8_t* iv, size_t ivLen,
+                    CipherOperator op) {
+                if (keyLen != ivLen)
+                    BOOST_THROW_EXCEPTION(Error(getIndex(), "Key length must be the same as IV length"));
 
-  const EVP_CIPHER* cipherType = nullptr;
-  switch (keyLen) {
-  case 16:
-    cipherType = EVP_aes_128_cbc();
-    break;
-  case 24:
-    cipherType = EVP_aes_192_cbc();
-    break;
-  case 32:
-    cipherType = EVP_aes_256_cbc();
-    break;
-  default:
-    BOOST_THROW_EXCEPTION(Error(getIndex(), "Key length is not supported"));
-  }
-  BIO_set_cipher(m_impl->m_cipher, cipherType, key, iv, static_cast<int>(op));
-}
+                const EVP_CIPHER* cipherType = nullptr;
+                switch (keyLen) {
+                    case 16:
+                        cipherType = EVP_aes_128_cbc();
+                        break;
+                    case 24:
+                        cipherType = EVP_aes_192_cbc();
+                        break;
+                    case 32:
+                        cipherType = EVP_aes_256_cbc();
+                        break;
+                    default:
+                        BOOST_THROW_EXCEPTION(Error(getIndex(), "Key length is not supported"));
+                }
+                BIO_set_cipher(m_impl->m_cipher, cipherType, key, iv, static_cast<int> (op));
+            }
 
-unique_ptr<Transform>
-blockCipher(BlockCipherAlgorithm algo, CipherOperator op,
-            const uint8_t* key, size_t keyLen,
-            const uint8_t* iv, size_t ivLen)
-{
-  return make_unique<BlockCipher>(algo, op, key, keyLen, iv, ivLen);
-}
+            unique_ptr<Transform>
+            blockCipher(BlockCipherAlgorithm algo, CipherOperator op,
+                    const uint8_t* key, size_t keyLen,
+                    const uint8_t* iv, size_t ivLen) {
+                return make_unique<BlockCipher>(algo, op, key, keyLen, iv, ivLen);
+            }
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

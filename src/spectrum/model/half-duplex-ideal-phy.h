@@ -37,191 +37,188 @@
 
 namespace ns3 {
 
-/**
- * \ingroup spectrum
- *
- * This PHY layer implementation realizes an ideal OFDM PHY which
- * transmits half-duplex (i.e., it can either receive or transmit at a
- * given time). The device is ideal in the sense that:
- * 1) it uses an error model based on the Shannon capacity, which
- * assumes ideal channel coding;
- * 2) it uses ideal signal acquisition, i.e., preamble detection and
- * synchronization are always successful
- * 3) it has no PHY layer overhead
- *
- * Being half duplex, if a RX is ongoing but a TX is requested, the RX
- * is aborted and the TX is started. Of course, no RX can be performed
- * while there is an ongoing TX.
- *
- * The use of OFDM is modeled by means of the Spectrum framework. By
- * calling the method SetTxPowerSpectralDensity(), the
- * user can specify how much of the spectrum is used, how many
- * subcarriers are used, and what power is allocated to each
- * subcarrier.
- *
- * The user can also specify the PHY rate
- * at which communications take place by using SetRate(). This is
- * equivalent to choosing a particular modulation and coding scheme.
- *
- * The use of the ShannonSpectrumErrorModel allows us to account for
- * the following aspects in determining whether a
- * transmission is successful or not:
- * - the PHY rate (trades off communication speed with reliability)
- * - the power spectral density (trade-off among total power consumed,
- * total bandwidth used (i.e., how much of the spectrum is occupied),
- * and communication reliability)
- * - the signal propagation
- *
- * This PHY model supports a single antenna model instance which is
- * used for both transmission and reception.  
- */
-class HalfDuplexIdealPhy : public SpectrumPhy
-{
+    /**
+     * \ingroup spectrum
+     *
+     * This PHY layer implementation realizes an ideal OFDM PHY which
+     * transmits half-duplex (i.e., it can either receive or transmit at a
+     * given time). The device is ideal in the sense that:
+     * 1) it uses an error model based on the Shannon capacity, which
+     * assumes ideal channel coding;
+     * 2) it uses ideal signal acquisition, i.e., preamble detection and
+     * synchronization are always successful
+     * 3) it has no PHY layer overhead
+     *
+     * Being half duplex, if a RX is ongoing but a TX is requested, the RX
+     * is aborted and the TX is started. Of course, no RX can be performed
+     * while there is an ongoing TX.
+     *
+     * The use of OFDM is modeled by means of the Spectrum framework. By
+     * calling the method SetTxPowerSpectralDensity(), the
+     * user can specify how much of the spectrum is used, how many
+     * subcarriers are used, and what power is allocated to each
+     * subcarrier.
+     *
+     * The user can also specify the PHY rate
+     * at which communications take place by using SetRate(). This is
+     * equivalent to choosing a particular modulation and coding scheme.
+     *
+     * The use of the ShannonSpectrumErrorModel allows us to account for
+     * the following aspects in determining whether a
+     * transmission is successful or not:
+     * - the PHY rate (trades off communication speed with reliability)
+     * - the power spectral density (trade-off among total power consumed,
+     * total bandwidth used (i.e., how much of the spectrum is occupied),
+     * and communication reliability)
+     * - the signal propagation
+     *
+     * This PHY model supports a single antenna model instance which is
+     * used for both transmission and reception.  
+     */
+    class HalfDuplexIdealPhy : public SpectrumPhy {
+    public:
+        HalfDuplexIdealPhy();
+        virtual ~HalfDuplexIdealPhy();
 
-public:
-  HalfDuplexIdealPhy ();
-  virtual ~HalfDuplexIdealPhy ();
+        /**
+         *  PHY states
+         *
+         */
+        enum State {
+            IDLE, TX, RX
+        };
 
-  /**
-   *  PHY states
-   *
-   */
-  enum State
-  {
-    IDLE, TX, RX
-  };
+        static TypeId GetTypeId(void);
 
-  static TypeId GetTypeId (void);
-
-  // inherited from SpectrumPhy
-  void SetChannel (Ptr<SpectrumChannel> c);
-  void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice () const;
-  Ptr<const SpectrumModel> GetRxSpectrumModel () const;
-  Ptr<AntennaModel> GetRxAntenna ();
-  void StartRx (Ptr<SpectrumSignalParameters> params);
+        // inherited from SpectrumPhy
+        void SetChannel(Ptr<SpectrumChannel> c);
+        void SetMobility(Ptr<MobilityModel> m);
+        void SetDevice(Ptr<NetDevice> d);
+        Ptr<MobilityModel> GetMobility();
+        Ptr<NetDevice> GetDevice() const;
+        Ptr<const SpectrumModel> GetRxSpectrumModel() const;
+        Ptr<AntennaModel> GetRxAntenna();
+        void StartRx(Ptr<SpectrumSignalParameters> params);
 
 
-  /**
-   * set the Power Spectral Density of outgoing signals in power units
-   * (Watt, Pascal...) per Hz.
-   *
-   * @param txPsd
-   */
-  void SetTxPowerSpectralDensity (Ptr<SpectrumValue> txPsd);
+        /**
+         * set the Power Spectral Density of outgoing signals in power units
+         * (Watt, Pascal...) per Hz.
+         *
+         * @param txPsd
+         */
+        void SetTxPowerSpectralDensity(Ptr<SpectrumValue> txPsd);
 
-  /**
-   *
-   * @param noisePsd the Noise Power Spectral Density in power units
-   * (Watt, Pascal...) per Hz.
-   */
-  void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
+        /**
+         *
+         * @param noisePsd the Noise Power Spectral Density in power units
+         * (Watt, Pascal...) per Hz.
+         */
+        void SetNoisePowerSpectralDensity(Ptr<const SpectrumValue> noisePsd);
 
 
-  /**
-   * Start a transmission
-   *
-   *
-   * @param p the packet to be transmitted
-   *
-   * @return true if an error occurred and the transmission was not
-   * started, false otherwise.
-   */
-  bool StartTx (Ptr<Packet> p);
+        /**
+         * Start a transmission
+         *
+         *
+         * @param p the packet to be transmitted
+         *
+         * @return true if an error occurred and the transmission was not
+         * started, false otherwise.
+         */
+        bool StartTx(Ptr<Packet> p);
 
-  /**
-   * set the PHY rate to be used by this PHY.
-   *
-   * @param rate
-   */
-  void SetRate (DataRate rate);
+        /**
+         * set the PHY rate to be used by this PHY.
+         *
+         * @param rate
+         */
+        void SetRate(DataRate rate);
 
-  /**
-   *
-   * @return the PHY rate used by this PHY.
-   */
-  DataRate GetRate () const;
+        /**
+         *
+         * @return the PHY rate used by this PHY.
+         */
+        DataRate GetRate() const;
 
-  /**
-   * set the callback for the end of a TX, as part of the
-   * interconnections betweenthe PHY and the MAC
-   *
-   * @param c the callback
-   */
-  void SetGenericPhyTxEndCallback (GenericPhyTxEndCallback c);
+        /**
+         * set the callback for the end of a TX, as part of the
+         * interconnections betweenthe PHY and the MAC
+         *
+         * @param c the callback
+         */
+        void SetGenericPhyTxEndCallback(GenericPhyTxEndCallback c);
 
-  /**
-   * set the callback for the start of RX, as part of the
-   * interconnections betweenthe PHY and the MAC
-   *
-   * @param c the callback
-   */
-  void SetGenericPhyRxStartCallback (GenericPhyRxStartCallback c);
+        /**
+         * set the callback for the start of RX, as part of the
+         * interconnections betweenthe PHY and the MAC
+         *
+         * @param c the callback
+         */
+        void SetGenericPhyRxStartCallback(GenericPhyRxStartCallback c);
 
-  /**
-   * set the callback for the end of a RX in error, as part of the
-   * interconnections betweenthe PHY and the MAC
-   *
-   * @param c the callback
-   */
-  void SetGenericPhyRxEndErrorCallback (GenericPhyRxEndErrorCallback c);
+        /**
+         * set the callback for the end of a RX in error, as part of the
+         * interconnections betweenthe PHY and the MAC
+         *
+         * @param c the callback
+         */
+        void SetGenericPhyRxEndErrorCallback(GenericPhyRxEndErrorCallback c);
 
-  /**
-   * set the callback for the successful end of a RX, as part of the
-   * interconnections betweenthe PHY and the MAC
-   *
-   * @param c the callback
-   */
-  void SetGenericPhyRxEndOkCallback (GenericPhyRxEndOkCallback c);
+        /**
+         * set the callback for the successful end of a RX, as part of the
+         * interconnections betweenthe PHY and the MAC
+         *
+         * @param c the callback
+         */
+        void SetGenericPhyRxEndOkCallback(GenericPhyRxEndOkCallback c);
 
-  /** 
-   * set the AntennaModel to be used
-   * 
-   * \param a the Antenna Model
-   */
-  void SetAntenna (Ptr<AntennaModel> a);
+        /** 
+         * set the AntennaModel to be used
+         * 
+         * \param a the Antenna Model
+         */
+        void SetAntenna(Ptr<AntennaModel> a);
 
-private:
-  virtual void DoDispose (void);
+    private:
+        virtual void DoDispose(void);
 
-  void ChangeState (State newState);
-  void EndTx ();
-  void AbortRx ();
-  void EndRx ();
+        void ChangeState(State newState);
+        void EndTx();
+        void AbortRx();
+        void EndRx();
 
-  EventId m_endRxEventId;
+        EventId m_endRxEventId;
 
-  Ptr<MobilityModel> m_mobility;
-  Ptr<AntennaModel> m_antenna;
-  Ptr<NetDevice> m_netDevice;
-  Ptr<SpectrumChannel> m_channel;
+        Ptr<MobilityModel> m_mobility;
+        Ptr<AntennaModel> m_antenna;
+        Ptr<NetDevice> m_netDevice;
+        Ptr<SpectrumChannel> m_channel;
 
-  Ptr<SpectrumValue> m_txPsd;
-  Ptr<const SpectrumValue> m_rxPsd;
-  Ptr<Packet> m_txPacket;
-  Ptr<Packet> m_rxPacket;
+        Ptr<SpectrumValue> m_txPsd;
+        Ptr<const SpectrumValue> m_rxPsd;
+        Ptr<Packet> m_txPacket;
+        Ptr<Packet> m_rxPacket;
 
-  DataRate m_rate;
+        DataRate m_rate;
 
-  State m_state;
+        State m_state;
 
-  TracedCallback<Ptr<const Packet> > m_phyTxStartTrace;
-  TracedCallback<Ptr<const Packet> > m_phyTxEndTrace;
-  TracedCallback<Ptr<const Packet> > m_phyRxStartTrace;
-  TracedCallback<Ptr<const Packet> > m_phyRxAbortTrace;
-  TracedCallback<Ptr<const Packet> > m_phyRxEndOkTrace;
-  TracedCallback<Ptr<const Packet> > m_phyRxEndErrorTrace;
+        TracedCallback<Ptr<const Packet> > m_phyTxStartTrace;
+        TracedCallback<Ptr<const Packet> > m_phyTxEndTrace;
+        TracedCallback<Ptr<const Packet> > m_phyRxStartTrace;
+        TracedCallback<Ptr<const Packet> > m_phyRxAbortTrace;
+        TracedCallback<Ptr<const Packet> > m_phyRxEndOkTrace;
+        TracedCallback<Ptr<const Packet> > m_phyRxEndErrorTrace;
 
-  GenericPhyTxEndCallback        m_phyMacTxEndCallback;
-  GenericPhyRxStartCallback      m_phyMacRxStartCallback;
-  GenericPhyRxEndErrorCallback   m_phyMacRxEndErrorCallback;
-  GenericPhyRxEndOkCallback      m_phyMacRxEndOkCallback;
+        GenericPhyTxEndCallback m_phyMacTxEndCallback;
+        GenericPhyRxStartCallback m_phyMacRxStartCallback;
+        GenericPhyRxEndErrorCallback m_phyMacRxEndErrorCallback;
+        GenericPhyRxEndOkCallback m_phyMacRxEndOkCallback;
 
-  SpectrumInterference m_interference;
+        SpectrumInterference m_interference;
 
-};
+    };
 
 
 

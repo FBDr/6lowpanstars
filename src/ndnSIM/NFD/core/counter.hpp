@@ -30,111 +30,102 @@
 
 namespace nfd {
 
-/** \brief represents a counter that encloses an integer value
- *
- *  SimpleCounter is noncopyable, because increment should be called on the counter,
- *  not a copy of it; it's implicitly convertible to an integral type to be observed
- */
-class SimpleCounter
-{
-public:
-  typedef uint64_t rep;
+    /** \brief represents a counter that encloses an integer value
+     *
+     *  SimpleCounter is noncopyable, because increment should be called on the counter,
+     *  not a copy of it; it's implicitly convertible to an integral type to be observed
+     */
+    class SimpleCounter {
+    public:
+        typedef uint64_t rep;
 
-  constexpr
-  SimpleCounter()
-    : m_value(0)
-  {
-  }
+        constexpr
+        SimpleCounter()
+        : m_value(0) {
+        }
 
-  SimpleCounter(const SimpleCounter&) = delete;
+        SimpleCounter(const SimpleCounter&) = delete;
 
-  SimpleCounter&
-  operator=(const SimpleCounter&) = delete;
+        SimpleCounter&
+                operator=(const SimpleCounter&) = delete;
 
-  /** \brief observe the counter
-   */
-  operator rep() const
-  {
-    return m_value;
-  }
+        /** \brief observe the counter
+         */
+        operator rep() const {
+            return m_value;
+        }
 
-  /** \brief replace the counter value
-   */
-  void
-  set(rep value)
-  {
-    m_value = value;
-  }
+        /** \brief replace the counter value
+         */
+        void
+        set(rep value) {
+            m_value = value;
+        }
 
-protected:
-  rep m_value;
-};
+    protected:
+        rep m_value;
+    };
 
-/** \brief represents a counter of number of packets
- *
- *  \warning The counter value may wrap after exceeding the range of underlying integer type.
- */
-class PacketCounter : public SimpleCounter
-{
-public:
-  /** \brief increment the counter by one
-   */
-  PacketCounter&
-  operator++()
-  {
-    ++m_value;
-    return *this;
-  }
-  // postfix ++ operator is not provided because it's not needed
-};
+    /** \brief represents a counter of number of packets
+     *
+     *  \warning The counter value may wrap after exceeding the range of underlying integer type.
+     */
+    class PacketCounter : public SimpleCounter {
+    public:
 
-/** \brief represents a counter of number of bytes
- *
- *  \warning The counter value may wrap after exceeding the range of underlying integer type.
- */
-class ByteCounter : public SimpleCounter
-{
-public:
-  /** \brief increase the counter
-   */
-  ByteCounter&
-  operator+=(rep n)
-  {
-    m_value += n;
-    return *this;
-  }
-};
+        /** \brief increment the counter by one
+         */
+        PacketCounter&
+        operator++() {
+            ++m_value;
+            return *this;
+        }
+        // postfix ++ operator is not provided because it's not needed
+    };
 
-/** \brief provides a counter that observes the size of a table
- *  \tparam T a type that provides a size() const member function
- */
-template<typename T>
-class SizeCounter
-{
-public:
-  typedef size_t rep;
+    /** \brief represents a counter of number of bytes
+     *
+     *  \warning The counter value may wrap after exceeding the range of underlying integer type.
+     */
+    class ByteCounter : public SimpleCounter {
+    public:
 
-  constexpr
-  SizeCounter(const T& table)
-    : m_table(table)
-  {
-  }
+        /** \brief increase the counter
+         */
+        ByteCounter&
+                operator+=(rep n) {
+            m_value += n;
+            return *this;
+        }
+    };
 
-  SizeCounter(const SizeCounter&) = delete;
+    /** \brief provides a counter that observes the size of a table
+     *  \tparam T a type that provides a size() const member function
+     */
+    template<typename T>
+    class SizeCounter {
+    public:
+        typedef size_t rep;
 
-  SizeCounter&
-  operator=(const SizeCounter&) = delete;
+        constexpr
+        SizeCounter(const T& table)
+        : m_table(table) {
+        }
 
-  /** \brief observe the counter
-   */
-  operator rep() const
-  {
-    return m_table.size();
-  }
+        SizeCounter(const SizeCounter&) = delete;
 
-private:
-  const T& m_table;
-};
+        SizeCounter&
+                operator=(const SizeCounter&) = delete;
+
+        /** \brief observe the counter
+         */
+        operator rep() const {
+            return m_table.size();
+        }
+
+    private:
+        const T& m_table;
+    };
 
 } // namespace nfd
 

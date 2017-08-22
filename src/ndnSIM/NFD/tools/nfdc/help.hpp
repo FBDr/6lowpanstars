@@ -29,25 +29,25 @@
 #include "command-parser.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-void
-helpList(std::ostream& os, const CommandParser& parser,
-         ParseMode mode = ParseMode::ONE_SHOT, const std::string& noun = "");
+            void
+            helpList(std::ostream& os, const CommandParser& parser,
+                    ParseMode mode = ParseMode::ONE_SHOT, const std::string& noun = "");
 
-/** \brief the 'help' command
- */
-int
-help(ExecuteContext& ctx, const CommandParser& parser, std::ostream& os);
+            /** \brief the 'help' command
+             */
+            int
+            help(ExecuteContext& ctx, const CommandParser& parser, std::ostream& os);
 
-/** \brief registers 'help' command
- */
-void
-registerHelpCommand(CommandParser& parser);
+            /** \brief registers 'help' command
+             */
+            void
+            registerHelpCommand(CommandParser& parser);
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_HELP_HPP

@@ -36,7 +36,8 @@
 
 
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -92,10 +93,10 @@ namespace ns3 {
     }
 
     CoapClient::CoapClient()
-    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-    , m_q(0.7)
-    , m_s(0.7)
-    , m_seqRng(CreateObject<UniformRandomVariable>()) {
+            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+            , m_q(0.7)
+            , m_s(0.7)
+            , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
         m_received = 0;
@@ -343,7 +344,7 @@ namespace ns3 {
         coaptag.SetReq(nxtsq);
         coaptag.SetSeq(m_sent);
         SetFill("Sensordata/" + std::to_string(nxtsq));
-        NS_LOG_INFO("Added REQ to label: "<< coaptag.GetReq());
+        NS_LOG_INFO("Added REQ to label: " << coaptag.GetReq());
         Ptr<Packet> p;
         if (m_dataSize) {
             //
@@ -404,12 +405,12 @@ namespace ns3 {
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
                 packet->RemovePacketTag(coaptag);
                 packet->RemovePacketTag(hoplimitTag);
-                NS_LOG_INFO("Pending sequence list contains "<<m_PenSeqSet.size() << " entries before Rx." );
+                NS_LOG_INFO("Pending sequence list contains " << m_PenSeqSet.size() << " entries before Rx.");
                 uint32_t cur_req = coaptag.GetReq();
                 NS_LOG_INFO("Req Tag: " << (int) cur_req);
                 NS_LOG_INFO("Seq Tag: " << coaptag.GetSeq());
                 // NS_LOG_INFO("IT: " << m_PenSeqSet[m_PenSeqSet.find(coaptag.GetReq())]);
-                
+
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();

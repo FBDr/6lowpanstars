@@ -29,89 +29,82 @@
 #include "core/logger.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-NFD_LOG_INIT("LimitedIo");
+        NFD_LOG_INIT("LimitedIo");
 
-const int LimitedIo::UNLIMITED_OPS = std::numeric_limits<int>::max();
-const time::nanoseconds LimitedIo::UNLIMITED_TIME = time::nanoseconds::min();
+        const int LimitedIo::UNLIMITED_OPS = std::numeric_limits<int>::max();
+        const time::nanoseconds LimitedIo::UNLIMITED_TIME = time::nanoseconds::min();
 
-LimitedIo::LimitedIo(UnitTestTimeFixture* uttf)
-  : m_uttf(uttf)
-  , m_nOpsRemaining(0)
-  , m_isRunning(false)
-{
-}
+        LimitedIo::LimitedIo(UnitTestTimeFixture* uttf)
+        : m_uttf(uttf)
+        , m_nOpsRemaining(0)
+        , m_isRunning(false) {
+        }
 
-LimitedIo::StopReason
-LimitedIo::run(int nOpsLimit, const time::nanoseconds& timeLimit, const time::nanoseconds& tick)
-{
-  BOOST_ASSERT(!m_isRunning);
+        LimitedIo::StopReason
+        LimitedIo::run(int nOpsLimit, const time::nanoseconds& timeLimit, const time::nanoseconds& tick) {
+            BOOST_ASSERT(!m_isRunning);
 
-  if (nOpsLimit <= 0) {
-    return EXCEED_OPS;
-  }
+            if (nOpsLimit <= 0) {
+                return EXCEED_OPS;
+            }
 
-  m_isRunning = true;
+            m_isRunning = true;
 
-  m_reason = NO_WORK;
-  m_nOpsRemaining = nOpsLimit;
-  if (timeLimit >= time::nanoseconds::zero()) {
-    m_timeout = scheduler::schedule(timeLimit, bind(&LimitedIo::afterTimeout, this));
-  }
+            m_reason = NO_WORK;
+            m_nOpsRemaining = nOpsLimit;
+            if (timeLimit >= time::nanoseconds::zero()) {
+                m_timeout = scheduler::schedule(timeLimit, bind(&LimitedIo::afterTimeout, this));
+            }
 
-  try {
-    if (m_uttf == nullptr) {
-      getGlobalIoService().run();
-    }
-    else {
-      // timeLimit is enforced by afterTimeout
-      m_uttf->advanceClocks(tick, time::nanoseconds::max());
-    }
-  }
-  catch (const StopException&) {
-  }
-  catch (const std::exception& ex) {
-    NFD_LOG_ERROR("g_io.run() exception: " << getExtendedErrorMessage(ex));
-    m_reason = EXCEPTION;
-    m_lastException = std::current_exception();
-  }
+            try {
+                if (m_uttf == nullptr) {
+                    getGlobalIoService().run();
+                } else {
+                    // timeLimit is enforced by afterTimeout
+                    m_uttf->advanceClocks(tick, time::nanoseconds::max());
+                }
+            } catch (const StopException&) {
+            } catch (const std::exception& ex) {
+                NFD_LOG_ERROR("g_io.run() exception: " << getExtendedErrorMessage(ex));
+                m_reason = EXCEPTION;
+                m_lastException = std::current_exception();
+            }
 
-  getGlobalIoService().reset();
-  scheduler::cancel(m_timeout);
-  m_isRunning = false;
+            getGlobalIoService().reset();
+            scheduler::cancel(m_timeout);
+            m_isRunning = false;
 
-  return m_reason;
-}
+            return m_reason;
+        }
 
-void
-LimitedIo::afterOp()
-{
-  if (!m_isRunning) {
-    // Do not proceed further if .afterOp() is invoked out of .run(),
-    return;
-  }
+        void
+        LimitedIo::afterOp() {
+            if (!m_isRunning) {
+                // Do not proceed further if .afterOp() is invoked out of .run(),
+                return;
+            }
 
-  --m_nOpsRemaining;
+            --m_nOpsRemaining;
 
-  if (m_nOpsRemaining <= 0) {
-    m_reason = EXCEED_OPS;
-    getGlobalIoService().stop();
-    if (m_uttf != nullptr) {
-      BOOST_THROW_EXCEPTION(StopException());
-    }
-  }
-}
+            if (m_nOpsRemaining <= 0) {
+                m_reason = EXCEED_OPS;
+                getGlobalIoService().stop();
+                if (m_uttf != nullptr) {
+                    BOOST_THROW_EXCEPTION(StopException());
+                }
+            }
+        }
 
-void
-LimitedIo::afterTimeout()
-{
-  m_reason = EXCEED_TIME;
-  getGlobalIoService().stop();
-  if (m_uttf != nullptr) {
-    BOOST_THROW_EXCEPTION(StopException());
-  }
-}
+        void
+        LimitedIo::afterTimeout() {
+            m_reason = EXCEED_TIME;
+            getGlobalIoService().stop();
+            if (m_uttf != nullptr) {
+                BOOST_THROW_EXCEPTION(StopException());
+            }
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace nfd

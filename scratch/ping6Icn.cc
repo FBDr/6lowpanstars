@@ -38,7 +38,8 @@
 #include "ns3/network-module.h"
 
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("Ping6Example");
 
@@ -140,7 +141,7 @@ namespace ns3 {
         AsciiTraceHelper ascii;
         csma.EnableAsciiAll(ascii.CreateFileStream("ping6.tr"));
         csma.EnablePcapAll(std::string("ping6"), true);
-        
+
 
         NS_LOG_INFO("Run Simulation.");
         Simulator::Run();
@@ -151,7 +152,6 @@ namespace ns3 {
 }
 
 int
-main(int argc, char* argv[])
-{
-  return ns3::main(argc, argv);
+main(int argc, char* argv[]) {
+    return ns3::main(argc, argv);
 }

@@ -26,80 +26,73 @@
 #include "openssl.hpp"
 
 namespace ndn {
-namespace security {
-namespace detail {
+    namespace security {
+        namespace detail {
 
-const EVP_MD*
-toDigestEvpMd(DigestAlgorithm algo);
+            const EVP_MD*
+            toDigestEvpMd(DigestAlgorithm algo);
 
-class EvpPkey
-{
-public:
-  EvpPkey();
+            class EvpPkey {
+            public:
+                EvpPkey();
 
-  ~EvpPkey();
+                ~EvpPkey();
 
-  EVP_PKEY*
-  get() const
-  {
-    return m_key;
-  }
+                EVP_PKEY*
+                get() const {
+                    return m_key;
+                }
 
-  EVP_PKEY**
-  operator&()
-  {
-    return &m_key;
-  }
+                EVP_PKEY**
+                operator&() {
+                    return &m_key;
+                }
 
-private:
-  EVP_PKEY* m_key;
-};
+            private:
+                EVP_PKEY* m_key;
+            };
 
-class EvpPkeyCtx
-{
-public:
-  explicit
-  EvpPkeyCtx(EVP_PKEY* key);
+            class EvpPkeyCtx {
+            public:
+                explicit
+                EvpPkeyCtx(EVP_PKEY* key);
 
-  explicit
-  EvpPkeyCtx(int id);
+                explicit
+                EvpPkeyCtx(int id);
 
-  ~EvpPkeyCtx();
+                ~EvpPkeyCtx();
 
-  EVP_PKEY_CTX*
-  get() const
-  {
-    return m_ctx;
-  }
+                EVP_PKEY_CTX*
+                get() const {
+                    return m_ctx;
+                }
 
-private:
-  EVP_PKEY_CTX* m_ctx;
-};
+            private:
+                EVP_PKEY_CTX* m_ctx;
+            };
 
-class Bio
-{
-public:
-  explicit
+            class Bio {
+            public:
+                explicit
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL
-  Bio(BIO_METHOD* method);
+                Bio(BIO_METHOD* method);
 #else
-  Bio(const BIO_METHOD* method);
+                Bio(const BIO_METHOD* method);
 #endif // OPENSSL_VERSION_NUMBER < 0x1010000fL
 
-  ~Bio();
+                ~Bio();
 
-  BIO*
-  get() const
-  {
-    return m_bio;
-  }
+                BIO*
+                get() const {
+                    return m_bio;
+                }
 
-private:
-  BIO* m_bio;
-};
+            private:
+                BIO* m_bio;
+            };
 
-} // namespace detail
-} // namespace security
+        } // namespace detail
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_DETAIL_OPENSSL_HELPER_HPP

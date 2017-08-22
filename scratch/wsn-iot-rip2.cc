@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     // - br: 	  		NodeContainer with border gateway routers.
     // - Master:  	NodeContainer with the top router only.
     // - lcsmam[]:	NodeContainer with specific border router and master node.
-    
+
     NS_LOG_INFO("Creating IoT bubbles.");
     NodeContainer iot[node_head];
     NodeContainer br;

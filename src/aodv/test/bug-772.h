@@ -35,56 +35,55 @@ using namespace ns3;
  * 
  * \todo describe expected packet trace 
  */
-class Bug772ChainTest : public TestCase
-{
+class Bug772ChainTest : public TestCase {
 public:
-  /**
-   * Create test case
-   * 
-   * \param prefix              Unique file names prefix
-   * \param proto               ns3::UdpSocketFactory or ns3::TcpSocketFactory
-   * \param size                Number of nodes in the chain
-   * \param time                Simulation time
-   */
-  Bug772ChainTest (const char * const prefix, const char * const proto, Time time, uint32_t size);
-  ~Bug772ChainTest ();
+    /**
+     * Create test case
+     * 
+     * \param prefix              Unique file names prefix
+     * \param proto               ns3::UdpSocketFactory or ns3::TcpSocketFactory
+     * \param size                Number of nodes in the chain
+     * \param time                Simulation time
+     */
+    Bug772ChainTest(const char * const prefix, const char * const proto, Time time, uint32_t size);
+    ~Bug772ChainTest();
 
 private:
-  /// \internal It is important to have pointers here
-  NodeContainer * m_nodes;
+    /// \internal It is important to have pointers here
+    NodeContainer * m_nodes;
 
-  /// PCAP file names prefix
-  const std::string m_prefix;
-  /// Socket factory TID
-  const std::string m_proto;
-  /// Total simulation time
-  const Time m_time;
-  /// Chain size
-  const uint32_t m_size;
-  /// Chain step, meters
-  const double m_step;
-  /// port number
-  const uint16_t m_port;
+    /// PCAP file names prefix
+    const std::string m_prefix;
+    /// Socket factory TID
+    const std::string m_proto;
+    /// Total simulation time
+    const Time m_time;
+    /// Chain size
+    const uint32_t m_size;
+    /// Chain step, meters
+    const double m_step;
+    /// port number
+    const uint16_t m_port;
 
-  /// Create test topology
-  void CreateNodes ();
-  /// Create devices, install TCP/IP stack and applications
-  void CreateDevices ();
-  /// Compare traces with reference ones
-  void CheckResults ();
-  /// Go
-  void DoRun ();
+    /// Create test topology
+    void CreateNodes();
+    /// Create devices, install TCP/IP stack and applications
+    void CreateDevices();
+    /// Compare traces with reference ones
+    void CheckResults();
+    /// Go
+    void DoRun();
 
-  /// Receiving socket
-  Ptr<Socket> m_recvSocket;
-  /// Transmitting socket
-  Ptr<Socket> m_sendSocket;
+    /// Receiving socket
+    Ptr<Socket> m_recvSocket;
+    /// Transmitting socket
+    Ptr<Socket> m_sendSocket;
 
-  /**
-   * Send data
-   * \param socket the sending socket
-   */
-  void SendData (Ptr<Socket> socket);
+    /**
+     * Send data
+     * \param socket the sending socket
+     */
+    void SendData(Ptr<Socket> socket);
 };
 
 #endif /* BUG_772_H */

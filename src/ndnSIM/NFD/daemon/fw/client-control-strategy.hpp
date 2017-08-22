@@ -29,29 +29,28 @@
 #include "best-route-strategy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief identical to BestRouteStrategy v1, for backwards compatibility
- *  \deprecated NextHopFaceId field is honored universally and it's unnecessary to set this strategy
- */
-class ClientControlStrategy : public BestRouteStrategy
-{
-public:
-  explicit
-  ClientControlStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+        /** \brief identical to BestRouteStrategy v1, for backwards compatibility
+         *  \deprecated NextHopFaceId field is honored universally and it's unnecessary to set this strategy
+         */
+        class ClientControlStrategy : public BestRouteStrategy {
+        public:
+            explicit
+            ClientControlStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<pit::Entry>& pitEntry) override;
+            virtual void
+            afterReceiveInterest(const Face& inFace, const Interest& interest,
+                    const shared_ptr<pit::Entry>& pitEntry) override;
 
-public:
-  static const Name STRATEGY_NAME;
+        public:
+            static const Name STRATEGY_NAME;
 
-private:
-  bool m_isFirstUse = true;
-};
+        private:
+            bool m_isFirstUse = true;
+        };
 
-} // namespace fw
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_CLIENT_CONTROL_STRATEGY_HPP

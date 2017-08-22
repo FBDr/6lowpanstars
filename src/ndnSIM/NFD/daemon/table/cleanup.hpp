@@ -32,20 +32,20 @@
 
 namespace nfd {
 
-/** \brief cleanup tables when a face is destroyed
- *
- *  This function enumerates the NameTree, calls Fib::removeNextHop for each FIB entry,
- *  calls Pit::deleteInOutRecords for each PIT entry, and finally
- *  deletes any name tree entries that have become empty.
- *
- *  \note It's a design choice to let Fib and Pit classes decide what to do with each entry.
- *        This function is only responsible for implementing the enumeration procedure.
- *        The benefit of having this function instead of doing the enumeration in Fib and Pit
- *        classes is to perform both FIB and PIT cleanups in one pass of NameTree enumeration,
- *        so as to reduce performance overhead.
- */
-void
-cleanupOnFaceRemoval(NameTree& nt, Fib& fib, Pit& pit, const Face& face);
+    /** \brief cleanup tables when a face is destroyed
+     *
+     *  This function enumerates the NameTree, calls Fib::removeNextHop for each FIB entry,
+     *  calls Pit::deleteInOutRecords for each PIT entry, and finally
+     *  deletes any name tree entries that have become empty.
+     *
+     *  \note It's a design choice to let Fib and Pit classes decide what to do with each entry.
+     *        This function is only responsible for implementing the enumeration procedure.
+     *        The benefit of having this function instead of doing the enumeration in Fib and Pit
+     *        classes is to perform both FIB and PIT cleanups in one pass of NameTree enumeration,
+     *        so as to reduce performance overhead.
+     */
+    void
+    cleanupOnFaceRemoval(NameTree& nt, Fib& fib, Pit& pit, const Face& face);
 
 } // namespace nfd
 

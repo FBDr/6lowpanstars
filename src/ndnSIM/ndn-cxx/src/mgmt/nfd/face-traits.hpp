@@ -25,178 +25,159 @@
 #include "../../encoding/tlv-nfd.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/** \ingroup management
- *  \brief providers getters and setters of face information fields
- *  \tparam C the concrete class; it must provide .wireReset() method
-            to clear wire encoding when a field changes
- */
-template<class C>
-class FaceTraits
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /** \ingroup management
+         *  \brief providers getters and setters of face information fields
+         *  \tparam C the concrete class; it must provide .wireReset() method
+                    to clear wire encoding when a field changes
+         */
+        template<class C>
+        class FaceTraits {
+        public:
 
-  FaceTraits()
-    : m_faceId(0)
-    , m_faceScope(FACE_SCOPE_NON_LOCAL)
-    , m_facePersistency(FACE_PERSISTENCY_PERSISTENT)
-    , m_linkType(LINK_TYPE_POINT_TO_POINT)
-    , m_flags(0x0)
-  {
-  }
+            class Error : public tlv::Error {
+            public:
 
-  uint64_t
-  getFaceId() const
-  {
-    return m_faceId;
-  }
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  C&
-  setFaceId(uint64_t faceId)
-  {
-    wireReset();
-    m_faceId = faceId;
-    return static_cast<C&>(*this);
-  }
+            FaceTraits()
+            : m_faceId(0)
+            , m_faceScope(FACE_SCOPE_NON_LOCAL)
+            , m_facePersistency(FACE_PERSISTENCY_PERSISTENT)
+            , m_linkType(LINK_TYPE_POINT_TO_POINT)
+            , m_flags(0x0) {
+            }
 
-  const std::string&
-  getRemoteUri() const
-  {
-    return m_remoteUri;
-  }
+            uint64_t
+            getFaceId() const {
+                return m_faceId;
+            }
 
-  C&
-  setRemoteUri(const std::string& remoteUri)
-  {
-    wireReset();
-    m_remoteUri = remoteUri;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setFaceId(uint64_t faceId) {
+                wireReset();
+                m_faceId = faceId;
+                return static_cast<C&> (*this);
+            }
 
-  const std::string&
-  getLocalUri() const
-  {
-    return m_localUri;
-  }
+            const std::string&
+            getRemoteUri() const {
+                return m_remoteUri;
+            }
 
-  C&
-  setLocalUri(const std::string& localUri)
-  {
-    wireReset();
-    m_localUri = localUri;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setRemoteUri(const std::string& remoteUri) {
+                wireReset();
+                m_remoteUri = remoteUri;
+                return static_cast<C&> (*this);
+            }
 
-  FaceScope
-  getFaceScope() const
-  {
-    return m_faceScope;
-  }
+            const std::string&
+            getLocalUri() const {
+                return m_localUri;
+            }
 
-  C&
-  setFaceScope(FaceScope faceScope)
-  {
-    wireReset();
-    m_faceScope = faceScope;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setLocalUri(const std::string& localUri) {
+                wireReset();
+                m_localUri = localUri;
+                return static_cast<C&> (*this);
+            }
 
-  FacePersistency
-  getFacePersistency() const
-  {
-    return m_facePersistency;
-  }
+            FaceScope
+            getFaceScope() const {
+                return m_faceScope;
+            }
 
-  C&
-  setFacePersistency(FacePersistency facePersistency)
-  {
-    wireReset();
-    m_facePersistency = facePersistency;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setFaceScope(FaceScope faceScope) {
+                wireReset();
+                m_faceScope = faceScope;
+                return static_cast<C&> (*this);
+            }
 
-  LinkType
-  getLinkType() const
-  {
-    return m_linkType;
-  }
+            FacePersistency
+            getFacePersistency() const {
+                return m_facePersistency;
+            }
 
-  C&
-  setLinkType(LinkType linkType)
-  {
-    wireReset();
-    m_linkType = linkType;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setFacePersistency(FacePersistency facePersistency) {
+                wireReset();
+                m_facePersistency = facePersistency;
+                return static_cast<C&> (*this);
+            }
 
-  uint64_t
-  getFlags() const
-  {
-    return m_flags;
-  }
+            LinkType
+            getLinkType() const {
+                return m_linkType;
+            }
 
-  C&
-  setFlags(uint64_t flags)
-  {
-    wireReset();
-    m_flags = flags;
-    return static_cast<C&>(*this);
-  }
+            C&
+            setLinkType(LinkType linkType) {
+                wireReset();
+                m_linkType = linkType;
+                return static_cast<C&> (*this);
+            }
 
-  bool
-  getFlagBit(size_t bit) const
-  {
-    if (bit >= 64) {
-      BOOST_THROW_EXCEPTION(std::out_of_range("bit must be within range [0, 64)"));
-    }
+            uint64_t
+            getFlags() const {
+                return m_flags;
+            }
 
-    return m_flags & (1 << bit);
-  }
+            C&
+            setFlags(uint64_t flags) {
+                wireReset();
+                m_flags = flags;
+                return static_cast<C&> (*this);
+            }
 
-  C&
-  setFlagBit(size_t bit, bool value)
-  {
-    if (bit >= 64) {
-      BOOST_THROW_EXCEPTION(std::out_of_range("bit must be within range [0, 64)"));
-    }
+            bool
+            getFlagBit(size_t bit) const {
+                if (bit >= 64) {
+                    BOOST_THROW_EXCEPTION(std::out_of_range("bit must be within range [0, 64)"));
+                }
 
-    wireReset();
+                return m_flags & (1 << bit);
+            }
 
-    if (value) {
-      m_flags |= (1 << bit);
-    }
-    else {
-      m_flags &= ~(1 << bit);
-    }
+            C&
+            setFlagBit(size_t bit, bool value) {
+                if (bit >= 64) {
+                    BOOST_THROW_EXCEPTION(std::out_of_range("bit must be within range [0, 64)"));
+                }
 
-    return static_cast<C&>(*this);
-  }
+                wireReset();
 
-protected:
-  virtual void
-  wireReset() const = 0;
+                if (value) {
+                    m_flags |= (1 << bit);
+                } else {
+                    m_flags &= ~(1 << bit);
+                }
 
-protected:
-  uint64_t m_faceId;
-  std::string m_remoteUri;
-  std::string m_localUri;
-  FaceScope m_faceScope;
-  FacePersistency  m_facePersistency;
-  LinkType m_linkType;
-  uint64_t m_flags;
-};
+                return static_cast<C&> (*this);
+            }
 
-} // namespace nfd
+        protected:
+            virtual void
+            wireReset() const = 0;
+
+        protected:
+            uint64_t m_faceId;
+            std::string m_remoteUri;
+            std::string m_localUri;
+            FaceScope m_faceScope;
+            FacePersistency m_facePersistency;
+            LinkType m_linkType;
+            uint64_t m_flags;
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FACE_TRAITS_HPP

@@ -29,16 +29,16 @@
 #include "status.hpp"
 
 namespace nfd {
-namespace tools {
-namespace nfdc {
+    namespace tools {
+        namespace nfdc {
 
-/** \brief registers 'legacy-nfd-status' command
- */
-void
-registerLegacyStatusCommand(CommandParser& parser);
+            /** \brief registers 'legacy-nfd-status' command
+             */
+            void
+            registerLegacyStatusCommand(CommandParser& parser);
 
-} // namespace nfdc
-} // namespace tools
+        } // namespace nfdc
+    } // namespace tools
 } // namespace nfd
 
 #endif // NFD_TOOLS_NFDC_LEGACY_STATUS_HPP

@@ -33,7 +33,7 @@ void echo_func(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
 
 std::string run_server_test(std::string input, bool log) {
     server test_server;
-    return run_server_test(test_server,input,log);
+    return run_server_test(test_server, input, log);
 }
 
 std::string run_server_test(server & s, std::string input, bool log) {

@@ -27,104 +27,96 @@
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Application");
-
-NS_OBJECT_ENSURE_REGISTERED (Application);
-
-// Application Methods
-
-TypeId 
-Application::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Application")
-    .SetParent<Object> ()
-    .SetGroupName("Network")
-    .AddAttribute ("StartTime", "Time at which the application will start",
-                   TimeValue (Seconds (0.0)),
-                   MakeTimeAccessor (&Application::m_startTime),
-                   MakeTimeChecker ())
-    .AddAttribute ("StopTime", "Time at which the application will stop",
-                   TimeValue (TimeStep (0)),
-                   MakeTimeAccessor (&Application::m_stopTime),
-                   MakeTimeChecker ())
-  ;
-  return tid;
-}
 
-// \brief Application Constructor
-Application::Application()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("Application");
 
-// \brief Application Destructor
-Application::~Application()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(Application);
 
-void
-Application::SetStartTime (Time start)
-{
-  NS_LOG_FUNCTION (this << start);
-  m_startTime = start;
-}
-void
-Application::SetStopTime (Time stop)
-{
-  NS_LOG_FUNCTION (this << stop);
-  m_stopTime = stop;
-}
+    // Application Methods
 
-
-void
-Application::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_node = 0;
-  m_startEvent.Cancel ();
-  m_stopEvent.Cancel ();
-  Object::DoDispose ();
-}
-
-void
-Application::DoInitialize (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_startEvent = Simulator::Schedule (m_startTime, &Application::StartApplication, this);
-  if (m_stopTime != TimeStep (0))
-    {
-      m_stopEvent = Simulator::Schedule (m_stopTime, &Application::StopApplication, this);
+    TypeId
+    Application::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Application")
+                .SetParent<Object> ()
+                .SetGroupName("Network")
+                .AddAttribute("StartTime", "Time at which the application will start",
+                TimeValue(Seconds(0.0)),
+                MakeTimeAccessor(&Application::m_startTime),
+                MakeTimeChecker())
+                .AddAttribute("StopTime", "Time at which the application will stop",
+                TimeValue(TimeStep(0)),
+                MakeTimeAccessor(&Application::m_stopTime),
+                MakeTimeChecker())
+                ;
+        return tid;
     }
-  Object::DoInitialize ();
-}
 
-Ptr<Node> Application::GetNode () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_node;
-}
+    // \brief Application Constructor
 
-void 
-Application::SetNode (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (this);
-  m_node = node;
-}
+    Application::Application() {
+        NS_LOG_FUNCTION(this);
+    }
 
-// Protected methods
-// StartApp and StopApp will likely be overridden by application subclasses
-void Application::StartApplication ()
-{ // Provide null functionality in case subclass is not interested
-  NS_LOG_FUNCTION (this);
-}
+    // \brief Application Destructor
 
-void Application::StopApplication ()
-{ // Provide null functionality in case subclass is not interested
-  NS_LOG_FUNCTION (this);
-}
+    Application::~Application() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    void
+    Application::SetStartTime(Time start) {
+        NS_LOG_FUNCTION(this << start);
+        m_startTime = start;
+    }
+
+    void
+    Application::SetStopTime(Time stop) {
+        NS_LOG_FUNCTION(this << stop);
+        m_stopTime = stop;
+    }
+
+    void
+    Application::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        m_node = 0;
+        m_startEvent.Cancel();
+        m_stopEvent.Cancel();
+        Object::DoDispose();
+    }
+
+    void
+    Application::DoInitialize(void) {
+        NS_LOG_FUNCTION(this);
+        m_startEvent = Simulator::Schedule(m_startTime, &Application::StartApplication, this);
+        if (m_stopTime != TimeStep(0)) {
+            m_stopEvent = Simulator::Schedule(m_stopTime, &Application::StopApplication, this);
+        }
+        Object::DoInitialize();
+    }
+
+    Ptr<Node> Application::GetNode() const {
+        NS_LOG_FUNCTION(this);
+        return m_node;
+    }
+
+    void
+    Application::SetNode(Ptr<Node> node) {
+        NS_LOG_FUNCTION(this);
+        m_node = node;
+    }
+
+    // Protected methods
+    // StartApp and StopApp will likely be overridden by application subclasses
+
+    void Application::StartApplication() { // Provide null functionality in case subclass is not interested
+        NS_LOG_FUNCTION(this);
+    }
+
+    void Application::StopApplication() { // Provide null functionality in case subclass is not interested
+        NS_LOG_FUNCTION(this);
+    }
 
 } // namespace ns3
 

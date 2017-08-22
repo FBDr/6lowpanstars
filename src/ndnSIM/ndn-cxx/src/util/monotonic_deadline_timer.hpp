@@ -31,51 +31,45 @@
 #include <boost/asio/basic_deadline_timer.hpp>
 
 namespace boost {
-namespace asio {
+    namespace asio {
 
-template<>
-struct time_traits<ndn::time::steady_clock>
-{
-  typedef ndn::time::steady_clock::TimePoint time_type;
-  typedef ndn::time::steady_clock::Duration  duration_type;
+        template<>
+        struct time_traits<ndn::time::steady_clock> {
+            typedef ndn::time::steady_clock::TimePoint time_type;
+            typedef ndn::time::steady_clock::Duration duration_type;
 
-  static time_type
-  now()
-  {
-    return ndn::time::steady_clock::now();
-  }
+            static time_type
+            now() {
+                return ndn::time::steady_clock::now();
+            }
 
-  static time_type
-  add(const time_type& time, const duration_type& duration)
-  {
-    return time + duration;
-  }
+            static time_type
+            add(const time_type& time, const duration_type& duration) {
+                return time + duration;
+            }
 
-  static duration_type
-  subtract(const time_type& timeLhs, const time_type& timeRhs)
-  {
-    return timeLhs - timeRhs;
-  }
+            static duration_type
+            subtract(const time_type& timeLhs, const time_type& timeRhs) {
+                return timeLhs - timeRhs;
+            }
 
-  static bool
-  less_than(const time_type& timeLhs, const time_type& timeRhs)
-  {
-    return timeLhs < timeRhs;
-  }
+            static bool
+            less_than(const time_type& timeLhs, const time_type& timeRhs) {
+                return timeLhs < timeRhs;
+            }
 
-  static boost::posix_time::time_duration
-  to_posix_duration(const duration_type& duration)
-  {
-    return ndn::time::steady_clock::to_posix_duration(duration);
-  }
-};
+            static boost::posix_time::time_duration
+            to_posix_duration(const duration_type& duration) {
+                return ndn::time::steady_clock::to_posix_duration(duration);
+            }
+        };
 
-} // namespace asio
+    } // namespace asio
 } // namespace boost
 
 namespace ndn {
 
-typedef boost::asio::basic_deadline_timer<time::steady_clock> monotonic_deadline_timer;
+    typedef boost::asio::basic_deadline_timer<time::steady_clock> monotonic_deadline_timer;
 
 } // namespace ndn
 

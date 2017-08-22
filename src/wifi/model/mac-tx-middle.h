@@ -29,48 +29,47 @@
 
 namespace ns3 {
 
-class WifiMacHeader;
+    class WifiMacHeader;
 
-/**
- * \ingroup wifi
- *
- * Handles sequence numbering of IEEE 802.11 data frames
- */
-class MacTxMiddle
-{
-public:
-  MacTxMiddle ();
-  ~MacTxMiddle ();
+    /**
+     * \ingroup wifi
+     *
+     * Handles sequence numbering of IEEE 802.11 data frames
+     */
+    class MacTxMiddle {
+    public:
+        MacTxMiddle();
+        ~MacTxMiddle();
 
-  /**
-   * Return the next sequence number for the given header.
-   *
-   * \param hdr Wi-Fi header
-   * \return the next sequence number
-   */
-  uint16_t GetNextSequenceNumberfor (const WifiMacHeader *hdr);
-  /**
-   * Return the next sequence number for the Traffic ID and destination, but do not pick it (i.e. the current sequence number remains unchanged).
-   * This functions is used for A-MPDU aggregation.
-   *
-   * \param hdr Wi-Fi header
-   * \return the next sequence number
-   */
-  uint16_t PeekNextSequenceNumberfor (const WifiMacHeader *hdr);
-  /**
-   * Return the next sequence number for the Traffic ID and destination.
-   *
-   * \param tid Traffic ID
-   * \param addr destination address
-   * \return the next sequence number
-   */
-  uint16_t GetNextSeqNumberByTidAndAddress (uint8_t tid, Mac48Address addr) const;
+        /**
+         * Return the next sequence number for the given header.
+         *
+         * \param hdr Wi-Fi header
+         * \return the next sequence number
+         */
+        uint16_t GetNextSequenceNumberfor(const WifiMacHeader *hdr);
+        /**
+         * Return the next sequence number for the Traffic ID and destination, but do not pick it (i.e. the current sequence number remains unchanged).
+         * This functions is used for A-MPDU aggregation.
+         *
+         * \param hdr Wi-Fi header
+         * \return the next sequence number
+         */
+        uint16_t PeekNextSequenceNumberfor(const WifiMacHeader *hdr);
+        /**
+         * Return the next sequence number for the Traffic ID and destination.
+         *
+         * \param tid Traffic ID
+         * \param addr destination address
+         * \return the next sequence number
+         */
+        uint16_t GetNextSeqNumberByTidAndAddress(uint8_t tid, Mac48Address addr) const;
 
 
-private:
-  std::map <Mac48Address,uint16_t*> m_qosSequences;
-  uint16_t m_sequence;
-};
+    private:
+        std::map <Mac48Address, uint16_t*> m_qosSequences;
+        uint16_t m_sequence;
+    };
 
 } //namespace ns3
 

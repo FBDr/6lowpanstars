@@ -28,59 +28,54 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace rib {
-namespace tests {
+    namespace rib {
+        namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TestPropagatedEntry, nfd::tests::BaseFixture)
+            BOOST_FIXTURE_TEST_SUITE(TestPropagatedEntry, nfd::tests::BaseFixture)
 
-BOOST_AUTO_TEST_CASE(Identity)
-{
-  PropagatedEntry entry;
-  BOOST_CHECK(entry.m_signingIdentity.empty());
+            BOOST_AUTO_TEST_CASE(Identity) {
+                PropagatedEntry entry;
+                BOOST_CHECK(entry.m_signingIdentity.empty());
 
-  entry.setSigningIdentity("/test");
-  BOOST_CHECK_EQUAL(entry.m_signingIdentity, "/test");
-  BOOST_CHECK_EQUAL(entry.getSigningIdentity(), "/test");
-}
+                entry.setSigningIdentity("/test");
+                BOOST_CHECK_EQUAL(entry.m_signingIdentity, "/test");
+                BOOST_CHECK_EQUAL(entry.getSigningIdentity(), "/test");
+            }
 
-BOOST_AUTO_TEST_CASE(Start)
-{
-  PropagatedEntry entry;
-  BOOST_CHECK(!entry.isPropagating());
+            BOOST_AUTO_TEST_CASE(Start) {
+                PropagatedEntry entry;
+                BOOST_CHECK(!entry.isPropagating());
 
-  entry.startPropagation();
-  BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATING, entry.m_propagationStatus);
-  BOOST_CHECK(entry.isPropagating());
-}
+                entry.startPropagation();
+                BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATING, entry.m_propagationStatus);
+                BOOST_CHECK(entry.isPropagating());
+            }
 
-BOOST_AUTO_TEST_CASE(Succeed)
-{
-  PropagatedEntry entry;
-  entry.succeed(nullptr);
-  BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATED, entry.m_propagationStatus);
-  BOOST_CHECK(entry.isPropagated());
-}
+            BOOST_AUTO_TEST_CASE(Succeed) {
+                PropagatedEntry entry;
+                entry.succeed(nullptr);
+                BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATED, entry.m_propagationStatus);
+                BOOST_CHECK(entry.isPropagated());
+            }
 
-BOOST_AUTO_TEST_CASE(Fail)
-{
-  PropagatedEntry entry;
-  entry.fail(nullptr);
-  BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATE_FAIL, entry.m_propagationStatus);
-  BOOST_CHECK(entry.isPropagateFail());
-}
+            BOOST_AUTO_TEST_CASE(Fail) {
+                PropagatedEntry entry;
+                entry.fail(nullptr);
+                BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATE_FAIL, entry.m_propagationStatus);
+                BOOST_CHECK(entry.isPropagateFail());
+            }
 
-BOOST_AUTO_TEST_CASE(Initialize)
-{
-  PropagatedEntry entry;
-  entry.startPropagation();
-  BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATING, entry.m_propagationStatus);
+            BOOST_AUTO_TEST_CASE(Initialize) {
+                PropagatedEntry entry;
+                entry.startPropagation();
+                BOOST_CHECK_EQUAL(PropagationStatus::PROPAGATING, entry.m_propagationStatus);
 
-  entry.initialize();
-  BOOST_CHECK_EQUAL(PropagationStatus::NEW, entry.m_propagationStatus);
-}
+                entry.initialize();
+                BOOST_CHECK_EQUAL(PropagationStatus::NEW, entry.m_propagationStatus);
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestPropagatedEntry
+            BOOST_AUTO_TEST_SUITE_END() // TestPropagatedEntry
 
-} // namespace tests
-} // namespace rib
+        } // namespace tests
+    } // namespace rib
 } // namespace nfd

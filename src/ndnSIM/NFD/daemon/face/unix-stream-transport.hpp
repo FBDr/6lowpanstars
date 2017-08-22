@@ -33,23 +33,22 @@
 #endif
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/**
- * \brief A Transport that communicates on a stream-oriented Unix domain socket
- */
-class UnixStreamTransport final : public StreamTransport<boost::asio::local::stream_protocol>
-{
-public:
-  explicit
-  UnixStreamTransport(protocol::socket&& socket);
+        /**
+         * \brief A Transport that communicates on a stream-oriented Unix domain socket
+         */
+        class UnixStreamTransport final : public StreamTransport<boost::asio::local::stream_protocol> {
+        public:
+            explicit
+            UnixStreamTransport(protocol::socket&& socket);
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
-};
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
+        };
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_UNIX_STREAM_TRANSPORT_HPP

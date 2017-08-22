@@ -28,77 +28,77 @@
 
 namespace ndn {
 
-namespace signed_interest {
+    namespace signed_interest {
 
-const ssize_t POS_SIG_VALUE = -1;
-const ssize_t POS_SIG_INFO = -2;
-const ssize_t POS_RANDOM_VAL = -3;
-const ssize_t POS_TIMESTAMP = -4;
+        const ssize_t POS_SIG_VALUE = -1;
+        const ssize_t POS_SIG_INFO = -2;
+        const ssize_t POS_RANDOM_VAL = -3;
+        const ssize_t POS_TIMESTAMP = -4;
 
-/** \brief minimal number of components for Command Interest
- *  \sa https://redmine.named-data.net/projects/ndn-cxx/wiki/CommandInterest
- */
-const size_t MIN_LENGTH = 4;
+        /** \brief minimal number of components for Command Interest
+         *  \sa https://redmine.named-data.net/projects/ndn-cxx/wiki/CommandInterest
+         */
+        const size_t MIN_LENGTH = 4;
 
-/** \brief minimal number of components for Signed Interest
- *  \sa https://redmine.named-data.net/projects/ndn-cxx/wiki/SignedInterest
- */
-const size_t MIN_LENGTH_SIG_ONLY = 2;
+        /** \brief minimal number of components for Signed Interest
+         *  \sa https://redmine.named-data.net/projects/ndn-cxx/wiki/SignedInterest
+         */
+        const size_t MIN_LENGTH_SIG_ONLY = 2;
 
-} // namespace signed_interest
+    } // namespace signed_interest
 
-enum class KeyType {
-  NONE = 0,
-  RSA  = 1,
-  EC   = 2,
-  AES  = 128
-};
+    enum class KeyType {
+        NONE = 0,
+        RSA = 1,
+        EC = 2,
+        AES = 128
+    };
 
-std::ostream&
-operator<<(std::ostream& os, KeyType keyType);
+    std::ostream&
+    operator<<(std::ostream& os, KeyType keyType);
 
-enum class KeyClass {
-  NONE,
-  PUBLIC,
-  PRIVATE,
-  SYMMETRIC
-};
+    enum class KeyClass {
+        NONE,
+        PUBLIC,
+        PRIVATE,
+        SYMMETRIC
+    };
 
-std::ostream&
-operator<<(std::ostream& os, KeyClass keyClass);
+    std::ostream&
+    operator<<(std::ostream& os, KeyClass keyClass);
 
-enum class DigestAlgorithm {
-  NONE   = 0,
-  SHA256 = 1
-};
+    enum class DigestAlgorithm {
+        NONE = 0,
+        SHA256 = 1
+    };
 
-std::ostream&
-operator<<(std::ostream& os, DigestAlgorithm algorithm);
+    std::ostream&
+    operator<<(std::ostream& os, DigestAlgorithm algorithm);
 
-enum class BlockCipherAlgorithm {
-  NONE,
-  AES_CBC
-};
+    enum class BlockCipherAlgorithm {
+        NONE,
+        AES_CBC
+    };
 
-std::ostream&
-operator<<(std::ostream& os, BlockCipherAlgorithm algorithm);
+    std::ostream&
+    operator<<(std::ostream& os, BlockCipherAlgorithm algorithm);
 
-enum class CipherOperator {
-  DECRYPT = 0,
-  ENCRYPT = 1
-};
+    enum class CipherOperator {
+        DECRYPT = 0,
+        ENCRYPT = 1
+    };
 
-std::ostream&
-operator<<(std::ostream& os, CipherOperator op);
+    std::ostream&
+    operator<<(std::ostream& os, CipherOperator op);
 
-enum class AclType {
-  NONE,
-  PUBLIC,
-  PRIVATE
-};
+    enum class AclType {
+        NONE,
+        PUBLIC,
+        PRIVATE
+    };
 
-std::ostream&
-operator<<(std::ostream& os, AclType aclType);
+    std::ostream&
+    operator<<(std::ostream& os, AclType aclType);
 
 } // namespace ndn
 

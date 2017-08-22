@@ -27,127 +27,130 @@
 
 namespace ns3 {
 
-class DataCollector;
+    class DataCollector;
 
-//------------------------------------------------------------
-//--------------------------------------------
-/**
- * \ingroup dataoutput
- *
- * \brief Abstract Data Output Interface class
-s */
-class DataOutputInterface : public Object {
-public:
-  DataOutputInterface();
-  virtual ~DataOutputInterface();
+    //------------------------------------------------------------
+    //--------------------------------------------
 
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  /**
-   * Outputs information from the provided DataCollector
-   * \param dc DataCollector object
-   */
-  virtual void Output (DataCollector &dc) = 0;
+    /**
+     * \ingroup dataoutput
+     *
+     * \brief Abstract Data Output Interface class
+    s */
+    class DataOutputInterface : public Object {
+    public:
+        DataOutputInterface();
+        virtual ~DataOutputInterface();
 
-  /**
-   * Sets the DataOutputInterface prefix to the provided prefix
-   * \param prefix prefix as a string
-   */
-  void SetFilePrefix (const std::string prefix);
-  /**
-   * Gets the file prefix of the DataOutputInterface
-   * \return File prefix as a string
-   */
-  std::string GetFilePrefix () const;
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-protected:
-  virtual void DoDispose ();
+        /**
+         * Outputs information from the provided DataCollector
+         * \param dc DataCollector object
+         */
+        virtual void Output(DataCollector &dc) = 0;
 
-  std::string m_filePrefix; //!< File prefix for the DataOutputInterface
+        /**
+         * Sets the DataOutputInterface prefix to the provided prefix
+         * \param prefix prefix as a string
+         */
+        void SetFilePrefix(const std::string prefix);
+        /**
+         * Gets the file prefix of the DataOutputInterface
+         * \return File prefix as a string
+         */
+        std::string GetFilePrefix() const;
 
-  // end class DataOutputInterface
-};
+    protected:
+        virtual void DoDispose();
 
-/**
- * \ingroup dataoutput
- *
- * \brief Callback class for the DataOutput classes
- *
- */
-class DataOutputCallback {
-public:
-  /**
-   * Destructor
-   */
-  virtual ~DataOutputCallback() {}
+        std::string m_filePrefix; //!< File prefix for the DataOutputInterface
 
-  /**
-   * Outputs the data from the specified StatisticalSummary
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param statSum Pointer to a StatisticalSummary object
-   */
-  virtual void OutputStatistic (std::string key,
-                                std::string variable,
-                                const StatisticalSummary *statSum) = 0;
+        // end class DataOutputInterface
+    };
 
-  /**
-   * Associates the integer value with the variable name for a specific output format
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param val Value to be stored
-   */
-  virtual void OutputSingleton (std::string key,
-                                std::string variable,
-                                int val) = 0;
+    /**
+     * \ingroup dataoutput
+     *
+     * \brief Callback class for the DataOutput classes
+     *
+     */
+    class DataOutputCallback {
+    public:
 
-  /**
-   * Associates the uint32_t value with the variable name for a specific output format
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param val Value to be stored
-   */
-  virtual void OutputSingleton (std::string key,
-                                std::string variable,
-                                uint32_t val) = 0;
+        /**
+         * Destructor
+         */
+        virtual ~DataOutputCallback() {
+        }
 
-  /**
-   * Associates the double value with the variable name for a specific output format
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param val Value to be stored
-   */
-  virtual void OutputSingleton (std::string key,
-                                std::string variable,
-                                double val) = 0;
+        /**
+         * Outputs the data from the specified StatisticalSummary
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param statSum Pointer to a StatisticalSummary object
+         */
+        virtual void OutputStatistic(std::string key,
+                std::string variable,
+                const StatisticalSummary *statSum) = 0;
 
-  /**
-   * Associates the string value with the variable name for a specific output format
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param val Value to be stored
-   */
-  virtual void OutputSingleton (std::string key,
-                                std::string variable,
-                                std::string val) = 0;
+        /**
+         * Associates the integer value with the variable name for a specific output format
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param val Value to be stored
+         */
+        virtual void OutputSingleton(std::string key,
+                std::string variable,
+                int val) = 0;
 
-  /**
-   * Associates the Time value with the variable name for a specific output format
-   * \param key Key value of a DataCalculator
-   * \param variable Name of the variable for which statistics are being provided
-   * \param val Value to be stored
-   */
-  virtual void OutputSingleton (std::string key,
-                                std::string variable,
-                                Time val) = 0;
-  // end class DataOutputCallback
-};
+        /**
+         * Associates the uint32_t value with the variable name for a specific output format
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param val Value to be stored
+         */
+        virtual void OutputSingleton(std::string key,
+                std::string variable,
+                uint32_t val) = 0;
 
-// end namespace ns3
+        /**
+         * Associates the double value with the variable name for a specific output format
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param val Value to be stored
+         */
+        virtual void OutputSingleton(std::string key,
+                std::string variable,
+                double val) = 0;
+
+        /**
+         * Associates the string value with the variable name for a specific output format
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param val Value to be stored
+         */
+        virtual void OutputSingleton(std::string key,
+                std::string variable,
+                std::string val) = 0;
+
+        /**
+         * Associates the Time value with the variable name for a specific output format
+         * \param key Key value of a DataCalculator
+         * \param variable Name of the variable for which statistics are being provided
+         * \param val Value to be stored
+         */
+        virtual void OutputSingleton(std::string key,
+                std::string variable,
+                Time val) = 0;
+        // end class DataOutputCallback
+    };
+
+    // end namespace ns3
 };
 
 

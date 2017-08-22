@@ -23,84 +23,77 @@
 #include <ns3/nstime.h>
 #include <ns3/log.h>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("ShannonSpectrumErrorModel");
-
-NS_OBJECT_ENSURE_REGISTERED (SpectrumErrorModel);
-
-TypeId
-SpectrumErrorModel::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SpectrumErrorModel")
-    .SetParent<Object> ()
-    .SetGroupName ("Spectrum")
-    // No AddConstructor because this is an abstract class.
-    ;
-  return tid;
-}
 
-SpectrumErrorModel::~SpectrumErrorModel ()
-{
-}
+    NS_LOG_COMPONENT_DEFINE("ShannonSpectrumErrorModel");
 
-/* static */
-TypeId
-ShannonSpectrumErrorModel::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::ShannonSpectrumErrorModel")
-    .SetParent<SpectrumErrorModel> ()
-    .SetGroupName ("Spectrum")
-    .AddConstructor<ShannonSpectrumErrorModel> ()
-    ;
-  return tid;
-}
-void
-ShannonSpectrumErrorModel::DoDispose ()
-{
-  NS_LOG_FUNCTION (this);
-  SpectrumErrorModel::DoDispose ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(SpectrumErrorModel);
 
-void
-ShannonSpectrumErrorModel::StartRx (Ptr<const Packet> p)
-{
-  NS_LOG_FUNCTION (this);
-  m_bytes = p->GetSize ();
-  NS_LOG_LOGIC ("bytes to deliver: " << m_bytes);
-  m_deliverableBytes = 0;
-}
-
-void
-ShannonSpectrumErrorModel::EvaluateChunk (const SpectrumValue& sinr, Time duration)
-{
-  NS_LOG_FUNCTION (this << sinr << duration);
-  SpectrumValue CapacityPerHertz = Log2 (1 + sinr);
-  double capacity = 0;
-
-  Bands::const_iterator bi = CapacityPerHertz.ConstBandsBegin ();
-  Values::const_iterator vi = CapacityPerHertz.ConstValuesBegin ();
-
-  while (bi != CapacityPerHertz.ConstBandsEnd ())
-    {
-      NS_ASSERT (vi != CapacityPerHertz.ConstValuesEnd ());
-      capacity += (bi->fh - bi->fl) * (*vi);
-      ++bi;
-      ++vi;
+    TypeId
+    SpectrumErrorModel::GetTypeId() {
+        static TypeId tid = TypeId("ns3::SpectrumErrorModel")
+                .SetParent<Object> ()
+                .SetGroupName("Spectrum")
+                // No AddConstructor because this is an abstract class.
+                ;
+        return tid;
     }
-  NS_ASSERT (vi == CapacityPerHertz.ConstValuesEnd ());
-  NS_LOG_LOGIC ("ChunkCapacity = " << capacity);
-  m_deliverableBytes += static_cast<uint32_t> (capacity * duration.GetSeconds () / 8);
-  NS_LOG_LOGIC ("DeliverableBytes = " << m_deliverableBytes);
-}
 
+    SpectrumErrorModel::~SpectrumErrorModel() {
+    }
 
-bool
-ShannonSpectrumErrorModel::IsRxCorrect ()
-{
-  NS_LOG_FUNCTION (this);
-  return (m_deliverableBytes > m_bytes);
-}
+    /* static */
+    TypeId
+    ShannonSpectrumErrorModel::GetTypeId() {
+        static TypeId tid = TypeId("ns3::ShannonSpectrumErrorModel")
+                .SetParent<SpectrumErrorModel> ()
+                .SetGroupName("Spectrum")
+                .AddConstructor<ShannonSpectrumErrorModel> ()
+                ;
+        return tid;
+    }
+
+    void
+    ShannonSpectrumErrorModel::DoDispose() {
+        NS_LOG_FUNCTION(this);
+        SpectrumErrorModel::DoDispose();
+    }
+
+    void
+    ShannonSpectrumErrorModel::StartRx(Ptr<const Packet> p) {
+        NS_LOG_FUNCTION(this);
+        m_bytes = p->GetSize();
+        NS_LOG_LOGIC("bytes to deliver: " << m_bytes);
+        m_deliverableBytes = 0;
+    }
+
+    void
+    ShannonSpectrumErrorModel::EvaluateChunk(const SpectrumValue& sinr, Time duration) {
+        NS_LOG_FUNCTION(this << sinr << duration);
+        SpectrumValue CapacityPerHertz = Log2(1 + sinr);
+        double capacity = 0;
+
+        Bands::const_iterator bi = CapacityPerHertz.ConstBandsBegin();
+        Values::const_iterator vi = CapacityPerHertz.ConstValuesBegin();
+
+        while (bi != CapacityPerHertz.ConstBandsEnd()) {
+            NS_ASSERT(vi != CapacityPerHertz.ConstValuesEnd());
+            capacity += (bi->fh - bi->fl) * (*vi);
+            ++bi;
+            ++vi;
+        }
+        NS_ASSERT(vi == CapacityPerHertz.ConstValuesEnd());
+        NS_LOG_LOGIC("ChunkCapacity = " << capacity);
+        m_deliverableBytes += static_cast<uint32_t> (capacity * duration.GetSeconds() / 8);
+        NS_LOG_LOGIC("DeliverableBytes = " << m_deliverableBytes);
+    }
+
+    bool
+    ShannonSpectrumErrorModel::IsRxCorrect() {
+        NS_LOG_FUNCTION(this);
+        return (m_deliverableBytes > m_bytes);
+    }
 
 
 } // namespace ns3

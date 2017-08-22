@@ -26,64 +26,63 @@
 #include "../util/config-file.hpp"
 
 namespace boost {
-namespace asio {
-namespace local {
-class stream_protocol;
-} // namespace local
-} // namespace asio
+    namespace asio {
+        namespace local {
+            class stream_protocol;
+        } // namespace local
+    } // namespace asio
 } // namespace boost
 
 namespace ndn {
 
-template<typename BaseTransport, typename Protocol>
-class StreamTransportImpl;
+    template<typename BaseTransport, typename Protocol>
+    class StreamTransportImpl;
 
-/** \brief a transport using Unix stream socket
- */
-class UnixTransport : public Transport
-{
-public:
-  explicit
-  UnixTransport(const std::string& unixSocket);
+    /** \brief a transport using Unix stream socket
+     */
+    class UnixTransport : public Transport {
+    public:
+        explicit
+        UnixTransport(const std::string& unixSocket);
 
-  ~UnixTransport();
+        ~UnixTransport();
 
-  virtual void
-  connect(boost::asio::io_service& ioService,
-          const ReceiveCallback& receiveCallback) override;
+        virtual void
+        connect(boost::asio::io_service& ioService,
+                const ReceiveCallback& receiveCallback) override;
 
-  virtual void
-  close() override;
+        virtual void
+        close() override;
 
-  virtual void
-  pause() override;
+        virtual void
+        pause() override;
 
-  virtual void
-  resume() override;
+        virtual void
+        resume() override;
 
-  virtual void
-  send(const Block& wire) override;
+        virtual void
+        send(const Block& wire) override;
 
-  virtual void
-  send(const Block& header, const Block& payload) override;
+        virtual void
+        send(const Block& header, const Block& payload) override;
 
-  /** \brief Create transport with parameters defined in URI
-   *  \throw Transport::Error if incorrect URI or unsupported protocol is specified
-   */
-  static shared_ptr<UnixTransport>
-  create(const std::string& uri);
+        /** \brief Create transport with parameters defined in URI
+         *  \throw Transport::Error if incorrect URI or unsupported protocol is specified
+         */
+        static shared_ptr<UnixTransport>
+        create(const std::string& uri);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  static std::string
-  getSocketNameFromUri(const std::string& uri);
+        static std::string
+        getSocketNameFromUri(const std::string& uri);
 
-private:
-  std::string m_unixSocket;
+    private:
+        std::string m_unixSocket;
 
-  typedef StreamTransportImpl<UnixTransport, boost::asio::local::stream_protocol> Impl;
-  friend class StreamTransportImpl<UnixTransport, boost::asio::local::stream_protocol>;
-  shared_ptr<Impl> m_impl;
-};
+        typedef StreamTransportImpl<UnixTransport, boost::asio::local::stream_protocol> Impl;
+        friend class StreamTransportImpl<UnixTransport, boost::asio::local::stream_protocol>;
+        shared_ptr<Impl> m_impl;
+    };
 
 } // namespace ndn
 

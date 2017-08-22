@@ -21,85 +21,75 @@
 #include "backoff.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Backoff");
-
-Backoff::Backoff () 
+namespace ns3
 {
-  m_slotTime = MicroSeconds (1);
-  m_minSlots = 1;
-  m_maxSlots = 1000;
-  m_ceiling = 10;
-  m_maxRetries = 1000;
-  m_numBackoffRetries = 0;
-  m_rng = CreateObject<UniformRandomVariable> ();
 
-  ResetBackoffTime ();
-}
+    NS_LOG_COMPONENT_DEFINE("Backoff");
 
-Backoff::Backoff(Time slotTime, uint32_t minSlots, uint32_t maxSlots, uint32_t ceiling, uint32_t maxRetries)
-{
-  m_slotTime = slotTime;
-  m_minSlots = minSlots;
-  m_maxSlots = maxSlots;
-  m_ceiling = ceiling;
-  m_maxRetries = maxRetries;
-  m_numBackoffRetries = 0;
-  m_rng = CreateObject<UniformRandomVariable> ();
-}
+    Backoff::Backoff() {
+        m_slotTime = MicroSeconds(1);
+        m_minSlots = 1;
+        m_maxSlots = 1000;
+        m_ceiling = 10;
+        m_maxRetries = 1000;
+        m_numBackoffRetries = 0;
+        m_rng = CreateObject<UniformRandomVariable> ();
 
-Time
-Backoff::GetBackoffTime (void)
-{
-  uint32_t ceiling;
-
-  if ((m_ceiling > 0) &&(m_numBackoffRetries > m_ceiling))
-    {
-      ceiling = m_ceiling;
-    }
-  else
-    {
-      ceiling = m_numBackoffRetries;
+        ResetBackoffTime();
     }
 
-  uint32_t minSlot = m_minSlots;
-  uint32_t maxSlot = (uint32_t)pow (2, ceiling) - 1;
-  if (maxSlot > m_maxSlots)
-    {
-      maxSlot = m_maxSlots;
+    Backoff::Backoff(Time slotTime, uint32_t minSlots, uint32_t maxSlots, uint32_t ceiling, uint32_t maxRetries) {
+        m_slotTime = slotTime;
+        m_minSlots = minSlots;
+        m_maxSlots = maxSlots;
+        m_ceiling = ceiling;
+        m_maxRetries = maxRetries;
+        m_numBackoffRetries = 0;
+        m_rng = CreateObject<UniformRandomVariable> ();
     }
 
-  uint32_t backoffSlots = (uint32_t)m_rng->GetValue (minSlot, maxSlot);
+    Time
+    Backoff::GetBackoffTime(void) {
+        uint32_t ceiling;
 
-  Time backoff = Time (backoffSlots * m_slotTime);
-  return backoff;
-}
+        if ((m_ceiling > 0) &&(m_numBackoffRetries > m_ceiling)) {
+            ceiling = m_ceiling;
+        } else {
+            ceiling = m_numBackoffRetries;
+        }
 
-void 
-Backoff::ResetBackoffTime (void)
-{
-  m_numBackoffRetries = 0;
-}
+        uint32_t minSlot = m_minSlots;
+        uint32_t maxSlot = (uint32_t) pow(2, ceiling) - 1;
+        if (maxSlot > m_maxSlots) {
+            maxSlot = m_maxSlots;
+        }
 
-bool 
-Backoff::MaxRetriesReached (void) 
-{
-  return (m_numBackoffRetries >= m_maxRetries);
-}
+        uint32_t backoffSlots = (uint32_t) m_rng->GetValue(minSlot, maxSlot);
 
-void 
-Backoff::IncrNumRetries (void) 
-{
-  m_numBackoffRetries++;
-}
+        Time backoff = Time(backoffSlots * m_slotTime);
+        return backoff;
+    }
 
-int64_t
-Backoff::AssignStreams (int64_t stream)
-{
-  NS_LOG_FUNCTION (this << stream);
-  m_rng->SetStream (stream);
-  return 1;
-}
+    void
+    Backoff::ResetBackoffTime(void) {
+        m_numBackoffRetries = 0;
+    }
+
+    bool
+    Backoff::MaxRetriesReached(void) {
+        return (m_numBackoffRetries >= m_maxRetries);
+    }
+
+    void
+    Backoff::IncrNumRetries(void) {
+        m_numBackoffRetries++;
+    }
+
+    int64_t
+    Backoff::AssignStreams(int64_t stream) {
+        NS_LOG_FUNCTION(this << stream);
+        m_rng->SetStream(stream);
+        return 1;
+    }
 
 } // namespace ns3

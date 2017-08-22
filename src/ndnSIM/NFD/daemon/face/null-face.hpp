@@ -29,14 +29,14 @@
 #include "face.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/** \return a Face that has no underlying transport and drops every packet
- */
-shared_ptr<Face>
-makeNullFace(const FaceUri& uri = FaceUri("null://"));
+        /** \return a Face that has no underlying transport and drops every packet
+         */
+        shared_ptr<Face>
+        makeNullFace(const FaceUri& uri = FaceUri("null://"));
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_NULL_FACE_HPP

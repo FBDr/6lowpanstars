@@ -27,50 +27,47 @@
 
 namespace ns3 {
 
-class MobilityModel;
+    class MobilityModel;
+
+    /**
+     * \ingroup spectrum
+     *
+     */
+    class FriisSpectrumPropagationLossModel : public SpectrumPropagationLossModel {
+    public:
+        FriisSpectrumPropagationLossModel();
+        ~FriisSpectrumPropagationLossModel();
+
+        static TypeId GetTypeId();
 
 
-/**
- * \ingroup spectrum
- *
- */
-class FriisSpectrumPropagationLossModel : public SpectrumPropagationLossModel
-{
-
-public:
-  FriisSpectrumPropagationLossModel ();
-  ~FriisSpectrumPropagationLossModel ();
-
-  static TypeId GetTypeId ();
+        virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity(Ptr<const SpectrumValue> txPsd,
+                Ptr<const MobilityModel> a,
+                Ptr<const MobilityModel> b) const;
 
 
-  virtual Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
-                                                           Ptr<const MobilityModel> a,
-                                                           Ptr<const MobilityModel> b) const;
+        /**
+         * Return the propagation loss L according to a simplified version of Friis'
+         * formula in which antenna gains are unitary:
+         *
+         *      (4 * pi * d * f) ^ 2
+         * L = ----------------------
+         *               C^2
+         *
+         * where C = 3e8 m/s is the light speed in the vacuum. The intended
+         * use is to calculate Prx = Ptx * G
+         *
+         * @param f frequency in Hz
+         * @param d distance in m
+         *
+         * @return if Prx < Ptx then return Prx; else return Ptx
+         */
+        double CalculateLoss(double f, double d) const;
 
+    protected:
+        double m_propagationSpeed;
 
-  /**
-   * Return the propagation loss L according to a simplified version of Friis'
-   * formula in which antenna gains are unitary:
-   *
-   *      (4 * pi * d * f) ^ 2
-   * L = ----------------------
-   *               C^2
-   *
-   * where C = 3e8 m/s is the light speed in the vacuum. The intended
-   * use is to calculate Prx = Ptx * G
-   *
-   * @param f frequency in Hz
-   * @param d distance in m
-   *
-   * @return if Prx < Ptx then return Prx; else return Ptx
-   */
-  double CalculateLoss (double f, double d) const;
-
-protected:
-  double m_propagationSpeed;
-
-};
+    };
 
 
 

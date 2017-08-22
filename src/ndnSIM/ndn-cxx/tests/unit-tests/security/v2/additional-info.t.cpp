@@ -24,78 +24,77 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecurityAdditionalDescription)
+            BOOST_AUTO_TEST_SUITE(SecurityAdditionalDescription)
 
-static const uint8_t description[] = {
-  0xfd, 0x01, 0x02, 0x28,
-    0xfd, 0x02, 0x00, 0x10, // DescriptionEntry
-      0xfd, 0x02, 0x01, 0x04, // DescriptionKey
-        0x6b, 0x65, 0x79, 0x31, // "key1"
-      0xfd, 0x02, 0x02, 0x04, // DescriptionValue
-        0x76, 0x61, 0x6c, 0x31, // "val1"
-    0xfd, 0x02, 0x00, 0x10, // DescriptionEntry
-      0xfd, 0x02, 0x01, 0x04, // DescriptionKey
-        0x6b, 0x65, 0x79, 0x32, // "key2"
-      0xfd, 0x02, 0x02, 0x04, // DescriptionValue
-        0x76, 0x61, 0x6c, 0x32, // "val2"
-};
+            static const uint8_t description[] = {
+                0xfd, 0x01, 0x02, 0x28,
+                0xfd, 0x02, 0x00, 0x10, // DescriptionEntry
+                0xfd, 0x02, 0x01, 0x04, // DescriptionKey
+                0x6b, 0x65, 0x79, 0x31, // "key1"
+                0xfd, 0x02, 0x02, 0x04, // DescriptionValue
+                0x76, 0x61, 0x6c, 0x31, // "val1"
+                0xfd, 0x02, 0x00, 0x10, // DescriptionEntry
+                0xfd, 0x02, 0x01, 0x04, // DescriptionKey
+                0x6b, 0x65, 0x79, 0x32, // "key2"
+                0xfd, 0x02, 0x02, 0x04, // DescriptionValue
+                0x76, 0x61, 0x6c, 0x32, // "val2"
+            };
 
-static const std::string text = "((key1:val1), (key2:val2))";
+            static const std::string text = "((key1:val1), (key2:val2))";
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  AdditionalDescription aDescription;
+            BOOST_AUTO_TEST_CASE(Basic) {
+                AdditionalDescription aDescription;
 
-  aDescription.set("key2", "val2");
-  aDescription.set("key1", "val1");
+                aDescription.set("key2", "val2");
+                aDescription.set("key1", "val1");
 
-  BOOST_REQUIRE_NO_THROW(aDescription.get("key1"));
-  BOOST_REQUIRE_NO_THROW(aDescription.get("key2"));
-  BOOST_REQUIRE_THROW(aDescription.get("key3"), AdditionalDescription::Error);
+                BOOST_REQUIRE_NO_THROW(aDescription.get("key1"));
+                BOOST_REQUIRE_NO_THROW(aDescription.get("key2"));
+                BOOST_REQUIRE_THROW(aDescription.get("key3"), AdditionalDescription::Error);
 
-  BOOST_CHECK_EQUAL(aDescription.has("key1"), true);
-  BOOST_CHECK_EQUAL(aDescription.has("key2"), true);
-  BOOST_CHECK_EQUAL(aDescription.has("key3"), false);
+                BOOST_CHECK_EQUAL(aDescription.has("key1"), true);
+                BOOST_CHECK_EQUAL(aDescription.has("key2"), true);
+                BOOST_CHECK_EQUAL(aDescription.has("key3"), false);
 
-  auto val1 = aDescription.get("key1");
-  auto val2 = aDescription.get("key2");
+                auto val1 = aDescription.get("key1");
+                auto val2 = aDescription.get("key2");
 
-  BOOST_CHECK_EQUAL(val1, "val1");
-  BOOST_CHECK_EQUAL(val2, "val2");
+                BOOST_CHECK_EQUAL(val1, "val1");
+                BOOST_CHECK_EQUAL(val2, "val2");
 
-  auto it = aDescription.begin();
-  BOOST_CHECK_EQUAL(it->second, "val1");
-  it++;
-  BOOST_CHECK_EQUAL(it->second, "val2");
-  it++;
-  BOOST_CHECK(it == aDescription.end());
+                auto it = aDescription.begin();
+                BOOST_CHECK_EQUAL(it->second, "val1");
+                it++;
+                BOOST_CHECK_EQUAL(it->second, "val2");
+                it++;
+                BOOST_CHECK(it == aDescription.end());
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(aDescription.wireEncode().wire(),
-                                aDescription.wireEncode().wire() + aDescription.wireEncode().size(),
-                                description,
-                                description + sizeof(description));
+                BOOST_CHECK_EQUAL_COLLECTIONS(aDescription.wireEncode().wire(),
+                        aDescription.wireEncode().wire() + aDescription.wireEncode().size(),
+                        description,
+                        description + sizeof (description));
 
-  BOOST_REQUIRE_NO_THROW(AdditionalDescription(Block(description, sizeof(description))));
-  AdditionalDescription aDescription2(Block(description, sizeof(description)));
+                BOOST_REQUIRE_NO_THROW(AdditionalDescription(Block(description, sizeof (description))));
+                AdditionalDescription aDescription2(Block(description, sizeof (description)));
 
-  BOOST_CHECK(aDescription2 == aDescription);
+                BOOST_CHECK(aDescription2 == aDescription);
 
-  AdditionalDescription aDescription3;
-  aDescription3.set("key3", "val3");
-  aDescription3.set("key2", "val2");
+                AdditionalDescription aDescription3;
+                aDescription3.set("key3", "val3");
+                aDescription3.set("key2", "val2");
 
-  BOOST_CHECK(aDescription2 != aDescription3);
+                BOOST_CHECK(aDescription2 != aDescription3);
 
-  std::ostringstream os;
-  os << aDescription;
-  BOOST_CHECK_EQUAL(os.str(), text);
-}
+                std::ostringstream os;
+                os << aDescription;
+                BOOST_CHECK_EQUAL(os.str(), text);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

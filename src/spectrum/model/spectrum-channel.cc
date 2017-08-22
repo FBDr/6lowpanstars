@@ -21,23 +21,22 @@
 #include "spectrum-channel.h"
 
 
-namespace ns3 {
-
-
-NS_OBJECT_ENSURE_REGISTERED (SpectrumChannel);
-
-TypeId
-SpectrumChannel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SpectrumChannel")
-    .SetParent<Channel> ()
-    .SetGroupName ("Spectrum")
-  ;
-  return tid;
-}
 
-SpectrumChannel::~SpectrumChannel ()
-{
-}
+
+    NS_OBJECT_ENSURE_REGISTERED(SpectrumChannel);
+
+    TypeId
+    SpectrumChannel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::SpectrumChannel")
+                .SetParent<Channel> ()
+                .SetGroupName("Spectrum")
+                ;
+        return tid;
+    }
+
+    SpectrumChannel::~SpectrumChannel() {
+    }
 
 } // namespace

@@ -28,20 +28,18 @@
 #include "fw/strategy.hpp"
 
 namespace nfd {
-namespace strategy_choice {
+    namespace strategy_choice {
 
-Entry::Entry(const Name& prefix)
-  : m_prefix(prefix)
-  , m_strategy(nullptr)
-  , m_nameTreeEntry(nullptr)
-{
-}
+        Entry::Entry(const Name& prefix)
+        : m_prefix(prefix)
+        , m_strategy(nullptr)
+        , m_nameTreeEntry(nullptr) {
+        }
 
-const Name&
-Entry::getStrategyName() const
-{
-  return m_strategy->getName();
-}
+        const Name&
+        Entry::getStrategyName() const {
+            return m_strategy->getName();
+        }
 
-} // namespace strategy_choice
+    } // namespace strategy_choice
 } // namespace nfd

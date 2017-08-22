@@ -25,58 +25,57 @@
 #include "../../encoding/block.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/**
- * @ingroup management
- * @brief represents NFD Channel Status dataset
- * @sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Channel-Dataset
- */
-class ChannelStatus
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /**
+         * @ingroup management
+         * @brief represents NFD Channel Status dataset
+         * @sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Channel-Dataset
+         */
+        class ChannelStatus {
+        public:
 
-  ChannelStatus();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  ChannelStatus(const Block& payload);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            ChannelStatus();
 
-  const Block&
-  wireEncode() const;
+            explicit
+            ChannelStatus(const Block& payload);
 
-  void
-  wireDecode(const Block& wire);
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // getters & setters
-  const std::string&
-  getLocalUri() const
-  {
-    return m_localUri;
-  }
+            const Block&
+            wireEncode() const;
 
-  ChannelStatus&
-  setLocalUri(const std::string localUri);
+            void
+            wireDecode(const Block& wire);
 
-private:
-  std::string m_localUri;
+        public: // getters & setters
 
-  mutable Block m_wire;
-};
+            const std::string&
+            getLocalUri() const {
+                return m_localUri;
+            }
 
-} // namespace nfd
+            ChannelStatus&
+            setLocalUri(const std::string localUri);
+
+        private:
+            std::string m_localUri;
+
+            mutable Block m_wire;
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_CHANNEL_STATUS_HPP

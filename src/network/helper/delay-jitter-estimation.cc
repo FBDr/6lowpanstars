@@ -23,132 +23,127 @@
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 
-namespace ns3 {
-
-/**
- * Tag to perform Delay and Jitter estimations
- *
- * The tag holds the packet's creation timestamp
- */
-class DelayJitterEstimationTimestampTag : public Tag
+namespace ns3
 {
-public:
-  DelayJitterEstimationTimestampTag ();
 
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * Tag to perform Delay and Jitter estimations
+     *
+     * The tag holds the packet's creation timestamp
+     */
+    class DelayJitterEstimationTimestampTag : public Tag
+            {
+        public :
+        DelayJitterEstimationTimestampTag();
 
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual void Print (std::ostream &os) const;
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * \brief Get the Transmission time stored in the tag
-   * \return the transmission time
-   */
-  Time GetTxTime (void) const;
+        virtual uint32_t GetSerializedSize(void) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual void Print(std::ostream & os) const;
+
+        /**
+         * \brief Get the Transmission time stored in the tag
+         * \return the transmission time
+         */
+        Time GetTxTime(void) const;
 private:
-  uint64_t m_creationTime; //!< The time stored in the tag
-};
+        uint64_t m_creationTime; //!< The time stored in the tag
+    };
 
-DelayJitterEstimationTimestampTag::DelayJitterEstimationTimestampTag ()
-  : m_creationTime (Simulator::Now ().GetTimeStep ())
-{
-}
-
-TypeId
-DelayJitterEstimationTimestampTag::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("anon::DelayJitterEstimationTimestampTag")
-    .SetParent<Tag> ()
-    .SetGroupName("Network")
-    .AddConstructor<DelayJitterEstimationTimestampTag> ()
-    .AddAttribute ("CreationTime",
-                   "The time at which the timestamp was created",
-                   StringValue ("0.0s"),
-                   MakeTimeAccessor (&DelayJitterEstimationTimestampTag::GetTxTime),
-                   MakeTimeChecker ())
-  ;
-  return tid;
-}
-TypeId
-DelayJitterEstimationTimestampTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-uint32_t
-DelayJitterEstimationTimestampTag::GetSerializedSize (void) const
-{
-  return 8;
-}
-void
-DelayJitterEstimationTimestampTag::Serialize (TagBuffer i) const
-{
-  i.WriteU64 (m_creationTime);
-}
-void
-DelayJitterEstimationTimestampTag::Deserialize (TagBuffer i)
-{
-  m_creationTime = i.ReadU64 ();
-}
-void
-DelayJitterEstimationTimestampTag::Print (std::ostream &os) const
-{
-  os << "CreationTime=" << m_creationTime;
-}
-Time
-DelayJitterEstimationTimestampTag::GetTxTime (void) const
-{
-  return TimeStep (m_creationTime);
-}
-
-DelayJitterEstimation::DelayJitterEstimation ()
-  : m_previousRx (Simulator::Now ()),
-    m_previousRxTx (Simulator::Now ()),
-    m_jitter (0),
-    m_delay (Seconds (0.0))
-{
-}
-void
-DelayJitterEstimation::PrepareTx (Ptr<const Packet> packet)
-{
-  DelayJitterEstimationTimestampTag tag;
-  packet->AddByteTag (tag);
-}
-void
-DelayJitterEstimation::RecordRx (Ptr<const Packet> packet)
-{
-  DelayJitterEstimationTimestampTag tag;
-  bool found;
-  found = packet->FindFirstMatchingByteTag (tag);
-  if (!found)
-    {
-      return;
+    DelayJitterEstimationTimestampTag::DelayJitterEstimationTimestampTag()
+            : m_creationTime(Simulator::Now().GetTimeStep()) {
     }
-  tag.GetTxTime ();
 
-  Time delta = (Simulator::Now () - m_previousRx) - (tag.GetTxTime () - m_previousRxTx);
-  m_jitter += (Abs (delta) - m_jitter) / 16;
-  m_previousRx = Simulator::Now ();
-  m_previousRxTx = tag.GetTxTime ();
-  m_delay = Simulator::Now () - tag.GetTxTime ();
-}
+    TypeId
+    DelayJitterEstimationTimestampTag::GetTypeId(void) {
+        static TypeId tid = TypeId("anon::DelayJitterEstimationTimestampTag")
+                .SetParent<Tag> ()
+                .SetGroupName("Network")
+                .AddConstructor<DelayJitterEstimationTimestampTag> ()
+                .AddAttribute("CreationTime",
+                "The time at which the timestamp was created",
+                StringValue("0.0s"),
+                MakeTimeAccessor(&DelayJitterEstimationTimestampTag::GetTxTime),
+                MakeTimeChecker())
+                ;
+        return tid;
+    }
 
-Time 
-DelayJitterEstimation::GetLastDelay (void) const
-{
-  return m_delay;
-}
-uint64_t
-DelayJitterEstimation::GetLastJitter (void) const
-{
-  return m_jitter.GetHigh ();
-}
+    TypeId
+    DelayJitterEstimationTimestampTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
+
+    uint32_t
+    DelayJitterEstimationTimestampTag::GetSerializedSize(void) const {
+        return 8;
+    }
+
+    void
+    DelayJitterEstimationTimestampTag::Serialize(TagBuffer i) const {
+        i.WriteU64(m_creationTime);
+    }
+
+    void
+    DelayJitterEstimationTimestampTag::Deserialize(TagBuffer i) {
+        m_creationTime = i.ReadU64();
+    }
+
+    void
+    DelayJitterEstimationTimestampTag::Print(std::ostream & os) const {
+        os << "CreationTime=" << m_creationTime;
+    }
+
+    Time
+    DelayJitterEstimationTimestampTag::GetTxTime(void) const {
+        return TimeStep(m_creationTime);
+    }
+
+    DelayJitterEstimation::DelayJitterEstimation()
+            : m_previousRx(Simulator::Now()),
+            m_previousRxTx(Simulator::Now()),
+            m_jitter(0),
+            m_delay(Seconds(0.0)) {
+    }
+
+    void
+    DelayJitterEstimation::PrepareTx(Ptr<const Packet> packet) {
+        DelayJitterEstimationTimestampTag tag;
+        packet->AddByteTag(tag);
+    }
+
+    void
+    DelayJitterEstimation::RecordRx(Ptr<const Packet> packet) {
+        DelayJitterEstimationTimestampTag tag;
+        bool found;
+        found = packet->FindFirstMatchingByteTag(tag);
+        if (!found) {
+            return;
+        }
+        tag.GetTxTime();
+
+        Time delta = (Simulator::Now() - m_previousRx) - (tag.GetTxTime() - m_previousRxTx);
+        m_jitter += (Abs(delta) - m_jitter) / 16;
+        m_previousRx = Simulator::Now();
+        m_previousRxTx = tag.GetTxTime();
+        m_delay = Simulator::Now() - tag.GetTxTime();
+    }
+
+    Time
+    DelayJitterEstimation::GetLastDelay(void) const {
+        return m_delay;
+    }
+
+    uint64_t
+    DelayJitterEstimation::GetLastJitter(void) const {
+        return m_jitter.GetHigh();
+    }
 
 } // namespace ns3

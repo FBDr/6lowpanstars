@@ -22,34 +22,32 @@
 
 namespace ns3 {
 
-
-/**
- * \ingroup wifi
- * Identifies the PHY specification that a Wifi device is configured to use.
- */
-enum WifiPhyStandard
-{
-  /** OFDM PHY for the 5 GHz band (Clause 17) */
-  WIFI_PHY_STANDARD_80211a,
-  /** DSSS PHY (Clause 15) and HR/DSSS PHY (Clause 18) */
-  WIFI_PHY_STANDARD_80211b,
-  /** ERP-OFDM PHY (Clause 19, Section 19.5) */
-  WIFI_PHY_STANDARD_80211g,
-  /** OFDM PHY for the 5 GHz band (Clause 17 with 10 MHz channel bandwidth) */
-  WIFI_PHY_STANDARD_80211_10MHZ,
-  /** OFDM PHY for the 5 GHz band (Clause 17 with 5 MHz channel bandwidth) */
-  WIFI_PHY_STANDARD_80211_5MHZ,
-  /** This is intended to be the configuration used in this paper:
-   *  Gavin Holland, Nitin Vaidya and Paramvir Bahl, "A Rate-Adaptive
-   *  MAC Protocol for Multi-Hop Wireless Networks", in Proc. of
-   *  ACM MOBICOM, 2001.
-   */
-  WIFI_PHY_STANDARD_holland,
-  /** HT OFDM PHY for the 2.4 GHz band (clause 20) */
-  WIFI_PHY_STANDARD_80211n_2_4GHZ,
-  /** HT OFDM PHY for the 5 GHz band (clause 20) */
-  WIFI_PHY_STANDARD_80211n_5GHZ
-};
+    /**
+     * \ingroup wifi
+     * Identifies the PHY specification that a Wifi device is configured to use.
+     */
+    enum WifiPhyStandard {
+        /** OFDM PHY for the 5 GHz band (Clause 17) */
+        WIFI_PHY_STANDARD_80211a,
+        /** DSSS PHY (Clause 15) and HR/DSSS PHY (Clause 18) */
+        WIFI_PHY_STANDARD_80211b,
+        /** ERP-OFDM PHY (Clause 19, Section 19.5) */
+        WIFI_PHY_STANDARD_80211g,
+        /** OFDM PHY for the 5 GHz band (Clause 17 with 10 MHz channel bandwidth) */
+        WIFI_PHY_STANDARD_80211_10MHZ,
+        /** OFDM PHY for the 5 GHz band (Clause 17 with 5 MHz channel bandwidth) */
+        WIFI_PHY_STANDARD_80211_5MHZ,
+        /** This is intended to be the configuration used in this paper:
+         *  Gavin Holland, Nitin Vaidya and Paramvir Bahl, "A Rate-Adaptive
+         *  MAC Protocol for Multi-Hop Wireless Networks", in Proc. of
+         *  ACM MOBICOM, 2001.
+         */
+        WIFI_PHY_STANDARD_holland,
+        /** HT OFDM PHY for the 2.4 GHz band (clause 20) */
+        WIFI_PHY_STANDARD_80211n_2_4GHZ,
+        /** HT OFDM PHY for the 5 GHz band (clause 20) */
+        WIFI_PHY_STANDARD_80211n_5GHZ
+    };
 
 } //namespace ns3
 

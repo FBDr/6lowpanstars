@@ -23,206 +23,194 @@
 #include "../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-BOOST_AUTO_TEST_SUITE(HelperNdnNetworkRegionTableHelper)
+        BOOST_AUTO_TEST_SUITE(HelperNdnNetworkRegionTableHelper)
 
-class BasicFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  BasicFixture()
-  {
-    createTopology({
-     {"1"}
-    });
-  }
+        class BasicFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-  ~BasicFixture()
-  {
-  }
-};
+            BasicFixture() {
+                createTopology({
+                    {"1"}
+                });
+            }
 
-BOOST_FIXTURE_TEST_SUITE(Basic, BasicFixture)
+            ~BasicFixture() {
+            }
+        };
 
-BOOST_AUTO_TEST_CASE(AddBase)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ucla"));
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 1);
-}
+        BOOST_FIXTURE_TEST_SUITE(Basic, BasicFixture)
 
-BOOST_AUTO_TEST_CASE(RemoveBase){
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ucla"));
-  NetworkRegionTableHelper::RemoveRegionName(getNode("1"), Name("/ucla"));
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 0);
-}
+        BOOST_AUTO_TEST_CASE(AddBase) {
+            NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ucla"));
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 1);
+        }
 
-BOOST_AUTO_TEST_CASE(AddSet)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), { Name("/ucla"), Name("/att") });
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 1);
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/att"), 1);
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().size(), 2);
-}
+        BOOST_AUTO_TEST_CASE(RemoveBase) {
+            NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ucla"));
+            NetworkRegionTableHelper::RemoveRegionName(getNode("1"), Name("/ucla"));
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 0);
+        }
 
-BOOST_AUTO_TEST_CASE(RemoveSet)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), { "/ucla", "/att" });
-  NetworkRegionTableHelper::RemoveRegionName(getNode("1"), { "/att", "/ucla" });
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().empty(), true);
-}
+        BOOST_AUTO_TEST_CASE(AddSet) {
+            NetworkRegionTableHelper::AddRegionName(getNode("1"),{Name("/ucla"), Name("/att")});
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/ucla"), 1);
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().count("/att"), 1);
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().size(), 2);
+        }
 
-BOOST_AUTO_TEST_CASE(Empty)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), { Name("/ucla"), Name("/att") });
-  NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ndnSIM"));
-  NetworkRegionTableHelper::EmptyNetworkRegionTable(getNode("1"));
-  BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().empty(), true);
-}
+        BOOST_AUTO_TEST_CASE(RemoveSet) {
+            NetworkRegionTableHelper::AddRegionName(getNode("1"),{"/ucla", "/att"});
+            NetworkRegionTableHelper::RemoveRegionName(getNode("1"),{"/att", "/ucla"});
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().empty(), true);
+        }
 
-BOOST_AUTO_TEST_SUITE_END() // Basic
+        BOOST_AUTO_TEST_CASE(Empty) {
+            NetworkRegionTableHelper::AddRegionName(getNode("1"),{Name("/ucla"), Name("/att")});
+            NetworkRegionTableHelper::AddRegionName(getNode("1"), Name("/ndnSIM"));
+            NetworkRegionTableHelper::EmptyNetworkRegionTable(getNode("1"));
+            BOOST_CHECK_EQUAL(getNode("1")->GetObject<L3Protocol>()->getForwarder()->getNetworkRegionTable().empty(), true);
+        }
 
-class MultiNodeWithAppFixture;
-class TesterApp
-{
-public:
-  TesterApp(const Interest& interest, MultiNodeWithAppFixture* fixture);
+        BOOST_AUTO_TEST_SUITE_END() // Basic
 
-protected:
-  ::ndn::Face m_face;
-};
+        class MultiNodeWithAppFixture;
 
-Block
-makeLink(const Name& delegation)
-{
-  ::ndn::Link link("/LINK");
-  link.addDelegation(1, delegation);
-  ndn::StackHelper::getKeyChain().sign(link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
-  return link.wireEncode();
-}
+        class TesterApp {
+        public:
+            TesterApp(const Interest& interest, MultiNodeWithAppFixture* fixture);
 
-class MultiNodeWithAppFixture : public ScenarioHelperWithCleanupFixture
-{
-public:
-  MultiNodeWithAppFixture()
-    : m_nData(0)
-    , m_nTimeouts(0)
-    , m_nNacks(0)
-  {
-    createTopology({
-        {"1", "2"}
-      });
+        protected:
+            ::ndn::Face m_face;
+        };
 
-    addApps({
-        {"2", "ns3::ndn::Producer",
-            {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
-            "0s", "100s"}
-      });
+        Block
+        makeLink(const Name& delegation) {
+            ::ndn::Link link("/LINK");
+            link.addDelegation(1, delegation);
+            ndn::StackHelper::getKeyChain().sign(link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
+            return link.wireEncode();
+        }
 
-    addRoutes({
-        {"1", "2", "/otherPrefix", 1},
-      });
-  }
+        class MultiNodeWithAppFixture : public ScenarioHelperWithCleanupFixture {
+        public:
 
-public:
-  size_t m_nData;
-  size_t m_nTimeouts;
-  size_t m_nNacks;
-};
+            MultiNodeWithAppFixture()
+            : m_nData(0)
+            , m_nTimeouts(0)
+            , m_nNacks(0) {
+                createTopology({
+                    {"1", "2"}
+                });
 
-TesterApp::TesterApp(const Interest& interest, MultiNodeWithAppFixture* fixture)
-{
-  m_face.expressInterest(interest,
-                         std::bind([fixture] {
-                             ++fixture->m_nData;
-                           }),
-                         std::bind([fixture] {
-                             ++fixture->m_nTimeouts;
-                           }),
-                         std::bind([fixture] {
-                             ++fixture->m_nNacks;
-                           }));
-}
+                addApps({
+                    {"2", "ns3::ndn::Producer",
+                        {
+                            {"Prefix", "/prefix"},
+                            {"PayloadSize", "1024"}},
+                        "0s", "100s"}
+                });
 
+                addRoutes({
+                    {"1", "2", "/otherPrefix", 1},
+                });
+            }
 
-BOOST_FIXTURE_TEST_SUITE(MultiNode, MultiNodeWithAppFixture)
+        public:
+            size_t m_nData;
+            size_t m_nTimeouts;
+            size_t m_nNacks;
+        };
 
-BOOST_AUTO_TEST_CASE(WithoutNetworkRegion)
-{
-  FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
-      Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
-      return make_shared<TesterApp>(i, this);
-    })
-    .Start(Seconds(0.01));
+        TesterApp::TesterApp(const Interest& interest, MultiNodeWithAppFixture* fixture) {
+            m_face.expressInterest(interest,
+                    std::bind([fixture] {
+                        ++fixture->m_nData;
+                    }),
+            std::bind([fixture] {
+                ++fixture->m_nTimeouts;
+            }),
+            std::bind([fixture] {
+                ++fixture->m_nNacks;
+            }));
+        }
 
-  Simulator::Stop(Seconds(20.001));
-  Simulator::Run();
+        BOOST_FIXTURE_TEST_SUITE(MultiNode, MultiNodeWithAppFixture)
 
-  BOOST_CHECK_EQUAL(this->m_nData, 0);
-  BOOST_CHECK_EQUAL(m_nTimeouts, 0);
-  BOOST_CHECK_EQUAL(m_nNacks, 1);
-}
+        BOOST_AUTO_TEST_CASE(WithoutNetworkRegion) {
+            FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
+                Interest i("/prefix/someData");
+                i.setLink(makeLink("/otherPrefix"));
+                return make_shared<TesterApp>(i, this);
+            })
+            .Start(Seconds(0.01));
 
-BOOST_AUTO_TEST_CASE(WithNetworkRegion)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix"));
+            Simulator::Stop(Seconds(20.001));
+            Simulator::Run();
 
-  FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
-      Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
-      return make_shared<TesterApp>(i, this);
-    })
-    .Start(Seconds(0.01));
+            BOOST_CHECK_EQUAL(this->m_nData, 0);
+            BOOST_CHECK_EQUAL(m_nTimeouts, 0);
+            BOOST_CHECK_EQUAL(m_nNacks, 1);
+        }
 
-  Simulator::Stop(Seconds(20.001));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(WithNetworkRegion) {
+            NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix"));
 
-  BOOST_CHECK_EQUAL(m_nData, 1);
-  BOOST_CHECK_EQUAL(m_nTimeouts, 0);
-  BOOST_CHECK_EQUAL(m_nNacks, 0);
-}
+            FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
+                Interest i("/prefix/someData");
+                i.setLink(makeLink("/otherPrefix"));
+                return make_shared<TesterApp>(i, this);
+            })
+            .Start(Seconds(0.01));
 
-BOOST_AUTO_TEST_CASE(WithMoreSpecificNetworkRegion)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix/moreSpecific"));
+            Simulator::Stop(Seconds(20.001));
+            Simulator::Run();
 
-  FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
-      Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
-      return make_shared<TesterApp>(i, this);
-    })
-    .Start(Seconds(0.01));
+            BOOST_CHECK_EQUAL(m_nData, 1);
+            BOOST_CHECK_EQUAL(m_nTimeouts, 0);
+            BOOST_CHECK_EQUAL(m_nNacks, 0);
+        }
 
-  Simulator::Stop(Seconds(20.001));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(WithMoreSpecificNetworkRegion) {
+            NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix/moreSpecific"));
 
-  BOOST_CHECK_EQUAL(m_nData, 1);
-  BOOST_CHECK_EQUAL(m_nTimeouts, 0);
-  BOOST_CHECK_EQUAL(m_nNacks, 0);
-}
+            FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
+                Interest i("/prefix/someData");
+                i.setLink(makeLink("/otherPrefix"));
+                return make_shared<TesterApp>(i, this);
+            })
+            .Start(Seconds(0.01));
 
-BOOST_AUTO_TEST_CASE(WithLessSpecificLink)
-{
-  NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix"));
+            Simulator::Stop(Seconds(20.001));
+            Simulator::Run();
 
-  FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
-      Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix/moreSpecific"));
-      return make_shared<TesterApp>(i, this);
-    })
-    .Start(Seconds(0.01));
+            BOOST_CHECK_EQUAL(m_nData, 1);
+            BOOST_CHECK_EQUAL(m_nTimeouts, 0);
+            BOOST_CHECK_EQUAL(m_nNacks, 0);
+        }
 
-  Simulator::Stop(Seconds(20.001));
-  Simulator::Run();
+        BOOST_AUTO_TEST_CASE(WithLessSpecificLink) {
+            NetworkRegionTableHelper::AddRegionName(getNode("2"), Name("/otherPrefix"));
 
-  BOOST_CHECK_EQUAL(m_nData, 0);
-  BOOST_CHECK_EQUAL(m_nTimeouts, 0);
-  BOOST_CHECK_EQUAL(m_nNacks, 1);
-}
+            FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
+                Interest i("/prefix/someData");
+                i.setLink(makeLink("/otherPrefix/moreSpecific"));
+                return make_shared<TesterApp>(i, this);
+            })
+            .Start(Seconds(0.01));
 
-BOOST_AUTO_TEST_SUITE_END() // MultiNode
+            Simulator::Stop(Seconds(20.001));
+            Simulator::Run();
 
-BOOST_AUTO_TEST_SUITE_END() // HelperNdnNetworkRegionTableHelper
+            BOOST_CHECK_EQUAL(m_nData, 0);
+            BOOST_CHECK_EQUAL(m_nTimeouts, 0);
+            BOOST_CHECK_EQUAL(m_nNacks, 1);
+        }
 
-} // namespace ndn
+        BOOST_AUTO_TEST_SUITE_END() // MultiNode
+
+        BOOST_AUTO_TEST_SUITE_END() // HelperNdnNetworkRegionTableHelper
+
+    } // namespace ndn
 } // namespace ns3

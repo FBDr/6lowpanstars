@@ -25,87 +25,84 @@
 #include "time-custom-clock.hpp"
 
 namespace ndn {
-namespace time {
+    namespace time {
 
-/**
- * @brief Traits for UnitTestClock, defining default behavior for different clocks
- *
- * The only behavior that is currently controlled by the traits is default start
- * time.  The generic implementation assumes start time to be zero.
- */
-template<class BaseClock>
-class UnitTestClockTraits
-{
-public:
-  static nanoseconds
-  getDefaultStartTime()
-  {
-    return nanoseconds::zero();
-  }
-};
+        /**
+         * @brief Traits for UnitTestClock, defining default behavior for different clocks
+         *
+         * The only behavior that is currently controlled by the traits is default start
+         * time.  The generic implementation assumes start time to be zero.
+         */
+        template<class BaseClock>
+        class UnitTestClockTraits {
+        public:
 
-/**
- * @brief Specialization of UnitTestClockTraits for system_clock
- *
- * This specialization sets the default start time to 1415684132 seconds
- * (equivalent to Tue, 11 Nov 2014 05:35:32 UTC if unix epoch is assumed).
- */
-template<>
-class UnitTestClockTraits<system_clock>
-{
-public:
-  static nanoseconds
-  getDefaultStartTime()
-  {
-    return seconds(1415684132);
-  }
-};
+            static nanoseconds
+            getDefaultStartTime() {
+                return nanoseconds::zero();
+            }
+        };
 
-/**
- * @brief Clock that can be used in unit tests for time-dependent tests independent of wall clock
- *
- * This clock should be explicitly advanced with UnitTestClock<BaseClock>::advance() or set
- * with UnitTestClock<BaseClock>::setNow() methods.
- *
- * @note Default start time is determined by UnitTestClockTraits
- */
-template<class BaseClock>
-class UnitTestClock : public CustomClock<BaseClock>
-{
-public:
-  explicit
-  UnitTestClock(const nanoseconds& startTime = UnitTestClockTraits<BaseClock>::getDefaultStartTime());
+        /**
+         * @brief Specialization of UnitTestClockTraits for system_clock
+         *
+         * This specialization sets the default start time to 1415684132 seconds
+         * (equivalent to Tue, 11 Nov 2014 05:35:32 UTC if unix epoch is assumed).
+         */
+        template<>
+        class UnitTestClockTraits<system_clock> {
+        public:
 
-  /**
-   * @brief Advance unit test clock by @p duration
-   */
-  void
-  advance(const nanoseconds& duration);
+            static nanoseconds
+            getDefaultStartTime() {
+                return seconds(1415684132);
+            }
+        };
 
-  /**
-   * @brief Explicitly set clock to @p timeSinceEpoch
-   */
-  void
-  setNow(const nanoseconds& timeSinceEpoch);
+        /**
+         * @brief Clock that can be used in unit tests for time-dependent tests independent of wall clock
+         *
+         * This clock should be explicitly advanced with UnitTestClock<BaseClock>::advance() or set
+         * with UnitTestClock<BaseClock>::setNow() methods.
+         *
+         * @note Default start time is determined by UnitTestClockTraits
+         */
+        template<class BaseClock>
+        class UnitTestClock : public CustomClock<BaseClock> {
+        public:
+            explicit
+            UnitTestClock(const nanoseconds& startTime = UnitTestClockTraits<BaseClock>::getDefaultStartTime());
 
-public: // CustomClock<BaseClock>
-  virtual std::string
-  getSince() const override;
+            /**
+             * @brief Advance unit test clock by @p duration
+             */
+            void
+            advance(const nanoseconds& duration);
 
-  virtual typename BaseClock::time_point
-  getNow() const override;
+            /**
+             * @brief Explicitly set clock to @p timeSinceEpoch
+             */
+            void
+            setNow(const nanoseconds& timeSinceEpoch);
 
-  virtual boost::posix_time::time_duration
-  toPosixDuration(const typename BaseClock::duration& duration) const override;
+        public: // CustomClock<BaseClock>
+            virtual std::string
+            getSince() const override;
 
-private:
-  nanoseconds m_currentTime;
-};
+            virtual typename BaseClock::time_point
+            getNow() const override;
 
-typedef UnitTestClock<system_clock> UnitTestSystemClock;
-typedef UnitTestClock<steady_clock> UnitTestSteadyClock;
+            virtual boost::posix_time::time_duration
+            toPosixDuration(const typename BaseClock::duration& duration) const override;
 
-} // namespace time
+        private:
+            nanoseconds m_currentTime;
+        };
+
+        typedef UnitTestClock<system_clock> UnitTestSystemClock;
+        typedef UnitTestClock<steady_clock> UnitTestSteadyClock;
+
+    } // namespace time
 } // namespace ndn
 
 #endif // NDN_TIME_UNIT_TEST_CLOCK_HPP

@@ -24,153 +24,130 @@
 #include "topology-reader.h"
 
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("TopologyReader");
-
-TopologyReader::TopologyReader ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-TopologyReader::~TopologyReader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("TopologyReader");
 
-void
-TopologyReader::SetFileName (const std::string &fileName)
-{
-  m_fileName = fileName;
-}
-
-std::string
-TopologyReader::GetFileName () const
-{
-  return m_fileName;
-}
-
-/* Manipulating the address block */
-
-TopologyReader::ConstLinksIterator
-TopologyReader::LinksBegin (void) const
-{
-  return m_linksList.begin ();
-}
-
-TopologyReader::ConstLinksIterator
-TopologyReader::LinksEnd (void) const
-{
-  return m_linksList.end ();
-}
-
-int
-TopologyReader::LinksSize (void) const
-{
-  return m_linksList.size ();
-}
-
-bool
-TopologyReader::LinksEmpty (void) const
-{
-  return m_linksList.empty ();
-}
-
-void
-TopologyReader::AddLink (Link link)
-{
-  m_linksList.push_back (link);
-  return;
-}
-
-
-TopologyReader::Link::Link ( Ptr<Node> fromPtr, const std::string &fromName, Ptr<Node> toPtr, const std::string &toName )
-{
-  m_fromPtr = fromPtr;
-  m_fromName = fromName;
-  m_toPtr = toPtr;
-  m_toName = toName;
-}
-
-TopologyReader::Link::Link ()
-{
-}
-
-void
-TopologyReader::Link::SetNetDevices (Ptr<NetDevice> from, Ptr<NetDevice> to)
-{
-  m_fromNetDevice = from;
-  m_toNetDevice = to;
-}
-
-Ptr<Node> TopologyReader::Link::GetFromNode (void) const
-{
-  return m_fromPtr;
-}
-
-Ptr<NetDevice> TopologyReader::Link::GetFromNetDevice (void) const
-{
-  return m_fromNetDevice;
-}
-
-std::string
-TopologyReader::Link::GetFromNodeName (void) const
-{
-  return m_fromName;
-}
-
-Ptr<Node>
-TopologyReader::Link::GetToNode (void) const
-{
-  return m_toPtr;
-}
-
-Ptr<NetDevice>
-TopologyReader::Link::GetToNetDevice (void) const
-{
-  return m_toNetDevice;
-}
-
-std::string
-TopologyReader::Link::GetToNodeName (void) const
-{
-  return m_toName;
-}
-
-std::string
-TopologyReader::Link::GetAttribute (const std::string &name) const
-{
-  NS_ASSERT_MSG (m_linkAttr.find (name) != m_linkAttr.end (), "Requested topology link attribute not found");
-  return m_linkAttr.find (name)->second;
-}
-
-bool
-TopologyReader::Link::GetAttributeFailSafe (const std::string &name, std::string &value) const
-{
-  if ( m_linkAttr.find (name) == m_linkAttr.end () )
-    {
-      return false;
+    TopologyReader::TopologyReader() {
+        NS_LOG_FUNCTION(this);
     }
-  value = m_linkAttr.find (name)->second;
-  return true;
-}
 
-void
-TopologyReader::Link::SetAttribute (const std::string &name, const std::string &value)
-{
-  m_linkAttr[name] = value;
-}
+    TopologyReader::~TopologyReader() {
+        NS_LOG_FUNCTION(this);
+    }
 
-TopologyReader::Link::ConstAttributesIterator
-TopologyReader::Link::AttributesBegin (void) const
-{
-  return m_linkAttr.begin ();
-}
-TopologyReader::Link::ConstAttributesIterator
-TopologyReader::Link::AttributesEnd (void) const
-{
-  return m_linkAttr.end ();
-}
+    void
+    TopologyReader::SetFileName(const std::string & fileName) {
+        m_fileName = fileName;
+    }
+
+    std::string
+    TopologyReader::GetFileName() const {
+        return m_fileName;
+    }
+
+    /* Manipulating the address block */
+
+    TopologyReader::ConstLinksIterator
+    TopologyReader::LinksBegin(void) const {
+        return m_linksList.begin();
+    }
+
+    TopologyReader::ConstLinksIterator
+    TopologyReader::LinksEnd(void) const {
+        return m_linksList.end();
+    }
+
+    int
+    TopologyReader::LinksSize(void) const {
+        return m_linksList.size();
+    }
+
+    bool
+    TopologyReader::LinksEmpty(void) const {
+        return m_linksList.empty();
+    }
+
+    void
+    TopologyReader::AddLink(Link link) {
+        m_linksList.push_back(link);
+        return;
+    }
+
+    TopologyReader::Link::Link(Ptr<Node> fromPtr, const std::string &fromName, Ptr<Node> toPtr, const std::string & toName) {
+        m_fromPtr = fromPtr;
+        m_fromName = fromName;
+        m_toPtr = toPtr;
+        m_toName = toName;
+    }
+
+    TopologyReader::Link::Link() {
+    }
+
+    void
+    TopologyReader::Link::SetNetDevices(Ptr<NetDevice> from, Ptr<NetDevice> to) {
+        m_fromNetDevice = from;
+        m_toNetDevice = to;
+    }
+
+    Ptr<Node> TopologyReader::Link::GetFromNode(void) const {
+        return m_fromPtr;
+    }
+
+    Ptr<NetDevice> TopologyReader::Link::GetFromNetDevice(void) const {
+        return m_fromNetDevice;
+    }
+
+    std::string
+    TopologyReader::Link::GetFromNodeName(void) const {
+        return m_fromName;
+    }
+
+    Ptr<Node>
+            TopologyReader::Link::GetToNode(void) const {
+        return m_toPtr;
+    }
+
+    Ptr<NetDevice>
+            TopologyReader::Link::GetToNetDevice(void) const {
+        return m_toNetDevice;
+    }
+
+    std::string
+    TopologyReader::Link::GetToNodeName(void) const {
+        return m_toName;
+    }
+
+    std::string
+    TopologyReader::Link::GetAttribute(const std::string & name) const {
+        NS_ASSERT_MSG(m_linkAttr.find(name) != m_linkAttr.end(), "Requested topology link attribute not found");
+        return m_linkAttr.find(name)->second;
+    }
+
+    bool
+    TopologyReader::Link::GetAttributeFailSafe(const std::string &name, std::string & value) const {
+        if (m_linkAttr.find(name) == m_linkAttr.end()) {
+            return false;
+        }
+        value = m_linkAttr.find(name)->second;
+        return true;
+    }
+
+    void
+    TopologyReader::Link::SetAttribute(const std::string &name, const std::string & value) {
+        m_linkAttr[name] = value;
+    }
+
+    TopologyReader::Link::ConstAttributesIterator
+    TopologyReader::Link::AttributesBegin(void) const {
+        return m_linkAttr.begin();
+    }
+
+    TopologyReader::Link::ConstAttributesIterator
+    TopologyReader::Link::AttributesEnd(void) const {
+        return m_linkAttr.end();
+    }
 
 
 } /* namespace ns3 */

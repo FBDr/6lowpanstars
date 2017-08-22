@@ -31,101 +31,102 @@
 
 namespace ns3 {
 
-class Packet;
+    class Packet;
 
-namespace ndn {
+    namespace ndn {
 
-/**
- * \ingroup ndn
- * \defgroup ndn-apps NDN applications
- */
-/**
- * @ingroup ndn-apps
- * @brief Base class that all NDN applications should be derived from.
- *
- * The class implements virtual calls onInterest, onNack, and onData
- */
-class App : public Application {
-public:
-  static TypeId
-  GetTypeId();
+        /**
+         * \ingroup ndn
+         * \defgroup ndn-apps NDN applications
+         */
 
-  /**
-   * @brief Default constructor
-   */
-  App();
-  virtual ~App();
+        /**
+         * @ingroup ndn-apps
+         * @brief Base class that all NDN applications should be derived from.
+         *
+         * The class implements virtual calls onInterest, onNack, and onData
+         */
+        class App : public Application {
+        public:
+            static TypeId
+            GetTypeId();
 
-  /**
-   * @brief Get application ID (ID of applications face)
-   */
-  uint32_t
-  GetId() const;
+            /**
+             * @brief Default constructor
+             */
+            App();
+            virtual ~App();
 
-  /**
-   * @brief Method that will be called every time new Interest arrives
-   */
-  virtual void
-  OnInterest(shared_ptr<const Interest> interest);
+            /**
+             * @brief Get application ID (ID of applications face)
+             */
+            uint32_t
+            GetId() const;
 
-  /**
-   * @brief Method that will be called every time new Data arrives
-   */
-  virtual void
-  OnData(shared_ptr<const Data> data);
+            /**
+             * @brief Method that will be called every time new Interest arrives
+             */
+            virtual void
+            OnInterest(shared_ptr<const Interest> interest);
 
-   /**
-   * @brief Method that will be called every time new Nack arrives
-   */
-  virtual void
-  OnNack(shared_ptr<const lp::Nack> nack);
+            /**
+             * @brief Method that will be called every time new Data arrives
+             */
+            virtual void
+            OnData(shared_ptr<const Data> data);
 
-public:
-  typedef void (*InterestTraceCallback)(shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>);
-  typedef void (*DataTraceCallback)(shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>);
-  typedef void (*NackTraceCallback)(shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>);
+            /**
+             * @brief Method that will be called every time new Nack arrives
+             */
+            virtual void
+            OnNack(shared_ptr<const lp::Nack> nack);
 
-protected:
-  virtual void
-  DoInitialize();
+        public:
+            typedef void (*InterestTraceCallback)(shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>);
+            typedef void (*DataTraceCallback)(shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>);
+            typedef void (*NackTraceCallback)(shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>);
 
-  virtual void
-  DoDispose();
+        protected:
+            virtual void
+            DoInitialize();
 
-  // inherited from Application base class. Originally they were private
-  virtual void
-  StartApplication(); ///< @brief Called at time specified by Start
+            virtual void
+            DoDispose();
 
-  virtual void
-  StopApplication(); ///< @brief Called at time specified by Stop
+            // inherited from Application base class. Originally they were private
+            virtual void
+            StartApplication(); ///< @brief Called at time specified by Start
 
-protected:
-  bool m_active; ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
-  shared_ptr<Face> m_face;
-  AppLinkService* m_appLink;
+            virtual void
+            StopApplication(); ///< @brief Called at time specified by Stop
 
-  uint32_t m_appId;
+        protected:
+            bool m_active; ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
+            shared_ptr<Face> m_face;
+            AppLinkService* m_appLink;
 
-  TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
-    m_receivedInterests; ///< @brief App-level trace of received Interests
+            uint32_t m_appId;
 
-  TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
-    m_receivedDatas; ///< @brief App-level trace of received Data
+            TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
+            m_receivedInterests; ///< @brief App-level trace of received Interests
 
-  TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
-    m_receivedNacks; ///< @brief App-level trace of received Nacks
+            TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
+            m_receivedDatas; ///< @brief App-level trace of received Data
 
-  TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
-    m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
+            TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
+            m_receivedNacks; ///< @brief App-level trace of received Nacks
 
-  TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
-    m_transmittedDatas; ///< @brief App-level trace of transmitted Data
+            TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
+            m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
-    m_transmittedNacks; ///< @brief App-level trace of transmitted Nacks
-};
+            TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
+            m_transmittedDatas; ///< @brief App-level trace of transmitted Data
 
-} // namespace ndn
+            TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
+            m_transmittedNacks; ///< @brief App-level trace of transmitted Nacks
+        };
+
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_APP_H

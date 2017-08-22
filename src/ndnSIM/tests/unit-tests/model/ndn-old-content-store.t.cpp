@@ -21,53 +21,56 @@
 #include "../tests-common.hpp"
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(ModelNdnOldContentStore, ScenarioHelperWithCleanupFixture)
+        BOOST_FIXTURE_TEST_SUITE(ModelNdnOldContentStore, ScenarioHelperWithCleanupFixture)
 
-BOOST_AUTO_TEST_CASE(RandomPolicy)
-{
-  Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
-  Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+        BOOST_AUTO_TEST_CASE(RandomPolicy) {
+            Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
+            Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+            Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
 
-  getStackHelper().SetOldContentStore("ns3::ndn::cs::Random", "MaxSize", "10");
+            getStackHelper().SetOldContentStore("ns3::ndn::cs::Random", "MaxSize", "10");
 
-  createTopology({
-      {"1", "2"},
-    });
+            createTopology({
+                {"1", "2"},
+            });
 
-  addRoutes({
-      {"1", "2", "/prefix", 1},
-    });
+            addRoutes({
+                {"1", "2", "/prefix", 1},
+            });
 
-  addApps({
-      {"1", "ns3::ndn::ConsumerCbr",
-          {{"Prefix", "/prefix"}, {"Frequency", "10"}},
-          "0s", "9.99s"},
-      {"2", "ns3::ndn::Producer",
-          {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
-          "0s", "100s"}
-    });
+            addApps({
+                {"1", "ns3::ndn::ConsumerCbr",
+                    {
+                        {"Prefix", "/prefix"},
+                        {"Frequency", "10"}},
+                    "0s", "9.99s"},
+                {"2", "ns3::ndn::Producer",
+                    {
+                        {"Prefix", "/prefix"},
+                        {"PayloadSize", "1024"}},
+                    "0s", "100s"}
+            });
 
-  Simulator::Stop(Seconds(20.001));
-  Simulator::Run();
+            Simulator::Stop(Seconds(20.001));
+            Simulator::Run();
 
-  std::map<std::string, std::vector<Name>> entries;
-  for (const std::string& node : {"1", "2"}) {
-    auto cs = getNode(node)->GetObject<ContentStore>();
-    auto& nodeCs = entries[node];
-    for (auto it = cs->Begin(); it != cs->End(); it = cs->Next(it)) {
-      nodeCs.push_back(it->GetName());
-    }
-  }
+            std::map<std::string, std::vector < Name>> entries;
+            for (const std::string& node :{"1", "2"}) {
+                auto cs = getNode(node)->GetObject<ContentStore>();
+                auto& nodeCs = entries[node];
+                for (auto it = cs->Begin(); it != cs->End(); it = cs->Next(it)) {
+                    nodeCs.push_back(it->GetName());
+                }
+            }
 
-  BOOST_CHECK_EQUAL(entries["1"].size(), 10);
-  BOOST_CHECK_EQUAL(entries["2"].size(), 10);
-  BOOST_CHECK(entries["1"] != entries["2"]); // this test has a small chance of failing
-}
+            BOOST_CHECK_EQUAL(entries["1"].size(), 10);
+            BOOST_CHECK_EQUAL(entries["2"].size(), 10);
+            BOOST_CHECK(entries["1"] != entries["2"]); // this test has a small chance of failing
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

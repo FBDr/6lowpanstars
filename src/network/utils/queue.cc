@@ -20,187 +20,167 @@
 #include "ns3/trace-source-accessor.h"
 #include "queue.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("Queue");
-
-NS_OBJECT_ENSURE_REGISTERED (Queue);
-
-TypeId 
-Queue::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::Queue")
-    .SetParent<Object> ()
-    .SetGroupName("Network")  
-    .AddTraceSource ("Enqueue", "Enqueue a packet in the queue.",
-                     MakeTraceSourceAccessor (&Queue::m_traceEnqueue),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("Dequeue", "Dequeue a packet from the queue.",
-                     MakeTraceSourceAccessor (&Queue::m_traceDequeue),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("Drop", "Drop a packet stored in the queue.",
-                     MakeTraceSourceAccessor (&Queue::m_traceDrop),
-                     "ns3::Packet::TracedCallback")
-  ;
-  return tid;
-}
 
-Queue::Queue() : 
-  m_nBytes (0),
-  m_nTotalReceivedBytes (0),
-  m_nPackets (0),
-  m_nTotalReceivedPackets (0),
-  m_nTotalDroppedBytes (0),
-  m_nTotalDroppedPackets (0)
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("Queue");
 
-Queue::~Queue()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(Queue);
 
-
-bool 
-Queue::Enqueue (Ptr<Packet> p)
-{
-  NS_LOG_FUNCTION (this << p);
-
-  //
-  // If DoEnqueue fails, Queue::Drop is called by the subclass
-  //
-  bool retval = DoEnqueue (p);
-  if (retval)
-    {
-      NS_LOG_LOGIC ("m_traceEnqueue (p)");
-      m_traceEnqueue (p);
-
-      uint32_t size = p->GetSize ();
-      m_nBytes += size;
-      m_nTotalReceivedBytes += size;
-
-      m_nPackets++;
-      m_nTotalReceivedPackets++;
+    TypeId
+    Queue::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::Queue")
+                .SetParent<Object> ()
+                .SetGroupName("Network")
+                .AddTraceSource("Enqueue", "Enqueue a packet in the queue.",
+                MakeTraceSourceAccessor(&Queue::m_traceEnqueue),
+                "ns3::Packet::TracedCallback")
+                .AddTraceSource("Dequeue", "Dequeue a packet from the queue.",
+                MakeTraceSourceAccessor(&Queue::m_traceDequeue),
+                "ns3::Packet::TracedCallback")
+                .AddTraceSource("Drop", "Drop a packet stored in the queue.",
+                MakeTraceSourceAccessor(&Queue::m_traceDrop),
+                "ns3::Packet::TracedCallback")
+                ;
+        return tid;
     }
-  return retval;
-}
 
-Ptr<Packet>
-Queue::Dequeue (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  Ptr<Packet> packet = DoDequeue ();
-
-  if (packet != 0)
-    {
-      NS_ASSERT (m_nBytes >= packet->GetSize ());
-      NS_ASSERT (m_nPackets > 0);
-
-      m_nBytes -= packet->GetSize ();
-      m_nPackets--;
-
-      NS_LOG_LOGIC ("m_traceDequeue (packet)");
-      m_traceDequeue (packet);
+    Queue::Queue() :
+            m_nBytes(0),
+            m_nTotalReceivedBytes(0),
+            m_nPackets(0),
+            m_nTotalReceivedPackets(0),
+            m_nTotalDroppedBytes(0),
+            m_nTotalDroppedPackets(0) {
+        NS_LOG_FUNCTION(this);
     }
-  return packet;
-}
 
-void
-Queue::DequeueAll (void)
-{
-  NS_LOG_FUNCTION (this);
-  while (!IsEmpty ())
-    {
-      Dequeue ();
+    Queue::~Queue() {
+        NS_LOG_FUNCTION(this);
     }
-}
 
-Ptr<const Packet>
-Queue::Peek (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return DoPeek ();
-}
+    bool
+    Queue::Enqueue(Ptr<Packet> p) {
+        NS_LOG_FUNCTION(this << p);
 
+        //
+        // If DoEnqueue fails, Queue::Drop is called by the subclass
+        //
+        bool retval = DoEnqueue(p);
+        if (retval) {
+            NS_LOG_LOGIC("m_traceEnqueue (p)");
+            m_traceEnqueue(p);
 
-uint32_t 
-Queue::GetNPackets (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nPackets);
-  return m_nPackets;
-}
+            uint32_t size = p->GetSize();
+            m_nBytes += size;
+            m_nTotalReceivedBytes += size;
 
-uint32_t
-Queue::GetNBytes (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (" returns " << m_nBytes);
-  return m_nBytes;
-}
+            m_nPackets++;
+            m_nTotalReceivedPackets++;
+        }
+        return retval;
+    }
 
-bool
-Queue::IsEmpty (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << (m_nPackets == 0));
-  return m_nPackets == 0;
-}
+    Ptr<Packet>
+            Queue::Dequeue(void) {
+        NS_LOG_FUNCTION(this);
 
-uint32_t
-Queue::GetTotalReceivedBytes (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nTotalReceivedBytes);
-  return m_nTotalReceivedBytes;
-}
+        Ptr<Packet> packet = DoDequeue();
 
-uint32_t
-Queue::GetTotalReceivedPackets (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nTotalReceivedPackets);
-  return m_nTotalReceivedPackets;
-}
+        if (packet != 0) {
+            NS_ASSERT(m_nBytes >= packet->GetSize());
+            NS_ASSERT(m_nPackets > 0);
 
-uint32_t
-Queue:: GetTotalDroppedBytes (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nTotalDroppedBytes);
-  return m_nTotalDroppedBytes;
-}
+            m_nBytes -= packet->GetSize();
+            m_nPackets--;
 
-uint32_t
-Queue::GetTotalDroppedPackets (void) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nTotalDroppedPackets);
-  return m_nTotalDroppedPackets;
-}
+            NS_LOG_LOGIC("m_traceDequeue (packet)");
+            m_traceDequeue(packet);
+        }
+        return packet;
+    }
 
-void 
-Queue::ResetStatistics (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_nTotalReceivedBytes = 0;
-  m_nTotalReceivedPackets = 0;
-  m_nTotalDroppedBytes = 0;
-  m_nTotalDroppedPackets = 0;
-}
+    void
+    Queue::DequeueAll(void) {
+        NS_LOG_FUNCTION(this);
+        while (!IsEmpty()) {
+            Dequeue();
+        }
+    }
 
-void
-Queue::Drop (Ptr<Packet> p)
-{
-  NS_LOG_FUNCTION (this << p);
+    Ptr<const Packet>
+            Queue::Peek(void) const {
+        NS_LOG_FUNCTION(this);
+        return DoPeek();
+    }
 
-  m_nTotalDroppedPackets++;
-  m_nTotalDroppedBytes += p->GetSize ();
+    uint32_t
+    Queue::GetNPackets(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << m_nPackets);
+        return m_nPackets;
+    }
 
-  NS_LOG_LOGIC ("m_traceDrop (p)");
-  m_traceDrop (p);
-}
+    uint32_t
+    Queue::GetNBytes(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC(" returns " << m_nBytes);
+        return m_nBytes;
+    }
+
+    bool
+    Queue::IsEmpty(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << (m_nPackets == 0));
+        return m_nPackets == 0;
+    }
+
+    uint32_t
+    Queue::GetTotalReceivedBytes(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << m_nTotalReceivedBytes);
+        return m_nTotalReceivedBytes;
+    }
+
+    uint32_t
+    Queue::GetTotalReceivedPackets(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << m_nTotalReceivedPackets);
+        return m_nTotalReceivedPackets;
+    }
+
+    uint32_t
+    Queue::GetTotalDroppedBytes(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << m_nTotalDroppedBytes);
+        return m_nTotalDroppedBytes;
+    }
+
+    uint32_t
+    Queue::GetTotalDroppedPackets(void) const {
+        NS_LOG_FUNCTION(this);
+        NS_LOG_LOGIC("returns " << m_nTotalDroppedPackets);
+        return m_nTotalDroppedPackets;
+    }
+
+    void
+    Queue::ResetStatistics(void) {
+        NS_LOG_FUNCTION(this);
+        m_nTotalReceivedBytes = 0;
+        m_nTotalReceivedPackets = 0;
+        m_nTotalDroppedBytes = 0;
+        m_nTotalDroppedPackets = 0;
+    }
+
+    void
+    Queue::Drop(Ptr<Packet> p) {
+        NS_LOG_FUNCTION(this << p);
+
+        m_nTotalDroppedPackets++;
+        m_nTotalDroppedBytes += p->GetSize();
+
+        NS_LOG_LOGIC("m_traceDrop (p)");
+        m_traceDrop(p);
+    }
 
 } // namespace ns3

@@ -29,127 +29,117 @@
 #include "cryptopp.hpp"
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-PublicKey::PublicKey()
-  : m_type(KeyType::NONE)
-{
-}
+            PublicKey::PublicKey()
+            : m_type(KeyType::NONE) {
+            }
 
-PublicKey::PublicKey(const uint8_t* keyDerBuf, size_t keyDerSize)
-  : m_type(KeyType::NONE)
-{
-  CryptoPP::StringSource src(keyDerBuf, keyDerSize, true);
-  decode(src);
-}
+            PublicKey::PublicKey(const uint8_t* keyDerBuf, size_t keyDerSize)
+            : m_type(KeyType::NONE) {
+                CryptoPP::StringSource src(keyDerBuf, keyDerSize, true);
+                decode(src);
+            }
 
-const Block&
-PublicKey::computeDigest() const
-{
-  if (m_key.empty())
-    BOOST_THROW_EXCEPTION(Error("Public key is empty"));
+            const Block&
+            PublicKey::computeDigest() const {
+                if (m_key.empty())
+                    BOOST_THROW_EXCEPTION(Error("Public key is empty"));
 
-  if (m_digest.hasWire())
-    return m_digest;
-  else {
-    m_digest = Block(tlv::KeyDigest, crypto::computeSha256Digest(m_key.buf(), m_key.size()));
-    m_digest.encode();
-    return m_digest;
-  }
-}
+                if (m_digest.hasWire())
+                    return m_digest;
+                else {
+                    m_digest = Block(tlv::KeyDigest, crypto::computeSha256Digest(m_key.buf(), m_key.size()));
+                    m_digest.encode();
+                    return m_digest;
+                }
+            }
 
+            void
+            PublicKey::encode(CryptoPP::BufferedTransformation& out) const {
+                // SubjectPublicKeyInfo ::= SEQUENCE {
+                //     algorithm           AlgorithmIdentifier
+                //     keybits             BIT STRING   }
 
-void
-PublicKey::encode(CryptoPP::BufferedTransformation& out) const
-{
-  // SubjectPublicKeyInfo ::= SEQUENCE {
-  //     algorithm           AlgorithmIdentifier
-  //     keybits             BIT STRING   }
+                out.Put(m_key.buf(), m_key.size());
+            }
 
-  out.Put(m_key.buf(), m_key.size());
-}
+            void
+            PublicKey::decode(CryptoPP::BufferedTransformation& in) {
+                // SubjectPublicKeyInfo ::= SEQUENCE {
+                //     algorithm           AlgorithmIdentifier
+                //     keybits             BIT STRING   }
 
-void
-PublicKey::decode(CryptoPP::BufferedTransformation& in)
-{
-  // SubjectPublicKeyInfo ::= SEQUENCE {
-  //     algorithm           AlgorithmIdentifier
-  //     keybits             BIT STRING   }
+                using namespace CryptoPP;
+                try {
+                    std::string out;
+                    StringSink sink(out);
 
-  using namespace CryptoPP;
-  try
-    {
-      std::string out;
-      StringSink sink(out);
+                    ////////////////////////
+                    // part 1: copy as is //
+                    ////////////////////////
+                    BERSequenceDecoder decoder(in);
+                    {
+                        assert(decoder.IsDefiniteLength());
 
-      ////////////////////////
-      // part 1: copy as is //
-      ////////////////////////
-      BERSequenceDecoder decoder(in);
-      {
-        assert(decoder.IsDefiniteLength());
+                        DERSequenceEncoder encoder(sink);
+                        decoder.TransferTo(encoder, decoder.RemainingLength());
+                        encoder.MessageEnd();
+                    }
+                    decoder.MessageEnd();
 
-        DERSequenceEncoder encoder(sink);
-        decoder.TransferTo(encoder, decoder.RemainingLength());
-        encoder.MessageEnd();
-      }
-      decoder.MessageEnd();
+                    ////////////////////////
+                    // part 2: check if the key is RSA (since it is the only supported for now)
+                    ////////////////////////
+                    StringSource checkedSource(out, true);
+                    BERSequenceDecoder subjectPublicKeyInfo(checkedSource);
+                    {
+                        BERSequenceDecoder algorithmInfo(subjectPublicKeyInfo);
+                        {
+                            Oid algorithm;
+                            algorithm.decode(algorithmInfo);
 
-      ////////////////////////
-      // part 2: check if the key is RSA (since it is the only supported for now)
-      ////////////////////////
-      StringSource checkedSource(out, true);
-      BERSequenceDecoder subjectPublicKeyInfo(checkedSource);
-      {
-        BERSequenceDecoder algorithmInfo(subjectPublicKeyInfo);
-        {
-          Oid algorithm;
-          algorithm.decode(algorithmInfo);
+                            if (algorithm == oid::RSA)
+                                m_type = KeyType::RSA;
+                            else if (algorithm == oid::ECDSA)
+                                m_type = KeyType::EC;
+                            else
+                                BOOST_THROW_EXCEPTION(Error("Only RSA/ECDSA public keys are supported for now (" +
+                                    algorithm.toString() + " requested)"));
+                        }
+                    }
 
-          if (algorithm == oid::RSA)
-            m_type = KeyType::RSA;
-          else if (algorithm == oid::ECDSA)
-            m_type = KeyType::EC;
-          else
-            BOOST_THROW_EXCEPTION(Error("Only RSA/ECDSA public keys are supported for now (" +
-                                        algorithm.toString() + " requested)"));
-        }
-      }
+                    m_key.assign(out.begin(), out.end());
+                } catch (CryptoPP::BERDecodeErr& err) {
+                    m_type = KeyType::NONE;
+                    BOOST_THROW_EXCEPTION(Error("PublicKey decoding error"));
+                }
 
-      m_key.assign(out.begin(), out.end());
-    }
-  catch (CryptoPP::BERDecodeErr& err)
-    {
-      m_type = KeyType::NONE;
-      BOOST_THROW_EXCEPTION(Error("PublicKey decoding error"));
-    }
+                m_digest.reset();
+            }
 
-  m_digest.reset();
-}
+            // Blob
+            // PublicKey::getDigest(DigestAlgorithm digestAlgorithm) const
+            // {
+            //   if (digestAlgorithm == DigestAlgorithm::SHA256) {
+            //     uint8_t digest[SHA256_DIGEST_LENGTH];
+            //     ndn_digestSha256(keyDer_.buf(), keyDer_.size(), digest);
 
-// Blob
-// PublicKey::getDigest(DigestAlgorithm digestAlgorithm) const
-// {
-//   if (digestAlgorithm == DigestAlgorithm::SHA256) {
-//     uint8_t digest[SHA256_DIGEST_LENGTH];
-//     ndn_digestSha256(keyDer_.buf(), keyDer_.size(), digest);
+            //     return Blob(digest, sizeof(digest));
+            //   }
+            //   else
+            //     throw UnrecognizedDigestAlgorithmException("Wrong format!");
+            // }
 
-//     return Blob(digest, sizeof(digest));
-//   }
-//   else
-//     throw UnrecognizedDigestAlgorithmException("Wrong format!");
-// }
+            std::ostream&
+            operator<<(std::ostream& os, const PublicKey& key) {
+                CryptoPP::StringSource(key.get().buf(), key.get().size(), true,
+                        new CryptoPP::Base64Encoder(new CryptoPP::FileSink(os), true, 64));
 
-std::ostream&
-operator<<(std::ostream& os, const PublicKey& key)
-{
-  CryptoPP::StringSource(key.get().buf(), key.get().size(), true,
-                         new CryptoPP::Base64Encoder(new CryptoPP::FileSink(os), true, 64));
+                return os;
+            }
 
-  return os;
-}
-
-} // namespace v1
-} // namespace security
+        } // namespace v1
+    } // namespace security
 } // namespace ndn

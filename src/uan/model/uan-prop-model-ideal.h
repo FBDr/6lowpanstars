@@ -27,31 +27,30 @@
 
 namespace ns3 {
 
-/**
- * \ingroup uan
- *
- * Ideal propagation model (no pathloss, impulse PDP).
- */
-class UanPropModelIdeal : public UanPropModel
-{
-public:
-  /** Default constructor. */
-  UanPropModelIdeal ();
-  /** Destructor */
-  virtual ~UanPropModelIdeal ();
+    /**
+     * \ingroup uan
+     *
+     * Ideal propagation model (no pathloss, impulse PDP).
+     */
+    class UanPropModelIdeal : public UanPropModel {
+    public:
+        /** Default constructor. */
+        UanPropModelIdeal();
+        /** Destructor */
+        virtual ~UanPropModelIdeal();
 
-  /**
-   * Register this type.
-   * \return The object TypeId.
-   */
-  static TypeId GetTypeId (void);
+        /**
+         * Register this type.
+         * \return The object TypeId.
+         */
+        static TypeId GetTypeId(void);
 
-  // Inherited methods
-  virtual double GetPathLossDb (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
-  virtual UanPdp GetPdp (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
-  virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
+        // Inherited methods
+        virtual double GetPathLossDb(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
+        virtual UanPdp GetPdp(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
+        virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b, UanTxMode mode);
 
-};  // class UanPropModelIdeal
+    }; // class UanPropModelIdeal
 
 } // namespace ns3
 

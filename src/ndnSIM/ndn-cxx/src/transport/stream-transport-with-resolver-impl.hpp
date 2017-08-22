@@ -26,68 +26,65 @@
 
 namespace ndn {
 
-/** \brief implementation detail of a Boost.Asio-based stream-oriented transport
- *         with resolver support
- */
-template<typename BaseTransport, typename Protocol>
-class StreamTransportWithResolverImpl : public StreamTransportImpl<BaseTransport, Protocol>
-{
-public:
-  typedef StreamTransportWithResolverImpl<BaseTransport,Protocol> Impl;
+    /** \brief implementation detail of a Boost.Asio-based stream-oriented transport
+     *         with resolver support
+     */
+    template<typename BaseTransport, typename Protocol>
+    class StreamTransportWithResolverImpl : public StreamTransportImpl<BaseTransport, Protocol> {
+    public:
+        typedef StreamTransportWithResolverImpl<BaseTransport, Protocol> Impl;
 
-  StreamTransportWithResolverImpl(BaseTransport& transport, boost::asio::io_service& ioService)
-    : StreamTransportImpl<BaseTransport, Protocol>(transport, ioService)
-  {
-  }
+        StreamTransportWithResolverImpl(BaseTransport& transport, boost::asio::io_service& ioService)
+        : StreamTransportImpl<BaseTransport, Protocol>(transport, ioService) {
+        }
 
-  void
-  connect(const typename Protocol::resolver::query& query)
-  {
-    if (this->m_isConnecting) {
-      return;
-    }
+        void
+        connect(const typename Protocol::resolver::query& query) {
+            if (this->m_isConnecting) {
+                return;
+            }
 
-    this->m_isConnecting = true;
+            this->m_isConnecting = true;
 
-    // Wait at most 4 seconds to connect
-    /// @todo Decide whether this number should be configurable
-    this->m_connectTimer.expires_from_now(boost::posix_time::seconds(4));
-    this->m_connectTimer.async_wait(bind(&Impl::connectTimeoutHandler, this->shared_from_this(), _1));
+            // Wait at most 4 seconds to connect
+            /// @todo Decide whether this number should be configurable
+            this->m_connectTimer.expires_from_now(boost::posix_time::seconds(4));
+            this->m_connectTimer.async_wait(bind(&Impl::connectTimeoutHandler, this->shared_from_this(), _1));
 
-    // typename boost::asio::ip::basic_resolver< Protocol > resolver;
-    auto resolver = make_shared<typename Protocol::resolver>(ref(this->m_socket.get_io_service()));
-    resolver->async_resolve(query, bind(&Impl::resolveHandler, this->shared_from_base(), _1, _2, resolver));
-  }
+            // typename boost::asio::ip::basic_resolver< Protocol > resolver;
+            auto resolver = make_shared<typename Protocol::resolver > (ref(this->m_socket.get_io_service()));
+            resolver->async_resolve(query, bind(&Impl::resolveHandler, this->shared_from_base(), _1, _2, resolver));
+        }
 
-protected:
-  void
-  resolveHandler(const boost::system::error_code& error,
-                 typename Protocol::resolver::iterator endpoint,
-                 const shared_ptr<typename Protocol::resolver>&)
-  {
-    if (error) {
-      if (error == boost::system::errc::operation_canceled)
-        return;
+    protected:
 
-      BOOST_THROW_EXCEPTION(Transport::Error(error, "Error during resolution of host or port"));
-    }
+        void
+        resolveHandler(const boost::system::error_code& error,
+                typename Protocol::resolver::iterator endpoint,
+                const shared_ptr<typename Protocol::resolver>&) {
+            if (error) {
+                if (error == boost::system::errc::operation_canceled)
+                    return;
 
-    typename Protocol::resolver::iterator end;
-    if (endpoint == end) {
-      this->m_transport.close();
-      BOOST_THROW_EXCEPTION(Transport::Error(error, "Unable to resolve because host or port"));
-    }
+                BOOST_THROW_EXCEPTION(Transport::Error(error, "Error during resolution of host or port"));
+            }
 
-    this->m_socket.async_connect(*endpoint, bind(&Impl::connectHandler, this->shared_from_this(), _1));
-  }
+            typename Protocol::resolver::iterator end;
+            if (endpoint == end) {
+                this->m_transport.close();
+                BOOST_THROW_EXCEPTION(Transport::Error(error, "Unable to resolve because host or port"));
+            }
 
-private:
-  shared_ptr<Impl>
-  shared_from_base()
-  {
-    return static_pointer_cast<Impl>(this->shared_from_this());
-  }
-};
+            this->m_socket.async_connect(*endpoint, bind(&Impl::connectHandler, this->shared_from_this(), _1));
+        }
+
+    private:
+
+        shared_ptr<Impl>
+        shared_from_base() {
+            return static_pointer_cast<Impl>(this->shared_from_this());
+        }
+    };
 
 
 } // namespace ndn

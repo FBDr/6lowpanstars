@@ -28,162 +28,156 @@
 #include "custom-policies/freshness-policy.hpp"
 
 namespace ns3 {
-namespace ndn {
-namespace cs {
+    namespace ndn {
+        namespace cs {
 
-/**
- * @ingroup ndn-cs
- * @brief Special content store realization that honors Freshness parameter in Data packets
- */
-template<class Policy>
-class ContentStoreWithFreshness
-  : public ContentStoreImpl<ndnSIM::
-                              multi_policy_traits<boost::mpl::
-                                                    vector2<Policy,
-                                                            ndnSIM::freshness_policy_traits>>> {
-public:
-  typedef ContentStoreImpl<ndnSIM::multi_policy_traits<boost::mpl::
-                                                         vector2<Policy,
-                                                                 ndnSIM::freshness_policy_traits>>>
-    super;
+            /**
+             * @ingroup ndn-cs
+             * @brief Special content store realization that honors Freshness parameter in Data packets
+             */
+            template<class Policy>
+            class ContentStoreWithFreshness
+            : public ContentStoreImpl<ndnSIM::
+            multi_policy_traits<boost::mpl::
+            vector2<Policy,
+            ndnSIM::freshness_policy_traits>>>
+            {
+                public:
+                typedef ContentStoreImpl<ndnSIM::multi_policy_traits<boost::mpl::
+                        vector2<Policy,
+                        ndnSIM::freshness_policy_traits>>>
+                        super;
 
-  typedef typename super::policy_container::template index<1>::type freshness_policy_container;
+                typedef typename super::policy_container::template index<1>::type freshness_policy_container;
 
-  static TypeId
-  GetTypeId();
+                static TypeId
+                GetTypeId();
 
-  virtual inline void
-  Print(std::ostream& os) const;
+                virtual inline void
+                Print(std::ostream & os) const;
 
-  virtual inline bool
-  Add(shared_ptr<const Data> data);
+                virtual inline bool
+                Add(shared_ptr<const Data> data);
 
-private:
-  inline void
-  CleanExpired();
+                private:
+                inline void
+                CleanExpired();
 
-  inline void
-  RescheduleCleaning();
+                inline void
+                RescheduleCleaning();
 
-private:
-  static LogComponent g_log; ///< @brief Logging variable
+                private:
+                static LogComponent g_log; ///< @brief Logging variable
 
-  EventId m_cleanEvent;
-  Time m_scheduledCleaningTime;
-};
+                EventId m_cleanEvent;
+                Time m_scheduledCleaningTime;
+            };
 
-//////////////////////////////////////////
-////////// Implementation ////////////////
-//////////////////////////////////////////
+            //////////////////////////////////////////
+            ////////// Implementation ////////////////
+            //////////////////////////////////////////
 
-template<class Policy>
-LogComponent ContentStoreWithFreshness<Policy>::g_log = LogComponent(("ndn.cs.Freshness."
-                                                                      + Policy::GetName()).c_str(), __FILE__);
+            template<class Policy>
+            LogComponent ContentStoreWithFreshness<Policy>::g_log = LogComponent(("ndn.cs.Freshness."
+                    + Policy::GetName()).c_str(), __FILE__);
 
-template<class Policy>
-TypeId
-ContentStoreWithFreshness<Policy>::GetTypeId()
-{
-  static TypeId tid = TypeId(("ns3::ndn::cs::Freshness::" + Policy::GetName()).c_str())
+            template<class Policy>
+            TypeId
+            ContentStoreWithFreshness<Policy>::GetTypeId() {
+                static TypeId tid = TypeId(("ns3::ndn::cs::Freshness::" + Policy::GetName()).c_str())
                         .SetGroupName("Ndn")
                         .SetParent<super>()
-                        .template AddConstructor<ContentStoreWithFreshness<Policy>>()
+                        .template AddConstructor<ContentStoreWithFreshness < Policy >> ()
 
-    // trace stuff here
-    ;
+                        // trace stuff here
+                        ;
 
-  return tid;
-}
+                return tid;
+            }
 
-template<class Policy>
-inline bool
-ContentStoreWithFreshness<Policy>::Add(shared_ptr<const Data> data)
-{
-  bool ok = super::Add(data);
-  if (!ok)
-    return false;
+            template<class Policy>
+            inline bool
+            ContentStoreWithFreshness<Policy>::Add(shared_ptr<const Data> data) {
+                bool ok = super::Add(data);
+                if (!ok)
+                    return false;
 
-  NS_LOG_DEBUG(data->getName() << " added to cache");
-  RescheduleCleaning();
-  return true;
-}
+                NS_LOG_DEBUG(data->getName() << " added to cache");
+                RescheduleCleaning();
+                return true;
+            }
 
-template<class Policy>
-inline void
-ContentStoreWithFreshness<Policy>::RescheduleCleaning()
-{
-  const freshness_policy_container& freshness =
-    this->getPolicy().template get<freshness_policy_container>();
+            template<class Policy>
+            inline void
+            ContentStoreWithFreshness<Policy>::RescheduleCleaning() {
+                const freshness_policy_container& freshness =
+                        this->getPolicy().template get<freshness_policy_container>();
 
-  if (freshness.size() > 0) {
-    Time nextStateTime =
-      freshness_policy_container::policy_base::get_freshness(&(*freshness.begin()));
+                if (freshness.size() > 0) {
+                    Time nextStateTime =
+                            freshness_policy_container::policy_base::get_freshness(&(*freshness.begin()));
 
-    if (m_scheduledCleaningTime.IsZero() ||      // if not yet scheduled
-        m_scheduledCleaningTime > nextStateTime) // if new item expire sooner than already scheduled
-    {
-      if (m_cleanEvent.IsRunning()) {
-        Simulator::Remove(m_cleanEvent); // just canceling would not clean up list of events
-      }
+                    if (m_scheduledCleaningTime.IsZero() || // if not yet scheduled
+                            m_scheduledCleaningTime > nextStateTime) // if new item expire sooner than already scheduled
+                    {
+                        if (m_cleanEvent.IsRunning()) {
+                            Simulator::Remove(m_cleanEvent); // just canceling would not clean up list of events
+                        }
 
-      // NS_LOG_DEBUG ("Next event in: " << (nextStateTime - Now ()).ToDouble (Time::S) << "s");
-      m_cleanEvent = Simulator::Schedule(nextStateTime - Now(),
-                                         &ContentStoreWithFreshness<Policy>::CleanExpired, this);
-      m_scheduledCleaningTime = nextStateTime;
-    }
-  }
-  else {
-    if (m_cleanEvent.IsRunning()) {
-      Simulator::Remove(m_cleanEvent); // just canceling would not clean up list of events
-    }
-  }
-}
+                        // NS_LOG_DEBUG ("Next event in: " << (nextStateTime - Now ()).ToDouble (Time::S) << "s");
+                        m_cleanEvent = Simulator::Schedule(nextStateTime - Now(),
+                                &ContentStoreWithFreshness<Policy>::CleanExpired, this);
+                        m_scheduledCleaningTime = nextStateTime;
+                    }
+                } else {
+                    if (m_cleanEvent.IsRunning()) {
+                        Simulator::Remove(m_cleanEvent); // just canceling would not clean up list of events
+                    }
+                }
+            }
 
-template<class Policy>
-inline void
-ContentStoreWithFreshness<Policy>::CleanExpired()
-{
-  freshness_policy_container& freshness =
-    this->getPolicy().template get<freshness_policy_container>();
+            template<class Policy>
+            inline void
+            ContentStoreWithFreshness<Policy>::CleanExpired() {
+                freshness_policy_container& freshness =
+                        this->getPolicy().template get<freshness_policy_container>();
 
-  // NS_LOG_LOGIC (">> Cleaning: Total number of items:" << this->getPolicy ().size () << ", items
-  // with freshness: " << freshness.size ());
-  Time now = Simulator::Now();
+                // NS_LOG_LOGIC (">> Cleaning: Total number of items:" << this->getPolicy ().size () << ", items
+                // with freshness: " << freshness.size ());
+                Time now = Simulator::Now();
 
-  while (!freshness.empty()) {
-    typename freshness_policy_container::iterator entry = freshness.begin();
+                while (!freshness.empty()) {
+                    typename freshness_policy_container::iterator entry = freshness.begin();
 
-    if (freshness_policy_container::policy_base::get_freshness(&(*entry))
-        <= now) // is the record stale?
-    {
-      super::erase(&(*entry));
-    }
-    else
-      break; // nothing else to do. All later records will not be stale
-  }
-  // NS_LOG_LOGIC ("<< Cleaning: Total number of items:" << this->getPolicy ().size () << ", items
-  // with freshness: " << freshness.size ());
+                    if (freshness_policy_container::policy_base::get_freshness(&(*entry))
+                            <= now) // is the record stale?
+                    {
+                        super::erase(&(*entry));
+                    } else
+                        break; // nothing else to do. All later records will not be stale
+                }
+                // NS_LOG_LOGIC ("<< Cleaning: Total number of items:" << this->getPolicy ().size () << ", items
+                // with freshness: " << freshness.size ());
 
-  m_scheduledCleaningTime = Time();
-  RescheduleCleaning();
-}
+                m_scheduledCleaningTime = Time();
+                RescheduleCleaning();
+            }
 
-template<class Policy>
-void
-ContentStoreWithFreshness<Policy>::Print(std::ostream& os) const
-{
-  // const freshness_policy_container &freshness = this->getPolicy ().template
-  // get<freshness_policy_container> ();
+            template<class Policy>
+            void
+            ContentStoreWithFreshness<Policy>::Print(std::ostream& os) const {
+                // const freshness_policy_container &freshness = this->getPolicy ().template
+                // get<freshness_policy_container> ();
 
-  for (typename super::policy_container::const_iterator item = this->getPolicy().begin();
-       item != this->getPolicy().end(); item++) {
-    Time ttl = freshness_policy_container::policy_base::get_freshness(&(*item)) - Simulator::Now();
-    os << item->payload()->GetName() << "(left: " << ttl.ToDouble(Time::S) << "s)" << std::endl;
-  }
-}
+                for (typename super::policy_container::const_iterator item = this->getPolicy().begin();
+                        item != this->getPolicy().end(); item++) {
+                    Time ttl = freshness_policy_container::policy_base::get_freshness(&(*item)) - Simulator::Now();
+                    os << item->payload()->GetName() << "(left: " << ttl.ToDouble(Time::S) << "s)" << std::endl;
+                }
+            }
 
-} // namespace cs
-} // namespace ndn
+        } // namespace cs
+    } // namespace ndn
 } // namespace ns3
 
 #endif // NDN_CONTENT_STORE_WITH_FRESHNESS_H_

@@ -25,61 +25,60 @@
 #include "signal-connection.hpp"
 
 namespace ndn {
-namespace util {
-namespace signal {
+    namespace util {
+        namespace signal {
 
-/** \brief disconnects a Connection automatically upon destruction
- */
-class ScopedConnection : noncopyable
-{
-public:
-  ScopedConnection();
+            /** \brief disconnects a Connection automatically upon destruction
+             */
+            class ScopedConnection : noncopyable {
+            public:
+                ScopedConnection();
 
-  /** \brief implicit constructor from Connection
-   *  \param connection the Connection to be disconnected upon destruction
-   */
-  ScopedConnection(const Connection& connection);
+                /** \brief implicit constructor from Connection
+                 *  \param connection the Connection to be disconnected upon destruction
+                 */
+                ScopedConnection(const Connection& connection);
 
-  /** \brief move constructor
-   */
-  ScopedConnection(ScopedConnection&& other) noexcept;
+                /** \brief move constructor
+                 */
+                ScopedConnection(ScopedConnection&& other) noexcept;
 
-  /** \brief assigns a connection
-   *
-   *  If a different connection has been assigned to this instance previously,
-   *  that connection will be disconnected immediately.
-   */
-  ScopedConnection&
-  operator=(const Connection& connection);
+                /** \brief assigns a connection
+                 *
+                 *  If a different connection has been assigned to this instance previously,
+                 *  that connection will be disconnected immediately.
+                 */
+                ScopedConnection&
+                        operator=(const Connection& connection);
 
-  /** \brief disconnects the connection
-   */
-  ~ScopedConnection() noexcept;
+                /** \brief disconnects the connection
+                 */
+                ~ScopedConnection() noexcept;
 
-  /** \brief disconnects the connection manually
-   */
-  void
-  disconnect();
+                /** \brief disconnects the connection manually
+                 */
+                void
+                disconnect();
 
-  /** \brief check if the connection is connected to the signal
-   *  \return false when a default-constructed connection is used, the connection is released,
-   *          or the connection is disconnected
-   */
-  bool
-  isConnected() const;
+                /** \brief check if the connection is connected to the signal
+                 *  \return false when a default-constructed connection is used, the connection is released,
+                 *          or the connection is disconnected
+                 */
+                bool
+                isConnected() const;
 
-  /** \brief releases the connection so that it won't be disconnected
-   *         when this ScopedConnection is destructed
-   */
-  void
-  release();
+                /** \brief releases the connection so that it won't be disconnected
+                 *         when this ScopedConnection is destructed
+                 */
+                void
+                release();
 
-private:
-  Connection m_connection;
-};
+            private:
+                Connection m_connection;
+            };
 
-} // namespace signal
-} // namespace util
+        } // namespace signal
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_SIGNAL_SCOPED_CONNECTION_HPP

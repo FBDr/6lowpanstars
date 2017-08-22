@@ -25,48 +25,47 @@
 
 namespace ns3 {
 
-/**
- * \ingroup socket
- * \ingroup tcp
- *
- * \brief An implementation of a stream socket using TCP.
- *
- * This class contains an \RFC{793} implementation of TCP, as well as a sockets
- * interface for talking to TCP.  This serves as a base for other TCP functions
- * where the sliding window mechanism is handled here.  This class provides
- * connection orientation and sliding window flow control.
- */
-class TcpRfc793 : public TcpSocketBase
-{
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * Create an unbound tcp socket.
-   */
-  TcpRfc793 (void);
-  /**
-   * \brief Copy constructor
-   * \param sock the object to copy
-   */
-  TcpRfc793 (const TcpRfc793& sock);
-  virtual ~TcpRfc793 (void);
+    /**
+     * \ingroup socket
+     * \ingroup tcp
+     *
+     * \brief An implementation of a stream socket using TCP.
+     *
+     * This class contains an \RFC{793} implementation of TCP, as well as a sockets
+     * interface for talking to TCP.  This serves as a base for other TCP functions
+     * where the sliding window mechanism is handled here.  This class provides
+     * connection orientation and sliding window flow control.
+     */
+    class TcpRfc793 : public TcpSocketBase {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        /**
+         * Create an unbound tcp socket.
+         */
+        TcpRfc793(void);
+        /**
+         * \brief Copy constructor
+         * \param sock the object to copy
+         */
+        TcpRfc793(const TcpRfc793& sock);
+        virtual ~TcpRfc793(void);
 
-protected:
-  virtual Ptr<TcpSocketBase> Fork (); // Call CopyObject<TcpRfc793> to clone me
-  virtual void DupAck (const TcpHeader& t, uint32_t count);
-  virtual void     SetInitialSSThresh (uint32_t threshold);
-  virtual uint32_t GetInitialSSThresh (void) const;
-  virtual void     SetInitialCwnd (uint32_t cwnd);
-  virtual uint32_t GetInitialCwnd (void) const;
+    protected:
+        virtual Ptr<TcpSocketBase> Fork(); // Call CopyObject<TcpRfc793> to clone me
+        virtual void DupAck(const TcpHeader& t, uint32_t count);
+        virtual void SetInitialSSThresh(uint32_t threshold);
+        virtual uint32_t GetInitialSSThresh(void) const;
+        virtual void SetInitialCwnd(uint32_t cwnd);
+        virtual uint32_t GetInitialCwnd(void) const;
 
-  virtual uint32_t Window (void);
-  virtual void ScaleSsThresh (uint8_t scaleFactor);
+        virtual uint32_t Window(void);
+        virtual void ScaleSsThresh(uint8_t scaleFactor);
 
-};
+    };
 
 } // namespace ns3
 

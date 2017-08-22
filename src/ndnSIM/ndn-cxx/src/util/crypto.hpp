@@ -26,33 +26,32 @@
 #include "../encoding/buffer.hpp"
 
 namespace ndn {
-namespace crypto {
+    namespace crypto {
 
-/// @brief number of octets in a SHA256 digest
-static const size_t SHA256_DIGEST_SIZE = 32;
+        /// @brief number of octets in a SHA256 digest
+        static const size_t SHA256_DIGEST_SIZE = 32;
 
-/**
- * @brief Compute the sha-256 digest of data.
- *
- * @param data Pointer to the input byte array.
- * @param dataLength The length of data.
- * @return A pointer to a buffer of SHA256_DIGEST.
- */
-ConstBufferPtr
-computeSha256Digest(const uint8_t* data, size_t dataLength);
+        /**
+         * @brief Compute the sha-256 digest of data.
+         *
+         * @param data Pointer to the input byte array.
+         * @param dataLength The length of data.
+         * @return A pointer to a buffer of SHA256_DIGEST.
+         */
+        ConstBufferPtr
+        computeSha256Digest(const uint8_t* data, size_t dataLength);
 
-/**
- * @brief Compute the sha-256 digest of data.
- *
- * @deprecated Use computeSha256Digest function instead
- */
-inline ConstBufferPtr
-sha256(const uint8_t* data, size_t dataLength)
-{
-  return computeSha256Digest(data, dataLength);
-}
+        /**
+         * @brief Compute the sha-256 digest of data.
+         *
+         * @deprecated Use computeSha256Digest function instead
+         */
+        inline ConstBufferPtr
+        sha256(const uint8_t* data, size_t dataLength) {
+            return computeSha256Digest(data, dataLength);
+        }
 
-} // namespace crypto
+    } // namespace crypto
 
 } // namespace ndn
 

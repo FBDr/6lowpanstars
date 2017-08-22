@@ -31,62 +31,61 @@
 #include <ndn-cxx/lp/packet.hpp>
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-class LinkService;
+        class LinkService;
 
-/** \brief fragments network-layer packets into NDNLPv2 link-layer packets
- *  \sa http://redmine.named-data.net/projects/nfd/wiki/NDNLPv2
- */
-class LpFragmenter
-{
-public:
-  /** \brief Options that control the behavior of LpFragmenter
-   */
-  class Options
-  {
-  public:
-    Options();
+        /** \brief fragments network-layer packets into NDNLPv2 link-layer packets
+         *  \sa http://redmine.named-data.net/projects/nfd/wiki/NDNLPv2
+         */
+        class LpFragmenter {
+        public:
 
-  public:
-    /** \brief maximum number of fragments in a packet
-     */
-    size_t nMaxFragments;
-  };
+            /** \brief Options that control the behavior of LpFragmenter
+             */
+            class Options {
+            public:
+                Options();
 
-  explicit
-  LpFragmenter(const Options& options = Options(), const LinkService* linkService = nullptr);
+            public:
+                /** \brief maximum number of fragments in a packet
+                 */
+                size_t nMaxFragments;
+            };
 
-  /** \brief set options for fragmenter
-   */
-  void
-  setOptions(const Options& options);
+            explicit
+            LpFragmenter(const Options& options = Options(), const LinkService* linkService = nullptr);
 
-  /** \return LinkService that owns this instance
-   *
-   *  This is only used for logging, and may be nullptr.
-   */
-  const LinkService*
-  getLinkService() const;
+            /** \brief set options for fragmenter
+             */
+            void
+            setOptions(const Options& options);
 
-  /** \brief fragments a network-layer packet into link-layer packets
-   *  \param packet an LpPacket that contains a network-layer packet;
-   *                must have Fragment field, must not have FragIndex and FragCount fields
-   *  \param mtu maximum allowable LpPacket size after fragmentation and sequence number assignment
-   *  \return whether fragmentation succeeded, fragmented packets without sequence number
-   */
-  std::tuple<bool, std::vector<lp::Packet>>
-  fragmentPacket(const lp::Packet& packet, size_t mtu);
+            /** \return LinkService that owns this instance
+             *
+             *  This is only used for logging, and may be nullptr.
+             */
+            const LinkService*
+            getLinkService() const;
 
-private:
-  Options m_options;
-  const LinkService* m_linkService;
-};
+            /** \brief fragments a network-layer packet into link-layer packets
+             *  \param packet an LpPacket that contains a network-layer packet;
+             *                must have Fragment field, must not have FragIndex and FragCount fields
+             *  \param mtu maximum allowable LpPacket size after fragmentation and sequence number assignment
+             *  \return whether fragmentation succeeded, fragmented packets without sequence number
+             */
+            std::tuple<bool, std::vector<lp::Packet>>
+            fragmentPacket(const lp::Packet& packet, size_t mtu);
 
-std::ostream&
-operator<<(std::ostream& os, const FaceLogHelper<LpFragmenter>& flh);
+        private:
+            Options m_options;
+            const LinkService* m_linkService;
+        };
 
-} // namespace face
+        std::ostream&
+        operator<<(std::ostream& os, const FaceLogHelper<LpFragmenter>& flh);
+
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_LP_FRAGMENTER_HPP

@@ -29,102 +29,101 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace fw {
-namespace asf {
-namespace tests {
+    namespace fw {
+        namespace asf {
+            namespace tests {
 
-using namespace nfd::tests;
+                using namespace nfd::tests;
 
-BOOST_AUTO_TEST_SUITE(Fw)
-BOOST_AUTO_TEST_SUITE(TestAsfMeasurements)
+                BOOST_AUTO_TEST_SUITE(Fw)
+                BOOST_AUTO_TEST_SUITE(TestAsfMeasurements)
 
-BOOST_AUTO_TEST_SUITE(TestRttStats)
+                BOOST_AUTO_TEST_SUITE(TestRttStats)
 
-BOOST_FIXTURE_TEST_CASE(Basic, BaseFixture)
-{
-  RttStats stats;
+                BOOST_FIXTURE_TEST_CASE(Basic, BaseFixture) {
+                    RttStats stats;
 
-  BOOST_CHECK_EQUAL(stats.getRtt(), RttStats::RTT_NO_MEASUREMENT);
-  BOOST_CHECK_EQUAL(stats.getSrtt(), RttStats::RTT_NO_MEASUREMENT);
+                    BOOST_CHECK_EQUAL(stats.getRtt(), RttStats::RTT_NO_MEASUREMENT);
+                    BOOST_CHECK_EQUAL(stats.getSrtt(), RttStats::RTT_NO_MEASUREMENT);
 
-  // Receive Data back in 50ms
-  RttEstimator::Duration rtt(time::milliseconds(50));
-  stats.addRttMeasurement(rtt);
+                    // Receive Data back in 50ms
+                    RttEstimator::Duration rtt(time::milliseconds(50));
+                    stats.addRttMeasurement(rtt);
 
-  BOOST_CHECK_EQUAL(stats.getRtt(), rtt);
-  BOOST_CHECK_EQUAL(stats.getSrtt(), rtt);
+                    BOOST_CHECK_EQUAL(stats.getRtt(), rtt);
+                    BOOST_CHECK_EQUAL(stats.getSrtt(), rtt);
 
-  // Receive Data back in 50ms
-  stats.addRttMeasurement(rtt);
+                    // Receive Data back in 50ms
+                    stats.addRttMeasurement(rtt);
 
-  BOOST_CHECK_EQUAL(stats.getRtt(), rtt);
-  BOOST_CHECK_EQUAL(stats.getSrtt(), rtt);
+                    BOOST_CHECK_EQUAL(stats.getRtt(), rtt);
+                    BOOST_CHECK_EQUAL(stats.getSrtt(), rtt);
 
-  // Receive Data back with a higher RTT
-  RttEstimator::Duration higherRtt(time::milliseconds(100));
-  stats.addRttMeasurement(higherRtt);
+                    // Receive Data back with a higher RTT
+                    RttEstimator::Duration higherRtt(time::milliseconds(100));
+                    stats.addRttMeasurement(higherRtt);
 
-  BOOST_CHECK_EQUAL(stats.getRtt(), higherRtt);
-  BOOST_CHECK_GT(stats.getSrtt(), rtt);
-  BOOST_CHECK_LT(stats.getSrtt(), higherRtt);
+                    BOOST_CHECK_EQUAL(stats.getRtt(), higherRtt);
+                    BOOST_CHECK_GT(stats.getSrtt(), rtt);
+                    BOOST_CHECK_LT(stats.getSrtt(), higherRtt);
 
-  // Simulate timeout
-  RttStats::Rtt previousSrtt = stats.getSrtt();
+                    // Simulate timeout
+                    RttStats::Rtt previousSrtt = stats.getSrtt();
 
-  stats.recordTimeout();
+                    stats.recordTimeout();
 
-  BOOST_CHECK_EQUAL(stats.getRtt(), RttStats::RTT_TIMEOUT);
-  BOOST_CHECK_EQUAL(stats.getSrtt(), previousSrtt);
-}
+                    BOOST_CHECK_EQUAL(stats.getRtt(), RttStats::RTT_TIMEOUT);
+                    BOOST_CHECK_EQUAL(stats.getSrtt(), previousSrtt);
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestRttStats
+                BOOST_AUTO_TEST_SUITE_END() // TestRttStats
 
-BOOST_AUTO_TEST_SUITE(TestFaceInfo)
+                BOOST_AUTO_TEST_SUITE(TestFaceInfo)
 
-BOOST_FIXTURE_TEST_CASE(Basic, UnitTestTimeFixture)
-{
-  FaceInfo info;
+                BOOST_FIXTURE_TEST_CASE(Basic, UnitTestTimeFixture) {
+                    FaceInfo info;
 
-  scheduler::EventId id = scheduler::schedule(time::seconds(1), []{});
-  ndn::Name interestName("/ndn/interest");
+                    scheduler::EventId id = scheduler::schedule(time::seconds(1), [] {
+                    });
+                    ndn::Name interestName("/ndn/interest");
 
-  // Receive Interest and forward to next hop; should update RTO information
-  info.setTimeoutEvent(id, interestName);
-  BOOST_CHECK_EQUAL(info.isTimeoutScheduled(), true);
+                    // Receive Interest and forward to next hop; should update RTO information
+                    info.setTimeoutEvent(id, interestName);
+                    BOOST_CHECK_EQUAL(info.isTimeoutScheduled(), true);
 
-  // If the strategy tries to schedule an RTO when one is already scheduled, throw an exception
-  BOOST_CHECK_THROW(info.setTimeoutEvent(id, interestName), FaceInfo::Error);
+                    // If the strategy tries to schedule an RTO when one is already scheduled, throw an exception
+                    BOOST_CHECK_THROW(info.setTimeoutEvent(id, interestName), FaceInfo::Error);
 
-  // Receive Data
-  shared_ptr<Interest> interest = makeInterest(interestName);
-  shared_ptr<pit::Entry> pitEntry = make_shared<pit::Entry>(*interest);
-  std::shared_ptr<DummyFace> face = make_shared<DummyFace>();
+                    // Receive Data
+                    shared_ptr<Interest> interest = makeInterest(interestName);
+                    shared_ptr<pit::Entry> pitEntry = make_shared<pit::Entry>(*interest);
+                    std::shared_ptr<DummyFace> face = make_shared<DummyFace>();
 
-  pitEntry->insertOrUpdateOutRecord(*face, *interest);
+                    pitEntry->insertOrUpdateOutRecord(*face, *interest);
 
-  RttEstimator::Duration rtt(50);
-  this->advanceClocks(time::milliseconds(5), rtt);
+                    RttEstimator::Duration rtt(50);
+                    this->advanceClocks(time::milliseconds(5), rtt);
 
-  info.recordRtt(pitEntry, *face);
-  info.cancelTimeoutEvent(interestName);
+                    info.recordRtt(pitEntry, *face);
+                    info.cancelTimeoutEvent(interestName);
 
-  BOOST_CHECK_EQUAL(info.getRtt(), rtt);
-  BOOST_CHECK_EQUAL(info.getSrtt(), rtt);
+                    BOOST_CHECK_EQUAL(info.getRtt(), rtt);
+                    BOOST_CHECK_EQUAL(info.getSrtt(), rtt);
 
-  // Send out another Interest which times out
-  info.setTimeoutEvent(id, interestName);
+                    // Send out another Interest which times out
+                    info.setTimeoutEvent(id, interestName);
 
-  info.recordTimeout(interestName);
-  BOOST_CHECK_EQUAL(info.getRtt(), RttStats::RTT_TIMEOUT);
-  BOOST_CHECK_EQUAL(info.isTimeoutScheduled(), false);
-}
+                    info.recordTimeout(interestName);
+                    BOOST_CHECK_EQUAL(info.getRtt(), RttStats::RTT_TIMEOUT);
+                    BOOST_CHECK_EQUAL(info.isTimeoutScheduled(), false);
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestFaceInfo
+                BOOST_AUTO_TEST_SUITE_END() // TestFaceInfo
 
-BOOST_AUTO_TEST_SUITE_END() // TestAsfStrategy
-BOOST_AUTO_TEST_SUITE_END() // Fw
+                BOOST_AUTO_TEST_SUITE_END() // TestAsfStrategy
+                BOOST_AUTO_TEST_SUITE_END() // Fw
 
-} // namespace tests
-} // namespace asf
-} // namespace fw
+            } // namespace tests
+        } // namespace asf
+    } // namespace fw
 } // namespace nfd

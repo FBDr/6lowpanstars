@@ -42,7 +42,7 @@
  * origin (arc length) is calculated. This distance radius is compared to the 
  * max distance radius to ensure that it is less than the maximum.
  */
-NS_LOG_COMPONENT_DEFINE ("RandCartAroundGeoTest");
+NS_LOG_COMPONENT_DEFINE("RandCartAroundGeoTest");
 
 using namespace ns3;
 
@@ -51,124 +51,113 @@ using namespace ns3;
 const double TOLERANCE = 0.1;
 
 // earth's radius in meters if modeled as a perfect sphere
-static const double EARTH_RADIUS = 6371e3; 
+static const double EARTH_RADIUS = 6371e3;
 
 class RandCartAroundGeoTestCase : public TestCase
 {
-public:
-  RandCartAroundGeoTestCase (double originLatitude, 
-                             double originLongitude,
-                             double maxAltitude, 
-                             int numPoints, 
-                             double maxDistFromOrigin,
-                             Ptr<UniformRandomVariable> uniRand);
-  virtual ~RandCartAroundGeoTestCase ();
+    public :
+    RandCartAroundGeoTestCase(double originLatitude,
+    double originLongitude,
+    double maxAltitude,
+    int numPoints,
+    double maxDistFromOrigin,
+    Ptr<UniformRandomVariable> uniRand);
+    virtual ~RandCartAroundGeoTestCase();
 
 private:
-  virtual void DoRun (void);
-  static std::string Name (double originLatitude, 
-                           double originLongitude,
-                           double maxDistFromOrigin);
-  double m_originLatitude;
-  double m_originLongitude;
-  double m_maxAltitude;
-  int m_numPoints;
-  double m_maxDistFromOrigin;
-  Ptr<UniformRandomVariable> m_uniRand;
-};
+    virtual void DoRun(void);
+    static std::string Name(double originLatitude,
+    double originLongitude,
+    double maxDistFromOrigin);
+    double m_originLatitude;
+    double m_originLongitude;
+    double m_maxAltitude;
+    int m_numPoints;
+    double m_maxDistFromOrigin;
+    Ptr<UniformRandomVariable> m_uniRand;};
 
-std::string 
-RandCartAroundGeoTestCase::Name (double originLatitude, 
-                                 double originLongitude,
-                                 double maxDistFromOrigin)
-{
-  std::ostringstream oss;
-  oss << "origin latitude = " << originLatitude << " degrees, "
-      << "origin longitude = " << originLongitude << " degrees, "
-      << "max distance from origin = " << maxDistFromOrigin;
-  return oss.str();
+std::string
+RandCartAroundGeoTestCase::Name(double originLatitude,
+        double originLongitude,
+        double maxDistFromOrigin) {
+    std::ostringstream oss;
+    oss << "origin latitude = " << originLatitude << " degrees, "
+            << "origin longitude = " << originLongitude << " degrees, "
+            << "max distance from origin = " << maxDistFromOrigin;
+    return oss.str();
 }
 
-RandCartAroundGeoTestCase::RandCartAroundGeoTestCase (double originLatitude, 
-                                                      double originLongitude,
-                                                      double maxAltitude, 
-                                                      int numPoints, 
-                                                      double maxDistFromOrigin,
-                                                      Ptr<UniformRandomVariable> uniRand)
-  : TestCase (Name (originLatitude, originLongitude, maxDistFromOrigin)),
-    m_originLatitude (originLatitude),
-    m_originLongitude (originLongitude),
-    m_maxAltitude (maxAltitude),
-    m_numPoints (numPoints),
-    m_maxDistFromOrigin (maxDistFromOrigin),
-    m_uniRand (uniRand)
-{
+RandCartAroundGeoTestCase::RandCartAroundGeoTestCase(double originLatitude,
+        double originLongitude,
+        double maxAltitude,
+        int numPoints,
+        double maxDistFromOrigin,
+        Ptr<UniformRandomVariable> uniRand)
+: TestCase(Name(originLatitude, originLongitude, maxDistFromOrigin)),
+m_originLatitude(originLatitude),
+m_originLongitude(originLongitude),
+m_maxAltitude(maxAltitude),
+m_numPoints(numPoints),
+m_maxDistFromOrigin(maxDistFromOrigin),
+m_uniRand(uniRand) {
 }
 
-RandCartAroundGeoTestCase::~RandCartAroundGeoTestCase ()
-{
+RandCartAroundGeoTestCase::~RandCartAroundGeoTestCase() {
 }
 
 void
-RandCartAroundGeoTestCase::DoRun (void)
-{  
-  std::list<Vector> points =  GeographicPositions::RandCartesianPointsAroundGeographicPoint (m_originLatitude, 
-                                                                                             m_originLongitude,
-                                                                                             m_maxAltitude, 
-                                                                                             m_numPoints, 
-                                                                                             m_maxDistFromOrigin,
-                                                                                             m_uniRand);
-  Vector origin = GeographicPositions::GeographicToCartesianCoordinates (m_originLatitude, 
-                                                                         m_originLongitude, 
-                                                                         m_maxAltitude,
-                                                                         GeographicPositions::SPHERE);
-  Vector randPoint;
-  while (!points.empty ())
-    {
-      randPoint = points.front ();
-      points.pop_front ();
+RandCartAroundGeoTestCase::DoRun(void) {
+    std::list<Vector> points = GeographicPositions::RandCartesianPointsAroundGeographicPoint(m_originLatitude,
+            m_originLongitude,
+            m_maxAltitude,
+            m_numPoints,
+            m_maxDistFromOrigin,
+            m_uniRand);
+    Vector origin = GeographicPositions::GeographicToCartesianCoordinates(m_originLatitude,
+            m_originLongitude,
+            m_maxAltitude,
+            GeographicPositions::SPHERE);
+    Vector randPoint;
+    while (!points.empty()) {
+        randPoint = points.front();
+        points.pop_front();
 
-      // pythagorean distance between random point and origin, not distance on surface of earth
-      double straightDistFromOrigin = sqrt (pow (randPoint.x - origin.x, 2) + 
-                                            pow (randPoint.y - origin.y, 2) + 
-                                            pow (randPoint.z - origin.z, 2));
+        // pythagorean distance between random point and origin, not distance on surface of earth
+        double straightDistFromOrigin = sqrt(pow(randPoint.x - origin.x, 2) +
+                pow(randPoint.y - origin.y, 2) +
+                pow(randPoint.z - origin.z, 2));
 
-      // arc length distance between random point and origin, on surface of earth
-      double arcDistFromOrigin = 2 * EARTH_RADIUS * asin (straightDistFromOrigin / (2 * EARTH_RADIUS));
+        // arc length distance between random point and origin, on surface of earth
+        double arcDistFromOrigin = 2 * EARTH_RADIUS * asin(straightDistFromOrigin / (2 * EARTH_RADIUS));
 
-      NS_TEST_ASSERT_MSG_LT (arcDistFromOrigin, 
-                             m_maxDistFromOrigin + TOLERANCE,  
-                             "random point (" << randPoint.x << ", " << randPoint.y 
-                             << ", " << randPoint.z << ") is outside of max radius from origin");
+        NS_TEST_ASSERT_MSG_LT(arcDistFromOrigin,
+                m_maxDistFromOrigin + TOLERANCE,
+                "random point (" << randPoint.x << ", " << randPoint.y
+                << ", " << randPoint.z << ") is outside of max radius from origin");
     }
 }
 
 
 class RandCartAroundGeoTestSuite : public TestSuite
 {
-public:
-  RandCartAroundGeoTestSuite ();
-};
+    public :
+    RandCartAroundGeoTestSuite();};
 
-RandCartAroundGeoTestSuite::RandCartAroundGeoTestSuite ()
-  : TestSuite ("rand-cart-around-geo", UNIT)
-{
-  NS_LOG_INFO ("creating RandCartAroundGeoTestSuite");
-  Ptr<UniformRandomVariable> uniRand = CreateObject<UniformRandomVariable> ();
-  uniRand->SetStream (5);
-  for (double originLatitude = -89.9; originLatitude <= 89.9; originLatitude += 35.96)
-    {
-      for (double originLongitude = 0; originLongitude <= 360; originLongitude += 72)
-        {
-          for (double maxDistFromOrigin = 1000; maxDistFromOrigin <= 1000000; maxDistFromOrigin *= 10)
-            {
-              AddTestCase (new RandCartAroundGeoTestCase (originLatitude, 
-                                                          originLongitude, 
-                                                          0, // on earth's surface
-                                                          50, // 50 points generated
-                                                          maxDistFromOrigin,
-                                                          uniRand), 
-                           TestCase::QUICK);
+RandCartAroundGeoTestSuite::RandCartAroundGeoTestSuite()
+: TestSuite("rand-cart-around-geo", UNIT) {
+    NS_LOG_INFO("creating RandCartAroundGeoTestSuite");
+    Ptr<UniformRandomVariable> uniRand = CreateObject<UniformRandomVariable> ();
+    uniRand->SetStream(5);
+    for (double originLatitude = -89.9; originLatitude <= 89.9; originLatitude += 35.96) {
+        for (double originLongitude = 0; originLongitude <= 360; originLongitude += 72) {
+            for (double maxDistFromOrigin = 1000; maxDistFromOrigin <= 1000000; maxDistFromOrigin *= 10) {
+                AddTestCase(new RandCartAroundGeoTestCase(originLatitude,
+                        originLongitude,
+                        0, // on earth's surface
+                        50, // 50 points generated
+                        maxDistFromOrigin,
+                        uniRand),
+                        TestCase::QUICK);
             }
         }
     }

@@ -31,122 +31,114 @@
 #include "sec-tpm.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class SecTpmFile : public SecTpm
-{
-public:
-  class Error : public SecTpm::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : SecTpm::Error(what)
-    {
-    }
-  };
+        class SecTpmFile : public SecTpm {
+        public:
 
-  explicit
-  SecTpmFile(const std::string& dir = "");
+            class Error : public SecTpm::Error {
+            public:
 
-  virtual
-  ~SecTpmFile();
+                explicit
+                Error(const std::string& what)
+                : SecTpm::Error(what) {
+                }
+            };
 
-  virtual void
-  setTpmPassword(const uint8_t* password, size_t passwordLength)
-  {
-  }
+            explicit
+            SecTpmFile(const std::string& dir = "");
 
-  virtual void
-  resetTpmPassword()
-  {
-  }
+            virtual
+            ~SecTpmFile();
 
-  virtual void
-  setInTerminal(bool inTerminal)
-  {
-    m_inTerminal = inTerminal;
-  }
+            virtual void
+            setTpmPassword(const uint8_t* password, size_t passwordLength) {
+            }
 
-  virtual bool
-  getInTerminal() const
-  {
-    return m_inTerminal;
-  }
+            virtual void
+            resetTpmPassword() {
+            }
 
-  virtual bool
-  isLocked()
-  {
-    return false;
-  }
+            virtual void
+            setInTerminal(bool inTerminal) {
+                m_inTerminal = inTerminal;
+            }
 
-  virtual bool
-  unlockTpm(const char* password, size_t passwordLength, bool usePassword)
-  {
-    return !isLocked();
-  }
+            virtual bool
+            getInTerminal() const {
+                return m_inTerminal;
+            }
 
-  virtual void
-  generateKeyPairInTpm(const Name& keyName, const KeyParams& params);
+            virtual bool
+            isLocked() {
+                return false;
+            }
 
-  virtual void
-  deleteKeyPairInTpm(const Name& keyName);
+            virtual bool
+            unlockTpm(const char* password, size_t passwordLength, bool usePassword) {
+                return !isLocked();
+            }
 
-  virtual shared_ptr<v1::PublicKey>
-  getPublicKeyFromTpm(const Name&  keyName);
+            virtual void
+            generateKeyPairInTpm(const Name& keyName, const KeyParams& params);
 
-  virtual Block
-  signInTpm(const uint8_t* data, size_t dataLength,
-            const Name& keyName, DigestAlgorithm digestAlgorithm);
+            virtual void
+            deleteKeyPairInTpm(const Name& keyName);
 
-  virtual ConstBufferPtr
-  decryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
+            virtual shared_ptr<v1::PublicKey>
+            getPublicKeyFromTpm(const Name& keyName);
 
-  virtual ConstBufferPtr
-  encryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
+            virtual Block
+            signInTpm(const uint8_t* data, size_t dataLength,
+                    const Name& keyName, DigestAlgorithm digestAlgorithm);
 
-  virtual void
-  generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params);
+            virtual ConstBufferPtr
+            decryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
 
-  virtual bool
-  doesKeyExistInTpm(const Name& keyName, KeyClass keyClass);
+            virtual ConstBufferPtr
+            encryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
 
-  virtual bool
-  generateRandomBlock(uint8_t* res, size_t size);
+            virtual void
+            generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params);
 
-  virtual void
-  addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl)
-  {
-  }
+            virtual bool
+            doesKeyExistInTpm(const Name& keyName, KeyClass keyClass);
 
-protected:
-  ////////////////////////////////
-  // From TrustedPlatformModule //
-  ////////////////////////////////
-  virtual std::string
-  getScheme();
+            virtual bool
+            generateRandomBlock(uint8_t* res, size_t size);
 
-  virtual ConstBufferPtr
-  exportPrivateKeyPkcs8FromTpm(const Name& keyName);
+            virtual void
+            addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl) {
+            }
 
-  virtual bool
-  importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
+        protected:
+            ////////////////////////////////
+            // From TrustedPlatformModule //
+            ////////////////////////////////
+            virtual std::string
+            getScheme();
 
-  virtual bool
-  importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
+            virtual ConstBufferPtr
+            exportPrivateKeyPkcs8FromTpm(const Name& keyName);
 
-public:
-  static const std::string SCHEME;
+            virtual bool
+            importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-  bool m_inTerminal;
-};
+            virtual bool
+            importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size);
 
-} // namespace security
+        public:
+            static const std::string SCHEME;
 
-using security::SecTpmFile;
+        private:
+            class Impl;
+            unique_ptr<Impl> m_impl;
+            bool m_inTerminal;
+        };
+
+    } // namespace security
+
+    using security::SecTpmFile;
 
 } // namespace ndn
 

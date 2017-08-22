@@ -28,111 +28,104 @@
 #include "tests/test-common.hpp"
 
 namespace nfd {
-namespace tests {
+    namespace tests {
 
-using fw::StrategyInfo;
+        using fw::StrategyInfo;
 
-static int g_DummyStrategyInfo_count = 0;
+        static int g_DummyStrategyInfo_count = 0;
 
-class DummyStrategyInfo : public StrategyInfo, noncopyable
-{
-public:
-  static constexpr int
-  getTypeId()
-  {
-    return 1;
-  }
+        class DummyStrategyInfo : public StrategyInfo, noncopyable {
+        public:
 
-  DummyStrategyInfo(int id)
-    : m_id(id)
-  {
-    ++g_DummyStrategyInfo_count;
-  }
+            static constexpr int
+            getTypeId() {
+                return 1;
+            }
 
-  virtual
-  ~DummyStrategyInfo()
-  {
-    --g_DummyStrategyInfo_count;
-  }
+            DummyStrategyInfo(int id)
+            : m_id(id) {
+                ++g_DummyStrategyInfo_count;
+            }
 
-public:
-  int m_id;
-};
+            virtual
+            ~DummyStrategyInfo() {
+                --g_DummyStrategyInfo_count;
+            }
 
-class DummyStrategyInfo2 : public StrategyInfo, noncopyable
-{
-public:
-  static constexpr int
-  getTypeId()
-  {
-    return 2;
-  }
+        public:
+            int m_id;
+        };
 
-  DummyStrategyInfo2(int id)
-    : m_id(id)
-  {
-  }
+        class DummyStrategyInfo2 : public StrategyInfo, noncopyable {
+        public:
 
-public:
-  int m_id;
-};
+            static constexpr int
+            getTypeId() {
+                return 2;
+            }
 
-BOOST_AUTO_TEST_SUITE(Table)
-BOOST_FIXTURE_TEST_SUITE(TestStrategyInfoHost, BaseFixture)
+            DummyStrategyInfo2(int id)
+            : m_id(id) {
+            }
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  StrategyInfoHost host;
-  g_DummyStrategyInfo_count = 0;
-  bool isNew = false;
+        public:
+            int m_id;
+        };
 
-  DummyStrategyInfo* info = nullptr;
-  std::tie(info, isNew) = host.insertStrategyInfo<DummyStrategyInfo>(3503);
-  BOOST_CHECK_EQUAL(isNew, true);
-  BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 1);
-  BOOST_REQUIRE(info != nullptr);
-  BOOST_CHECK_EQUAL(info->m_id, 3503);
-  BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>(), info);
+        BOOST_AUTO_TEST_SUITE(Table)
+        BOOST_FIXTURE_TEST_SUITE(TestStrategyInfoHost, BaseFixture)
 
-  DummyStrategyInfo* info2 = nullptr;
-  std::tie(info2, isNew) = host.insertStrategyInfo<DummyStrategyInfo>(1032);
-  BOOST_CHECK_EQUAL(isNew, false);
-  BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 1);
-  BOOST_CHECK_EQUAL(info2, info);
-  BOOST_CHECK_EQUAL(info->m_id, 3503);
-  BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>(), info);
+        BOOST_AUTO_TEST_CASE(Basic) {
+            StrategyInfoHost host;
+            g_DummyStrategyInfo_count = 0;
+            bool isNew = false;
 
-  host.clearStrategyInfo();
-  BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo>() == nullptr);
-  BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 0);
-}
+            DummyStrategyInfo* info = nullptr;
+            std::tie(info, isNew) = host.insertStrategyInfo<DummyStrategyInfo>(3503);
+            BOOST_CHECK_EQUAL(isNew, true);
+            BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 1);
+            BOOST_REQUIRE(info != nullptr);
+            BOOST_CHECK_EQUAL(info->m_id, 3503);
+            BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>(), info);
 
-BOOST_AUTO_TEST_CASE(Types)
-{
-  StrategyInfoHost host;
-  g_DummyStrategyInfo_count = 0;
+            DummyStrategyInfo* info2 = nullptr;
+            std::tie(info2, isNew) = host.insertStrategyInfo<DummyStrategyInfo>(1032);
+            BOOST_CHECK_EQUAL(isNew, false);
+            BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 1);
+            BOOST_CHECK_EQUAL(info2, info);
+            BOOST_CHECK_EQUAL(info->m_id, 3503);
+            BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>(), info);
 
-  host.insertStrategyInfo<DummyStrategyInfo>(8063);
-  BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo>() != nullptr);
-  BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>()->m_id, 8063);
+            host.clearStrategyInfo();
+            BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo>() == nullptr);
+            BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 0);
+        }
 
-  host.insertStrategyInfo<DummyStrategyInfo2>(2871);
-  BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo2>() != nullptr);
-  BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo2>()->m_id, 2871);
+        BOOST_AUTO_TEST_CASE(Types) {
+            StrategyInfoHost host;
+            g_DummyStrategyInfo_count = 0;
 
-  BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo>() != nullptr);
-  BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>()->m_id, 8063);
+            host.insertStrategyInfo<DummyStrategyInfo>(8063);
+            BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo>() != nullptr);
+            BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>()->m_id, 8063);
 
-  BOOST_CHECK_EQUAL(host.eraseStrategyInfo<DummyStrategyInfo>(), 1);
-  BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo>() == nullptr);
-  BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 0);
-  BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo2>() != nullptr);
+            host.insertStrategyInfo<DummyStrategyInfo2>(2871);
+            BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo2>() != nullptr);
+            BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo2>()->m_id, 2871);
 
-  BOOST_CHECK_EQUAL(host.eraseStrategyInfo<DummyStrategyInfo>(), 0);
-}
+            BOOST_REQUIRE(host.getStrategyInfo<DummyStrategyInfo>() != nullptr);
+            BOOST_CHECK_EQUAL(host.getStrategyInfo<DummyStrategyInfo>()->m_id, 8063);
 
-BOOST_AUTO_TEST_SUITE_END() // TestStrategyInfoHost
-BOOST_AUTO_TEST_SUITE_END() // Table
+            BOOST_CHECK_EQUAL(host.eraseStrategyInfo<DummyStrategyInfo>(), 1);
+            BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo>() == nullptr);
+            BOOST_CHECK_EQUAL(g_DummyStrategyInfo_count, 0);
+            BOOST_CHECK(host.getStrategyInfo<DummyStrategyInfo2>() != nullptr);
 
-} // namespace tests
+            BOOST_CHECK_EQUAL(host.eraseStrategyInfo<DummyStrategyInfo>(), 0);
+        }
+
+        BOOST_AUTO_TEST_SUITE_END() // TestStrategyInfoHost
+        BOOST_AUTO_TEST_SUITE_END() // Table
+
+    } // namespace tests
 } // namespace nfd

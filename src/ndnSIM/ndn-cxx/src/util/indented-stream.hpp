@@ -27,57 +27,56 @@
 #include <string>
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/**
- * @brief Output to stream with specified indent or prefix
- *
- * For example, the following code:
- *
- *     std::cout << "Hello" << std::endl;
- *     IndentedStream os1(std::cout, " [prefix] ");
- *     os1 << "," << "\n";
- *     {
- *       IndentedStream os2(os1, " [another prefix] ");
- *       os2 << "World!" << "\n";
- *     }
- *     // either os1 needs to go out of scope or call os1.flush()
- *
- * Will produce the following output:
- *
- *     Hello
- *      [prefix] ,
- *      [prefix] [another prefix] World!
- *
- * Based on http://stackoverflow.com/a/2212940/2150331
- */
-class IndentedStream : public std::ostream
-{
-public:
-  IndentedStream(std::ostream& os, const std::string& indent);
+        /**
+         * @brief Output to stream with specified indent or prefix
+         *
+         * For example, the following code:
+         *
+         *     std::cout << "Hello" << std::endl;
+         *     IndentedStream os1(std::cout, " [prefix] ");
+         *     os1 << "," << "\n";
+         *     {
+         *       IndentedStream os2(os1, " [another prefix] ");
+         *       os2 << "World!" << "\n";
+         *     }
+         *     // either os1 needs to go out of scope or call os1.flush()
+         *
+         * Will produce the following output:
+         *
+         *     Hello
+         *      [prefix] ,
+         *      [prefix] [another prefix] World!
+         *
+         * Based on http://stackoverflow.com/a/2212940/2150331
+         */
+        class IndentedStream : public std::ostream {
+        public:
+            IndentedStream(std::ostream& os, const std::string& indent);
 
-  virtual
-  ~IndentedStream() override;
+            virtual
+            ~IndentedStream() override;
 
-private:
-  // Write a stream buffer that prefixes each line
-  class StreamBuf : public std::stringbuf
-  {
-  public:
-    StreamBuf(std::ostream& os, const std::string& indent);
+        private:
+            // Write a stream buffer that prefixes each line
 
-    virtual int
-    sync() override;
+            class StreamBuf : public std::stringbuf {
+            public:
+                StreamBuf(std::ostream& os, const std::string& indent);
 
-  private:
-    std::ostream& m_output;
-    std::string m_indent;
-  };
+                virtual int
+                sync() override;
 
-  StreamBuf m_buffer;
-};
+            private:
+                std::ostream& m_output;
+                std::string m_indent;
+            };
 
-} // namespace util
+            StreamBuf m_buffer;
+        };
+
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_INDENTED_STREAM_HPP

@@ -33,100 +33,90 @@
 #include <cstdlib>
 #include <cstdio>
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PacketSocketServer");
-
-NS_OBJECT_ENSURE_REGISTERED (PacketSocketServer);
-
-TypeId
-PacketSocketServer::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PacketSocketServer")
-    .SetParent<Application> ()
-    .SetGroupName("Network")
-    .AddConstructor<PacketSocketServer> ()
-    .AddTraceSource ("Rx", "A packet has been received",
-                     MakeTraceSourceAccessor (&PacketSocketServer::m_rxTrace),
-                     "ns3::Packet::PacketAddressTracedCallback")
-  ;
-  return tid;
-}
 
-PacketSocketServer::PacketSocketServer ()
-{
-  NS_LOG_FUNCTION (this);
-  m_pktRx = 0;
-  m_bytesRx = 0;
-  m_socket = 0;
-  m_localAddressSet = false;
-}
+    NS_LOG_COMPONENT_DEFINE("PacketSocketServer");
 
-PacketSocketServer::~PacketSocketServer ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(PacketSocketServer);
 
-void
-PacketSocketServer::DoDispose (void)
-{
-  NS_LOG_FUNCTION (this);
-  Application::DoDispose ();
-}
-
-void
-PacketSocketServer::StartApplication (void)
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT_MSG (m_localAddressSet, "Local address not set");
-
-  if (m_socket == 0)
-    {
-      TypeId tid = TypeId::LookupByName ("ns3::PacketSocketFactory");
-      m_socket = Socket::CreateSocket (GetNode (), tid);
-      m_socket->Bind (m_localAddress);
+    TypeId
+    PacketSocketServer::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PacketSocketServer")
+                .SetParent<Application> ()
+                .SetGroupName("Network")
+                .AddConstructor<PacketSocketServer> ()
+                .AddTraceSource("Rx", "A packet has been received",
+                MakeTraceSourceAccessor(&PacketSocketServer::m_rxTrace),
+                "ns3::Packet::PacketAddressTracedCallback")
+                ;
+        return tid;
     }
 
-  m_socket->SetRecvCallback (MakeCallback (&PacketSocketServer::HandleRead, this));
-}
+    PacketSocketServer::PacketSocketServer() {
+        NS_LOG_FUNCTION(this);
+        m_pktRx = 0;
+        m_bytesRx = 0;
+        m_socket = 0;
+        m_localAddressSet = false;
+    }
 
-void
-PacketSocketServer::StopApplication (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
-  m_socket->Close ();
-}
+    PacketSocketServer::~PacketSocketServer() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-PacketSocketServer::SetLocal (PacketSocketAddress addr)
-{
-  NS_LOG_FUNCTION (this << addr);
-  m_localAddress = addr;
-  m_localAddressSet = true;
-}
+    void
+    PacketSocketServer::DoDispose(void) {
+        NS_LOG_FUNCTION(this);
+        Application::DoDispose();
+    }
 
-void
-PacketSocketServer::HandleRead (Ptr<Socket> socket)
-{
-  NS_LOG_FUNCTION (this << socket);
-  Ptr<Packet> packet;
-  Address from;
-  while ((packet = socket->RecvFrom (from)))
-    {
-      if (PacketSocketAddress::IsMatchingType (from))
-        {
-          m_pktRx ++;
-          m_bytesRx += packet->GetSize ();
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds ()
-                       << "s packet sink received "
-                       << packet->GetSize () << " bytes from "
-                       << PacketSocketAddress::ConvertFrom (from)
-                       << " total Rx " << m_pktRx << " packets"
-                       << " and " << m_bytesRx << " bytes");
-          m_rxTrace (packet, from);
+    void
+    PacketSocketServer::StartApplication(void) {
+        NS_LOG_FUNCTION(this);
+        NS_ASSERT_MSG(m_localAddressSet, "Local address not set");
+
+        if (m_socket == 0) {
+            TypeId tid = TypeId::LookupByName("ns3::PacketSocketFactory");
+            m_socket = Socket::CreateSocket(GetNode(), tid);
+            m_socket->Bind(m_localAddress);
+        }
+
+        m_socket->SetRecvCallback(MakeCallback(&PacketSocketServer::HandleRead, this));
+    }
+
+    void
+    PacketSocketServer::StopApplication(void) {
+        NS_LOG_FUNCTION(this);
+        m_socket->SetRecvCallback(MakeNullCallback<void, Ptr<Socket> > ());
+        m_socket->Close();
+    }
+
+    void
+    PacketSocketServer::SetLocal(PacketSocketAddress addr) {
+        NS_LOG_FUNCTION(this << addr);
+        m_localAddress = addr;
+        m_localAddressSet = true;
+    }
+
+    void
+    PacketSocketServer::HandleRead(Ptr<Socket> socket) {
+        NS_LOG_FUNCTION(this << socket);
+        Ptr<Packet> packet;
+        Address from;
+        while ((packet = socket->RecvFrom(from))) {
+            if (PacketSocketAddress::IsMatchingType(from)) {
+                m_pktRx++;
+                m_bytesRx += packet->GetSize();
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds()
+                        << "s packet sink received "
+                        << packet->GetSize() << " bytes from "
+                        << PacketSocketAddress::ConvertFrom(from)
+                        << " total Rx " << m_pktRx << " packets"
+                        << " and " << m_bytesRx << " bytes");
+                m_rxTrace(packet, from);
+            }
         }
     }
-}
 
 } // Namespace ns3

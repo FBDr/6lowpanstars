@@ -30,8 +30,10 @@
 
 namespace websocketpp {
 
-/// Stub for user supplied base class.
-class connection_base {};
+    /// Stub for user supplied base class.
+
+    class connection_base {
+    };
 
 } // namespace websocketpp
 

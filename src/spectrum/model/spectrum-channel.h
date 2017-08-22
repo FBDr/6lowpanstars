@@ -30,83 +30,82 @@
 namespace ns3 {
 
 
-class PacketBurst;
-class SpectrumValue;
-class SpectrumPhy;
-class SpectrumPropagationLossModel;
-class PropagationLossModel;
-class PropagationDelayModel;
+    class PacketBurst;
+    class SpectrumValue;
+    class SpectrumPhy;
+    class SpectrumPropagationLossModel;
+    class PropagationLossModel;
+    class PropagationDelayModel;
 
-/**
- * \ingroup spectrum
- *
- * Defines the interface for spectrum-aware channel implementations
- *
- */
-class SpectrumChannel : public Channel
-{
-public:
-  virtual ~SpectrumChannel ();
-  static TypeId GetTypeId (void);
-
-
-  /**
-   * set the single-frequency propagation loss model to be used
-   * \warning only models that do not depend on the TX power should be used.
-   *
-   * \param loss a pointer to the propagation loss model to be used.
-   */
-  virtual void AddPropagationLossModel (Ptr<PropagationLossModel> loss) = 0;
-
-  /**
-   * set the frequency-dependent propagation loss model to be used
-   * \param loss a pointer to the propagation loss model to be used.
-   */
-  virtual void AddSpectrumPropagationLossModel (Ptr<SpectrumPropagationLossModel> loss) = 0;
-
-  /**
-   * set the  propagation delay model to be used
-   * \param delay Ptr to the propagation delay model to be used.
-   */
-  virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay) = 0;
+    /**
+     * \ingroup spectrum
+     *
+     * Defines the interface for spectrum-aware channel implementations
+     *
+     */
+    class SpectrumChannel : public Channel {
+    public:
+        virtual ~SpectrumChannel();
+        static TypeId GetTypeId(void);
 
 
-  /**
-   * Used by attached PHY instances to transmit signals on the channel
-   *
-   * @param params the parameters of the signals being transmitted
-   */
-  virtual void StartTx (Ptr<SpectrumSignalParameters> params) = 0;
+        /**
+         * set the single-frequency propagation loss model to be used
+         * \warning only models that do not depend on the TX power should be used.
+         *
+         * \param loss a pointer to the propagation loss model to be used.
+         */
+        virtual void AddPropagationLossModel(Ptr<PropagationLossModel> loss) = 0;
 
-  /**
-   * @brief add a SpectrumPhy to a channel, so it can receive packets
-   *
-   * This method is used to attach a SpectrumPhy instance to a
-   * SpectrumChannel instance, so that the SpectrumPhy can receive
-   * packets sent on that channel. Note that a SpectrumPhy that only
-   * transmits (without receiveing ever) does not need to be added to
-   * the channel.
-   *
-   * This method is to be implemented by all classes inheriting from
-   * SpectrumChannel.
-   *
-   * @param phy the SpectrumPhy instance to be added to the channel as
-   * a receiver.
-   */
-  virtual void AddRx (Ptr<SpectrumPhy> phy) = 0;
+        /**
+         * set the frequency-dependent propagation loss model to be used
+         * \param loss a pointer to the propagation loss model to be used.
+         */
+        virtual void AddSpectrumPropagationLossModel(Ptr<SpectrumPropagationLossModel> loss) = 0;
 
-  /**
-   * TracedCallback signature for path loss calculation events.
-   *
-   * \param [in] txPhy The TX SpectrumPhy instance.
-   * \param [in] rxPhy The RX SpectrumPhy instance.
-   * \param [in] lossDb The loss value, in dB.
-   */
-  typedef void (* LossTracedCallback)
-    (const Ptr<const SpectrumPhy> txPhy, const Ptr<const SpectrumPhy> rxPhy,
-     const double lossDb);
-  
-};
+        /**
+         * set the  propagation delay model to be used
+         * \param delay Ptr to the propagation delay model to be used.
+         */
+        virtual void SetPropagationDelayModel(Ptr<PropagationDelayModel> delay) = 0;
+
+
+        /**
+         * Used by attached PHY instances to transmit signals on the channel
+         *
+         * @param params the parameters of the signals being transmitted
+         */
+        virtual void StartTx(Ptr<SpectrumSignalParameters> params) = 0;
+
+        /**
+         * @brief add a SpectrumPhy to a channel, so it can receive packets
+         *
+         * This method is used to attach a SpectrumPhy instance to a
+         * SpectrumChannel instance, so that the SpectrumPhy can receive
+         * packets sent on that channel. Note that a SpectrumPhy that only
+         * transmits (without receiveing ever) does not need to be added to
+         * the channel.
+         *
+         * This method is to be implemented by all classes inheriting from
+         * SpectrumChannel.
+         *
+         * @param phy the SpectrumPhy instance to be added to the channel as
+         * a receiver.
+         */
+        virtual void AddRx(Ptr<SpectrumPhy> phy) = 0;
+
+        /**
+         * TracedCallback signature for path loss calculation events.
+         *
+         * \param [in] txPhy The TX SpectrumPhy instance.
+         * \param [in] rxPhy The RX SpectrumPhy instance.
+         * \param [in] lossDb The loss value, in dB.
+         */
+        typedef void (* LossTracedCallback)
+        (const Ptr<const SpectrumPhy> txPhy, const Ptr<const SpectrumPhy> rxPhy,
+                const double lossDb);
+
+    };
 
 
 

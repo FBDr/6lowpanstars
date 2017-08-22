@@ -30,18 +30,17 @@
 
 namespace nfd {
 
-/** \brief counters provided by Forwarder
- */
-class ForwarderCounters
-{
-public:
-  PacketCounter nInInterests;
-  PacketCounter nOutInterests;
-  PacketCounter nInData;
-  PacketCounter nOutData;
-  PacketCounter nInNacks;
-  PacketCounter nOutNacks;
-};
+    /** \brief counters provided by Forwarder
+     */
+    class ForwarderCounters {
+    public:
+        PacketCounter nInInterests;
+        PacketCounter nOutInterests;
+        PacketCounter nInData;
+        PacketCounter nOutData;
+        PacketCounter nInNacks;
+        PacketCounter nOutNacks;
+    };
 
 } // namespace nfd
 

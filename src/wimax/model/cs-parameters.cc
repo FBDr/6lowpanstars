@@ -21,75 +21,72 @@
 #include "wimax-tlv.h"
 #include "cs-parameters.h"
 
-namespace ns3 {
-CsParameters::CsParameters ()
-{
-  m_classifierDscAction = CsParameters::ADD;
-}
-CsParameters::~CsParameters ()
+namespace ns3
 {
 
-}
+    CsParameters::CsParameters() {
+        m_classifierDscAction = CsParameters::ADD;
+    }
 
-CsParameters::CsParameters (Tlv tlv)
-{
-  NS_ASSERT_MSG (tlv.GetType () == SfVectorTlvValue::IPV4_CS_Parameters,
-                 "Invalid TLV");
-  CsParamVectorTlvValue* param = ((CsParamVectorTlvValue*)(tlv.PeekValue ()));
+    CsParameters::~CsParameters() {
 
-  for (std::vector<Tlv*>::const_iterator iter = param->Begin (); iter
-       != param->End (); ++iter)
-    {
-      switch ((*iter)->GetType ())
-        {
-        case CsParamVectorTlvValue::Classifier_DSC_Action:
-          {
-            m_classifierDscAction
-              = (enum CsParameters::Action)((U8TlvValue*)((*iter)->PeekValue ()))->GetValue ();
-            break;
-          }
-        case CsParamVectorTlvValue::Packet_Classification_Rule:
-          {
-            m_packetClassifierRule
-              = IpcsClassifierRecord (*(*iter));
-            break;
-          }
+    }
+
+    CsParameters::CsParameters(Tlv tlv) {
+        NS_ASSERT_MSG(tlv.GetType() == SfVectorTlvValue::IPV4_CS_Parameters,
+                "Invalid TLV");
+        CsParamVectorTlvValue* param = ((CsParamVectorTlvValue*) (tlv.PeekValue()));
+
+        for (std::vector<Tlv*>::const_iterator iter = param->Begin(); iter
+                != param->End(); ++iter) {
+            switch ((*iter)->GetType()) {
+                case CsParamVectorTlvValue::Classifier_DSC_Action:
+                {
+                    m_classifierDscAction
+                            = (enum CsParameters::Action)((U8TlvValue*) ((*iter)->PeekValue()))->GetValue();
+                    break;
+                }
+                case CsParamVectorTlvValue::Packet_Classification_Rule:
+                {
+                    m_packetClassifierRule
+                            = IpcsClassifierRecord(*(*iter));
+                    break;
+                }
+            }
         }
     }
-}
 
-CsParameters::CsParameters (enum CsParameters::Action classifierDscAction,
-                            IpcsClassifierRecord classifier)
-{
-  m_classifierDscAction = classifierDscAction;
-  m_packetClassifierRule = classifier;
-}
-void
-CsParameters::SetClassifierDscAction (enum CsParameters::Action action)
-{
-  m_classifierDscAction = action;
-}
-void
-CsParameters::SetPacketClassifierRule (IpcsClassifierRecord packetClassifierRule)
-{
-  m_packetClassifierRule = packetClassifierRule;
-}
-enum CsParameters::Action
-CsParameters::GetClassifierDscAction (void) const
-{
-  return m_classifierDscAction;
-}
-IpcsClassifierRecord
-CsParameters::GetPacketClassifierRule (void) const
-{
-  return m_packetClassifierRule;
-}
-Tlv
-CsParameters::ToTlv (void) const
-{
-  CsParamVectorTlvValue tmp;
-  tmp.Add (Tlv (CsParamVectorTlvValue::Classifier_DSC_Action,1, U8TlvValue (m_classifierDscAction)));
-  tmp.Add (m_packetClassifierRule.ToTlv ());
-  return Tlv (SfVectorTlvValue::IPV4_CS_Parameters, tmp.GetSerializedSize (), tmp);
-}
+    CsParameters::CsParameters(enum CsParameters::Action classifierDscAction,
+            IpcsClassifierRecord classifier) {
+        m_classifierDscAction = classifierDscAction;
+        m_packetClassifierRule = classifier;
+    }
+
+    void
+    CsParameters::SetClassifierDscAction(enum CsParameters::Action action) {
+        m_classifierDscAction = action;
+    }
+
+    void
+    CsParameters::SetPacketClassifierRule(IpcsClassifierRecord packetClassifierRule) {
+        m_packetClassifierRule = packetClassifierRule;
+    }
+
+    enum CsParameters::Action
+    CsParameters::GetClassifierDscAction(void) const {
+        return m_classifierDscAction;
+    }
+
+    IpcsClassifierRecord
+    CsParameters::GetPacketClassifierRule(void) const {
+        return m_packetClassifierRule;
+    }
+
+    Tlv
+    CsParameters::ToTlv(void) const {
+        CsParamVectorTlvValue tmp;
+        tmp.Add(Tlv(CsParamVectorTlvValue::Classifier_DSC_Action, 1, U8TlvValue(m_classifierDscAction)));
+        tmp.Add(m_packetClassifierRule.ToTlv());
+        return Tlv(SfVectorTlvValue::IPV4_CS_Parameters, tmp.GetSerializedSize(), tmp);
+    }
 }

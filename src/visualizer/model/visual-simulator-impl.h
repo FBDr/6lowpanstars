@@ -26,61 +26,60 @@
 namespace ns3 {
 
 
-/**
- * \defgroup  visualizer Visualizer
- *
- */
+    /**
+     * \defgroup  visualizer Visualizer
+     *
+     */
 
-/**
- * \ingroup visualizer
- * \ingroup simulator
- *
- * \brief A replacement simulator that starts the visualizer
- *
- * To use this class, run any ns-3 simulation with the command-line
- * argument --SimulatorImplementationType=ns3::VisualSimulatorImpl.
- * This causes the visualizer (PyViz) to start automatically.
- **/
-class VisualSimulatorImpl : public SimulatorImpl
-{
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * \ingroup visualizer
+     * \ingroup simulator
+     *
+     * \brief A replacement simulator that starts the visualizer
+     *
+     * To use this class, run any ns-3 simulation with the command-line
+     * argument --SimulatorImplementationType=ns3::VisualSimulatorImpl.
+     * This causes the visualizer (PyViz) to start automatically.
+     **/
+    class VisualSimulatorImpl : public SimulatorImpl {
+    public:
+        static TypeId GetTypeId(void);
 
-  VisualSimulatorImpl ();
-  ~VisualSimulatorImpl ();
+        VisualSimulatorImpl();
+        ~VisualSimulatorImpl();
 
-  virtual void Destroy ();
-  virtual bool IsFinished (void) const;
-  virtual void Stop (void);
-  virtual void Stop (Time const &delay);
-  virtual EventId Schedule (Time const &delay, EventImpl *event);
-  virtual void ScheduleWithContext (uint32_t context, Time const &delay, EventImpl *event);
-  virtual EventId ScheduleNow (EventImpl *event);
-  virtual EventId ScheduleDestroy (EventImpl *event);
-  virtual void Remove (const EventId &id);
-  virtual void Cancel (const EventId &id);
-  virtual bool IsExpired (const EventId &id) const;
-  virtual void Run (void);
-  virtual Time Now (void) const;
-  virtual Time GetDelayLeft (const EventId &id) const;
-  virtual Time GetMaximumSimulationTime (void) const;
-  virtual void SetScheduler (ObjectFactory schedulerFactory);
-  virtual uint32_t GetSystemId (void) const; 
-  virtual uint32_t GetContext (void) const;
+        virtual void Destroy();
+        virtual bool IsFinished(void) const;
+        virtual void Stop(void);
+        virtual void Stop(Time const &delay);
+        virtual EventId Schedule(Time const &delay, EventImpl *event);
+        virtual void ScheduleWithContext(uint32_t context, Time const &delay, EventImpl *event);
+        virtual EventId ScheduleNow(EventImpl *event);
+        virtual EventId ScheduleDestroy(EventImpl *event);
+        virtual void Remove(const EventId &id);
+        virtual void Cancel(const EventId &id);
+        virtual bool IsExpired(const EventId &id) const;
+        virtual void Run(void);
+        virtual Time Now(void) const;
+        virtual Time GetDelayLeft(const EventId &id) const;
+        virtual Time GetMaximumSimulationTime(void) const;
+        virtual void SetScheduler(ObjectFactory schedulerFactory);
+        virtual uint32_t GetSystemId(void) const;
+        virtual uint32_t GetContext(void) const;
 
-  /// calls Run() in the wrapped simulator
-  void RunRealSimulator (void);
+        /// calls Run() in the wrapped simulator
+        void RunRealSimulator(void);
 
-protected:
-  void DoDispose ();
-  void NotifyConstructionCompleted (void);
+    protected:
+        void DoDispose();
+        void NotifyConstructionCompleted(void);
 
-private:
-  Ptr<SimulatorImpl> GetSim ();
-  Ptr<SimulatorImpl> m_simulator;
-  ObjectFactory m_simulatorImplFactory;
+    private:
+        Ptr<SimulatorImpl> GetSim();
+        Ptr<SimulatorImpl> m_simulator;
+        ObjectFactory m_simulatorImplFactory;
 
-};
+    };
 
 } // namespace ns3
 

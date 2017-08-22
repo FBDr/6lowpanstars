@@ -27,7 +27,8 @@
 #include "ns3/mobility-module.h"
 
 
-namespace ns3 {
+namespace ns3
+{
 
     // Network topology
     //

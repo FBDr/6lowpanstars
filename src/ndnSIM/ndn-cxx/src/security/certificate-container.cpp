@@ -23,82 +23,70 @@
 #include "pib-impl.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-CertificateContainer::const_iterator::const_iterator(std::set<Name>::const_iterator it,
-                                                     shared_ptr<PibImpl> impl)
-  : m_it(it)
-  , m_impl(impl)
-{
-}
+        CertificateContainer::const_iterator::const_iterator(std::set<Name>::const_iterator it,
+                shared_ptr<PibImpl> impl)
+        : m_it(it)
+        , m_impl(impl) {
+        }
 
-v1::IdentityCertificate
-CertificateContainer::const_iterator::operator*()
-{
-  return m_impl->getCertificate(*m_it);
-}
+        v1::IdentityCertificate
+        CertificateContainer::const_iterator::operator*() {
+            return m_impl->getCertificate(*m_it);
+        }
 
-CertificateContainer::const_iterator&
-CertificateContainer::const_iterator::operator++()
-{
-  ++m_it;
-  return *this;
-}
+        CertificateContainer::const_iterator&
+        CertificateContainer::const_iterator::operator++() {
+            ++m_it;
+            return *this;
+        }
 
-CertificateContainer::const_iterator
-CertificateContainer::const_iterator::operator++(int)
-{
-  const_iterator it(m_it, m_impl);
-  ++m_it;
-  return it;
-}
+        CertificateContainer::const_iterator
+        CertificateContainer::const_iterator::operator++(int) {
+            const_iterator it(m_it, m_impl);
+            ++m_it;
+            return it;
+        }
 
-bool
-CertificateContainer::const_iterator::operator==(const const_iterator& other)
-{
-  return (m_impl == other.m_impl && m_it == other.m_it);
-}
+        bool
+        CertificateContainer::const_iterator::operator==(const const_iterator& other) {
+            return (m_impl == other.m_impl && m_it == other.m_it);
+        }
 
-bool
-CertificateContainer::const_iterator::operator!=(const const_iterator& other)
-{
-  return !(*this == other);
-}
+        bool
+        CertificateContainer::const_iterator::operator!=(const const_iterator& other) {
+            return !(*this == other);
+        }
 
-CertificateContainer::CertificateContainer()
-{
-}
+        CertificateContainer::CertificateContainer() {
+        }
 
-CertificateContainer::CertificateContainer(std::set<Name>&& certNames,
-                                           shared_ptr<PibImpl> impl)
-  : m_certNames(certNames)
-  , m_impl(impl)
-{
-}
+        CertificateContainer::CertificateContainer(std::set<Name>&& certNames,
+                shared_ptr<PibImpl> impl)
+        : m_certNames(certNames)
+        , m_impl(impl) {
+        }
 
-CertificateContainer::const_iterator
-CertificateContainer::begin() const
-{
-  return const_iterator(m_certNames.begin(), m_impl);
-}
+        CertificateContainer::const_iterator
+        CertificateContainer::begin() const {
+            return const_iterator(m_certNames.begin(), m_impl);
+        }
 
-CertificateContainer::const_iterator
-CertificateContainer::end() const
-{
-  return const_iterator(m_certNames.end(), m_impl);
-}
+        CertificateContainer::const_iterator
+        CertificateContainer::end() const {
+            return const_iterator(m_certNames.end(), m_impl);
+        }
 
-CertificateContainer::const_iterator
-CertificateContainer::find(const Name& certName) const
-{
-  return const_iterator(m_certNames.find(certName), m_impl);
-}
+        CertificateContainer::const_iterator
+        CertificateContainer::find(const Name& certName) const {
+            return const_iterator(m_certNames.find(certName), m_impl);
+        }
 
-size_t
-CertificateContainer::size() const
-{
-  return m_certNames.size();
-}
+        size_t
+        CertificateContainer::size() const {
+            return m_certNames.size();
+        }
 
-} // namespace security
+    } // namespace security
 } // namespace ndn

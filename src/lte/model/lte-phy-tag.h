@@ -25,39 +25,38 @@
 
 namespace ns3 {
 
-/**
- * Tag used to define PHY parameters 
- */
-class LtePhyTag : public Tag
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * Tag used to define PHY parameters 
+     */
+    class LtePhyTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create an empty LtePhyTag
-   */
-  LtePhyTag ();
+        /**
+         * Create an empty LtePhyTag
+         */
+        LtePhyTag();
 
-  /**
-   * Create a LtePhyTag with the given RNTI and LC id
-   */
-  LtePhyTag (uint16_t cellId);
+        /**
+         * Create a LtePhyTag with the given RNTI and LC id
+         */
+        LtePhyTag(uint16_t cellId);
 
 
-  virtual ~LtePhyTag ();
+        virtual ~LtePhyTag();
 
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Print(std::ostream &os) const;
 
-  uint16_t GetCellId () const;
+        uint16_t GetCellId() const;
 
-private:
-  uint16_t m_cellId;
+    private:
+        uint16_t m_cellId;
 
-};
+    };
 
 
 

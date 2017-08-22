@@ -24,65 +24,60 @@
 #include "../security/transform.hpp"
 
 namespace ndn {
-namespace io {
+    namespace io {
 
-optional<Block>
-loadBlock(std::istream& is, IoEncoding encoding)
-{
-  namespace t = ndn::security::transform;
+        optional<Block>
+        loadBlock(std::istream& is, IoEncoding encoding) {
+            namespace t = ndn::security::transform;
 
-  OBufferStream os;
-  try {
-    switch (encoding) {
-      case NO_ENCODING:
-        t::streamSource(is) >> t::streamSink(os);
-        break;
-      case BASE64:
-        t::streamSource(is) >> t::stripSpace("\n") >> t::base64Decode(false) >> t::streamSink(os);
-        break;
-      case HEX:
-        t::streamSource(is) >> t::hexDecode() >> t::streamSink(os);
-        break;
-      default:
-        return nullopt;
-    }
-  }
-  catch (const t::Error&) {
-    return nullopt;
-  }
+            OBufferStream os;
+            try {
+                switch (encoding) {
+                    case NO_ENCODING:
+                        t::streamSource(is) >> t::streamSink(os);
+                        break;
+                    case BASE64:
+                        t::streamSource(is) >> t::stripSpace("\n") >> t::base64Decode(false) >> t::streamSink(os);
+                        break;
+                    case HEX:
+                        t::streamSource(is) >> t::hexDecode() >> t::streamSink(os);
+                        break;
+                    default:
+                        return nullopt;
+                }
+            } catch (const t::Error&) {
+                return nullopt;
+            }
 
-  try {
-    return make_optional<Block>(os.buf());
-  }
-  catch (const tlv::Error&) {
-    return nullopt;
-  }
-}
+            try {
+                return make_optional<Block>(os.buf());
+            } catch (const tlv::Error&) {
+                return nullopt;
+            }
+        }
 
-void
-saveBlock(const Block& block, std::ostream& os, IoEncoding encoding)
-{
-  namespace t = ndn::security::transform;
+        void
+        saveBlock(const Block& block, std::ostream& os, IoEncoding encoding) {
+            namespace t = ndn::security::transform;
 
-  try {
-    switch (encoding) {
-      case NO_ENCODING:
-        t::bufferSource(block.wire(), block.size()) >> t::streamSink(os);
-        break;
-      case BASE64:
-        t::bufferSource(block.wire(), block.size()) >> t::base64Encode() >> t::streamSink(os);
-        break;
-      case HEX:
-        t::bufferSource(block.wire(), block.size()) >> t::hexEncode(true) >> t::streamSink(os);
-        break;
-      default:
-        BOOST_THROW_EXCEPTION(Error("unrecognized IoEncoding"));
-    }
-  }
-  catch (const t::Error& e) {
-    BOOST_THROW_EXCEPTION(Error(e.what()));
-  }
-}
+            try {
+                switch (encoding) {
+                    case NO_ENCODING:
+                        t::bufferSource(block.wire(), block.size()) >> t::streamSink(os);
+                        break;
+                    case BASE64:
+                        t::bufferSource(block.wire(), block.size()) >> t::base64Encode() >> t::streamSink(os);
+                        break;
+                    case HEX:
+                        t::bufferSource(block.wire(), block.size()) >> t::hexEncode(true) >> t::streamSink(os);
+                        break;
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("unrecognized IoEncoding"));
+                }
+            } catch (const t::Error& e) {
+                BOOST_THROW_EXCEPTION(Error(e.what()));
+            }
+        }
 
-} // namespace io
+    } // namespace io
 } // namespace ndn

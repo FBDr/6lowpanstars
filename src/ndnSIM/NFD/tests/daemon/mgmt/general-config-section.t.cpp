@@ -31,132 +31,125 @@
 #include <cstring>
 
 namespace nfd {
-namespace general {
-namespace tests {
+    namespace general {
+        namespace tests {
 
-using namespace nfd::tests;
+            using namespace nfd::tests;
 
-class GeneralConfigSectionFixture : public BaseFixture
-{
-public:
+            class GeneralConfigSectionFixture : public BaseFixture {
+            public:
 #ifdef HAVE_PRIVILEGE_DROP_AND_ELEVATE
-  ~GeneralConfigSectionFixture()
-  {
-    // revert changes to s_normalUid/s_normalGid, if any
-    PrivilegeHelper::s_normalUid = ::geteuid();
-    PrivilegeHelper::s_normalGid = ::getegid();
-  }
+
+                ~GeneralConfigSectionFixture() {
+                    // revert changes to s_normalUid/s_normalGid, if any
+                    PrivilegeHelper::s_normalUid = ::geteuid();
+                    PrivilegeHelper::s_normalGid = ::getegid();
+                }
 #endif // HAVE_PRIVILEGE_DROP_AND_ELEVATE
-};
+            };
 
-BOOST_AUTO_TEST_SUITE(Mgmt)
-BOOST_FIXTURE_TEST_SUITE(TestGeneralConfigSection, GeneralConfigSectionFixture)
+            BOOST_AUTO_TEST_SUITE(Mgmt)
+            BOOST_FIXTURE_TEST_SUITE(TestGeneralConfigSection, GeneralConfigSectionFixture)
 
-BOOST_AUTO_TEST_CASE(DefaultConfig)
-{
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "}\n";
+            BOOST_AUTO_TEST_CASE(DefaultConfig) {
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "}\n";
 
-  ConfigFile configFile;
+                ConfigFile configFile;
 
-  general::setConfigFile(configFile);
-  BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
-}
+                general::setConfigFile(configFile);
+                BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
+            }
 
 #ifdef HAVE_PRIVILEGE_DROP_AND_ELEVATE
 
-BOOST_AUTO_TEST_CASE(UserAndGroupConfig)
-{
-  SKIP_IF_NOT_SUPERUSER();
+            BOOST_AUTO_TEST_CASE(UserAndGroupConfig) {
+                SKIP_IF_NOT_SUPERUSER();
 
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "  user nobody\n"
-    "  group nogroup\n"
-    "}\n";
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "  user nobody\n"
+                        "  group nogroup\n"
+                        "}\n";
 
-  ConfigFile configFile;
+                ConfigFile configFile;
 
-  general::setConfigFile(configFile);
-  BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
-}
+                general::setConfigFile(configFile);
+                BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
+            }
 
-BOOST_AUTO_TEST_CASE(NoUserConfig)
-{
-  SKIP_IF_NOT_SUPERUSER();
+            BOOST_AUTO_TEST_CASE(NoUserConfig) {
+                SKIP_IF_NOT_SUPERUSER();
 
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "  group nogroup\n"
-    "}\n";
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "  group nogroup\n"
+                        "}\n";
 
-  ConfigFile configFile;
+                ConfigFile configFile;
 
-  general::setConfigFile(configFile);
-  BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
-}
+                general::setConfigFile(configFile);
+                BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
+            }
 
-BOOST_AUTO_TEST_CASE(NoGroupConfig)
-{
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "  user nobody\n"
-    "}\n";
+            BOOST_AUTO_TEST_CASE(NoGroupConfig) {
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "  user nobody\n"
+                        "}\n";
 
-  ConfigFile configFile;
+                ConfigFile configFile;
 
-  general::setConfigFile(configFile);
-  BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
-}
+                general::setConfigFile(configFile);
+                BOOST_CHECK_NO_THROW(configFile.parse(CONFIG, true, "test-general-config-section"));
+            }
 
 #endif // HAVE_PRIVILEGE_DROP_AND_ELEVATE
 
-BOOST_AUTO_TEST_CASE(InvalidUserConfig)
-{
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "  user\n"
-    "}\n";
+            BOOST_AUTO_TEST_CASE(InvalidUserConfig) {
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "  user\n"
+                        "}\n";
 
-  ConfigFile configFile;
-  general::setConfigFile(configFile);
+                ConfigFile configFile;
+                general::setConfigFile(configFile);
 
-  BOOST_CHECK_EXCEPTION(configFile.parse(CONFIG, true, "test-general-config-section"),
+                BOOST_CHECK_EXCEPTION(configFile.parse(CONFIG, true, "test-general-config-section"),
                         ConfigFile::Error,
-                        [] (const ConfigFile::Error& e) {
-                          return std::strcmp(e.what(),
-                                             "Invalid value for \"user\" in \"general\" section") == 0;
+                        [] (const ConfigFile::Error & e) {
+                            return std::strcmp(e.what(),
+                                    "Invalid value for \"user\" in \"general\" section") == 0;
                         });
-}
+            }
 
-BOOST_AUTO_TEST_CASE(InvalidGroupConfig)
-{
-  const std::string CONFIG =
-    "general\n"
-    "{\n"
-    "  group\n"
-    "}\n";
+            BOOST_AUTO_TEST_CASE(InvalidGroupConfig) {
+                const std::string CONFIG =
+                        "general\n"
+                        "{\n"
+                        "  group\n"
+                        "}\n";
 
-  ConfigFile configFile;
-  general::setConfigFile(configFile);
+                ConfigFile configFile;
+                general::setConfigFile(configFile);
 
-  BOOST_CHECK_EXCEPTION(configFile.parse(CONFIG, true, "test-general-config-section"),
+                BOOST_CHECK_EXCEPTION(configFile.parse(CONFIG, true, "test-general-config-section"),
                         ConfigFile::Error,
-                        [] (const ConfigFile::Error& e) {
-                          return std::strcmp(e.what(),
-                                             "Invalid value for \"group\" in \"general\" section") == 0;
+                        [] (const ConfigFile::Error & e) {
+                            return std::strcmp(e.what(),
+                                    "Invalid value for \"group\" in \"general\" section") == 0;
                         });
-}
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestGeneralConfigSection
-BOOST_AUTO_TEST_SUITE_END() // Mgmt
+            BOOST_AUTO_TEST_SUITE_END() // TestGeneralConfigSection
+            BOOST_AUTO_TEST_SUITE_END() // Mgmt
 
-} // namespace tests
-} // namespace general
+        } // namespace tests
+    } // namespace general
 } // namespace nfd

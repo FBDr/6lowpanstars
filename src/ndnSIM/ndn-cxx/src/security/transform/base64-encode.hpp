@@ -25,67 +25,66 @@
 #include "transform-base.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to perform Base64 encoding transformation.
- */
-class Base64Encode : public Transform
-{
-public:
-  /**
-   * @brief Create a base64 encoding module
-   *
-   * @p needBreak if true, insert newline after every 64 bytes, otherwise no newline is inserted
-   */
-  explicit
-  Base64Encode(bool needBreak = true);
+            /**
+             * @brief The module to perform Base64 encoding transformation.
+             */
+            class Base64Encode : public Transform {
+            public:
+                /**
+                 * @brief Create a base64 encoding module
+                 *
+                 * @p needBreak if true, insert newline after every 64 bytes, otherwise no newline is inserted
+                 */
+                explicit
+                Base64Encode(bool needBreak = true);
 
-private:
-  /**
-   * @brief Read partial transformation result (if exists) from BIO
-   */
-  virtual void
-  preTransform() final;
+            private:
+                /**
+                 * @brief Read partial transformation result (if exists) from BIO
+                 */
+                virtual void
+                preTransform() final;
 
-  /**
-   * @brief Encode @data into base64 format.
-   * @return The number of input bytes that have been accepted by the converter.
-   */
-  virtual size_t
-  convert(const uint8_t* data, size_t dataLen) final;
+                /**
+                 * @brief Encode @data into base64 format.
+                 * @return The number of input bytes that have been accepted by the converter.
+                 */
+                virtual size_t
+                convert(const uint8_t* data, size_t dataLen) final;
 
-  /**
-   * @brief Finalize base64 encoding
-   *
-   * This method with read all encoding results from the converter and write them into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize base64 encoding
+                 *
+                 * This method with read all encoding results from the converter and write them into next module.
+                 */
+                virtual void
+                finalize() final;
 
-  /**
-   * @brief Fill output buffer with the transformation result from BIO.
-   */
-  void
-  fillOutputBuffer();
+                /**
+                 * @brief Fill output buffer with the transformation result from BIO.
+                 */
+                void
+                fillOutputBuffer();
 
-  /**
-   * @return true if converter does not have partial result.
-   */
-  bool
-  isConverterEmpty();
+                /**
+                 * @return true if converter does not have partial result.
+                 */
+                bool
+                isConverterEmpty();
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-base64Encode(bool needBreak = true);
+            unique_ptr<Transform>
+            base64Encode(bool needBreak = true);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_BASE64_ENCODE_HPP

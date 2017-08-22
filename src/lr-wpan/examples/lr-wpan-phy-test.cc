@@ -29,70 +29,65 @@
 
 using namespace ns3;
 
-void GetSetTRXStateConfirm (LrWpanPhyEnumeration status)
-{
-  NS_LOG_UNCOND ("At: " << Simulator::Now ()
-                        << " Received Set TRX Confirm: " << status);
+void GetSetTRXStateConfirm(LrWpanPhyEnumeration status) {
+    NS_LOG_UNCOND("At: " << Simulator::Now()
+            << " Received Set TRX Confirm: " << status);
 }
 
 void
-ReceivePdDataIndication (uint32_t psduLength,
-                         Ptr<Packet> p,
-                         uint8_t lqi)
-{
-  NS_LOG_UNCOND ("At: " << Simulator::Now ()
-                        << " Received frame size: " << psduLength << " LQI: " <<
-                 (uint16_t) lqi);
+ReceivePdDataIndication(uint32_t psduLength,
+        Ptr<Packet> p,
+        uint8_t lqi) {
+    NS_LOG_UNCOND("At: " << Simulator::Now()
+            << " Received frame size: " << psduLength << " LQI: " <<
+            (uint16_t) lqi);
 }
 
-void SendOnePacket (Ptr<LrWpanPhy> sender, Ptr<LrWpanPhy> receiver)
-{
-  uint32_t n = 10;
-  Ptr<Packet> p = Create<Packet> (n);
-  sender->PdDataRequest (p->GetSize (), p);
+void SendOnePacket(Ptr<LrWpanPhy> sender, Ptr<LrWpanPhy> receiver) {
+    uint32_t n = 10;
+    Ptr<Packet> p = Create<Packet> (n);
+    sender->PdDataRequest(p->GetSize(), p);
 }
 
+int main(int argc, char *argv[]) {
+    CommandLine cmd;
+    cmd.Parse(argc, argv);
 
-int main (int argc, char *argv[])
-{
-  CommandLine cmd;
-  cmd.Parse (argc, argv);
-  
-  LogComponentEnableAll (LOG_PREFIX_FUNC);
-  LogComponentEnable ("LrWpanPhy", LOG_LEVEL_ALL);
-  LogComponentEnable ("SingleModelSpectrumChannel", LOG_LEVEL_ALL);
+    LogComponentEnableAll(LOG_PREFIX_FUNC);
+    LogComponentEnable("LrWpanPhy", LOG_LEVEL_ALL);
+    LogComponentEnable("SingleModelSpectrumChannel", LOG_LEVEL_ALL);
 
-  Ptr<LrWpanPhy> sender = CreateObject<LrWpanPhy> ();
-  Ptr<LrWpanPhy> receiver = CreateObject<LrWpanPhy> ();
+    Ptr<LrWpanPhy> sender = CreateObject<LrWpanPhy> ();
+    Ptr<LrWpanPhy> receiver = CreateObject<LrWpanPhy> ();
 
-  Ptr<SingleModelSpectrumChannel> channel = CreateObject<SingleModelSpectrumChannel> ();
-  sender->SetChannel (channel);
-  receiver->SetChannel (channel);
-  channel->AddRx (sender);
-  channel->AddRx (receiver);
+    Ptr<SingleModelSpectrumChannel> channel = CreateObject<SingleModelSpectrumChannel> ();
+    sender->SetChannel(channel);
+    receiver->SetChannel(channel);
+    channel->AddRx(sender);
+    channel->AddRx(receiver);
 
-  // CONFIGURE MOBILITY
-  Ptr<ConstantPositionMobilityModel> senderMobility = CreateObject<ConstantPositionMobilityModel> ();
-  sender->SetMobility (senderMobility);
-  Ptr<ConstantPositionMobilityModel> receiverMobility = CreateObject<ConstantPositionMobilityModel> ();
-  receiver->SetMobility (receiverMobility);
+    // CONFIGURE MOBILITY
+    Ptr<ConstantPositionMobilityModel> senderMobility = CreateObject<ConstantPositionMobilityModel> ();
+    sender->SetMobility(senderMobility);
+    Ptr<ConstantPositionMobilityModel> receiverMobility = CreateObject<ConstantPositionMobilityModel> ();
+    receiver->SetMobility(receiverMobility);
 
 
-  sender->SetPlmeSetTRXStateConfirmCallback (MakeCallback (&GetSetTRXStateConfirm));
-  receiver->SetPlmeSetTRXStateConfirmCallback (MakeCallback (&GetSetTRXStateConfirm));
+    sender->SetPlmeSetTRXStateConfirmCallback(MakeCallback(&GetSetTRXStateConfirm));
+    receiver->SetPlmeSetTRXStateConfirmCallback(MakeCallback(&GetSetTRXStateConfirm));
 
-  sender->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_TX_ON);
-  receiver->PlmeSetTRXStateRequest (IEEE_802_15_4_PHY_RX_ON);
+    sender->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+    receiver->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
 
-  receiver->SetPdDataIndicationCallback (MakeCallback (&ReceivePdDataIndication));
+    receiver->SetPdDataIndicationCallback(MakeCallback(&ReceivePdDataIndication));
 
-  Simulator::Schedule (Seconds (1.0), &SendOnePacket, sender, receiver);
+    Simulator::Schedule(Seconds(1.0), &SendOnePacket, sender, receiver);
 
-  Simulator::Stop (Seconds (10.0));
+    Simulator::Stop(Seconds(10.0));
 
-  Simulator::Run ();
+    Simulator::Run();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

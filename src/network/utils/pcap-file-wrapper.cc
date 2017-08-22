@@ -22,173 +22,153 @@
 #include "ns3/header.h"
 #include "pcap-file-wrapper.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("PcapFileWrapper");
-
-NS_OBJECT_ENSURE_REGISTERED (PcapFileWrapper);
-
-TypeId 
-PcapFileWrapper::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PcapFileWrapper")
-    .SetParent<Object> ()
-    .SetGroupName("Network")
-    .AddConstructor<PcapFileWrapper> ()
-    .AddAttribute ("CaptureSize",
-                   "Maximum length of captured packets (cf. pcap snaplen)",
-                   UintegerValue (PcapFile::SNAPLEN_DEFAULT),
-                   MakeUintegerAccessor (&PcapFileWrapper::m_snapLen),
-                   MakeUintegerChecker<uint32_t> (0, PcapFile::SNAPLEN_DEFAULT))
-  ;
-  return tid;
-}
 
+    NS_LOG_COMPONENT_DEFINE("PcapFileWrapper");
 
-PcapFileWrapper::PcapFileWrapper ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(PcapFileWrapper);
 
-PcapFileWrapper::~PcapFileWrapper ()
-{
-  NS_LOG_FUNCTION (this);
-  Close ();
-}
+    TypeId
+    PcapFileWrapper::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::PcapFileWrapper")
+                .SetParent<Object> ()
+                .SetGroupName("Network")
+                .AddConstructor<PcapFileWrapper> ()
+                .AddAttribute("CaptureSize",
+                "Maximum length of captured packets (cf. pcap snaplen)",
+                UintegerValue(PcapFile::SNAPLEN_DEFAULT),
+                MakeUintegerAccessor(&PcapFileWrapper::m_snapLen),
+                MakeUintegerChecker<uint32_t> (0, PcapFile::SNAPLEN_DEFAULT))
+                ;
+        return tid;
+    }
 
+    PcapFileWrapper::PcapFileWrapper() {
+        NS_LOG_FUNCTION(this);
+    }
 
-bool 
-PcapFileWrapper::Fail (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.Fail ();
-}
-bool 
-PcapFileWrapper::Eof (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.Eof ();
-}
-void 
-PcapFileWrapper::Clear (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_file.Clear ();
-}
+    PcapFileWrapper::~PcapFileWrapper() {
+        NS_LOG_FUNCTION(this);
+        Close();
+    }
 
-void
-PcapFileWrapper::Close (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_file.Close ();
-}
+    bool
+    PcapFileWrapper::Fail(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_file.Fail();
+    }
 
-void
-PcapFileWrapper::Open (std::string const &filename, std::ios::openmode mode)
-{
-  NS_LOG_FUNCTION (this << filename << mode);
-  m_file.Open (filename, mode);
-}
+    bool
+    PcapFileWrapper::Eof(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_file.Eof();
+    }
 
-void
-PcapFileWrapper::Init (uint32_t dataLinkType, uint32_t snapLen, int32_t tzCorrection)
-{
-  //
-  // If the user doesn't provide a snaplen, the default value will come in.  If
-  // this happens, we use the "CaptureSize" Attribute.  If the user does provide
-  // a snaplen, we use the one provided.
-  //
-  NS_LOG_FUNCTION (this << dataLinkType << snapLen << tzCorrection);
-  if (snapLen != std::numeric_limits<uint32_t>::max ())
-    {
-      m_file.Init (dataLinkType, snapLen, tzCorrection);
-    } 
-  else
-    {
-      m_file.Init (dataLinkType, m_snapLen, tzCorrection);
-    } 
-}
+    void
+    PcapFileWrapper::Clear(void) {
+        NS_LOG_FUNCTION(this);
+        m_file.Clear();
+    }
 
-void
-PcapFileWrapper::Write (Time t, Ptr<const Packet> p)
-{
-  NS_LOG_FUNCTION (this << t << p);
-  uint64_t current = t.GetMicroSeconds ();
-  uint64_t s = current / 1000000;
-  uint64_t us = current % 1000000;
+    void
+    PcapFileWrapper::Close(void) {
+        NS_LOG_FUNCTION(this);
+        m_file.Close();
+    }
 
-  m_file.Write (s, us, p);
-}
+    void
+    PcapFileWrapper::Open(std::string const &filename, std::ios::openmode mode) {
+        NS_LOG_FUNCTION(this << filename << mode);
+        m_file.Open(filename, mode);
+    }
 
-void
-PcapFileWrapper::Write (Time t, const Header &header, Ptr<const Packet> p)
-{
-  NS_LOG_FUNCTION (this << t << &header << p);
-  uint64_t current = t.GetMicroSeconds ();
-  uint64_t s = current / 1000000;
-  uint64_t us = current % 1000000;
+    void
+    PcapFileWrapper::Init(uint32_t dataLinkType, uint32_t snapLen, int32_t tzCorrection) {
+        //
+        // If the user doesn't provide a snaplen, the default value will come in.  If
+        // this happens, we use the "CaptureSize" Attribute.  If the user does provide
+        // a snaplen, we use the one provided.
+        //
+        NS_LOG_FUNCTION(this << dataLinkType << snapLen << tzCorrection);
+        if (snapLen != std::numeric_limits<uint32_t>::max()) {
+            m_file.Init(dataLinkType, snapLen, tzCorrection);
+        }
+        else {
+            m_file.Init(dataLinkType, m_snapLen, tzCorrection);
+        }
+    }
 
-  m_file.Write (s, us, header, p);
-}
+    void
+    PcapFileWrapper::Write(Time t, Ptr<const Packet> p) {
+        NS_LOG_FUNCTION(this << t << p);
+        uint64_t current = t.GetMicroSeconds();
+        uint64_t s = current / 1000000;
+        uint64_t us = current % 1000000;
 
-void
-PcapFileWrapper::Write (Time t, uint8_t const *buffer, uint32_t length)
-{
-  NS_LOG_FUNCTION (this << t << &buffer << length);
-  uint64_t current = t.GetMicroSeconds ();
-  uint64_t s = current / 1000000;
-  uint64_t us = current % 1000000;
+        m_file.Write(s, us, p);
+    }
 
-  m_file.Write (s, us, buffer, length);
-}
+    void
+    PcapFileWrapper::Write(Time t, const Header &header, Ptr<const Packet> p) {
+        NS_LOG_FUNCTION(this << t << &header << p);
+        uint64_t current = t.GetMicroSeconds();
+        uint64_t s = current / 1000000;
+        uint64_t us = current % 1000000;
 
-uint32_t
-PcapFileWrapper::GetMagic (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetMagic ();
-}
+        m_file.Write(s, us, header, p);
+    }
 
-uint16_t
-PcapFileWrapper::GetVersionMajor (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetVersionMajor ();
-}
+    void
+    PcapFileWrapper::Write(Time t, uint8_t const *buffer, uint32_t length) {
+        NS_LOG_FUNCTION(this << t << &buffer << length);
+        uint64_t current = t.GetMicroSeconds();
+        uint64_t s = current / 1000000;
+        uint64_t us = current % 1000000;
 
-uint16_t
-PcapFileWrapper::GetVersionMinor (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetVersionMinor ();
-}
+        m_file.Write(s, us, buffer, length);
+    }
 
-int32_t
-PcapFileWrapper::GetTimeZoneOffset (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetTimeZoneOffset ();
-}
+    uint32_t
+    PcapFileWrapper::GetMagic(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetMagic();
+    }
 
-uint32_t
-PcapFileWrapper::GetSigFigs (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetSigFigs ();
-}
+    uint16_t
+    PcapFileWrapper::GetVersionMajor(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetVersionMajor();
+    }
 
-uint32_t
-PcapFileWrapper::GetSnapLen (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetSnapLen ();
-}
+    uint16_t
+    PcapFileWrapper::GetVersionMinor(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetVersionMinor();
+    }
 
-uint32_t
-PcapFileWrapper::GetDataLinkType (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_file.GetDataLinkType ();
-}
+    int32_t
+    PcapFileWrapper::GetTimeZoneOffset(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetTimeZoneOffset();
+    }
+
+    uint32_t
+    PcapFileWrapper::GetSigFigs(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetSigFigs();
+    }
+
+    uint32_t
+    PcapFileWrapper::GetSnapLen(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetSnapLen();
+    }
+
+    uint32_t
+    PcapFileWrapper::GetDataLinkType(void) {
+        NS_LOG_FUNCTION(this);
+        return m_file.GetDataLinkType();
+    }
 
 } // namespace ns3

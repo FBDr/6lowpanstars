@@ -29,79 +29,78 @@
 #include "face/face.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-class DummyTransport;
+            class DummyTransport;
 
-/** \brief a Face for unit testing
- *
- *  The DummyFace has no underlying transport, but allows observing outgoing packets
- *  and injecting incoming packets at network layer.
- *  It's primarily used for forwarding test suites, but can be used in other tests as well.
- *
- *  Outgoing network-layer packets sent through the DummyFace are recorded in sent* vectors,
- *  which can be observed in test cases.
- *  Incoming network-layer packets can be injected from test cases through receive* method.
- */
-class DummyFace : public Face
-{
-public:
-  class LinkService;
+            /** \brief a Face for unit testing
+             *
+             *  The DummyFace has no underlying transport, but allows observing outgoing packets
+             *  and injecting incoming packets at network layer.
+             *  It's primarily used for forwarding test suites, but can be used in other tests as well.
+             *
+             *  Outgoing network-layer packets sent through the DummyFace are recorded in sent* vectors,
+             *  which can be observed in test cases.
+             *  Incoming network-layer packets can be injected from test cases through receive* method.
+             */
+            class DummyFace : public Face {
+            public:
+                class LinkService;
 
-  DummyFace(const std::string& localUri = "dummy://", const std::string& remoteUri = "dummy://",
-            ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_NON_LOCAL,
-            ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
-            ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+                DummyFace(const std::string& localUri = "dummy://", const std::string& remoteUri = "dummy://",
+                        ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_NON_LOCAL,
+                        ndn::nfd::FacePersistency persistency = ndn::nfd::FACE_PERSISTENCY_PERSISTENT,
+                        ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT);
 
-  /** \brief changes face state
-   *  \throw std::runtime_error state transition is invalid
-   */
-  void
-  setState(FaceState state);
+                /** \brief changes face state
+                 *  \throw std::runtime_error state transition is invalid
+                 */
+                void
+                setState(FaceState state);
 
-  /** \brief causes the face to receive an Interest
-   */
-  void
-  receiveInterest(const Interest& interest);
+                /** \brief causes the face to receive an Interest
+                 */
+                void
+                receiveInterest(const Interest& interest);
 
-  /** \brief causes the face to receive a Data
-   */
-  void
-  receiveData(const Data& data);
+                /** \brief causes the face to receive a Data
+                 */
+                void
+                receiveData(const Data& data);
 
-  /** \brief causes the face to receive a Nack
-   */
-  void
-  receiveNack(const lp::Nack& nack);
+                /** \brief causes the face to receive a Nack
+                 */
+                void
+                receiveNack(const lp::Nack& nack);
 
-  /** \brief signals after any network-layer packet is sent
-   *
-   *  The network-layer packet type is indicated as an argument,
-   *  which is either of tlv::Interest, tlv::Data, or lp::tlv::Nack.
-   *  The callback may retrieve the packet from sentInterests.back(), sentData.back(), or sentNacks.back().
-   */
-  signal::Signal<LinkService, uint32_t>& afterSend;
+                /** \brief signals after any network-layer packet is sent
+                 *
+                 *  The network-layer packet type is indicated as an argument,
+                 *  which is either of tlv::Interest, tlv::Data, or lp::tlv::Nack.
+                 *  The callback may retrieve the packet from sentInterests.back(), sentData.back(), or sentNacks.back().
+                 */
+                signal::Signal<LinkService, uint32_t>& afterSend;
 
-private:
-  LinkService*
-  getLinkServiceInternal();
+            private:
+                LinkService*
+                getLinkServiceInternal();
 
-  DummyTransport*
-  getTransportInternal();
+                DummyTransport*
+                getTransportInternal();
 
-public:
-  std::vector<Interest>& sentInterests;
-  std::vector<Data>& sentData;
-  std::vector<lp::Nack>& sentNacks;
-};
+            public:
+                std::vector<Interest>& sentInterests;
+                std::vector<Data>& sentData;
+                std::vector<lp::Nack>& sentNacks;
+            };
 
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 
-namespace tests {
-using nfd::face::tests::DummyFace;
-} // namespace tests
+    namespace tests {
+        using nfd::face::tests::DummyFace;
+    } // namespace tests
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_DUMMY_FACE_HPP

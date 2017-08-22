@@ -29,51 +29,50 @@
 #include "datagram-transport.hpp"
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-// Explicit specialization of makeEndpointId for the UDP multicast case.
-// Note that this "shall be declared before the first use of the specialization
-// that would cause an implicit instantiation to take place, in every translation
-// unit in which such a use occurs".
-template<>
-Transport::EndpointId
-DatagramTransport<boost::asio::ip::udp, Multicast>::makeEndpointId(const protocol::endpoint& ep);
+        // Explicit specialization of makeEndpointId for the UDP multicast case.
+        // Note that this "shall be declared before the first use of the specialization
+        // that would cause an implicit instantiation to take place, in every translation
+        // unit in which such a use occurs".
+        template<>
+        Transport::EndpointId
+        DatagramTransport<boost::asio::ip::udp, Multicast>::makeEndpointId(const protocol::endpoint& ep);
 
-/**
- * \brief A Transport that communicates on a UDP multicast group
- */
-class MulticastUdpTransport final : public DatagramTransport<boost::asio::ip::udp, Multicast>
-{
-public:
-  /**
-   * \brief Creates a UDP-based transport for multicast communication
-   * \param localEndpoint local endpoint
-   * \param multicastGroup multicast group
-   * \param recvSocket socket used to receive packets
-   * \param sendSocket socket used to send to the multicast group
-   */
-  MulticastUdpTransport(const protocol::endpoint& localEndpoint,
-                        const protocol::endpoint& multicastGroup,
-                        protocol::socket&& recvSocket,
-                        protocol::socket&& sendSocket);
+        /**
+         * \brief A Transport that communicates on a UDP multicast group
+         */
+        class MulticastUdpTransport final : public DatagramTransport<boost::asio::ip::udp, Multicast> {
+        public:
+            /**
+             * \brief Creates a UDP-based transport for multicast communication
+             * \param localEndpoint local endpoint
+             * \param multicastGroup multicast group
+             * \param recvSocket socket used to receive packets
+             * \param sendSocket socket used to send to the multicast group
+             */
+            MulticastUdpTransport(const protocol::endpoint& localEndpoint,
+                    const protocol::endpoint& multicastGroup,
+                    protocol::socket&& recvSocket,
+                    protocol::socket&& sendSocket);
 
-protected:
-  virtual void
-  beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
+        protected:
+            virtual void
+            beforeChangePersistency(ndn::nfd::FacePersistency newPersistency) final;
 
-private:
-  virtual void
-  doSend(Transport::Packet&& packet) final;
+        private:
+            virtual void
+            doSend(Transport::Packet&& packet) final;
 
-  virtual void
-  doClose() final;
+            virtual void
+            doClose() final;
 
-private:
-  protocol::endpoint m_multicastGroup;
-  protocol::socket m_sendSocket;
-};
+        private:
+            protocol::endpoint m_multicastGroup;
+            protocol::socket m_sendSocket;
+        };
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_MULTICAST_UDP_TRANSPORT_HPP

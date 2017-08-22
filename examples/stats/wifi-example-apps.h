@@ -35,90 +35,93 @@ using namespace ns3;
 
 //----------------------------------------------------------------------
 //------------------------------------------------------
+
 class Sender : public Application {
 public:
-  static TypeId GetTypeId (void);
-  Sender();
-  virtual ~Sender();
+    static TypeId GetTypeId(void);
+    Sender();
+    virtual ~Sender();
 
 protected:
-  virtual void DoDispose (void);
+    virtual void DoDispose(void);
 
 private:
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
+    virtual void StartApplication(void);
+    virtual void StopApplication(void);
 
-  void SendPacket ();
+    void SendPacket();
 
-  uint32_t        m_pktSize;
-  Ipv4Address     m_destAddr;
-  uint32_t        m_destPort;
-  Ptr<ConstantRandomVariable> m_interval;
-  uint32_t        m_numPkts;
+    uint32_t m_pktSize;
+    Ipv4Address m_destAddr;
+    uint32_t m_destPort;
+    Ptr<ConstantRandomVariable> m_interval;
+    uint32_t m_numPkts;
 
-  Ptr<Socket>     m_socket;
-  EventId         m_sendEvent;
+    Ptr<Socket> m_socket;
+    EventId m_sendEvent;
 
-  TracedCallback<Ptr<const Packet> > m_txTrace;
+    TracedCallback<Ptr<const Packet> > m_txTrace;
 
-  uint32_t        m_count;
+    uint32_t m_count;
 
-  // end class Sender
+    // end class Sender
 };
 
 
 
 
 //------------------------------------------------------
+
 class Receiver : public Application {
 public:
-  static TypeId GetTypeId (void);
-  Receiver();
-  virtual ~Receiver();
+    static TypeId GetTypeId(void);
+    Receiver();
+    virtual ~Receiver();
 
-  void SetCounter (Ptr<CounterCalculator<> > calc);
-  void SetDelayTracker (Ptr<TimeMinMaxAvgTotalCalculator> delay);
+    void SetCounter(Ptr<CounterCalculator<> > calc);
+    void SetDelayTracker(Ptr<TimeMinMaxAvgTotalCalculator> delay);
 
 protected:
-  virtual void DoDispose (void);
+    virtual void DoDispose(void);
 
 private:
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
+    virtual void StartApplication(void);
+    virtual void StopApplication(void);
 
-  void Receive (Ptr<Socket> socket);
+    void Receive(Ptr<Socket> socket);
 
-  Ptr<Socket>     m_socket;
+    Ptr<Socket> m_socket;
 
-  uint32_t        m_port;
+    uint32_t m_port;
 
-  Ptr<CounterCalculator<> > m_calc;
-  Ptr<TimeMinMaxAvgTotalCalculator> m_delay;
+    Ptr<CounterCalculator<> > m_calc;
+    Ptr<TimeMinMaxAvgTotalCalculator> m_delay;
 
-  // end class Receiver
+    // end class Receiver
 };
 
 
 
 
 //------------------------------------------------------
+
 class TimestampTag : public Tag {
 public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
+    virtual uint32_t GetSerializedSize(void) const;
+    virtual void Serialize(TagBuffer i) const;
+    virtual void Deserialize(TagBuffer i);
 
-  // these are our accessors to our tag structure
-  void SetTimestamp (Time time);
-  Time GetTimestamp (void) const;
+    // these are our accessors to our tag structure
+    void SetTimestamp(Time time);
+    Time GetTimestamp(void) const;
 
-  void Print (std::ostream &os) const;
+    void Print(std::ostream &os) const;
 
 private:
-  Time m_timestamp;
+    Time m_timestamp;
 
-  // end class TimestampTag
+    // end class TimestampTag
 };

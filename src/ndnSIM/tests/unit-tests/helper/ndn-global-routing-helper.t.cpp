@@ -37,117 +37,113 @@
 #include <boost/filesystem.hpp>
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-const boost::filesystem::path TEST_TOPO_TXT = boost::filesystem::path(TEST_CONFIG_PATH) / "topo.txt";
+        const boost::filesystem::path TEST_TOPO_TXT = boost::filesystem::path(TEST_CONFIG_PATH) / "topo.txt";
 
-class GlobalRoutingHelperFixture : public CleanupFixture
-{
-public:
-  GlobalRoutingHelperFixture()
-  {
-    boost::filesystem::create_directories(TEST_CONFIG_PATH);
-  }
+        class GlobalRoutingHelperFixture : public CleanupFixture {
+        public:
 
-  ~GlobalRoutingHelperFixture()
-  {
-    boost::filesystem::remove(TEST_TOPO_TXT);
-  }
-};
+            GlobalRoutingHelperFixture() {
+                boost::filesystem::create_directories(TEST_CONFIG_PATH);
+            }
 
-BOOST_FIXTURE_TEST_SUITE(HelperGlobalRoutingHelper, GlobalRoutingHelperFixture)
+            ~GlobalRoutingHelperFixture() {
+                boost::filesystem::remove(TEST_TOPO_TXT);
+            }
+        };
 
-BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
-{
-  ofstream file1(TEST_TOPO_TXT.string().c_str());
-  file1 << "router\n\n"
-        << "#node city  y x mpi-partition\n"
-        << "A1  NA  1 1 1\n"
-        << "B1  NA  80  -40 1\n"
-        << "C1  NA  80  40  1\n\n"
-        << "link\n\n"
-        << "# from  to  capacity  metric  delay queue\n"
-        << "A1      B1  10Mbps    100 1ms 100\n"
-        << "A1      C1  10Mbps    50  1ms 100\n"
-        << "B1      C1  10Mbps    1 1ms 100\n";
-  file1.close();
+        BOOST_FIXTURE_TEST_SUITE(HelperGlobalRoutingHelper, GlobalRoutingHelperFixture)
 
-  AnnotatedTopologyReader topologyReader("");
-  topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
-  topologyReader.Read();
+        BOOST_AUTO_TEST_CASE(CalculateRouteCase1) {
+            ofstream file1(TEST_TOPO_TXT.string().c_str());
+            file1 << "router\n\n"
+                    << "#node city  y x mpi-partition\n"
+                    << "A1  NA  1 1 1\n"
+                    << "B1  NA  80  -40 1\n"
+                    << "C1  NA  80  40  1\n\n"
+                    << "link\n\n"
+                    << "# from  to  capacity  metric  delay queue\n"
+                    << "A1      B1  10Mbps    100 1ms 100\n"
+                    << "A1      C1  10Mbps    50  1ms 100\n"
+                    << "B1      C1  10Mbps    1 1ms 100\n";
+            file1.close();
 
-  // Install NDN stack on all nodes
-  ndn::StackHelper ndnHelper;
-  ndnHelper.InstallAll();
+            AnnotatedTopologyReader topologyReader("");
+            topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
+            topologyReader.Read();
 
-  topologyReader.ApplyOspfMetric();
+            // Install NDN stack on all nodes
+            ndn::StackHelper ndnHelper;
+            ndnHelper.InstallAll();
 
-  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-  BOOST_CHECK_NO_THROW(ndnGlobalRoutingHelper.InstallAll());
+            topologyReader.ApplyOspfMetric();
 
-  ndnGlobalRoutingHelper.AddOrigins("/test/prefix", Names::Find<Node>("C1"));
-  BOOST_CHECK_NO_THROW(ndn::GlobalRoutingHelper::CalculateRoutes());
+            ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+            BOOST_CHECK_NO_THROW(ndnGlobalRoutingHelper.InstallAll());
 
-  auto ndn = Names::Find<Node>("A1")->GetObject<ndn::L3Protocol>();
-  for (const auto& entry : ndn->getForwarder()->getFib()) {
-    bool isFirst = true;
-    for (auto& nextHop : entry.getNextHops()) {
-      auto& face = nextHop.getFace();
-      auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
-      if (transport == nullptr)
-        continue;
-      BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "C1");
-      isFirst = false;
-    }
-  }
-}
+            ndnGlobalRoutingHelper.AddOrigins("/test/prefix", Names::Find<Node>("C1"));
+            BOOST_CHECK_NO_THROW(ndn::GlobalRoutingHelper::CalculateRoutes());
 
-BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
-{
-  ofstream file1(TEST_TOPO_TXT.string().c_str());
-  file1 << "router\n\n"
-        << "#node city  y x mpi-partition\n"
-        << "A2  NA  1 1 1\n"
-        << "B2  NA  80  -40 1\n"
-        << "C2  NA  80  40  1\n\n"
-        << "link\n\n"
-        << "# from  to  capacity  metric  delay queue\n"
-        << "A2      B2  10Mbps    100 1ms 100\n"
-        << "A2      C2  10Mbps    500  1ms 100\n"
-        << "B2      C2  10Mbps    1 1ms 100\n";
-  file1.close();
+            auto ndn = Names::Find<Node>("A1")->GetObject<ndn::L3Protocol>();
+            for (const auto& entry : ndn->getForwarder()->getFib()) {
+                bool isFirst = true;
+                for (auto& nextHop : entry.getNextHops()) {
+                    auto& face = nextHop.getFace();
+                    auto transport = dynamic_cast<NetDeviceTransport*> (face.getTransport());
+                    if (transport == nullptr)
+                        continue;
+                    BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "C1");
+                    isFirst = false;
+                }
+            }
+        }
 
-  AnnotatedTopologyReader topologyReader("");
-  topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
-  topologyReader.Read();
+        BOOST_AUTO_TEST_CASE(CalculateRouteCase2) {
+            ofstream file1(TEST_TOPO_TXT.string().c_str());
+            file1 << "router\n\n"
+                    << "#node city  y x mpi-partition\n"
+                    << "A2  NA  1 1 1\n"
+                    << "B2  NA  80  -40 1\n"
+                    << "C2  NA  80  40  1\n\n"
+                    << "link\n\n"
+                    << "# from  to  capacity  metric  delay queue\n"
+                    << "A2      B2  10Mbps    100 1ms 100\n"
+                    << "A2      C2  10Mbps    500  1ms 100\n"
+                    << "B2      C2  10Mbps    1 1ms 100\n";
+            file1.close();
 
-  // Install NDN stack on all nodes
-  ndn::StackHelper ndnHelper;
-  ndnHelper.InstallAll();
+            AnnotatedTopologyReader topologyReader("");
+            topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
+            topologyReader.Read();
 
-  topologyReader.ApplyOspfMetric();
+            // Install NDN stack on all nodes
+            ndn::StackHelper ndnHelper;
+            ndnHelper.InstallAll();
 
-  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-  ndnGlobalRoutingHelper.InstallAll();
+            topologyReader.ApplyOspfMetric();
 
-  ndnGlobalRoutingHelper.AddOrigins("/prefix", Names::Find<Node>("C2"));
-  ndn::GlobalRoutingHelper::CalculateRoutes();
+            ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+            ndnGlobalRoutingHelper.InstallAll();
 
-  auto ndn = Names::Find<Node>("A2")->GetObject<ndn::L3Protocol>();
-  for (const auto& entry : ndn->getForwarder()->getFib()) {
-    bool isFirst = true;
-    for (auto& nextHop : entry.getNextHops()) {
-      auto& face = nextHop.getFace();
-      auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
-      if (transport == nullptr)
-        continue;
-      BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");
-      isFirst = false;
-    }
-  }
-}
+            ndnGlobalRoutingHelper.AddOrigins("/prefix", Names::Find<Node>("C2"));
+            ndn::GlobalRoutingHelper::CalculateRoutes();
 
-BOOST_AUTO_TEST_SUITE_END()
+            auto ndn = Names::Find<Node>("A2")->GetObject<ndn::L3Protocol>();
+            for (const auto& entry : ndn->getForwarder()->getFib()) {
+                bool isFirst = true;
+                for (auto& nextHop : entry.getNextHops()) {
+                    auto& face = nextHop.getFace();
+                    auto transport = dynamic_cast<NetDeviceTransport*> (face.getTransport());
+                    if (transport == nullptr)
+                        continue;
+                    BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");
+                    isFirst = false;
+                }
+            }
+        }
 
-} // namespace ndn
+        BOOST_AUTO_TEST_SUITE_END()
+
+    } // namespace ndn
 } // namespace ns3

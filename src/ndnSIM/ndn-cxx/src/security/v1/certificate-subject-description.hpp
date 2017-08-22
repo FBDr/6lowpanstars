@@ -30,64 +30,60 @@
 #include "../../encoding/oid.hpp"
 
 namespace CryptoPP {
-class BufferedTransformation;
+    class BufferedTransformation;
 } // namespace CryptoPP
 
 namespace ndn {
-namespace security {
-namespace v1 {
+    namespace security {
+        namespace v1 {
 
-/**
- * A CertificateSubjectDescription represents the SubjectDescription entry in a Certificate.
- */
-class CertificateSubjectDescription
-{
-public:
-  explicit
-  CertificateSubjectDescription(CryptoPP::BufferedTransformation& in)
-  {
-    decode(in);
-  }
+            /**
+             * A CertificateSubjectDescription represents the SubjectDescription entry in a Certificate.
+             */
+            class CertificateSubjectDescription {
+            public:
 
-  /**
-   * Create a new CertificateSubjectDescription.
-   * @param oid The oid of the subject description entry.
-   * @param value The value of the subject description entry.
-   */
-  CertificateSubjectDescription(const Oid& oid, const std::string& value)
-  : m_oid(oid), m_value(value)
-  {
-  }
+                explicit
+                CertificateSubjectDescription(CryptoPP::BufferedTransformation& in) {
+                    decode(in);
+                }
 
-  void
-  encode(CryptoPP::BufferedTransformation& out) const;
+                /**
+                 * Create a new CertificateSubjectDescription.
+                 * @param oid The oid of the subject description entry.
+                 * @param value The value of the subject description entry.
+                 */
+                CertificateSubjectDescription(const Oid& oid, const std::string& value)
+                : m_oid(oid), m_value(value) {
+                }
 
-  void
-  decode(CryptoPP::BufferedTransformation& in);
+                void
+                encode(CryptoPP::BufferedTransformation& out) const;
 
-  std::string
-  getOidString() const
-  {
-    return m_oid.toString();
-  }
+                void
+                decode(CryptoPP::BufferedTransformation& in);
 
-  const std::string&
-  getValue() const
-  {
-    return m_value;
-  }
+                std::string
+                getOidString() const {
+                    return m_oid.toString();
+                }
 
-private:
-  Oid m_oid;
-  std::string m_value;
-};
+                const std::string&
+                getValue() const {
+                    return m_value;
+                }
 
-} // namespace v1
-} // namespace security
+            private:
+                Oid m_oid;
+                std::string m_value;
+            };
+
+        } // namespace v1
+    } // namespace security
 
 #ifdef NDN_CXX_KEEP_SECURITY_V1_ALIASES
-/// @deprecated When needed, use explicit namespace
-using security::v1::CertificateSubjectDescription;
+    /// @deprecated When needed, use explicit namespace
+    using security::v1::CertificateSubjectDescription;
 #endif // NDN_CXX_KEEP_SECURITY_V1_ALIASES
 
 } // namespace ndn

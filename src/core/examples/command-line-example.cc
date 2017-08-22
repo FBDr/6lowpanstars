@@ -46,103 +46,100 @@ std::string g_cbArg = "cbArg default";
  * \param [in] val New value for \p g_cbArg.
  * \returns \c true.
  */
-bool SetCbArg (std::string val)
-{
-  g_cbArg = val;
-  return true;
+bool SetCbArg(std::string val) {
+    g_cbArg = val;
+    return true;
 }
 
+int main(int argc, char *argv[]) {
 
-int main (int argc, char *argv[])
-{
+    int intArg = 1;
+    bool boolArg = false;
+    std::string strArg = "strArg default";
+    // Attribute path
+    const std::string attrClass = "ns3::RandomVariableStream";
+    const std::string attrName = "Antithetic";
+    const std::string attrPath = attrClass + "::" + attrName;
 
-  int         intArg  = 1;
-  bool        boolArg = false;
-  std::string strArg  = "strArg default";
-  // Attribute path
-  const std::string attrClass = "ns3::RandomVariableStream";
-  const std::string attrName  = "Antithetic";
-  const std::string attrPath  = attrClass + "::" + attrName;
- 
-  // Cache the initial values.  Normally one wouldn't do this,
-  // but we want to demonstrate that CommandLine has changed them.
-  const int intDef = intArg;
-  const bool boolDef = boolArg;
-  const std::string strDef = strArg;
-  const std::string cbDef  = g_cbArg;
-  // Look up default value for attribute
-  const TypeId tid = TypeId::LookupByName (attrClass);
-  std::string attrDef;
-  {
-    struct TypeId::AttributeInformation info;
-    tid.LookupAttributeByName (attrName, &info);
-    attrDef = info.originalInitialValue->SerializeToString (info.checker);
-  }
-  
-  
-  CommandLine cmd;
-  cmd.Usage ("CommandLine example program.\n"
-             "\n"
-             "This little program demonstrates how to use CommandLine.");
-  cmd.AddValue ("intArg",  "an int argument",       intArg);
-  cmd.AddValue ("boolArg", "a bool argument",       boolArg);
-  cmd.AddValue ("strArg",  "a string argument",     strArg);
-  cmd.AddValue ("anti",    attrPath);
-  cmd.AddValue ("cbArg",   "a string via callback", MakeCallback (SetCbArg));
-  cmd.Parse (argc, argv);
-
-  // Show initial values:
-  std::cout << std::endl;
-  std::cout << cmd.GetName () << ":" << std::endl;
-  std::cout << "Initial values:" << std::endl;
-  
-  std::cout << std::left << std::setw (10) << "intArg:"
-            <<                    intDef
-            << std::endl;
-  std::cout << std::setw (10)              << "boolArg:"
-            << std::boolalpha  << boolDef  << std::noboolalpha
-            << std::endl;
-  
-  std::cout << std::setw (10)              << "strArg:"
-            << "\""            << strDef   << "\""
-            << std::endl;
-  std::cout << std::setw (10)              << "anti:"
-            << "\""            << attrDef  << "\""
-            << std::endl;
-  std::cout << std::setw (10)              << "cbArg:"
-            << "\""            << cbDef    << "\""
-            << std::endl;
-  std::cout << std::endl;
+    // Cache the initial values.  Normally one wouldn't do this,
+    // but we want to demonstrate that CommandLine has changed them.
+    const int intDef = intArg;
+    const bool boolDef = boolArg;
+    const std::string strDef = strArg;
+    const std::string cbDef = g_cbArg;
+    // Look up default value for attribute
+    const TypeId tid = TypeId::LookupByName(attrClass);
+    std::string attrDef;
+    {
+        struct TypeId::AttributeInformation info;
+        tid.LookupAttributeByName(attrName, &info);
+        attrDef = info.originalInitialValue->SerializeToString(info.checker);
+    }
 
 
-  // Show final values
-  std::cout << "Final values:" << std::endl;
-  std::cout << std::left << std::setw (10) << "intArg:"
-            <<                    intArg
+    CommandLine cmd;
+    cmd.Usage("CommandLine example program.\n"
+            "\n"
+            "This little program demonstrates how to use CommandLine.");
+    cmd.AddValue("intArg", "an int argument", intArg);
+    cmd.AddValue("boolArg", "a bool argument", boolArg);
+    cmd.AddValue("strArg", "a string argument", strArg);
+    cmd.AddValue("anti", attrPath);
+    cmd.AddValue("cbArg", "a string via callback", MakeCallback(SetCbArg));
+    cmd.Parse(argc, argv);
+
+    // Show initial values:
+    std::cout << std::endl;
+    std::cout << cmd.GetName() << ":" << std::endl;
+    std::cout << "Initial values:" << std::endl;
+
+    std::cout << std::left << std::setw(10) << "intArg:"
+            << intDef
             << std::endl;
-  std::cout << std::setw (10)              << "boolArg:"
-            << std::boolalpha  << boolArg
+    std::cout << std::setw(10) << "boolArg:"
+            << std::boolalpha << boolDef << std::noboolalpha
+            << std::endl;
+
+    std::cout << std::setw(10) << "strArg:"
+            << "\"" << strDef << "\""
+            << std::endl;
+    std::cout << std::setw(10) << "anti:"
+            << "\"" << attrDef << "\""
+            << std::endl;
+    std::cout << std::setw(10) << "cbArg:"
+            << "\"" << cbDef << "\""
+            << std::endl;
+    std::cout << std::endl;
+
+
+    // Show final values
+    std::cout << "Final values:" << std::endl;
+    std::cout << std::left << std::setw(10) << "intArg:"
+            << intArg
+            << std::endl;
+    std::cout << std::setw(10) << "boolArg:"
+            << std::boolalpha << boolArg
             << std::noboolalpha
             << std::endl;
-  
-  std::cout << std::setw (10)              << "strArg:"
-            << "\""            << strArg   << "\""
+
+    std::cout << std::setw(10) << "strArg:"
+            << "\"" << strArg << "\""
             << std::endl;
 
-  // Look up new default value for attribute
-  {
-    struct TypeId::AttributeInformation info;
-    tid.LookupAttributeByName (attrName, &info);
-  
-    std::cout << std::setw (10)            << "anti:"
-              << "\""
-              << info.initialValue->SerializeToString (info.checker)
-              << "\""
-              << std::endl;
-  }
-  std::cout << std::setw (10)              << "cbArg:"
-            << "\""            << g_cbArg  << "\""
+    // Look up new default value for attribute
+    {
+        struct TypeId::AttributeInformation info;
+        tid.LookupAttributeByName(attrName, &info);
+
+        std::cout << std::setw(10) << "anti:"
+                << "\""
+                << info.initialValue->SerializeToString(info.checker)
+                << "\""
+                << std::endl;
+    }
+    std::cout << std::setw(10) << "cbArg:"
+            << "\"" << g_cbArg << "\""
             << std::endl;
 
-  return 0;
+    return 0;
 }

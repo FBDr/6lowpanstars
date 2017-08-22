@@ -48,164 +48,153 @@
 using namespace ns3;
 
 static void
-AddInternetStack (Ptr<Node> node)
-{
-  Ptr<Ipv6L3Protocol> ipv6 = CreateObject<Ipv6L3Protocol> ();
-  Ptr<Icmpv6L4Protocol> icmpv6 = CreateObject<Icmpv6L4Protocol> ();
-  node->AggregateObject (ipv6);
-  node->AggregateObject (icmpv6);
-  ipv6->Insert (icmpv6);
-  icmpv6->SetAttribute ("DAD", BooleanValue (false));
+AddInternetStack(Ptr<Node> node) {
+    Ptr<Ipv6L3Protocol> ipv6 = CreateObject<Ipv6L3Protocol> ();
+    Ptr<Icmpv6L4Protocol> icmpv6 = CreateObject<Icmpv6L4Protocol> ();
+    node->AggregateObject(ipv6);
+    node->AggregateObject(icmpv6);
+    ipv6->Insert(icmpv6);
+    icmpv6->SetAttribute("DAD", BooleanValue(false));
 
-  //Routing for Ipv6
-  Ptr<Ipv6ListRouting> ipv6Routing = CreateObject<Ipv6ListRouting> ();
-  ipv6->SetRoutingProtocol (ipv6Routing);
-  Ptr<Ipv6StaticRouting> ipv6staticRouting = CreateObject<Ipv6StaticRouting> ();
-  ipv6Routing->AddRoutingProtocol (ipv6staticRouting, 0);
+    //Routing for Ipv6
+    Ptr<Ipv6ListRouting> ipv6Routing = CreateObject<Ipv6ListRouting> ();
+    ipv6->SetRoutingProtocol(ipv6Routing);
+    Ptr<Ipv6StaticRouting> ipv6staticRouting = CreateObject<Ipv6StaticRouting> ();
+    ipv6Routing->AddRoutingProtocol(ipv6staticRouting, 0);
 
-  /* register IPv6 extensions and options */
-  ipv6->RegisterExtensions ();
-  ipv6->RegisterOptions ();
+    /* register IPv6 extensions and options */
+    ipv6->RegisterExtensions();
+    ipv6->RegisterOptions();
 }
 
 class Ipv6PacketInfoTagTest : public TestCase
 {
-public:
-  Ipv6PacketInfoTagTest ();
+    public :
+    Ipv6PacketInfoTagTest();
 private:
-  virtual void DoRun (void);
-  void RxCb (Ptr<Socket> socket);
-  void DoSendData (Ptr<Socket> socket, std::string to);
-};
+    virtual void DoRun(void);
+    void RxCb(Ptr<Socket> socket);
+    void DoSendData(Ptr<Socket> socket, std::string to);};
 
-Ipv6PacketInfoTagTest::Ipv6PacketInfoTagTest ()
-  : TestCase ("Ipv6PacketInfoTagTest") 
-{
+Ipv6PacketInfoTagTest::Ipv6PacketInfoTagTest()
+: TestCase("Ipv6PacketInfoTagTest") {
 }
 
 void
-Ipv6PacketInfoTagTest::RxCb (Ptr<Socket> socket)
-{
-  uint32_t availableData;
-  Ptr<Packet> m_receivedPacket;
+Ipv6PacketInfoTagTest::RxCb(Ptr<Socket> socket) {
+    uint32_t availableData;
+    Ptr<Packet> m_receivedPacket;
 
-  availableData = socket->GetRxAvailable ();
-  m_receivedPacket = socket->Recv (std::numeric_limits<uint32_t>::max (), 0);
-  NS_TEST_ASSERT_MSG_EQ (availableData, m_receivedPacket->GetSize (), "Did not read expected data");
+    availableData = socket->GetRxAvailable();
+    m_receivedPacket = socket->Recv(std::numeric_limits<uint32_t>::max(), 0);
+    NS_TEST_ASSERT_MSG_EQ(availableData, m_receivedPacket->GetSize(), "Did not read expected data");
 
-  Ipv6PacketInfoTag tag;
-  bool found;
-  found = m_receivedPacket->RemovePacketTag (tag);
-  NS_TEST_ASSERT_MSG_EQ (found, true, "Could not find tag");
+    Ipv6PacketInfoTag tag;
+    bool found;
+    found = m_receivedPacket->RemovePacketTag(tag);
+    NS_TEST_ASSERT_MSG_EQ(found, true, "Could not find tag");
 }
 
 void
-Ipv6PacketInfoTagTest::DoSendData (Ptr<Socket> socket, std::string to)
-{
-  Address realTo = Inet6SocketAddress (Ipv6Address (to.c_str ()), 200);
-  if (DynamicCast<UdpSocket> (socket) != 0)
-    {
-      NS_TEST_EXPECT_MSG_EQ (socket->SendTo (Create<Packet> (123), 0, realTo),
-                             123, "100");
-    }
-  // Should only Ipv6RawSock
-  else
-    {
-      socket->SendTo (Create<Packet> (123), 0, realTo);
+Ipv6PacketInfoTagTest::DoSendData(Ptr<Socket> socket, std::string to) {
+    Address realTo = Inet6SocketAddress(Ipv6Address(to.c_str()), 200);
+    if (DynamicCast<UdpSocket> (socket) != 0) {
+        NS_TEST_EXPECT_MSG_EQ(socket->SendTo(Create<Packet> (123), 0, realTo),
+                123, "100");
+    }        // Should only Ipv6RawSock
+    else {
+        socket->SendTo(Create<Packet> (123), 0, realTo);
     }
 }
 
 void
-Ipv6PacketInfoTagTest::DoRun (void)
-{
-  Ptr<Node> node0 = CreateObject<Node> ();
-  Ptr<Node> node1 = CreateObject<Node> ();
+Ipv6PacketInfoTagTest::DoRun(void) {
+    Ptr<Node> node0 = CreateObject<Node> ();
+    Ptr<Node> node1 = CreateObject<Node> ();
 
-  Ptr<SimpleNetDevice> device = CreateObject<SimpleNetDevice> ();
-  Ptr<SimpleNetDevice> device2 = CreateObject<SimpleNetDevice> ();
+    Ptr<SimpleNetDevice> device = CreateObject<SimpleNetDevice> ();
+    Ptr<SimpleNetDevice> device2 = CreateObject<SimpleNetDevice> ();
 
-  // For Node 0
-  node0->AddDevice (device);
-  AddInternetStack (node0);
-  Ptr<Ipv6> ipv6 = node0->GetObject<Ipv6> ();
+    // For Node 0
+    node0->AddDevice(device);
+    AddInternetStack(node0);
+    Ptr<Ipv6> ipv6 = node0->GetObject<Ipv6> ();
 
-  uint32_t index = ipv6->AddInterface (device);
-  Ipv6InterfaceAddress ifaceAddr1 = Ipv6InterfaceAddress (Ipv6Address ("2000:1000:0:2000::1"),
-                                                          Ipv6Prefix (64));
-  ipv6->AddAddress (index, ifaceAddr1);
-  ipv6->SetMetric (index, 1);
-  ipv6->SetUp (index);
+    uint32_t index = ipv6->AddInterface(device);
+    Ipv6InterfaceAddress ifaceAddr1 = Ipv6InterfaceAddress(Ipv6Address("2000:1000:0:2000::1"),
+            Ipv6Prefix(64));
+    ipv6->AddAddress(index, ifaceAddr1);
+    ipv6->SetMetric(index, 1);
+    ipv6->SetUp(index);
 
-  // For Node 1
-  node1->AddDevice (device2);
-  AddInternetStack (node1);
-  ipv6 = node1->GetObject<Ipv6> ();
+    // For Node 1
+    node1->AddDevice(device2);
+    AddInternetStack(node1);
+    ipv6 = node1->GetObject<Ipv6> ();
 
-  index = ipv6->AddInterface (device2);
-  Ipv6InterfaceAddress ifaceAddr2 = Ipv6InterfaceAddress (Ipv6Address ("2000:1000:0:2000::2"),
-                                                          Ipv6Prefix (64));
-  ipv6->AddAddress (index, ifaceAddr2);
-  ipv6->SetMetric (index, 1);
-  ipv6->SetUp (index);
+    index = ipv6->AddInterface(device2);
+    Ipv6InterfaceAddress ifaceAddr2 = Ipv6InterfaceAddress(Ipv6Address("2000:1000:0:2000::2"),
+            Ipv6Prefix(64));
+    ipv6->AddAddress(index, ifaceAddr2);
+    ipv6->SetMetric(index, 1);
+    ipv6->SetUp(index);
 
-  // ipv6 w rawsocket
-  Ptr<SocketFactory> factory = node0->GetObject<SocketFactory> (Ipv6RawSocketFactory::GetTypeId ());
-  Ptr<Socket> socket = factory->CreateSocket ();
-  Inet6SocketAddress local =  Inet6SocketAddress (Ipv6Address::GetAny (), 0);
-  socket->SetAttribute ("Protocol", UintegerValue (Ipv6Header::IPV6_ICMPV6));
-  socket->Bind (local);
-  socket->SetRecvPktInfo (true);
-  socket->SetRecvCallback (MakeCallback (&Ipv6PacketInfoTagTest::RxCb, this));
+    // ipv6 w rawsocket
+    Ptr<SocketFactory> factory = node0->GetObject<SocketFactory> (Ipv6RawSocketFactory::GetTypeId());
+    Ptr<Socket> socket = factory->CreateSocket();
+    Inet6SocketAddress local = Inet6SocketAddress(Ipv6Address::GetAny(), 0);
+    socket->SetAttribute("Protocol", UintegerValue(Ipv6Header::IPV6_ICMPV6));
+    socket->Bind(local);
+    socket->SetRecvPktInfo(true);
+    socket->SetRecvCallback(MakeCallback(&Ipv6PacketInfoTagTest::RxCb, this));
 
-  // receive on loopback 
-  Simulator::ScheduleWithContext (socket->GetNode ()->GetId (), Seconds (0),
-                                  &Ipv6PacketInfoTagTest::DoSendData, this, socket, "::1");
-  Simulator::Run ();
+    // receive on loopback 
+    Simulator::ScheduleWithContext(socket->GetNode()->GetId(), Seconds(0),
+            &Ipv6PacketInfoTagTest::DoSendData, this, socket, "::1");
+    Simulator::Run();
 
-  Ptr<SocketFactory> factory2 = node1->GetObject<SocketFactory> (Ipv6RawSocketFactory::GetTypeId ());
-  Ptr<Socket> socket2 = factory2->CreateSocket ();
-  std::stringstream dst;
-  dst << ifaceAddr1.GetAddress ();
-  Simulator::ScheduleWithContext (socket2->GetNode ()->GetId (), Seconds (0),
-                                  &Ipv6PacketInfoTagTest::DoSendData, this, socket, 
-                                  dst.str ());
-  Simulator::Run ();
+    Ptr<SocketFactory> factory2 = node1->GetObject<SocketFactory> (Ipv6RawSocketFactory::GetTypeId());
+    Ptr<Socket> socket2 = factory2->CreateSocket();
+    std::stringstream dst;
+    dst << ifaceAddr1.GetAddress();
+    Simulator::ScheduleWithContext(socket2->GetNode()->GetId(), Seconds(0),
+            &Ipv6PacketInfoTagTest::DoSendData, this, socket,
+            dst.str());
+    Simulator::Run();
 
 #ifdef UDP6_SUPPORTED
-  // IPv6 test
-  factory = node0->GetObject<SocketFactory> (UdpSocketFactory::GetTypeId ());
-  socket = factory->CreateSocket ();
-  local =  Inet6SocketAddress (Ipv6Address::GetAny (), 200);
-  socket->Bind (local);
-  socket->SetRecvPktInfo (true);
-  socket->SetRecvCallback (MakeCallback (&Ipv6PacketInfoTagTest::RxCb, this));
+    // IPv6 test
+    factory = node0->GetObject<SocketFactory> (UdpSocketFactory::GetTypeId());
+    socket = factory->CreateSocket();
+    local = Inet6SocketAddress(Ipv6Address::GetAny(), 200);
+    socket->Bind(local);
+    socket->SetRecvPktInfo(true);
+    socket->SetRecvCallback(MakeCallback(&Ipv6PacketInfoTagTest::RxCb, this));
 
-  // receive on loopback 
-  Simulator::ScheduleWithContext (socket->GetNode ()->GetId (), Seconds (0),
-                                  &Ipv6PacketInfoTagTest::DoSendData, this, socket, "::1");
-  Simulator::Run ();
+    // receive on loopback 
+    Simulator::ScheduleWithContext(socket->GetNode()->GetId(), Seconds(0),
+            &Ipv6PacketInfoTagTest::DoSendData, this, socket, "::1");
+    Simulator::Run();
 
-  factory2 = node1->GetObject<SocketFactory> (UdpSocketFactory::GetTypeId ());
-  socket2 = factory2->CreateSocket ();
-  Simulator::ScheduleWithContext (socket2->GetNode ()->GetId (), Seconds (0),
-                                  &Ipv6PacketInfoTagTest::DoSendData, this, socket, "10.1.1.1");
-  Simulator::Run ();
+    factory2 = node1->GetObject<SocketFactory> (UdpSocketFactory::GetTypeId());
+    socket2 = factory2->CreateSocket();
+    Simulator::ScheduleWithContext(socket2->GetNode()->GetId(), Seconds(0),
+            &Ipv6PacketInfoTagTest::DoSendData, this, socket, "10.1.1.1");
+    Simulator::Run();
 
 #endif  // UDP6_SUPPORTED
 
-  Simulator::Destroy ();
-  // IPv6 test
+    Simulator::Destroy();
+    // IPv6 test
 }
 
 static class Ipv6PacketInfoTagTestSuite : public TestSuite
 {
-public:
-  Ipv6PacketInfoTagTestSuite ();
-private:
-} g_packetinfotagTests;
+    public :
+    Ipv6PacketInfoTagTestSuite();
+private:} g_packetinfotagTests;
 
-Ipv6PacketInfoTagTestSuite::Ipv6PacketInfoTagTestSuite ()
-  : TestSuite ("ipv6-packet-info-tag", UNIT)
-{
-  AddTestCase (new Ipv6PacketInfoTagTest (), TestCase::QUICK);
+Ipv6PacketInfoTagTestSuite::Ipv6PacketInfoTagTestSuite()
+: TestSuite("ipv6-packet-info-tag", UNIT) {
+    AddTestCase(new Ipv6PacketInfoTagTest(), TestCase::QUICK);
 }

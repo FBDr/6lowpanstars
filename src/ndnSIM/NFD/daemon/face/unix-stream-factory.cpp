@@ -29,52 +29,48 @@
 
 namespace nfd {
 
-shared_ptr<UnixStreamChannel>
-UnixStreamFactory::createChannel(const std::string& unixSocketPath)
-{
-  boost::filesystem::path p(unixSocketPath);
-  p = boost::filesystem::canonical(p.parent_path()) / p.filename();
-  unix_stream::Endpoint endpoint(p.string());
+    shared_ptr<UnixStreamChannel>
+    UnixStreamFactory::createChannel(const std::string& unixSocketPath) {
+        boost::filesystem::path p(unixSocketPath);
+        p = boost::filesystem::canonical(p.parent_path()) / p.filename();
+        unix_stream::Endpoint endpoint(p.string());
 
-  auto channel = findChannel(endpoint);
-  if (channel)
-    return channel;
+        auto channel = findChannel(endpoint);
+        if (channel)
+            return channel;
 
-  channel = make_shared<UnixStreamChannel>(endpoint);
-  m_channels[endpoint] = channel;
-  return channel;
-}
+        channel = make_shared<UnixStreamChannel>(endpoint);
+        m_channels[endpoint] = channel;
+        return channel;
+    }
 
-void
-UnixStreamFactory::createFace(const FaceUri& uri,
-                              ndn::nfd::FacePersistency persistency,
-                              bool wantLocalFieldsEnabled,
-                              const FaceCreatedCallback& onCreated,
-                              const FaceCreationFailedCallback& onFailure)
-{
-  onFailure(406, "Unsupported protocol");
-}
+    void
+    UnixStreamFactory::createFace(const FaceUri& uri,
+            ndn::nfd::FacePersistency persistency,
+            bool wantLocalFieldsEnabled,
+            const FaceCreatedCallback& onCreated,
+            const FaceCreationFailedCallback& onFailure) {
+        onFailure(406, "Unsupported protocol");
+    }
 
-std::vector<shared_ptr<const Channel>>
-UnixStreamFactory::getChannels() const
-{
-  std::vector<shared_ptr<const Channel>> channels;
-  channels.reserve(m_channels.size());
+    std::vector<shared_ptr<const Channel>>
+    UnixStreamFactory::getChannels() const {
+        std::vector<shared_ptr<const Channel>> channels;
+        channels.reserve(m_channels.size());
 
-  for (const auto& i : m_channels)
-    channels.push_back(i.second);
+        for (const auto& i : m_channels)
+            channels.push_back(i.second);
 
-  return channels;
-}
+        return channels;
+    }
 
-shared_ptr<UnixStreamChannel>
-UnixStreamFactory::findChannel(const unix_stream::Endpoint& endpoint) const
-{
-  auto i = m_channels.find(endpoint);
-  if (i != m_channels.end())
-    return i->second;
-  else
-    return nullptr;
-}
+    shared_ptr<UnixStreamChannel>
+    UnixStreamFactory::findChannel(const unix_stream::Endpoint& endpoint) const {
+        auto i = m_channels.find(endpoint);
+        if (i != m_channels.end())
+            return i->second;
+        else
+            return nullptr;
+    }
 
 } // namespace nfd

@@ -36,63 +36,64 @@
 
 namespace ns3 {
 
-/**
- * \ingroup mpi
- *
- * \brief Pure virtual base class for the interface between ns-3 and
- * the parallel communication layer being used.
- *
- * Each type of parallel communication layer is required to implement
- * this interface.  This interface is called through the
- * MpiInterface.
- */
-  class ParallelCommunicationInterface
-{
-public:
-  /**
-    * Destructor
-    */
-  virtual ~ParallelCommunicationInterface() {}
-  /**
-   * Deletes storage used by the parallel environment.
-   */
-  virtual void Destroy () = 0;
-  /**
-   * \return system identification
-   */
-  virtual uint32_t GetSystemId () = 0;
-  /**
-   * \return number of parallel tasks
-   */
-  virtual uint32_t GetSize () = 0;
-  /**
-   * \return true if parallel communication is enabled
-   */
-  virtual bool IsEnabled () = 0;
-  /**
-   * \param pargc number of command line arguments
-   * \param pargv command line arguments
-   *
-   * Sets up parallel communication interface
-   */
-  virtual void Enable (int* pargc, char*** pargv) = 0;
-  /**
-   * Terminates the parallel environment.
-   * This function must be called after Destroy ()
-   */
-  virtual void Disable () = 0;
-  /**
-   * \param p packet to send
-   * \param rxTime received time at destination node
-   * \param node destination node
-   * \param dev destination device
-   *
-   * Serialize and send a packet to the specified node and net device
-   */
-  virtual void SendPacket (Ptr<Packet> p, const Time &rxTime, uint32_t node, uint32_t dev) = 0;
+        /**
+     * \ingroup mpi
+     *
+     * \brief Pure virtual base class for the interface between ns-3 and
+     * the parallel communication layer being used.
+     *
+     * Each type of parallel communication layer is required to implement
+     * this interface.  This interface is called through the
+     * MpiInterface.
+     */
+    class ParallelCommunicationInterface {
+    public:
 
-private:
-};
+        /**
+         * Destructor
+         */
+        virtual ~ParallelCommunicationInterface() {
+        }
+        /**
+         * Deletes storage used by the parallel environment.
+         */
+        virtual void Destroy() = 0;
+        /**
+         * \return system identification
+         */
+        virtual uint32_t GetSystemId() = 0;
+        /**
+         * \return number of parallel tasks
+         */
+        virtual uint32_t GetSize() = 0;
+        /**
+         * \return true if parallel communication is enabled
+         */
+        virtual bool IsEnabled() = 0;
+        /**
+         * \param pargc number of command line arguments
+         * \param pargv command line arguments
+         *
+         * Sets up parallel communication interface
+         */
+        virtual void Enable(int* pargc, char*** pargv) = 0;
+        /**
+         * Terminates the parallel environment.
+         * This function must be called after Destroy ()
+         */
+        virtual void Disable() = 0;
+        /**
+         * \param p packet to send
+         * \param rxTime received time at destination node
+         * \param node destination node
+         * \param dev destination device
+         *
+         * Serialize and send a packet to the specified node and net device
+         */
+        virtual void SendPacket(Ptr<Packet> p, const Time &rxTime, uint32_t node, uint32_t dev) = 0;
+
+    private:
+    };
 
 } // namespace ns3
 

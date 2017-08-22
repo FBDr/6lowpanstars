@@ -25,129 +25,128 @@
 #include "pib-impl.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-/**
- * @brief An in-memory implementation of Pib
- *
- * All the contents in Pib are stored in memory
- * and have the same lifetime as the implementation instance.
- */
-class PibMemory : public PibImpl
-{
-public:
-  class Error : public PibImpl::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : PibImpl::Error(what)
-    {
-    }
-  };
+        /**
+         * @brief An in-memory implementation of Pib
+         *
+         * All the contents in Pib are stored in memory
+         * and have the same lifetime as the implementation instance.
+         */
+        class PibMemory : public PibImpl {
+        public:
 
-public:
-  PibMemory();
+            class Error : public PibImpl::Error {
+            public:
 
-public: // TpmLocator management
+                explicit
+                Error(const std::string& what)
+                : PibImpl::Error(what) {
+                }
+            };
 
-  virtual void
-  setTpmLocator(const std::string& tpmLocator) override;
+        public:
+            PibMemory();
 
-  virtual std::string
-  getTpmLocator() const override;
+        public: // TpmLocator management
 
-public: // Identity management
+            virtual void
+            setTpmLocator(const std::string& tpmLocator) override;
 
-  virtual bool
-  hasIdentity(const Name& identity) const override;
+            virtual std::string
+            getTpmLocator() const override;
 
-  virtual void
-  addIdentity(const Name& identity) override;
+        public: // Identity management
 
-  virtual void
-  removeIdentity(const Name& identity) override;
+            virtual bool
+            hasIdentity(const Name& identity) const override;
 
-  virtual std::set<Name>
-  getIdentities() const override;
+            virtual void
+            addIdentity(const Name& identity) override;
 
-  virtual void
-  setDefaultIdentity(const Name& identityName) override;
+            virtual void
+            removeIdentity(const Name& identity) override;
 
-  virtual Name
-  getDefaultIdentity() const override;
+            virtual std::set<Name>
+            getIdentities() const override;
 
-public: // Key management
+            virtual void
+            setDefaultIdentity(const Name& identityName) override;
 
-  virtual bool
-  hasKey(const Name& identity, const name::Component& keyId) const override;
+            virtual Name
+            getDefaultIdentity() const override;
 
-  virtual void
-  addKey(const Name& identity, const name::Component& keyId, const v1::PublicKey& publicKey) override;
+        public: // Key management
 
-  virtual void
-  removeKey(const Name& identity, const name::Component& keyId) override;
+            virtual bool
+            hasKey(const Name& identity, const name::Component& keyId) const override;
 
-  virtual v1::PublicKey
-  getKeyBits(const Name& identity, const name::Component& keyId) const override;
+            virtual void
+            addKey(const Name& identity, const name::Component& keyId, const v1::PublicKey& publicKey) override;
 
-  virtual std::set<name::Component>
-  getKeysOfIdentity(const Name& identity) const override;
+            virtual void
+            removeKey(const Name& identity, const name::Component& keyId) override;
 
-  virtual void
-  setDefaultKeyOfIdentity(const Name& identity, const name::Component& keyId) override;
+            virtual v1::PublicKey
+            getKeyBits(const Name& identity, const name::Component& keyId) const override;
 
-  virtual name::Component
-  getDefaultKeyOfIdentity(const Name& identity) const override;
+            virtual std::set<name::Component>
+            getKeysOfIdentity(const Name& identity) const override;
 
-public: // Certificate management
+            virtual void
+            setDefaultKeyOfIdentity(const Name& identity, const name::Component& keyId) override;
 
-  virtual bool
-  hasCertificate(const Name& certName) const override;
+            virtual name::Component
+            getDefaultKeyOfIdentity(const Name& identity) const override;
 
-  virtual void
-  addCertificate(const v1::IdentityCertificate& certificate) override;
+        public: // Certificate management
 
-  virtual void
-  removeCertificate(const Name& certName) override;
+            virtual bool
+            hasCertificate(const Name& certName) const override;
 
-  virtual v1::IdentityCertificate
-  getCertificate(const Name& certName) const override;
+            virtual void
+            addCertificate(const v1::IdentityCertificate& certificate) override;
 
-  virtual std::set<Name>
-  getCertificatesOfKey(const Name& identity, const name::Component& keyId) const override;
+            virtual void
+            removeCertificate(const Name& certName) override;
 
-  virtual void
-  setDefaultCertificateOfKey(const Name& identity, const name::Component& keyId, const Name& certName) override;
+            virtual v1::IdentityCertificate
+            getCertificate(const Name& certName) const override;
 
-  virtual v1::IdentityCertificate
-  getDefaultCertificateOfKey(const Name& identity, const name::Component& keyId) const override;
+            virtual std::set<Name>
+            getCertificatesOfKey(const Name& identity, const name::Component& keyId) const override;
 
-private: // Key management
+            virtual void
+            setDefaultCertificateOfKey(const Name& identity, const name::Component& keyId, const Name& certName) override;
 
-  Name
-  getKeyName(const Name& identity, const name::Component& keyId) const;
+            virtual v1::IdentityCertificate
+            getDefaultCertificateOfKey(const Name& identity, const name::Component& keyId) const override;
 
-private:
+        private: // Key management
 
-  std::set<Name> m_identities;
-  bool m_hasDefaultIdentity;
-  Name m_defaultIdentity;
+            Name
+            getKeyName(const Name& identity, const name::Component& keyId) const;
 
-  /// @brief keyName => keyBits
-  std::map<Name, v1::PublicKey> m_keys;
+        private:
 
-  /// @brief identity => default key Name
-  std::map<Name, Name> m_defaultKey;
+            std::set<Name> m_identities;
+            bool m_hasDefaultIdentity;
+            Name m_defaultIdentity;
 
-  /// @brief certificate Name => certificate
-  std::map<Name, v1::IdentityCertificate> m_certs;
+            /// @brief keyName => keyBits
+            std::map<Name, v1::PublicKey> m_keys;
 
-  /// @brief keyName => default certificate Name
-  std::map<Name, Name> m_defaultCert;
-};
+            /// @brief identity => default key Name
+            std::map<Name, Name> m_defaultKey;
 
-} // namespace security
+            /// @brief certificate Name => certificate
+            std::map<Name, v1::IdentityCertificate> m_certs;
+
+            /// @brief keyName => default certificate Name
+            std::map<Name, Name> m_defaultCert;
+        };
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_PIB_MEMORY_HPP

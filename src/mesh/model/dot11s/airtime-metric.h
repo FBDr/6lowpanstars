@@ -22,34 +22,34 @@
 #define AIRTIME_METRIC_H
 #include "ns3/mesh-wifi-interface-mac.h"
 namespace ns3 {
-namespace dot11s {
-/**
- * \ingroup dot11s
- *
- * \brief Airtime link metric calculator
- *
- * Airtime link metric is defined in 11B.10 of 802.11s Draft D3.0 as:
- *
- * airtime = (O + Bt/r)* (1 + average retry counter), where:
- * - o  -- the PHY dependent channel access which includes frame headers, training sequences,
- *       access protocol frames, etc.
- * - bt -- the test packet length in bits (8192 by default),
- * - r  -- the current bitrate of the packet,
- *
- * Final result is expressed in units of 0.01 Time Unit = 10.24 us (as required by 802.11s draft)
- */
-class AirtimeLinkMetricCalculator : public Object
-{
-public:
-  AirtimeLinkMetricCalculator ();
-  static TypeId GetTypeId ();
-  uint32_t CalculateMetric (Mac48Address peerAddress, Ptr<MeshWifiInterfaceMac> mac);
-  void SetTestLength (uint16_t testLength);
-  void SetHeaderTid (uint8_t tid);
-private:
-  Ptr<Packet> m_testFrame;
-  WifiMacHeader m_testHeader;
-};
-} // namespace dot11s
+    namespace dot11s {
+
+        /**
+         * \ingroup dot11s
+         *
+         * \brief Airtime link metric calculator
+         *
+         * Airtime link metric is defined in 11B.10 of 802.11s Draft D3.0 as:
+         *
+         * airtime = (O + Bt/r)* (1 + average retry counter), where:
+         * - o  -- the PHY dependent channel access which includes frame headers, training sequences,
+         *       access protocol frames, etc.
+         * - bt -- the test packet length in bits (8192 by default),
+         * - r  -- the current bitrate of the packet,
+         *
+         * Final result is expressed in units of 0.01 Time Unit = 10.24 us (as required by 802.11s draft)
+         */
+        class AirtimeLinkMetricCalculator : public Object {
+        public:
+            AirtimeLinkMetricCalculator();
+            static TypeId GetTypeId();
+            uint32_t CalculateMetric(Mac48Address peerAddress, Ptr<MeshWifiInterfaceMac> mac);
+            void SetTestLength(uint16_t testLength);
+            void SetHeaderTid(uint8_t tid);
+        private:
+            Ptr<Packet> m_testFrame;
+            WifiMacHeader m_testHeader;
+        };
+    } // namespace dot11s
 } // namespace ns3
 #endif

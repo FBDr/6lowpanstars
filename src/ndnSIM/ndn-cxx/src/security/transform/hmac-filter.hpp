@@ -26,47 +26,46 @@
 #include "../security-common.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
+    namespace security {
+        namespace transform {
 
-/**
- * @brief The module to generate HMAC for input data.
- */
-class HmacFilter : public Transform
-{
-public:
+            /**
+             * @brief The module to generate HMAC for input data.
+             */
+            class HmacFilter : public Transform {
+            public:
 
-  /**
-   * @brief Create a HMAC module to generate HMAC using algorithm @p algo and @p key
-   * @pre @p key must not be nullptr, and @p size must be a positive integer.
-   */
-  HmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen);
+                /**
+                 * @brief Create a HMAC module to generate HMAC using algorithm @p algo and @p key
+                 * @pre @p key must not be nullptr, and @p size must be a positive integer.
+                 */
+                HmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen);
 
-private:
-  /**
-   * @brief write data @p buf into HMAC signer
-   *
-   * @return The number of bytes that are actually accepted
-   */
-  virtual size_t
-  convert(const uint8_t* buf, size_t size) final;
+            private:
+                /**
+                 * @brief write data @p buf into HMAC signer
+                 *
+                 * @return The number of bytes that are actually accepted
+                 */
+                virtual size_t
+                convert(const uint8_t* buf, size_t size) final;
 
-  /**
-   * @brief Finalize HMAC calculation and write the HMAC into next module.
-   */
-  virtual void
-  finalize() final;
+                /**
+                 * @brief Finalize HMAC calculation and write the HMAC into next module.
+                 */
+                virtual void
+                finalize() final;
 
-private:
-  class Impl;
-  unique_ptr<Impl> m_impl;
-};
+            private:
+                class Impl;
+                unique_ptr<Impl> m_impl;
+            };
 
-unique_ptr<Transform>
-hmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen);
+            unique_ptr<Transform>
+            hmacFilter(DigestAlgorithm algo, const uint8_t* key, size_t keyLen);
 
-} // namespace transform
-} // namespace security
+        } // namespace transform
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_CXX_SECURITY_TRANSFORM_HMAC_FILTER_HPP

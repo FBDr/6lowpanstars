@@ -28,43 +28,40 @@
 #include "estimator.hpp"
 
 namespace ndn {
-namespace encoding {
+    namespace encoding {
 
-/**
- * @brief EncodingImpl specialization for real TLV encoding
- */
-template<>
-class EncodingImpl<EncoderTag> : public encoding::Encoder
-{
-public:
-  explicit
-  EncodingImpl(size_t totalReserve = MAX_NDN_PACKET_SIZE, size_t reserveFromBack = 400)
-    : Encoder(totalReserve, reserveFromBack)
-  {
-  }
+        /**
+         * @brief EncodingImpl specialization for real TLV encoding
+         */
+        template<>
+        class EncodingImpl<EncoderTag> : public encoding::Encoder {
+        public:
 
-  explicit
-  EncodingImpl(const Block& block)
-    : Encoder(block)
-  {
-  }
-};
+            explicit
+            EncodingImpl(size_t totalReserve = MAX_NDN_PACKET_SIZE, size_t reserveFromBack = 400)
+            : Encoder(totalReserve, reserveFromBack) {
+            }
 
-/**
- * @brief EncodingImpl specialization TLV size estimation
- */
-template<>
-class EncodingImpl<EstimatorTag> : public encoding::Estimator
-{
-public:
-  explicit
-  EncodingImpl(size_t totalReserve = 0, size_t totalFromBack = 0)
-    : Estimator(totalReserve, totalFromBack)
-  {
-  }
-};
+            explicit
+            EncodingImpl(const Block& block)
+            : Encoder(block) {
+            }
+        };
 
-} // namespace encoding
+        /**
+         * @brief EncodingImpl specialization TLV size estimation
+         */
+        template<>
+        class EncodingImpl<EstimatorTag> : public encoding::Estimator {
+        public:
+
+            explicit
+            EncodingImpl(size_t totalReserve = 0, size_t totalFromBack = 0)
+            : Estimator(totalReserve, totalFromBack) {
+            }
+        };
+
+    } // namespace encoding
 } // namespace ndn
 
 #endif // NDN_ENCODING_ENCODING_BUFFER_HPP

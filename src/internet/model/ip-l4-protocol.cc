@@ -25,46 +25,44 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("IpL4Protocol");
-
-NS_OBJECT_ENSURE_REGISTERED (IpL4Protocol);
-
-TypeId 
-IpL4Protocol::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::IpL4Protocol")
-    .SetParent<Object> ()
-    .SetGroupName ("Internet")
-    .AddAttribute ("ProtocolNumber", "The IP protocol number.",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&IpL4Protocol::GetProtocolNumber),
-                   MakeUintegerChecker<int> ())
-  ;
-  return tid;
-}
 
-IpL4Protocol::~IpL4Protocol ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("IpL4Protocol");
 
-void
-IpL4Protocol::ReceiveIcmp (Ipv4Address icmpSource, uint8_t icmpTtl,
-                           uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
-                           Ipv4Address payloadSource,Ipv4Address payloadDestination,
-                           const uint8_t payload[8])
-{
-  NS_LOG_FUNCTION (this << icmpSource << static_cast<uint32_t> (icmpTtl) << static_cast<uint32_t> (icmpType) << static_cast<uint32_t> (icmpCode) << icmpInfo << payloadSource << payloadDestination << payload);
-}
-void
-IpL4Protocol::ReceiveIcmp (Ipv6Address icmpSource, uint8_t icmpTtl,
-                           uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
-                           Ipv6Address payloadSource, Ipv6Address payloadDestination,
-                           const uint8_t payload[8])
-{
-  NS_LOG_FUNCTION (this << icmpSource << static_cast<uint32_t> (icmpTtl) << static_cast<uint32_t> (icmpType) << static_cast<uint32_t> (icmpCode) << icmpInfo << payloadSource << payloadDestination << payload);
-}
+    NS_OBJECT_ENSURE_REGISTERED(IpL4Protocol);
+
+    TypeId
+    IpL4Protocol::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::IpL4Protocol")
+                .SetParent<Object> ()
+                .SetGroupName("Internet")
+                .AddAttribute("ProtocolNumber", "The IP protocol number.",
+                UintegerValue(0),
+                MakeUintegerAccessor(&IpL4Protocol::GetProtocolNumber),
+                MakeUintegerChecker<int> ())
+                ;
+        return tid;
+    }
+
+    IpL4Protocol::~IpL4Protocol() {
+        NS_LOG_FUNCTION(this);
+    }
+
+    void
+    IpL4Protocol::ReceiveIcmp(Ipv4Address icmpSource, uint8_t icmpTtl,
+            uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
+            Ipv4Address payloadSource, Ipv4Address payloadDestination,
+            const uint8_t payload[8]) {
+        NS_LOG_FUNCTION(this << icmpSource << static_cast<uint32_t> (icmpTtl) << static_cast<uint32_t> (icmpType) << static_cast<uint32_t> (icmpCode) << icmpInfo << payloadSource << payloadDestination << payload);
+    }
+
+    void
+    IpL4Protocol::ReceiveIcmp(Ipv6Address icmpSource, uint8_t icmpTtl,
+            uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
+            Ipv6Address payloadSource, Ipv6Address payloadDestination,
+            const uint8_t payload[8]) {
+        NS_LOG_FUNCTION(this << icmpSource << static_cast<uint32_t> (icmpTtl) << static_cast<uint32_t> (icmpType) << static_cast<uint32_t> (icmpCode) << icmpInfo << payloadSource << payloadDestination << payload);
+    }
 
 } //namespace ns3

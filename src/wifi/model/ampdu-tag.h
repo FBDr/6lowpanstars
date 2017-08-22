@@ -25,58 +25,57 @@
 
 namespace ns3 {
 
-class Tag;
+    class Tag;
 
-/**
- * \ingroup wifi
- *
- * The aim of the AmpduTag is to provide means for a MAC to specify that a packet includes A-MPDU
- * since this is done in HT-SIG and there is no HT-SIG representation in ns-3
- */
-class AmpduTag : public Tag
-{
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \ingroup wifi
+     *
+     * The aim of the AmpduTag is to provide means for a MAC to specify that a packet includes A-MPDU
+     * since this is done in HT-SIG and there is no HT-SIG representation in ns-3
+     */
+    class AmpduTag : public Tag {
+    public:
+        static TypeId GetTypeId(void);
+        virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create a AmpduTag with the default =0 no Ampdu
-   */
-  AmpduTag ();
-  /**
-   * Set m_ampdu to 1.
-   */
-  void SetAmpdu (bool supported);
-  /**
-   * \param noofmpdus the number of MPDUs
-   *
-   * Set the number of MPDUs in the A-MPDU.
-   */
-  void SetNoOfMpdus (uint8_t noofmpdus);
+        /**
+         * Create a AmpduTag with the default =0 no Ampdu
+         */
+        AmpduTag();
+        /**
+         * Set m_ampdu to 1.
+         */
+        void SetAmpdu(bool supported);
+        /**
+         * \param noofmpdus the number of MPDUs
+         *
+         * Set the number of MPDUs in the A-MPDU.
+         */
+        void SetNoOfMpdus(uint8_t noofmpdus);
 
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+        virtual void Serialize(TagBuffer i) const;
+        virtual void Deserialize(TagBuffer i);
+        virtual uint32_t GetSerializedSize() const;
+        virtual void Print(std::ostream &os) const;
 
-  /**
-   * \return true if it is an A-MPDU,
-   *         false otherwise.
-   *
-   * Returns m_ampdu
-   */
-  bool GetAmpdu (void) const;
-  /**
-   * \return the number of MPDUs in an A-MPDU
-   *
-   * Returns the number of MPDUs in an A-MPDU
-   */
-  uint8_t GetNoOfMpdus (void) const;
+        /**
+         * \return true if it is an A-MPDU,
+         *         false otherwise.
+         *
+         * Returns m_ampdu
+         */
+        bool GetAmpdu(void) const;
+        /**
+         * \return the number of MPDUs in an A-MPDU
+         *
+         * Returns the number of MPDUs in an A-MPDU
+         */
+        uint8_t GetNoOfMpdus(void) const;
 
-private:
-  uint8_t m_ampdu;     //!< Flag whether it is an A-MPDU
-  uint8_t m_noOfMpdus; //!< number of MPDUs in the A-MPDU
-};
+    private:
+        uint8_t m_ampdu; //!< Flag whether it is an A-MPDU
+        uint8_t m_noOfMpdus; //!< number of MPDUs in the A-MPDU
+    };
 
 } //namespace ns3
 

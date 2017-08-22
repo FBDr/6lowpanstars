@@ -11,7 +11,6 @@ using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 using websocketpp::lib::ref;
 
-
 bool validate(server & s, connection_hdl hdl) {
     server::connection_ptr con = s.get_con_from_hdl(hdl);
 
@@ -35,7 +34,7 @@ int main() {
     try {
         server s;
 
-        s.set_validate_handler(bind(&validate,ref(s),::_1));
+        s.set_validate_handler(bind(&validate, ref(s), ::_1));
 
         s.init_asio();
         s.listen(9005);

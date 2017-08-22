@@ -34,33 +34,34 @@
 #include <websocketpp/config/asio.hpp>
 #include <websocketpp/server.hpp>
 
-BOOST_AUTO_TEST_CASE( construct_server_iostream ) {
+BOOST_AUTO_TEST_CASE(construct_server_iostream) {
     websocketpp::server<websocketpp::config::core> s;
 }
 
-BOOST_AUTO_TEST_CASE( construct_server_asio_plain ) {
+BOOST_AUTO_TEST_CASE(construct_server_asio_plain) {
     websocketpp::server<websocketpp::config::asio> s;
 }
 
-BOOST_AUTO_TEST_CASE( construct_server_asio_tls ) {
+BOOST_AUTO_TEST_CASE(construct_server_asio_tls) {
     websocketpp::server<websocketpp::config::asio_tls> s;
 }
 
-BOOST_AUTO_TEST_CASE( initialize_server_asio ) {
+BOOST_AUTO_TEST_CASE(initialize_server_asio) {
     websocketpp::server<websocketpp::config::asio> s;
     s.init_asio();
 }
 
-BOOST_AUTO_TEST_CASE( initialize_server_asio_external ) {
+BOOST_AUTO_TEST_CASE(initialize_server_asio_external) {
     websocketpp::server<websocketpp::config::asio> s;
     boost::asio::io_service ios;
     s.init_asio(&ios);
 }
 
 #ifdef _WEBSOCKETPP_MOVE_SEMANTICS_
-BOOST_AUTO_TEST_CASE( move_construct_server_core ) {
+
+BOOST_AUTO_TEST_CASE(move_construct_server_core) {
     websocketpp::server<websocketpp::config::core> s1;
-    
+
     websocketpp::server<websocketpp::config::core> s2(std::move(s1));
 }
 
@@ -87,7 +88,9 @@ BOOST_AUTO_TEST_CASE( emplace ) {
 #endif // _WEBSOCKETPP_MOVE_SEMANTICS_
 
 struct endpoint_extension {
-    endpoint_extension() : extension_value(5) {}
+
+    endpoint_extension() : extension_value(5) {
+    }
 
     int extension_method() {
         return extension_value;
@@ -120,16 +123,16 @@ struct stub_config : public websocketpp::config::core {
     typedef endpoint_extension endpoint_base;
 };
 
-BOOST_AUTO_TEST_CASE( endpoint_extensions ) {
+BOOST_AUTO_TEST_CASE(endpoint_extensions) {
     websocketpp::server<stub_config> s;
 
-    BOOST_CHECK_EQUAL( s.extension_value, 5 );
-    BOOST_CHECK_EQUAL( s.extension_method(), 5 );
+    BOOST_CHECK_EQUAL(s.extension_value, 5);
+    BOOST_CHECK_EQUAL(s.extension_method(), 5);
 
-    BOOST_CHECK( s.is_server() );
+    BOOST_CHECK(s.is_server());
 }
 
-BOOST_AUTO_TEST_CASE( listen_after_listen_failure ) {
+BOOST_AUTO_TEST_CASE(listen_after_listen_failure) {
     using websocketpp::transport::asio::error::make_error_code;
     using websocketpp::transport::asio::error::pass_through;
 

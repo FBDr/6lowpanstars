@@ -24,40 +24,39 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace transform {
-namespace tests {
+    namespace security {
+        namespace transform {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Security)
-BOOST_AUTO_TEST_SUITE(Transform)
-BOOST_AUTO_TEST_SUITE(TestBoolSink)
+                BOOST_AUTO_TEST_SUITE(Security)
+                BOOST_AUTO_TEST_SUITE(Transform)
+                BOOST_AUTO_TEST_SUITE(TestBoolSink)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  uint8_t in1[] = {0x00, 0x01};
-  bool value1 = true;
-  BoolSink sink1(value1);
-  BOOST_CHECK_EQUAL(sink1.write(in1, 1), 1);
-  BOOST_CHECK_EQUAL(sink1.write(in1 + 1, 1), 1);
-  sink1.end();
-  BOOST_CHECK_EQUAL(value1, false);
-  BOOST_CHECK_THROW(sink1.write(in1 + 1, 1), transform::Error);
+                BOOST_AUTO_TEST_CASE(Basic) {
+                    uint8_t in1[] = {0x00, 0x01};
+                    bool value1 = true;
+                    BoolSink sink1(value1);
+                    BOOST_CHECK_EQUAL(sink1.write(in1, 1), 1);
+                    BOOST_CHECK_EQUAL(sink1.write(in1 + 1, 1), 1);
+                    sink1.end();
+                    BOOST_CHECK_EQUAL(value1, false);
+                    BOOST_CHECK_THROW(sink1.write(in1 + 1, 1), transform::Error);
 
-  uint8_t in2[] = {0x01, 0x00};
-  bool value2 = false;
-  BoolSink sink2(value2);
-  BOOST_CHECK_EQUAL(sink2.write(in2, 1), 1);
-  BOOST_CHECK_EQUAL(sink2.write(in2 + 1, 1), 1);
-  sink2.end();
-  BOOST_CHECK_EQUAL(value2, true);
-  BOOST_CHECK_THROW(sink2.write(in2 + 1, 1), transform::Error);
-}
+                    uint8_t in2[] = {0x01, 0x00};
+                    bool value2 = false;
+                    BoolSink sink2(value2);
+                    BOOST_CHECK_EQUAL(sink2.write(in2, 1), 1);
+                    BOOST_CHECK_EQUAL(sink2.write(in2 + 1, 1), 1);
+                    sink2.end();
+                    BOOST_CHECK_EQUAL(value2, true);
+                    BOOST_CHECK_THROW(sink2.write(in2 + 1, 1), transform::Error);
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestBoolSink
-BOOST_AUTO_TEST_SUITE_END() // Transform
-BOOST_AUTO_TEST_SUITE_END() // Security
+                BOOST_AUTO_TEST_SUITE_END() // TestBoolSink
+                BOOST_AUTO_TEST_SUITE_END() // Transform
+                BOOST_AUTO_TEST_SUITE_END() // Security
 
-} // namespace tests
-} // namespace transform
-} // namespace security
+            } // namespace tests
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

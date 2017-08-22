@@ -35,110 +35,104 @@
 #include <boost/filesystem.hpp>
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
-typedef boost::asio::local::stream_protocol unix_stream;
+            using namespace nfd::tests;
+            typedef boost::asio::local::stream_protocol unix_stream;
 
-/** \brief automatically unlinks the socket file of a Unix stream acceptor
- */
-class AcceptorWithCleanup : public unix_stream::acceptor
-{
-public:
-  explicit
-  AcceptorWithCleanup(boost::asio::io_service& io, const std::string& path = "")
-    : unix_stream::acceptor(io)
-  {
-    this->open();
+            /** \brief automatically unlinks the socket file of a Unix stream acceptor
+             */
+            class AcceptorWithCleanup : public unix_stream::acceptor {
+            public:
 
-    if (path.empty()) {
-      this->bind("nfd-unix-stream-test." + to_string(time::system_clock::now().time_since_epoch().count()) + ".sock");
-    }
-    else {
-      this->bind(path);
-    }
+                explicit
+                AcceptorWithCleanup(boost::asio::io_service& io, const std::string& path = "")
+                : unix_stream::acceptor(io) {
+                    this->open();
 
-    this->listen(1);
-  }
+                    if (path.empty()) {
+                        this->bind("nfd-unix-stream-test." + to_string(time::system_clock::now().time_since_epoch().count()) + ".sock");
+                    } else {
+                        this->bind(path);
+                    }
 
-  ~AcceptorWithCleanup()
-  {
-    boost::system::error_code ec;
+                    this->listen(1);
+                }
 
-    std::string path = this->local_endpoint(ec).path();
-    if (ec) {
-      return;
-    }
+                ~AcceptorWithCleanup() {
+                    boost::system::error_code ec;
 
-    this->close(ec);
-    boost::filesystem::remove(path, ec);
-  }
-};
+                    std::string path = this->local_endpoint(ec).path();
+                    if (ec) {
+                        return;
+                    }
 
-class UnixStreamTransportFixture : public BaseFixture
-{
-protected:
-  UnixStreamTransportFixture()
-    : transport(nullptr)
-    , remoteSocket(g_io)
-    , receivedPackets(nullptr)
-    , acceptor(g_io)
-  {
-  }
+                    this->close(ec);
+                    boost::filesystem::remove(path, ec);
+                }
+            };
 
-  void
-  initialize()
-  {
-    unix_stream::socket sock(g_io);
-    acceptor.async_accept(sock, [this] (const boost::system::error_code& error) {
-      BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-      limitedIo.afterOp();
-    });
+            class UnixStreamTransportFixture : public BaseFixture {
+            protected:
 
-    unix_stream::endpoint remoteEp(acceptor.local_endpoint());
-    remoteSocket.async_connect(remoteEp, [this] (const boost::system::error_code& error) {
-      BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-      limitedIo.afterOp();
-    });
+                UnixStreamTransportFixture()
+                : transport(nullptr)
+                , remoteSocket(g_io)
+                , receivedPackets(nullptr)
+                , acceptor(g_io) {
+                }
 
-    BOOST_REQUIRE_EQUAL(limitedIo.run(2, time::seconds(1)), LimitedIo::EXCEED_OPS);
+                void
+                initialize() {
+                    unix_stream::socket sock(g_io);
+                    acceptor.async_accept(sock, [this] (const boost::system::error_code & error) {
+                        BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                        limitedIo.afterOp();
+                    });
 
-    localEp = sock.local_endpoint();
-    face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
-                             make_unique<UnixStreamTransport>(std::move(sock)));
-    transport = static_cast<UnixStreamTransport*>(face->getTransport());
-    receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
+                    unix_stream::endpoint remoteEp(acceptor.local_endpoint());
+                    remoteSocket.async_connect(remoteEp, [this] (const boost::system::error_code & error) {
+                        BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                        limitedIo.afterOp();
+                    });
 
-    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
-  }
+                    BOOST_REQUIRE_EQUAL(limitedIo.run(2, time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-  void
-  remoteWrite(const ndn::Buffer& buf, bool needToCheck = true)
-  {
-    boost::asio::async_write(remoteSocket, boost::asio::buffer(buf),
-      [needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-      });
-    limitedIo.defer(time::seconds(1));
-  }
+                    localEp = sock.local_endpoint();
+                    face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
+                            make_unique<UnixStreamTransport>(std::move(sock)));
+                    transport = static_cast<UnixStreamTransport*> (face->getTransport());
+                    receivedPackets = &static_cast<DummyReceiveLinkService*> (face->getLinkService())->receivedPackets;
 
-protected:
-  LimitedIo limitedIo;
-  UnixStreamTransport* transport;
-  unix_stream::endpoint localEp;
-  unix_stream::socket remoteSocket;
-  std::vector<Transport::Packet>* receivedPackets;
+                    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
+                }
 
-private:
-  AcceptorWithCleanup acceptor;
-  unique_ptr<Face> face;
-};
+                void
+                remoteWrite(const ndn::Buffer& buf, bool needToCheck = true) {
+                    boost::asio::async_write(remoteSocket, boost::asio::buffer(buf),
+                            [needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                            });
+                    limitedIo.defer(time::seconds(1));
+                }
 
-} // namespace tests
-} // namespace face
+            protected:
+                LimitedIo limitedIo;
+                UnixStreamTransport* transport;
+                unix_stream::endpoint localEp;
+                unix_stream::socket remoteSocket;
+                std::vector<Transport::Packet>* receivedPackets;
+
+            private:
+                AcceptorWithCleanup acceptor;
+                unique_ptr<Face> face;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_UNIX_STREAM_TRANSPORT_FIXTURE_HPP

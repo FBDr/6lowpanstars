@@ -36,117 +36,105 @@
 #include <ndn-cxx/transport/tcp-transport.hpp>
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
+        static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
 
-Service::Service(const std::string& configFile, ndn::KeyChain& keyChain)
-  : m_configFile(configFile)
-  , m_keyChain(keyChain)
-{
-}
+        Service::Service(const std::string& configFile, ndn::KeyChain& keyChain)
+        : m_configFile(configFile)
+        , m_keyChain(keyChain) {
+        }
 
-Service::Service(const ConfigSection& config, ndn::KeyChain& keyChain)
-  : m_configSection(config)
-  , m_keyChain(keyChain)
-{
-}
+        Service::Service(const ConfigSection& config, ndn::KeyChain& keyChain)
+        : m_configSection(config)
+        , m_keyChain(keyChain) {
+        }
 
-Service::~Service()
-{
-  // It is necessary to explicitly define the destructor, because some member variables
-  // (e.g., unique_ptr<RibManager>) are forward-declared, but implicitly declared destructor
-  // requires complete types for all members when instantiated.
-}
+        Service::~Service() {
+            // It is necessary to explicitly define the destructor, because some member variables
+            // (e.g., unique_ptr<RibManager>) are forward-declared, but implicitly declared destructor
+            // requires complete types for all members when instantiated.
+        }
 
-void
-Service::initialize()
-{
-  m_face.reset(new ndn::Face(getLocalNfdTransport(), getGlobalIoService(), m_keyChain));
-  m_dispatcher.reset(new ndn::mgmt::Dispatcher(*m_face, m_keyChain));
+        void
+        Service::initialize() {
+            m_face.reset(new ndn::Face(getLocalNfdTransport(), getGlobalIoService(), m_keyChain));
+            m_dispatcher.reset(new ndn::mgmt::Dispatcher(*m_face, m_keyChain));
 
-  initializeLogging();
+            initializeLogging();
 
-  m_ribManager.reset(new RibManager(*m_dispatcher, *m_face, m_keyChain));
+            m_ribManager.reset(new RibManager(*m_dispatcher, *m_face, m_keyChain));
 
-  ConfigFile config([] (const std::string& filename, const std::string& sectionName,
-                        const ConfigSection& section, bool isDryRun) {
-      // Ignore "log" and sections belonging to NFD,
-      // but raise an error if we're missing a handler for a "rib" section.
-      if (sectionName != "rib" || sectionName == "log") {
-        // do nothing
-      }
-      else {
-        // missing "rib" section handler
-        ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
-      }
-    });
-  m_ribManager->setConfigFile(config);
+            ConfigFile config([] (const std::string& filename, const std::string& sectionName,
+                    const ConfigSection& section, bool isDryRun) {
+                // Ignore "log" and sections belonging to NFD,
+                // but raise an error if we're missing a handler for a "rib" section.
+                if (sectionName != "rib" || sectionName == "log") {
+                    // do nothing
+                } else {
+                    // missing "rib" section handler
+                    ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
+                }
+            });
+            m_ribManager->setConfigFile(config);
 
-  // parse config file
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, true);
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, true, INTERNAL_CONFIG);
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
+            // parse config file
+            if (!m_configFile.empty()) {
+                config.parse(m_configFile, true);
+                config.parse(m_configFile, false);
+            } else {
+                config.parse(m_configSection, true, INTERNAL_CONFIG);
+                config.parse(m_configSection, false, INTERNAL_CONFIG);
+            }
 
-  m_ribManager->registerWithNfd();
-  m_ribManager->enableLocalFields();
-}
+            m_ribManager->registerWithNfd();
+            m_ribManager->enableLocalFields();
+        }
 
-void
-Service::initializeLogging()
-{
-  ConfigFile config(&ConfigFile::ignoreUnknownSection);
-  LoggerFactory::getInstance().setConfigFile(config);
+        void
+        Service::initializeLogging() {
+            ConfigFile config(&ConfigFile::ignoreUnknownSection);
+            LoggerFactory::getInstance().setConfigFile(config);
 
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, true);
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, true, INTERNAL_CONFIG);
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
-}
+            if (!m_configFile.empty()) {
+                config.parse(m_configFile, true);
+                config.parse(m_configFile, false);
+            } else {
+                config.parse(m_configSection, true, INTERNAL_CONFIG);
+                config.parse(m_configSection, false, INTERNAL_CONFIG);
+            }
+        }
 
-shared_ptr<ndn::Transport>
-Service::getLocalNfdTransport()
-{
-  ConfigSection config;
+        shared_ptr<ndn::Transport>
+        Service::getLocalNfdTransport() {
+            ConfigSection config;
 
-  if (!m_configFile.empty()) {
-    // Any format errors should have been caught already
-    // If error is thrown at this point, it is development error
-    boost::property_tree::read_info(m_configFile, config);
-  }
-  else
-    config = m_configSection;
+            if (!m_configFile.empty()) {
+                // Any format errors should have been caught already
+                // If error is thrown at this point, it is development error
+                boost::property_tree::read_info(m_configFile, config);
+            } else
+                config = m_configSection;
 
-  if (config.get_child_optional("face_system.unix")) {
-    // unix socket enabled
+            if (config.get_child_optional("face_system.unix")) {
+                // unix socket enabled
 
-    auto&& socketPath = config.get<std::string>("face_system.unix.path", "/var/run/nfd.sock");
-    // default socketPath should be the same as in FaceManager::processSectionUnix
+                auto&& socketPath = config.get<std::string>("face_system.unix.path", "/var/run/nfd.sock");
+                // default socketPath should be the same as in FaceManager::processSectionUnix
 
-    return make_shared<ndn::UnixTransport>(socketPath);
-  }
-  else if (config.get_child_optional("face_system.tcp") &&
-           config.get<std::string>("face_system.tcp.listen", "yes") == "yes") {
-    // tcp is enabled
+                return make_shared<ndn::UnixTransport>(socketPath);
+            } else if (config.get_child_optional("face_system.tcp") &&
+                    config.get<std::string>("face_system.tcp.listen", "yes") == "yes") {
+                // tcp is enabled
 
-    auto&& port = config.get<std::string>("face_system.tcp.port", "6363");
-    // default port should be the same as in FaceManager::processSectionTcp
+                auto&& port = config.get<std::string>("face_system.tcp.port", "6363");
+                // default port should be the same as in FaceManager::processSectionTcp
 
-    return make_shared<ndn::TcpTransport>("localhost", port);
-  }
-  else {
-    BOOST_THROW_EXCEPTION(Error("No transport is available to communicate with NFD"));
-  }
-}
+                return make_shared<ndn::TcpTransport>("localhost", port);
+            } else {
+                BOOST_THROW_EXCEPTION(Error("No transport is available to communicate with NFD"));
+            }
+        }
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd

@@ -40,87 +40,84 @@
 
 namespace ns3 {
 
-class PcapWriter {
-public:
-  PcapWriter(const std::string& file)
-  {
-    PcapHelper helper;
-    m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
-  }
+    class PcapWriter {
+    public:
 
-  void
-  TracePacket(Ptr<const Packet> packet)
-  {
-    static PppHeader pppHeader;
-    pppHeader.SetProtocol(0x0077);
+        PcapWriter(const std::string& file) {
+            PcapHelper helper;
+            m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
+        }
 
-    m_pcap->Write(Simulator::Now(), pppHeader, packet);
-  }
+        void
+        TracePacket(Ptr<const Packet> packet) {
+            static PppHeader pppHeader;
+            pppHeader.SetProtocol(0x0077);
 
-private:
-  Ptr<PcapFileWrapper> m_pcap;
-};
+            m_pcap->Write(Simulator::Now(), pppHeader, packet);
+        }
 
-int
-main(int argc, char* argv[])
-{
-  // setting default parameters for PointToPoint links and channels
-  Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
-  Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+    private:
+        Ptr<PcapFileWrapper> m_pcap;
+    };
 
-  // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
-  CommandLine cmd;
-  cmd.Parse(argc, argv);
+    int
+    main(int argc, char* argv[]) {
+        // setting default parameters for PointToPoint links and channels
+        Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
+        Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+        Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
 
-  // Creating nodes
-  NodeContainer nodes;
-  nodes.Create(3);
+        // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
+        CommandLine cmd;
+        cmd.Parse(argc, argv);
 
-  // Connecting nodes using two links
-  PointToPointHelper p2p;
-  p2p.Install(nodes.Get(0), nodes.Get(1));
-  p2p.Install(nodes.Get(1), nodes.Get(2));
+        // Creating nodes
+        NodeContainer nodes;
+        nodes.Create(3);
 
-  // Install NDN stack on all nodes
-  ndn::StackHelper ndnHelper;
-  ndnHelper.SetDefaultRoutes(true);
-  ndnHelper.InstallAll();
+        // Connecting nodes using two links
+        PointToPointHelper p2p;
+        p2p.Install(nodes.Get(0), nodes.Get(1));
+        p2p.Install(nodes.Get(1), nodes.Get(2));
 
-  // Installing applications
+        // Install NDN stack on all nodes
+        ndn::StackHelper ndnHelper;
+        ndnHelper.SetDefaultRoutes(true);
+        ndnHelper.InstallAll();
 
-  // Consumer
-  ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-  // Consumer will request /prefix/0, /prefix/1, ...
-  consumerHelper.SetPrefix("/prefix");
-  consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
-  consumerHelper.Install(nodes.Get(0));                        // first node
+        // Installing applications
 
-  // Producer
-  ndn::AppHelper producerHelper("ns3::ndn::Producer");
-  // Producer will reply to all requests starting with /prefix
-  producerHelper.SetPrefix("/prefix");
-  producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-  producerHelper.SetAttribute("Signature", UintegerValue(100));
-  producerHelper.SetAttribute("KeyLocator", StringValue("/unique/key/locator"));
-  producerHelper.Install(nodes.Get(2)); // last node
+        // Consumer
+        ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
+        // Consumer will request /prefix/0, /prefix/1, ...
+        consumerHelper.SetPrefix("/prefix");
+        consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
+        consumerHelper.Install(nodes.Get(0)); // first node
 
-  PcapWriter trace("ndn-simple-trace.pcap");
-  Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/MacTx",
-                                MakeCallback(&PcapWriter::TracePacket, &trace));
+        // Producer
+        ndn::AppHelper producerHelper("ns3::ndn::Producer");
+        // Producer will reply to all requests starting with /prefix
+        producerHelper.SetPrefix("/prefix");
+        producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+        producerHelper.SetAttribute("Signature", UintegerValue(100));
+        producerHelper.SetAttribute("KeyLocator", StringValue("/unique/key/locator"));
+        producerHelper.Install(nodes.Get(2)); // last node
 
-  Simulator::Stop(Seconds(20.0));
+        PcapWriter trace("ndn-simple-trace.pcap");
+        Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/MacTx",
+                MakeCallback(&PcapWriter::TracePacket, &trace));
 
-  Simulator::Run();
-  Simulator::Destroy();
+        Simulator::Stop(Seconds(20.0));
 
-  return 0;
-}
+        Simulator::Run();
+        Simulator::Destroy();
+
+        return 0;
+    }
 
 } // namespace ns3
 
 int
-main(int argc, char* argv[])
-{
-  return ns3::main(argc, argv);
+main(int argc, char* argv[]) {
+    return ns3::main(argc, argv);
 }

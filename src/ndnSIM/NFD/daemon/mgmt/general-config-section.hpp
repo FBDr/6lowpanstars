@@ -27,14 +27,14 @@
 
 namespace nfd {
 
-class ConfigFile;
+    class ConfigFile;
 
-namespace general {
+    namespace general {
 
-void
-setConfigFile(ConfigFile& configFile);
+        void
+        setConfigFile(ConfigFile& configFile);
 
-} // namespace general
+    } // namespace general
 
 } // namespace nfd
 

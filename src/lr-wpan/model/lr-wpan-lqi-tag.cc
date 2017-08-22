@@ -21,75 +21,66 @@
 #include "lr-wpan-lqi-tag.h"
 #include <ns3/integer.h>
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (LrWpanLqiTag);
-
-TypeId
-LrWpanLqiTag::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::LrWpanLqiTag")
-    .SetParent<Tag> ()
-    .SetGroupName ("LrWpan")
-    .AddConstructor<LrWpanLqiTag> ()
-    .AddAttribute ("Lqi", "The lqi of the last packet received",
-                   IntegerValue (0),
-                   MakeIntegerAccessor (&LrWpanLqiTag::Get),
-                   MakeIntegerChecker<uint8_t> ())
-  ;
-  return tid;
-}
 
-TypeId
-LrWpanLqiTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_OBJECT_ENSURE_REGISTERED(LrWpanLqiTag);
 
-LrWpanLqiTag::LrWpanLqiTag (void)
-  : m_lqi (0)
-{
-}
+    TypeId
+    LrWpanLqiTag::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::LrWpanLqiTag")
+                .SetParent<Tag> ()
+                .SetGroupName("LrWpan")
+                .AddConstructor<LrWpanLqiTag> ()
+                .AddAttribute("Lqi", "The lqi of the last packet received",
+                IntegerValue(0),
+                MakeIntegerAccessor(&LrWpanLqiTag::Get),
+                MakeIntegerChecker<uint8_t> ())
+                ;
+        return tid;
+    }
 
-LrWpanLqiTag::LrWpanLqiTag (uint8_t lqi)
-  : m_lqi (lqi)
-{
-}
+    TypeId
+    LrWpanLqiTag::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-uint32_t
-LrWpanLqiTag::GetSerializedSize (void) const
-{
-  return sizeof (uint8_t);
-}
+    LrWpanLqiTag::LrWpanLqiTag(void)
+            : m_lqi(0) {
+    }
 
-void
-LrWpanLqiTag::Serialize (TagBuffer i) const
-{
-  i.WriteU8 (m_lqi);
-}
+    LrWpanLqiTag::LrWpanLqiTag(uint8_t lqi)
+            : m_lqi(lqi) {
+    }
 
-void
-LrWpanLqiTag::Deserialize (TagBuffer i)
-{
-  m_lqi = i.ReadU8 ();
-}
+    uint32_t
+    LrWpanLqiTag::GetSerializedSize(void) const {
+        return sizeof (uint8_t);
+    }
 
-void
-LrWpanLqiTag::Print (std::ostream &os) const
-{
-  os << "Lqi = " << m_lqi;
-}
+    void
+    LrWpanLqiTag::Serialize(TagBuffer i) const {
+        i.WriteU8(m_lqi);
+    }
 
-void
-LrWpanLqiTag::Set (uint8_t lqi)
-{
-  m_lqi = lqi;
-}
+    void
+    LrWpanLqiTag::Deserialize(TagBuffer i) {
+        m_lqi = i.ReadU8();
+    }
 
-uint8_t
-LrWpanLqiTag::Get (void) const
-{
-  return m_lqi;
-}
+    void
+    LrWpanLqiTag::Print(std::ostream & os) const {
+        os << "Lqi = " << m_lqi;
+    }
+
+    void
+    LrWpanLqiTag::Set(uint8_t lqi) {
+        m_lqi = lqi;
+    }
+
+    uint8_t
+    LrWpanLqiTag::Get(void) const {
+        return m_lqi;
+    }
 
 }

@@ -29,130 +29,129 @@
 #include "core/scheduler.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-enum class PropagationStatus {
-  /// initial status
-  NEW,
-  /// is being propagated
-  PROPAGATING,
-  /// has been propagated successfully
-  PROPAGATED,
-  /// has failed in propagation
-  PROPAGATE_FAIL
-};
+        enum class PropagationStatus {
+            /// initial status
+            NEW,
+            /// is being propagated
+            PROPAGATING,
+            /// has been propagated successfully
+            PROPAGATED,
+            /// has failed in propagation
+            PROPAGATE_FAIL
+        };
 
-void
-operator<<(std::ostream& out, PropagationStatus status);
+        void
+        operator<<(std::ostream& out, PropagationStatus status);
 
-/**
- * @brief represents an entry for prefix propagation.
- * @sa http://redmine.named-data.net/issues/3211
- *
- * it consists of a PropagationStatus indicates current state of the state machine, as
- * well as an event scheduled for refresh or retry (i.e., the RefreshTimer and the RetryTimer of
- * the state machine respectively). Besides, it stores a copy of signing identity for this entry.
- */
-class PropagatedEntry
-{
-public:
-  PropagatedEntry();
+        /**
+         * @brief represents an entry for prefix propagation.
+         * @sa http://redmine.named-data.net/issues/3211
+         *
+         * it consists of a PropagationStatus indicates current state of the state machine, as
+         * well as an event scheduled for refresh or retry (i.e., the RefreshTimer and the RetryTimer of
+         * the state machine respectively). Besides, it stores a copy of signing identity for this entry.
+         */
+        class PropagatedEntry {
+        public:
+            PropagatedEntry();
 
-  /**
-   * @pre other is not in PROPAGATED or PROPAGATE_FAIL state
-   */
-  PropagatedEntry(const PropagatedEntry& other);
+            /**
+             * @pre other is not in PROPAGATED or PROPAGATE_FAIL state
+             */
+            PropagatedEntry(const PropagatedEntry& other);
 
-  PropagatedEntry&
-  operator=(const PropagatedEntry& other) = delete;
+            PropagatedEntry&
+                    operator=(const PropagatedEntry& other) = delete;
 
-  /**
-   * @brief set the signing identity
-   */
-  PropagatedEntry&
-  setSigningIdentity(const Name& identity);
+            /**
+             * @brief set the signing identity
+             */
+            PropagatedEntry&
+            setSigningIdentity(const Name& identity);
 
-  /**
-   * @brief get the signing identity
-   *
-   * @return the signing identity
-   */
-  const Name&
-  getSigningIdentity() const;
+            /**
+             * @brief get the signing identity
+             *
+             * @return the signing identity
+             */
+            const Name&
+            getSigningIdentity() const;
 
-  /**
-   * @brief switch the propagation status to PROPAGATING.
-   *
-   * this is called before start the propagation process of this entry.
-   */
-  void
-  startPropagation();
+            /**
+             * @brief switch the propagation status to PROPAGATING.
+             *
+             * this is called before start the propagation process of this entry.
+             */
+            void
+            startPropagation();
 
-  /**
-   * @brief switch the propagation status to PROPAGATED, and set the
-   *        rePropagateEvent to @p event for refresh.
-   *
-   * this is called just after this entry is successfully propagated.
-   */
-  void
-  succeed(const scheduler::EventId& event);
+            /**
+             * @brief switch the propagation status to PROPAGATED, and set the
+             *        rePropagateEvent to @p event for refresh.
+             *
+             * this is called just after this entry is successfully propagated.
+             */
+            void
+            succeed(const scheduler::EventId& event);
 
-  /**
-   * @brief switch the propagation status to PROPAGATE_FAIL, and then set the
-   *        rePropagateEvent to @p event for retry.
-   *
-   * this is called just after propagation for this entry fails.
-   */
-  void
-  fail(const scheduler::EventId& event);
+            /**
+             * @brief switch the propagation status to PROPAGATE_FAIL, and then set the
+             *        rePropagateEvent to @p event for retry.
+             *
+             * this is called just after propagation for this entry fails.
+             */
+            void
+            fail(const scheduler::EventId& event);
 
-  /**
-   * @brief cancel the events of re-sending propagation commands.
-   *
-   * switch the propagation status to NEW.
-   */
-  void
-  initialize();
+            /**
+             * @brief cancel the events of re-sending propagation commands.
+             *
+             * switch the propagation status to NEW.
+             */
+            void
+            initialize();
 
-  /**
-   * @brief check whether this entry is a new entry.
-   *
-   * @return true if current status is NEW.
-   */
-  bool
-  isNew() const;
+            /**
+             * @brief check whether this entry is a new entry.
+             *
+             * @return true if current status is NEW.
+             */
+            bool
+            isNew() const;
 
-  /**
-   * @brief check whether this entry is being propagated.
-   *
-   * @return true if current status is PROPAGATING.
-   */
-  bool
-  isPropagating() const;
+            /**
+             * @brief check whether this entry is being propagated.
+             *
+             * @return true if current status is PROPAGATING.
+             */
+            bool
+            isPropagating() const;
 
-  /**
-   * @brief check whether this entry has been successfully propagated.
-   *
-   * @return true if current status is PROPAGATED.
-   */
-  bool
-  isPropagated() const;
+            /**
+             * @brief check whether this entry has been successfully propagated.
+             *
+             * @return true if current status is PROPAGATED.
+             */
+            bool
+            isPropagated() const;
 
-  /**
-   * @brief check whether this entry has failed in propagating.
-   *
-   * @return true if current status is PROPAGATE_FAIL.
-   */
-  bool
-  isPropagateFail() const;
+            /**
+             * @brief check whether this entry has failed in propagating.
+             *
+             * @return true if current status is PROPAGATE_FAIL.
+             */
+            bool
+            isPropagateFail() const;
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  Name m_signingIdentity;
-  scheduler::ScopedEventId m_rePropagateEvent;
-  PropagationStatus m_propagationStatus;
-};
+            Name m_signingIdentity;
+            scheduler::ScopedEventId m_rePropagateEvent;
+            PropagationStatus m_propagationStatus;
+        };
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_PROPAGATED_ENTRY_HPP

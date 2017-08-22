@@ -29,155 +29,144 @@
  * for Windows-32 systems.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-/**
- * \ingroup system
- * \brief System-dependent implementation for SystemWallClockMs
- */
-class SystemWallClockMsPrivate {
-public:
-  /** \copydoc SystemWallClockMs::Start() */
-  void Start (void);
-  /** \copydoc SystemWallClockMs::End() */
-  int64_t End (void);
-  /** \copydoc SystemWallClockMs::GetElapsedReal() */
-  int64_t GetElapsedReal (void) const;
-  /** \copydoc SystemWallClockMs::GetElapsedUser() */
-  int64_t GetElapsedUser (void) const;
-  /** \copydoc SystemWallClockMs::GetElapsedSystem() */
-  int64_t GetElapsedSystem (void) const;
+    /**
+     * \ingroup system
+     * \brief System-dependent implementation for SystemWallClockMs
+     */
+    class SystemWallClockMsPrivate{
+        public :
+        /** \copydoc SystemWallClockMs::Start() */
+        void Start(void);
+        /** \copydoc SystemWallClockMs::End() */
+        int64_t End(void);
+        /** \copydoc SystemWallClockMs::GetElapsedReal() */
+        int64_t GetElapsedReal(void) const;
+        /** \copydoc SystemWallClockMs::GetElapsedUser() */
+        int64_t GetElapsedUser(void) const;
+        /** \copydoc SystemWallClockMs::GetElapsedSystem() */
+        int64_t GetElapsedSystem(void) const;
 
 private:
-  clock_t m_startTime;      //!< The wall clock start time.
-  int64_t m_elapsedReal;    //!< Elapsed real time, in ms.  
-  int64_t m_elapsedUser;    //!< Elapsed user time, in ms.  
-  int64_t m_elapsedSystem;  //!< Elapsed system time, in ms.
-};
+        clock_t m_startTime; //!< The wall clock start time.
+        int64_t m_elapsedReal; //!< Elapsed real time, in ms.  
+        int64_t m_elapsedUser; //!< Elapsed user time, in ms.  
+        int64_t m_elapsedSystem; //!< Elapsed system time, in ms.
+    };
 
-void 
-SystemWallClockMsPrivate::Start (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_startTime = std::clock ();
-}
+    void
+    SystemWallClockMsPrivate::Start(void) {
+        NS_LOG_FUNCTION(this);
+        m_startTime = std::clock();
+    }
 
-int64_t
-SystemWallClockMsPrivate::End (void)
-{
-  //
-  // We need to return the number of milliseconds that have elapsed in some
-  // reasonably portable way.  The underlying function that we will use returns
-  // a number of elapsed ticks.  We can look up the number of ticks per second
-  // from the system configuration.
-  //
-  // Conceptually, we need to find the number of elapsed clock ticks and then
-  // multiply the result by the milliseconds per clock tick (or just as easily
-  // divide by clock ticks per millisecond).  Integer dividing by clock ticks
-  // per millisecond is bad since this number is fractional on most machines
-  // and would result in divide by zero errors due to integer rounding.
-  //
-  // Multiplying by milliseconds per clock tick works up to a clock resolution 
-  // of 1000 ticks per second.  If we go  past this point, we begin to get zero
-  // elapsed times when millisecondsPerTick becomes fractional and another 
-  // rounding error appears.
-  //
-  // So rounding errors using integers can bite you from two direction.  Since 
-  // all of our targets have math coprocessors, why not just use doubles 
-  // internally?  Works fine, lasts a long time.
-  //
-  // If millisecondsPerTick becomes fractional, and an elapsed time greater than 
-  // a milliscond is measured, the function will work as expected.  If an elapsed 
-  // time is measured that turns out to be less than a millisecond, we'll just 
-  // return zero which would, I think, also will be expected.
-  //
-  NS_LOG_FUNCTION (this);
-  static int64_t ticksPerSecond = CLOCKS_PER_SEC;
-  static double millisecondsPerTick = 1000. / ticksPerSecond;
+    int64_t
+    SystemWallClockMsPrivate::End(void) {
+        //
+        // We need to return the number of milliseconds that have elapsed in some
+        // reasonably portable way.  The underlying function that we will use returns
+        // a number of elapsed ticks.  We can look up the number of ticks per second
+        // from the system configuration.
+        //
+        // Conceptually, we need to find the number of elapsed clock ticks and then
+        // multiply the result by the milliseconds per clock tick (or just as easily
+        // divide by clock ticks per millisecond).  Integer dividing by clock ticks
+        // per millisecond is bad since this number is fractional on most machines
+        // and would result in divide by zero errors due to integer rounding.
+        //
+        // Multiplying by milliseconds per clock tick works up to a clock resolution 
+        // of 1000 ticks per second.  If we go  past this point, we begin to get zero
+        // elapsed times when millisecondsPerTick becomes fractional and another 
+        // rounding error appears.
+        //
+        // So rounding errors using integers can bite you from two direction.  Since 
+        // all of our targets have math coprocessors, why not just use doubles 
+        // internally?  Works fine, lasts a long time.
+        //
+        // If millisecondsPerTick becomes fractional, and an elapsed time greater than 
+        // a milliscond is measured, the function will work as expected.  If an elapsed 
+        // time is measured that turns out to be less than a millisecond, we'll just 
+        // return zero which would, I think, also will be expected.
+        //
+        NS_LOG_FUNCTION(this);
+        static int64_t ticksPerSecond = CLOCKS_PER_SEC;
+        static double millisecondsPerTick = 1000. / ticksPerSecond;
 
-  clock_t endTime = std::clock ();
+        clock_t endTime = std::clock();
 
-  double tmp;
+        double tmp;
 
-  tmp = static_cast<double> (endTime - m_startTime) * millisecondsPerTick;
-  m_elapsedReal = static_cast<int64_t> (tmp);
+        tmp = static_cast<double> (endTime - m_startTime) * millisecondsPerTick;
+        m_elapsedReal = static_cast<int64_t> (tmp);
 
-  //
-  // Nothing like this in MinGW, for example.
-  //
-  m_elapsedUser = 0;
-  m_elapsedSystem = 0;
+        //
+        // Nothing like this in MinGW, for example.
+        //
+        m_elapsedUser = 0;
+        m_elapsedSystem = 0;
 
-  return m_elapsedReal;
-}
+        return m_elapsedReal;
+    }
 
-int64_t
-SystemWallClockMsPrivate::GetElapsedReal (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_elapsedReal;
-}
+    int64_t
+    SystemWallClockMsPrivate::GetElapsedReal(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_elapsedReal;
+    }
 
-int64_t
-SystemWallClockMsPrivate::GetElapsedUser (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_elapsedUser;
-}
+    int64_t
+    SystemWallClockMsPrivate::GetElapsedUser(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_elapsedUser;
+    }
 
-int64_t
-SystemWallClockMsPrivate::GetElapsedSystem (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_elapsedSystem;
-}
+    int64_t
+    SystemWallClockMsPrivate::GetElapsedSystem(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_elapsedSystem;
+    }
 
-SystemWallClockMs::SystemWallClockMs ()
-  : m_priv (new SystemWallClockMsPrivate ())
-{
-  NS_LOG_FUNCTION (this);
-}
+    SystemWallClockMs::SystemWallClockMs()
+            : m_priv(new SystemWallClockMsPrivate()) {
+        NS_LOG_FUNCTION(this);
+    }
 
-SystemWallClockMs::~SystemWallClockMs ()
-{
-  NS_LOG_FUNCTION (this);
-  delete m_priv;
-  m_priv = 0;
-}
+    SystemWallClockMs::~SystemWallClockMs() {
+        NS_LOG_FUNCTION(this);
+        delete m_priv;
+        m_priv = 0;
+    }
 
-void
-SystemWallClockMs::Start (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_priv->Start ();
-}
+    void
+    SystemWallClockMs::Start(void) {
+        NS_LOG_FUNCTION(this);
+        m_priv->Start();
+    }
 
-int64_t
-SystemWallClockMs::End (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_priv->End ();
-}
+    int64_t
+    SystemWallClockMs::End(void) {
+        NS_LOG_FUNCTION(this);
+        return m_priv->End();
+    }
 
-int64_t
-SystemWallClockMs::GetElapsedReal (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_priv->GetElapsedReal ();
-}
+    int64_t
+    SystemWallClockMs::GetElapsedReal(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_priv->GetElapsedReal();
+    }
 
-int64_t
-SystemWallClockMs::GetElapsedUser (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_priv->GetElapsedUser ();
-}
+    int64_t
+    SystemWallClockMs::GetElapsedUser(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_priv->GetElapsedUser();
+    }
 
-int64_t
-SystemWallClockMs::GetElapsedSystem (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_priv->GetElapsedSystem ();
-}
+    int64_t
+    SystemWallClockMs::GetElapsedSystem(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_priv->GetElapsedSystem();
+    }
 
 } // namespace ns3

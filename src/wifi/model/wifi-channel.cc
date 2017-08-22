@@ -32,20 +32,20 @@
 #include "ns3/propagation-loss-model.h"
 #include "ns3/propagation-delay-model.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("WifiChannel");
-
-NS_OBJECT_ENSURE_REGISTERED (WifiChannel);
-
-TypeId
-WifiChannel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::WifiChannel")
-    .SetParent<Channel> ()
-    .SetGroupName ("Wifi")
-  ;
-  return tid;
-}
+
+    NS_LOG_COMPONENT_DEFINE("WifiChannel");
+
+    NS_OBJECT_ENSURE_REGISTERED(WifiChannel);
+
+    TypeId
+    WifiChannel::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::WifiChannel")
+                .SetParent<Channel> ()
+                .SetGroupName("Wifi")
+                ;
+        return tid;
+    }
 
 } //namespace ns3

@@ -26,38 +26,33 @@
 #include "rib-update-batch.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-RibUpdateBatch::RibUpdateBatch(uint64_t faceId)
-  : m_faceId(faceId)
-{
-}
+        RibUpdateBatch::RibUpdateBatch(uint64_t faceId)
+        : m_faceId(faceId) {
+        }
 
-void
-RibUpdateBatch::add(const RibUpdate& update)
-{
-  BOOST_ASSERT(m_faceId == update.getRoute().faceId);
+        void
+        RibUpdateBatch::add(const RibUpdate& update) {
+            BOOST_ASSERT(m_faceId == update.getRoute().faceId);
 
-  m_updates.push_back(update);
-}
+            m_updates.push_back(update);
+        }
 
-RibUpdateBatch::const_iterator
-RibUpdateBatch::begin() const
-{
-  return m_updates.begin();
-}
+        RibUpdateBatch::const_iterator
+        RibUpdateBatch::begin() const {
+            return m_updates.begin();
+        }
 
-RibUpdateBatch::const_iterator
-RibUpdateBatch::end() const
-{
-  return m_updates.end();
-}
+        RibUpdateBatch::const_iterator
+        RibUpdateBatch::end() const {
+            return m_updates.end();
+        }
 
-size_t
-RibUpdateBatch::size() const
-{
-  return m_updates.size();
-}
+        size_t
+        RibUpdateBatch::size() const {
+            return m_updates.size();
+        }
 
-} // namespace rib
+    } // namespace rib
 } // namespace nfd

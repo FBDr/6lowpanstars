@@ -27,10 +27,10 @@ namespace ns3
         Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
         Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
 
-        selAS = Ras->GetValue((double)(0), (double)(totAS - 1));
+        selAS = Ras->GetValue((double) (0), (double) (totAS - 1));
         leafnum = briteth.GetNLeafNodesForAs(selAS);
-        selLN = Rleaf->GetValue((double)(0), (double)(leafnum - 1));
-        
+        selLN = Rleaf->GetValue((double) (0), (double) (leafnum - 1));
+
         return briteth.GetLeafNodeForAs(selAS, selLN);
     }
 

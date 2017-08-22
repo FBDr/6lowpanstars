@@ -29,28 +29,27 @@
 
 namespace ns3 {
 
-class WifiMacHeader;
+    class WifiMacHeader;
 
-/**
- * \brief Abstract class that concrete msdu aggregators have to implement
- * \ingroup wifi
- */
-class MsduAggregator : public Object
-{
-public:
-  typedef std::list<std::pair<Ptr<Packet>, AmsduSubframeHeader> > DeaggregatedMsdus;
-  typedef std::list<std::pair<Ptr<Packet>, AmsduSubframeHeader> >::const_iterator DeaggregatedMsdusCI;
+    /**
+     * \brief Abstract class that concrete msdu aggregators have to implement
+     * \ingroup wifi
+     */
+    class MsduAggregator : public Object {
+    public:
+        typedef std::list<std::pair<Ptr<Packet>, AmsduSubframeHeader> > DeaggregatedMsdus;
+        typedef std::list<std::pair<Ptr<Packet>, AmsduSubframeHeader> >::const_iterator DeaggregatedMsdusCI;
 
-  static TypeId GetTypeId (void);
-  /* Adds <i>packet</i> to <i>aggregatedPacket</i>. In concrete aggregator's implementation is
-   * specified how and if <i>packet</i> can be added to <i>aggregatedPacket</i>. If <i>packet</i>
-   * can be added returns true, false otherwise.
-   */
-  virtual bool Aggregate (Ptr<const Packet> packet, Ptr<Packet> aggregatedPacket,
-                          Mac48Address src, Mac48Address dest) = 0;
+        static TypeId GetTypeId(void);
+        /* Adds <i>packet</i> to <i>aggregatedPacket</i>. In concrete aggregator's implementation is
+         * specified how and if <i>packet</i> can be added to <i>aggregatedPacket</i>. If <i>packet</i>
+         * can be added returns true, false otherwise.
+         */
+        virtual bool Aggregate(Ptr<const Packet> packet, Ptr<Packet> aggregatedPacket,
+                Mac48Address src, Mac48Address dest) = 0;
 
-  static DeaggregatedMsdus Deaggregate (Ptr<Packet> aggregatedPacket);
-};
+        static DeaggregatedMsdus Deaggregate(Ptr<Packet> aggregatedPacket);
+    };
 
 } //namespace ns3
 

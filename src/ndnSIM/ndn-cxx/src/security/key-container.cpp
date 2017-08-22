@@ -23,86 +23,74 @@
 #include "pib-impl.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-KeyContainer::const_iterator::const_iterator(const Name& identity,
-                                             std::set<name::Component>::const_iterator it,
-                                             shared_ptr<PibImpl> impl)
-  : m_identity(identity)
-  , m_it(it)
-  , m_impl(impl)
-{
-}
+        KeyContainer::const_iterator::const_iterator(const Name& identity,
+                std::set<name::Component>::const_iterator it,
+                shared_ptr<PibImpl> impl)
+        : m_identity(identity)
+        , m_it(it)
+        , m_impl(impl) {
+        }
 
-Key
-KeyContainer::const_iterator::operator*()
-{
-  return Key(m_identity, *m_it, m_impl);
-}
+        Key
+        KeyContainer::const_iterator::operator*() {
+            return Key(m_identity, *m_it, m_impl);
+        }
 
-KeyContainer::const_iterator&
-KeyContainer::const_iterator::operator++()
-{
-  ++m_it;
-  return *this;
-}
+        KeyContainer::const_iterator&
+        KeyContainer::const_iterator::operator++() {
+            ++m_it;
+            return *this;
+        }
 
-KeyContainer::const_iterator
-KeyContainer::const_iterator::operator++(int)
-{
-  const_iterator it(*this);
-  ++m_it;
-  return it;
-}
+        KeyContainer::const_iterator
+        KeyContainer::const_iterator::operator++(int) {
+            const_iterator it(*this);
+            ++m_it;
+            return it;
+        }
 
-bool
-KeyContainer::const_iterator::operator==(const const_iterator& other)
-{
-  return (m_impl == other.m_impl && m_identity == other.m_identity && m_it == other.m_it);
-}
+        bool
+        KeyContainer::const_iterator::operator==(const const_iterator& other) {
+            return (m_impl == other.m_impl && m_identity == other.m_identity && m_it == other.m_it);
+        }
 
-bool
-KeyContainer::const_iterator::operator!=(const const_iterator& other)
-{
-  return !(*this == other);
-}
+        bool
+        KeyContainer::const_iterator::operator!=(const const_iterator& other) {
+            return !(*this == other);
+        }
 
-KeyContainer::KeyContainer()
-{
-}
+        KeyContainer::KeyContainer() {
+        }
 
-KeyContainer::KeyContainer(const Name& identity,
-                           std::set<name::Component>&& keyIds,
-                           shared_ptr<PibImpl> impl)
-  : m_identity(identity)
-  , m_keyIds(keyIds)
-  , m_impl(impl)
-{
-}
+        KeyContainer::KeyContainer(const Name& identity,
+                std::set<name::Component>&& keyIds,
+                shared_ptr<PibImpl> impl)
+        : m_identity(identity)
+        , m_keyIds(keyIds)
+        , m_impl(impl) {
+        }
 
-KeyContainer::const_iterator
-KeyContainer::begin() const
-{
-  return const_iterator(m_identity, m_keyIds.begin(), m_impl);
-}
+        KeyContainer::const_iterator
+        KeyContainer::begin() const {
+            return const_iterator(m_identity, m_keyIds.begin(), m_impl);
+        }
 
-KeyContainer::const_iterator
-KeyContainer::end() const
-{
-  return const_iterator(m_identity, m_keyIds.end(), m_impl);
-}
+        KeyContainer::const_iterator
+        KeyContainer::end() const {
+            return const_iterator(m_identity, m_keyIds.end(), m_impl);
+        }
 
-KeyContainer::const_iterator
-KeyContainer::find(const name::Component& keyId) const
-{
-  return const_iterator(m_identity, m_keyIds.find(keyId), m_impl);
-}
+        KeyContainer::const_iterator
+        KeyContainer::find(const name::Component& keyId) const {
+            return const_iterator(m_identity, m_keyIds.find(keyId), m_impl);
+        }
 
-size_t
-KeyContainer::size() const
-{
-  return m_keyIds.size();
-}
+        size_t
+        KeyContainer::size() const {
+            return m_keyIds.size();
+        }
 
-} // namespace security
+    } // namespace security
 } // namespace ndn

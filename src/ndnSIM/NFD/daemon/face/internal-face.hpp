@@ -30,22 +30,22 @@
 #include <ndn-cxx/face.hpp>
 
 namespace nfd {
-namespace face {
+    namespace face {
 
-/** \brief make a pair of forwarder-side face and client-side face
- *         that are connected with each other
- *
- *  Network-layer packets sent by one face will be received by the other face
- *  after io.poll().
- *
- *  \param clientKeyChain A KeyChain used by client-side face to sign
- *                        prefix registration commands.
- *  \return a forwarder-side face and a client-side face connected with each other
- */
-std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(ndn::KeyChain& clientKeyChain);
+        /** \brief make a pair of forwarder-side face and client-side face
+         *         that are connected with each other
+         *
+         *  Network-layer packets sent by one face will be received by the other face
+         *  after io.poll().
+         *
+         *  \param clientKeyChain A KeyChain used by client-side face to sign
+         *                        prefix registration commands.
+         *  \return a forwarder-side face and a client-side face connected with each other
+         */
+        std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
+        makeInternalFace(ndn::KeyChain& clientKeyChain);
 
-} // namespace face
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_INTERNAL_FACE_HPP

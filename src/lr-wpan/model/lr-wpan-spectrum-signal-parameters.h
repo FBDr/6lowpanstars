@@ -26,37 +26,35 @@
 
 namespace ns3 {
 
-class PacketBurst;
+    class PacketBurst;
 
-/**
- * \ingroup lr-wpan
- *
- * Signal parameters for LrWpan.
- */
-struct LrWpanSpectrumSignalParameters : public SpectrumSignalParameters
-{
+    /**
+     * \ingroup lr-wpan
+     *
+     * Signal parameters for LrWpan.
+     */
+    struct LrWpanSpectrumSignalParameters : public SpectrumSignalParameters {
+        // inherited from SpectrumSignalParameters
+        virtual Ptr<SpectrumSignalParameters> Copy(void);
 
-  // inherited from SpectrumSignalParameters
-  virtual Ptr<SpectrumSignalParameters> Copy (void);
+        /**
+         * default constructor
+         */
+        LrWpanSpectrumSignalParameters(void);
 
-  /**
-   * default constructor
-   */
-  LrWpanSpectrumSignalParameters (void);
+        /**
+         * copy constructor
+         * \param p the object to copy from.
+         */
+        LrWpanSpectrumSignalParameters(const LrWpanSpectrumSignalParameters& p);
 
-  /**
-   * copy constructor
-   * \param p the object to copy from.
-   */
-  LrWpanSpectrumSignalParameters (const LrWpanSpectrumSignalParameters& p);
+        /**
+         * The packet burst being transmitted with this signal
+         */
+        Ptr<PacketBurst> packetBurst;
+    };
 
-  /**
-   * The packet burst being transmitted with this signal
-   */
-  Ptr<PacketBurst> packetBurst;
-};
-
-}  // namespace ns3
+} // namespace ns3
 
 
 #endif /* LR_WPAN_SPECTRUM_SIGNAL_PARAMETERS_H */

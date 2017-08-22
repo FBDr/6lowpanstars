@@ -28,58 +28,55 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(SecurityDigestSha256, IdentityManagementFixture)
+        BOOST_FIXTURE_TEST_SUITE(SecurityDigestSha256, IdentityManagementFixture)
 
-std::string SHA256_RESULT("a883dafc480d466ee04e0d6da986bd78eb1fdd2178d04693723da3a8f95d42f4");
+        std::string SHA256_RESULT("a883dafc480d466ee04e0d6da986bd78eb1fdd2178d04693723da3a8f95d42f4");
 
-BOOST_AUTO_TEST_CASE(Sha256)
-{
-  using namespace CryptoPP;
+        BOOST_AUTO_TEST_CASE(Sha256) {
+            using namespace CryptoPP;
 
-  char content[6] = "1234\n";
-  ConstBufferPtr buf = crypto::computeSha256Digest(reinterpret_cast<uint8_t*>(content), 5);
+            char content[6] = "1234\n";
+            ConstBufferPtr buf = crypto::computeSha256Digest(reinterpret_cast<uint8_t*> (content), 5);
 
-  BOOST_CHECK_EQUAL(SHA256_RESULT, toHex(buf->buf(), buf->size(), false));
-}
+            BOOST_CHECK_EQUAL(SHA256_RESULT, toHex(buf->buf(), buf->size(), false));
+        }
 
-BOOST_AUTO_TEST_CASE(DataSignature)
-{
-  using namespace CryptoPP;
+        BOOST_AUTO_TEST_CASE(DataSignature) {
+            using namespace CryptoPP;
 
-  Name name("/TestSignatureSha/Basic");
-  Data testData(name);
-  char content[5] = "1234";
-  testData.setContent(reinterpret_cast<uint8_t*>(content), 5);
+            Name name("/TestSignatureSha/Basic");
+            Data testData(name);
+            char content[5] = "1234";
+            testData.setContent(reinterpret_cast<uint8_t*> (content), 5);
 
-  m_keyChain.sign(testData, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
+            m_keyChain.sign(testData, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
 
-  testData.wireEncode();
+            testData.wireEncode();
 
-  DigestSha256 sig(testData.getSignature());
+            DigestSha256 sig(testData.getSignature());
 
-  BOOST_CHECK(Validator::verifySignature(testData, sig));
+            BOOST_CHECK(Validator::verifySignature(testData, sig));
 
-  BOOST_CHECK_THROW(sig.getKeyLocator(), ndn::SignatureInfo::Error);
-}
+            BOOST_CHECK_THROW(sig.getKeyLocator(), ndn::SignatureInfo::Error);
+        }
 
-BOOST_AUTO_TEST_CASE(InterestSignature)
-{
-  Name name("/SecurityTestDigestSha256/InterestSignature/Interest1");
-  Interest testInterest(name);
+        BOOST_AUTO_TEST_CASE(InterestSignature) {
+            Name name("/SecurityTestDigestSha256/InterestSignature/Interest1");
+            Interest testInterest(name);
 
-  m_keyChain.sign(testInterest, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
-  testInterest.wireEncode();
-  const Name& signedName = testInterest.getName();
+            m_keyChain.sign(testInterest, security::SigningInfo(security::SigningInfo::SIGNER_TYPE_SHA256));
+            testInterest.wireEncode();
+            const Name& signedName = testInterest.getName();
 
-  Signature signature(signedName[signed_interest::POS_SIG_INFO].blockFromValue(),
-                      signedName[signed_interest::POS_SIG_VALUE].blockFromValue());
-  DigestSha256 sig(signature);
-  BOOST_CHECK(Validator::verifySignature(testInterest, sig));
-}
+            Signature signature(signedName[signed_interest::POS_SIG_INFO].blockFromValue(),
+                    signedName[signed_interest::POS_SIG_VALUE].blockFromValue());
+            DigestSha256 sig(signature);
+            BOOST_CHECK(Validator::verifySignature(testInterest, sig));
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

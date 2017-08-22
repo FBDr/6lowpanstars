@@ -27,43 +27,38 @@
  * ns3::EventImpl definitions.
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("EventImpl");
-
-EventImpl::~EventImpl ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-}
 
-EventImpl::EventImpl ()
-  : m_cancel (false)
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_LOG_COMPONENT_DEFINE("EventImpl");
 
-void
-EventImpl::Invoke (void)
-{
-  NS_LOG_FUNCTION (this);
-  if (!m_cancel)
-    {
-      Notify ();
+    EventImpl::~EventImpl() {
+        NS_LOG_FUNCTION(this);
     }
-}
 
-void
-EventImpl::Cancel (void)
-{
-  NS_LOG_FUNCTION (this);
-  m_cancel = true;
-}
+    EventImpl::EventImpl()
+            : m_cancel(false) {
+        NS_LOG_FUNCTION(this);
+    }
 
-bool
-EventImpl::IsCancelled (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_cancel;
-}
+    void
+    EventImpl::Invoke(void) {
+        NS_LOG_FUNCTION(this);
+        if (!m_cancel) {
+            Notify();
+        }
+    }
+
+    void
+    EventImpl::Cancel(void) {
+        NS_LOG_FUNCTION(this);
+        m_cancel = true;
+    }
+
+    bool
+    EventImpl::IsCancelled(void) {
+        NS_LOG_FUNCTION(this);
+        return m_cancel;
+    }
 
 } // namespace ns3

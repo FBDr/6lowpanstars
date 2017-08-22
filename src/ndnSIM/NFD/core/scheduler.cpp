@@ -29,79 +29,68 @@
 #include <boost/thread/tss.hpp>
 
 namespace nfd {
-namespace scheduler {
+    namespace scheduler {
 
-static boost::thread_specific_ptr<Scheduler> g_scheduler;
+        static boost::thread_specific_ptr<Scheduler> g_scheduler;
 
-Scheduler&
-getGlobalScheduler()
-{
-  if (g_scheduler.get() == nullptr) {
-    g_scheduler.reset(new Scheduler(*static_cast<boost::asio::io_service*>(nullptr)));
-  }
+        Scheduler&
+        getGlobalScheduler() {
+            if (g_scheduler.get() == nullptr) {
+                g_scheduler.reset(new Scheduler(*static_cast<boost::asio::io_service*> (nullptr)));
+            }
 
-  return *g_scheduler;
-}
+            return *g_scheduler;
+        }
 
-EventId
-schedule(const time::nanoseconds& after, const Scheduler::Event& event)
-{
-  return getGlobalScheduler().scheduleEvent(after, event);
-}
+        EventId
+        schedule(const time::nanoseconds& after, const Scheduler::Event& event) {
+            return getGlobalScheduler().scheduleEvent(after, event);
+        }
 
-void
-cancel(const EventId& eventId)
-{
-  getGlobalScheduler().cancelEvent(eventId);
-}
+        void
+        cancel(const EventId& eventId) {
+            getGlobalScheduler().cancelEvent(eventId);
+        }
 
-void
-resetGlobalScheduler()
-{
-  g_scheduler.reset();
-}
+        void
+        resetGlobalScheduler() {
+            g_scheduler.reset();
+        }
 
-ScopedEventId::ScopedEventId()
-{
-}
+        ScopedEventId::ScopedEventId() {
+        }
 
-ScopedEventId::ScopedEventId(const EventId& event)
-  : m_event(event)
-{
-}
+        ScopedEventId::ScopedEventId(const EventId& event)
+        : m_event(event) {
+        }
 
-ScopedEventId::ScopedEventId(ScopedEventId&& other)
-  : m_event(other.m_event)
-{
-  other.release();
-}
+        ScopedEventId::ScopedEventId(ScopedEventId&& other)
+        : m_event(other.m_event) {
+            other.release();
+        }
 
-ScopedEventId&
-ScopedEventId::operator=(const EventId& event)
-{
-  if (m_event != event) {
-    scheduler::cancel(m_event);
-    m_event = event;
-  }
-  return *this;
-}
+        ScopedEventId&
+                ScopedEventId::operator=(const EventId& event) {
+            if (m_event != event) {
+                scheduler::cancel(m_event);
+                m_event = event;
+            }
+            return *this;
+        }
 
-ScopedEventId::~ScopedEventId()
-{
-  scheduler::cancel(m_event);
-}
+        ScopedEventId::~ScopedEventId() {
+            scheduler::cancel(m_event);
+        }
 
-void
-ScopedEventId::cancel()
-{
-  scheduler::cancel(m_event);
-}
+        void
+        ScopedEventId::cancel() {
+            scheduler::cancel(m_event);
+        }
 
-void
-ScopedEventId::release()
-{
-  m_event.reset();
-}
+        void
+        ScopedEventId::release() {
+            m_event.reset();
+        }
 
-} // namespace scheduler
+    } // namespace scheduler
 } // namespace nfd

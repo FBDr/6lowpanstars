@@ -35,116 +35,114 @@
 namespace ns3 {
 
 
-class AntennaModel;
+    class AntennaModel;
 
-/**
- * \ingroup spectrum
- *
- * Simple SpectrumPhy implementation that sends customizable waveform.
- * The generated waveforms have a given Spectrum Power Density and
- * duration (set with the SetResolution()) . The generator activates
- * and deactivates periodically with a given period and with a duty
- * cycle of 1/2.
- *
- * This PHY model supports a single antenna model instance which is
- * used for both transmission and reception (though received signals
- * are discarded by this PHY).
- */
-class WaveformGenerator : public SpectrumPhy
-{
+    /**
+     * \ingroup spectrum
+     *
+     * Simple SpectrumPhy implementation that sends customizable waveform.
+     * The generated waveforms have a given Spectrum Power Density and
+     * duration (set with the SetResolution()) . The generator activates
+     * and deactivates periodically with a given period and with a duty
+     * cycle of 1/2.
+     *
+     * This PHY model supports a single antenna model instance which is
+     * used for both transmission and reception (though received signals
+     * are discarded by this PHY).
+     */
+    class WaveformGenerator : public SpectrumPhy {
+    public:
+        WaveformGenerator();
+        virtual ~WaveformGenerator();
 
-public:
-  WaveformGenerator ();
-  virtual ~WaveformGenerator ();
+        static TypeId GetTypeId(void);
 
-  static TypeId GetTypeId (void);
-
-  // inherited from SpectrumPhy
-  void SetChannel (Ptr<SpectrumChannel> c);
-  void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice () const;
-  Ptr<const SpectrumModel> GetRxSpectrumModel () const;
-  Ptr<AntennaModel> GetRxAntenna ();
-  void StartRx (Ptr<SpectrumSignalParameters> params);
+        // inherited from SpectrumPhy
+        void SetChannel(Ptr<SpectrumChannel> c);
+        void SetMobility(Ptr<MobilityModel> m);
+        void SetDevice(Ptr<NetDevice> d);
+        Ptr<MobilityModel> GetMobility();
+        Ptr<NetDevice> GetDevice() const;
+        Ptr<const SpectrumModel> GetRxSpectrumModel() const;
+        Ptr<AntennaModel> GetRxAntenna();
+        void StartRx(Ptr<SpectrumSignalParameters> params);
 
 
-  /**
-   * Set the Power Spectral Density used for outgoing waveforms
-   *
-   * @param txs the Power Spectral Density
-   */
-  void SetTxPowerSpectralDensity (Ptr<SpectrumValue> txs);
+        /**
+         * Set the Power Spectral Density used for outgoing waveforms
+         *
+         * @param txs the Power Spectral Density
+         */
+        void SetTxPowerSpectralDensity(Ptr<SpectrumValue> txs);
 
-  /**
-   * Set the period according to which the WaveformGenerator switches
-   * on and off
-   *
-   * @param period
-   */
-  void SetPeriod (Time period);
-
-
-  /**
-   *
-   * @return the value of the period according to which the WaveformGenerator switches
-   * on and off
-   */
-  Time GetPeriod () const;
+        /**
+         * Set the period according to which the WaveformGenerator switches
+         * on and off
+         *
+         * @param period
+         */
+        void SetPeriod(Time period);
 
 
-  /**
-   *
-   * @param value the value of the duty cycle
-   */
-  void SetDutyCycle (double value);
-
-  /**
-   *
-   * @return the value of the duty cycle
-   */
-  double GetDutyCycle () const;
-
-  /**
-   * set the AntennaModel to be used
-   *
-   * \param a the Antenna Model
-   */
-  void SetAntenna (Ptr<AntennaModel> a);
-
-  /**
-   * Start the waveform generator
-   *
-   */
-  virtual void Start ();
-
-  /**
-   * Stop the waveform generator
-   *
-   */
-  virtual void Stop ();
+        /**
+         *
+         * @return the value of the period according to which the WaveformGenerator switches
+         * on and off
+         */
+        Time GetPeriod() const;
 
 
-private:
-  virtual void DoDispose (void);
+        /**
+         *
+         * @param value the value of the duty cycle
+         */
+        void SetDutyCycle(double value);
 
-  Ptr<MobilityModel> m_mobility;
-  Ptr<AntennaModel> m_antenna;
-  Ptr<NetDevice> m_netDevice;
-  Ptr<SpectrumChannel> m_channel;
+        /**
+         *
+         * @return the value of the duty cycle
+         */
+        double GetDutyCycle() const;
 
-  virtual void GenerateWaveform ();
+        /**
+         * set the AntennaModel to be used
+         *
+         * \param a the Antenna Model
+         */
+        void SetAntenna(Ptr<AntennaModel> a);
 
-  Ptr<SpectrumValue> m_txPowerSpectralDensity;
-  Time   m_period;
-  double m_dutyCycle;
-  Time m_startTime;
-  EventId m_nextWave;
+        /**
+         * Start the waveform generator
+         *
+         */
+        virtual void Start();
 
-  TracedCallback<Ptr<const Packet> > m_phyTxStartTrace;
-  TracedCallback<Ptr<const Packet> > m_phyTxEndTrace;
-};
+        /**
+         * Stop the waveform generator
+         *
+         */
+        virtual void Stop();
+
+
+    private:
+        virtual void DoDispose(void);
+
+        Ptr<MobilityModel> m_mobility;
+        Ptr<AntennaModel> m_antenna;
+        Ptr<NetDevice> m_netDevice;
+        Ptr<SpectrumChannel> m_channel;
+
+        virtual void GenerateWaveform();
+
+        Ptr<SpectrumValue> m_txPowerSpectralDensity;
+        Time m_period;
+        double m_dutyCycle;
+        Time m_startTime;
+        EventId m_nextWave;
+
+        TracedCallback<Ptr<const Packet> > m_phyTxStartTrace;
+        TracedCallback<Ptr<const Packet> > m_phyTxEndTrace;
+    };
 
 
 

@@ -27,73 +27,70 @@
 #include <boost/mpl/vector.hpp>
 
 namespace ndn {
-namespace security {
-namespace transform {
-namespace tests {
+    namespace security {
+        namespace transform {
+            namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Security)
-BOOST_AUTO_TEST_SUITE(Transform)
-BOOST_AUTO_TEST_SUITE(TestStreamSource)
+                BOOST_AUTO_TEST_SUITE(Security)
+                BOOST_AUTO_TEST_SUITE(Transform)
+                BOOST_AUTO_TEST_SUITE(TestStreamSource)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  std::string input =
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "01234567012345670123456701234567 1234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567"
-    "0123456701234567012345670123456701234567012345670123456701234567";
+                BOOST_AUTO_TEST_CASE(Basic) {
+                    std::string input =
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "01234567012345670123456701234567 1234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567"
+                            "0123456701234567012345670123456701234567012345670123456701234567";
 
-  std::stringstream is(input);
-  std::stringstream os;
-  streamSource(is) >> streamSink(os);
-  std::string output = os.str();
+                    std::stringstream is(input);
+                    std::stringstream os;
+                    streamSource(is) >> streamSink(os);
+                    std::string output = os.str();
 
-  BOOST_CHECK_EQUAL(input, output);
-}
+                    BOOST_CHECK_EQUAL(input, output);
+                }
 
-BOOST_AUTO_TEST_CASE(EmptyStream)
-{
-  std::stringstream is;
-  std::stringstream os;
-  streamSource(is) >> streamSink(os);
+                BOOST_AUTO_TEST_CASE(EmptyStream) {
+                    std::stringstream is;
+                    std::stringstream os;
+                    streamSource(is) >> streamSink(os);
 
-  BOOST_CHECK_EQUAL(os.str(), "");
-}
+                    BOOST_CHECK_EQUAL(os.str(), "");
+                }
 
-typedef boost::mpl::vector<
-  boost::mpl::integral_c<std::ios_base::iostate, std::ios_base::badbit>,
-  boost::mpl::integral_c<std::ios_base::iostate, std::ios_base::failbit>
-> BadBits;
+                typedef boost::mpl::vector<
+                boost::mpl::integral_c<std::ios_base::iostate, std::ios_base::badbit>,
+                boost::mpl::integral_c<std::ios_base::iostate, std::ios_base::failbit>
+                > BadBits;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(BadStream, BadBit, BadBits)
-{
-  std::stringstream is;
-  is.setstate(BadBit::value);
-  std::stringstream os;
-  BOOST_CHECK_THROW(streamSource(is) >> streamSink(os), transform::Error);
-}
+                BOOST_AUTO_TEST_CASE_TEMPLATE(BadStream, BadBit, BadBits) {
+                    std::stringstream is;
+                    is.setstate(BadBit::value);
+                    std::stringstream os;
+                    BOOST_CHECK_THROW(streamSource(is) >> streamSink(os), transform::Error);
+                }
 
-BOOST_AUTO_TEST_SUITE_END() // TestStreamSource
-BOOST_AUTO_TEST_SUITE_END() // Transform
-BOOST_AUTO_TEST_SUITE_END() // Security
+                BOOST_AUTO_TEST_SUITE_END() // TestStreamSource
+                BOOST_AUTO_TEST_SUITE_END() // Transform
+                BOOST_AUTO_TEST_SUITE_END() // Security
 
-} // namespace tests
-} // namespace transform
-} // namespace security
+            } // namespace tests
+        } // namespace transform
+    } // namespace security
 } // namespace ndn

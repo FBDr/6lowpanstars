@@ -25,55 +25,55 @@
 
 namespace ns3 {
 
-class TraceContainer;
+    class TraceContainer;
 
-/**
- * \ingroup queue
- *
- * \brief A FIFO packet queue that drops tail-end packets on overflow
- */
-class DropTailQueue : public Queue {
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * \brief DropTailQueue Constructor
-   *
-   * Creates a droptail queue with a maximum size of 100 packets by default
-   */
-  DropTailQueue ();
+    /**
+     * \ingroup queue
+     *
+     * \brief A FIFO packet queue that drops tail-end packets on overflow
+     */
+    class DropTailQueue : public Queue {
+    public:
+        /**
+         * \brief Get the type ID.
+         * \return the object TypeId
+         */
+        static TypeId GetTypeId(void);
+        /**
+         * \brief DropTailQueue Constructor
+         *
+         * Creates a droptail queue with a maximum size of 100 packets by default
+         */
+        DropTailQueue();
 
-  virtual ~DropTailQueue();
+        virtual ~DropTailQueue();
 
-  /**
-   * Set the operating mode of this device.
-   *
-   * \param mode The operating mode of this device.
-   *
-   */
-  void SetMode (DropTailQueue::QueueMode mode);
+        /**
+         * Set the operating mode of this device.
+         *
+         * \param mode The operating mode of this device.
+         *
+         */
+        void SetMode(DropTailQueue::QueueMode mode);
 
-  /**
-   * Get the encapsulation mode of this device.
-   *
-   * \returns The encapsulation mode of this device.
-   */
-  DropTailQueue::QueueMode GetMode (void) const;
+        /**
+         * Get the encapsulation mode of this device.
+         *
+         * \returns The encapsulation mode of this device.
+         */
+        DropTailQueue::QueueMode GetMode(void) const;
 
-private:
-  virtual bool DoEnqueue (Ptr<Packet> p);
-  virtual Ptr<Packet> DoDequeue (void);
-  virtual Ptr<const Packet> DoPeek (void) const;
+    private:
+        virtual bool DoEnqueue(Ptr<Packet> p);
+        virtual Ptr<Packet> DoDequeue(void);
+        virtual Ptr<const Packet> DoPeek(void) const;
 
-  std::queue<Ptr<Packet> > m_packets; //!< the packets in the queue
-  uint32_t m_maxPackets;              //!< max packets in the queue
-  uint32_t m_maxBytes;                //!< max bytes in the queue
-  uint32_t m_bytesInQueue;            //!< actual bytes in the queue
-  QueueMode m_mode;                   //!< queue mode (packets or bytes limited)
-};
+        std::queue<Ptr<Packet> > m_packets; //!< the packets in the queue
+        uint32_t m_maxPackets; //!< max packets in the queue
+        uint32_t m_maxBytes; //!< max bytes in the queue
+        uint32_t m_bytesInQueue; //!< actual bytes in the queue
+        QueueMode m_mode; //!< queue mode (packets or bytes limited)
+    };
 
 } // namespace ns3
 

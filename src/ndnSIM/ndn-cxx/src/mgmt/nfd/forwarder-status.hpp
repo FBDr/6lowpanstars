@@ -26,200 +26,186 @@
 #include "../../util/time.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/**
- * \ingroup management
- * \brief represents NFD Forwarder Status
- * \sa http://redmine.named-data.net/projects/nfd/wiki/ForwarderStatus
- */
-class ForwarderStatus
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /**
+         * \ingroup management
+         * \brief represents NFD Forwarder Status
+         * \sa http://redmine.named-data.net/projects/nfd/wiki/ForwarderStatus
+         */
+        class ForwarderStatus {
+        public:
 
-  ForwarderStatus();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  ForwarderStatus(const Block& payload);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  /** \brief prepend ForwarderStatus as a Content block to the encoder
-   *
-   *  The outermost Content element isn't part of ForwardStatus structure.
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            ForwarderStatus();
 
-  /** \brief encode ForwarderStatus as a Content block
-   *
-   *  The outermost Content element isn't part of ForwardStatus structure.
-   */
-  const Block&
-  wireEncode() const;
+            explicit
+            ForwarderStatus(const Block& payload);
 
-  /** \brief decode ForwarderStatus from a Content block
-   *
-   *  The outermost Content element isn't part of ForwardStatus structure.
-   */
-  void
-  wireDecode(const Block& wire);
+            /** \brief prepend ForwarderStatus as a Content block to the encoder
+             *
+             *  The outermost Content element isn't part of ForwardStatus structure.
+             */
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // getters & setters
-  const std::string&
-  getNfdVersion() const
-  {
-    return m_nfdVersion;
-  }
+            /** \brief encode ForwarderStatus as a Content block
+             *
+             *  The outermost Content element isn't part of ForwardStatus structure.
+             */
+            const Block&
+            wireEncode() const;
 
-  ForwarderStatus&
-  setNfdVersion(const std::string& nfdVersion);
+            /** \brief decode ForwarderStatus from a Content block
+             *
+             *  The outermost Content element isn't part of ForwardStatus structure.
+             */
+            void
+            wireDecode(const Block& wire);
 
-  const time::system_clock::TimePoint&
-  getStartTimestamp() const
-  {
-    return m_startTimestamp;
-  }
+        public: // getters & setters
 
-  ForwarderStatus&
-  setStartTimestamp(const time::system_clock::TimePoint& startTimestamp);
+            const std::string&
+            getNfdVersion() const {
+                return m_nfdVersion;
+            }
 
-  const time::system_clock::TimePoint&
-  getCurrentTimestamp() const
-  {
-    return m_currentTimestamp;
-  }
+            ForwarderStatus&
+            setNfdVersion(const std::string& nfdVersion);
 
-  ForwarderStatus&
-  setCurrentTimestamp(const time::system_clock::TimePoint& currentTimestamp);
+            const time::system_clock::TimePoint&
+            getStartTimestamp() const {
+                return m_startTimestamp;
+            }
 
-  size_t
-  getNNameTreeEntries() const
-  {
-    return m_nNameTreeEntries;
-  }
+            ForwarderStatus&
+            setStartTimestamp(const time::system_clock::TimePoint& startTimestamp);
 
-  ForwarderStatus&
-  setNNameTreeEntries(size_t nNameTreeEntries);
+            const time::system_clock::TimePoint&
+            getCurrentTimestamp() const {
+                return m_currentTimestamp;
+            }
 
-  size_t
-  getNFibEntries() const
-  {
-    return m_nFibEntries;
-  }
+            ForwarderStatus&
+            setCurrentTimestamp(const time::system_clock::TimePoint& currentTimestamp);
 
-  ForwarderStatus&
-  setNFibEntries(size_t nFibEntries);
+            size_t
+            getNNameTreeEntries() const {
+                return m_nNameTreeEntries;
+            }
 
-  size_t
-  getNPitEntries() const
-  {
-    return m_nPitEntries;
-  }
+            ForwarderStatus&
+            setNNameTreeEntries(size_t nNameTreeEntries);
 
-  ForwarderStatus&
-  setNPitEntries(size_t nPitEntries);
+            size_t
+            getNFibEntries() const {
+                return m_nFibEntries;
+            }
 
-  size_t
-  getNMeasurementsEntries() const
-  {
-    return m_nMeasurementsEntries;
-  }
+            ForwarderStatus&
+            setNFibEntries(size_t nFibEntries);
 
-  ForwarderStatus&
-  setNMeasurementsEntries(size_t nMeasurementsEntries);
+            size_t
+            getNPitEntries() const {
+                return m_nPitEntries;
+            }
 
-  size_t
-  getNCsEntries() const
-  {
-    return m_nCsEntries;
-  }
+            ForwarderStatus&
+            setNPitEntries(size_t nPitEntries);
 
-  ForwarderStatus&
-  setNCsEntries(size_t nCsEntries);
+            size_t
+            getNMeasurementsEntries() const {
+                return m_nMeasurementsEntries;
+            }
 
-  uint64_t
-  getNInInterests() const
-  {
-    return m_nInInterests;
-  }
+            ForwarderStatus&
+            setNMeasurementsEntries(size_t nMeasurementsEntries);
 
-  ForwarderStatus&
-  setNInInterests(uint64_t nInInterests);
+            size_t
+            getNCsEntries() const {
+                return m_nCsEntries;
+            }
 
-  uint64_t
-  getNInDatas() const
-  {
-    return m_nInDatas;
-  }
+            ForwarderStatus&
+            setNCsEntries(size_t nCsEntries);
 
-  ForwarderStatus&
-  setNInDatas(uint64_t nInDatas);
+            uint64_t
+            getNInInterests() const {
+                return m_nInInterests;
+            }
 
-  uint64_t
-  getNInNacks() const
-  {
-    return m_nInNacks;
-  }
+            ForwarderStatus&
+            setNInInterests(uint64_t nInInterests);
 
-  ForwarderStatus&
-  setNInNacks(uint64_t nInNacks);
+            uint64_t
+            getNInDatas() const {
+                return m_nInDatas;
+            }
 
-  uint64_t
-  getNOutInterests() const
-  {
-    return m_nOutInterests;
-  }
+            ForwarderStatus&
+            setNInDatas(uint64_t nInDatas);
 
-  ForwarderStatus&
-  setNOutInterests(uint64_t nOutInterests);
+            uint64_t
+            getNInNacks() const {
+                return m_nInNacks;
+            }
 
-  uint64_t
-  getNOutDatas() const
-  {
-    return m_nOutDatas;
-  }
+            ForwarderStatus&
+            setNInNacks(uint64_t nInNacks);
 
-  ForwarderStatus&
-  setNOutDatas(uint64_t nOutDatas);
+            uint64_t
+            getNOutInterests() const {
+                return m_nOutInterests;
+            }
 
-  uint64_t
-  getNOutNacks() const
-  {
-    return m_nOutNacks;
-  }
+            ForwarderStatus&
+            setNOutInterests(uint64_t nOutInterests);
 
-  ForwarderStatus&
-  setNOutNacks(uint64_t nOutNacks);
+            uint64_t
+            getNOutDatas() const {
+                return m_nOutDatas;
+            }
 
-private:
-  std::string m_nfdVersion;
-  time::system_clock::TimePoint m_startTimestamp;
-  time::system_clock::TimePoint m_currentTimestamp;
-  size_t m_nNameTreeEntries;
-  size_t m_nFibEntries;
-  size_t m_nPitEntries;
-  size_t m_nMeasurementsEntries;
-  size_t m_nCsEntries;
-  uint64_t m_nInInterests;
-  uint64_t m_nInDatas;
-  uint64_t m_nInNacks;
-  uint64_t m_nOutInterests;
-  uint64_t m_nOutDatas;
-  uint64_t m_nOutNacks;
+            ForwarderStatus&
+            setNOutDatas(uint64_t nOutDatas);
 
-  mutable Block m_wire;
-};
+            uint64_t
+            getNOutNacks() const {
+                return m_nOutNacks;
+            }
 
-} // namespace nfd
+            ForwarderStatus&
+            setNOutNacks(uint64_t nOutNacks);
+
+        private:
+            std::string m_nfdVersion;
+            time::system_clock::TimePoint m_startTimestamp;
+            time::system_clock::TimePoint m_currentTimestamp;
+            size_t m_nNameTreeEntries;
+            size_t m_nFibEntries;
+            size_t m_nPitEntries;
+            size_t m_nMeasurementsEntries;
+            size_t m_nCsEntries;
+            uint64_t m_nInInterests;
+            uint64_t m_nInDatas;
+            uint64_t m_nInNacks;
+            uint64_t m_nOutInterests;
+            uint64_t m_nOutDatas;
+            uint64_t m_nOutNacks;
+
+            mutable Block m_wire;
+        };
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FORWARDER_STATUS_HPP

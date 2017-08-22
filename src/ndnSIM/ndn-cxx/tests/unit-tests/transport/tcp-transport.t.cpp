@@ -25,63 +25,57 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-BOOST_FIXTURE_TEST_SUITE(TransportTcpTransport, TransportFixture)
+        BOOST_FIXTURE_TEST_SUITE(TransportTcpTransport, TransportFixture)
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOk)
-{
-  const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://127.0.0.1:6000");
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketNameOk) {
+            const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://127.0.0.1:6000");
 
-  BOOST_CHECK_EQUAL(got.first, "127.0.0.1");
-  BOOST_CHECK_EQUAL(got.second, "6000");
-}
+            BOOST_CHECK_EQUAL(got.first, "127.0.0.1");
+            BOOST_CHECK_EQUAL(got.second, "6000");
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadMissingHost)
-{
-  BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("tcp://:6000"),
-                        Transport::Error,
-                        [] (const Transport::Error& error) {
-                          return error.what() == std::string("Malformed URI: tcp://:6000");
-                        });
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadMissingHost) {
+            BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("tcp://:6000"),
+                    Transport::Error,
+                    [] (const Transport::Error & error) {
+                        return error.what() == std::string("Malformed URI: tcp://:6000");
+                    });
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortOkOmittedPort)
-{
-  const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://127.0.0.1");
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortOkOmittedPort) {
+            const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://127.0.0.1");
 
-  BOOST_CHECK_EQUAL(got.first, "127.0.0.1");
-  BOOST_CHECK_EQUAL(got.second, "6363");
-}
+            BOOST_CHECK_EQUAL(got.first, "127.0.0.1");
+            BOOST_CHECK_EQUAL(got.second, "6363");
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortNameOkOmittedHostOmittedPort)
-{
-  const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://");
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortNameOkOmittedHostOmittedPort) {
+            const auto got = TcpTransport::getSocketHostAndPortFromUri("tcp://");
 
-  BOOST_CHECK_EQUAL(got.first, "localhost");
-  BOOST_CHECK_EQUAL(got.second, "6363");
-}
+            BOOST_CHECK_EQUAL(got.first, "localhost");
+            BOOST_CHECK_EQUAL(got.second, "6363");
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadWrongTransport)
-{
-  BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("unix://"),
-                        Transport::Error,
-                        [] (const Transport::Error& error) {
-                          return error.what() == std::string("Cannot create TcpTransport "
-                                                             "from \"unix\" URI");
-                        });
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadWrongTransport) {
+            BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("unix://"),
+                    Transport::Error,
+                    [] (const Transport::Error & error) {
+                        return error.what() == std::string("Cannot create TcpTransport "
+                                "from \"unix\" URI");
+                    });
+        }
 
-BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadMalformedUri)
-{
-  BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("tcp"),
-                        Transport::Error,
-                        [] (const Transport::Error& error) {
-                          return error.what() == std::string("Malformed URI: tcp");
-                        });
-}
+        BOOST_AUTO_TEST_CASE(GetDefaultSocketHostAndPortBadMalformedUri) {
+            BOOST_CHECK_EXCEPTION(TcpTransport::getSocketHostAndPortFromUri("tcp"),
+                    Transport::Error,
+                    [] (const Transport::Error & error) {
+                        return error.what() == std::string("Malformed URI: tcp");
+                    });
+        }
 
-BOOST_AUTO_TEST_SUITE_END()
+        BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

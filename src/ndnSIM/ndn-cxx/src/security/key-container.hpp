@@ -26,74 +26,74 @@
 #include "key.hpp"
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class PibImpl;
+        class PibImpl;
 
-/// @brief A handler to search or enumerate keys of an identity.
-class KeyContainer
-{
-public:
-  class const_iterator
-  {
-  public:
-    friend class KeyContainer;
+        /// @brief A handler to search or enumerate keys of an identity.
 
-  public:
-    Key
-    operator*();
+        class KeyContainer {
+        public:
 
-    const_iterator&
-    operator++();
+            class const_iterator {
+            public:
+                friend class KeyContainer;
 
-    const_iterator
-    operator++(int);
+            public:
+                Key
+                operator*();
 
-    bool
-    operator==(const const_iterator& other);
+                const_iterator&
+                operator++();
 
-    bool
-    operator!=(const const_iterator& other);
+                const_iterator
+                operator++(int);
 
-  private:
-    const_iterator(const Name& identity,
-                   std::set<name::Component>::const_iterator it,
-                   shared_ptr<PibImpl> impl);
+                bool
+                operator==(const const_iterator& other);
 
-  private:
-    Name m_identity;
-    std::set<name::Component>::const_iterator m_it;
-    shared_ptr<PibImpl> m_impl;
-  };
+                bool
+                operator!=(const const_iterator& other);
 
-  typedef const_iterator iterator;
+            private:
+                const_iterator(const Name& identity,
+                        std::set<name::Component>::const_iterator it,
+                        shared_ptr<PibImpl> impl);
 
-public:
-  KeyContainer();
+            private:
+                Name m_identity;
+                std::set<name::Component>::const_iterator m_it;
+                shared_ptr<PibImpl> m_impl;
+            };
 
-  KeyContainer(const Name& identity,
-               std::set<name::Component>&& keyIds,
-               shared_ptr<PibImpl> impl);
+            typedef const_iterator iterator;
 
-  const_iterator
-  begin() const;
+        public:
+            KeyContainer();
 
-  const_iterator
-  end() const;
+            KeyContainer(const Name& identity,
+                    std::set<name::Component>&& keyIds,
+                    shared_ptr<PibImpl> impl);
 
-  const_iterator
-  find(const name::Component& keyId) const;
+            const_iterator
+            begin() const;
 
-  size_t
-  size() const;
+            const_iterator
+            end() const;
 
-private:
-  Name m_identity;
-  std::set<name::Component> m_keyIds;
-  shared_ptr<PibImpl> m_impl;
-};
+            const_iterator
+            find(const name::Component& keyId) const;
 
-} // namespace security
+            size_t
+            size() const;
+
+        private:
+            Name m_identity;
+            std::set<name::Component> m_keyIds;
+            shared_ptr<PibImpl> m_impl;
+        };
+
+    } // namespace security
 } // namespace ndn
 
 #endif // NDN_SECURITY_KEY_CONTAINER_HPP

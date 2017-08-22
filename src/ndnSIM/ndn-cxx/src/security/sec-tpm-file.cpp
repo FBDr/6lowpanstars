@@ -38,554 +38,530 @@
 #include <algorithm>
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-using std::string;
-using std::ostringstream;
-using std::ofstream;
+        using std::string;
+        using std::ostringstream;
+        using std::ofstream;
 
-const std::string SecTpmFile::SCHEME("tpm-file");
+        const std::string SecTpmFile::SCHEME("tpm-file");
 
-class SecTpmFile::Impl
-{
-public:
-  explicit
-  Impl(const string& dir)
-  {
-    boost::filesystem::path actualDir;
-    if (dir.empty()) {
+        class SecTpmFile::Impl {
+        public:
+
+            explicit
+            Impl(const string& dir) {
+                boost::filesystem::path actualDir;
+                if (dir.empty()) {
 #ifdef NDN_CXX_HAVE_TESTS
-      if (getenv("TEST_HOME") != nullptr) {
-        actualDir = boost::filesystem::path(getenv("TEST_HOME")) / ".ndn";
-      }
-      else
+                    if (getenv("TEST_HOME") != nullptr) {
+                        actualDir = boost::filesystem::path(getenv("TEST_HOME")) / ".ndn";
+                    } else
 #endif // NDN_CXX_HAVE_TESTS
-      if (getenv("HOME") != nullptr) {
-        actualDir = boost::filesystem::path(getenv("HOME")) / ".ndn";
-      }
-      else {
-        actualDir = boost::filesystem::path(".") / ".ndn";
-      }
-    }
-    else {
-      actualDir = boost::filesystem::path(dir);
-    }
+                        if (getenv("HOME") != nullptr) {
+                        actualDir = boost::filesystem::path(getenv("HOME")) / ".ndn";
+                    } else {
+                        actualDir = boost::filesystem::path(".") / ".ndn";
+                    }
+                } else {
+                    actualDir = boost::filesystem::path(dir);
+                }
 
-    m_keystorePath = actualDir / "ndnsec-tpm-file";
-    boost::filesystem::create_directories(m_keystorePath);
-  }
+                m_keystorePath = actualDir / "ndnsec-tpm-file";
+                boost::filesystem::create_directories(m_keystorePath);
+            }
 
-  boost::filesystem::path
-  transformName(const string& keyName, const string& extension)
-  {
-    using namespace CryptoPP;
-    string digest;
-    SHA256 hash;
-    StringSource src(keyName,
-                     true,
-                     new HashFilter(hash,
-                                    new Base64Encoder(new CryptoPP::StringSink(digest))));
+            boost::filesystem::path
+            transformName(const string& keyName, const string& extension) {
+                using namespace CryptoPP;
+                string digest;
+                SHA256 hash;
+                StringSource src(keyName,
+                        true,
+                        new HashFilter(hash,
+                        new Base64Encoder(new CryptoPP::StringSink(digest))));
 
-    boost::algorithm::trim(digest);
-    std::replace(digest.begin(), digest.end(), '/', '%');
+                boost::algorithm::trim(digest);
+                std::replace(digest.begin(), digest.end(), '/', '%');
 
-    return m_keystorePath / (digest + extension);
-  }
+                return m_keystorePath / (digest + extension);
+            }
 
-  string
-  maintainMapping(const string& keyName)
-  {
-    string keyFileName = transformName(keyName, "").string();
+            string
+            maintainMapping(const string& keyName) {
+                string keyFileName = transformName(keyName, "").string();
 
-    ofstream outfile;
-    string dirFile = (m_keystorePath / "mapping.txt").string();
+                ofstream outfile;
+                string dirFile = (m_keystorePath / "mapping.txt").string();
 
-    outfile.open(dirFile.c_str(), std::ios_base::app);
-    outfile << keyName << ' ' << keyFileName << '\n';
-    outfile.close();
+                outfile.open(dirFile.c_str(), std::ios_base::app);
+                outfile << keyName << ' ' << keyFileName << '\n';
+                outfile.close();
 
-    return keyFileName;
-  }
+                return keyFileName;
+            }
 
-public:
-  boost::filesystem::path m_keystorePath;
-};
+        public:
+            boost::filesystem::path m_keystorePath;
+        };
 
-
-SecTpmFile::SecTpmFile(const string& location)
-  : SecTpm(location)
-  , m_impl(new Impl(location))
-  , m_inTerminal(false)
-{
-}
-
-SecTpmFile::~SecTpmFile()
-{
-}
-
-void
-SecTpmFile::generateKeyPairInTpm(const Name& keyName, const KeyParams& params)
-{
-  string keyURI = keyName.toUri();
-
-  if (doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
-    BOOST_THROW_EXCEPTION(Error("public key exists"));
-  if (doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
-    BOOST_THROW_EXCEPTION(Error("private key exists"));
-
-  string keyFileName = m_impl->maintainMapping(keyURI);
-
-  try {
-    switch (params.getKeyType()) {
-      case KeyType::RSA: {
-        using namespace CryptoPP;
-
-        const RsaKeyParams& rsaParams = static_cast<const RsaKeyParams&>(params);
-        AutoSeededRandomPool rng;
-        InvertibleRSAFunction privateKey;
-        privateKey.Initialize(rng, rsaParams.getKeySize());
-
-        string privateKeyFileName = keyFileName + ".pri";
-        Base64Encoder privateKeySink(new FileSink(privateKeyFileName.c_str()));
-        privateKey.DEREncode(privateKeySink);
-        privateKeySink.MessageEnd();
-
-        RSAFunction publicKey(privateKey);
-        string publicKeyFileName = keyFileName + ".pub";
-        Base64Encoder publicKeySink(new FileSink(publicKeyFileName.c_str()));
-        publicKey.DEREncode(publicKeySink);
-        publicKeySink.MessageEnd();
-
-        // set file permission
-        chmod(privateKeyFileName.c_str(), 0000400);
-        chmod(publicKeyFileName.c_str(), 0000444);
-        return;
-      }
-
-      case KeyType::EC: {
-        using namespace CryptoPP;
-
-        const EcdsaKeyParams& ecdsaParams = static_cast<const EcdsaKeyParams&>(params);
-
-        CryptoPP::OID curveName;
-        switch (ecdsaParams.getKeySize()) {
-        case 256:
-          curveName = ASN1::secp256r1();
-          break;
-        case 384:
-          curveName = ASN1::secp384r1();
-          break;
-        default:
-          curveName = ASN1::secp256r1();
-          break;
+        SecTpmFile::SecTpmFile(const string& location)
+        : SecTpm(location)
+        , m_impl(new Impl(location))
+        , m_inTerminal(false) {
         }
 
-        AutoSeededRandomPool rng;
-
-        ECDSA<ECP, SHA256>::PrivateKey privateKey;
-        DL_GroupParameters_EC<ECP> cryptoParams(curveName);
-        cryptoParams.SetEncodeAsOID(true);
-        privateKey.Initialize(rng, cryptoParams);
-
-        ECDSA<ECP, SHA256>::PublicKey publicKey;
-        privateKey.MakePublicKey(publicKey);
-        publicKey.AccessGroupParameters().SetEncodeAsOID(true);
-
-        string privateKeyFileName = keyFileName + ".pri";
-        Base64Encoder privateKeySink(new FileSink(privateKeyFileName.c_str()));
-        privateKey.DEREncode(privateKeySink);
-        privateKeySink.MessageEnd();
-
-        string publicKeyFileName = keyFileName + ".pub";
-        Base64Encoder publicKeySink(new FileSink(publicKeyFileName.c_str()));
-        publicKey.Save(publicKeySink);
-        publicKeySink.MessageEnd();
-
-        // set file permission
-        chmod(privateKeyFileName.c_str(), 0000400);
-        chmod(publicKeyFileName.c_str(), 0000444);
-        return;
-      }
-
-      default:
-        BOOST_THROW_EXCEPTION(Error("Unsupported key type"));
-    }
-  }
-  catch (const KeyParams::Error& e) {
-    BOOST_THROW_EXCEPTION(Error(e.what()));
-  }
-  catch (const CryptoPP::Exception& e) {
-    BOOST_THROW_EXCEPTION(Error(e.what()));
-  }
-}
-
-void
-SecTpmFile::deleteKeyPairInTpm(const Name& keyName)
-{
-  boost::filesystem::path publicKeyPath(m_impl->transformName(keyName.toUri(), ".pub"));
-  boost::filesystem::path privateKeyPath(m_impl->transformName(keyName.toUri(), ".pri"));
-
-  if (boost::filesystem::exists(publicKeyPath))
-    boost::filesystem::remove(publicKeyPath);
-
-  if (boost::filesystem::exists(privateKeyPath))
-    boost::filesystem::remove(privateKeyPath);
-}
-
-shared_ptr<v1::PublicKey>
-SecTpmFile::getPublicKeyFromTpm(const Name&  keyName)
-{
-  string keyURI = keyName.toUri();
-
-  if (!doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
-    BOOST_THROW_EXCEPTION(Error("Public Key does not exist"));
-
-  ostringstream os;
-  try {
-    using namespace CryptoPP;
-    FileSource(m_impl->transformName(keyURI, ".pub").string().c_str(),
-               true,
-               new Base64Decoder(new FileSink(os)));
-  }
-  catch (const CryptoPP::Exception& e) {
-    BOOST_THROW_EXCEPTION(Error(e.what()));
-  }
-
-  return make_shared<v1::PublicKey>(reinterpret_cast<const uint8_t*>(os.str().c_str()),
-                                os.str().size());
-}
-
-std::string
-SecTpmFile::getScheme()
-{
-  return SCHEME;
-}
-
-ConstBufferPtr
-SecTpmFile::exportPrivateKeyPkcs8FromTpm(const Name& keyName)
-{
-  OBufferStream privateKeyOs;
-  CryptoPP::FileSource(m_impl->transformName(keyName.toUri(), ".pri").string().c_str(), true,
-                       new CryptoPP::Base64Decoder(new CryptoPP::FileSink(privateKeyOs)));
-
-  return privateKeyOs.buf();
-}
-
-bool
-SecTpmFile::importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size)
-{
-  try {
-    using namespace CryptoPP;
-
-    string keyFileName = m_impl->maintainMapping(keyName.toUri());
-    keyFileName.append(".pri");
-    StringSource(buf, size,
-                 true,
-                 new Base64Encoder(new FileSink(keyFileName.c_str())));
-    return true;
-  }
-  catch (const CryptoPP::Exception& e) {
-    return false;
-  }
-}
-
-bool
-SecTpmFile::importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size)
-{
-  try {
-    using namespace CryptoPP;
-
-    string keyFileName = m_impl->maintainMapping(keyName.toUri());
-    keyFileName.append(".pub");
-    StringSource(buf, size,
-                 true,
-                 new Base64Encoder(new FileSink(keyFileName.c_str())));
-    return true;
-  }
-  catch (const CryptoPP::Exception& e) {
-    return false;
-  }
-}
-
-Block
-SecTpmFile::signInTpm(const uint8_t* data, size_t dataLength,
-                      const Name& keyName, DigestAlgorithm digestAlgorithm)
-{
-  string keyURI = keyName.toUri();
-
-  if (!doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
-    BOOST_THROW_EXCEPTION(Error("private key doesn't exist"));
-
-  try {
-    using namespace CryptoPP;
-    AutoSeededRandomPool rng;
-
-    // Read public key
-    shared_ptr<v1::PublicKey> pubkeyPtr;
-    pubkeyPtr = getPublicKeyFromTpm(keyName);
-
-    switch (pubkeyPtr->getKeyType()) {
-      case KeyType::RSA: {
-        // Read private key
-        ByteQueue bytes;
-        FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(),
-                        true, new Base64Decoder);
-        file.TransferTo(bytes);
-        bytes.MessageEnd();
-        RSA::PrivateKey privateKey;
-        privateKey.Load(bytes);
-
-        // Sign message
-        switch (digestAlgorithm) {
-          case DigestAlgorithm::SHA256: {
-            RSASS<PKCS1v15, SHA256>::Signer signer(privateKey);
-
-            OBufferStream os;
-            StringSource(data, dataLength,
-                         true,
-                         new SignerFilter(rng, signer, new FileSink(os)));
-
-            return Block(tlv::SignatureValue, os.buf());
-          }
-
-          default:
-            BOOST_THROW_EXCEPTION(Error("Unsupported digest algorithm"));
+        SecTpmFile::~SecTpmFile() {
         }
-      }
 
-      case KeyType::EC: {
-        // Read private key
-        ByteQueue bytes;
-        FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(),
-                        true, new Base64Decoder);
-        file.TransferTo(bytes);
-        bytes.MessageEnd();
+        void
+        SecTpmFile::generateKeyPairInTpm(const Name& keyName, const KeyParams& params) {
+            string keyURI = keyName.toUri();
 
-        // Sign message
-        switch (digestAlgorithm) {
-          case DigestAlgorithm::SHA256: {
-            ECDSA<ECP, SHA256>::PrivateKey privateKey;
-            privateKey.Load(bytes);
-            ECDSA<ECP, SHA256>::Signer signer(privateKey);
+            if (doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
+                BOOST_THROW_EXCEPTION(Error("public key exists"));
+            if (doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
+                BOOST_THROW_EXCEPTION(Error("private key exists"));
 
-            OBufferStream os;
-            StringSource(data, dataLength,
-                         true,
-                         new SignerFilter(rng, signer, new FileSink(os)));
+            string keyFileName = m_impl->maintainMapping(keyURI);
 
-            uint8_t buf[200];
-            size_t bufSize = DSAConvertSignatureFormat(buf, sizeof(buf), DSA_DER,
-                                                       os.buf()->buf(), os.buf()->size(),
-                                                       DSA_P1363);
+            try {
+                switch (params.getKeyType()) {
+                    case KeyType::RSA:
+                    {
+                        using namespace CryptoPP;
 
-            shared_ptr<Buffer> sigBuffer = make_shared<Buffer>(buf, bufSize);
+                        const RsaKeyParams& rsaParams = static_cast<const RsaKeyParams&> (params);
+                        AutoSeededRandomPool rng;
+                        InvertibleRSAFunction privateKey;
+                        privateKey.Initialize(rng, rsaParams.getKeySize());
 
-            return Block(tlv::SignatureValue, sigBuffer);
-          }
+                        string privateKeyFileName = keyFileName + ".pri";
+                        Base64Encoder privateKeySink(new FileSink(privateKeyFileName.c_str()));
+                        privateKey.DEREncode(privateKeySink);
+                        privateKeySink.MessageEnd();
 
-          default:
-            BOOST_THROW_EXCEPTION(Error("Unsupported digest algorithm"));
+                        RSAFunction publicKey(privateKey);
+                        string publicKeyFileName = keyFileName + ".pub";
+                        Base64Encoder publicKeySink(new FileSink(publicKeyFileName.c_str()));
+                        publicKey.DEREncode(publicKeySink);
+                        publicKeySink.MessageEnd();
+
+                        // set file permission
+                        chmod(privateKeyFileName.c_str(), 0000400);
+                        chmod(publicKeyFileName.c_str(), 0000444);
+                        return;
+                    }
+
+                    case KeyType::EC:
+                    {
+                        using namespace CryptoPP;
+
+                        const EcdsaKeyParams& ecdsaParams = static_cast<const EcdsaKeyParams&> (params);
+
+                        CryptoPP::OID curveName;
+                        switch (ecdsaParams.getKeySize()) {
+                            case 256:
+                                curveName = ASN1::secp256r1();
+                                break;
+                            case 384:
+                                curveName = ASN1::secp384r1();
+                                break;
+                            default:
+                                curveName = ASN1::secp256r1();
+                                break;
+                        }
+
+                        AutoSeededRandomPool rng;
+
+                        ECDSA<ECP, SHA256>::PrivateKey privateKey;
+                        DL_GroupParameters_EC<ECP> cryptoParams(curveName);
+                        cryptoParams.SetEncodeAsOID(true);
+                        privateKey.Initialize(rng, cryptoParams);
+
+                        ECDSA<ECP, SHA256>::PublicKey publicKey;
+                        privateKey.MakePublicKey(publicKey);
+                        publicKey.AccessGroupParameters().SetEncodeAsOID(true);
+
+                        string privateKeyFileName = keyFileName + ".pri";
+                        Base64Encoder privateKeySink(new FileSink(privateKeyFileName.c_str()));
+                        privateKey.DEREncode(privateKeySink);
+                        privateKeySink.MessageEnd();
+
+                        string publicKeyFileName = keyFileName + ".pub";
+                        Base64Encoder publicKeySink(new FileSink(publicKeyFileName.c_str()));
+                        publicKey.Save(publicKeySink);
+                        publicKeySink.MessageEnd();
+
+                        // set file permission
+                        chmod(privateKeyFileName.c_str(), 0000400);
+                        chmod(publicKeyFileName.c_str(), 0000444);
+                        return;
+                    }
+
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("Unsupported key type"));
+                }
+            } catch (const KeyParams::Error& e) {
+                BOOST_THROW_EXCEPTION(Error(e.what()));
+            } catch (const CryptoPP::Exception& e) {
+                BOOST_THROW_EXCEPTION(Error(e.what()));
+            }
         }
-      }
 
-      default:
-        BOOST_THROW_EXCEPTION(Error("Unsupported key type"));
-    }
-  }
-  catch (const CryptoPP::Exception& e) {
-    BOOST_THROW_EXCEPTION(Error(e.what()));
-  }
-}
+        void
+        SecTpmFile::deleteKeyPairInTpm(const Name& keyName) {
+            boost::filesystem::path publicKeyPath(m_impl->transformName(keyName.toUri(), ".pub"));
+            boost::filesystem::path privateKeyPath(m_impl->transformName(keyName.toUri(), ".pri"));
 
+            if (boost::filesystem::exists(publicKeyPath))
+                boost::filesystem::remove(publicKeyPath);
 
-ConstBufferPtr
-SecTpmFile::decryptInTpm(const uint8_t* data, size_t dataLength,
-                         const Name& keyName, bool isSymmetric)
-{
-  BOOST_THROW_EXCEPTION(Error("SecTpmFile::decryptInTpm is not supported"));
-  // string keyURI = keyName.toUri();
-  // if (!isSymmetric)
-  //   {
-  //     if (!doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
-  //       throw Error("private key doesn't exist");
+            if (boost::filesystem::exists(privateKeyPath))
+                boost::filesystem::remove(privateKeyPath);
+        }
 
-  //     try{
-  //       using namespace CryptoPP;
-  //       AutoSeededRandomPool rng;
+        shared_ptr<v1::PublicKey>
+        SecTpmFile::getPublicKeyFromTpm(const Name& keyName) {
+            string keyURI = keyName.toUri();
 
-  //       //Read private key
-  //       ByteQueue bytes;
-  //       FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(), true, new Base64Decoder);
-  //       file.TransferTo(bytes);
-  //       bytes.MessageEnd();
-  //       RSA::PrivateKey privateKey;
-  //       privateKey.Load(bytes);
-  //       RSAES_PKCS1v15_Decryptor decryptor(privateKey);
+            if (!doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
+                BOOST_THROW_EXCEPTION(Error("Public Key does not exist"));
 
-  //       OBufferStream os;
-  //       StringSource(data, dataLength, true, new PK_DecryptorFilter(rng, decryptor, new FileSink(os)));
+            ostringstream os;
+            try {
+                using namespace CryptoPP;
+                FileSource(m_impl->transformName(keyURI, ".pub").string().c_str(),
+                        true,
+                        new Base64Decoder(new FileSink(os)));
+            } catch (const CryptoPP::Exception& e) {
+                BOOST_THROW_EXCEPTION(Error(e.what()));
+            }
 
-  //       return os.buf();
-  //     }
-  //     catch (const CryptoPP::Exception& e){
-  //       throw Error(e.what());
-  //     }
-  //   }
-  // else
-  //   {
-  //     throw Error("Symmetric encryption is not implemented!");
-  //     // if (!doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
-  //     //     throw Error("symmetric key doesn't exist");
+            return make_shared<v1::PublicKey>(reinterpret_cast<const uint8_t*> (os.str().c_str()),
+                    os.str().size());
+        }
 
-  //     // try{
-  //     //     string keyBits;
-  //     //     string symKeyFileName = m_impl->transformName(keyURI, ".key");
-  //     //     FileSource(symKeyFileName, true, new HexDecoder(new StringSink(keyBits)));
+        std::string
+        SecTpmFile::getScheme() {
+            return SCHEME;
+        }
 
-  //     //     using CryptoPP::AES;
-  //     //     AutoSeededRandomPool rnd;
-  //     //     byte iv[AES::BLOCKSIZE];
-  //     //     rnd.GenerateBlock(iv, AES::BLOCKSIZE);
+        ConstBufferPtr
+        SecTpmFile::exportPrivateKeyPkcs8FromTpm(const Name& keyName) {
+            OBufferStream privateKeyOs;
+            CryptoPP::FileSource(m_impl->transformName(keyName.toUri(), ".pri").string().c_str(), true,
+                    new CryptoPP::Base64Decoder(new CryptoPP::FileSink(privateKeyOs)));
 
-  //     //     CFB_Mode<AES>::Decryption decryptor;
-  //     //     decryptor.SetKeyWithIV(reinterpret_cast<const uint8_t*>(keyBits.c_str()), keyBits.size(), iv);
+            return privateKeyOs.buf();
+        }
 
-  //     //     OBufferStream os;
-  //     //     StringSource(data, dataLength, true, new StreamTransformationFilter(decryptor,new FileSink(os)));
-  //     //     return os.buf();
+        bool
+        SecTpmFile::importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buf, size_t size) {
+            try {
+                using namespace CryptoPP;
 
-  //     // }
-  //     // catch (const CryptoPP::Exception& e){
-  //     //     throw Error(e.what());
-  //     // }
-  //   }
-}
+                string keyFileName = m_impl->maintainMapping(keyName.toUri());
+                keyFileName.append(".pri");
+                StringSource(buf, size,
+                        true,
+                        new Base64Encoder(new FileSink(keyFileName.c_str())));
+                return true;
+            } catch (const CryptoPP::Exception& e) {
+                return false;
+            }
+        }
 
-ConstBufferPtr
-SecTpmFile::encryptInTpm(const uint8_t* data, size_t dataLength,
-                         const Name& keyName, bool isSymmetric)
-{
-  BOOST_THROW_EXCEPTION(Error("SecTpmFile::encryptInTpm is not supported"));
-  // string keyURI = keyName.toUri();
+        bool
+        SecTpmFile::importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buf, size_t size) {
+            try {
+                using namespace CryptoPP;
 
-  // if (!isSymmetric)
-  //   {
-  //     if (!doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
-  //       throw Error("public key doesn't exist");
-  //     try
-  //       {
-  //         using namespace CryptoPP;
-  //         AutoSeededRandomPool rng;
+                string keyFileName = m_impl->maintainMapping(keyName.toUri());
+                keyFileName.append(".pub");
+                StringSource(buf, size,
+                        true,
+                        new Base64Encoder(new FileSink(keyFileName.c_str())));
+                return true;
+            } catch (const CryptoPP::Exception& e) {
+                return false;
+            }
+        }
 
-  //         //Read private key
-  //         ByteQueue bytes;
-  //         FileSource file(m_impl->transformName(keyURI, ".pub").string().c_str(), true, new Base64Decoder);
-  //         file.TransferTo(bytes);
-  //         bytes.MessageEnd();
-  //         RSA::PublicKey publicKey;
-  //         publicKey.Load(bytes);
+        Block
+        SecTpmFile::signInTpm(const uint8_t* data, size_t dataLength,
+                const Name& keyName, DigestAlgorithm digestAlgorithm) {
+            string keyURI = keyName.toUri();
 
-  //         OBufferStream os;
-  //         RSAES_PKCS1v15_Encryptor encryptor(publicKey);
+            if (!doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
+                BOOST_THROW_EXCEPTION(Error("private key doesn't exist"));
 
-  //         StringSource(data, dataLength, true, new PK_EncryptorFilter(rng, encryptor, new FileSink(os)));
-  //         return os.buf();
-  //       }
-  //     catch (const CryptoPP::Exception& e){
-  //       throw Error(e.what());
-  //     }
-  //   }
-  // else
-  //   {
-  //     throw Error("Symmetric encryption is not implemented!");
-  //     // if (!doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
-  //     //     throw Error("symmetric key doesn't exist");
+            try {
+                using namespace CryptoPP;
+                AutoSeededRandomPool rng;
 
-  //     // try{
-  //     //     string keyBits;
-  //     //     string symKeyFileName = m_impl->transformName(keyURI, ".key");
-  //     //     FileSource(symKeyFileName, true, new HexDecoder(new StringSink(keyBits)));
+                // Read public key
+                shared_ptr<v1::PublicKey> pubkeyPtr;
+                pubkeyPtr = getPublicKeyFromTpm(keyName);
 
-  //     //     using CryptoPP::AES;
-  //     //     AutoSeededRandomPool rnd;
-  //     //     byte iv[AES::BLOCKSIZE];
-  //     //     rnd.GenerateBlock(iv, AES::BLOCKSIZE);
+                switch (pubkeyPtr->getKeyType()) {
+                    case KeyType::RSA:
+                    {
+                        // Read private key
+                        ByteQueue bytes;
+                        FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(),
+                                true, new Base64Decoder);
+                        file.TransferTo(bytes);
+                        bytes.MessageEnd();
+                        RSA::PrivateKey privateKey;
+                        privateKey.Load(bytes);
 
-  //     //     CFB_Mode<AES>::Encryption encryptor;
-  //     //     encryptor.SetKeyWithIV(reinterpret_cast<const uint8_t*>(keyBits.c_str()), keyBits.size(), iv);
+                        // Sign message
+                        switch (digestAlgorithm) {
+                            case DigestAlgorithm::SHA256:
+                            {
+                                RSASS<PKCS1v15, SHA256>::Signer signer(privateKey);
 
-  //     //     OBufferStream os;
-  //     //     StringSource(data, dataLength, true, new StreamTransformationFilter(encryptor, new FileSink(os)));
-  //     //     return os.buf();
-  //     // } catch (const CryptoPP::Exception& e){
-  //     //     throw Error(e.what());
-  //     // }
-  //   }
-}
+                                OBufferStream os;
+                                StringSource(data, dataLength,
+                                        true,
+                                        new SignerFilter(rng, signer, new FileSink(os)));
 
-void
-SecTpmFile::generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params)
-{
-  BOOST_THROW_EXCEPTION(Error("SecTpmFile::generateSymmetricKeyInTpm is not supported"));
-  // string keyURI = keyName.toUri();
+                                return Block(tlv::SignatureValue, os.buf());
+                            }
 
-  // if (doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
-  //   throw Error("symmetric key exists");
+                            default:
+                                BOOST_THROW_EXCEPTION(Error("Unsupported digest algorithm"));
+                        }
+                    }
 
-  // string keyFileName = m_impl->maintainMapping(keyURI);
-  // string symKeyFileName = keyFileName + ".key";
+                    case KeyType::EC:
+                    {
+                        // Read private key
+                        ByteQueue bytes;
+                        FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(),
+                                true, new Base64Decoder);
+                        file.TransferTo(bytes);
+                        bytes.MessageEnd();
 
-  // try{
-  //   switch (keyType){
-  //   case KeyType::AES:
-  //     {
-  //       using namespace CryptoPP;
-  //       AutoSeededRandomPool rng;
+                        // Sign message
+                        switch (digestAlgorithm) {
+                            case DigestAlgorithm::SHA256:
+                            {
+                                ECDSA<ECP, SHA256>::PrivateKey privateKey;
+                                privateKey.Load(bytes);
+                                ECDSA<ECP, SHA256>::Signer signer(privateKey);
 
-  //       SecByteBlock key(0x00, keySize);
-  //       rng.GenerateBlock(key, keySize);
+                                OBufferStream os;
+                                StringSource(data, dataLength,
+                                        true,
+                                        new SignerFilter(rng, signer, new FileSink(os)));
 
-  //       StringSource(key, key.size(), true, new HexEncoder(new FileSink(symKeyFileName.c_str())));
+                                uint8_t buf[200];
+                                size_t bufSize = DSAConvertSignatureFormat(buf, sizeof (buf), DSA_DER,
+                                        os.buf()->buf(), os.buf()->size(),
+                                        DSA_P1363);
 
-  //       chmod(symKeyFileName.c_str(), 0000400);
-  //       return;
-  //     }
-  //   default:
-  //     throw Error("Unsupported symmetric key type!");
-  //   }
-  // } catch (const CryptoPP::Exception& e){
-  //   throw Error(e.what());
-  // }
-}
+                                shared_ptr<Buffer> sigBuffer = make_shared<Buffer>(buf, bufSize);
 
-bool
-SecTpmFile::doesKeyExistInTpm(const Name& keyName, KeyClass keyClass)
-{
-  string keyURI = keyName.toUri();
-  if (keyClass == KeyClass::PUBLIC) {
-    return boost::filesystem::exists(m_impl->transformName(keyURI, ".pub"));
-  }
-  if (keyClass == KeyClass::PRIVATE) {
-    return boost::filesystem::exists(m_impl->transformName(keyURI, ".pri"));
-  }
-  if (keyClass == KeyClass::SYMMETRIC) {
-    return boost::filesystem::exists(m_impl->transformName(keyURI, ".key"));
-  }
-  return false;
-}
+                                return Block(tlv::SignatureValue, sigBuffer);
+                            }
 
-bool
-SecTpmFile::generateRandomBlock(uint8_t* res, size_t size)
-{
-  try {
-    CryptoPP::AutoSeededRandomPool rng;
-    rng.GenerateBlock(res, size);
-    return true;
-  }
-  catch (const CryptoPP::Exception& e) {
-    return false;
-  }
-}
+                            default:
+                                BOOST_THROW_EXCEPTION(Error("Unsupported digest algorithm"));
+                        }
+                    }
 
-} // namespace security
+                    default:
+                        BOOST_THROW_EXCEPTION(Error("Unsupported key type"));
+                }
+            } catch (const CryptoPP::Exception& e) {
+                BOOST_THROW_EXCEPTION(Error(e.what()));
+            }
+        }
+
+        ConstBufferPtr
+        SecTpmFile::decryptInTpm(const uint8_t* data, size_t dataLength,
+                const Name& keyName, bool isSymmetric) {
+            BOOST_THROW_EXCEPTION(Error("SecTpmFile::decryptInTpm is not supported"));
+            // string keyURI = keyName.toUri();
+            // if (!isSymmetric)
+            //   {
+            //     if (!doesKeyExistInTpm(keyName, KeyClass::PRIVATE))
+            //       throw Error("private key doesn't exist");
+
+            //     try{
+            //       using namespace CryptoPP;
+            //       AutoSeededRandomPool rng;
+
+            //       //Read private key
+            //       ByteQueue bytes;
+            //       FileSource file(m_impl->transformName(keyURI, ".pri").string().c_str(), true, new Base64Decoder);
+            //       file.TransferTo(bytes);
+            //       bytes.MessageEnd();
+            //       RSA::PrivateKey privateKey;
+            //       privateKey.Load(bytes);
+            //       RSAES_PKCS1v15_Decryptor decryptor(privateKey);
+
+            //       OBufferStream os;
+            //       StringSource(data, dataLength, true, new PK_DecryptorFilter(rng, decryptor, new FileSink(os)));
+
+            //       return os.buf();
+            //     }
+            //     catch (const CryptoPP::Exception& e){
+            //       throw Error(e.what());
+            //     }
+            //   }
+            // else
+            //   {
+            //     throw Error("Symmetric encryption is not implemented!");
+            //     // if (!doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
+            //     //     throw Error("symmetric key doesn't exist");
+
+            //     // try{
+            //     //     string keyBits;
+            //     //     string symKeyFileName = m_impl->transformName(keyURI, ".key");
+            //     //     FileSource(symKeyFileName, true, new HexDecoder(new StringSink(keyBits)));
+
+            //     //     using CryptoPP::AES;
+            //     //     AutoSeededRandomPool rnd;
+            //     //     byte iv[AES::BLOCKSIZE];
+            //     //     rnd.GenerateBlock(iv, AES::BLOCKSIZE);
+
+            //     //     CFB_Mode<AES>::Decryption decryptor;
+            //     //     decryptor.SetKeyWithIV(reinterpret_cast<const uint8_t*>(keyBits.c_str()), keyBits.size(), iv);
+
+            //     //     OBufferStream os;
+            //     //     StringSource(data, dataLength, true, new StreamTransformationFilter(decryptor,new FileSink(os)));
+            //     //     return os.buf();
+
+            //     // }
+            //     // catch (const CryptoPP::Exception& e){
+            //     //     throw Error(e.what());
+            //     // }
+            //   }
+        }
+
+        ConstBufferPtr
+        SecTpmFile::encryptInTpm(const uint8_t* data, size_t dataLength,
+                const Name& keyName, bool isSymmetric) {
+            BOOST_THROW_EXCEPTION(Error("SecTpmFile::encryptInTpm is not supported"));
+            // string keyURI = keyName.toUri();
+
+            // if (!isSymmetric)
+            //   {
+            //     if (!doesKeyExistInTpm(keyName, KeyClass::PUBLIC))
+            //       throw Error("public key doesn't exist");
+            //     try
+            //       {
+            //         using namespace CryptoPP;
+            //         AutoSeededRandomPool rng;
+
+            //         //Read private key
+            //         ByteQueue bytes;
+            //         FileSource file(m_impl->transformName(keyURI, ".pub").string().c_str(), true, new Base64Decoder);
+            //         file.TransferTo(bytes);
+            //         bytes.MessageEnd();
+            //         RSA::PublicKey publicKey;
+            //         publicKey.Load(bytes);
+
+            //         OBufferStream os;
+            //         RSAES_PKCS1v15_Encryptor encryptor(publicKey);
+
+            //         StringSource(data, dataLength, true, new PK_EncryptorFilter(rng, encryptor, new FileSink(os)));
+            //         return os.buf();
+            //       }
+            //     catch (const CryptoPP::Exception& e){
+            //       throw Error(e.what());
+            //     }
+            //   }
+            // else
+            //   {
+            //     throw Error("Symmetric encryption is not implemented!");
+            //     // if (!doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
+            //     //     throw Error("symmetric key doesn't exist");
+
+            //     // try{
+            //     //     string keyBits;
+            //     //     string symKeyFileName = m_impl->transformName(keyURI, ".key");
+            //     //     FileSource(symKeyFileName, true, new HexDecoder(new StringSink(keyBits)));
+
+            //     //     using CryptoPP::AES;
+            //     //     AutoSeededRandomPool rnd;
+            //     //     byte iv[AES::BLOCKSIZE];
+            //     //     rnd.GenerateBlock(iv, AES::BLOCKSIZE);
+
+            //     //     CFB_Mode<AES>::Encryption encryptor;
+            //     //     encryptor.SetKeyWithIV(reinterpret_cast<const uint8_t*>(keyBits.c_str()), keyBits.size(), iv);
+
+            //     //     OBufferStream os;
+            //     //     StringSource(data, dataLength, true, new StreamTransformationFilter(encryptor, new FileSink(os)));
+            //     //     return os.buf();
+            //     // } catch (const CryptoPP::Exception& e){
+            //     //     throw Error(e.what());
+            //     // }
+            //   }
+        }
+
+        void
+        SecTpmFile::generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params) {
+            BOOST_THROW_EXCEPTION(Error("SecTpmFile::generateSymmetricKeyInTpm is not supported"));
+            // string keyURI = keyName.toUri();
+
+            // if (doesKeyExistInTpm(keyName, KeyClass::SYMMETRIC))
+            //   throw Error("symmetric key exists");
+
+            // string keyFileName = m_impl->maintainMapping(keyURI);
+            // string symKeyFileName = keyFileName + ".key";
+
+            // try{
+            //   switch (keyType){
+            //   case KeyType::AES:
+            //     {
+            //       using namespace CryptoPP;
+            //       AutoSeededRandomPool rng;
+
+            //       SecByteBlock key(0x00, keySize);
+            //       rng.GenerateBlock(key, keySize);
+
+            //       StringSource(key, key.size(), true, new HexEncoder(new FileSink(symKeyFileName.c_str())));
+
+            //       chmod(symKeyFileName.c_str(), 0000400);
+            //       return;
+            //     }
+            //   default:
+            //     throw Error("Unsupported symmetric key type!");
+            //   }
+            // } catch (const CryptoPP::Exception& e){
+            //   throw Error(e.what());
+            // }
+        }
+
+        bool
+        SecTpmFile::doesKeyExistInTpm(const Name& keyName, KeyClass keyClass) {
+            string keyURI = keyName.toUri();
+            if (keyClass == KeyClass::PUBLIC) {
+                return boost::filesystem::exists(m_impl->transformName(keyURI, ".pub"));
+            }
+            if (keyClass == KeyClass::PRIVATE) {
+                return boost::filesystem::exists(m_impl->transformName(keyURI, ".pri"));
+            }
+            if (keyClass == KeyClass::SYMMETRIC) {
+                return boost::filesystem::exists(m_impl->transformName(keyURI, ".key"));
+            }
+            return false;
+        }
+
+        bool
+        SecTpmFile::generateRandomBlock(uint8_t* res, size_t size) {
+            try {
+                CryptoPP::AutoSeededRandomPool rng;
+                rng.GenerateBlock(res, size);
+                return true;
+            } catch (const CryptoPP::Exception& e) {
+                return false;
+            }
+        }
+
+    } // namespace security
 } // namespace ndn

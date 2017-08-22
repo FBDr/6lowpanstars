@@ -22,32 +22,31 @@
 #include "ns3/socket.h"
 #include "ns3/address.h"
 
-namespace ns3
-{
-//  Simple class to write data to sockets
-class SocketWriter : public Application
-{
-public:
-  SocketWriter ();
-  virtual ~SocketWriter ();
-  /**
-   * Register this type.
-   * \return The TypeId.
-   */
-  static TypeId GetTypeId (void);
-  
-  void Setup (Ptr<Node> node, Address peer);
-  void Connect ();
-  void Write (uint32_t numBytes);
-  void Close ();
+namespace ns3 {
+    //  Simple class to write data to sockets
 
-private:
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
-  Address m_peer;
-  Ptr<Node> m_node;
-  Ptr<Socket> m_socket;
-  bool m_isSetup;
-  bool m_isConnected;
-};
+    class SocketWriter : public Application {
+    public:
+        SocketWriter();
+        virtual ~SocketWriter();
+        /**
+         * Register this type.
+         * \return The TypeId.
+         */
+        static TypeId GetTypeId(void);
+
+        void Setup(Ptr<Node> node, Address peer);
+        void Connect();
+        void Write(uint32_t numBytes);
+        void Close();
+
+    private:
+        virtual void StartApplication(void);
+        virtual void StopApplication(void);
+        Address m_peer;
+        Ptr<Node> m_node;
+        Ptr<Socket> m_socket;
+        bool m_isSetup;
+        bool m_isConnected;
+    };
 }

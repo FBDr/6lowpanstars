@@ -27,70 +27,60 @@
 namespace ns3
 {
 
-AodvHelper::AodvHelper() : 
-  Ipv4RoutingHelper ()
-{
-  m_agentFactory.SetTypeId ("ns3::aodv::RoutingProtocol");
-}
+    AodvHelper::AodvHelper() :
+            Ipv4RoutingHelper() {
+        m_agentFactory.SetTypeId("ns3::aodv::RoutingProtocol");
+    }
 
-AodvHelper* 
-AodvHelper::Copy (void) const 
-{
-  return new AodvHelper (*this); 
-}
+    AodvHelper *
+            AodvHelper::Copy(void) const {
+        return new AodvHelper(*this);
+    }
 
-Ptr<Ipv4RoutingProtocol> 
-AodvHelper::Create (Ptr<Node> node) const
-{
-  Ptr<aodv::RoutingProtocol> agent = m_agentFactory.Create<aodv::RoutingProtocol> ();
-  node->AggregateObject (agent);
-  return agent;
-}
+    Ptr<Ipv4RoutingProtocol>
+            AodvHelper::Create(Ptr<Node> node) const {
+        Ptr<aodv::RoutingProtocol> agent = m_agentFactory.Create<aodv::RoutingProtocol> ();
+        node->AggregateObject(agent);
+        return agent;
+    }
 
-void 
-AodvHelper::Set (std::string name, const AttributeValue &value)
-{
-  m_agentFactory.Set (name, value);
-}
+    void
+    AodvHelper::Set(std::string name, const AttributeValue & value) {
+        m_agentFactory.Set(name, value);
+    }
 
-int64_t
-AodvHelper::AssignStreams (NodeContainer c, int64_t stream)
-{
-  int64_t currentStream = stream;
-  Ptr<Node> node;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      node = (*i);
-      Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-      NS_ASSERT_MSG (ipv4, "Ipv4 not installed on node");
-      Ptr<Ipv4RoutingProtocol> proto = ipv4->GetRoutingProtocol ();
-      NS_ASSERT_MSG (proto, "Ipv4 routing not installed on node");
-      Ptr<aodv::RoutingProtocol> aodv = DynamicCast<aodv::RoutingProtocol> (proto);
-      if (aodv)
-        {
-          currentStream += aodv->AssignStreams (currentStream);
-          continue;
-        }
-      // Aodv may also be in a list
-      Ptr<Ipv4ListRouting> list = DynamicCast<Ipv4ListRouting> (proto);
-      if (list)
-        {
-          int16_t priority;
-          Ptr<Ipv4RoutingProtocol> listProto;
-          Ptr<aodv::RoutingProtocol> listAodv;
-          for (uint32_t i = 0; i < list->GetNRoutingProtocols (); i++)
-            {
-              listProto = list->GetRoutingProtocol (i, priority);
-              listAodv = DynamicCast<aodv::RoutingProtocol> (listProto);
-              if (listAodv)
-                {
-                  currentStream += listAodv->AssignStreams (currentStream);
-                  break;
+    int64_t
+    AodvHelper::AssignStreams(NodeContainer c, int64_t stream) {
+        int64_t currentStream = stream;
+        Ptr<Node> node;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            node = (*i);
+            Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
+            NS_ASSERT_MSG(ipv4, "Ipv4 not installed on node");
+            Ptr<Ipv4RoutingProtocol> proto = ipv4->GetRoutingProtocol();
+            NS_ASSERT_MSG(proto, "Ipv4 routing not installed on node");
+            Ptr<aodv::RoutingProtocol> aodv = DynamicCast<aodv::RoutingProtocol> (proto);
+            if (aodv) {
+                currentStream += aodv->AssignStreams(currentStream);
+                continue;
+            }
+            // Aodv may also be in a list
+            Ptr<Ipv4ListRouting> list = DynamicCast<Ipv4ListRouting> (proto);
+            if (list) {
+                int16_t priority;
+                Ptr<Ipv4RoutingProtocol> listProto;
+                Ptr<aodv::RoutingProtocol> listAodv;
+                for (uint32_t i = 0; i < list->GetNRoutingProtocols(); i++) {
+                    listProto = list->GetRoutingProtocol(i, priority);
+                    listAodv = DynamicCast<aodv::RoutingProtocol> (listProto);
+                    if (listAodv) {
+                        currentStream += listAodv->AssignStreams(currentStream);
+                        break;
+                    }
                 }
             }
         }
+        return (currentStream - stream);
     }
-  return (currentStream - stream);
-}
 
 }

@@ -26,15 +26,15 @@
  * ns3::TraceSourceAccessor implementation (constructor and destructor).
  */
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("TraceSourceAccessor");
-
-TraceSourceAccessor::TraceSourceAccessor ()
+namespace ns3
 {
-}
-TraceSourceAccessor::~TraceSourceAccessor ()
-{
-}
+
+    NS_LOG_COMPONENT_DEFINE("TraceSourceAccessor");
+
+    TraceSourceAccessor::TraceSourceAccessor() {
+    }
+
+    TraceSourceAccessor::~TraceSourceAccessor() {
+    }
 
 } // namespace ns3

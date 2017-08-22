@@ -27,80 +27,80 @@
 #include "ns3/mac48-address.h"
 
 namespace ns3 {
-namespace flame {
-/**
- * \ingroup flame
- *
- * \brief Routing table for FLAME
- */
-class FlameRtable : public Object
-{
-public:
-  /// Means all interfaces
-  const static uint32_t INTERFACE_ANY = 0xffffffff;
-  /// Maximum (the best?) path cost
-  const static uint32_t MAX_COST = 0xff;
+    namespace flame {
 
-  /// Route lookup result, return type of LookupXXX methods
-  struct LookupResult
-  {
-    Mac48Address retransmitter;
-    uint32_t ifIndex;
-    uint8_t  cost;
-    uint16_t seqnum;
-    LookupResult (Mac48Address r = Mac48Address::GetBroadcast (),
-                  uint32_t i = INTERFACE_ANY,
-                  uint8_t  c = MAX_COST,
-                  uint16_t s = 0)
-      : retransmitter (r),
-        ifIndex (i),
-        cost (c),
-        seqnum (s)
-    {
-    }
-    /// True for valid route
-    bool IsValid () const;
-    /// Compare route lookup results, used by tests
-    bool operator== (const LookupResult & o) const;
-  };
-public:
-  static TypeId GetTypeId ();
-  FlameRtable ();
-  ~FlameRtable ();
-  void DoDispose ();
+        /**
+         * \ingroup flame
+         *
+         * \brief Routing table for FLAME
+         */
+        class FlameRtable : public Object {
+        public:
+            /// Means all interfaces
+            const static uint32_t INTERFACE_ANY = 0xffffffff;
+            /// Maximum (the best?) path cost
+            const static uint32_t MAX_COST = 0xff;
 
-  /// Add path
-  void AddPath (
-    const Mac48Address destination,
-    const Mac48Address retransmitter,
-    const uint32_t interface,
-    const uint8_t cost,
-    const uint16_t seqnum
-    );
-  /**
-   * \brief Lookup path to destination
-   * \return Broadcast if not found
-   */
-  LookupResult Lookup (Mac48Address destination);
-private:
-  FlameRtable& operator= (const FlameRtable &);
-  FlameRtable (const FlameRtable &);
+            /// Route lookup result, return type of LookupXXX methods
 
-  /// Routing table entry
-  struct Route
-  {
-    Mac48Address retransmitter;
-    uint32_t interface;
-    uint32_t cost;
-    Time whenExpire;
-    uint32_t seqnum;
-  };
-  /// Lifetime parameter
-  Time m_lifetime;
-  /// List of routes
-  std::map<Mac48Address, Route>  m_routes;
-};
+            struct LookupResult {
+                Mac48Address retransmitter;
+                uint32_t ifIndex;
+                uint8_t cost;
+                uint16_t seqnum;
 
-} // namespace flame
+                LookupResult(Mac48Address r = Mac48Address::GetBroadcast(),
+                        uint32_t i = INTERFACE_ANY,
+                        uint8_t c = MAX_COST,
+                        uint16_t s = 0)
+                : retransmitter(r),
+                ifIndex(i),
+                cost(c),
+                seqnum(s) {
+                }
+                /// True for valid route
+                bool IsValid() const;
+                /// Compare route lookup results, used by tests
+                bool operator==(const LookupResult & o) const;
+            };
+        public:
+            static TypeId GetTypeId();
+            FlameRtable();
+            ~FlameRtable();
+            void DoDispose();
+
+            /// Add path
+            void AddPath(
+                    const Mac48Address destination,
+                    const Mac48Address retransmitter,
+                    const uint32_t interface,
+                    const uint8_t cost,
+                    const uint16_t seqnum
+                    );
+            /**
+             * \brief Lookup path to destination
+             * \return Broadcast if not found
+             */
+            LookupResult Lookup(Mac48Address destination);
+        private:
+            FlameRtable& operator=(const FlameRtable &);
+            FlameRtable(const FlameRtable &);
+
+            /// Routing table entry
+
+            struct Route {
+                Mac48Address retransmitter;
+                uint32_t interface;
+                uint32_t cost;
+                Time whenExpire;
+                uint32_t seqnum;
+            };
+            /// Lifetime parameter
+            Time m_lifetime;
+            /// List of routes
+            std::map<Mac48Address, Route> m_routes;
+        };
+
+    } // namespace flame
 } // namespace ns3
 #endif /* FLAME_PROTOCOL_H */

@@ -31,57 +31,56 @@
 
 namespace nfd {
 
-class WebSocketFactory : public ProtocolFactory
-{
-public:
-  /**
-   * \brief Create WebSocket-based channel using websocket::Endpoint
-   *
-   * websocket::Endpoint is really an alias for boost::asio::ip::tcp::endpoint.
-   *
-   * If this method called twice with the same endpoint, only one channel
-   * will be created.  The second call will just retrieve the existing
-   * channel.
-   *
-   * \returns always a valid pointer to a WebSocketChannel object, an exception
-   *          is thrown if it cannot be created.
-   */
-  shared_ptr<WebSocketChannel>
-  createChannel(const websocket::Endpoint& localEndpoint);
+    class WebSocketFactory : public ProtocolFactory {
+    public:
+        /**
+         * \brief Create WebSocket-based channel using websocket::Endpoint
+         *
+         * websocket::Endpoint is really an alias for boost::asio::ip::tcp::endpoint.
+         *
+         * If this method called twice with the same endpoint, only one channel
+         * will be created.  The second call will just retrieve the existing
+         * channel.
+         *
+         * \returns always a valid pointer to a WebSocketChannel object, an exception
+         *          is thrown if it cannot be created.
+         */
+        shared_ptr<WebSocketChannel>
+        createChannel(const websocket::Endpoint& localEndpoint);
 
-  /**
-   * \brief Create WebSocket-based channel using specified IP address and port number
-   *
-   * This method is just a helper that converts a string representation of localIp and port to
-   * websocket::Endpoint and calls the other createChannel overload.
-   */
-  shared_ptr<WebSocketChannel>
-  createChannel(const std::string& localIp, const std::string& localPort);
+        /**
+         * \brief Create WebSocket-based channel using specified IP address and port number
+         *
+         * This method is just a helper that converts a string representation of localIp and port to
+         * websocket::Endpoint and calls the other createChannel overload.
+         */
+        shared_ptr<WebSocketChannel>
+        createChannel(const std::string& localIp, const std::string& localPort);
 
-public: // from ProtocolFactory
-  virtual void
-  createFace(const FaceUri& uri,
-             ndn::nfd::FacePersistency persistency,
-             bool wantLocalFieldsEnabled,
-             const FaceCreatedCallback& onCreated,
-             const FaceCreationFailedCallback& onFailure) override;
+    public: // from ProtocolFactory
+        virtual void
+        createFace(const FaceUri& uri,
+                ndn::nfd::FacePersistency persistency,
+                bool wantLocalFieldsEnabled,
+                const FaceCreatedCallback& onCreated,
+                const FaceCreationFailedCallback& onFailure) override;
 
-  virtual std::vector<shared_ptr<const Channel>>
-  getChannels() const override;
+        virtual std::vector<shared_ptr<const Channel>>
+        getChannels() const override;
 
-private:
-  /**
-   * \brief Look up WebSocketChannel using specified local endpoint
-   *
-   * \returns shared pointer to the existing WebSocketChannel object
-   *          or empty shared pointer when such channel does not exist
-   */
-  shared_ptr<WebSocketChannel>
-  findChannel(const websocket::Endpoint& endpoint) const;
+    private:
+        /**
+         * \brief Look up WebSocketChannel using specified local endpoint
+         *
+         * \returns shared pointer to the existing WebSocketChannel object
+         *          or empty shared pointer when such channel does not exist
+         */
+        shared_ptr<WebSocketChannel>
+        findChannel(const websocket::Endpoint& endpoint) const;
 
-private:
-  std::map<websocket::Endpoint, shared_ptr<WebSocketChannel>> m_channels;
-};
+    private:
+        std::map<websocket::Endpoint, shared_ptr<WebSocketChannel>> m_channels;
+    };
 
 } // namespace nfd
 

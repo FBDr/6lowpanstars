@@ -31,16 +31,16 @@
 
 namespace ns3 {
 
-//  Additional docs for class StringValue:
-/**
- * Hold variables of type string
- *
- * This class can be used to hold variables of type string,
- * that is, either char * or std::string.
- */
-ATTRIBUTE_VALUE_DEFINE_WITH_NAME (std::string, String);
-ATTRIBUTE_ACCESSOR_DEFINE (String);
-ATTRIBUTE_CHECKER_DEFINE (String);
+    //  Additional docs for class StringValue:
+    /**
+     * Hold variables of type string
+     *
+     * This class can be used to hold variables of type string,
+     * that is, either char * or std::string.
+     */
+    ATTRIBUTE_VALUE_DEFINE_WITH_NAME(std::string, String);
+    ATTRIBUTE_ACCESSOR_DEFINE(String);
+    ATTRIBUTE_CHECKER_DEFINE(String);
 
 } // namespace ns3
 

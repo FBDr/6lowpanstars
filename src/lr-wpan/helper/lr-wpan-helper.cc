@@ -31,7 +31,8 @@
 #include <ns3/log.h>
 #include "ns3/names.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("LrWpanHelper");
 
@@ -216,7 +217,7 @@ namespace ns3 {
     }
 
     Ptr<SpectrumChannel>
-    LrWpanHelper::GetChannel(void) {
+            LrWpanHelper::GetChannel(void) {
         return m_channel;
     }
 

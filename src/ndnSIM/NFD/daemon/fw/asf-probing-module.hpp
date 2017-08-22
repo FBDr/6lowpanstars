@@ -29,57 +29,56 @@
 #include "asf-measurements.hpp"
 
 namespace nfd {
-namespace fw {
-namespace asf {
+    namespace fw {
+        namespace asf {
 
-/** \brief ASF Probing Module
- */
-class ProbingModule
-{
-public:
-  explicit
-  ProbingModule(AsfMeasurements& measurements);
+            /** \brief ASF Probing Module
+             */
+            class ProbingModule {
+            public:
+                explicit
+                ProbingModule(AsfMeasurements& measurements);
 
-  void
-  scheduleProbe(const fib::Entry& fibEntry, const time::milliseconds& interval);
+                void
+                scheduleProbe(const fib::Entry& fibEntry, const time::milliseconds& interval);
 
-  Face*
-  getFaceToProbe(const Face& inFace,
-                 const Interest& interest,
-                 const fib::Entry& fibEntry,
-                 const Face& faceUsed);
+                Face*
+                getFaceToProbe(const Face& inFace,
+                        const Interest& interest,
+                        const fib::Entry& fibEntry,
+                        const Face& faceUsed);
 
-  bool
-  isProbingNeeded(const fib::Entry& fibEntry, const Interest& interest);
+                bool
+                isProbingNeeded(const fib::Entry& fibEntry, const Interest& interest);
 
-  void
-  afterForwardingProbe(const fib::Entry& fibEntry, const Interest& interest);
+                void
+                afterForwardingProbe(const fib::Entry& fibEntry, const Interest& interest);
 
-private:
-  // Used to associate FaceInfo with the face in a NextHop
-  typedef std::pair<FaceInfo*, Face*> FaceInfoFacePair;
-  typedef std::function<bool(FaceInfoFacePair, FaceInfoFacePair)> FaceInfoPredicate;
-  typedef std::set<FaceInfoFacePair, FaceInfoPredicate> FaceInfoFacePairSet;
+            private:
+                // Used to associate FaceInfo with the face in a NextHop
+                typedef std::pair<FaceInfo*, Face*> FaceInfoFacePair;
+                typedef std::function<bool(FaceInfoFacePair, FaceInfoFacePair) > FaceInfoPredicate;
+                typedef std::set<FaceInfoFacePair, FaceInfoPredicate> FaceInfoFacePairSet;
 
-  Face*
-  getFaceBasedOnProbability(const FaceInfoFacePairSet& rankedFaces);
+                Face*
+                getFaceBasedOnProbability(const FaceInfoFacePairSet& rankedFaces);
 
-  double
-  getProbingProbability(uint64_t rank, uint64_t rankSum, uint64_t nFaces);
+                double
+                getProbingProbability(uint64_t rank, uint64_t rankSum, uint64_t nFaces);
 
-  double
-  getRandomNumber(double start, double end);
+                double
+                getRandomNumber(double start, double end);
 
-public:
-  static constexpr time::seconds DEFAULT_PROBING_INTERVAL = time::seconds(60);
+            public:
+                static constexpr time::seconds DEFAULT_PROBING_INTERVAL = time::seconds(60);
 
-private:
-  time::seconds m_probingInterval;
-  AsfMeasurements& m_measurements;
-};
+            private:
+                time::seconds m_probingInterval;
+                AsfMeasurements& m_measurements;
+            };
 
-} // namespace asf
-} // namespace fw
+        } // namespace asf
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_ASF_PROBING_MODULE_HPP

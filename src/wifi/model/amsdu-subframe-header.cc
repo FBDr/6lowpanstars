@@ -22,114 +22,101 @@
 #include "ns3/address-utils.h"
 #include "ns3/log.h"
 
-namespace ns3 {
-
-NS_LOG_COMPONENT_DEFINE ("AmsduSubframeHeader");
-
-NS_OBJECT_ENSURE_REGISTERED (AmsduSubframeHeader);
-
-TypeId
-AmsduSubframeHeader::GetTypeId ()
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::AmsduSubframeHeader")
-    .SetParent<Header> ()
-    .SetGroupName ("Wifi")
-    .AddConstructor<AmsduSubframeHeader> ()
-  ;
-  return tid;
-}
 
-TypeId
-AmsduSubframeHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
+    NS_LOG_COMPONENT_DEFINE("AmsduSubframeHeader");
 
-AmsduSubframeHeader::AmsduSubframeHeader ()
-  : m_length (0)
-{
-  NS_LOG_FUNCTION (this);
-}
+    NS_OBJECT_ENSURE_REGISTERED(AmsduSubframeHeader);
 
-AmsduSubframeHeader::~AmsduSubframeHeader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+    TypeId
+    AmsduSubframeHeader::GetTypeId() {
+        static TypeId tid = TypeId("ns3::AmsduSubframeHeader")
+                .SetParent<Header> ()
+                .SetGroupName("Wifi")
+                .AddConstructor<AmsduSubframeHeader> ()
+                ;
+        return tid;
+    }
 
-uint32_t
-AmsduSubframeHeader::GetSerializedSize () const
-{
-  NS_LOG_FUNCTION (this);
-  return (6 + 6 + 2);
-}
+    TypeId
+    AmsduSubframeHeader::GetInstanceTypeId(void) const {
+        return GetTypeId();
+    }
 
-void
-AmsduSubframeHeader::Serialize (Buffer::Iterator i) const
-{
-  NS_LOG_FUNCTION (this << &i);
-  WriteTo (i, m_da);
-  WriteTo (i, m_sa);
-  i.WriteHtonU16 (m_length);
-}
+    AmsduSubframeHeader::AmsduSubframeHeader()
+            : m_length(0) {
+        NS_LOG_FUNCTION(this);
+    }
 
-uint32_t
-AmsduSubframeHeader::Deserialize (Buffer::Iterator start)
-{
-  NS_LOG_FUNCTION (this << &start);
-  Buffer::Iterator i = start;
-  ReadFrom (i, m_da);
-  ReadFrom (i, m_sa);
-  m_length = i.ReadNtohU16 ();
-  return i.GetDistanceFrom (start);
-}
+    AmsduSubframeHeader::~AmsduSubframeHeader() {
+        NS_LOG_FUNCTION(this);
+    }
 
-void
-AmsduSubframeHeader::Print (std::ostream &os) const
-{
-  NS_LOG_FUNCTION (this << &os);
-  os << "DA = " << m_da << ", SA = " << m_sa << ", length = " << m_length;
-}
+    uint32_t
+    AmsduSubframeHeader::GetSerializedSize() const {
+        NS_LOG_FUNCTION(this);
+        return (6 + 6 + 2);
+    }
 
-void
-AmsduSubframeHeader::SetDestinationAddr (Mac48Address to)
-{
-  NS_LOG_FUNCTION (this << to);
-  m_da = to;
-}
+    void
+    AmsduSubframeHeader::Serialize(Buffer::Iterator i) const {
+        NS_LOG_FUNCTION(this << &i);
+        WriteTo(i, m_da);
+        WriteTo(i, m_sa);
+        i.WriteHtonU16(m_length);
+    }
 
-void
-AmsduSubframeHeader::SetSourceAddr (Mac48Address from)
-{
-  NS_LOG_FUNCTION (this << from);
-  m_sa = from;
-}
+    uint32_t
+    AmsduSubframeHeader::Deserialize(Buffer::Iterator start) {
+        NS_LOG_FUNCTION(this << &start);
+        Buffer::Iterator i = start;
+        ReadFrom(i, m_da);
+        ReadFrom(i, m_sa);
+        m_length = i.ReadNtohU16();
+        return i.GetDistanceFrom(start);
+    }
 
-void
-AmsduSubframeHeader::SetLength (uint16_t length)
-{
-  NS_LOG_FUNCTION (this << length);
-  m_length = length;
-}
+    void
+    AmsduSubframeHeader::Print(std::ostream & os) const {
+        NS_LOG_FUNCTION(this << &os);
+        os << "DA = " << m_da << ", SA = " << m_sa << ", length = " << m_length;
+    }
 
-Mac48Address
-AmsduSubframeHeader::GetDestinationAddr (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_da;
-}
+    void
+    AmsduSubframeHeader::SetDestinationAddr(Mac48Address to) {
+        NS_LOG_FUNCTION(this << to);
+        m_da = to;
+    }
 
-Mac48Address
-AmsduSubframeHeader::GetSourceAddr (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_sa;
-}
+    void
+    AmsduSubframeHeader::SetSourceAddr(Mac48Address from) {
+        NS_LOG_FUNCTION(this << from);
+        m_sa = from;
+    }
 
-uint16_t
-AmsduSubframeHeader::GetLength (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_length;
-}
+    void
+    AmsduSubframeHeader::SetLength(uint16_t length) {
+        NS_LOG_FUNCTION(this << length);
+        m_length = length;
+    }
+
+    Mac48Address
+    AmsduSubframeHeader::GetDestinationAddr(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_da;
+    }
+
+    Mac48Address
+    AmsduSubframeHeader::GetSourceAddr(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_sa;
+    }
+
+    uint16_t
+    AmsduSubframeHeader::GetLength(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_length;
+    }
 
 } //namespace ns3

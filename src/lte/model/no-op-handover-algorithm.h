@@ -28,49 +28,47 @@
 
 namespace ns3 {
 
+    /**
+     * \brief Handover algorithm implementation which simply does nothing.
+     *
+     * Selecting this handover algorithm is equivalent to disabling automatic
+     * triggering of handover. This is the default choice.
+     *
+     * To enable automatic handover, please select another handover algorithm, i.e.,
+     * another child class of LteHandoverAlgorithm.
+     */
+    class NoOpHandoverAlgorithm : public LteHandoverAlgorithm {
+    public:
+        /// Creates a No-op handover algorithm instance.
+        NoOpHandoverAlgorithm();
 
-/**
- * \brief Handover algorithm implementation which simply does nothing.
- *
- * Selecting this handover algorithm is equivalent to disabling automatic
- * triggering of handover. This is the default choice.
- *
- * To enable automatic handover, please select another handover algorithm, i.e.,
- * another child class of LteHandoverAlgorithm.
- */
-class NoOpHandoverAlgorithm : public LteHandoverAlgorithm
-{
-public:
-  /// Creates a No-op handover algorithm instance.
-  NoOpHandoverAlgorithm ();
+        virtual ~NoOpHandoverAlgorithm();
 
-  virtual ~NoOpHandoverAlgorithm ();
+        // inherited from Object
+        static TypeId GetTypeId();
 
-  // inherited from Object
-  static TypeId GetTypeId ();
+        // inherited from LteHandoverAlgorithm
+        virtual void SetLteHandoverManagementSapUser(LteHandoverManagementSapUser* s);
+        virtual LteHandoverManagementSapProvider* GetLteHandoverManagementSapProvider();
 
-  // inherited from LteHandoverAlgorithm
-  virtual void SetLteHandoverManagementSapUser (LteHandoverManagementSapUser* s);
-  virtual LteHandoverManagementSapProvider* GetLteHandoverManagementSapProvider ();
+        // let the forwarder class access the protected and private members
+        friend class MemberLteHandoverManagementSapProvider<NoOpHandoverAlgorithm>;
 
-  // let the forwarder class access the protected and private members
-  friend class MemberLteHandoverManagementSapProvider<NoOpHandoverAlgorithm>;
+    protected:
+        // inherited from Object
+        virtual void DoInitialize();
+        virtual void DoDispose();
 
-protected:
-  // inherited from Object
-  virtual void DoInitialize ();
-  virtual void DoDispose ();
+        // inherited from LteHandoverAlgorithm as a Handover Management SAP implementation
+        void DoReportUeMeas(uint16_t rnti, LteRrcSap::MeasResults measResults);
 
-  // inherited from LteHandoverAlgorithm as a Handover Management SAP implementation
-  void DoReportUeMeas (uint16_t rnti, LteRrcSap::MeasResults measResults);
+    private:
+        /// Interface to the eNodeB RRC instance.
+        LteHandoverManagementSapUser* m_handoverManagementSapUser;
+        /// Receive API calls from the eNodeB RRC instance.
+        LteHandoverManagementSapProvider* m_handoverManagementSapProvider;
 
-private:
-  /// Interface to the eNodeB RRC instance.
-  LteHandoverManagementSapUser* m_handoverManagementSapUser;
-  /// Receive API calls from the eNodeB RRC instance.
-  LteHandoverManagementSapProvider* m_handoverManagementSapProvider;
-
-}; // end of class NoOpHandoverAlgorithm
+    }; // end of class NoOpHandoverAlgorithm
 
 
 } // end of namespace ns3

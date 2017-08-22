@@ -29,75 +29,68 @@
  * System-independent thread class ns3::SystemThread definitions.
  */
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("SystemThread");
+    NS_LOG_COMPONENT_DEFINE("SystemThread");
 
 #ifdef HAVE_PTHREAD_H
 
-SystemThread::SystemThread (Callback<void> callback)
-  : m_callback (callback)
-{
-  NS_LOG_FUNCTION (this << &callback);
-}
-
-SystemThread::~SystemThread()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SystemThread::Start (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  int rc = pthread_create (&m_thread, NULL, &SystemThread::DoRun,
-                           (void *)this);
-
-  if (rc) 
-    {
-      NS_FATAL_ERROR ("pthread_create failed: " << rc << "=\"" << 
-                      strerror (rc) << "\".");
+    SystemThread::SystemThread(Callback<void> callback)
+            : m_callback(callback) {
+        NS_LOG_FUNCTION(this << &callback);
     }
-}
 
-void
-SystemThread::Join (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  void *thread_return;
-  int rc = pthread_join (m_thread, &thread_return);
-  if (rc) 
-    {
-      NS_FATAL_ERROR ("pthread_join failed: " << rc << "=\"" << 
-                      strerror (rc) << "\".");
+    SystemThread::~SystemThread() {
+        NS_LOG_FUNCTION(this);
     }
-}
 
-void *
-SystemThread::DoRun (void *arg)
-{
-  NS_LOG_FUNCTION (arg);
+    void
+    SystemThread::Start(void) {
+        NS_LOG_FUNCTION(this);
 
-  SystemThread *self = static_cast<SystemThread *> (arg);
-  self->m_callback ();
+        int rc = pthread_create(&m_thread, NULL, &SystemThread::DoRun,
+                (void *) this);
 
-  return 0;
-}
-SystemThread::ThreadId 
-SystemThread::Self (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  return pthread_self ();
-}
+        if (rc) {
+            NS_FATAL_ERROR("pthread_create failed: " << rc << "=\"" <<
+                    strerror(rc) << "\".");
+        }
+    }
 
-bool 
-SystemThread::Equals (SystemThread::ThreadId id)
-{
-  NS_LOG_FUNCTION (id);
-  return (pthread_equal (pthread_self (), id) != 0);
-}
+    void
+    SystemThread::Join(void) {
+        NS_LOG_FUNCTION(this);
+
+        void *thread_return;
+        int rc = pthread_join(m_thread, &thread_return);
+        if (rc) {
+            NS_FATAL_ERROR("pthread_join failed: " << rc << "=\"" <<
+                    strerror(rc) << "\".");
+        }
+    }
+
+    void *
+    SystemThread::DoRun(void *arg) {
+        NS_LOG_FUNCTION(arg);
+
+        SystemThread *self = static_cast<SystemThread *> (arg);
+        self->m_callback();
+
+        return 0;
+    }
+
+    SystemThread::ThreadId
+    SystemThread::Self(void) {
+        NS_LOG_FUNCTION_NOARGS();
+        return pthread_self();
+    }
+
+    bool
+    SystemThread::Equals(SystemThread::ThreadId id) {
+        NS_LOG_FUNCTION(id);
+        return (pthread_equal(pthread_self(), id) != 0);
+    }
 
 #endif /* HAVE_PTHREAD_H */
 

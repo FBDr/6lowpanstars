@@ -29,34 +29,32 @@
 #include "pit-face-record.hpp"
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-/** \brief contains information about an Interest from an incoming face
- */
-class InRecord : public FaceRecord
-{
-public:
-  explicit
-  InRecord(Face& face);
+        /** \brief contains information about an Interest from an incoming face
+         */
+        class InRecord : public FaceRecord {
+        public:
+            explicit
+            InRecord(Face& face);
 
-  void
-  update(const Interest& interest);
+            void
+            update(const Interest& interest);
 
-  const Interest&
-  getInterest() const;
+            const Interest&
+            getInterest() const;
 
-private:
-  shared_ptr<const Interest> m_interest;
-};
+        private:
+            shared_ptr<const Interest> m_interest;
+        };
 
-inline const Interest&
-InRecord::getInterest() const
-{
-  BOOST_ASSERT(static_cast<bool>(m_interest));
-  return *m_interest;
-}
+        inline const Interest&
+        InRecord::getInterest() const {
+            BOOST_ASSERT(static_cast<bool> (m_interest));
+            return *m_interest;
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_PIT_IN_RECORD_HPP

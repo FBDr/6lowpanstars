@@ -27,7 +27,6 @@
 
 using namespace ns3;
 
-
 /**
  * This system test program creates different test cases with a single eNB and
  * several UEs, all having the same Radio Bearer specification. In each test
@@ -35,30 +34,24 @@ using namespace ns3;
  * implemented obtained by using different SINR values and different numbers of
  * UEs. The test consists on ...
  */
-class LenaHarqTestCase : public TestCase
-{
+class LenaHarqTestCase : public TestCase {
 public:
-  LenaHarqTestCase (uint16_t nUser, uint16_t dist, uint16_t tbSize, double amcBer, double thrRef);
-  virtual ~LenaHarqTestCase ();
+    LenaHarqTestCase(uint16_t nUser, uint16_t dist, uint16_t tbSize, double amcBer, double thrRef);
+    virtual ~LenaHarqTestCase();
 
 private:
-  virtual void DoRun (void);
-  static std::string BuildNameString (uint16_t nUser, uint16_t dist, uint16_t tbSize);
-  uint16_t m_nUser;
-  uint16_t m_dist;
-  double m_amcBer;
-  double m_throughputRef;
+    virtual void DoRun(void);
+    static std::string BuildNameString(uint16_t nUser, uint16_t dist, uint16_t tbSize);
+    uint16_t m_nUser;
+    uint16_t m_dist;
+    double m_amcBer;
+    double m_throughputRef;
 
 };
 
-
-
-
-
-class LenaTestHarqSuite : public TestSuite
-{
+class LenaTestHarqSuite : public TestSuite {
 public:
-  LenaTestHarqSuite ();
+    LenaTestHarqSuite();
 };
 
 #endif /* LENA_TEST_HARQ_H */

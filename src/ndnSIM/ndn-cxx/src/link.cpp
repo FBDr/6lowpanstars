@@ -31,216 +31,199 @@
 
 namespace ndn {
 
-BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Link>));
-BOOST_CONCEPT_ASSERT((WireEncodable<Link>));
-BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<Link>));
-BOOST_CONCEPT_ASSERT((WireDecodable<Link>));
-static_assert(std::is_base_of<Data::Error, Link::Error>::value,
-              "Link::Error should inherit from Data::Error");
+    BOOST_CONCEPT_ASSERT((boost::EqualityComparable<Link>));
+    BOOST_CONCEPT_ASSERT((WireEncodable<Link>));
+    BOOST_CONCEPT_ASSERT((WireEncodableWithEncodingBuffer<Link>));
+    BOOST_CONCEPT_ASSERT((WireDecodable<Link>));
+    static_assert(std::is_base_of<Data::Error, Link::Error>::value,
+            "Link::Error should inherit from Data::Error");
 
-Link::Link(const Block& block)
-{
-  wireDecode(block);
-}
-
-Link::Link(const Name& name)
-  : Data(name)
-{
-}
-
-Link::Link(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> links)
-  : Data(name)
-{
-  m_delegations.insert(links);
-  encodeContent();
-}
-
-void
-Link::addDelegation(uint32_t preference, const Name& name)
-{
-  this->removeDelegationNoEncode(name);
-  m_delegations.insert({preference, name});
-  encodeContent();
-}
-
-bool
-Link::removeDelegation(const Name& name)
-{
-  bool hasRemovedDelegation = this->removeDelegationNoEncode(name);
-  if (hasRemovedDelegation) {
-    encodeContent();
-  }
-  return hasRemovedDelegation;
-}
-
-const Link::DelegationSet&
-Link::getDelegations() const
-{
-  return m_delegations;
-}
-
-template<encoding::Tag TAG>
-size_t
-Link::encodeContent(EncodingImpl<TAG>& encoder) const
-{
-  // LinkContent ::= CONTENT-TYPE TLV-LENGTH
-  //                    Delegation+
-
-  // Delegation ::= LINK-DELEGATION-TYPE TLV-LENGTH
-  //              Preference
-  //              Name
-
-  // Preference ::= LINK-PREFERENCE-TYPE TLV-LENGTH
-  //       nonNegativeInteger
-
-  size_t totalLength = 0;
-  for (const auto& delegation : m_delegations |  boost::adaptors::reversed) {
-    size_t delegationLength = 0;
-    delegationLength += std::get<1>(delegation).wireEncode(encoder);
-    delegationLength += prependNonNegativeIntegerBlock(encoder, tlv::LinkPreference,
-                                                       std::get<0>(delegation));
-    delegationLength += encoder.prependVarNumber(delegationLength);
-    delegationLength += encoder.prependVarNumber(tlv::LinkDelegation);
-    totalLength += delegationLength;
-  }
-  totalLength += encoder.prependVarNumber(totalLength);
-  totalLength += encoder.prependVarNumber(tlv::Content);
-  return totalLength;
-}
-
-template size_t
-Link::encodeContent<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
-
-template size_t
-Link::encodeContent<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
-
-void
-Link::encodeContent()
-{
-  onChanged();
-
-  EncodingEstimator estimator;
-  size_t estimatedSize = encodeContent(estimator);
-
-  EncodingBuffer buffer(estimatedSize, 0);
-  encodeContent(buffer);
-
-  setContentType(tlv::ContentType_Link);
-  setContent(buffer.block());
-}
-
-void
-Link::decodeContent()
-{
-  // LinkContent ::= CONTENT-TYPE TLV-LENGTH
-  //                    Delegation+
-
-  // Delegation ::= LINK-DELEGATION-TYPE TLV-LENGTH
-  //              Preference
-  //              Name
-
-  // Preference ::= LINK-PREFERENCE-TYPE TLV-LENGTH
-  //       nonNegativeInteger
-
-  if (getContentType() != tlv::ContentType_Link)
-    {
-      BOOST_THROW_EXCEPTION(Error("Expected Content Type Link"));
+    Link::Link(const Block& block) {
+        wireDecode(block);
     }
 
-  const Block& content = getContent();
-  content.parse();
+    Link::Link(const Name& name)
+    : Data(name) {
+    }
 
-  for (auto& delegation : content.elements()) {
-    delegation.parse();
-    Block::element_const_iterator val = delegation.elements_begin();
-    if (val == delegation.elements_end()) {
-      BOOST_THROW_EXCEPTION(Error("Unexpected Link Encoding"));
+    Link::Link(const Name& name, std::initializer_list<std::pair<uint32_t, Name>> links)
+    : Data(name) {
+        m_delegations.insert(links);
+        encodeContent();
     }
-    uint32_t preference;
-    try {
-      preference = static_cast<uint32_t>(readNonNegativeInteger(*val));
-    }
-    catch (tlv::Error&) {
-      BOOST_THROW_EXCEPTION(Error("Missing Preference field in Link Encoding"));
-    }
-    ++val;
-    if (val == delegation.elements_end()) {
-      BOOST_THROW_EXCEPTION(Error("Missing Name field in Link Encoding"));
-    }
-    Name name(*val);
-    m_delegations.insert({preference, name});
-  }
-}
 
-void
-Link::wireDecode(const Block& wire)
-{
-  Data::wireDecode(wire);
-  decodeContent();
-}
-
-std::tuple<uint32_t, Name>
-Link::getDelegationFromWire(const Block& block, size_t index)
-{
-  block.parse();
-  const Block& contentBlock = block.get(tlv::Content);
-  contentBlock.parse();
-  const Block& delegationBlock = contentBlock.elements().at(index);
-  delegationBlock.parse();
-  if (delegationBlock.type() != tlv::LinkDelegation) {
-    BOOST_THROW_EXCEPTION(Error("Unexpected TLV-TYPE, expecting LinkDelegation"));
-  }
-  return std::make_tuple(
-    static_cast<uint32_t>(
-      readNonNegativeInteger(delegationBlock.get(tlv::LinkPreference))),
-    Name(delegationBlock.get(tlv::Name)));
-}
-
-ssize_t
-Link::findDelegationFromWire(const Block& block, const Name& delegationName)
-{
-  block.parse();
-  const Block& contentBlock = block.get(tlv::Content);
-  contentBlock.parse();
-  size_t counter = 0;
-  for (auto&& delegationBlock : contentBlock.elements()) {
-    delegationBlock.parse();
-    if (delegationBlock.type() != tlv::LinkDelegation) {
-      BOOST_THROW_EXCEPTION(Error("Unexpected TLV-TYPE, expecting LinkDelegation"));
+    void
+    Link::addDelegation(uint32_t preference, const Name& name) {
+        this->removeDelegationNoEncode(name);
+        m_delegations.insert({preference, name});
+        encodeContent();
     }
-    Name name(delegationBlock.get(tlv::Name));
-    if (name == delegationName) {
-      return counter;
-    }
-    ++counter;
-  }
-  return INVALID_SELECTED_DELEGATION_INDEX;
-}
 
-ssize_t
-Link::countDelegationsFromWire(const Block& block)
-{
-  block.parse();
-  const Block& contentBlock = block.get(tlv::Content);
-  contentBlock.parse();
-  return contentBlock.elements_size();
-}
+    bool
+    Link::removeDelegation(const Name& name) {
+        bool hasRemovedDelegation = this->removeDelegationNoEncode(name);
+        if (hasRemovedDelegation) {
+            encodeContent();
+        }
+        return hasRemovedDelegation;
+    }
 
-bool
-Link::removeDelegationNoEncode(const Name& name)
-{
-  bool hasRemoved = false;
-  auto i = m_delegations.begin();
-  while (i != m_delegations.end()) {
-    if (i->second == name) {
-      hasRemoved = true;
-      i = m_delegations.erase(i);
+    const Link::DelegationSet&
+    Link::getDelegations() const {
+        return m_delegations;
     }
-    else {
-      ++i;
+
+    template<encoding::Tag TAG>
+    size_t
+    Link::encodeContent(EncodingImpl<TAG>& encoder) const {
+        // LinkContent ::= CONTENT-TYPE TLV-LENGTH
+        //                    Delegation+
+
+        // Delegation ::= LINK-DELEGATION-TYPE TLV-LENGTH
+        //              Preference
+        //              Name
+
+        // Preference ::= LINK-PREFERENCE-TYPE TLV-LENGTH
+        //       nonNegativeInteger
+
+        size_t totalLength = 0;
+        for (const auto& delegation : m_delegations | boost::adaptors::reversed) {
+            size_t delegationLength = 0;
+            delegationLength += std::get<1>(delegation).wireEncode(encoder);
+            delegationLength += prependNonNegativeIntegerBlock(encoder, tlv::LinkPreference,
+                    std::get<0>(delegation));
+            delegationLength += encoder.prependVarNumber(delegationLength);
+            delegationLength += encoder.prependVarNumber(tlv::LinkDelegation);
+            totalLength += delegationLength;
+        }
+        totalLength += encoder.prependVarNumber(totalLength);
+        totalLength += encoder.prependVarNumber(tlv::Content);
+        return totalLength;
     }
-  }
-  return hasRemoved;
-}
+
+    template size_t
+    Link::encodeContent<encoding::EncoderTag>(EncodingImpl<encoding::EncoderTag>& encoder) const;
+
+    template size_t
+    Link::encodeContent<encoding::EstimatorTag>(EncodingImpl<encoding::EstimatorTag>& encoder) const;
+
+    void
+    Link::encodeContent() {
+        onChanged();
+
+        EncodingEstimator estimator;
+        size_t estimatedSize = encodeContent(estimator);
+
+        EncodingBuffer buffer(estimatedSize, 0);
+        encodeContent(buffer);
+
+        setContentType(tlv::ContentType_Link);
+        setContent(buffer.block());
+    }
+
+    void
+    Link::decodeContent() {
+        // LinkContent ::= CONTENT-TYPE TLV-LENGTH
+        //                    Delegation+
+
+        // Delegation ::= LINK-DELEGATION-TYPE TLV-LENGTH
+        //              Preference
+        //              Name
+
+        // Preference ::= LINK-PREFERENCE-TYPE TLV-LENGTH
+        //       nonNegativeInteger
+
+        if (getContentType() != tlv::ContentType_Link) {
+            BOOST_THROW_EXCEPTION(Error("Expected Content Type Link"));
+        }
+
+        const Block& content = getContent();
+        content.parse();
+
+        for (auto& delegation : content.elements()) {
+            delegation.parse();
+            Block::element_const_iterator val = delegation.elements_begin();
+            if (val == delegation.elements_end()) {
+                BOOST_THROW_EXCEPTION(Error("Unexpected Link Encoding"));
+            }
+            uint32_t preference;
+            try {
+                preference = static_cast<uint32_t> (readNonNegativeInteger(*val));
+            } catch (tlv::Error&) {
+                BOOST_THROW_EXCEPTION(Error("Missing Preference field in Link Encoding"));
+            }
+            ++val;
+            if (val == delegation.elements_end()) {
+                BOOST_THROW_EXCEPTION(Error("Missing Name field in Link Encoding"));
+            }
+            Name name(*val);
+            m_delegations.insert({preference, name});
+        }
+    }
+
+    void
+    Link::wireDecode(const Block& wire) {
+        Data::wireDecode(wire);
+        decodeContent();
+    }
+
+    std::tuple<uint32_t, Name>
+    Link::getDelegationFromWire(const Block& block, size_t index) {
+        block.parse();
+        const Block& contentBlock = block.get(tlv::Content);
+        contentBlock.parse();
+        const Block& delegationBlock = contentBlock.elements().at(index);
+        delegationBlock.parse();
+        if (delegationBlock.type() != tlv::LinkDelegation) {
+            BOOST_THROW_EXCEPTION(Error("Unexpected TLV-TYPE, expecting LinkDelegation"));
+        }
+        return std::make_tuple(
+                static_cast<uint32_t> (
+                readNonNegativeInteger(delegationBlock.get(tlv::LinkPreference))),
+                Name(delegationBlock.get(tlv::Name)));
+    }
+
+    ssize_t
+    Link::findDelegationFromWire(const Block& block, const Name& delegationName) {
+        block.parse();
+        const Block& contentBlock = block.get(tlv::Content);
+        contentBlock.parse();
+        size_t counter = 0;
+        for (auto&& delegationBlock : contentBlock.elements()) {
+            delegationBlock.parse();
+            if (delegationBlock.type() != tlv::LinkDelegation) {
+                BOOST_THROW_EXCEPTION(Error("Unexpected TLV-TYPE, expecting LinkDelegation"));
+            }
+            Name name(delegationBlock.get(tlv::Name));
+            if (name == delegationName) {
+                return counter;
+            }
+            ++counter;
+        }
+        return INVALID_SELECTED_DELEGATION_INDEX;
+    }
+
+    ssize_t
+    Link::countDelegationsFromWire(const Block& block) {
+        block.parse();
+        const Block& contentBlock = block.get(tlv::Content);
+        contentBlock.parse();
+        return contentBlock.elements_size();
+    }
+
+    bool
+    Link::removeDelegationNoEncode(const Name& name) {
+        bool hasRemoved = false;
+        auto i = m_delegations.begin();
+        while (i != m_delegations.end()) {
+            if (i->second == name) {
+                hasRemoved = true;
+                i = m_delegations.erase(i);
+            } else {
+                ++i;
+            }
+        }
+        return hasRemoved;
+    }
 
 } // namespace ndn

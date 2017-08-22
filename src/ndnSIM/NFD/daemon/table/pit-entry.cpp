@@ -27,97 +27,94 @@
 #include <algorithm>
 
 namespace nfd {
-namespace pit {
+    namespace pit {
 
-Entry::Entry(const Interest& interest)
-  : m_interest(interest.shared_from_this())
-  , m_nameTreeEntry(nullptr)
-{
-}
+        Entry::Entry(const Interest& interest)
+        : m_interest(interest.shared_from_this())
+        , m_nameTreeEntry(nullptr) {
+        }
 
-bool
-Entry::canMatch(const Interest& interest, size_t nEqualNameComps) const
-{
-  BOOST_ASSERT(m_interest->getName().compare(0, nEqualNameComps,
-                                             interest.getName(), 0, nEqualNameComps) == 0);
+        bool
+        Entry::canMatch(const Interest& interest, size_t nEqualNameComps) const {
+            BOOST_ASSERT(m_interest->getName().compare(0, nEqualNameComps,
+                    interest.getName(), 0, nEqualNameComps) == 0);
 
-  return m_interest->getName().compare(nEqualNameComps, Name::npos,
-                                       interest.getName(), nEqualNameComps) == 0 &&
-         m_interest->getSelectors() == interest.getSelectors();
-  /// \todo #3162 match Link field
-}
+            return m_interest->getName().compare(nEqualNameComps, Name::npos,
+                    interest.getName(), nEqualNameComps) == 0 &&
+                    m_interest->getSelectors() == interest.getSelectors();
+            /// \todo #3162 match Link field
+        }
 
-InRecordCollection::iterator
-Entry::getInRecord(const Face& face)
-{
-  return std::find_if(m_inRecords.begin(), m_inRecords.end(),
-    [&face] (const InRecord& inRecord) { return &inRecord.getFace() == &face; });
-}
+        InRecordCollection::iterator
+        Entry::getInRecord(const Face& face) {
+            return std::find_if(m_inRecords.begin(), m_inRecords.end(),
+                    [&face] (const InRecord & inRecord) {
+                        return &inRecord.getFace() == &face; });
+        }
 
-InRecordCollection::iterator
-Entry::insertOrUpdateInRecord(Face& face, const Interest& interest)
-{
-  BOOST_ASSERT(this->canMatch(interest));
+        InRecordCollection::iterator
+        Entry::insertOrUpdateInRecord(Face& face, const Interest& interest) {
+            BOOST_ASSERT(this->canMatch(interest));
 
-  auto it = std::find_if(m_inRecords.begin(), m_inRecords.end(),
-    [&face] (const InRecord& inRecord) { return &inRecord.getFace() == &face; });
-  if (it == m_inRecords.end()) {
-    m_inRecords.emplace_front(face);
-    it = m_inRecords.begin();
-  }
+            auto it = std::find_if(m_inRecords.begin(), m_inRecords.end(),
+                    [&face] (const InRecord & inRecord) {
+                        return &inRecord.getFace() == &face; });
+            if (it == m_inRecords.end()) {
+                m_inRecords.emplace_front(face);
+                it = m_inRecords.begin();
+            }
 
-  it->update(interest);
-  return it;
-}
+            it->update(interest);
+            return it;
+        }
 
-void
-Entry::deleteInRecord(const Face& face)
-{
-  auto it = std::find_if(m_inRecords.begin(), m_inRecords.end(),
-    [&face] (const InRecord& inRecord) { return &inRecord.getFace() == &face; });
-  if (it != m_inRecords.end()) {
-    m_inRecords.erase(it);
-  }
-}
+        void
+        Entry::deleteInRecord(const Face& face) {
+            auto it = std::find_if(m_inRecords.begin(), m_inRecords.end(),
+                    [&face] (const InRecord & inRecord) {
+                        return &inRecord.getFace() == &face; });
+            if (it != m_inRecords.end()) {
+                m_inRecords.erase(it);
+            }
+        }
 
-void
-Entry::clearInRecords()
-{
-  m_inRecords.clear();
-}
+        void
+        Entry::clearInRecords() {
+            m_inRecords.clear();
+        }
 
-OutRecordCollection::iterator
-Entry::getOutRecord(const Face& face)
-{
-  return std::find_if(m_outRecords.begin(), m_outRecords.end(),
-    [&face] (const OutRecord& outRecord) { return &outRecord.getFace() == &face; });
-}
+        OutRecordCollection::iterator
+        Entry::getOutRecord(const Face& face) {
+            return std::find_if(m_outRecords.begin(), m_outRecords.end(),
+                    [&face] (const OutRecord & outRecord) {
+                        return &outRecord.getFace() == &face; });
+        }
 
-OutRecordCollection::iterator
-Entry::insertOrUpdateOutRecord(Face& face, const Interest& interest)
-{
-  BOOST_ASSERT(this->canMatch(interest));
+        OutRecordCollection::iterator
+        Entry::insertOrUpdateOutRecord(Face& face, const Interest& interest) {
+            BOOST_ASSERT(this->canMatch(interest));
 
-  auto it = std::find_if(m_outRecords.begin(), m_outRecords.end(),
-    [&face] (const OutRecord& outRecord) { return &outRecord.getFace() == &face; });
-  if (it == m_outRecords.end()) {
-    m_outRecords.emplace_front(face);
-    it = m_outRecords.begin();
-  }
+            auto it = std::find_if(m_outRecords.begin(), m_outRecords.end(),
+                    [&face] (const OutRecord & outRecord) {
+                        return &outRecord.getFace() == &face; });
+            if (it == m_outRecords.end()) {
+                m_outRecords.emplace_front(face);
+                it = m_outRecords.begin();
+            }
 
-  it->update(interest);
-  return it;
-}
+            it->update(interest);
+            return it;
+        }
 
-void
-Entry::deleteOutRecord(const Face& face)
-{
-  auto it = std::find_if(m_outRecords.begin(), m_outRecords.end(),
-    [&face] (const OutRecord& outRecord) { return &outRecord.getFace() == &face; });
-  if (it != m_outRecords.end()) {
-    m_outRecords.erase(it);
-  }
-}
+        void
+        Entry::deleteOutRecord(const Face& face) {
+            auto it = std::find_if(m_outRecords.begin(), m_outRecords.end(),
+                    [&face] (const OutRecord & outRecord) {
+                        return &outRecord.getFace() == &face; });
+            if (it != m_outRecords.end()) {
+                m_outRecords.erase(it);
+            }
+        }
 
-} // namespace pit
+    } // namespace pit
 } // namespace nfd

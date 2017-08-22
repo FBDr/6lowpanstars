@@ -34,72 +34,67 @@
 
 namespace nfd {
 
-namespace ethernet = ndn::util::ethernet;
+    namespace ethernet = ndn::util::ethernet;
 
-/** \brief contains information about a network interface
- */
-class NetworkInterfaceInfo
-{
-public:
+    /** \brief contains information about a network interface
+     */
+    class NetworkInterfaceInfo {
+    public:
 
-  int index;
-  std::string name;
-  ethernet::Address etherAddress;
-  std::vector<boost::asio::ip::address_v4> ipv4Addresses;
-  std::vector<boost::asio::ip::address_v6> ipv6Addresses;
-  boost::asio::ip::address_v4 broadcastAddress;
-  unsigned int flags;
+        int index;
+        std::string name;
+        ethernet::Address etherAddress;
+        std::vector<boost::asio::ip::address_v4> ipv4Addresses;
+        std::vector<boost::asio::ip::address_v6> ipv6Addresses;
+        boost::asio::ip::address_v4 broadcastAddress;
+        unsigned int flags;
 
-  bool
-  isLoopback() const;
+        bool
+        isLoopback() const;
 
-  bool
-  isMulticastCapable() const;
+        bool
+        isMulticastCapable() const;
 
-  bool
-  isBroadcastCapable() const;
+        bool
+        isBroadcastCapable() const;
 
-  bool
-  isUp() const;
+        bool
+        isUp() const;
 
-};
+    };
 
-inline bool
-NetworkInterfaceInfo::isLoopback() const
-{
-  return (flags & IFF_LOOPBACK) != 0;
-}
+    inline bool
+    NetworkInterfaceInfo::isLoopback() const {
+        return (flags & IFF_LOOPBACK) != 0;
+    }
 
-inline bool
-NetworkInterfaceInfo::isMulticastCapable() const
-{
-  return (flags & IFF_MULTICAST) != 0;
-}
+    inline bool
+    NetworkInterfaceInfo::isMulticastCapable() const {
+        return (flags & IFF_MULTICAST) != 0;
+    }
 
-inline bool
-NetworkInterfaceInfo::isBroadcastCapable() const
-{
-  return (flags & IFF_BROADCAST) != 0;
-}
+    inline bool
+    NetworkInterfaceInfo::isBroadcastCapable() const {
+        return (flags & IFF_BROADCAST) != 0;
+    }
 
-inline bool
-NetworkInterfaceInfo::isUp() const
-{
-  return (flags & IFF_UP) != 0;
-}
+    inline bool
+    NetworkInterfaceInfo::isUp() const {
+        return (flags & IFF_UP) != 0;
+    }
 
-/** \brief List configured network interfaces on the system and their info
- *  \warning invalid IP addresses (e.g., 0.0.0.0) may be returned in some environments
- */
-std::vector<NetworkInterfaceInfo>
-listNetworkInterfaces();
+    /** \brief List configured network interfaces on the system and their info
+     *  \warning invalid IP addresses (e.g., 0.0.0.0) may be returned in some environments
+     */
+    std::vector<NetworkInterfaceInfo>
+    listNetworkInterfaces();
 
 #ifdef WITH_TESTS
-/** \brief Set a list of network interfaces to be returned by subsequent listNetworkInterfaces call
- *  \note To reset to normal behavior, use `setDebugNetworkInterfaces(nullptr);`
- */
-void
-setDebugNetworkInterfaces(shared_ptr<std::vector<NetworkInterfaceInfo>> interfaces);
+    /** \brief Set a list of network interfaces to be returned by subsequent listNetworkInterfaces call
+     *  \note To reset to normal behavior, use `setDebugNetworkInterfaces(nullptr);`
+     */
+    void
+    setDebugNetworkInterfaces(shared_ptr<std::vector<NetworkInterfaceInfo>> interfaces);
 #endif
 
 } // namespace nfd

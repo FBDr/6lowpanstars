@@ -28,60 +28,56 @@
 #include <boost/range/iterator_range_core.hpp>
 
 namespace ndn {
-namespace tests {
+    namespace tests {
 
-bool NetworkConfigurationDetector::m_isInitialized = false;
-bool NetworkConfigurationDetector::m_hasIpv4 = false;
-bool NetworkConfigurationDetector::m_hasIpv6 = false;
+        bool NetworkConfigurationDetector::m_isInitialized = false;
+        bool NetworkConfigurationDetector::m_hasIpv4 = false;
+        bool NetworkConfigurationDetector::m_hasIpv6 = false;
 
-bool
-NetworkConfigurationDetector::hasIpv4()
-{
-  if (!m_isInitialized) {
-    detect();
-  }
-  return m_hasIpv4;
-}
+        bool
+        NetworkConfigurationDetector::hasIpv4() {
+            if (!m_isInitialized) {
+                detect();
+            }
+            return m_hasIpv4;
+        }
 
-bool
-NetworkConfigurationDetector::hasIpv6()
-{
-  if (!m_isInitialized) {
-    detect();
-  }
-  return m_hasIpv6;
-}
+        bool
+        NetworkConfigurationDetector::hasIpv6() {
+            if (!m_isInitialized) {
+                detect();
+            }
+            return m_hasIpv6;
+        }
 
-void
-NetworkConfigurationDetector::detect()
-{
-  typedef boost::asio::ip::basic_resolver<boost::asio::ip::udp> BoostResolver;
+        void
+        NetworkConfigurationDetector::detect() {
+            typedef boost::asio::ip::basic_resolver<boost::asio::ip::udp> BoostResolver;
 
-  boost::asio::io_service ioService;
-  BoostResolver resolver(ioService);
+            boost::asio::io_service ioService;
+            BoostResolver resolver(ioService);
 
-  // The specified hostname must contain both A and AAAA records
-  BoostResolver::query query("a.root-servers.net", "");
+            // The specified hostname must contain both A and AAAA records
+            BoostResolver::query query("a.root-servers.net", "");
 
-  boost::system::error_code errorCode;
-  BoostResolver::iterator begin = resolver.resolve(query, errorCode);
-  if (errorCode) {
-    m_isInitialized = true;
-    return;
-  }
-  BoostResolver::iterator end;
+            boost::system::error_code errorCode;
+            BoostResolver::iterator begin = resolver.resolve(query, errorCode);
+            if (errorCode) {
+                m_isInitialized = true;
+                return;
+            }
+            BoostResolver::iterator end;
 
-  for (const auto& i : boost::make_iterator_range(begin, end)) {
-    if (i.endpoint().address().is_v4()) {
-      m_hasIpv4 = true;
-    }
-    else if (i.endpoint().address().is_v6()) {
-      m_hasIpv6 = true;
-    }
-  }
+            for (const auto& i : boost::make_iterator_range(begin, end)) {
+                if (i.endpoint().address().is_v4()) {
+                    m_hasIpv4 = true;
+                } else if (i.endpoint().address().is_v6()) {
+                    m_hasIpv6 = true;
+                }
+            }
 
-  m_isInitialized = true;
-}
+            m_isInitialized = true;
+        }
 
-} // namespace tests
+    } // namespace tests
 } // namespace ndn

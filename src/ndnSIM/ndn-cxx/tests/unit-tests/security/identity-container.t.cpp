@@ -27,50 +27,49 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace security {
-namespace tests {
+    namespace security {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(SecurityIdentityContainer)
+            BOOST_AUTO_TEST_SUITE(SecurityIdentityContainer)
 
-BOOST_FIXTURE_TEST_CASE(TestIdentityContainer, PibDataFixture)
-{
-  auto pibImpl = make_shared<PibMemory>();
-  Pib pib("pib-memory", "", pibImpl);
+            BOOST_FIXTURE_TEST_CASE(TestIdentityContainer, PibDataFixture) {
+                auto pibImpl = make_shared<PibMemory>();
+                Pib pib("pib-memory", "", pibImpl);
 
-  Identity identity1 = pib.addIdentity(id1);
-  Identity identity2 = pib.addIdentity(id2);
+                Identity identity1 = pib.addIdentity(id1);
+                Identity identity2 = pib.addIdentity(id2);
 
-  IdentityContainer container = pib.getIdentities();
-  BOOST_CHECK_EQUAL(container.size(), 2);
-  BOOST_CHECK(container.find(id1) != container.end());
-  BOOST_CHECK(container.find(id2) != container.end());
+                IdentityContainer container = pib.getIdentities();
+                BOOST_CHECK_EQUAL(container.size(), 2);
+                BOOST_CHECK(container.find(id1) != container.end());
+                BOOST_CHECK(container.find(id2) != container.end());
 
-  std::set<Name> idNames;
-  idNames.insert(id1);
-  idNames.insert(id2);
+                std::set<Name> idNames;
+                idNames.insert(id1);
+                idNames.insert(id2);
 
-  IdentityContainer::const_iterator it = container.begin();
-  std::set<Name>::const_iterator testIt = idNames.begin();
-  BOOST_CHECK_EQUAL((*it).getName(), *testIt);
-  it++;
-  testIt++;
-  BOOST_CHECK_EQUAL((*it).getName(), *testIt);
-  ++it;
-  testIt++;
-  BOOST_CHECK(it == container.end());
+                IdentityContainer::const_iterator it = container.begin();
+                std::set<Name>::const_iterator testIt = idNames.begin();
+                BOOST_CHECK_EQUAL((*it).getName(), *testIt);
+                it++;
+                testIt++;
+                BOOST_CHECK_EQUAL((*it).getName(), *testIt);
+                ++it;
+                testIt++;
+                BOOST_CHECK(it == container.end());
 
-  size_t count = 0;
-  testIt = idNames.begin();
-  for (const auto& identity : container) {
-    BOOST_CHECK_EQUAL(identity.getName(), *testIt);
-    testIt++;
-    count++;
-  }
-  BOOST_CHECK_EQUAL(count, 2);
-}
+                size_t count = 0;
+                testIt = idNames.begin();
+                for (const auto& identity : container) {
+                    BOOST_CHECK_EQUAL(identity.getName(), *testIt);
+                    testIt++;
+                    count++;
+                }
+                BOOST_CHECK_EQUAL(count, 2);
+            }
 
-BOOST_AUTO_TEST_SUITE_END()
+            BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace security
+        } // namespace tests
+    } // namespace security
 } // namespace ndn

@@ -41,183 +41,168 @@
 
 namespace nfd {
 
-NFD_LOG_INIT("Nfd");
+    NFD_LOG_INIT("Nfd");
 
-static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
+    static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
 
-static inline ndn::util::NetworkMonitor*
-makeNetworkMonitor()
-{
-  try {
-    return new ndn::util::NetworkMonitor(getGlobalIoService());
-  }
-  catch (const ndn::util::NetworkMonitor::Error& e) {
-    NFD_LOG_WARN(e.what());
-    return nullptr;
-  }
-}
+    static inline ndn::util::NetworkMonitor*
+    makeNetworkMonitor() {
+        try {
+            return new ndn::util::NetworkMonitor(getGlobalIoService());
+        } catch (const ndn::util::NetworkMonitor::Error& e) {
+            NFD_LOG_WARN(e.what());
+            return nullptr;
+        }
+    }
 
-Nfd::Nfd(const std::string& configFile, ndn::KeyChain& keyChain)
-  : m_configFile(configFile)
-  , m_keyChain(keyChain)
-  , m_networkMonitor(makeNetworkMonitor())
-{
-}
+    Nfd::Nfd(const std::string& configFile, ndn::KeyChain& keyChain)
+    : m_configFile(configFile)
+    , m_keyChain(keyChain)
+    , m_networkMonitor(makeNetworkMonitor()) {
+    }
 
-Nfd::Nfd(const ConfigSection& config, ndn::KeyChain& keyChain)
-  : m_configSection(config)
-  , m_keyChain(keyChain)
-  , m_networkMonitor(makeNetworkMonitor())
-{
-}
+    Nfd::Nfd(const ConfigSection& config, ndn::KeyChain& keyChain)
+    : m_configSection(config)
+    , m_keyChain(keyChain)
+    , m_networkMonitor(makeNetworkMonitor()) {
+    }
 
-// It is necessary to explicitly define the destructor, because some member variables (e.g.,
-// unique_ptr<Forwarder>) are forward-declared, but implicitly declared destructor requires
-// complete types for all members when instantiated.
-Nfd::~Nfd() = default;
+    // It is necessary to explicitly define the destructor, because some member variables (e.g.,
+    // unique_ptr<Forwarder>) are forward-declared, but implicitly declared destructor requires
+    // complete types for all members when instantiated.
+    Nfd::~Nfd() = default;
 
-void
-Nfd::initialize()
-{
-  initializeLogging();
+    void
+    Nfd::initialize() {
+        initializeLogging();
 
-  m_forwarder.reset(new Forwarder());
+        m_forwarder.reset(new Forwarder());
 
-  initializeManagement();
+        initializeManagement();
 
-  FaceTable& faceTable = m_forwarder->getFaceTable();
-  faceTable.addReserved(face::makeNullFace(), face::FACEID_NULL);
-  faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
+        FaceTable& faceTable = m_forwarder->getFaceTable();
+        faceTable.addReserved(face::makeNullFace(), face::FACEID_NULL);
+        faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
 
-  PrivilegeHelper::drop();
+        PrivilegeHelper::drop();
 
-  if (m_networkMonitor) {
-    m_networkMonitor->onNetworkStateChanged.connect([this] {
-        // delay stages, so if multiple events are triggered in short sequence,
-        // only one auto-detection procedure is triggered
-        m_reloadConfigEvent = scheduler::schedule(time::seconds(5),
-          [this] {
-            NFD_LOG_INFO("Network change detected, reloading face section of the config file...");
-            this->reloadConfigFileFaceSection();
-          });
-      });
-  }
-}
+        if (m_networkMonitor) {
+            m_networkMonitor->onNetworkStateChanged.connect([this] {
+                // delay stages, so if multiple events are triggered in short sequence,
+                // only one auto-detection procedure is triggered
+                m_reloadConfigEvent = scheduler::schedule(time::seconds(5),
+                        [this] {
+                            NFD_LOG_INFO("Network change detected, reloading face section of the config file...");
+                            this->reloadConfigFileFaceSection();
+                        });
+            });
+        }
+    }
 
-void
-Nfd::initializeLogging()
-{
-  ConfigFile config(&ConfigFile::ignoreUnknownSection);
-  LoggerFactory::getInstance().setConfigFile(config);
+    void
+    Nfd::initializeLogging() {
+        ConfigFile config(&ConfigFile::ignoreUnknownSection);
+        LoggerFactory::getInstance().setConfigFile(config);
 
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, true);
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, true, INTERNAL_CONFIG);
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
-}
+        if (!m_configFile.empty()) {
+            config.parse(m_configFile, true);
+            config.parse(m_configFile, false);
+        } else {
+            config.parse(m_configSection, true, INTERNAL_CONFIG);
+            config.parse(m_configSection, false, INTERNAL_CONFIG);
+        }
+    }
 
-static inline void
-ignoreRibAndLogSections(const std::string& filename, const std::string& sectionName,
-                        const ConfigSection& section, bool isDryRun)
-{
-  // Ignore "log" and "rib" sections, but raise an error if we're missing a
-  // handler for an NFD section.
-  if (sectionName == "rib" || sectionName == "log") {
-    // do nothing
-  }
-  else {
-    // missing NFD section
-    ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
-  }
-}
+    static inline void
+    ignoreRibAndLogSections(const std::string& filename, const std::string& sectionName,
+            const ConfigSection& section, bool isDryRun) {
+        // Ignore "log" and "rib" sections, but raise an error if we're missing a
+        // handler for an NFD section.
+        if (sectionName == "rib" || sectionName == "log") {
+            // do nothing
+        } else {
+            // missing NFD section
+            ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
+        }
+    }
 
-void
-Nfd::initializeManagement()
-{
-  std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_keyChain);
-  m_forwarder->getFaceTable().addReserved(m_internalFace, face::FACEID_INTERNAL_FACE);
+    void
+    Nfd::initializeManagement() {
+        std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_keyChain);
+        m_forwarder->getFaceTable().addReserved(m_internalFace, face::FACEID_INTERNAL_FACE);
 
-  m_dispatcher.reset(new ndn::mgmt::Dispatcher(*m_internalClientFace, m_keyChain));
-  m_authenticator = CommandAuthenticator::create();
+        m_dispatcher.reset(new ndn::mgmt::Dispatcher(*m_internalClientFace, m_keyChain));
+        m_authenticator = CommandAuthenticator::create();
 
-  m_forwarderStatusManager.reset(new ForwarderStatusManager(*m_forwarder, *m_dispatcher));
-  m_faceManager.reset(new FaceManager(m_forwarder->getFaceTable(),
-                                      *m_dispatcher, *m_authenticator));
-  m_fibManager.reset(new FibManager(m_forwarder->getFib(), m_forwarder->getFaceTable(),
-                                    *m_dispatcher, *m_authenticator));
-  m_strategyChoiceManager.reset(new StrategyChoiceManager(m_forwarder->getStrategyChoice(),
-                                                          *m_dispatcher, *m_authenticator));
+        m_forwarderStatusManager.reset(new ForwarderStatusManager(*m_forwarder, *m_dispatcher));
+        m_faceManager.reset(new FaceManager(m_forwarder->getFaceTable(),
+                *m_dispatcher, *m_authenticator));
+        m_fibManager.reset(new FibManager(m_forwarder->getFib(), m_forwarder->getFaceTable(),
+                *m_dispatcher, *m_authenticator));
+        m_strategyChoiceManager.reset(new StrategyChoiceManager(m_forwarder->getStrategyChoice(),
+                *m_dispatcher, *m_authenticator));
 
-  ConfigFile config(&ignoreRibAndLogSections);
-  general::setConfigFile(config);
+        ConfigFile config(&ignoreRibAndLogSections);
+        general::setConfigFile(config);
 
-  TablesConfigSection tablesConfig(*m_forwarder);
-  tablesConfig.setConfigFile(config);
+        TablesConfigSection tablesConfig(*m_forwarder);
+        tablesConfig.setConfigFile(config);
 
-  m_authenticator->setConfigFile(config);
-  m_faceManager->setConfigFile(config);
+        m_authenticator->setConfigFile(config);
+        m_faceManager->setConfigFile(config);
 
-  // parse config file
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, true);
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, true, INTERNAL_CONFIG);
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
+        // parse config file
+        if (!m_configFile.empty()) {
+            config.parse(m_configFile, true);
+            config.parse(m_configFile, false);
+        } else {
+            config.parse(m_configSection, true, INTERNAL_CONFIG);
+            config.parse(m_configSection, false, INTERNAL_CONFIG);
+        }
 
-  tablesConfig.ensureConfigured();
+        tablesConfig.ensureConfigured();
 
-  // add FIB entry for NFD Management Protocol
-  Name topPrefix("/localhost/nfd");
-  m_forwarder->getFib().insert(topPrefix).first->addNextHop(*m_internalFace, 0);
-  m_dispatcher->addTopPrefix(topPrefix, false);
-}
+        // add FIB entry for NFD Management Protocol
+        Name topPrefix("/localhost/nfd");
+        m_forwarder->getFib().insert(topPrefix).first->addNextHop(*m_internalFace, 0);
+        m_dispatcher->addTopPrefix(topPrefix, false);
+    }
 
-void
-Nfd::reloadConfigFile()
-{
-  // Logging
-  initializeLogging();
-  /// \todo Reopen log file
+    void
+    Nfd::reloadConfigFile() {
+        // Logging
+        initializeLogging();
+        /// \todo Reopen log file
 
-  // Other stuff
-  ConfigFile config(&ignoreRibAndLogSections);
+        // Other stuff
+        ConfigFile config(&ignoreRibAndLogSections);
 
-  general::setConfigFile(config);
+        general::setConfigFile(config);
 
-  TablesConfigSection tablesConfig(*m_forwarder);
-  tablesConfig.setConfigFile(config);
+        TablesConfigSection tablesConfig(*m_forwarder);
+        tablesConfig.setConfigFile(config);
 
-  m_authenticator->setConfigFile(config);
-  m_faceManager->setConfigFile(config);
+        m_authenticator->setConfigFile(config);
+        m_faceManager->setConfigFile(config);
 
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
-}
+        if (!m_configFile.empty()) {
+            config.parse(m_configFile, false);
+        } else {
+            config.parse(m_configSection, false, INTERNAL_CONFIG);
+        }
+    }
 
-void
-Nfd::reloadConfigFileFaceSection()
-{
-  // reload only face_system section of the config file to re-initialize multicast faces
-  ConfigFile config(&ConfigFile::ignoreUnknownSection);
-  m_faceManager->setConfigFile(config);
+    void
+    Nfd::reloadConfigFileFaceSection() {
+        // reload only face_system section of the config file to re-initialize multicast faces
+        ConfigFile config(&ConfigFile::ignoreUnknownSection);
+        m_faceManager->setConfigFile(config);
 
-  if (!m_configFile.empty()) {
-    config.parse(m_configFile, false);
-  }
-  else {
-    config.parse(m_configSection, false, INTERNAL_CONFIG);
-  }
-}
+        if (!m_configFile.empty()) {
+            config.parse(m_configFile, false);
+        } else {
+            config.parse(m_configSection, false, INTERNAL_CONFIG);
+        }
+    }
 
 } // namespace nfd

@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     Config::SetDefault("ns3::Ipv6L3Protocol::SendIcmpv6Redirect", BooleanValue(false));
 
     NodeContainer nodes;
-    nodes.Create (noden);
+    nodes.Create(noden);
 
     // Set seed for random numbers
     SeedManager::SetSeed(133);
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         ipic[i].SetDefaultRouteInAllNodes(0);
         std::cout << ipic[i].GetAddress(0, 1) << std::endl;
         ipv6.NewNetwork();
-        
+
     }
 
 

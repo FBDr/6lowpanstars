@@ -25,83 +25,81 @@
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 
-namespace ns3
-{
+namespace ns3 {
 
-class Ipv6Extension;
-class Node;
+    class Ipv6Extension;
+    class Node;
 
-/**
- * \class Ipv6ExtensionDemux
- * \brief Demultiplexes IPv6 extensions.
- */
-class Ipv6ExtensionDemux : public Object
-{
-public:
-  /**
-   * \brief The interface ID.
-   * \return type ID
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \class Ipv6ExtensionDemux
+     * \brief Demultiplexes IPv6 extensions.
+     */
+    class Ipv6ExtensionDemux : public Object {
+    public:
+        /**
+         * \brief The interface ID.
+         * \return type ID
+         */
+        static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor.
-   */
-  Ipv6ExtensionDemux ();
+        /**
+         * \brief Constructor.
+         */
+        Ipv6ExtensionDemux();
 
-  /**
-   * \brief Destructor.
-   */
-  virtual ~Ipv6ExtensionDemux ();
+        /**
+         * \brief Destructor.
+         */
+        virtual ~Ipv6ExtensionDemux();
 
-  /**
-   * \brief Set the node.
-   * \param node the node to set
-   */
-  void SetNode (Ptr<Node> node);
+        /**
+         * \brief Set the node.
+         * \param node the node to set
+         */
+        void SetNode(Ptr<Node> node);
 
-  /**
-   * \brief Insert a new IPv6 Extension.
-   * \param extension the extension to insert
-   */
-  void Insert (Ptr<Ipv6Extension> extension);
+        /**
+         * \brief Insert a new IPv6 Extension.
+         * \param extension the extension to insert
+         */
+        void Insert(Ptr<Ipv6Extension> extension);
 
-  /**
-   * \brief Get the extension corresponding to extensionNumber.
-   * \param extensionNumber extension number of the extension to retrieve
-   * \return a matching IPv6 extension
-   */
-  Ptr<Ipv6Extension> GetExtension (uint8_t extensionNumber);
+        /**
+         * \brief Get the extension corresponding to extensionNumber.
+         * \param extensionNumber extension number of the extension to retrieve
+         * \return a matching IPv6 extension
+         */
+        Ptr<Ipv6Extension> GetExtension(uint8_t extensionNumber);
 
-  /**
-   * \brief Remove an extension from this demux.
-   * \param extension pointer on the extension to remove
-   */
-  void Remove (Ptr<Ipv6Extension> extension);
+        /**
+         * \brief Remove an extension from this demux.
+         * \param extension pointer on the extension to remove
+         */
+        void Remove(Ptr<Ipv6Extension> extension);
 
-protected:
-  /**
-   * \brief Dispose object.
-   */
-  virtual void DoDispose ();
+    protected:
+        /**
+         * \brief Dispose object.
+         */
+        virtual void DoDispose();
 
-private:
+    private:
 
-  /**
-   * \brief Container of the IPv6 Extensions.
-   */
-  typedef std::list<Ptr<Ipv6Extension> > Ipv6ExtensionList_t;
+        /**
+         * \brief Container of the IPv6 Extensions.
+         */
+        typedef std::list<Ptr<Ipv6Extension> > Ipv6ExtensionList_t;
 
-  /**
-   * \brief List of IPv6 Extensions supported.
-   */
-  Ipv6ExtensionList_t m_extensions;
+        /**
+         * \brief List of IPv6 Extensions supported.
+         */
+        Ipv6ExtensionList_t m_extensions;
 
-  /**
-   * \brief The node.
-   */
-  Ptr<Node> m_node;
-};
+        /**
+         * \brief The node.
+         */
+        Ptr<Node> m_node;
+    };
 
 } /* namespace ns3 */
 

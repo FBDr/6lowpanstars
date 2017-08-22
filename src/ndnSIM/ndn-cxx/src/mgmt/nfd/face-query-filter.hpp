@@ -26,206 +26,191 @@
 #include "../../encoding/nfd-constants.hpp"
 
 namespace ndn {
-namespace nfd {
+    namespace nfd {
 
-/**
- * \ingroup management
- * \brief represents Face Query Filter
- * \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Query-Operation
- */
-class FaceQueryFilter
-{
-public:
-  class Error : public tlv::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : tlv::Error(what)
-    {
-    }
-  };
+        /**
+         * \ingroup management
+         * \brief represents Face Query Filter
+         * \sa http://redmine.named-data.net/projects/nfd/wiki/FaceMgmt#Query-Operation
+         */
+        class FaceQueryFilter {
+        public:
 
-  FaceQueryFilter();
+            class Error : public tlv::Error {
+            public:
 
-  explicit
-  FaceQueryFilter(const Block& block);
+                explicit
+                Error(const std::string& what)
+                : tlv::Error(what) {
+                }
+            };
 
-  /** \brief prepend FaceQueryFilter to the encoder
-   */
-  template<encoding::Tag TAG>
-  size_t
-  wireEncode(EncodingImpl<TAG>& encoder) const;
+            FaceQueryFilter();
 
-  /** \brief encode FaceQueryFilter
-   */
-  const Block&
-  wireEncode() const;
+            explicit
+            FaceQueryFilter(const Block& block);
 
-  /** \brief decode FaceQueryFilter
-   */
-  void
-  wireDecode(const Block& wire);
+            /** \brief prepend FaceQueryFilter to the encoder
+             */
+            template<encoding::Tag TAG>
+            size_t
+            wireEncode(EncodingImpl<TAG>& encoder) const;
 
-public: // getters & setters
+            /** \brief encode FaceQueryFilter
+             */
+            const Block&
+            wireEncode() const;
 
-  bool
-  hasFaceId() const
-  {
-    return m_hasFaceId;
-  }
+            /** \brief decode FaceQueryFilter
+             */
+            void
+            wireDecode(const Block& wire);
 
-  uint64_t
-  getFaceId() const
-  {
-    BOOST_ASSERT(this->hasFaceId());
-    return m_faceId;
-  }
+        public: // getters & setters
 
-  FaceQueryFilter&
-  setFaceId(uint64_t faceId);
+            bool
+            hasFaceId() const {
+                return m_hasFaceId;
+            }
 
-  FaceQueryFilter&
-  unsetFaceId();
+            uint64_t
+            getFaceId() const {
+                BOOST_ASSERT(this->hasFaceId());
+                return m_faceId;
+            }
 
-  bool
-  hasUriScheme() const
-  {
-    return m_hasUriScheme;
-  }
+            FaceQueryFilter&
+            setFaceId(uint64_t faceId);
 
-  const std::string&
-  getUriScheme() const
-  {
-    BOOST_ASSERT(this->hasUriScheme());
-    return m_uriScheme;
-  }
+            FaceQueryFilter&
+            unsetFaceId();
 
-  FaceQueryFilter&
-  setUriScheme(const std::string& uriScheme);
+            bool
+            hasUriScheme() const {
+                return m_hasUriScheme;
+            }
 
-  FaceQueryFilter&
-  unsetUriScheme();
+            const std::string&
+            getUriScheme() const {
+                BOOST_ASSERT(this->hasUriScheme());
+                return m_uriScheme;
+            }
 
-  bool
-  hasRemoteUri() const
-  {
-    return m_hasRemoteUri;
-  }
+            FaceQueryFilter&
+            setUriScheme(const std::string& uriScheme);
 
-  const std::string&
-  getRemoteUri() const
-  {
-    BOOST_ASSERT(this->hasRemoteUri());
-    return m_remoteUri;
-  }
+            FaceQueryFilter&
+            unsetUriScheme();
 
-  FaceQueryFilter&
-  setRemoteUri(const std::string& remoteUri);
+            bool
+            hasRemoteUri() const {
+                return m_hasRemoteUri;
+            }
 
-  FaceQueryFilter&
-  unsetRemoteUri();
+            const std::string&
+            getRemoteUri() const {
+                BOOST_ASSERT(this->hasRemoteUri());
+                return m_remoteUri;
+            }
 
-  bool
-  hasLocalUri() const
-  {
-    return m_hasLocalUri;
-  }
+            FaceQueryFilter&
+            setRemoteUri(const std::string& remoteUri);
 
-  const std::string&
-  getLocalUri() const
-  {
-    BOOST_ASSERT(this->hasLocalUri());
-    return m_localUri;
-  }
+            FaceQueryFilter&
+            unsetRemoteUri();
 
-  FaceQueryFilter&
-  setLocalUri(const std::string& localUri);
+            bool
+            hasLocalUri() const {
+                return m_hasLocalUri;
+            }
 
-  FaceQueryFilter&
-  unsetLocalUri();
+            const std::string&
+            getLocalUri() const {
+                BOOST_ASSERT(this->hasLocalUri());
+                return m_localUri;
+            }
 
-  bool
-  hasFaceScope() const
-  {
-    return m_hasFaceScope;
-  }
+            FaceQueryFilter&
+            setLocalUri(const std::string& localUri);
 
-  FaceScope
-  getFaceScope() const
-  {
-    BOOST_ASSERT(this->hasFaceScope());
-    return m_faceScope;
-  }
+            FaceQueryFilter&
+            unsetLocalUri();
 
-  FaceQueryFilter&
-  setFaceScope(FaceScope faceScope);
+            bool
+            hasFaceScope() const {
+                return m_hasFaceScope;
+            }
 
-  FaceQueryFilter&
-  unsetFaceScope();
+            FaceScope
+            getFaceScope() const {
+                BOOST_ASSERT(this->hasFaceScope());
+                return m_faceScope;
+            }
 
-  bool
-  hasFacePersistency() const
-  {
-    return m_hasFacePersistency;
-  }
+            FaceQueryFilter&
+            setFaceScope(FaceScope faceScope);
 
-  FacePersistency
-  getFacePersistency() const
-  {
-    BOOST_ASSERT(this->hasFacePersistency());
-    return m_facePersistency;
-  }
+            FaceQueryFilter&
+            unsetFaceScope();
 
-  FaceQueryFilter&
-  setFacePersistency(FacePersistency facePersistency);
+            bool
+            hasFacePersistency() const {
+                return m_hasFacePersistency;
+            }
 
-  FaceQueryFilter&
-  unsetFacePersistency();
+            FacePersistency
+            getFacePersistency() const {
+                BOOST_ASSERT(this->hasFacePersistency());
+                return m_facePersistency;
+            }
 
-  bool
-  hasLinkType() const
-  {
-    return m_hasLinkType;
-  }
+            FaceQueryFilter&
+            setFacePersistency(FacePersistency facePersistency);
 
-  LinkType
-  getLinkType() const
-  {
-    BOOST_ASSERT(this->hasLinkType());
-    return m_linkType;
-  }
+            FaceQueryFilter&
+            unsetFacePersistency();
 
-  FaceQueryFilter&
-  setLinkType(LinkType linkType);
+            bool
+            hasLinkType() const {
+                return m_hasLinkType;
+            }
 
-  FaceQueryFilter&
-  unsetLinkType();
+            LinkType
+            getLinkType() const {
+                BOOST_ASSERT(this->hasLinkType());
+                return m_linkType;
+            }
 
-private:
-  uint64_t m_faceId;
-  std::string m_uriScheme;
-  std::string m_remoteUri;
-  std::string m_localUri;
-  FaceScope m_faceScope;
-  FacePersistency m_facePersistency;
-  LinkType m_linkType;
+            FaceQueryFilter&
+            setLinkType(LinkType linkType);
 
-  bool m_hasFaceId;
-  bool m_hasUriScheme;
-  bool m_hasRemoteUri;
-  bool m_hasLocalUri;
-  bool m_hasFaceScope;
-  bool m_hasFacePersistency;
-  bool m_hasLinkType;
+            FaceQueryFilter&
+            unsetLinkType();
 
-  mutable Block m_wire;
-};
+        private:
+            uint64_t m_faceId;
+            std::string m_uriScheme;
+            std::string m_remoteUri;
+            std::string m_localUri;
+            FaceScope m_faceScope;
+            FacePersistency m_facePersistency;
+            LinkType m_linkType;
 
-std::ostream&
-operator<<(std::ostream& os, const FaceQueryFilter& filter);
+            bool m_hasFaceId;
+            bool m_hasUriScheme;
+            bool m_hasRemoteUri;
+            bool m_hasLocalUri;
+            bool m_hasFaceScope;
+            bool m_hasFacePersistency;
+            bool m_hasLinkType;
 
-} // namespace nfd
+            mutable Block m_wire;
+        };
+
+        std::ostream&
+        operator<<(std::ostream& os, const FaceQueryFilter& filter);
+
+    } // namespace nfd
 } // namespace ndn
 
 #endif // NDN_MGMT_NFD_FACE_QUERY_FILTER_HPP

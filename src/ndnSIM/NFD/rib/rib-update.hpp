@@ -30,99 +30,93 @@
 #include "route.hpp"
 
 namespace nfd {
-namespace rib {
+    namespace rib {
 
-/** RibUpdate
- *  \brief represents a route that will be added to or removed from a namespace
- *
- *  \note This type is copyable so that it can be stored in STL containers.
- */
-class RibUpdate
-{
-public:
-  enum Action {
-    REGISTER     = 0,
-    UNREGISTER   = 1,
+        /** RibUpdate
+         *  \brief represents a route that will be added to or removed from a namespace
+         *
+         *  \note This type is copyable so that it can be stored in STL containers.
+         */
+        class RibUpdate {
+        public:
 
-    /** \brief An update triggered by a face destruction notification
-     *
-     *  \note indicates a Route needs to be removed after a face is destroyed
-     */
-    REMOVE_FACE = 2
-  };
+            enum Action {
+                REGISTER = 0,
+                UNREGISTER = 1,
 
-  RibUpdate();
+                /** \brief An update triggered by a face destruction notification
+                 *
+                 *  \note indicates a Route needs to be removed after a face is destroyed
+                 */
+                REMOVE_FACE = 2
+            };
 
-  RibUpdate&
-  setAction(Action action);
+            RibUpdate();
 
-  Action
-  getAction() const;
+            RibUpdate&
+            setAction(Action action);
 
-  RibUpdate&
-  setName(const Name& name);
+            Action
+            getAction() const;
 
-  const Name&
-  getName() const;
+            RibUpdate&
+            setName(const Name& name);
 
-  RibUpdate&
-  setRoute(const Route& route);
+            const Name&
+            getName() const;
 
-  const Route&
-  getRoute() const;
+            RibUpdate&
+            setRoute(const Route& route);
 
-private:
-  Action m_action;
-  Name m_name;
-  Route m_route;
-};
+            const Route&
+            getRoute() const;
 
-inline RibUpdate&
-RibUpdate::setAction(Action action)
-{
-  m_action = action;
-  return *this;
-}
+        private:
+            Action m_action;
+            Name m_name;
+            Route m_route;
+        };
 
-inline RibUpdate::Action
-RibUpdate::getAction() const
-{
-  return m_action;
-}
+        inline RibUpdate&
+        RibUpdate::setAction(Action action) {
+            m_action = action;
+            return *this;
+        }
 
-inline RibUpdate&
-RibUpdate::setName(const Name& name)
-{
-  m_name = name;
-  return *this;
-}
+        inline RibUpdate::Action
+        RibUpdate::getAction() const {
+            return m_action;
+        }
 
-inline const Name&
-RibUpdate::getName() const
-{
-  return m_name;
-}
+        inline RibUpdate&
+        RibUpdate::setName(const Name& name) {
+            m_name = name;
+            return *this;
+        }
 
-inline RibUpdate&
-RibUpdate::setRoute(const Route& route)
-{
-  m_route = route;
-  return *this;
-}
+        inline const Name&
+        RibUpdate::getName() const {
+            return m_name;
+        }
 
-inline const Route&
-RibUpdate::getRoute() const
-{
-  return m_route;
-}
+        inline RibUpdate&
+        RibUpdate::setRoute(const Route& route) {
+            m_route = route;
+            return *this;
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const RibUpdate::Action action);
+        inline const Route&
+        RibUpdate::getRoute() const {
+            return m_route;
+        }
 
-std::ostream&
-operator<<(std::ostream& os, const RibUpdate& update);
+        std::ostream&
+        operator<<(std::ostream& os, const RibUpdate::Action action);
 
-} // namespace rib
+        std::ostream&
+        operator<<(std::ostream& os, const RibUpdate& update);
+
+    } // namespace rib
 } // namespace nfd
 
 #endif // NFD_RIB_RIB_UPDATE_HPP

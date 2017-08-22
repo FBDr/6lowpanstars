@@ -27,147 +27,144 @@
 #include "../security/key-chain.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** \brief a client-side face for unit testing
- */
-class DummyClientFace : public ndn::Face
-{
-public:
-  /** \brief options for DummyClientFace
-   */
-  class Options
-  {
-  public:
-    Options(bool enablePacketLogging, bool enableRegistrationReply,
-            const std::function<void(time::milliseconds)>& processEventsOverride)
-      : enablePacketLogging(enablePacketLogging)
-      , enableRegistrationReply(enableRegistrationReply)
-      , processEventsOverride(processEventsOverride)
-    {
-    }
+        /** \brief a client-side face for unit testing
+         */
+        class DummyClientFace : public ndn::Face {
+        public:
 
-    Options(bool enablePacketLogging, bool enableRegistrationReply)
-      : Options(enablePacketLogging, enableRegistrationReply, nullptr)
-    {
-    }
+            /** \brief options for DummyClientFace
+             */
+            class Options {
+            public:
 
-    Options()
-      : Options(true, false)
-    {
-    }
+                Options(bool enablePacketLogging, bool enableRegistrationReply,
+                        const std::function<void(time::milliseconds)>& processEventsOverride)
+                : enablePacketLogging(enablePacketLogging)
+                , enableRegistrationReply(enableRegistrationReply)
+                , processEventsOverride(processEventsOverride) {
+                }
 
-  public:
-    /** \brief if true, packets sent out of DummyClientFace will be appended to a container
-     */
-    bool enablePacketLogging;
+                Options(bool enablePacketLogging, bool enableRegistrationReply)
+                : Options(enablePacketLogging, enableRegistrationReply, nullptr) {
+                }
 
-    /** \brief if true, prefix registration command will be automatically
-     *         replied with a successful response
-     */
-    bool enableRegistrationReply;
+                Options()
+                : Options(true, false) {
+                }
 
-    /** \brief if not empty, face.processEvents() will be overridden by this function
-     */
-    std::function<void(time::milliseconds)> processEventsOverride;
-  };
+            public:
+                /** \brief if true, packets sent out of DummyClientFace will be appended to a container
+                 */
+                bool enablePacketLogging;
 
-  /** \brief Create a dummy face with internal IO service
-   */
-  explicit
-  DummyClientFace(const Options& options = Options());
+                /** \brief if true, prefix registration command will be automatically
+                 *         replied with a successful response
+                 */
+                bool enableRegistrationReply;
 
-  /** \brief Create a dummy face with internal IO service and the specified KeyChain
-   */
-  explicit
-  DummyClientFace(KeyChain& keyChain, const Options& options = Options());
+                /** \brief if not empty, face.processEvents() will be overridden by this function
+                 */
+                std::function<void(time::milliseconds) > processEventsOverride;
+            };
 
-  /** \brief Create a dummy face with the provided IO service
-   */
-  explicit
-  DummyClientFace(boost::asio::io_service& ioService, const Options& options = Options());
+            /** \brief Create a dummy face with internal IO service
+             */
+            explicit
+            DummyClientFace(const Options& options = Options());
 
-  /** \brief Create a dummy face with the provided IO service and the specified KeyChain
-   */
-  DummyClientFace(boost::asio::io_service& ioService, KeyChain& keyChain,
-                  const Options& options = Options());
+            /** \brief Create a dummy face with internal IO service and the specified KeyChain
+             */
+            explicit
+            DummyClientFace(KeyChain& keyChain, const Options& options = Options());
 
-  /** \brief cause the Face to receive a packet
-   *  \tparam Packet either Interest or Data
-   */
-  template<typename Packet>
-  void
-  receive(const Packet& packet);
+            /** \brief Create a dummy face with the provided IO service
+             */
+            explicit
+            DummyClientFace(boost::asio::io_service& ioService, const Options& options = Options());
 
-private:
-  class Transport;
+            /** \brief Create a dummy face with the provided IO service and the specified KeyChain
+             */
+            DummyClientFace(boost::asio::io_service& ioService, KeyChain& keyChain,
+                    const Options& options = Options());
 
-  void
-  construct(const Options& options);
+            /** \brief cause the Face to receive a packet
+             *  \tparam Packet either Interest or Data
+             */
+            template<typename Packet>
+            void
+            receive(const Packet& packet);
 
-  void
-  enablePacketLogging();
+        private:
+            class Transport;
 
-  void
-  enableRegistrationReply();
+            void
+            construct(const Options& options);
 
-  virtual void
-  doProcessEvents(const time::milliseconds& timeout, bool keepThread) override;
+            void
+            enablePacketLogging();
 
-public:
-  /** \brief Interests sent out of this DummyClientFace
-   *
-   *  Sent Interests are appended to this container if options.enablePacketLogger is true.
-   *  User of this class is responsible for cleaning up the container, if necessary.
-   *  After .expressInterest, .processEvents must be called before the Interest would show up here.
-   */
-  std::vector<Interest> sentInterests;
+            void
+            enableRegistrationReply();
 
-  /** \brief Data sent out of this DummyClientFace
-   *
-   *  Sent Data are appended to this container if options.enablePacketLogger is true.
-   *  User of this class is responsible for cleaning up the container, if necessary.
-   *  After .put, .processEvents must be called before the Data would show up here.
-   */
-  std::vector<Data> sentData;
+            virtual void
+            doProcessEvents(const time::milliseconds& timeout, bool keepThread) override;
 
-  /** \brief Nacks sent out of this DummyClientFace
-   *
-   *  Sent Nacks are appended to this container if options.enablePacketLogger is true.
-   *  User of this class is responsible for cleaning up the container, if necessary.
-   *  After .put, .processEvents must be called before the NACK would show up here.
-   */
-  std::vector<lp::Nack> sentNacks;
+        public:
+            /** \brief Interests sent out of this DummyClientFace
+             *
+             *  Sent Interests are appended to this container if options.enablePacketLogger is true.
+             *  User of this class is responsible for cleaning up the container, if necessary.
+             *  After .expressInterest, .processEvents must be called before the Interest would show up here.
+             */
+            std::vector<Interest> sentInterests;
 
-  /** \brief emits whenever an Interest is sent
-   *
-   *  After .expressInterest, .processEvents must be called before this signal would be emitted.
-   */
-  Signal<DummyClientFace, Interest> onSendInterest;
+            /** \brief Data sent out of this DummyClientFace
+             *
+             *  Sent Data are appended to this container if options.enablePacketLogger is true.
+             *  User of this class is responsible for cleaning up the container, if necessary.
+             *  After .put, .processEvents must be called before the Data would show up here.
+             */
+            std::vector<Data> sentData;
 
-  /** \brief emits whenever a Data packet is sent
-   *
-   *  After .put, .processEvents must be called before this signal would be emitted.
-   */
-  Signal<DummyClientFace, Data> onSendData;
+            /** \brief Nacks sent out of this DummyClientFace
+             *
+             *  Sent Nacks are appended to this container if options.enablePacketLogger is true.
+             *  User of this class is responsible for cleaning up the container, if necessary.
+             *  After .put, .processEvents must be called before the NACK would show up here.
+             */
+            std::vector<lp::Nack> sentNacks;
 
-  /** \brief emits whenever a Nack is sent
-   *
-   *  After .put, .processEvents must be called before this signal would be emitted.
-   */
-  Signal<DummyClientFace, lp::Nack> onSendNack;
+            /** \brief emits whenever an Interest is sent
+             *
+             *  After .expressInterest, .processEvents must be called before this signal would be emitted.
+             */
+            Signal<DummyClientFace, Interest> onSendInterest;
 
-private:
-  std::unique_ptr<KeyChain> m_internalKeyChain;
-  KeyChain& m_keyChain;
-  std::function<void(time::milliseconds)> m_processEventsOverride;
-};
+            /** \brief emits whenever a Data packet is sent
+             *
+             *  After .put, .processEvents must be called before this signal would be emitted.
+             */
+            Signal<DummyClientFace, Data> onSendData;
 
-template<>
-void
-DummyClientFace::receive(const lp::Nack& nack);
+            /** \brief emits whenever a Nack is sent
+             *
+             *  After .put, .processEvents must be called before this signal would be emitted.
+             */
+            Signal<DummyClientFace, lp::Nack> onSendNack;
 
-} // namespace util
+        private:
+            std::unique_ptr<KeyChain> m_internalKeyChain;
+            KeyChain& m_keyChain;
+            std::function<void(time::milliseconds) > m_processEventsOverride;
+        };
+
+        template<>
+        void
+        DummyClientFace::receive(const lp::Nack& nack);
+
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_DUMMY_CLIENT_FACE_HPP

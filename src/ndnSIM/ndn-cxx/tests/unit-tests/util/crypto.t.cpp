@@ -24,32 +24,31 @@
 #include "boost-test.hpp"
 
 namespace ndn {
-namespace crypto {
-namespace tests {
+    namespace crypto {
+        namespace tests {
 
-BOOST_AUTO_TEST_SUITE(Util)
-BOOST_AUTO_TEST_SUITE(TestCrypto)
+            BOOST_AUTO_TEST_SUITE(Util)
+            BOOST_AUTO_TEST_SUITE(TestCrypto)
 
-BOOST_AUTO_TEST_CASE(Basic)
-{
-  const std::string testString = "Hello, world!";
-  ConstBufferPtr result;
-  BOOST_CHECK_NO_THROW(result = computeSha256Digest(reinterpret_cast<const uint8_t*>(testString.data()),
-                                                    testString.size()));
+            BOOST_AUTO_TEST_CASE(Basic) {
+                const std::string testString = "Hello, world!";
+                ConstBufferPtr result;
+                BOOST_CHECK_NO_THROW(result = computeSha256Digest(reinterpret_cast<const uint8_t*> (testString.data()),
+                        testString.size()));
 
-  BOOST_CHECK_EQUAL(result->size(), SHA256_DIGEST_SIZE);
+                BOOST_CHECK_EQUAL(result->size(), SHA256_DIGEST_SIZE);
 
-  const uint8_t expectedSha256[] = {0x31, 0x5f, 0x5b, 0xdb, 0x76, 0xd0, 0x78, 0xc4,
-                                    0x3b, 0x8a, 0xc0, 0x06, 0x4e, 0x4a, 0x01, 0x64,
-                                    0x61, 0x2b, 0x1f, 0xce, 0x77, 0xc8, 0x69, 0x34,
-                                    0x5b, 0xfc, 0x94, 0xc7, 0x58, 0x94, 0xed, 0xd3};
-  BOOST_CHECK_EQUAL_COLLECTIONS(result->begin(), result->end(),
-                                expectedSha256, expectedSha256 + sizeof(expectedSha256));
-}
+                const uint8_t expectedSha256[] = {0x31, 0x5f, 0x5b, 0xdb, 0x76, 0xd0, 0x78, 0xc4,
+                    0x3b, 0x8a, 0xc0, 0x06, 0x4e, 0x4a, 0x01, 0x64,
+                    0x61, 0x2b, 0x1f, 0xce, 0x77, 0xc8, 0x69, 0x34,
+                    0x5b, 0xfc, 0x94, 0xc7, 0x58, 0x94, 0xed, 0xd3};
+                BOOST_CHECK_EQUAL_COLLECTIONS(result->begin(), result->end(),
+                        expectedSha256, expectedSha256 + sizeof (expectedSha256));
+            }
 
-BOOST_AUTO_TEST_SUITE_END() // TestCrypto
-BOOST_AUTO_TEST_SUITE_END() // Util
+            BOOST_AUTO_TEST_SUITE_END() // TestCrypto
+            BOOST_AUTO_TEST_SUITE_END() // Util
 
-} // namespace tests
-} // namespace crypto
+        } // namespace tests
+    } // namespace crypto
 } // namespace ndn

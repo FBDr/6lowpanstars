@@ -41,7 +41,8 @@ typedef websocketpp::client<websocketpp::config::asio_client> client;
 
 class websocket_endpoint {
 public:
-    websocket_endpoint () {
+
+    websocket_endpoint() {
         m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
         m_endpoint.clear_error_channels(websocketpp::log::elevel::all);
 
@@ -67,11 +68,11 @@ int main() {
         if (input == "quit") {
             done = true;
         } else if (input == "help") {
-            std::cout 
-                << "\nCommand List:\n"
-                << "help: Display this help text\n"
-                << "quit: Exit the program\n"
-                << std::endl;
+            std::cout
+                    << "\nCommand List:\n"
+                    << "help: Display this help text\n"
+                    << "quit: Exit the program\n"
+                    << std::endl;
         } else {
             std::cout << "Unrecognized Command" << std::endl;
         }

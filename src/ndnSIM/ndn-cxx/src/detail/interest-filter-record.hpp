@@ -27,87 +27,81 @@
 
 namespace ndn {
 
-/**
- * @brief associates an InterestFilter with Interest callback
- */
-class InterestFilterRecord : noncopyable
-{
-public:
-  /**
-   * @brief Construct an Interest filter record
-   *
-   * @param filter an InterestFilter that represents what Interest should invoke the callback
-   * @param interestCallback invoked when matching Interest is received
-   */
-  InterestFilterRecord(const InterestFilter& filter,
-                       const InterestCallback& interestCallback)
-    : m_filter(filter)
-    , m_interestCallback(interestCallback)
-  {
-  }
+    /**
+     * @brief associates an InterestFilter with Interest callback
+     */
+    class InterestFilterRecord : noncopyable {
+    public:
 
-  /**
-   * @return the filter
-   */
-  const InterestFilter&
-  getFilter() const
-  {
-    return m_filter;
-  }
+        /**
+         * @brief Construct an Interest filter record
+         *
+         * @param filter an InterestFilter that represents what Interest should invoke the callback
+         * @param interestCallback invoked when matching Interest is received
+         */
+        InterestFilterRecord(const InterestFilter& filter,
+                const InterestCallback& interestCallback)
+        : m_filter(filter)
+        , m_interestCallback(interestCallback) {
+        }
 
-  /**
-   * @brief Check if Interest name matches the filter
-   * @param name Interest Name
-   */
-  bool
-  doesMatch(const Name& name) const
-  {
-    return m_filter.doesMatch(name);
-  }
+        /**
+         * @return the filter
+         */
+        const InterestFilter&
+        getFilter() const {
+            return m_filter;
+        }
 
-  /**
-   * @brief invokes the InterestCallback
-   * @note This method does nothing if the Interest callback is empty
-   */
-  void
-  invokeInterestCallback(const Interest& interest) const
-  {
-    if (m_interestCallback != nullptr) {
-      m_interestCallback(m_filter, interest);
-    }
-  }
+        /**
+         * @brief Check if Interest name matches the filter
+         * @param name Interest Name
+         */
+        bool
+        doesMatch(const Name& name) const {
+            return m_filter.doesMatch(name);
+        }
 
-private:
-  InterestFilter m_filter;
-  InterestCallback m_interestCallback;
-};
+        /**
+         * @brief invokes the InterestCallback
+         * @note This method does nothing if the Interest callback is empty
+         */
+        void
+        invokeInterestCallback(const Interest& interest) const {
+            if (m_interestCallback != nullptr) {
+                m_interestCallback(m_filter, interest);
+            }
+        }
 
-/**
- * @brief Opaque type to identify an InterestFilterRecord
- */
-class InterestFilterId;
+    private:
+        InterestFilter m_filter;
+        InterestCallback m_interestCallback;
+    };
 
-/**
- * @brief Functor to match InterestFilterId
- */
-class MatchInterestFilterId
-{
-public:
-  explicit
-  MatchInterestFilterId(const InterestFilterId* interestFilterId)
-    : m_id(interestFilterId)
-  {
-  }
+    /**
+     * @brief Opaque type to identify an InterestFilterRecord
+     */
+    class InterestFilterId;
 
-  bool
-  operator()(const shared_ptr<InterestFilterRecord>& interestFilterId) const
-  {
-    return reinterpret_cast<const InterestFilterId*>(interestFilterId.get()) == m_id;
-  }
+    /**
+     * @brief Functor to match InterestFilterId
+     */
+    class MatchInterestFilterId {
+    public:
 
-private:
-  const InterestFilterId* m_id;
-};
+        explicit
+        MatchInterestFilterId(const InterestFilterId* interestFilterId)
+        : m_id(interestFilterId) {
+        }
+
+        bool
+        operator()(const shared_ptr<InterestFilterRecord>& interestFilterId) const {
+            return reinterpret_cast<const InterestFilterId*> (interestFilterId.get()) == m_id;
+        }
+
+    private:
+        const InterestFilterId* m_id;
+    };
 
 } // namespace ndn
 

@@ -30,74 +30,74 @@
 
 namespace ns3 {
 
-class Packet;
+    class Packet;
 
-/// Classifies packets by looking at their IP and TCP/UDP headers.
-/// From these packet headers, a tuple (source-ip, destination-ip,
-/// protocol, source-port, destination-port) is created, and a unique
-/// flow identifier is assigned for each different tuple combination
-class Ipv6FlowClassifier : public FlowClassifier
-{
-public:
+    /// Classifies packets by looking at their IP and TCP/UDP headers.
+    /// From these packet headers, a tuple (source-ip, destination-ip,
+    /// protocol, source-port, destination-port) is created, and a unique
+    /// flow identifier is assigned for each different tuple combination
 
-  /// Structure to classify a packet
-  struct FiveTuple
-  {
-    Ipv6Address sourceAddress;      //!< Source address
-    Ipv6Address destinationAddress; //!< Destination address
-    uint8_t protocol;               //!< Protocol
-    uint16_t sourcePort;            //!< Source port
-    uint16_t destinationPort;       //!< Destination port
-  };
+    class Ipv6FlowClassifier : public FlowClassifier {
+    public:
 
-  Ipv6FlowClassifier ();
+        /// Structure to classify a packet
 
-  /// \brief try to classify the packet into flow-id and packet-id
-  ///
-  /// \warning: it must be called only once per packet, from SendOutgoingLogger.
-  ///
-  /// \return true if the packet was classified, false if not (i.e. it
-  /// does not appear to be part of a flow).
-  /// \param ipHeader packet's IP header
-  /// \param ipPayload packet's IP payload
-  /// \param out_flowId packet's FlowId
-  /// \param out_packetId packet's identifier
-  bool Classify (const Ipv6Header &ipHeader, Ptr<const Packet> ipPayload,
-                 uint32_t *out_flowId, uint32_t *out_packetId);
+        struct FiveTuple {
+            Ipv6Address sourceAddress; //!< Source address
+            Ipv6Address destinationAddress; //!< Destination address
+            uint8_t protocol; //!< Protocol
+            uint16_t sourcePort; //!< Source port
+            uint16_t destinationPort; //!< Destination port
+        };
 
-  /// Searches for the FiveTuple corresponding to the given flowId
-  /// \param flowId the FlowId to search for
-  /// \returns the FiveTuple corresponding to flowId
-  FiveTuple FindFlow (FlowId flowId) const;
+        Ipv6FlowClassifier();
 
-  virtual void SerializeToXmlStream (std::ostream &os, int indent) const;
+        /// \brief try to classify the packet into flow-id and packet-id
+        ///
+        /// \warning: it must be called only once per packet, from SendOutgoingLogger.
+        ///
+        /// \return true if the packet was classified, false if not (i.e. it
+        /// does not appear to be part of a flow).
+        /// \param ipHeader packet's IP header
+        /// \param ipPayload packet's IP payload
+        /// \param out_flowId packet's FlowId
+        /// \param out_packetId packet's identifier
+        bool Classify(const Ipv6Header &ipHeader, Ptr<const Packet> ipPayload,
+                uint32_t *out_flowId, uint32_t *out_packetId);
 
-private:
+        /// Searches for the FiveTuple corresponding to the given flowId
+        /// \param flowId the FlowId to search for
+        /// \returns the FiveTuple corresponding to flowId
+        FiveTuple FindFlow(FlowId flowId) const;
 
-  /// Map to Flows Identifiers to FlowIds
-  std::map<FiveTuple, FlowId> m_flowMap;
-  /// Map to FlowIds to FlowPacketId
-  std::map<FlowId, FlowPacketId> m_flowPktIdMap;
+        virtual void SerializeToXmlStream(std::ostream &os, int indent) const;
 
-};
+    private:
 
-/**
- * \brief Less than operator.
- *
- * \param t1 the first operand
- * \param t2 the first operand
- * \returns true if the operands are equal
- */
-bool operator < (const Ipv6FlowClassifier::FiveTuple &t1, const Ipv6FlowClassifier::FiveTuple &t2);
+        /// Map to Flows Identifiers to FlowIds
+        std::map<FiveTuple, FlowId> m_flowMap;
+        /// Map to FlowIds to FlowPacketId
+        std::map<FlowId, FlowPacketId> m_flowPktIdMap;
 
-/**
- * \brief Equal to operator.
- *
- * \param t1 the first operand
- * \param t2 the first operand
- * \returns true if the operands are equal
- */
-bool operator == (const Ipv6FlowClassifier::FiveTuple &t1, const Ipv6FlowClassifier::FiveTuple &t2);
+    };
+
+    /**
+     * \brief Less than operator.
+     *
+     * \param t1 the first operand
+     * \param t2 the first operand
+     * \returns true if the operands are equal
+     */
+    bool operator<(const Ipv6FlowClassifier::FiveTuple &t1, const Ipv6FlowClassifier::FiveTuple &t2);
+
+    /**
+     * \brief Equal to operator.
+     *
+     * \param t1 the first operand
+     * \param t2 the first operand
+     * \returns true if the operands are equal
+     */
+    bool operator==(const Ipv6FlowClassifier::FiveTuple &t1, const Ipv6FlowClassifier::FiveTuple &t2);
 
 
 } // namespace ns3

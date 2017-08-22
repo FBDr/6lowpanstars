@@ -30,68 +30,60 @@
 NS_LOG_COMPONENT_DEFINE("ndn.AppLinkService");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-AppLinkService::AppLinkService(Ptr<App> app)
-  : m_node(app->GetNode())
-  , m_app(app)
-{
-  NS_LOG_FUNCTION(this << app);
+        AppLinkService::AppLinkService(Ptr<App> app)
+        : m_node(app->GetNode())
+        , m_app(app) {
+            NS_LOG_FUNCTION(this << app);
 
-  NS_ASSERT(m_app != 0);
-}
+            NS_ASSERT(m_app != 0);
+        }
 
-AppLinkService::~AppLinkService()
-{
-  NS_LOG_FUNCTION_NOARGS();
-}
+        AppLinkService::~AppLinkService() {
+            NS_LOG_FUNCTION_NOARGS();
+        }
 
-void
-AppLinkService::doSendInterest(const Interest& interest)
-{
-  NS_LOG_FUNCTION(this << &interest);
+        void
+        AppLinkService::doSendInterest(const Interest& interest) {
+            NS_LOG_FUNCTION(this << &interest);
 
-  // to decouple callbacks
-  Simulator::ScheduleNow(&App::OnInterest, m_app, interest.shared_from_this());
-}
+            // to decouple callbacks
+            Simulator::ScheduleNow(&App::OnInterest, m_app, interest.shared_from_this());
+        }
 
-void
-AppLinkService::doSendData(const Data& data)
-{
-  NS_LOG_FUNCTION(this << &data);
+        void
+        AppLinkService::doSendData(const Data& data) {
+            NS_LOG_FUNCTION(this << &data);
 
-  // to decouple callbacks
-  Simulator::ScheduleNow(&App::OnData, m_app, data.shared_from_this());
-}
+            // to decouple callbacks
+            Simulator::ScheduleNow(&App::OnData, m_app, data.shared_from_this());
+        }
 
-void
-AppLinkService::doSendNack(const lp::Nack& nack)
-{
-  NS_LOG_FUNCTION(this << &nack);
+        void
+        AppLinkService::doSendNack(const lp::Nack& nack) {
+            NS_LOG_FUNCTION(this << &nack);
 
-  // to decouple callbacks
-  Simulator::ScheduleNow(&App::OnNack, m_app, make_shared<lp::Nack>(nack));
-}
+            // to decouple callbacks
+            Simulator::ScheduleNow(&App::OnNack, m_app, make_shared<lp::Nack>(nack));
+        }
 
-//
+        //
 
-void
-AppLinkService::onReceiveInterest(const Interest& interest)
-{
-  this->receiveInterest(interest);
-}
+        void
+        AppLinkService::onReceiveInterest(const Interest& interest) {
+            this->receiveInterest(interest);
+        }
 
-void
-AppLinkService::onReceiveData(const Data& data)
-{
-  this->receiveData(data);
-}
+        void
+        AppLinkService::onReceiveData(const Data& data) {
+            this->receiveData(data);
+        }
 
-void
-AppLinkService::onReceiveNack(const lp::Nack& nack)
-{
-  this->receiveNack(nack);
-}
+        void
+        AppLinkService::onReceiveNack(const lp::Nack& nack) {
+            this->receiveNack(nack);
+        }
 
-} // namespace ndn
+    } // namespace ndn
 } // namespace ns3

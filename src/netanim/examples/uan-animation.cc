@@ -47,258 +47,241 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("UanCwExample");
+NS_LOG_COMPONENT_DEFINE("UanCwExample");
 
-NetAnimExperiment::NetAnimExperiment () 
-  : m_numNodes (15),
-    m_dataRate (80),
-    m_depth (70),
-    m_boundary (500),
-    m_packetSize (32),
-    m_bytesTotal (0),
-    m_cwMin (10),
-    m_cwMax (400),
-    m_cwStep (10),
-    m_avgs (3),
-    m_slotTime (Seconds (0.2)),
-    m_simTime (Seconds (1000))
-{
+NetAnimExperiment::NetAnimExperiment()
+: m_numNodes(15),
+m_dataRate(80),
+m_depth(70),
+m_boundary(500),
+m_packetSize(32),
+m_bytesTotal(0),
+m_cwMin(10),
+m_cwMax(400),
+m_cwStep(10),
+m_avgs(3),
+m_slotTime(Seconds(0.2)),
+m_simTime(Seconds(1000)) {
 }
 
 void
-NetAnimExperiment::ResetData ()
-{
-  NS_LOG_DEBUG (Simulator::Now ().GetSeconds () << "  Resetting data");
-  m_throughputs.push_back (m_bytesTotal * 8.0 / m_simTime.GetSeconds ());
-  m_bytesTotal = 0;
+NetAnimExperiment::ResetData() {
+    NS_LOG_DEBUG(Simulator::Now().GetSeconds() << "  Resetting data");
+    m_throughputs.push_back(m_bytesTotal * 8.0 / m_simTime.GetSeconds());
+    m_bytesTotal = 0;
 }
 
 void
-NetAnimExperiment::IncrementCw (uint32_t cw)
-{
-  NS_ASSERT (m_throughputs.size () == m_avgs);
+NetAnimExperiment::IncrementCw(uint32_t cw) {
+    NS_ASSERT(m_throughputs.size() == m_avgs);
 
-  double avgThroughput = 0.0;
-  for (uint32_t i=0; i<m_avgs; i++)
-    {
-      avgThroughput += m_throughputs[i];
+    double avgThroughput = 0.0;
+    for (uint32_t i = 0; i < m_avgs; i++) {
+        avgThroughput += m_throughputs[i];
     }
-  avgThroughput /= m_avgs;
-  m_throughputs.clear ();
+    avgThroughput /= m_avgs;
+    m_throughputs.clear();
 
-  Config::Set ("/NodeList/*/DeviceList/*/Mac/CW", UintegerValue (cw + m_cwStep));
+    Config::Set("/NodeList/*/DeviceList/*/Mac/CW", UintegerValue(cw + m_cwStep));
 
-  SeedManager::SetRun (SeedManager::GetRun () + 1);
+    SeedManager::SetRun(SeedManager::GetRun() + 1);
 
-  NS_LOG_DEBUG ("Average for cw=" << cw << " over " << m_avgs << " runs: " << avgThroughput);
+    NS_LOG_DEBUG("Average for cw=" << cw << " over " << m_avgs << " runs: " << avgThroughput);
 }
-void
-NetAnimExperiment::UpdatePositions (NodeContainer &nodes)
-{
 
-  NS_LOG_DEBUG (Simulator::Now ().GetSeconds () << " Updating positions");
-  NodeContainer::Iterator it = nodes.Begin ();
-  Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
-  uv->SetAttribute ("Min", DoubleValue (0.0));
-  uv->SetAttribute ("Max", DoubleValue (m_boundary));
-  for (; it != nodes.End (); it++)
-    {
-      Ptr<MobilityModel> mp = (*it)->GetObject<MobilityModel> ();
-      mp->SetPosition (Vector (uv->GetValue (), uv->GetValue (), 70.0));
+void
+NetAnimExperiment::UpdatePositions(NodeContainer &nodes) {
+
+    NS_LOG_DEBUG(Simulator::Now().GetSeconds() << " Updating positions");
+    NodeContainer::Iterator it = nodes.Begin();
+    Ptr<UniformRandomVariable> uv = CreateObject<UniformRandomVariable> ();
+    uv->SetAttribute("Min", DoubleValue(0.0));
+    uv->SetAttribute("Max", DoubleValue(m_boundary));
+    for (; it != nodes.End(); it++) {
+        Ptr<MobilityModel> mp = (*it)->GetObject<MobilityModel> ();
+        mp->SetPosition(Vector(uv->GetValue(), uv->GetValue(), 70.0));
     }
 }
 
 void
-NetAnimExperiment::ReceivePacket (Ptr<Socket> socket)
-{
-  Ptr<Packet> packet;
+NetAnimExperiment::ReceivePacket(Ptr<Socket> socket) {
+    Ptr<Packet> packet;
 
-  while ((packet = socket->Recv ()))
-    {
-      m_bytesTotal += packet->GetSize ();
+    while ((packet = socket->Recv())) {
+        m_bytesTotal += packet->GetSize();
     }
-  packet = 0;
+    packet = 0;
 }
 
 void
-NetAnimExperiment::Run (UanHelper &uan)
-{
-  uan.SetMac ("ns3::UanMacCw", "CW", UintegerValue (m_cwMin), "SlotTime", TimeValue (m_slotTime));
-  NodeContainer nc = NodeContainer ();
-  NodeContainer sink = NodeContainer ();
-  nc.Create (m_numNodes);
-  sink.Create (1);
+NetAnimExperiment::Run(UanHelper &uan) {
+    uan.SetMac("ns3::UanMacCw", "CW", UintegerValue(m_cwMin), "SlotTime", TimeValue(m_slotTime));
+    NodeContainer nc = NodeContainer();
+    NodeContainer sink = NodeContainer();
+    nc.Create(m_numNodes);
+    sink.Create(1);
 
-  PacketSocketHelper socketHelper;
-  socketHelper.Install (nc);
-  socketHelper.Install (sink);
+    PacketSocketHelper socketHelper;
+    socketHelper.Install(nc);
+    socketHelper.Install(sink);
 
 #ifdef UAN_PROP_BH_INSTALLED
-  Ptr<UanPropModelBh> prop = CreateObjectWithAttributes<UanPropModelBh> ("ConfigFile", StringValue ("exbhconfig.cfg"));
+    Ptr<UanPropModelBh> prop = CreateObjectWithAttributes<UanPropModelBh> ("ConfigFile", StringValue("exbhconfig.cfg"));
 #else 
-  Ptr<UanPropModelIdeal> prop = CreateObjectWithAttributes<UanPropModelIdeal> ();
+    Ptr<UanPropModelIdeal> prop = CreateObjectWithAttributes<UanPropModelIdeal> ();
 #endif //UAN_PROP_BH_INSTALLED
-  Ptr<UanChannel> channel = CreateObjectWithAttributes<UanChannel> ("PropagationModel", PointerValue (prop));
+    Ptr<UanChannel> channel = CreateObjectWithAttributes<UanChannel> ("PropagationModel", PointerValue(prop));
 
-  //Create net device and nodes with UanHelper
-  NetDeviceContainer devices = uan.Install (nc, channel);
-  NetDeviceContainer sinkdev = uan.Install (sink, channel);
+    //Create net device and nodes with UanHelper
+    NetDeviceContainer devices = uan.Install(nc, channel);
+    NetDeviceContainer sinkdev = uan.Install(sink, channel);
 
-  MobilityHelper mobility;
-  Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator> ();
+    MobilityHelper mobility;
+    Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator> ();
 
-  {
-    Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable> ();
-    urv->SetAttribute ("Min", DoubleValue (0.0));
-    urv->SetAttribute ("Max", DoubleValue (m_boundary));
-    pos->Add (Vector (m_boundary / 2.0, m_boundary / 2.0, m_depth));
-    double rsum = 0;
+    {
+        Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable> ();
+        urv->SetAttribute("Min", DoubleValue(0.0));
+        urv->SetAttribute("Max", DoubleValue(m_boundary));
+        pos->Add(Vector(m_boundary / 2.0, m_boundary / 2.0, m_depth));
+        double rsum = 0;
 
-    double minr = 2 * m_boundary;
-    for (uint32_t i = 0; i < m_numNodes; i++)
-      {
-        double x = urv->GetValue ();
-        double y = urv->GetValue ();
-        double newr = std::sqrt ((x - m_boundary / 2.0) * (x - m_boundary / 2.0)
-                            + (y - m_boundary / 2.0) * (y - m_boundary / 2.0));
-        rsum += newr;
-        minr = std::min (minr, newr);
-        pos->Add (Vector (x, y, m_depth));
-      }
-    NS_LOG_DEBUG ("Mean range from gateway: " << rsum / m_numNodes
-                                              << "    min. range " << minr);
+        double minr = 2 * m_boundary;
+        for (uint32_t i = 0; i < m_numNodes; i++) {
+            double x = urv->GetValue();
+            double y = urv->GetValue();
+            double newr = std::sqrt((x - m_boundary / 2.0) * (x - m_boundary / 2.0)
+                    + (y - m_boundary / 2.0) * (y - m_boundary / 2.0));
+            rsum += newr;
+            minr = std::min(minr, newr);
+            pos->Add(Vector(x, y, m_depth));
+        }
+        NS_LOG_DEBUG("Mean range from gateway: " << rsum / m_numNodes
+                << "    min. range " << minr);
 
-    mobility.SetPositionAllocator (pos);
-    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-    mobility.Install (sink);
+        mobility.SetPositionAllocator(pos);
+        mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        mobility.Install(sink);
 
-    NS_LOG_DEBUG ("Position of sink: "
-                  << sink.Get (0)->GetObject<MobilityModel> ()->GetPosition ());
-    mobility.Install (nc);
+        NS_LOG_DEBUG("Position of sink: "
+                << sink.Get(0)->GetObject<MobilityModel> ()->GetPosition());
+        mobility.Install(nc);
 
-    PacketSocketAddress socket;
-    socket.SetSingleDevice (sinkdev.Get (0)->GetIfIndex ());
-    socket.SetPhysicalAddress (sinkdev.Get (0)->GetAddress ());
-    socket.SetProtocol (0);
+        PacketSocketAddress socket;
+        socket.SetSingleDevice(sinkdev.Get(0)->GetIfIndex());
+        socket.SetPhysicalAddress(sinkdev.Get(0)->GetAddress());
+        socket.SetProtocol(0);
 
-    OnOffHelper app ("ns3::PacketSocketFactory", Address (socket));
-    app.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1.0]"));
-    app.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.0]"));
-    app.SetAttribute ("DataRate", DataRateValue (m_dataRate));
-    app.SetAttribute ("PacketSize", UintegerValue (m_packetSize));
+        OnOffHelper app("ns3::PacketSocketFactory", Address(socket));
+        app.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1.0]"));
+        app.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0.0]"));
+        app.SetAttribute("DataRate", DataRateValue(m_dataRate));
+        app.SetAttribute("PacketSize", UintegerValue(m_packetSize));
 
-    ApplicationContainer apps = app.Install (nc);
-    apps.Start (Seconds (0.5));
-    Time nextEvent = Seconds (0.5);
+        ApplicationContainer apps = app.Install(nc);
+        apps.Start(Seconds(0.5));
+        Time nextEvent = Seconds(0.5);
 
 
-    for (uint32_t cw = m_cwMin; cw <= m_cwMax; cw += m_cwStep)
-      {
+        for (uint32_t cw = m_cwMin; cw <= m_cwMax; cw += m_cwStep) {
 
-        for (uint32_t an = 0; an < m_avgs; an++)
-          {
-            nextEvent += m_simTime;
-            Simulator::Schedule (nextEvent, &NetAnimExperiment::ResetData, this);
-            Simulator::Schedule (nextEvent, &NetAnimExperiment::UpdatePositions, this, nc);
-          }
-        Simulator::Schedule (nextEvent, &NetAnimExperiment::IncrementCw, this, cw);
-      }
-    apps.Stop (nextEvent + m_simTime);
+            for (uint32_t an = 0; an < m_avgs; an++) {
+                nextEvent += m_simTime;
+                Simulator::Schedule(nextEvent, &NetAnimExperiment::ResetData, this);
+                Simulator::Schedule(nextEvent, &NetAnimExperiment::UpdatePositions, this, nc);
+            }
+            Simulator::Schedule(nextEvent, &NetAnimExperiment::IncrementCw, this, cw);
+        }
+        apps.Stop(nextEvent + m_simTime);
 
-    Ptr<Node> sinkNode = sink.Get (0);
-    TypeId psfid = TypeId::LookupByName ("ns3::PacketSocketFactory");
-    if (sinkNode->GetObject<SocketFactory> (psfid) == 0)
-      {
-        Ptr<PacketSocketFactory> psf = CreateObject<PacketSocketFactory> ();
-        sinkNode->AggregateObject (psf);
-      }
-    Ptr<Socket> sinkSocket = Socket::CreateSocket (sinkNode, psfid);
-    sinkSocket->Bind (socket);
-    sinkSocket->SetRecvCallback (MakeCallback (&NetAnimExperiment::ReceivePacket, this));
+        Ptr<Node> sinkNode = sink.Get(0);
+        TypeId psfid = TypeId::LookupByName("ns3::PacketSocketFactory");
+        if (sinkNode->GetObject<SocketFactory> (psfid) == 0) {
+            Ptr<PacketSocketFactory> psf = CreateObject<PacketSocketFactory> ();
+            sinkNode->AggregateObject(psf);
+        }
+        Ptr<Socket> sinkSocket = Socket::CreateSocket(sinkNode, psfid);
+        sinkSocket->Bind(socket);
+        sinkSocket->SetRecvCallback(MakeCallback(&NetAnimExperiment::ReceivePacket, this));
 
-    m_bytesTotal = 0;
+        m_bytesTotal = 0;
 
-    std::string traceFileName = "uan-animation.xml";
-    AnimationInterface anim(traceFileName.c_str ());
+        std::string traceFileName = "uan-animation.xml";
+        AnimationInterface anim(traceFileName.c_str());
 
-    Simulator::Run ();
-    sinkNode = 0;
-    sinkSocket = 0;
-    pos = 0;
-    channel = 0;
-    prop = 0;
-    for (uint32_t i=0; i < nc.GetN (); i++)
-      {
-        nc.Get (i) = 0;
-      }
-    for (uint32_t i=0; i < sink.GetN (); i++)
-      {
-        sink.Get (i) = 0;
-      }
+        Simulator::Run();
+        sinkNode = 0;
+        sinkSocket = 0;
+        pos = 0;
+        channel = 0;
+        prop = 0;
+        for (uint32_t i = 0; i < nc.GetN(); i++) {
+            nc.Get(i) = 0;
+        }
+        for (uint32_t i = 0; i < sink.GetN(); i++) {
+            sink.Get(i) = 0;
+        }
 
-    for (uint32_t i=0; i < devices.GetN (); i++)
-      {
-        devices.Get (i) = 0;
-      }
-    for (uint32_t i=0; i < sinkdev.GetN (); i++)
-      {
-        sinkdev.Get (i) = 0;
-      }
+        for (uint32_t i = 0; i < devices.GetN(); i++) {
+            devices.Get(i) = 0;
+        }
+        for (uint32_t i = 0; i < sinkdev.GetN(); i++) {
+            sinkdev.Get(i) = 0;
+        }
 
-    Simulator::Destroy ();
-  }
+        Simulator::Destroy();
+    }
 }
 
 int
-main (int argc, char **argv)
-{
+main(int argc, char **argv) {
 
-  LogComponentEnable ("UanCwExample", LOG_LEVEL_ALL);
-  //LogComponentEnable ("AnimationInterface", LOG_LEVEL_ALL);
+    LogComponentEnable("UanCwExample", LOG_LEVEL_ALL);
+    //LogComponentEnable ("AnimationInterface", LOG_LEVEL_ALL);
 
-  NetAnimExperiment exp;
+    NetAnimExperiment exp;
 
-  std::string perModel = "ns3::UanPhyPerGenDefault";
-  std::string sinrModel = "ns3::UanPhyCalcSinrDefault";
+    std::string perModel = "ns3::UanPhyPerGenDefault";
+    std::string sinrModel = "ns3::UanPhyCalcSinrDefault";
 
-  CommandLine cmd;
-  cmd.AddValue ("NumNodes", "Number of transmitting nodes", exp.m_numNodes);
-  cmd.AddValue ("Depth", "Depth of transmitting and sink nodes", exp.m_depth);
-  cmd.AddValue ("RegionSize", "Size of boundary in meters", exp.m_boundary);
-  cmd.AddValue ("PacketSize", "Generated packet size in bytes", exp.m_packetSize);
-  cmd.AddValue ("DataRate", "DataRate in bps", exp.m_dataRate);
-  cmd.AddValue ("CwMin", "Min CW to simulate", exp.m_cwMin);
-  cmd.AddValue ("CwMax", "Max CW to simulate", exp.m_cwMax);
-  cmd.AddValue ("SlotTime", "Slot time duration", exp.m_slotTime);
-  cmd.AddValue ("Averages", "Number of topologies to test for each cw point", exp.m_avgs);
-  cmd.AddValue ("PerModel", "PER model name", perModel);
-  cmd.AddValue ("SinrModel", "SINR model name", sinrModel);
-  cmd.Parse (argc, argv);
+    CommandLine cmd;
+    cmd.AddValue("NumNodes", "Number of transmitting nodes", exp.m_numNodes);
+    cmd.AddValue("Depth", "Depth of transmitting and sink nodes", exp.m_depth);
+    cmd.AddValue("RegionSize", "Size of boundary in meters", exp.m_boundary);
+    cmd.AddValue("PacketSize", "Generated packet size in bytes", exp.m_packetSize);
+    cmd.AddValue("DataRate", "DataRate in bps", exp.m_dataRate);
+    cmd.AddValue("CwMin", "Min CW to simulate", exp.m_cwMin);
+    cmd.AddValue("CwMax", "Max CW to simulate", exp.m_cwMax);
+    cmd.AddValue("SlotTime", "Slot time duration", exp.m_slotTime);
+    cmd.AddValue("Averages", "Number of topologies to test for each cw point", exp.m_avgs);
+    cmd.AddValue("PerModel", "PER model name", perModel);
+    cmd.AddValue("SinrModel", "SINR model name", sinrModel);
+    cmd.Parse(argc, argv);
 
-  ObjectFactory obf;
-  obf.SetTypeId (perModel);
-  Ptr<UanPhyPer> per = obf.Create<UanPhyPer> ();
-  obf.SetTypeId (sinrModel);
-  Ptr<UanPhyCalcSinr> sinr = obf.Create<UanPhyCalcSinr> ();
+    ObjectFactory obf;
+    obf.SetTypeId(perModel);
+    Ptr<UanPhyPer> per = obf.Create<UanPhyPer> ();
+    obf.SetTypeId(sinrModel);
+    Ptr<UanPhyCalcSinr> sinr = obf.Create<UanPhyCalcSinr> ();
 
-  UanHelper uan;
-  UanTxMode mode;
-  mode = UanTxModeFactory::CreateMode (UanTxMode::FSK, exp.m_dataRate,
-                                       exp.m_dataRate, 12000,
-                                       exp.m_dataRate, 2,
-                                       "Default mode");
-  UanModesList myModes;
-  myModes.AppendMode (mode);
+    UanHelper uan;
+    UanTxMode mode;
+    mode = UanTxModeFactory::CreateMode(UanTxMode::FSK, exp.m_dataRate,
+            exp.m_dataRate, 12000,
+            exp.m_dataRate, 2,
+            "Default mode");
+    UanModesList myModes;
+    myModes.AppendMode(mode);
 
-  uan.SetPhy ("ns3::UanPhyGen",
-              "PerModel", PointerValue (per),
-              "SinrModel", PointerValue (sinr),
-              "SupportedModes", UanModesListValue (myModes));
+    uan.SetPhy("ns3::UanPhyGen",
+            "PerModel", PointerValue(per),
+            "SinrModel", PointerValue(sinr),
+            "SupportedModes", UanModesListValue(myModes));
 
-  exp.Run (uan);
+    exp.Run(uan);
 
-  per = 0;
-  sinr = 0;
+    per = 0;
+    sinr = 0;
 
 }
 

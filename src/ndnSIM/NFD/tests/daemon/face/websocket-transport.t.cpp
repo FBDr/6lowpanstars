@@ -32,414 +32,392 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
-namespace ip = boost::asio::ip;
+            using namespace nfd::tests;
+            namespace ip = boost::asio::ip;
 
-BOOST_AUTO_TEST_SUITE(Face)
+            BOOST_AUTO_TEST_SUITE(Face)
 
-using nfd::Face;
+            using nfd::Face;
 
-/** \brief a fixture that accepts a single WebSocket connection from a client
- */
-class SingleWebSocketFixture : public BaseFixture
-{
-public:
-  SingleWebSocketFixture()
-    : transport(nullptr)
-    , serverReceivedPackets(nullptr)
-    , clientShouldPong(true)
-  {
-  }
+            /** \brief a fixture that accepts a single WebSocket connection from a client
+             */
+            class SingleWebSocketFixture : public BaseFixture {
+            public:
 
-  /** \brief initialize server and start listening
-   */
-  void
-  serverListen(const ip::tcp::endpoint& ep,
-               const time::milliseconds& pongTimeout = time::seconds(1))
-  {
-    server.clear_access_channels(websocketpp::log::alevel::all);
-    server.clear_error_channels(websocketpp::log::elevel::all);
+                SingleWebSocketFixture()
+                : transport(nullptr)
+                , serverReceivedPackets(nullptr)
+                , clientShouldPong(true) {
+                }
 
-    server.init_asio(&g_io);
-    server.set_open_handler(bind(&SingleWebSocketFixture::serverHandleOpen, this, _1));
-    server.set_close_handler(bind(&SingleWebSocketFixture::serverHandleClose, this));
-    server.set_message_handler(bind(&SingleWebSocketFixture::serverHandleMessage, this, _2));
-    server.set_pong_handler(bind(&SingleWebSocketFixture::serverHandlePong, this));
-    server.set_pong_timeout_handler(bind(&SingleWebSocketFixture::serverHandlePongTimeout, this));
-    server.set_pong_timeout(pongTimeout.count());
+                /** \brief initialize server and start listening
+                 */
+                void
+                serverListen(const ip::tcp::endpoint& ep,
+                        const time::milliseconds& pongTimeout = time::seconds(1)) {
+                    server.clear_access_channels(websocketpp::log::alevel::all);
+                    server.clear_error_channels(websocketpp::log::elevel::all);
 
-    server.set_reuse_addr(true);
+                    server.init_asio(&g_io);
+                    server.set_open_handler(bind(&SingleWebSocketFixture::serverHandleOpen, this, _1));
+                    server.set_close_handler(bind(&SingleWebSocketFixture::serverHandleClose, this));
+                    server.set_message_handler(bind(&SingleWebSocketFixture::serverHandleMessage, this, _2));
+                    server.set_pong_handler(bind(&SingleWebSocketFixture::serverHandlePong, this));
+                    server.set_pong_timeout_handler(bind(&SingleWebSocketFixture::serverHandlePongTimeout, this));
+                    server.set_pong_timeout(pongTimeout.count());
 
-    server.listen(ep);
-    server.start_accept();
-  }
+                    server.set_reuse_addr(true);
 
-  /** \brief initialize client and connect to server
-   */
-  void
-  clientConnect(const std::string& uri)
-  {
-    client.clear_access_channels(websocketpp::log::alevel::all);
-    client.clear_error_channels(websocketpp::log::elevel::all);
+                    server.listen(ep);
+                    server.start_accept();
+                }
 
-    client.init_asio(&g_io);
-    client.set_open_handler(bind(&SingleWebSocketFixture::clientHandleOpen, this, _1));
-    client.set_message_handler(bind(&SingleWebSocketFixture::clientHandleMessage, this, _2));
-    client.set_ping_handler(bind(&SingleWebSocketFixture::clientHandlePing, this));
+                /** \brief initialize client and connect to server
+                 */
+                void
+                clientConnect(const std::string& uri) {
+                    client.clear_access_channels(websocketpp::log::alevel::all);
+                    client.clear_error_channels(websocketpp::log::elevel::all);
 
-    websocketpp::lib::error_code ec;
-    auto con = client.get_connection(uri, ec);
-    BOOST_REQUIRE_EQUAL(ec, websocketpp::lib::error_code());
+                    client.init_asio(&g_io);
+                    client.set_open_handler(bind(&SingleWebSocketFixture::clientHandleOpen, this, _1));
+                    client.set_message_handler(bind(&SingleWebSocketFixture::clientHandleMessage, this, _2));
+                    client.set_ping_handler(bind(&SingleWebSocketFixture::clientHandlePing, this));
 
-    client.connect(con);
-  }
+                    websocketpp::lib::error_code ec;
+                    auto con = client.get_connection(uri, ec);
+                    BOOST_REQUIRE_EQUAL(ec, websocketpp::lib::error_code());
 
-  void
-  makeFace(const time::milliseconds& pingInterval = time::seconds(10))
-  {
-    face = make_unique<Face>(
-             make_unique<DummyReceiveLinkService>(),
-             make_unique<WebSocketTransport>(serverHdl, ref(server), pingInterval));
-    transport = static_cast<WebSocketTransport*>(face->getTransport());
-    serverReceivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
-  }
+                    client.connect(con);
+                }
 
-  /** \brief initialize both server and client, and have each other connected, create Transport
-   */
-  void
-  endToEndInitialize(const ip::tcp::endpoint& ep,
-                     const time::milliseconds& pingInterval = time::seconds(10),
-                     const time::milliseconds& pongTimeout = time::seconds(1))
-  {
-    this->serverListen(ep, pongTimeout);
-    std::string uri;
-    if (ep.address().is_v6()) {
-      uri = "ws://[" + ep.address().to_string() + "]:" + to_string(ep.port());
-    }
-    else {
-      uri = "ws://" + ep.address().to_string() + ":" + to_string(ep.port());
-    }
-    this->clientConnect(uri);
-    BOOST_REQUIRE_EQUAL(limitedIo.run(2, // serverHandleOpen, clientHandleOpen
+                void
+                makeFace(const time::milliseconds& pingInterval = time::seconds(10)) {
+                    face = make_unique<Face>(
+                            make_unique<DummyReceiveLinkService>(),
+                            make_unique<WebSocketTransport>(serverHdl, ref(server), pingInterval));
+                    transport = static_cast<WebSocketTransport*> (face->getTransport());
+                    serverReceivedPackets = &static_cast<DummyReceiveLinkService*> (face->getLinkService())->receivedPackets;
+                }
+
+                /** \brief initialize both server and client, and have each other connected, create Transport
+                 */
+                void
+                endToEndInitialize(const ip::tcp::endpoint& ep,
+                        const time::milliseconds& pingInterval = time::seconds(10),
+                        const time::milliseconds& pongTimeout = time::seconds(1)) {
+                    this->serverListen(ep, pongTimeout);
+                    std::string uri;
+                    if (ep.address().is_v6()) {
+                        uri = "ws://[" + ep.address().to_string() + "]:" + to_string(ep.port());
+                    } else {
+                        uri = "ws://" + ep.address().to_string() + ":" + to_string(ep.port());
+                    }
+                    this->clientConnect(uri);
+                    BOOST_REQUIRE_EQUAL(limitedIo.run(2, // serverHandleOpen, clientHandleOpen
+                            time::seconds(1)), LimitedIo::EXCEED_OPS);
+                    this->makeFace(pingInterval);
+                }
+
+            private:
+
+                void
+                serverHandleOpen(websocketpp::connection_hdl hdl) {
+                    websocketpp::lib::error_code ec;
+                    auto con = server.get_con_from_hdl(hdl, ec);
+                    BOOST_REQUIRE_EQUAL(ec, websocketpp::lib::error_code());
+                    BOOST_REQUIRE(con);
+                    remoteEp = con->get_socket().remote_endpoint();
+
+                    serverHdl = hdl;
+                    limitedIo.afterOp();
+                }
+
+                void
+                serverHandleClose() {
+                    if (transport == nullptr) {
+                        return;
+                    }
+
+                    transport->close();
+                    limitedIo.afterOp();
+                }
+
+                void
+                serverHandleMessage(websocket::Server::message_ptr msg) {
+                    if (transport == nullptr) {
+                        return;
+                    }
+
+                    transport->receiveMessage(msg->get_payload());
+                    limitedIo.afterOp();
+                }
+
+                void
+                serverHandlePong() {
+                    if (transport == nullptr) {
+                        return;
+                    }
+
+                    transport->handlePong();
+                    limitedIo.afterOp();
+                }
+
+                void
+                serverHandlePongTimeout() {
+                    if (transport == nullptr) {
+                        return;
+                    }
+
+                    transport->handlePongTimeout();
+                    limitedIo.afterOp();
+                }
+
+                void
+                clientHandleOpen(websocketpp::connection_hdl hdl) {
+                    clientHdl = hdl;
+                    limitedIo.afterOp();
+                }
+
+                void
+                clientHandleMessage(websocket::Client::message_ptr msg) {
+                    clientReceivedMessages.push_back(msg->get_payload());
+                    limitedIo.afterOp();
+                }
+
+                bool
+                clientHandlePing() {
+                    limitedIo.afterOp();
+                    return clientShouldPong;
+                }
+
+            public:
+                LimitedIo limitedIo;
+
+                websocket::Server server;
+                websocketpp::connection_hdl serverHdl;
+                ip::tcp::endpoint remoteEp;
+                unique_ptr<Face> face;
+                WebSocketTransport* transport;
+                std::vector<Transport::Packet>* serverReceivedPackets;
+
+                websocket::Client client;
+                websocketpp::connection_hdl clientHdl;
+                bool clientShouldPong;
+                std::vector<std::string> clientReceivedMessages;
+            };
+
+            BOOST_FIXTURE_TEST_SUITE(TestWebSocketTransport, SingleWebSocketFixture)
+
+            BOOST_AUTO_TEST_CASE(StaticPropertiesLocalIpv4) {
+                auto address = getTestIp<ip::address_v4>(LoopbackAddress::Yes);
+                SKIP_IF_IP_UNAVAILABLE(address);
+                ip::tcp::endpoint ep(address, 20070);
+                this->endToEndInitialize(ep);
+
+                checkStaticPropertiesInitialized(*transport);
+
+                BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
+                BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
+                BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
+                BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+                BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+                BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
+            }
+
+            BOOST_AUTO_TEST_CASE(StaticPropertiesNonLocalIpv4) {
+                auto address = getTestIp<ip::address_v4>(LoopbackAddress::No);
+                SKIP_IF_IP_UNAVAILABLE(address);
+                ip::tcp::endpoint ep(address, 20070);
+                this->endToEndInitialize(ep);
+
+                checkStaticPropertiesInitialized(*transport);
+
+                BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
+                BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
+                BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_NON_LOCAL);
+                BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+                BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+                BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
+            }
+
+            BOOST_AUTO_TEST_CASE(StaticPropertiesLocalIpv4MappedIpv6) {
+                auto address4 = getTestIp<ip::address_v4>(LoopbackAddress::Yes);
+                SKIP_IF_IP_UNAVAILABLE(address4);
+                auto address6 = ip::address_v6::v4_mapped(address4);
+                BOOST_REQUIRE(address6.is_v4_mapped());
+                ip::tcp::endpoint ep(address6, 20070);
+                this->endToEndInitialize(ep);
+
+                checkStaticPropertiesInitialized(*transport);
+
+                BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
+                BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
+                BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
+                BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+                BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+                BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
+            }
+
+            BOOST_AUTO_TEST_CASE(PingPong) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070),
+                        time::milliseconds(500), time::milliseconds(300));
+
+                BOOST_CHECK_EQUAL(limitedIo.run(2, // clientHandlePing, serverHandlePong
+                        time::milliseconds(1500)), LimitedIo::EXCEED_OPS);
+
+                BOOST_CHECK_EQUAL(transport->getState(), TransportState::UP);
+                BOOST_CHECK_EQUAL(transport->getCounters().nOutPings, 1);
+                BOOST_CHECK_EQUAL(transport->getCounters().nInPongs, 1);
+
+                this->clientShouldPong = false;
+                BOOST_CHECK_EQUAL(limitedIo.run(2, // clientHandlePing, serverHandlePongTimeout
+                        time::seconds(2)), LimitedIo::EXCEED_OPS);
+
+                BOOST_CHECK_MESSAGE(transport->getState() == TransportState::FAILED ||
+                        transport->getState() == TransportState::CLOSED,
+                        "expect FAILED or CLOSED state, actual state=" << transport->getState());
+                BOOST_CHECK_EQUAL(transport->getCounters().nOutPings, 2);
+                BOOST_CHECK_EQUAL(transport->getCounters().nInPongs, 1);
+            }
+
+            BOOST_AUTO_TEST_CASE(Send) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
+
+                Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
+                transport->send(Transport::Packet(Block(pkt1)));
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // clientHandleMessage
                         time::seconds(1)), LimitedIo::EXCEED_OPS);
-    this->makeFace(pingInterval);
-  }
 
-private:
-  void
-  serverHandleOpen(websocketpp::connection_hdl hdl)
-  {
-    websocketpp::lib::error_code ec;
-    auto con = server.get_con_from_hdl(hdl, ec);
-    BOOST_REQUIRE_EQUAL(ec, websocketpp::lib::error_code());
-    BOOST_REQUIRE(con);
-    remoteEp = con->get_socket().remote_endpoint();
+                Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
+                transport->send(Transport::Packet(Block(pkt2)));
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // clientHandleMessage
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-    serverHdl = hdl;
-    limitedIo.afterOp();
-  }
+                BOOST_REQUIRE_EQUAL(clientReceivedMessages.size(), 2);
+                BOOST_CHECK_EQUAL_COLLECTIONS(
+                        reinterpret_cast<const uint8_t*> (clientReceivedMessages[0].data()),
+                        reinterpret_cast<const uint8_t*> (clientReceivedMessages[0].data()) + clientReceivedMessages[0].size(),
+                        pkt1.begin(), pkt1.end());
+                BOOST_CHECK_EQUAL_COLLECTIONS(
+                        reinterpret_cast<const uint8_t*> (clientReceivedMessages[1].data()),
+                        reinterpret_cast<const uint8_t*> (clientReceivedMessages[1].data()) + clientReceivedMessages[1].size(),
+                        pkt2.begin(), pkt2.end());
+            }
 
-  void
-  serverHandleClose()
-  {
-    if (transport == nullptr) {
-      return;
-    }
+            BOOST_AUTO_TEST_CASE(ReceiveNormal) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
 
-    transport->close();
-    limitedIo.afterOp();
-  }
+                Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
+                client.send(clientHdl, pkt1.wire(), pkt1.size(), websocketpp::frame::opcode::binary);
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-  void
-  serverHandleMessage(websocket::Server::message_ptr msg)
-  {
-    if (transport == nullptr) {
-      return;
-    }
+                Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
+                client.send(clientHdl, pkt2.wire(), pkt2.size(), websocketpp::frame::opcode::binary);
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-    transport->receiveMessage(msg->get_payload());
-    limitedIo.afterOp();
-  }
+                BOOST_REQUIRE_EQUAL(serverReceivedPackets->size(), 2);
+                BOOST_CHECK(serverReceivedPackets->at(0).packet == pkt1);
+                BOOST_CHECK(serverReceivedPackets->at(1).packet == pkt2);
+                BOOST_CHECK_EQUAL(serverReceivedPackets->at(0).remoteEndpoint, serverReceivedPackets->at(1).remoteEndpoint);
+            }
 
-  void
-  serverHandlePong()
-  {
-    if (transport == nullptr) {
-      return;
-    }
+            BOOST_AUTO_TEST_CASE(ReceiveMalformed) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
 
-    transport->handlePong();
-    limitedIo.afterOp();
-  }
+                Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
+                client.send(clientHdl, pkt1.wire(), pkt1.size() - 1, // truncated
+                        websocketpp::frame::opcode::binary);
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-  void
-  serverHandlePongTimeout()
-  {
-    if (transport == nullptr) {
-      return;
-    }
+                // bad packet is dropped
+                BOOST_CHECK_EQUAL(transport->getState(), TransportState::UP);
+                BOOST_CHECK_EQUAL(serverReceivedPackets->size(), 0);
 
-    transport->handlePongTimeout();
-    limitedIo.afterOp();
-  }
+                Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
+                client.send(clientHdl, pkt2.wire(), pkt2.size(), websocketpp::frame::opcode::binary);
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-  void
-  clientHandleOpen(websocketpp::connection_hdl hdl)
-  {
-    clientHdl = hdl;
-    limitedIo.afterOp();
-  }
+                // next valid packet is still received normally
+                BOOST_REQUIRE_EQUAL(serverReceivedPackets->size(), 1);
+                BOOST_CHECK(serverReceivedPackets->at(0).packet == pkt2);
+            }
 
-  void
-  clientHandleMessage(websocket::Client::message_ptr msg)
-  {
-    clientReceivedMessages.push_back(msg->get_payload());
-    limitedIo.afterOp();
-  }
+            BOOST_AUTO_TEST_CASE(Close) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
 
-  bool
-  clientHandlePing()
-  {
-    limitedIo.afterOp();
-    return clientShouldPong;
-  }
+                int nStateChanges = 0;
+                transport->afterStateChange.connect(
+                        [&nStateChanges] (TransportState oldState, TransportState newState) {
+                            switch (nStateChanges) {
+                                case 0:
+                                    BOOST_CHECK_EQUAL(oldState, TransportState::UP);
+                                    BOOST_CHECK_EQUAL(newState, TransportState::CLOSING);
+                                    break;
+                                case 1:
+                                    BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
+                                    BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
+                                    break;
+                                default:
+                                    BOOST_CHECK(false);
+                            }
+                            nStateChanges++;
+                        });
 
-public:
-  LimitedIo limitedIo;
+                transport->close();
+                BOOST_CHECK_EQUAL(nStateChanges, 2);
+            }
 
-  websocket::Server server;
-  websocketpp::connection_hdl serverHdl;
-  ip::tcp::endpoint remoteEp;
-  unique_ptr<Face> face;
-  WebSocketTransport* transport;
-  std::vector<Transport::Packet>* serverReceivedPackets;
+            BOOST_AUTO_TEST_CASE(RemoteClose) {
+                auto address = getTestIp<ip::address_v4>();
+                SKIP_IF_IP_UNAVAILABLE(address);
+                this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
 
-  websocket::Client client;
-  websocketpp::connection_hdl clientHdl;
-  bool clientShouldPong;
-  std::vector<std::string> clientReceivedMessages;
-};
+                int nStateChanges = 0;
+                transport->afterStateChange.connect(
+                        [&nStateChanges] (TransportState oldState, TransportState newState) {
+                            switch (nStateChanges) {
+                                case 0:
+                                    BOOST_CHECK_EQUAL(oldState, TransportState::UP);
+                                    BOOST_CHECK_EQUAL(newState, TransportState::CLOSING);
+                                    break;
+                                case 1:
+                                    BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
+                                    BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
+                                    break;
+                                default:
+                                    BOOST_CHECK(false);
+                            }
+                            nStateChanges++;
+                        });
 
-BOOST_FIXTURE_TEST_SUITE(TestWebSocketTransport, SingleWebSocketFixture)
+                client.close(clientHdl, websocketpp::close::status::going_away, "");
+                BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleClose
+                        time::seconds(1)), LimitedIo::EXCEED_OPS);
 
-BOOST_AUTO_TEST_CASE(StaticPropertiesLocalIpv4)
-{
-  auto address = getTestIp<ip::address_v4>(LoopbackAddress::Yes);
-  SKIP_IF_IP_UNAVAILABLE(address);
-  ip::tcp::endpoint ep(address, 20070);
-  this->endToEndInitialize(ep);
+                BOOST_CHECK_EQUAL(nStateChanges, 2);
+            }
 
-  checkStaticPropertiesInitialized(*transport);
+            BOOST_AUTO_TEST_SUITE_END() // TestWebSocketTransport
+            BOOST_AUTO_TEST_SUITE_END() // Face
 
-  BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
-  BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
-  BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
-  BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
-}
-
-BOOST_AUTO_TEST_CASE(StaticPropertiesNonLocalIpv4)
-{
-  auto address = getTestIp<ip::address_v4>(LoopbackAddress::No);
-  SKIP_IF_IP_UNAVAILABLE(address);
-  ip::tcp::endpoint ep(address, 20070);
-  this->endToEndInitialize(ep);
-
-  checkStaticPropertiesInitialized(*transport);
-
-  BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
-  BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
-  BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_NON_LOCAL);
-  BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
-}
-
-BOOST_AUTO_TEST_CASE(StaticPropertiesLocalIpv4MappedIpv6)
-{
-  auto address4 = getTestIp<ip::address_v4>(LoopbackAddress::Yes);
-  SKIP_IF_IP_UNAVAILABLE(address4);
-  auto address6 = ip::address_v6::v4_mapped(address4);
-  BOOST_REQUIRE(address6.is_v4_mapped());
-  ip::tcp::endpoint ep(address6, 20070);
-  this->endToEndInitialize(ep);
-
-  checkStaticPropertiesInitialized(*transport);
-
-  BOOST_CHECK_EQUAL(transport->getLocalUri(), FaceUri(ep, "ws"));
-  BOOST_CHECK_EQUAL(transport->getRemoteUri(), FaceUri(remoteEp, "wsclient"));
-  BOOST_CHECK_EQUAL(transport->getScope(), ndn::nfd::FACE_SCOPE_LOCAL);
-  BOOST_CHECK_EQUAL(transport->getPersistency(), ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
-  BOOST_CHECK_EQUAL(transport->getLinkType(), ndn::nfd::LINK_TYPE_POINT_TO_POINT);
-  BOOST_CHECK_EQUAL(transport->getMtu(), MTU_UNLIMITED);
-}
-
-BOOST_AUTO_TEST_CASE(PingPong)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070),
-                           time::milliseconds(500), time::milliseconds(300));
-
-  BOOST_CHECK_EQUAL(limitedIo.run(2, // clientHandlePing, serverHandlePong
-                    time::milliseconds(1500)), LimitedIo::EXCEED_OPS);
-
-  BOOST_CHECK_EQUAL(transport->getState(), TransportState::UP);
-  BOOST_CHECK_EQUAL(transport->getCounters().nOutPings, 1);
-  BOOST_CHECK_EQUAL(transport->getCounters().nInPongs, 1);
-
-  this->clientShouldPong = false;
-  BOOST_CHECK_EQUAL(limitedIo.run(2, // clientHandlePing, serverHandlePongTimeout
-                    time::seconds(2)), LimitedIo::EXCEED_OPS);
-
-  BOOST_CHECK_MESSAGE(transport->getState() == TransportState::FAILED ||
-                      transport->getState() == TransportState::CLOSED,
-                      "expect FAILED or CLOSED state, actual state=" << transport->getState());
-  BOOST_CHECK_EQUAL(transport->getCounters().nOutPings, 2);
-  BOOST_CHECK_EQUAL(transport->getCounters().nInPongs, 1);
-}
-
-BOOST_AUTO_TEST_CASE(Send)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
-
-  Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
-  transport->send(Transport::Packet(Block(pkt1)));
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // clientHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
-  transport->send(Transport::Packet(Block(pkt2)));
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // clientHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  BOOST_REQUIRE_EQUAL(clientReceivedMessages.size(), 2);
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    reinterpret_cast<const uint8_t*>(clientReceivedMessages[0].data()),
-    reinterpret_cast<const uint8_t*>(clientReceivedMessages[0].data()) + clientReceivedMessages[0].size(),
-    pkt1.begin(), pkt1.end());
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    reinterpret_cast<const uint8_t*>(clientReceivedMessages[1].data()),
-    reinterpret_cast<const uint8_t*>(clientReceivedMessages[1].data()) + clientReceivedMessages[1].size(),
-    pkt2.begin(), pkt2.end());
-}
-
-BOOST_AUTO_TEST_CASE(ReceiveNormal)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
-
-  Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
-  client.send(clientHdl, pkt1.wire(), pkt1.size(), websocketpp::frame::opcode::binary);
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
-  client.send(clientHdl, pkt2.wire(), pkt2.size(), websocketpp::frame::opcode::binary);
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  BOOST_REQUIRE_EQUAL(serverReceivedPackets->size(), 2);
-  BOOST_CHECK(serverReceivedPackets->at(0).packet == pkt1);
-  BOOST_CHECK(serverReceivedPackets->at(1).packet == pkt2);
-  BOOST_CHECK_EQUAL(serverReceivedPackets->at(0).remoteEndpoint, serverReceivedPackets->at(1).remoteEndpoint);
-}
-
-BOOST_AUTO_TEST_CASE(ReceiveMalformed)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
-
-  Block pkt1 = ndn::encoding::makeStringBlock(300, "hello");
-  client.send(clientHdl, pkt1.wire(), pkt1.size() - 1, // truncated
-              websocketpp::frame::opcode::binary);
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  // bad packet is dropped
-  BOOST_CHECK_EQUAL(transport->getState(), TransportState::UP);
-  BOOST_CHECK_EQUAL(serverReceivedPackets->size(), 0);
-
-  Block pkt2 = ndn::encoding::makeStringBlock(301, "world!");
-  client.send(clientHdl, pkt2.wire(), pkt2.size(), websocketpp::frame::opcode::binary);
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleMessage
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  // next valid packet is still received normally
-  BOOST_REQUIRE_EQUAL(serverReceivedPackets->size(), 1);
-  BOOST_CHECK(serverReceivedPackets->at(0).packet == pkt2);
-}
-
-BOOST_AUTO_TEST_CASE(Close)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
-
-  int nStateChanges = 0;
-  transport->afterStateChange.connect(
-    [&nStateChanges] (TransportState oldState, TransportState newState) {
-      switch (nStateChanges) {
-      case 0:
-        BOOST_CHECK_EQUAL(oldState, TransportState::UP);
-        BOOST_CHECK_EQUAL(newState, TransportState::CLOSING);
-        break;
-      case 1:
-        BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
-        BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
-        break;
-      default:
-        BOOST_CHECK(false);
-      }
-      nStateChanges++;
-    });
-
-  transport->close();
-  BOOST_CHECK_EQUAL(nStateChanges, 2);
-}
-
-BOOST_AUTO_TEST_CASE(RemoteClose)
-{
-  auto address = getTestIp<ip::address_v4>();
-  SKIP_IF_IP_UNAVAILABLE(address);
-  this->endToEndInitialize(ip::tcp::endpoint(address, 20070));
-
-  int nStateChanges = 0;
-  transport->afterStateChange.connect(
-    [&nStateChanges] (TransportState oldState, TransportState newState) {
-      switch (nStateChanges) {
-      case 0:
-        BOOST_CHECK_EQUAL(oldState, TransportState::UP);
-        BOOST_CHECK_EQUAL(newState, TransportState::CLOSING);
-        break;
-      case 1:
-        BOOST_CHECK_EQUAL(oldState, TransportState::CLOSING);
-        BOOST_CHECK_EQUAL(newState, TransportState::CLOSED);
-        break;
-      default:
-        BOOST_CHECK(false);
-      }
-      nStateChanges++;
-    });
-
-  client.close(clientHdl, websocketpp::close::status::going_away, "");
-  BOOST_CHECK_EQUAL(limitedIo.run(1, // serverHandleClose
-                    time::seconds(1)), LimitedIo::EXCEED_OPS);
-
-  BOOST_CHECK_EQUAL(nStateChanges, 2);
-}
-
-BOOST_AUTO_TEST_SUITE_END() // TestWebSocketTransport
-BOOST_AUTO_TEST_SUITE_END() // Face
-
-} // namespace tests
-} // namespace face
+        } // namespace tests
+    } // namespace face
 } // namespace nfd

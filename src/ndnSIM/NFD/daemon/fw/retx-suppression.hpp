@@ -29,42 +29,42 @@
 #include "strategy.hpp"
 
 namespace nfd {
-namespace fw {
+    namespace fw {
 
-/** \brief helper for consumer retransmission suppression
- */
-class RetxSuppression : noncopyable
-{
-public:
-  enum Result {
-    /** \brief Interest is new (not a retransmission)
-     */
-    NEW,
+        /** \brief helper for consumer retransmission suppression
+         */
+        class RetxSuppression : noncopyable {
+        public:
 
-    /** \brief Interest is retransmission and should be forwarded
-     */
-    FORWARD,
+            enum Result {
+                /** \brief Interest is new (not a retransmission)
+                 */
+                NEW,
 
-    /** \brief Interest is retransmission and should be suppressed
-     */
-    SUPPRESS
-  };
+                /** \brief Interest is retransmission and should be forwarded
+                 */
+                FORWARD,
 
-  /** \brief determines whether Interest is a retransmission,
-   *         and if so, whether it shall be forwarded or suppressed
-   */
-  virtual Result
-  decide(const Face& inFace, const Interest& interest, pit::Entry& pitEntry) const = 0;
+                /** \brief Interest is retransmission and should be suppressed
+                 */
+                SUPPRESS
+            };
 
-protected:
-  /** \return last out-record time
-   *  \pre pitEntry has one or more unexpired out-records
-   */
-  time::steady_clock::TimePoint
-  getLastOutgoing(const pit::Entry& pitEntry) const;
-};
+            /** \brief determines whether Interest is a retransmission,
+             *         and if so, whether it shall be forwarded or suppressed
+             */
+            virtual Result
+            decide(const Face& inFace, const Interest& interest, pit::Entry& pitEntry) const = 0;
 
-} // namespace fw
+        protected:
+            /** \return last out-record time
+             *  \pre pitEntry has one or more unexpired out-records
+             */
+            time::steady_clock::TimePoint
+            getLastOutgoing(const pit::Entry& pitEntry) const;
+        };
+
+    } // namespace fw
 } // namespace nfd
 
 #endif // NFD_DAEMON_FW_RETX_SUPPRESSION_HPP

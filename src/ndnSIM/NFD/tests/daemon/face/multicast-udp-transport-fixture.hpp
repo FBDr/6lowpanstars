@@ -34,100 +34,95 @@
 #include "tests/limited-io.hpp"
 
 namespace nfd {
-namespace face {
-namespace tests {
+    namespace face {
+        namespace tests {
 
-using namespace nfd::tests;
-namespace ip = boost::asio::ip;
-using ip::udp;
+            using namespace nfd::tests;
+            namespace ip = boost::asio::ip;
+            using ip::udp;
 
-class MulticastUdpTransportFixture : public BaseFixture
-{
-protected:
-  MulticastUdpTransportFixture()
-    : transport(nullptr)
-    , multicastEp(ip::address::from_string("230.15.19.47"), 7070)
-    , defaultAddr(getTestIp<ip::address_v4>(LoopbackAddress::No, MulticastInterface::Yes))
-    , receivedPackets(nullptr)
-    , remoteSockRx(g_io)
-    , remoteSockTx(g_io)
-  {
-  }
+            class MulticastUdpTransportFixture : public BaseFixture {
+            protected:
 
-  void
-  initialize(ip::address_v4 address)
-  {
-    openMulticastSockets(remoteSockRx, remoteSockTx, multicastEp.port());
+                MulticastUdpTransportFixture()
+                : transport(nullptr)
+                , multicastEp(ip::address::from_string("230.15.19.47"), 7070)
+                , defaultAddr(getTestIp<ip::address_v4>(LoopbackAddress::No, MulticastInterface::Yes))
+                , receivedPackets(nullptr)
+                , remoteSockRx(g_io)
+                , remoteSockTx(g_io) {
+                }
 
-    udp::socket sockRx(g_io);
-    udp::socket sockTx(g_io);
-    localEp = udp::endpoint(address, 7001);
-    openMulticastSockets(sockRx, sockTx, localEp.port());
+                void
+                initialize(ip::address_v4 address) {
+                    openMulticastSockets(remoteSockRx, remoteSockTx, multicastEp.port());
 
-    face = make_unique<Face>(
-             make_unique<DummyReceiveLinkService>(),
-             make_unique<MulticastUdpTransport>(localEp, multicastEp, std::move(sockRx), std::move(sockTx)));
-    transport = static_cast<MulticastUdpTransport*>(face->getTransport());
-    receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
+                    udp::socket sockRx(g_io);
+                    udp::socket sockTx(g_io);
+                    localEp = udp::endpoint(address, 7001);
+                    openMulticastSockets(sockRx, sockTx, localEp.port());
 
-    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
-  }
+                    face = make_unique<Face>(
+                            make_unique<DummyReceiveLinkService>(),
+                            make_unique<MulticastUdpTransport>(localEp, multicastEp, std::move(sockRx), std::move(sockTx)));
+                    transport = static_cast<MulticastUdpTransport*> (face->getTransport());
+                    receivedPackets = &static_cast<DummyReceiveLinkService*> (face->getLinkService())->receivedPackets;
 
-  void
-  openMulticastSockets(udp::socket& rx, udp::socket& tx, uint16_t port)
-  {
-    rx.open(udp::v4());
-    rx.set_option(udp::socket::reuse_address(true));
-    rx.bind(udp::endpoint(multicastEp.address(), port));
-    rx.set_option(ip::multicast::join_group(multicastEp.address()));
+                    BOOST_REQUIRE_EQUAL(transport->getState(), TransportState::UP);
+                }
 
-    tx.open(udp::v4());
-    tx.set_option(udp::socket::reuse_address(true));
-    tx.set_option(ip::multicast::enable_loopback(true));
-    tx.bind(udp::endpoint(ip::address_v4::any(), port));
-  }
+                void
+                openMulticastSockets(udp::socket& rx, udp::socket& tx, uint16_t port) {
+                    rx.open(udp::v4());
+                    rx.set_option(udp::socket::reuse_address(true));
+                    rx.bind(udp::endpoint(multicastEp.address(), port));
+                    rx.set_option(ip::multicast::join_group(multicastEp.address()));
 
-  void
-  remoteRead(std::vector<uint8_t>& buf, bool needToCheck = true)
-  {
-    remoteSockRx.async_receive(boost::asio::buffer(buf),
-      [this, needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-        limitedIo.afterOp();
-      });
-    BOOST_REQUIRE_EQUAL(limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
-  }
+                    tx.open(udp::v4());
+                    tx.set_option(udp::socket::reuse_address(true));
+                    tx.set_option(ip::multicast::enable_loopback(true));
+                    tx.bind(udp::endpoint(ip::address_v4::any(), port));
+                }
 
-  void
-  remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true)
-  {
-    remoteSockTx.async_send_to(boost::asio::buffer(buf), udp::endpoint(multicastEp.address(), 7001),
-      [needToCheck] (const boost::system::error_code& error, size_t) {
-        if (needToCheck) {
-          BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
-        }
-      });
-    limitedIo.defer(time::seconds(1));
-  }
+                void
+                remoteRead(std::vector<uint8_t>& buf, bool needToCheck = true) {
+                    remoteSockRx.async_receive(boost::asio::buffer(buf),
+                            [this, needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                                limitedIo.afterOp();
+                            });
+                    BOOST_REQUIRE_EQUAL(limitedIo.run(1, time::seconds(1)), LimitedIo::EXCEED_OPS);
+                }
 
-protected:
-  LimitedIo limitedIo;
-  MulticastUdpTransport* transport;
-  udp::endpoint localEp;
-  udp::endpoint multicastEp;
-  const ip::address_v4 defaultAddr;
-  std::vector<Transport::Packet>* receivedPackets;
+                void
+                remoteWrite(const std::vector<uint8_t>& buf, bool needToCheck = true) {
+                    remoteSockTx.async_send_to(boost::asio::buffer(buf), udp::endpoint(multicastEp.address(), 7001),
+                            [needToCheck] (const boost::system::error_code& error, size_t) {
+                                if (needToCheck) {
+                                    BOOST_REQUIRE_EQUAL(error, boost::system::errc::success);
+                                }
+                            });
+                    limitedIo.defer(time::seconds(1));
+                }
 
-private:
-  unique_ptr<Face> face;
-  udp::socket remoteSockRx;
-  udp::socket remoteSockTx;
-};
+            protected:
+                LimitedIo limitedIo;
+                MulticastUdpTransport* transport;
+                udp::endpoint localEp;
+                udp::endpoint multicastEp;
+                const ip::address_v4 defaultAddr;
+                std::vector<Transport::Packet>* receivedPackets;
 
-} // namespace tests
-} // namespace face
+            private:
+                unique_ptr<Face> face;
+                udp::socket remoteSockRx;
+                udp::socket remoteSockTx;
+            };
+
+        } // namespace tests
+    } // namespace face
 } // namespace nfd
 
 #endif // NFD_TESTS_DAEMON_FACE_MULTICAST_UDP_TRANSPORT_FIXTURE_HPP

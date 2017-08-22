@@ -30,101 +30,95 @@
 NS_LOG_COMPONENT_DEFINE("ndn.NetDeviceTransport");
 
 namespace ns3 {
-namespace ndn {
+    namespace ndn {
 
-NetDeviceTransport::NetDeviceTransport(Ptr<Node> node,
-                                       const Ptr<NetDevice>& netDevice,
-                                       const std::string& localUri,
-                                       const std::string& remoteUri,
-                                       ::ndn::nfd::FaceScope scope,
-                                       ::ndn::nfd::FacePersistency persistency,
-                                       ::ndn::nfd::LinkType linkType)
-  : m_netDevice(netDevice)
-  , m_node(node)
-{
-  this->setLocalUri(FaceUri(localUri));
-  this->setRemoteUri(FaceUri(remoteUri));
-  this->setScope(scope);
-  this->setPersistency(persistency);
-  this->setLinkType(linkType);
-  // this->setMtu(udp::computeMtu(m_socket.local_endpoint())); // not sure what should be here
+        NetDeviceTransport::NetDeviceTransport(Ptr<Node> node,
+                const Ptr<NetDevice>& netDevice,
+                const std::string& localUri,
+                const std::string& remoteUri,
+                ::ndn::nfd::FaceScope scope,
+                ::ndn::nfd::FacePersistency persistency,
+                ::ndn::nfd::LinkType linkType)
+        : m_netDevice(netDevice)
+        , m_node(node) {
+            this->setLocalUri(FaceUri(localUri));
+            this->setRemoteUri(FaceUri(remoteUri));
+            this->setScope(scope);
+            this->setPersistency(persistency);
+            this->setLinkType(linkType);
+            // this->setMtu(udp::computeMtu(m_socket.local_endpoint())); // not sure what should be here
 
-  NS_LOG_FUNCTION(this << "Creating an ndnSIM transport instance for netDevice with URI"
-                  << this->getLocalUri());
+            NS_LOG_FUNCTION(this << "Creating an ndnSIM transport instance for netDevice with URI"
+                    << this->getLocalUri());
 
-  NS_ASSERT_MSG(m_netDevice != 0, "NetDeviceFace needs to be assigned a valid NetDevice");
+            NS_ASSERT_MSG(m_netDevice != 0, "NetDeviceFace needs to be assigned a valid NetDevice");
 
-  m_node->RegisterProtocolHandler(MakeCallback(&NetDeviceTransport::receiveFromNetDevice, this),
-                                  0, m_netDevice,
-                                  false /*promiscuous mode*/);
-}
+            m_node->RegisterProtocolHandler(MakeCallback(&NetDeviceTransport::receiveFromNetDevice, this),
+                    0, m_netDevice,
+                    false /*promiscuous mode*/);
+        }
 
-NetDeviceTransport::~NetDeviceTransport()
-{
-  NS_LOG_FUNCTION_NOARGS();
-}
+        NetDeviceTransport::~NetDeviceTransport() {
+            NS_LOG_FUNCTION_NOARGS();
+        }
 
-void
-NetDeviceTransport::beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency)
-{
-  NS_LOG_FUNCTION(this << "Changing persistency for netDevice with URI"
-                  << this->getLocalUri() << "currently does nothing");
-  // do nothing for now
-}
+        void
+        NetDeviceTransport::beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency) {
+            NS_LOG_FUNCTION(this << "Changing persistency for netDevice with URI"
+                    << this->getLocalUri() << "currently does nothing");
+            // do nothing for now
+        }
 
-void
-NetDeviceTransport::doClose()
-{
-  NS_LOG_FUNCTION(this << "Closing transport for netDevice with URI"
-                  << this->getLocalUri());
+        void
+        NetDeviceTransport::doClose() {
+            NS_LOG_FUNCTION(this << "Closing transport for netDevice with URI"
+                    << this->getLocalUri());
 
-  // set the state of the transport to "CLOSED"
-  this->setState(nfd::face::TransportState::CLOSED);
-}
+            // set the state of the transport to "CLOSED"
+            this->setState(nfd::face::TransportState::CLOSED);
+        }
 
-void
-NetDeviceTransport::doSend(Packet&& packet)
-{
-  NS_LOG_FUNCTION(this << "Sending packet from netDevice with URI"
-                  << this->getLocalUri());
+        void
+        NetDeviceTransport::doSend(Packet&& packet) {
+            NS_LOG_FUNCTION(this << "Sending packet from netDevice with URI"
+                    << this->getLocalUri());
 
-  // convert NFD packet to NS3 packet
-  BlockHeader header(packet);
+            // convert NFD packet to NS3 packet
+            BlockHeader header(packet);
 
-  Ptr<ns3::Packet> ns3Packet = Create<ns3::Packet>();
-  ns3Packet->AddHeader(header);
+            Ptr<ns3::Packet> ns3Packet = Create<ns3::Packet>();
+            ns3Packet->AddHeader(header);
 
-  // send the NS3 packet
-  m_netDevice->Send(ns3Packet, m_netDevice->GetBroadcast(),
+            // send the NS3 packet
+            m_netDevice->Send(ns3Packet, m_netDevice->GetBroadcast(),
                     L3Protocol::ETHERNET_FRAME_TYPE);
-}
+        }
 
-// callback
-void
-NetDeviceTransport::receiveFromNetDevice(Ptr<NetDevice> device,
-                                      Ptr<const ns3::Packet> p,
-                                      uint16_t protocol,
-                                      const Address& from, const Address& to,
-                                      NetDevice::PacketType packetType)
-{
-  NS_LOG_FUNCTION(device << p << protocol << from << to << packetType);
+        // callback
 
-  // Convert NS3 packet to NFD packet
-  Ptr<ns3::Packet> packet = p->Copy();
+        void
+        NetDeviceTransport::receiveFromNetDevice(Ptr<NetDevice> device,
+                Ptr<const ns3::Packet> p,
+                uint16_t protocol,
+                const Address& from, const Address& to,
+                NetDevice::PacketType packetType) {
+            NS_LOG_FUNCTION(device << p << protocol << from << to << packetType);
 
-  BlockHeader header;
-  packet->RemoveHeader(header);
+            // Convert NS3 packet to NFD packet
+            Ptr<ns3::Packet> packet = p->Copy();
 
-  auto nfdPacket = Packet(std::move(header.getBlock()));
+            BlockHeader header;
+            packet->RemoveHeader(header);
 
-  this->receive(std::move(nfdPacket));
-}
+            auto nfdPacket = Packet(std::move(header.getBlock()));
 
-Ptr<NetDevice>
-NetDeviceTransport::GetNetDevice() const
-{
-  return m_netDevice;
-}
+            this->receive(std::move(nfdPacket));
+        }
 
-} // namespace ndn
+        Ptr<NetDevice>
+        NetDeviceTransport::GetNetDevice() const {
+            return m_netDevice;
+        }
+
+    } // namespace ndn
 } // namespace ns3

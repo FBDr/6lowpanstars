@@ -28,25 +28,21 @@
 
 using namespace ns3;
 
-
-
-class EpsGtpuTestSuite : public TestSuite
-{
+class EpsGtpuTestSuite : public TestSuite {
 public:
-  EpsGtpuTestSuite ();
+    EpsGtpuTestSuite();
 };
 
 /**
  * Test 1.Check header coding and decoding
  */
-class EpsGtpuHeaderTestCase : public TestCase
-{
+class EpsGtpuHeaderTestCase : public TestCase {
 public:
-  EpsGtpuHeaderTestCase ();
-  virtual ~EpsGtpuHeaderTestCase ();
+    EpsGtpuHeaderTestCase();
+    virtual ~EpsGtpuHeaderTestCase();
 
 private:
-  virtual void DoRun (void);
+    virtual void DoRun(void);
 };
 
 

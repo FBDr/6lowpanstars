@@ -30,90 +30,86 @@
 
 namespace nfd {
 
-namespace name_tree {
-class Entry;
-} // namespace name_tree
+    namespace name_tree {
+        class Entry;
+    } // namespace name_tree
 
-namespace fib {
+    namespace fib {
 
-/** \class NextHopList
- *  \brief represents a collection of nexthops
- *
- *  This type has these methods as public API:
- *    iterator<NextHop> begin()
- *    iterator<NextHop> end()
- *    size_t size()
- */
-typedef std::vector<fib::NextHop> NextHopList;
+        /** \class NextHopList
+         *  \brief represents a collection of nexthops
+         *
+         *  This type has these methods as public API:
+         *    iterator<NextHop> begin()
+         *    iterator<NextHop> end()
+         *    size_t size()
+         */
+        typedef std::vector<fib::NextHop> NextHopList;
 
-/** \brief represents a FIB entry
- */
-class Entry : noncopyable
-{
-public:
-  explicit
-  Entry(const Name& prefix);
+        /** \brief represents a FIB entry
+         */
+        class Entry : noncopyable {
+        public:
+            explicit
+            Entry(const Name& prefix);
 
-  const Name&
-  getPrefix() const
-  {
-    return m_prefix;
-  }
+            const Name&
+            getPrefix() const {
+                return m_prefix;
+            }
 
-  const NextHopList&
-  getNextHops() const
-  {
-    return m_nextHops;
-  }
+            const NextHopList&
+            getNextHops() const {
+                return m_nextHops;
+            }
 
-  /** \return whether this Entry has any NextHop record
-   */
-  bool
-  hasNextHops() const
-  {
-    return !m_nextHops.empty();
-  }
+            /** \return whether this Entry has any NextHop record
+             */
+            bool
+            hasNextHops() const {
+                return !m_nextHops.empty();
+            }
 
-  /** \return whether there is a NextHop record for \p face
-   */
-  bool
-  hasNextHop(const Face& face) const;
+            /** \return whether there is a NextHop record for \p face
+             */
+            bool
+            hasNextHop(const Face& face) const;
 
-  /** \brief adds a NextHop record
-   *
-   *  If a NextHop record for \p face already exists, its cost is updated.
-   */
-  void
-  addNextHop(Face& face, uint64_t cost);
+            /** \brief adds a NextHop record
+             *
+             *  If a NextHop record for \p face already exists, its cost is updated.
+             */
+            void
+            addNextHop(Face& face, uint64_t cost);
 
-  /** \brief removes a NextHop record
-   *
-   *  If no NextHop record for face exists, do nothing.
-   */
-  void
-  removeNextHop(const Face& face);
+            /** \brief removes a NextHop record
+             *
+             *  If no NextHop record for face exists, do nothing.
+             */
+            void
+            removeNextHop(const Face& face);
 
-private:
-  /** \note This method is non-const because mutable iterators are needed by callers.
-   */
-  NextHopList::iterator
-  findNextHop(const Face& face);
+        private:
+            /** \note This method is non-const because mutable iterators are needed by callers.
+             */
+            NextHopList::iterator
+            findNextHop(const Face& face);
 
-  /** \brief sorts the nexthop list
-   */
-  void
-  sortNextHops();
+            /** \brief sorts the nexthop list
+             */
+            void
+            sortNextHops();
 
-private:
-  Name m_prefix;
-  NextHopList m_nextHops;
+        private:
+            Name m_prefix;
+            NextHopList m_nextHops;
 
-  name_tree::Entry* m_nameTreeEntry;
+            name_tree::Entry* m_nameTreeEntry;
 
-  friend class name_tree::Entry;
-};
+            friend class name_tree::Entry;
+        };
 
-} // namespace fib
+    } // namespace fib
 } // namespace nfd
 
 #endif // NFD_DAEMON_TABLE_FIB_ENTRY_HPP

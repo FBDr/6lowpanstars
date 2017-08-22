@@ -31,141 +31,140 @@
 struct sqlite3;
 
 namespace ndn {
-namespace security {
+    namespace security {
 
-class SecPublicInfoSqlite3 : public SecPublicInfo
-{
-public:
-  class Error : public SecPublicInfo::Error
-  {
-  public:
-    explicit
-    Error(const std::string& what)
-      : SecPublicInfo::Error(what)
-    {
-    }
-  };
+        class SecPublicInfoSqlite3 : public SecPublicInfo {
+        public:
 
-  explicit
-  SecPublicInfoSqlite3(const std::string& dir = "");
+            class Error : public SecPublicInfo::Error {
+            public:
 
-  virtual
-  ~SecPublicInfoSqlite3();
+                explicit
+                Error(const std::string& what)
+                : SecPublicInfo::Error(what) {
+                }
+            };
 
-  /**********************
-   * from SecPublicInfo *
-   **********************/
+            explicit
+            SecPublicInfoSqlite3(const std::string& dir = "");
 
-  virtual void
-  setTpmLocator(const std::string& tpmLocator);
+            virtual
+            ~SecPublicInfoSqlite3();
 
-  virtual std::string
-  getTpmLocator();
+            /**********************
+             * from SecPublicInfo *
+             **********************/
 
-  virtual std::string
-  getPibLocator();
+            virtual void
+            setTpmLocator(const std::string& tpmLocator);
 
-  virtual bool
-  doesIdentityExist(const Name& identityName);
+            virtual std::string
+            getTpmLocator();
 
-  virtual void
-  addIdentity(const Name& identityName);
+            virtual std::string
+            getPibLocator();
 
-  virtual bool
-  revokeIdentity();
+            virtual bool
+            doesIdentityExist(const Name& identityName);
 
-  virtual bool
-  doesPublicKeyExist(const Name& keyName);
+            virtual void
+            addIdentity(const Name& identityName);
 
-  virtual void
-  addKey(const Name& keyName, const v1::PublicKey& publicKeyDer);
+            virtual bool
+            revokeIdentity();
 
-  virtual shared_ptr<v1::PublicKey>
-  getPublicKey(const Name& keyName);
+            virtual bool
+            doesPublicKeyExist(const Name& keyName);
 
-  virtual KeyType
-  getPublicKeyType(const Name& keyName);
+            virtual void
+            addKey(const Name& keyName, const v1::PublicKey& publicKeyDer);
 
-  virtual bool
-  doesCertificateExist(const Name& certificateName);
+            virtual shared_ptr<v1::PublicKey>
+            getPublicKey(const Name& keyName);
 
-  virtual void
-  addCertificate(const v1::IdentityCertificate& certificate);
+            virtual KeyType
+            getPublicKeyType(const Name& keyName);
 
-  virtual shared_ptr<v1::IdentityCertificate>
-  getCertificate(const Name& certificateName);
+            virtual bool
+            doesCertificateExist(const Name& certificateName);
 
+            virtual void
+            addCertificate(const v1::IdentityCertificate& certificate);
+
+            virtual shared_ptr<v1::IdentityCertificate>
+            getCertificate(const Name& certificateName);
 
 
-  virtual Name
-  getDefaultIdentity();
 
-  virtual Name
-  getDefaultKeyNameForIdentity(const Name& identityName);
+            virtual Name
+            getDefaultIdentity();
 
-  virtual Name
-  getDefaultCertificateNameForKey(const Name& keyName);
+            virtual Name
+            getDefaultKeyNameForIdentity(const Name& identityName);
 
-  virtual void
-  getAllIdentities(std::vector<Name>& nameList, bool isDefault);
+            virtual Name
+            getDefaultCertificateNameForKey(const Name& keyName);
 
-  virtual void
-  getAllKeyNames(std::vector<Name>& nameList, bool isDefault);
+            virtual void
+            getAllIdentities(std::vector<Name>& nameList, bool isDefault);
 
-  virtual void
-  getAllKeyNamesOfIdentity(const Name& identity, std::vector<Name>& nameList, bool isDefault);
+            virtual void
+            getAllKeyNames(std::vector<Name>& nameList, bool isDefault);
 
-  virtual void
-  getAllCertificateNames(std::vector<Name>& nameList, bool isDefault);
+            virtual void
+            getAllKeyNamesOfIdentity(const Name& identity, std::vector<Name>& nameList, bool isDefault);
 
-  virtual void
-  getAllCertificateNamesOfKey(const Name& keyName, std::vector<Name>& nameList, bool isDefault);
+            virtual void
+            getAllCertificateNames(std::vector<Name>& nameList, bool isDefault);
 
-  virtual void
-  deleteCertificateInfo(const Name& certificateName);
+            virtual void
+            getAllCertificateNamesOfKey(const Name& keyName, std::vector<Name>& nameList, bool isDefault);
 
-  virtual void
-  deletePublicKeyInfo(const Name& keyName);
+            virtual void
+            deleteCertificateInfo(const Name& certificateName);
 
-  virtual void
-  deleteIdentityInfo(const Name& identity);
+            virtual void
+            deletePublicKeyInfo(const Name& keyName);
 
-private:
-  bool
-  initializeTable(const std::string& tableName, const std::string& initCommand);
+            virtual void
+            deleteIdentityInfo(const Name& identity);
 
-  void
-  deleteTable(const std::string& tableName);
+        private:
+            bool
+            initializeTable(const std::string& tableName, const std::string& initCommand);
 
-  void
-  setTpmLocatorInternal(const std::string& tpmLocator, bool needReset);
+            void
+            deleteTable(const std::string& tableName);
 
-  void
-  setDefaultIdentityInternal(const Name& identityName);
+            void
+            setTpmLocatorInternal(const std::string& tpmLocator, bool needReset);
 
-  void
-  setDefaultKeyNameForIdentityInternal(const Name& keyName);
+            void
+            setDefaultIdentityInternal(const Name& identityName);
 
-  void
-  setDefaultCertificateNameForKeyInternal(const Name& certificateName);
+            void
+            setDefaultKeyNameForIdentityInternal(const Name& keyName);
 
-  std::string
-  getScheme();
+            void
+            setDefaultCertificateNameForKeyInternal(const Name& certificateName);
+
+            std::string
+            getScheme();
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PRIVATE:
-  bool
-  doesTableExist(const std::string& tableName);
+            bool
+            doesTableExist(const std::string& tableName);
 
-public:
-  static const std::string SCHEME;
+        public:
+            static const std::string SCHEME;
 
-private:
-  sqlite3* m_database;
-};
+        private:
+            sqlite3* m_database;
+        };
 
-} // namespace security
+    } // namespace security
 
-using security::SecPublicInfoSqlite3;
+    using security::SecPublicInfoSqlite3;
 
 } // namespace ndn
 

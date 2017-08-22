@@ -25,31 +25,30 @@
 #include "in-memory-storage.hpp"
 
 namespace ndn {
-namespace util {
+    namespace util {
 
-/** @brief Provides application cache with persistent storage, of which no replacement policy will
- *  be employed. Entries will only be deleted by explicitly application control.
- */
-class InMemoryStoragePersistent : public InMemoryStorage
-{
-public:
-  InMemoryStoragePersistent();
+        /** @brief Provides application cache with persistent storage, of which no replacement policy will
+         *  be employed. Entries will only be deleted by explicitly application control.
+         */
+        class InMemoryStoragePersistent : public InMemoryStorage {
+        public:
+            InMemoryStoragePersistent();
 
-  explicit
-  InMemoryStoragePersistent(boost::asio::io_service& ioService);
+            explicit
+            InMemoryStoragePersistent(boost::asio::io_service& ioService);
 
 NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
-  /** @brief Do nothing.
-   *
-   *  This storage is persistent, and does not support eviction.
-   *
-   *  @return false
-   */
-  virtual bool
-  evictItem() override;
-};
+            /** @brief Do nothing.
+             *
+             *  This storage is persistent, and does not support eviction.
+             *
+             *  @return false
+             */
+            virtual bool
+            evictItem() override;
+        };
 
-} // namespace util
+    } // namespace util
 } // namespace ndn
 
 #endif // NDN_UTIL_IN_MEMORY_STORAGE_PERSISTENT_HPP

@@ -33,395 +33,391 @@
 #include "ns3/sgi-hashmap.h"
 #include "ns3/output-stream-wrapper.h"
 
-namespace ns3
-{
+namespace ns3 {
 
-class NetDevice;
-class Ipv6Interface;
-
-/**
- * \class NdiscCache
- * \brief IPv6 Neighbor Discovery cache.
- */
-class NdiscCache : public Object
-{
-public:
-  class Entry;
-
-  /**
-   * \brief Get the type ID
-   * \return type ID
-   */
-  static TypeId GetTypeId ();
-
-  /**
-   * \brief Default value for unres qlen.
-   */
-  static const uint32_t DEFAULT_UNRES_QLEN = 3;
-
-  /**
-   * \brief Constructor.
-   */
-  NdiscCache ();
-
-  /**
-   * \brief Destructor.
-   */
-  ~NdiscCache ();
-
-  /**
-   * \brief Get the NetDevice associated with this cache.
-   * \return NetDevice
-   */
-  Ptr<NetDevice> GetDevice () const;
-
-  /**
-   * \brief Get the Ipv6Interface associated with this cache.
-   */
-  Ptr<Ipv6Interface> GetInterface () const;
-
-  /**
-   * \brief Lookup in the cache.
-   * \param dst destination address
-   * \return the entry if found, 0 otherwise
-   */
-  NdiscCache::Entry* Lookup (Ipv6Address dst);
-
-  /**
-   * \brief Add an entry.
-   * \param to address to add
-   * \return an new Entry
-   */
-  NdiscCache::Entry* Add (Ipv6Address to);
-
-  /**
-   * \brief Delete an entry.
-   * \param entry pointer to delete from the list.
-   */
-  void Remove (NdiscCache::Entry* entry);
-
-  /**
-   * \brief Flush the cache.
-   */
-  void Flush ();
-
-  /**
-   * \brief Set the max number of waiting packet.
-   * \param unresQlen value to set
-   */
-  void SetUnresQlen (uint32_t unresQlen);
-
-  /**
-   * \brief Get the max number of waiting packet.
-   * \return max number
-   */
-  uint32_t GetUnresQlen ();
-
-  /**
-   * \brief Set the device and interface.
-   * \param device the device
-   * \param interface the IPv6 interface
-   */
-  void SetDevice (Ptr<NetDevice> device, Ptr<Ipv6Interface> interface);
-
-  /**
-   * \brief Print the NDISC cache entries
-   *
-   * \param stream the ostream the NDISC cache entries is printed to
-   */
-  void PrintNdiscCache (Ptr<OutputStreamWrapper> stream);
-
-  /**
-   * \class Entry
-   * \brief A record that holds information about an NdiscCache entry.
-   */
-  class Entry
-  {
-public:
-    /**
-     * \brief Constructor.
-     * \param nd The NdiscCache this entry belongs to.
-     */
-    Entry (NdiscCache* nd);
+    class NetDevice;
+    class Ipv6Interface;
 
     /**
-     * \brief Changes the state to this entry to INCOMPLETE.
-     * \param p packet that wait to be sent
+     * \class NdiscCache
+     * \brief IPv6 Neighbor Discovery cache.
      */
-    void MarkIncomplete (Ptr<Packet> p);
+    class NdiscCache : public Object {
+    public:
+        class Entry;
 
-    /**
-     * \brief Changes the state to this entry to REACHABLE.
-     * \param mac MAC address
-     * \return the list of packet waiting
-     */
-    std::list<Ptr<Packet> > MarkReachable (Address mac);
+        /**
+         * \brief Get the type ID
+         * \return type ID
+         */
+        static TypeId GetTypeId();
 
-    /**
-     * \brief Changes the state to this entry to PROBE.
-     */
-    void MarkProbe ();
+        /**
+         * \brief Default value for unres qlen.
+         */
+        static const uint32_t DEFAULT_UNRES_QLEN = 3;
 
-    /**
-     * \brief Changes the state to this entry to STALE.
-     * \param mac L2 address
-     * \return the list of packet waiting
-     */
-    std::list<Ptr<Packet> > MarkStale (Address mac);
+        /**
+         * \brief Constructor.
+         */
+        NdiscCache();
 
-    /**
-     * \brief Changes the state to this entry to STALE.
-     */
-    void MarkStale ();
+        /**
+         * \brief Destructor.
+         */
+        ~NdiscCache();
 
-    /**
-     * \brief Changes the state to this entry to REACHABLE.
-     */
-    void MarkReachable ();
+        /**
+         * \brief Get the NetDevice associated with this cache.
+         * \return NetDevice
+         */
+        Ptr<NetDevice> GetDevice() const;
 
-    /**
-     * \brief Change the state to this entry to DELAY.
-     */
-    void MarkDelay ();
+        /**
+         * \brief Get the Ipv6Interface associated with this cache.
+         */
+        Ptr<Ipv6Interface> GetInterface() const;
 
-    /**
-     * \brief Add a packet (or replace old value) in the queue.
-     * \param p packet to add
-     */
-    void AddWaitingPacket (Ptr<Packet> p);
+        /**
+         * \brief Lookup in the cache.
+         * \param dst destination address
+         * \return the entry if found, 0 otherwise
+         */
+        NdiscCache::Entry* Lookup(Ipv6Address dst);
 
-    /**
-     * \brief Clear the waiting packet list.
-     */
-    void ClearWaitingPacket ();
+        /**
+         * \brief Add an entry.
+         * \param to address to add
+         * \return an new Entry
+         */
+        NdiscCache::Entry* Add(Ipv6Address to);
 
-    /**
-     * \brief Is the entry STALE
-     * \return true if the entry is in STALE state, false otherwise
-     */
-    bool IsStale () const;
+        /**
+         * \brief Delete an entry.
+         * \param entry pointer to delete from the list.
+         */
+        void Remove(NdiscCache::Entry* entry);
 
-    /**
-     * \brief Is the entry REACHABLE
-     * \return true if the entry is in REACHABLE state, false otherwise
-     */
-    bool IsReachable () const;
+        /**
+         * \brief Flush the cache.
+         */
+        void Flush();
 
-    /**
-     * \brief Is the entry DELAY
-     * \return true if the entry is in DELAY state, false otherwise
-     */
-    bool IsDelay () const;
+        /**
+         * \brief Set the max number of waiting packet.
+         * \param unresQlen value to set
+         */
+        void SetUnresQlen(uint32_t unresQlen);
 
-    /**
-     * \brief Is the entry INCOMPLETE
-     * \return true if the entry is in INCOMPLETE state, false otherwise
-     */
-    bool IsIncomplete () const;
+        /**
+         * \brief Get the max number of waiting packet.
+         * \return max number
+         */
+        uint32_t GetUnresQlen();
 
-    /**
-     * \brief Is the entry PROBE
-     * \return true if the entry is in PROBE state, false otherwise
-     */
-    bool IsProbe () const;
+        /**
+         * \brief Set the device and interface.
+         * \param device the device
+         * \param interface the IPv6 interface
+         */
+        void SetDevice(Ptr<NetDevice> device, Ptr<Ipv6Interface> interface);
 
-    /**
-     * \brief Get the MAC address of this entry.
-     * \return the L2 address
-     */
-    Address GetMacAddress () const;
+        /**
+         * \brief Print the NDISC cache entries
+         *
+         * \param stream the ostream the NDISC cache entries is printed to
+         */
+        void PrintNdiscCache(Ptr<OutputStreamWrapper> stream);
 
-    /**
-     * \brief Set the MAC address of this entry.
-     * \param mac the MAC address to set
-     */
-    void SetMacAddress (Address mac);
+        /**
+         * \class Entry
+         * \brief A record that holds information about an NdiscCache entry.
+         */
+        class Entry {
+        public:
+            /**
+             * \brief Constructor.
+             * \param nd The NdiscCache this entry belongs to.
+             */
+            Entry(NdiscCache* nd);
 
-    /**
-     * \brief If the entry is a host or a router.
-     * \return true if the node is a router, 0 if it is a host
-     */
-    bool IsRouter () const;
+            /**
+             * \brief Changes the state to this entry to INCOMPLETE.
+             * \param p packet that wait to be sent
+             */
+            void MarkIncomplete(Ptr<Packet> p);
 
-    /**
-     * \brief Set the node type.
-     * \param router true is a router, false means a host
-     */
-    void SetRouter (bool router);
+            /**
+             * \brief Changes the state to this entry to REACHABLE.
+             * \param mac MAC address
+             * \return the list of packet waiting
+             */
+            std::list<Ptr<Packet> > MarkReachable(Address mac);
 
-    /**
-     * \brief Get the time of last reachability confirmation.
-     * \return time
-     */
-    Time GetLastReachabilityConfirmation () const;
+            /**
+             * \brief Changes the state to this entry to PROBE.
+             */
+            void MarkProbe();
 
-    /**
-     * \brief Update the time of last reachability confirmation.
-     */
-    void UpdateLastReachabilityconfirmation ();
+            /**
+             * \brief Changes the state to this entry to STALE.
+             * \param mac L2 address
+             * \return the list of packet waiting
+             */
+            std::list<Ptr<Packet> > MarkStale(Address mac);
 
-    /**
-     * \brief Start the reachable timer.
-     */
-    void StartReachableTimer ();
+            /**
+             * \brief Changes the state to this entry to STALE.
+             */
+            void MarkStale();
 
-    /**
-     * \brief Start retransmit timer.
-     */
-    void StartRetransmitTimer ();
+            /**
+             * \brief Changes the state to this entry to REACHABLE.
+             */
+            void MarkReachable();
 
-    /**
-     * \brief Start probe timer.
-     */
-    void StartProbeTimer ();
+            /**
+             * \brief Change the state to this entry to DELAY.
+             */
+            void MarkDelay();
 
-    /**
-     * \brief Start delay timer.
-     */
-    void StartDelayTimer ();
+            /**
+             * \brief Add a packet (or replace old value) in the queue.
+             * \param p packet to add
+             */
+            void AddWaitingPacket(Ptr<Packet> p);
 
-    /**
-     * \brief Stop NUD timer and reset the NUD retransmission counter
-     */
-    void StopNudTimer ();
+            /**
+             * \brief Clear the waiting packet list.
+             */
+            void ClearWaitingPacket();
 
-    /**
-     * \brief Function called when reachable timer timeout.
-     */
-    void FunctionReachableTimeout ();
+            /**
+             * \brief Is the entry STALE
+             * \return true if the entry is in STALE state, false otherwise
+             */
+            bool IsStale() const;
 
-    /**
-     * \brief Function called when retransmit timer timeout.
-     * It verify that the NS retransmit has reached the max so discard the entry
-     * otherwise it retransmit a NS.
-     */
-    void FunctionRetransmitTimeout ();
+            /**
+             * \brief Is the entry REACHABLE
+             * \return true if the entry is in REACHABLE state, false otherwise
+             */
+            bool IsReachable() const;
 
-    /**
-     * \brief Function called when probe timer timeout.
-     */
-    void FunctionProbeTimeout ();
+            /**
+             * \brief Is the entry DELAY
+             * \return true if the entry is in DELAY state, false otherwise
+             */
+            bool IsDelay() const;
 
-    /**
-     * \brief Function called when delay timer timeout.
-     */
-    void FunctionDelayTimeout ();
+            /**
+             * \brief Is the entry INCOMPLETE
+             * \return true if the entry is in INCOMPLETE state, false otherwise
+             */
+            bool IsIncomplete() const;
 
-    /**
-     * \brief Set the IPv6 address.
-     * \param ipv6Address IPv6 address
-     */
-    void SetIpv6Address (Ipv6Address ipv6Address);
+            /**
+             * \brief Is the entry PROBE
+             * \return true if the entry is in PROBE state, false otherwise
+             */
+            bool IsProbe() const;
 
-private:
-    /**
-     * \brief The IPv6 address.
-     */
-    Ipv6Address m_ipv6Address;
+            /**
+             * \brief Get the MAC address of this entry.
+             * \return the L2 address
+             */
+            Address GetMacAddress() const;
 
-    /**
-     * \brief The Entry state enumeration.
-     */
-    enum NdiscCacheEntryState_e
-    {
-      INCOMPLETE, /**< No mapping between IPv6 and L2 addresses */
-      REACHABLE, /**< Mapping exists between IPv6 and L2 addresses */
-      STALE, /**< Mapping is stale */
-      DELAY, /**< Try to wait contact from remote host */
-      PROBE /**< Try to contact IPv6 address to know again its L2 address */
+            /**
+             * \brief Set the MAC address of this entry.
+             * \param mac the MAC address to set
+             */
+            void SetMacAddress(Address mac);
+
+            /**
+             * \brief If the entry is a host or a router.
+             * \return true if the node is a router, 0 if it is a host
+             */
+            bool IsRouter() const;
+
+            /**
+             * \brief Set the node type.
+             * \param router true is a router, false means a host
+             */
+            void SetRouter(bool router);
+
+            /**
+             * \brief Get the time of last reachability confirmation.
+             * \return time
+             */
+            Time GetLastReachabilityConfirmation() const;
+
+            /**
+             * \brief Update the time of last reachability confirmation.
+             */
+            void UpdateLastReachabilityconfirmation();
+
+            /**
+             * \brief Start the reachable timer.
+             */
+            void StartReachableTimer();
+
+            /**
+             * \brief Start retransmit timer.
+             */
+            void StartRetransmitTimer();
+
+            /**
+             * \brief Start probe timer.
+             */
+            void StartProbeTimer();
+
+            /**
+             * \brief Start delay timer.
+             */
+            void StartDelayTimer();
+
+            /**
+             * \brief Stop NUD timer and reset the NUD retransmission counter
+             */
+            void StopNudTimer();
+
+            /**
+             * \brief Function called when reachable timer timeout.
+             */
+            void FunctionReachableTimeout();
+
+            /**
+             * \brief Function called when retransmit timer timeout.
+             * It verify that the NS retransmit has reached the max so discard the entry
+             * otherwise it retransmit a NS.
+             */
+            void FunctionRetransmitTimeout();
+
+            /**
+             * \brief Function called when probe timer timeout.
+             */
+            void FunctionProbeTimeout();
+
+            /**
+             * \brief Function called when delay timer timeout.
+             */
+            void FunctionDelayTimeout();
+
+            /**
+             * \brief Set the IPv6 address.
+             * \param ipv6Address IPv6 address
+             */
+            void SetIpv6Address(Ipv6Address ipv6Address);
+
+        private:
+            /**
+             * \brief The IPv6 address.
+             */
+            Ipv6Address m_ipv6Address;
+
+            /**
+             * \brief The Entry state enumeration.
+             */
+            enum NdiscCacheEntryState_e {
+                INCOMPLETE, /**< No mapping between IPv6 and L2 addresses */
+                REACHABLE, /**< Mapping exists between IPv6 and L2 addresses */
+                STALE, /**< Mapping is stale */
+                DELAY, /**< Try to wait contact from remote host */
+                PROBE /**< Try to contact IPv6 address to know again its L2 address */
+            };
+
+            /**
+             * \brief The state of the entry.
+             */
+            NdiscCacheEntryState_e m_state;
+
+            /**
+             * \brief the NdiscCache associated.
+             */
+            NdiscCache* m_ndCache;
+
+            /**
+             * \brief The MAC address.
+             */
+            Address m_macAddress;
+
+            /**
+             * \brief The list of packet waiting.
+             */
+            std::list<Ptr<Packet> > m_waiting;
+
+            /**
+             * \brief Type of node (router or host).
+             */
+            bool m_router;
+
+            /**
+             * \brief Timer (used for NUD).
+             */
+            Timer m_nudTimer;
+
+            /**
+             * \brief Last time we see a reachability confirmation.
+             */
+            Time m_lastReachabilityConfirmation;
+
+            /**
+             * \brief Number of NS retransmission.
+             */
+            uint8_t m_nsRetransmit;
+        };
+
+    private:
+        /**
+         * \brief Neighbor Discovery Cache container
+         */
+        typedef sgi::hash_map<Ipv6Address, NdiscCache::Entry *, Ipv6AddressHash> Cache;
+        /**
+         * \brief Neighbor Discovery Cache container iterator
+         */
+        typedef sgi::hash_map<Ipv6Address, NdiscCache::Entry *, Ipv6AddressHash>::iterator CacheI;
+
+        /**
+         * \brief Copy constructor.
+         *
+         * Not implemented to avoid misuse
+         */
+        NdiscCache(NdiscCache const &);
+
+        /**
+         * \brief Copy constructor.
+         *
+         * Not implemented to avoid misuse
+         * \returns
+         */
+        NdiscCache& operator=(NdiscCache const &);
+
+        /**
+         * \brief Dispose this object.
+         */
+        void DoDispose();
+
+        /**
+         * \brief The NetDevice.
+         */
+        Ptr<NetDevice> m_device;
+
+        /**
+         * \brief the interface.
+         */
+        Ptr<Ipv6Interface> m_interface;
+
+        /**
+         * \brief A list of Entry.
+         */
+        Cache m_ndCache;
+
+        /**
+         * \brief Max number of packet stored in m_waiting.
+         */
+        uint32_t m_unresQlen;
     };
-
-    /**
-     * \brief The state of the entry.
-     */
-    NdiscCacheEntryState_e m_state;
-
-    /**
-     * \brief the NdiscCache associated.
-     */
-    NdiscCache* m_ndCache;
-
-    /**
-     * \brief The MAC address.
-     */
-    Address m_macAddress;
-
-    /**
-     * \brief The list of packet waiting.
-     */
-    std::list<Ptr<Packet> > m_waiting;
-
-    /**
-     * \brief Type of node (router or host).
-     */
-    bool m_router;
-
-    /**
-     * \brief Timer (used for NUD).
-     */
-    Timer m_nudTimer;
-
-    /**
-     * \brief Last time we see a reachability confirmation.
-     */
-    Time m_lastReachabilityConfirmation;
-
-    /**
-     * \brief Number of NS retransmission.
-     */
-    uint8_t m_nsRetransmit;
-  };
-
-private:
-  /**
-   * \brief Neighbor Discovery Cache container
-   */
-  typedef sgi::hash_map<Ipv6Address, NdiscCache::Entry *, Ipv6AddressHash> Cache;
-  /**
-   * \brief Neighbor Discovery Cache container iterator
-   */
-  typedef sgi::hash_map<Ipv6Address, NdiscCache::Entry *, Ipv6AddressHash>::iterator CacheI;
-
-  /**
-   * \brief Copy constructor.
-   *
-   * Not implemented to avoid misuse
-   */
-  NdiscCache (NdiscCache const &);
-
-  /**
-   * \brief Copy constructor.
-   *
-   * Not implemented to avoid misuse
-   * \returns
-   */
-  NdiscCache& operator= (NdiscCache const &);
-
-  /**
-   * \brief Dispose this object.
-   */
-  void DoDispose ();
-
-  /**
-   * \brief The NetDevice.
-   */
-  Ptr<NetDevice> m_device;
-
-  /**
-   * \brief the interface.
-   */
-  Ptr<Ipv6Interface> m_interface;
-
-  /**
-   * \brief A list of Entry.
-   */
-  Cache m_ndCache;
-
-  /**
-   * \brief Max number of packet stored in m_waiting.
-   */
-  uint32_t m_unresQlen;
-};
 
 } /* namespace ns3 */
 

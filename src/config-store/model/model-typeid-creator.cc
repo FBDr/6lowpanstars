@@ -18,64 +18,59 @@
 
 #include "model-typeid-creator.h"
 
-namespace ns3 {
-
-ModelTypeidCreator::ModelTypeidCreator ()
+namespace ns3
 {
-}
-void
 
-ModelTypeidCreator::Build (GtkTreeStore *treestore)
-{
-  m_treestore = treestore;
-  m_iters.push_back (0);
-  Iterate ();
-  NS_ASSERT (m_iters.size () == 1);
-}
+    ModelTypeidCreator::ModelTypeidCreator() {
+    }
 
-void
-ModelTypeidCreator::Add (ModelTypeid *node)
-{
-  GtkTreeIter *parent = m_iters.back ();
-  GtkTreeIter *current = g_new (GtkTreeIter, 1);
-  gtk_tree_store_append (m_treestore, current, parent);
-  gtk_tree_store_set (m_treestore, current, COL_TYPEID, node, -1);
-  m_iters.push_back (current);
-}
+    void
 
-void
-ModelTypeidCreator::Remove (void)
-{
-  GtkTreeIter *iter = m_iters.back ();
-  g_free (iter);
-  m_iters.pop_back ();
-}
+    ModelTypeidCreator::Build(GtkTreeStore * treestore) {
+        m_treestore = treestore;
+        m_iters.push_back(0);
+        Iterate();
+        NS_ASSERT(m_iters.size() == 1);
+    }
 
-void 
-ModelTypeidCreator::VisitAttribute (TypeId tid, std::string name, std::string defaultValue, uint32_t index)
-{
-  ModelTypeid *node = new ModelTypeid ();
-  node->type = ModelTypeid::NODE_ATTRIBUTE;
-  node->tid = tid;
-  node->name = name;
-  node->defaultValue = defaultValue;
-  node->index = index;
-  Add (node);
-  Remove ();
-}
+    void
+    ModelTypeidCreator::Add(ModelTypeid * node) {
+        GtkTreeIter *parent = m_iters.back();
+        GtkTreeIter *current = g_new(GtkTreeIter, 1);
+        gtk_tree_store_append(m_treestore, current, parent);
+        gtk_tree_store_set(m_treestore, current, COL_TYPEID, node, -1);
+        m_iters.push_back(current);
+    }
 
-void 
-ModelTypeidCreator::StartVisitTypeId (std::string name)
-{
-  ModelTypeid *node = new ModelTypeid ();
-  node->type = ModelTypeid::NODE_TYPEID;
-  node->tid = TypeId::LookupByName (name);
-  Add (node);
-}
+    void
+    ModelTypeidCreator::Remove(void) {
+        GtkTreeIter *iter = m_iters.back();
+        g_free(iter);
+        m_iters.pop_back();
+    }
 
-void 
-ModelTypeidCreator::EndVisitTypeId (void)
-{
-  Remove ();
-}
+    void
+    ModelTypeidCreator::VisitAttribute(TypeId tid, std::string name, std::string defaultValue, uint32_t index) {
+        ModelTypeid *node = new ModelTypeid();
+        node->type = ModelTypeid::NODE_ATTRIBUTE;
+        node->tid = tid;
+        node->name = name;
+        node->defaultValue = defaultValue;
+        node->index = index;
+        Add(node);
+        Remove();
+    }
+
+    void
+    ModelTypeidCreator::StartVisitTypeId(std::string name) {
+        ModelTypeid *node = new ModelTypeid();
+        node->type = ModelTypeid::NODE_TYPEID;
+        node->tid = TypeId::LookupByName(name);
+        Add(node);
+    }
+
+    void
+    ModelTypeidCreator::EndVisitTypeId(void) {
+        Remove();
+    }
 } //end namespace ns3
