@@ -261,9 +261,9 @@ namespace nfd {
 
     void
     Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest) {
-//        int size = 50;
-//        uint8_t * buff = new uint8_t [size];
-//        
+        //        int size = 50;
+        //        uint8_t * buff = new uint8_t [size];
+        //        
         NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
                 " interest=" << pitEntry->getName());
 
@@ -273,11 +273,16 @@ namespace nfd {
         // send Interest
         outFace.sendInterest(interest);
         ++m_counters.nOutInterests;
-//        ns3::Ptr<ns3::ndn::L3Protocol> retval = m_node->GetObject<ns3::ndn::L3Protocol>();
-//        std::cout << retval->getGTW() << std::endl;
-//        shared_ptr<Interest> interestcopy = make_shared<Interest>(interest);
-//        shared_ptr<Name> nameWithSequence = make_shared<Name>(interestcopy->getName());
-//        nameWithSequence->appendImplicitSha256Digest(buff, size);
+        //        ns3::Ptr<ns3::ndn::L3Protocol> retval = m_node->GetObject<ns3::ndn::L3Protocol>();
+        //        std::cout << retval->getGTW() << std::endl;
+        //        shared_ptr<Interest> interestcopy = make_shared<Interest>(interest);
+        //        shared_ptr<Name> nameWithSequence = make_shared<Name>(interestcopy->getName());
+        //        nameWithSequence->appendImplicitSha256Digest(buff, size);
+        
+//        FaceUri oerie = outFace.getLocalUri();
+//        std::cout<<oerie.getScheme()<<std::endl;
+
+
     }
 
     void
