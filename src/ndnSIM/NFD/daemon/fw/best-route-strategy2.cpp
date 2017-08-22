@@ -23,9 +23,17 @@
  * NFD, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bits/signum.h>
+
 #include "best-route-strategy2.hpp"
 #include "algorithm.hpp"
 #include "core/logger.hpp"
+#include "ns3/node.h"
+#include "ns3/pointer.h"
+#include "ns3/core-module.h"
+#include "ns3/object.h"
+#include "ns3/node-list.h"
+#include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 
 namespace nfd {
     namespace fw {
@@ -42,13 +50,31 @@ namespace nfd {
         : Strategy(forwarder, name)
         , m_retxSuppression(RETX_SUPPRESSION_INITIAL,
         RetxSuppressionExponential::DEFAULT_MULTIPLIER,
-        RETX_SUPPRESSION_MAX) {
+        RETX_SUPPRESSION_MAX)
+        , m_node(NULL) {
+
+        }
+
+        void BestRouteStrategy2::setNode() {
+            ns3::Ptr<ns3::Node> thisNode = ns3::NodeList::GetNode(ns3::Simulator::GetContext());
+            m_node = thisNode;
+        }
+
+        ns3::Ptr<ns3::Node> BestRouteStrategy2::getNode() {
+            if (m_node == NULL) { //initialize once
+                setNode();
+            }
+            return m_node;
         }
 
         void
         BestRouteStrategy2::CustomSendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest) {
-
             this->sendInterest(pitEntry, outFace, interest);
+            ns3::Ptr<ns3::Node> thisNode = getNode();
+            ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = thisNode->GetObject<ns3::ndn::L3Protocol>();
+            bool is_GTW = L3Prot->getGTW();
+
+
         }
 
         /** \brief determines whether a NextHop is eligible
