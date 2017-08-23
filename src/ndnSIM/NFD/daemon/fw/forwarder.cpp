@@ -49,6 +49,8 @@ namespace nfd {
     , m_measurements(m_nameTree)
     , m_strategyChoice(m_nameTree, fw::makeDefaultStrategy(*this))
     , m_csFace(face::makeNullFace(FaceUri("contentstore://"))) {
+        //        m_node = NULL;
+        //        m_is_GTW = 0;
         fw::installStrategies(*this);
         getFaceTable().addReserved(m_csFace, face::FACEID_CONTENT_STORE);
 
@@ -77,6 +79,9 @@ namespace nfd {
     void
     Forwarder::setNode(ns3::Ptr<ns3::Node> node) {
         m_node = node;
+        //ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = m_node->GetObject<ns3::ndn::L3Protocol>();
+        //m_is_GTW = L3Prot->getGTW();
+        std::cout << "Done setnode" << std::endl;
     }
 
     ns3::Ptr<ns3::Node>
@@ -144,23 +149,46 @@ namespace nfd {
             return;
         }
 
+        //*****New piece start
+        auto outInterest = make_shared<Interest>(interest);
+        
+        //        shared_ptr<Name> nameWithSequence;
+        //        std::string extra = "ovrhd";
+        //        int size = 5;
+        //        uint8_t * buff = new uint8_t [size];
+        //
+        //        memcpy(buff, extra.c_str(), size);
+        //
+        //        if (m_is_GTW || 1) {
+        //            if ((inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+        //                std::cout << "Sending special interest2" << std::endl;
+        //                nameWithSequence = make_shared<Name>(interestcopy.getName());
+        //                // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
+        //                nameWithSequence->append(buff, size);
+        //                interestcopy.setName(*nameWithSequence);
+        //                std::cout << interestcopy.getName() << std::endl;
+        //            }
+        //        }
+
+        //****New piece end     
+
         // detect duplicate Nonce with Dead Nonce List
-        bool hasDuplicateNonceInDnl = m_deadNonceList.has(interest.getName(), interest.getNonce());
+        bool hasDuplicateNonceInDnl = m_deadNonceList.has(outInterest->getName(), outInterest->getNonce());
         if (hasDuplicateNonceInDnl) {
             // goto Interest loop pipeline
-            this->onInterestLoop(inFace, interest);
+            this->onInterestLoop(inFace, *outInterest);
             return;
         }
 
         // PIT insert
-        shared_ptr<pit::Entry> pitEntry = m_pit.insert(interest).first;
+        shared_ptr<pit::Entry> pitEntry = m_pit.insert(*outInterest).first;
 
         // detect duplicate Nonce in PIT entry
-        bool hasDuplicateNonceInPit = fw::findDuplicateNonce(*pitEntry, interest.getNonce(), inFace) !=
+        bool hasDuplicateNonceInPit = fw::findDuplicateNonce(*pitEntry, outInterest->getNonce(), inFace) !=
                 fw::DUPLICATE_NONCE_NONE;
         if (hasDuplicateNonceInPit) {
             // goto Interest loop pipeline
-            this->onInterestLoop(inFace, interest);
+            this->onInterestLoop(inFace, *outInterest);
             return;
         }
 
@@ -171,19 +199,19 @@ namespace nfd {
         bool isPending = inRecords.begin() != inRecords.end();
         if (!isPending) {
             if (m_csFromNdnSim == nullptr) {
-                m_cs.find(interest,
+                m_cs.find(*outInterest,
                         bind(&Forwarder::onContentStoreHit, this, ref(inFace), pitEntry, _1, _2),
                         bind(&Forwarder::onContentStoreMiss, this, ref(inFace), pitEntry, _1));
             } else {
-                shared_ptr<Data> match = m_csFromNdnSim->Lookup(interest.shared_from_this());
+                shared_ptr<Data> match = m_csFromNdnSim->Lookup(outInterest->shared_from_this());
                 if (match != nullptr) {
-                    this->onContentStoreHit(inFace, pitEntry, interest, *match);
+                    this->onContentStoreHit(inFace, pitEntry, *outInterest, *match);
                 } else {
-                    this->onContentStoreMiss(inFace, pitEntry, interest);
+                    this->onContentStoreMiss(inFace, pitEntry, *outInterest);
                 }
             }
         } else {
-            this->onContentStoreMiss(inFace, pitEntry, interest);
+            this->onContentStoreMiss(inFace, pitEntry, *outInterest);
         }
     }
 

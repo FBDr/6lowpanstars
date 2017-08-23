@@ -34,6 +34,8 @@
 #include "ns3/object.h"
 #include "ns3/node-list.h"
 #include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
+#include "src/ndnSIM/ndn-cxx/src/util/face-uri.hpp"
+#include "src/ndnSIM/ndn-cxx/src/name.hpp"
 
 namespace nfd {
     namespace fw {
@@ -55,24 +57,49 @@ namespace nfd {
 
         }
 
-        void BestRouteStrategy2::setNode() {
-            ns3::Ptr<ns3::Node> thisNode = ns3::NodeList::GetNode(ns3::Simulator::GetContext());
-            m_node = thisNode;
-        }
-
-        ns3::Ptr<ns3::Node> BestRouteStrategy2::getNode() {
-            if (m_node == NULL) { //initialize once
-                setNode();
-            }
-            return m_node;
-        }
+//        void BestRouteStrategy2::setNode() {
+//            ns3::Ptr<ns3::Node> thisNode = ns3::NodeList::GetNode(ns3::Simulator::GetContext());
+//            ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = m_node->GetObject<ns3::ndn::L3Protocol>();
+//
+//            m_node = thisNode;
+//            m_is_GTW = L3Prot->getGTW();
+//        }
+//
+//        ns3::Ptr<ns3::Node> BestRouteStrategy2::getNode() {
+//            if (m_node == NULL) { //initialize once function is called for first time.
+//                setNode();
+//            }
+//            return m_node;
+//        }
 
         void
         BestRouteStrategy2::CustomSendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest) {
+
+//            Interest interestcopy = interest;
+//            shared_ptr<Name> nameWithSequence;
+//            std::string extra = "ovrhd";
+//            int size = 5;
+//            uint8_t * buff = new uint8_t [size];
+//
+//            memcpy(buff, extra.c_str(), size);
+//
+//            if (m_is_GTW || 1) {
+//                FaceUri oerie = outFace.getLocalUri();
+//                if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+//                    std::cout << "Sending special interest2" << std::endl;
+//                    nameWithSequence = make_shared<Name>(interestcopy.getName());
+//                    // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
+//                    nameWithSequence->append(buff, size);
+//                    interestcopy.setName(*nameWithSequence);
+//                    std::cout << interestcopy.getName() << std::endl;
+//                    this->sendInterest(pitEntry, outFace, interestcopy);
+//                    
+//                    return;
+//                }
+//            }
             this->sendInterest(pitEntry, outFace, interest);
-            ns3::Ptr<ns3::Node> thisNode = getNode();
-            ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = thisNode->GetObject<ns3::ndn::L3Protocol>();
-            bool is_GTW = L3Prot->getGTW();
+
+
 
 
         }

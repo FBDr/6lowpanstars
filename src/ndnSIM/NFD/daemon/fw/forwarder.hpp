@@ -293,6 +293,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
     private:
         ForwarderCounters m_counters;
         ns3::Ptr <ns3::Node> m_node;
+        bool m_is_GTW;
         FaceTable m_faceTable;
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
 

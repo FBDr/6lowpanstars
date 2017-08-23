@@ -57,11 +57,11 @@ namespace nfd {
             void 
             CustomSendInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest);
             
-            void 
-            setNode();
-            
-            ns3::Ptr<ns3::Node>
-            getNode();
+//            void 
+//            setNode();
+//            
+//            ns3::Ptr<ns3::Node>
+//            getNode();
             
             explicit
             BestRouteStrategy2(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
@@ -82,6 +82,7 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE:
             static const time::milliseconds RETX_SUPPRESSION_MAX;
             RetxSuppressionExponential m_retxSuppression;
             ns3::Ptr<ns3::Node> m_node;
+            bool m_is_GTW;
         };
 
     } // namespace fw
