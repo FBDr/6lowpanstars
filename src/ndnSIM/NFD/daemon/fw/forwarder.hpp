@@ -70,9 +70,12 @@ namespace nfd {
             return m_counters;
         }
 
+        bool
+        iamGTW();
+
     public: // faces and policies
 
-        FaceTable&
+        FaceTable &
         getFaceTable() {
             return m_faceTable;
         }
@@ -81,7 +84,7 @@ namespace nfd {
          *
          *  shortcut to .getFaceTable().get(face)
          */
-        Face*
+        Face *
         getFace(FaceId id) const {
             return m_faceTable.get(id);
         }
@@ -95,7 +98,7 @@ namespace nfd {
             m_faceTable.add(face);
         }
 
-        fw::UnsolicitedDataPolicy&
+        fw::UnsolicitedDataPolicy &
         getUnsolicitedDataPolicy() const {
             return *m_unsolicitedDataPolicy;
         }
@@ -112,58 +115,58 @@ namespace nfd {
          *  \param interest the incoming Interest, must be created with make_shared
          */
         void
-        startProcessInterest(Face& face, const Interest& interest);
+        startProcessInterest(Face& face, const Interest & interest);
 
         /** \brief start incoming Data processing
          *  \param face face on which Data is received
          *  \param data the incoming Data, must be created with make_shared
          */
         void
-        startProcessData(Face& face, const Data& data);
+        startProcessData(Face& face, const Data & data);
 
         /** \brief start incoming Nack processing
          *  \param face face on which Nack is received
          *  \param nack the incoming Nack, must be created with make_shared
          */
         void
-        startProcessNack(Face& face, const lp::Nack& nack);
+        startProcessNack(Face& face, const lp::Nack & nack);
 
-        NameTree&
+        NameTree &
         getNameTree() {
             return m_nameTree;
         }
 
-        Fib&
+        Fib &
         getFib() {
             return m_fib;
         }
 
-        Pit&
+        Pit &
         getPit() {
             return m_pit;
         }
 
-        Cs&
+        Cs &
         getCs() {
             return m_cs;
         }
 
-        Measurements&
+        Measurements &
         getMeasurements() {
             return m_measurements;
         }
 
-        StrategyChoice&
+        StrategyChoice &
         getStrategyChoice() {
             return m_strategyChoice;
         }
 
-        DeadNonceList&
+        DeadNonceList &
         getDeadNonceList() {
             return m_deadNonceList;
         }
 
-        NetworkRegionTable&
+        NetworkRegionTable &
         getNetworkRegionTable() {
             return m_networkRegionTable;
         }
@@ -190,28 +193,28 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE: // pipelines
         /** \brief incoming Interest pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onIncomingInterest(Face& inFace, const Interest& interest);
+        onIncomingInterest(Face& inFace, const Interest & interest);
 
         /** \brief Interest loop pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onInterestLoop(Face& inFace, const Interest& interest);
+        onInterestLoop(Face& inFace, const Interest & interest);
 
         /** \brief Content Store miss pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onContentStoreMiss(const Face& inFace, const shared_ptr<pit::Entry>& pitEntry, const Interest& interest);
+        onContentStoreMiss(const Face& inFace, const shared_ptr<pit::Entry>& pitEntry, const Interest & interest);
 
         /** \brief Content Store hit pipeline
          */
         VIRTUAL_WITH_TESTS void
         onContentStoreHit(const Face& inFace, const shared_ptr<pit::Entry>& pitEntry,
-                const Interest& interest, const Data& data);
+                const Interest& interest, const Data & data);
 
         /** \brief outgoing Interest pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest);
+        onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest & interest);
 
         /** \brief Interest reject pipeline
          */
@@ -234,27 +237,27 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE: // pipelines
         /** \brief incoming Data pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onIncomingData(Face& inFace, const Data& data);
+        onIncomingData(Face& inFace, const Data & data);
 
         /** \brief Data unsolicited pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onDataUnsolicited(Face& inFace, const Data& data);
+        onDataUnsolicited(Face& inFace, const Data & data);
 
         /** \brief outgoing Data pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onOutgoingData(const Data& data, Face& outFace);
+        onOutgoingData(const Data& data, Face & outFace);
 
         /** \brief incoming Nack pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onIncomingNack(Face& inFace, const lp::Nack& nack);
+        onIncomingNack(Face& inFace, const lp::Nack & nack);
 
         /** \brief outgoing Nack pipeline
          */
         VIRTUAL_WITH_TESTS void
-        onOutgoingNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace, const lp::NackHeader& nack);
+        onOutgoingNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace, const lp::NackHeader & nack);
 
 PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         VIRTUAL_WITH_TESTS void
@@ -265,7 +268,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
                 time::milliseconds dataFreshnessPeriod = time::milliseconds(-1));
 
         VIRTUAL_WITH_TESTS void
-        cancelUnsatisfyAndStragglerTimer(pit::Entry& pitEntry);
+        cancelUnsatisfyAndStragglerTimer(pit::Entry & pitEntry);
 
         /** \brief insert Nonce to Dead Nonce List if necessary
          *  \param upstream if null, insert Nonces from all out-records;
@@ -273,7 +276,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
          */
         VIRTUAL_WITH_TESTS void
         insertDeadNonceList(pit::Entry& pitEntry, bool isSatisfied,
-                time::milliseconds dataFreshnessPeriod, Face* upstream);
+                time::milliseconds dataFreshnessPeriod, Face * upstream);
 
         /** \brief call trigger (method) on the effective strategy of pitEntry
          */
@@ -293,7 +296,6 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
     private:
         ForwarderCounters m_counters;
         ns3::Ptr <ns3::Node> m_node;
-        bool m_is_GTW;
         FaceTable m_faceTable;
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
 

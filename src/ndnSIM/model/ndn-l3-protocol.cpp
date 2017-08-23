@@ -191,7 +191,7 @@ namespace ns3 {
 
         L3Protocol::L3Protocol()
         : m_impl(new Impl())
-        , m_isGTW(1) {
+        , m_isGTW(0) {
             NS_LOG_FUNCTION(this);
         }
 

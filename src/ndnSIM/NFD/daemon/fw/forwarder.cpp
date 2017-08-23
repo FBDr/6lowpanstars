@@ -49,8 +49,7 @@ namespace nfd {
     , m_measurements(m_nameTree)
     , m_strategyChoice(m_nameTree, fw::makeDefaultStrategy(*this))
     , m_csFace(face::makeNullFace(FaceUri("contentstore://"))) {
-                m_node = NULL;
-                m_is_GTW = 0;
+        m_node = NULL;
         fw::installStrategies(*this);
         getFaceTable().addReserved(m_csFace, face::FACEID_CONTENT_STORE);
 
@@ -79,14 +78,17 @@ namespace nfd {
     void
     Forwarder::setNode(ns3::Ptr<ns3::Node> node) {
         m_node = node;
-        ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = m_node->GetObject<ns3::ndn::L3Protocol>();
-        m_is_GTW = L3Prot->getGTW();
-        std::cout << "Done setnode" << std::endl;
     }
 
     ns3::Ptr<ns3::Node>
     Forwarder::getNode() {
         return m_node;
+    }
+
+    bool
+    Forwarder::iamGTW() {
+        ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = m_node->GetObject<ns3::ndn::L3Protocol>();
+        return L3Prot->getGTW();
     }
 
     void
@@ -151,24 +153,24 @@ namespace nfd {
 
         //*****New piece start
         auto outInterest = make_shared<Interest>(interest);
-        
-                shared_ptr<Name> nameWithSequence;
-                std::string extra = "ovrhd";
-                int size = 5;
-                uint8_t * buff = new uint8_t [size];
-        
-                memcpy(buff, extra.c_str(), size);
-        
-                if (m_is_GTW || 1) {
-                    if ((inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-                        std::cout << "Sending special interest2" << std::endl;
-                        nameWithSequence = make_shared<Name>(outInterest->getName());
-                        // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
-                        nameWithSequence->append(buff, size);
-                        outInterest->setName(*nameWithSequence);
-                        std::cout << outInterest->getName() << std::endl;
-                    }
-                }
+
+        shared_ptr<Name> nameWithSequence;
+        std::string extra = "ovrhd";
+        int size = 5;
+        uint8_t * buff = new uint8_t [size];
+
+        memcpy(buff, extra.c_str(), size);
+
+        if (iamGTW()) {
+            if ((inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+                std::cout << "Node: " << m_node->GetId() << " is a gateway." << "Sending special interest" << std::endl;
+                nameWithSequence = make_shared<Name>(outInterest->getName());
+                // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
+                nameWithSequence->append(buff, size);
+                outInterest->setName(*nameWithSequence);
+                std::cout << outInterest->getName() << std::endl;
+            }
+        }
 
         //****New piece end     
 

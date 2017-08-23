@@ -1,7 +1,6 @@
 #include "stacks_header.h"
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ndn-stack");
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
@@ -45,6 +44,15 @@ namespace ns3
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in an IP based backhaul network.  
         }
         ndnHelper.Install(backhaul);
+
+        if (ipbackhaul) {
+            for (int idx = 0; idx < node_head; idx++) {
+                Ptr<ndn::L3Protocol> L3Prot = iot[idx].Get(node_periph)->GetObject<ns3::ndn::L3Protocol>();
+                std::cout << "Default value: " << L3Prot->getGTW() << std::endl;
+                L3Prot->setGTW(true);
+                std::cout << "Installed IP GTW= " << L3Prot->getGTW() << " on node: " << iot[idx].Get(node_periph)->GetId() << std::endl;
+            }
+        }
 
         //Install strategy and routing objects on all nodes.
         ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/bestroute2");
