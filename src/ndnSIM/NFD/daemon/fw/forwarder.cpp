@@ -135,17 +135,16 @@ namespace nfd {
 
     void
     Forwarder::onIncomingInterest(Face& inFace, const Interest& interest) {
-        auto outInterest = make_shared<Interest>(interest);
-//        
-//
-//        if(interest.getName().at(-1).toUri().find("ovrhd") !=  std::string::npos ) //Check wheter name contains overhead component.
-//        {
-//            //Remove last segment
-//            Name subname = interest.getName().getSubName(0,interest.getName().size()-1);
-//            outInterest->setName(subname);
-//            std::cout<< "Removed overhead component, name is now: " << outInterest->getName();
-//        }
-        
+        //        
+        //
+        //        if(interest.getName().at(-1).toUri().find("ovrhd") !=  std::string::npos ) //Check wheter name contains overhead component.
+        //        {
+        //            //Remove last segment
+        //            Name subname = interest.getName().getSubName(0,interest.getName().size()-1);
+        //            outInterest->setName(subname);
+        //            std::cout<< "Removed overhead component, name is now: " << outInterest->getName();
+        //        }
+
         // receive Interest
         NFD_LOG_DEBUG("onIncomingInterest face=" << inFace.getId() <<
                 " interest=" << interest.getName());
@@ -160,7 +159,9 @@ namespace nfd {
                     " interest=" << interest.getName() << " violates /localhost");
             // (drop)
             return;
-        } 
+        }
+
+        auto outInterest = make_shared<Interest>(interest);
 
         // detect duplicate Nonce with Dead Nonce List
         bool hasDuplicateNonceInDnl = m_deadNonceList.has(outInterest->getName(), outInterest->getNonce());
@@ -290,24 +291,24 @@ namespace nfd {
 
         // send Interest
         auto outInterest = make_shared<Interest>(interest);
-//        shared_ptr<Name> nameWithSequence;
-//        std::string extra = "ovrhd";
-//        int size = 5;
-//        uint8_t * buff = new uint8_t [size];
-//        FaceUri oerie = outFace.getLocalUri();
-//
-//        memcpy(buff, extra.c_str(), size);
-//
-//        if (iamGTW()) {
-//            if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-//                std::cout << "Node: " << m_node->GetId() << " is a gateway." << "Sending special interest" << std::endl;
-//                nameWithSequence = make_shared<Name>(outInterest->getName());
-//                // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
-//                nameWithSequence->append(buff, size);
-//                outInterest->setName(*nameWithSequence);
-//                std::cout << outInterest->getName() << std::endl;
-//            }
-//        }
+        //        shared_ptr<Name> nameWithSequence;
+        //        std::string extra = "ovrhd";
+        //        int size = 5;
+        //        uint8_t * buff = new uint8_t [size];
+        //        FaceUri oerie = outFace.getLocalUri();
+        //
+        //        memcpy(buff, extra.c_str(), size);
+        //
+        //        if (iamGTW()) {
+        //            if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+        //                std::cout << "Node: " << m_node->GetId() << " is a gateway." << "Sending special interest" << std::endl;
+        //                nameWithSequence = make_shared<Name>(outInterest->getName());
+        //                // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
+        //                nameWithSequence->append(buff, size);
+        //                outInterest->setName(*nameWithSequence);
+        //                std::cout << outInterest->getName() << std::endl;
+        //            }
+        //        }
         outFace.sendInterest(interest);
         ++m_counters.nOutInterests;
     }
