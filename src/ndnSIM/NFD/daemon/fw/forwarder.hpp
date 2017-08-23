@@ -70,7 +70,7 @@ namespace nfd {
             return m_counters;
         }
 
-        bool
+        uint8_t
         iamGTW();
 
     public: // faces and policies
@@ -298,6 +298,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         ns3::Ptr <ns3::Node> m_node;
         FaceTable m_faceTable;
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
+        bool m_conOvrhd; //Flag to indicate if current interest contained overhead component.
 
         NameTree m_nameTree;
         Fib m_fib;

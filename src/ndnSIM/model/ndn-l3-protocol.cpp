@@ -191,7 +191,7 @@ namespace ns3 {
 
         L3Protocol::L3Protocol()
         : m_impl(new Impl())
-        , m_isGTW(0) {
+        , m_role(0) {
             NS_LOG_FUNCTION(this);
         }
 
@@ -200,13 +200,13 @@ namespace ns3 {
         }
 
         void
-        L3Protocol::setGTW(bool setGTW) {
-            m_isGTW = setGTW;
+        L3Protocol::setRole(uint8_t setrole) {
+            m_role = setrole;
         }
 
-        bool
-        L3Protocol::getGTW() {
-            return m_isGTW;
+        uint8_t
+        L3Protocol::getRole() {
+            return m_role;
         }
 
         void

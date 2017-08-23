@@ -98,12 +98,14 @@ namespace ns3 {
 
             /**
              * \brief Set this node to be a gateway.
+             * \param 0: normal node, 1: backhaul node, 2: gateway node.
              */
-            void setGTW(bool setGTW);
+            void setRole(uint8_t setrole);
             /**
              * \brief Return whether this node is a gateway.
+             * \param 0: normal node, 1: backhaul node, 2: gateway node.
              */
-            bool getGTW();
+            uint8_t getRole();
 
 
 
@@ -216,7 +218,7 @@ namespace ns3 {
 
             // These objects are aggregated, but for optimization, get them here
             Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
-            bool m_isGTW;
+            uint8_t m_role;
 
             TracedCallback<const Interest&, const Face&>
             m_inInterests; ///< @brief trace of incoming Interests

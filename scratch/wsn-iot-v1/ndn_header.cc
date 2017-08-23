@@ -46,11 +46,15 @@ namespace ns3 {
         ndnHelper.Install(backhaul);
 
         if (ipbackhaul) {
+            for (int idx = 0; idx < (int) backhaul.GetN(); idx++) {
+                Ptr<ndn::L3Protocol> L3Prot = backhaul.Get(idx)->GetObject<ns3::ndn::L3Protocol>();
+                L3Prot->setRole(1);
+            }
+
             for (int idx = 0; idx < node_head; idx++) {
                 Ptr<ndn::L3Protocol> L3Prot = iot[idx].Get(node_periph)->GetObject<ns3::ndn::L3Protocol>();
-                std::cout << "Default value: " << L3Prot->getGTW() << std::endl;
-                L3Prot->setGTW(true);
-                std::cout << "Installed IP GTW= " << L3Prot->getGTW() << " on node: " << iot[idx].Get(node_periph)->GetId() << std::endl;
+                L3Prot->setRole(2);
+
             }
         }
 
