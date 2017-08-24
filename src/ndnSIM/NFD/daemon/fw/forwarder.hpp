@@ -44,6 +44,7 @@
 #include "ns3/pointer.h"
 #include "ns3/core-module.h"
 #include "ns3/object.h"
+#include <utility>
 
 namespace nfd {
 
@@ -301,8 +302,9 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         ns3::Ptr <ns3::Node> m_node;
         FaceTable m_faceTable;
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
-        bool m_conOvrhd; //Flag to indicate if current interest contained overhead component.
-
+        bool m_conOvrhd_int; //Flag to indicate if current interest contained overhead component.
+        bool m_conOvrhd_data; //Flag to indicate if current interest contained overhead component.
+        std::vector<std::pair<std::string,std::string>> m_trnsoverhead;
         NameTree m_nameTree;
         Fib m_fib;
         Pit m_pit;

@@ -38,7 +38,7 @@
 #include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 #include "src/ndnSIM/ndn-cxx/src/interest.hpp"
 #include "ns3/random-variable-stream.h"
-
+#include <utility>
 namespace nfd {
 
     NFD_LOG_INIT("Forwarder");
@@ -157,20 +157,23 @@ namespace nfd {
         auto outInterest = make_shared<Interest>(interest);
 
         if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
-            m_conOvrhd = true;
+            m_conOvrhd_int = true;
             std::cout << "Contains overhead" << std::endl;
         } else {
-            m_conOvrhd = false;
-            std::cout << "Contains NO overhead" << std::endl;
+            m_conOvrhd_int = false;
         }
 
-        if (m_conOvrhd && (iamGTW() == 2)) //Check wheter name contains overhead component.
+        if (m_conOvrhd_int && (iamGTW() == 2)) //Check wheter name contains overhead component.
         {
             //Remove last segment
+            std::string ovrhd = interest.getName().at(-1).toUri();
             Name subname = interest.getName().getSubName(0, interest.getName().size() - 1);
+            m_trnsoverhead.push_back(std::make_pair(subname.toUri(), ovrhd));
             outInterest->setName(subname);
             std::cout << "Removed overhead component, name is now: " << outInterest->getName() << std::endl;
         }
+
+
 
 
 
@@ -320,7 +323,7 @@ namespace nfd {
 
         memcpy(buff, extra.c_str(), size);
 
-        if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd == 0)) {
+        if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0)) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
                     std::cout << "Node: " << m_node->GetId() << " is configured as a backhaulnode." << "Sending special interest" << std::endl;
@@ -399,6 +402,14 @@ namespace nfd {
             // (drop)
             return;
         }
+
+        if (data.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
+            m_conOvrhd_data = true;
+            std::cout << "Data contains overhead" << std::endl;
+        } else {
+            m_conOvrhd_data = false;
+        }
+
 
         // PIT match
         pit::DataMatchResult pitMatches = m_pit.findAllDataMatches(data);
@@ -494,10 +505,30 @@ namespace nfd {
             return;
         }
 
-        // TODO traffic manager
+        shared_ptr<Data> outData = make_shared<Data>(data);
+        FaceUri oerie = outFace.getLocalUri();
+        std::string dataName = data.getName().toUri();
+        shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
+
+
+        if ((iamGTW() == 2)) {
+            if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
+                    if (m_trnsoverhead[idx].first == dataName) {
+                        std::cout << "Found entry for data package: " << idx << std::endl;
+                        nameWithOvrhd->append(m_trnsoverhead[idx].second);
+                        outData->setName(*nameWithOvrhd);
+                        std::cout << nameWithOvrhd->toUri() << std::endl;
+                        m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
+                        break;
+                    }
+                }
+            }
+
+        }
 
         // send Data
-        outFace.sendData(data);
+        outFace.sendData(*outData);
         ++m_counters.nOutData;
     }
 
