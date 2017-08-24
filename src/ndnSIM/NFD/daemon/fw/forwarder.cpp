@@ -141,21 +141,23 @@ namespace nfd {
                 " interest=" << interest.getName());
         interest.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
         ++m_counters.nInInterests;
-        
+
         auto outInterest = make_shared<Interest>(interest);
 
-
-        if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) //Check wheter name contains overhead component.
-        {
+        if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd = true;
+            std::cout<< "Contains overhead" <<std::endl;
+        } else {
+            m_conOvrhd = false;
+            std::cout<< "Contains NO overhead" <<std::endl;
+        }
+
+        if (m_conOvrhd && (iamGTW() == 2)) //Check wheter name contains overhead component.
+        {
             //Remove last segment
             Name subname = interest.getName().getSubName(0, interest.getName().size() - 1);
             outInterest->setName(subname);
-            std::cout << "Removed overhead component, name is now: " << outInterest->getName() <<std::endl;
-        }
-        else
-        {
-            m_conOvrhd = false;
+            std::cout << "Removed overhead component, name is now: " << outInterest->getName() << std::endl;
         }
 
 
@@ -305,9 +307,14 @@ namespace nfd {
 
         memcpy(buff, extra.c_str(), size);
 
-        if (iamGTW() == 1 || ((iamGTW() == 2) && (m_conOvrhd == 0)) ) {
+        if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd == 0)) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-                std::cout << "Node: " << m_node->GetId() << " is a gateway." << "Sending special interest" << std::endl;
+                if (iamGTW() == 1) {
+                    std::cout << "Node: " << m_node->GetId() << " is configured as a backhaulnode." << "Sending special interest" << std::endl;
+                } else if (iamGTW() == 2) {
+                    std::cout << "Node: " << m_node->GetId() << " is configured as a gateway node." << "Sending special interest" << std::endl;
+                }
+
                 nameWithSequence = make_shared<Name>(outInterest->getName());
                 // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
                 nameWithSequence->append(buff, size);
