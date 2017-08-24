@@ -92,7 +92,12 @@ namespace ns3 {
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                apps = consumerHelper.Install(SelectRandomLeafNode(bth)); //Consumers are at leaf nodes.
+                Ptr<Node> sel_node = SelectRandomLeafNode(bth);
+                apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
+                if (ipbackhaul) {
+                    Ptr<ndn::L3Protocol> L3Prot = sel_node->GetObject<ns3::ndn::L3Protocol>();
+                    L3Prot->setRole(2);
+                }
                 apps.Start(Seconds(120.0 + interval_sel));
                 apps.Stop(Seconds(simtime - 5));
             }

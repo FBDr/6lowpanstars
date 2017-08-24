@@ -158,7 +158,7 @@ namespace nfd {
 
         if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd_int = true;
-            std::cout << "Contains overhead" << std::endl;
+            NFD_LOG_DEBUG( "Contains overhead" );
         } else {
             m_conOvrhd_int = false;
         }
@@ -170,7 +170,7 @@ namespace nfd {
             Name subname = interest.getName().getSubName(0, interest.getName().size() - 1);
             m_trnsoverhead.push_back(std::make_pair(subname.toUri(), ovrhd));
             outInterest->setName(subname);
-            std::cout << "Removed overhead component, name is now: " << outInterest->getName() << std::endl;
+            NFD_LOG_DEBUG( "Removed overhead component, name is now: " << outInterest->getName() );
         }
 
 
@@ -326,16 +326,16 @@ namespace nfd {
         if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0)) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
-                    std::cout << "Node: " << m_node->GetId() << " is configured as a backhaulnode." << "Sending special interest" << std::endl;
+                    NFD_LOG_DEBUG( "Node: " << m_node->GetId() << " is configured as a backhaulnode." << "Sending special interest" );
                 } else if (iamGTW() == 2) {
-                    std::cout << "Node: " << m_node->GetId() << " is configured as a gateway node." << "Sending special interest" << std::endl;
+                    NFD_LOG_DEBUG( "Node: " << m_node->GetId() << " is configured as a gateway node." << "Sending special interest" );
                 }
 
                 nameWithSequence = make_shared<Name>(outInterest->getName());
                 // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
                 nameWithSequence->append(buff, size);
                 outInterest->setName(*nameWithSequence);
-                std::cout << outInterest->getName() << std::endl;
+                NFD_LOG_DEBUG( outInterest->getName() );
             }
         }
         outFace.sendInterest(*outInterest);
@@ -392,7 +392,7 @@ namespace nfd {
         NFD_LOG_DEBUG("onIncomingData face=" << inFace.getId() << " data=" << data.getName());
         data.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
         ++m_counters.nInData;
-
+        auto outData = make_shared<Data>(data);
         // /localhost scope control
         bool isViolatingLocalhost = inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL &&
                 scope_prefix::LOCALHOST.isPrefixOf(data.getName());
@@ -402,23 +402,32 @@ namespace nfd {
             // (drop)
             return;
         }
+        
 
         if (data.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd_data = true;
-            std::cout << "Data contains overhead" << std::endl;
+            NFD_LOG_DEBUG( "Data contains overhead" );
         } else {
             m_conOvrhd_data = false;
         }
 
+        if (m_conOvrhd_data && (iamGTW() == 2)) //Check wheter name contains overhead component.
+        {
+            //Remove last segment
+            std::string ovrhd = data.getName().at(-1).toUri();
+            Name subname = data.getName().getSubName(0, data.getName().size() - 1);
+            outData->setName(subname);
+            NFD_LOG_DEBUG( "Removed overhead component, name is now: " << outData->getName() );
+        }
 
         // PIT match
-        pit::DataMatchResult pitMatches = m_pit.findAllDataMatches(data);
+        pit::DataMatchResult pitMatches = m_pit.findAllDataMatches(*outData);
         if (pitMatches.begin() == pitMatches.end()) {
             // goto Data unsolicited pipeline
-            this->onDataUnsolicited(inFace, data);
+            this->onDataUnsolicited(inFace, *outData);
             return;
         }
-        shared_ptr<Data> dataCopyWithoutTag = make_shared<Data>(data);
+        shared_ptr<Data> dataCopyWithoutTag = make_shared<Data>(*outData);
 
         dataCopyWithoutTag->removeTag<lp::HopCountTag>();
         // CS insert
@@ -444,20 +453,20 @@ namespace nfd {
             }
 
             // invoke PIT satisfy callback
-            beforeSatisfyInterest(*pitEntry, inFace, data);
+            beforeSatisfyInterest(*pitEntry, inFace, *outData);
             this->dispatchToStrategy(*pitEntry,
                     [&] (fw::Strategy & strategy) {
                         strategy.beforeSatisfyInterest(pitEntry, inFace, data); });
 
             // Dead Nonce List insert if necessary (for out-record of inFace)
-            this->insertDeadNonceList(*pitEntry, true, data.getFreshnessPeriod(), &inFace);
+            this->insertDeadNonceList(*pitEntry, true, outData->getFreshnessPeriod(), &inFace);
 
             // mark PIT satisfied
             pitEntry->clearInRecords();
             pitEntry->deleteOutRecord(inFace);
 
             // set PIT straggler timer
-            this->setStragglerTimer(pitEntry, true, data.getFreshnessPeriod());
+            this->setStragglerTimer(pitEntry, true, outData->getFreshnessPeriod());
         }
 
         // foreach pending downstream
@@ -466,7 +475,7 @@ namespace nfd {
                 continue;
             }
             // goto outgoing Data pipeline
-            this->onOutgoingData(data, *pendingDownstream);
+            this->onOutgoingData(*outData, *pendingDownstream);
         }
     }
 
@@ -515,10 +524,10 @@ namespace nfd {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
                     if (m_trnsoverhead[idx].first == dataName) {
-                        std::cout << "Found entry for data package: " << idx << std::endl;
+                        NFD_LOG_DEBUG( "Found entry for data package: " << idx );
                         nameWithOvrhd->append(m_trnsoverhead[idx].second);
                         outData->setName(*nameWithOvrhd);
-                        std::cout << nameWithOvrhd->toUri() << std::endl;
+                        NFD_LOG_DEBUG( nameWithOvrhd->toUri() );
                         m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
                         break;
                     }
