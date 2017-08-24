@@ -72,6 +72,9 @@ namespace nfd {
 
         uint8_t
         iamGTW();
+        
+        std::string
+        genRandomString(int len);
 
     public: // faces and policies
 

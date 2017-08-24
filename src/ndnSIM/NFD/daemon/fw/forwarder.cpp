@@ -37,6 +37,7 @@
 #include "ns3/object.h"
 #include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 #include "src/ndnSIM/ndn-cxx/src/interest.hpp"
+#include "ns3/random-variable-stream.h"
 
 namespace nfd {
 
@@ -89,6 +90,17 @@ namespace nfd {
     Forwarder::iamGTW() {
         ns3::Ptr<ns3::ndn::L3Protocol> L3Prot = m_node->GetObject<ns3::ndn::L3Protocol>();
         return L3Prot->getRole();
+    }
+
+    std::string
+    Forwarder::genRandomString(int len) {
+        std::string returnString;
+        ns3::Ptr<ns3::UniformRandomVariable> Rnum = ns3::CreateObject<ns3::UniformRandomVariable> ();
+        for (int idx = 0; idx < len; idx++) {
+            int curnum = round(Rnum->GetValue(0, 9));
+            returnString.append(std::to_string(curnum));
+        }
+        return returnString;
     }
 
     void
@@ -146,10 +158,10 @@ namespace nfd {
 
         if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd = true;
-            std::cout<< "Contains overhead" <<std::endl;
+            std::cout << "Contains overhead" << std::endl;
         } else {
             m_conOvrhd = false;
-            std::cout<< "Contains NO overhead" <<std::endl;
+            std::cout << "Contains NO overhead" << std::endl;
         }
 
         if (m_conOvrhd && (iamGTW() == 2)) //Check wheter name contains overhead component.
@@ -300,8 +312,9 @@ namespace nfd {
         // send Interest
         auto outInterest = make_shared<Interest>(interest);
         shared_ptr<Name> nameWithSequence;
-        std::string extra = "ovrhd";
         int size = 10;
+        std::string extra = "ovrhd";
+        extra.append(genRandomString(size - 5));
         uint8_t * buff = new uint8_t [size];
         FaceUri oerie = outFace.getLocalUri();
 
