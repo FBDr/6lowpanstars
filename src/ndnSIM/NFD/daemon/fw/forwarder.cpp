@@ -39,6 +39,7 @@
 #include "src/ndnSIM/ndn-cxx/src/interest.hpp"
 #include "ns3/random-variable-stream.h"
 #include "logger.hpp"
+#include "src/ndnSIM/ndn-cxx/src/util/face-uri.hpp"
 #include <utility>
 namespace nfd {
 
@@ -313,9 +314,9 @@ namespace nfd {
                 " interest=" << pitEntry->getName());
 
         //Debug
-        std::cout << "Link local: " << outFace.getLocalUri() << std::endl;
-        std::cout << "Link remote: " << outFace.getRemoteUri() << std::endl;
-        std::cout << "Link: " << outFace.getTransport()->getRemoteUri() << std::endl;
+        NFD_LOG_DEBUG("Link local: " << outFace.getLocalUri());
+        NFD_LOG_DEBUG("Link remote: " << outFace.getRemoteUri());
+        NFD_LOG_DEBUG("Link: " << outFace.getTransport()->getRemoteUri());
 
         // insert out-record
         pitEntry->insertOrUpdateOutRecord(outFace, interest);
@@ -334,7 +335,9 @@ namespace nfd {
 
         // If this node is either a gateway or a backhaul node, add overhead name. 
         // This should only be done if the incoming interest already had an overhead component.
-        if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0)) {
+        // Also check that outface is not a broadcast domain.
+        if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0) && ((outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")
+                && (outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1){
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
                     NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a backhaulnode. " << "Adding overhead component.");
