@@ -38,6 +38,7 @@
 #include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 #include "src/ndnSIM/ndn-cxx/src/interest.hpp"
 #include "ns3/random-variable-stream.h"
+#include "logger.hpp"
 #include <utility>
 namespace nfd {
 
@@ -154,28 +155,31 @@ namespace nfd {
         interest.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
         ++m_counters.nInInterests;
 
+        //**New part for IP backhaul functionality. 
+
+        // Make copy of interest in order to be able to change it.
         auto outInterest = make_shared<Interest>(interest);
 
+        //If interest name contains "ovrhd" keyword, set m_conOvrhd flag.
         if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd_int = true;
-            NFD_LOG_DEBUG( "Contains overhead" );
+            NFD_LOG_DEBUG("Contains overhead");
         } else {
             m_conOvrhd_int = false;
         }
 
-        if (m_conOvrhd_int && (iamGTW() == 2)) //Check wheter name contains overhead component.
-        {
-            //Remove last segment
+        // If Name contains overhead component and this node is configured as gateway,
+        // then remove this component.
+        if (m_conOvrhd_int && (iamGTW() == 2)) {
             std::string ovrhd = interest.getName().at(-1).toUri();
             Name subname = interest.getName().getSubName(0, interest.getName().size() - 1);
+            //Place ovrhd label into m_trnsoverhead translation vector.
             m_trnsoverhead.push_back(std::make_pair(subname.toUri(), ovrhd));
             outInterest->setName(subname);
-            NFD_LOG_DEBUG( "Removed overhead component, name is now: " << outInterest->getName() );
+            NFD_LOG_DEBUG("Removed overhead component, name is now: " << outInterest->getName());
         }
 
-
-
-
+        //**End of new part.
 
         // /localhost scope control
         bool isViolatingLocalhost = inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL &&
@@ -186,7 +190,6 @@ namespace nfd {
             // (drop)
             return;
         }
-
 
 
         // detect duplicate Nonce with Dead Nonce List
@@ -309,35 +312,42 @@ namespace nfd {
         NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
                 " interest=" << pitEntry->getName());
 
+        //Debug
+        std::cout << "Link local: " << outFace.getLocalUri() << std::endl;
+        std::cout << "Link remote: " << outFace.getRemoteUri() << std::endl;
+        std::cout << "Link: " << outFace.getTransport()->getRemoteUri() << std::endl;
+
         // insert out-record
         pitEntry->insertOrUpdateOutRecord(outFace, interest);
 
         // send Interest
+        //**New part for backhaul modeling
         auto outInterest = make_shared<Interest>(interest);
-        shared_ptr<Name> nameWithSequence;
+        // Size is the total size of the extra overhead component.
         int size = 10;
+        uint8_t * buff = new uint8_t [size];
+        shared_ptr<Name> nameWithSequence;
         std::string extra = "ovrhd";
         extra.append(genRandomString(size - 5));
-        uint8_t * buff = new uint8_t [size];
         FaceUri oerie = outFace.getLocalUri();
-
         memcpy(buff, extra.c_str(), size);
 
+        // If this node is either a gateway or a backhaul node, add overhead name. 
+        // This should only be done if the incoming interest already had an overhead component.
         if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0)) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
-                    NFD_LOG_DEBUG( "Node: " << m_node->GetId() << " is configured as a backhaulnode." << "Sending special interest" );
+                    NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a backhaulnode. " << "Adding overhead component.");
                 } else if (iamGTW() == 2) {
-                    NFD_LOG_DEBUG( "Node: " << m_node->GetId() << " is configured as a gateway node." << "Sending special interest" );
+                    NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a gateway node." << "Adding overhead component.");
                 }
-
                 nameWithSequence = make_shared<Name>(outInterest->getName());
-                // std::cout<< (nameWithSequence->getSubName(0,nameWithSequence->size()-1 )).toUri() <<std::endl; If we want to remove
                 nameWithSequence->append(buff, size);
                 outInterest->setName(*nameWithSequence);
-                NFD_LOG_DEBUG( outInterest->getName() );
+                NFD_LOG_DEBUG("Sending overhead interest: " << outInterest->getName());
             }
         }
+        //**End of part for backhaul modeling.
         outFace.sendInterest(*outInterest);
         ++m_counters.nOutInterests;
     }
@@ -392,7 +402,11 @@ namespace nfd {
         NFD_LOG_DEBUG("onIncomingData face=" << inFace.getId() << " data=" << data.getName());
         data.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
         ++m_counters.nInData;
+
+        //**New part for backhaul modeling.
+
         auto outData = make_shared<Data>(data);
+
         // /localhost scope control
         bool isViolatingLocalhost = inFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL &&
                 scope_prefix::LOCALHOST.isPrefixOf(data.getName());
@@ -402,23 +416,28 @@ namespace nfd {
             // (drop)
             return;
         }
-        
 
+        // Set flag if data pkt already contains overhead.
         if (data.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
             m_conOvrhd_data = true;
-            NFD_LOG_DEBUG( "Data contains overhead" );
+            NFD_LOG_DEBUG("Data contains overhead");
         } else {
             m_conOvrhd_data = false;
         }
 
-        if (m_conOvrhd_data && (iamGTW() == 2)) //Check wheter name contains overhead component.
-        {
+        // If data packet arrives with overhead component and this node is gateway, then
+        // remove overhead component.
+        if (m_conOvrhd_data && (iamGTW() == 2)) {
             //Remove last segment
             std::string ovrhd = data.getName().at(-1).toUri();
             Name subname = data.getName().getSubName(0, data.getName().size() - 1);
             outData->setName(subname);
-            NFD_LOG_DEBUG( "Removed overhead component, name is now: " << outData->getName() );
+            NFD_LOG_DEBUG("Removed overhead component, name is now: " << outData->getName());
         }
+
+        //**End of new part
+
+
 
         // PIT match
         pit::DataMatchResult pitMatches = m_pit.findAllDataMatches(*outData);
@@ -503,7 +522,6 @@ namespace nfd {
             return;
         }
         NFD_LOG_DEBUG("onOutgoingData face=" << outFace.getId() << " data=" << data.getName());
-
         // /localhost scope control
         bool isViolatingLocalhost = outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL &&
                 scope_prefix::LOCALHOST.isPrefixOf(data.getName());
@@ -513,41 +531,46 @@ namespace nfd {
             // (drop)
             return;
         }
-
+        //**New part for backhaul modeling.
         shared_ptr<Data> outData = make_shared<Data>(data);
         FaceUri oerie = outFace.getLocalUri();
         std::string dataName = data.getName().toUri();
         shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
 
-
+        //If this node is gateway, add overhead component to data name.
         if ((iamGTW() == 2)) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+                //Find overhead sequence corresponding to current data name.
                 for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
                     if (m_trnsoverhead[idx].first == dataName) {
-                        NFD_LOG_DEBUG( "Found entry for data package: " << idx );
+                        NFD_LOG_DEBUG("Found entry for data package: " << idx);
                         nameWithOvrhd->append(m_trnsoverhead[idx].second);
                         outData->setName(*nameWithOvrhd);
-                        NFD_LOG_DEBUG( nameWithOvrhd->toUri() );
+                        NFD_LOG_DEBUG(nameWithOvrhd->toUri());
                         m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
+                        
                         break;
                     }
+                    //Throw assertion if now entry is found.
+                    assert(idx < ((int) m_trnsoverhead.size())); 
                 }
             }
 
         }
-
+        //**End new part
+        
         // send Data
         outFace.sendData(*outData);
-        ++m_counters.nOutData;
+                ++m_counters.nOutData;
     }
 
     void
     Forwarder::onIncomingNack(Face& inFace, const lp::Nack& nack) {
         // receive Nack
         nack.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
-        ++m_counters.nInNacks;
+                ++m_counters.nInNacks;
 
-        // if multi-access face, drop
+                // if multi-access face, drop
         if (inFace.getLinkType() == ndn::nfd::LINK_TYPE_MULTI_ACCESS) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -557,7 +580,7 @@ namespace nfd {
 
         // PIT match
         shared_ptr<pit::Entry> pitEntry = m_pit.find(nack.getInterest());
-        // if no PIT entry found, drop
+                // if no PIT entry found, drop
         if (pitEntry == nullptr) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -567,7 +590,7 @@ namespace nfd {
 
         // has out-record?
         pit::OutRecordCollection::iterator outRecord = pitEntry->getOutRecord(inFace);
-        // if no out-record found, drop
+                // if no out-record found, drop
         if (outRecord == pitEntry->out_end()) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -588,12 +611,13 @@ namespace nfd {
                 " nack=" << nack.getInterest().getName() <<
                 "~" << nack.getReason() << " OK");
 
-        // record Nack on out-record
-        outRecord->setIncomingNack(nack);
+                // record Nack on out-record
+                outRecord->setIncomingNack(nack);
 
-        // trigger strategy: after receive NACK
-        this->dispatchToStrategy(*pitEntry,
+                // trigger strategy: after receive NACK
+                this->dispatchToStrategy(*pitEntry,
                 [&] (fw::Strategy & strategy) {
+
                     strategy.afterReceiveNack(inFace, nack, pitEntry); });
     }
 
@@ -610,7 +634,7 @@ namespace nfd {
         // has in-record?
         pit::InRecordCollection::iterator inRecord = pitEntry->getInRecord(outFace);
 
-        // if no in-record found, drop
+                // if no in-record found, drop
         if (inRecord == pitEntry->in_end()) {
             NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                     " nack=" << pitEntry->getInterest().getName() <<
@@ -623,6 +647,7 @@ namespace nfd {
             NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                     " nack=" << pitEntry->getInterest().getName() <<
                     "~" << nack.getReason() << " face-is-multi-access");
+
             return;
         }
 
@@ -632,20 +657,21 @@ namespace nfd {
                 " nack=" << pitEntry->getInterest().getName() <<
                 "~" << nack.getReason() << " OK");
 
-        // create Nack packet with the Interest from in-record
-        lp::Nack nackPkt(inRecord->getInterest());
-        nackPkt.setHeader(nack);
+                // create Nack packet with the Interest from in-record
+                lp::Nack nackPkt(inRecord->getInterest());
+                nackPkt.setHeader(nack);
 
-        // erase in-record
-        pitEntry->deleteInRecord(outFace);
+                // erase in-record
+                pitEntry->deleteInRecord(outFace);
 
-        // send Nack on face
-        const_cast<Face&> (outFace).sendNack(nackPkt);
-        ++m_counters.nOutNacks;
+                // send Nack on face
+                const_cast<Face&> (outFace).sendNack(nackPkt);
+                ++m_counters.nOutNacks;
     }
 
     static inline bool
     compare_InRecord_expiry(const pit::InRecord& a, const pit::InRecord& b) {
+
         return a.getExpiry() < b.getExpiry();
     }
 
@@ -654,36 +680,39 @@ namespace nfd {
         pit::InRecordCollection::iterator lastExpiring =
                 std::max_element(pitEntry->in_begin(), pitEntry->in_end(), &compare_InRecord_expiry);
 
-        time::steady_clock::TimePoint lastExpiry = lastExpiring->getExpiry();
-        time::nanoseconds lastExpiryFromNow = lastExpiry - time::steady_clock::now();
+                time::steady_clock::TimePoint lastExpiry = lastExpiring->getExpiry();
+                time::nanoseconds lastExpiryFromNow = lastExpiry - time::steady_clock::now();
         if (lastExpiryFromNow <= time::seconds::zero()) {
             // TODO all in-records are already expired; will this happen?
         }
 
         scheduler::cancel(pitEntry->m_unsatisfyTimer);
-        pitEntry->m_unsatisfyTimer = scheduler::schedule(lastExpiryFromNow,
+                pitEntry->m_unsatisfyTimer = scheduler::schedule(lastExpiryFromNow,
                 bind(&Forwarder::onInterestUnsatisfied, this, pitEntry));
     }
 
     void
     Forwarder::setStragglerTimer(const shared_ptr<pit::Entry>& pitEntry, bool isSatisfied,
             time::milliseconds dataFreshnessPeriod) {
+
         time::nanoseconds stragglerTime = time::milliseconds(100);
 
-        scheduler::cancel(pitEntry->m_stragglerTimer);
-        pitEntry->m_stragglerTimer = scheduler::schedule(stragglerTime,
+                scheduler::cancel(pitEntry->m_stragglerTimer);
+                pitEntry->m_stragglerTimer = scheduler::schedule(stragglerTime,
                 bind(&Forwarder::onInterestFinalize, this, pitEntry, isSatisfied, dataFreshnessPeriod));
     }
 
     void
     Forwarder::cancelUnsatisfyAndStragglerTimer(pit::Entry& pitEntry) {
+
         scheduler::cancel(pitEntry.m_unsatisfyTimer);
-        scheduler::cancel(pitEntry.m_stragglerTimer);
+                scheduler::cancel(pitEntry.m_stragglerTimer);
     }
 
     static inline void
     insertNonceToDnl(DeadNonceList& dnl, const pit::Entry& pitEntry,
             const pit::OutRecord& outRecord) {
+
         dnl.add(pitEntry.getName(), outRecord.getLastNonce());
     }
 
@@ -694,8 +723,8 @@ namespace nfd {
         bool needDnl = false;
         if (isSatisfied) {
             bool hasFreshnessPeriod = dataFreshnessPeriod >= time::milliseconds::zero();
-            // Data never becomes stale if it doesn't have FreshnessPeriod field
-            needDnl = static_cast<bool> (pitEntry.getInterest().getMustBeFresh()) &&
+                    // Data never becomes stale if it doesn't have FreshnessPeriod field
+                    needDnl = static_cast<bool> (pitEntry.getInterest().getMustBeFresh()) &&
                     (hasFreshnessPeriod && dataFreshnessPeriod < m_deadNonceList.getLifetime());
         } else {
             needDnl = true;
@@ -709,7 +738,7 @@ namespace nfd {
         if (upstream == 0) {
             // insert all outgoing Nonces
             const pit::OutRecordCollection& outRecords = pitEntry.getOutRecords();
-            std::for_each(outRecords.begin(), outRecords.end(),
+                    std::for_each(outRecords.begin(), outRecords.end(),
                     bind(&insertNonceToDnl, ref(m_deadNonceList), cref(pitEntry), _1));
         } else {
             // insert outgoing Nonce of a specific face
