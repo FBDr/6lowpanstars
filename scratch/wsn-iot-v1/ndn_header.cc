@@ -13,6 +13,7 @@ namespace ns3 {
         //Variables declaration
         std::string prefix = "/SensorData";
         double interval_sel;
+        double start_delay; //Prevent nodes from starting at the same time.
         ndn::StackHelper ndnHelper;
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
@@ -91,6 +92,7 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                start_delay = Rinterval->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 Ptr<Node> sel_node = SelectRandomLeafNode(bth);
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
@@ -98,7 +100,7 @@ namespace ns3 {
                     Ptr<ndn::L3Protocol> L3Prot = sel_node->GetObject<ns3::ndn::L3Protocol>();
                     L3Prot->setRole(2);
                 }
-                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
         }
@@ -110,9 +112,10 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                start_delay = Rinterval->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[idx])); //Consumers are at leaf nodes.
-                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
         }
@@ -126,9 +129,10 @@ namespace ns3 {
                 NS_LOG_INFO("Setting prefix to: " << cur_prefix);
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+                start_delay = Rinterval->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install((iot[idx].Get(node_periph))); //Consumers are at leaf nodes.
-                apps.Start(Seconds(120.0 + interval_sel));
+                apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
         }
