@@ -93,4 +93,5 @@ pylab.grid(True)
 
 fig = pylab.gcf()
 fig.canvas.set_window_title(sys.argv[1])
+pylab.rcParams.update({'font.size': 22})
 pylab.show()
