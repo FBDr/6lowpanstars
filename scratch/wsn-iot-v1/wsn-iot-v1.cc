@@ -106,8 +106,11 @@ namespace ns3
         remove("pktloss.txt");
         remove("bytes.txt");
 
-        //LogComponentEnable("LrWpanContikiMac", LOG_LEVEL_DEBUG);
-        //LogComponentEnable("LrWpanPhy", LOG_LEVEL_DEBUG);
+/*
+        LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
+        LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
+        LogComponentEnable("wsn-iot-v1", LOG_LEVEL_ALL);
+*/
 
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
