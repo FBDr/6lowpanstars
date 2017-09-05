@@ -121,6 +121,23 @@ namespace ns3 {
         uint32_t GetNLeafNodesForAs(uint32_t asNum);
 
         /**
+         * Sets a NodeContainer with all leaf nodes.
+         *
+         * 
+         *
+         */
+        void SetLeafNodeContainer();
+        /**
+         * Returns a NodeContainer with all leaf nodes.
+         *
+         * 
+         * \returns NodeContainer
+         *
+         */
+
+        NodeContainer GetLeafNodeContainer();
+
+        /**
          * Returns a given router leaf node from a given AS
          *
          * \param asNum the AS number
@@ -276,6 +293,9 @@ namespace ns3 {
 
         /// stores the number of AS in the BRITE generated topology
         uint32_t m_numAs;
+
+        /// stores all leafnodes in a single NodeContainer
+        NodeContainer m_leafnodes;
 
         /// stores the netdevices created for each AS
         std::vector<NetDeviceContainer*> m_netDevices;

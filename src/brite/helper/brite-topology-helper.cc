@@ -30,21 +30,20 @@
 #include <iostream>
 #include <fstream>
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("BriteTopologyHelper");
 
     BriteTopologyHelper::BriteTopologyHelper(std::string confFile,
             std::string seedFile,
             std::string newseedFile)
-            : m_confFile(confFile),
-            m_seedFile(seedFile),
-            m_newSeedFile(newseedFile),
-            m_numAs(0),
-            m_topology(NULL),
-            m_numNodes(0),
-            m_numEdges(0) {
+    : m_confFile(confFile),
+    m_seedFile(seedFile),
+    m_newSeedFile(newseedFile),
+    m_numAs(0),
+    m_topology(NULL),
+    m_numNodes(0),
+    m_numEdges(0) {
         NS_LOG_FUNCTION(this);
 
         m_uv = CreateObject<UniformRandomVariable> ();
@@ -52,11 +51,11 @@ namespace ns3
     }
 
     BriteTopologyHelper::BriteTopologyHelper(std::string confFile)
-            : m_confFile(confFile),
-            m_numAs(0),
-            m_topology(NULL),
-            m_numNodes(0),
-            m_numEdges(0) {
+    : m_confFile(confFile),
+    m_numAs(0),
+    m_topology(NULL),
+    m_numNodes(0),
+    m_numEdges(0) {
         NS_LOG_FUNCTION(this);
 
         m_uv = CreateObject<UniformRandomVariable> ();
@@ -248,12 +247,12 @@ namespace ns3
     }
 
     Ptr<Node>
-            BriteTopologyHelper::GetLeafNodeForAs(uint32_t asNum, uint32_t leafNum) {
+    BriteTopologyHelper::GetLeafNodeForAs(uint32_t asNum, uint32_t leafNum) {
         return m_asLeafNodes[asNum]->Get(leafNum);
     }
 
     Ptr<Node>
-            BriteTopologyHelper::GetNodeForAs(uint32_t asNum, uint32_t nodeNum) {
+    BriteTopologyHelper::GetNodeForAs(uint32_t asNum, uint32_t nodeNum) {
         return m_nodesByAs[asNum]->Get(nodeNum);
     }
 
@@ -274,6 +273,19 @@ namespace ns3
             totalL += m_asLeafNodes[idx]->GetN();
         }
         return totalL;
+    }
+
+    void
+    BriteTopologyHelper::SetLeafNodeContainer() {
+        for (uint32_t idx = 0; idx < m_numAs; idx++) {
+            m_leafnodes.Add(*(m_asLeafNodes[idx]));
+        }
+        std::cout<< "Leafnode contains: "<< m_leafnodes.GetN()<<std::endl;
+    }
+
+    NodeContainer
+    BriteTopologyHelper::GetLeafNodeContainer() {
+        return m_leafnodes;
     }
 
     uint32_t
@@ -498,6 +510,7 @@ namespace ns3
                 m_asLeafNodes[(*it).asId]->Add(m_nodes.Get((*it).nodeId));
             }
         }
+        SetLeafNodeContainer();
     }
 
 } // namespace ns3

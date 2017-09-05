@@ -13,43 +13,13 @@
 
 #include "g_function_header.h"
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("extra-functions");
 
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
-
-        //Select a random leafnode at the edges of the generated brite network. 
-        //This function is used for assigning consumer roles to clients.
-
-        uint32_t totAS = briteth.GetNAs();
-        NS_LOG_INFO("The total number of AS is: " << totAS);
-        uint32_t leafnum = 0;
-        uint32_t selAS = 0;
-        uint32_t selLN = 0;
-        int max_tries = 5;
-        Ptr<UniformRandomVariable> Ras = CreateObject<UniformRandomVariable> ();
-        Ptr<UniformRandomVariable> Rleaf = CreateObject<UniformRandomVariable> ();
-
-        for (int tries = 0; tries <= max_tries; tries++) {
-
-            NS_ASSERT_MSG(tries<max_tries, "Tried max_tries to find leafnode. No luck. Check Brite config.");
-
-            selAS = round(Ras->GetValue((double) (0), (double) (totAS - 1)));
-            NS_LOG_INFO("Selected AS num: " << selAS);
-            leafnum = briteth.GetNLeafNodesForAs(selAS);
-            NS_LOG_INFO("Total number of leafnodes in this AS is: " << leafnum);
-
-            if (leafnum) {
-                break;
-            }
-            NS_LOG_WARN("No leafnodes in this AS! Check config! ");
-        }
-
-        selLN = round(Rleaf->GetValue((double) (0), (double) (leafnum - 1)));
-        NS_LOG_INFO("Selected leafnode num: " << selLN);
-
-        return briteth.GetLeafNodeForAs(selAS, selLN);
+        Ptr<Node> sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
+        std::cout<<"Selected leafnode is: "<< sel_leaf->GetId()<<std::endl;
+        return sel_leaf;
     }
 
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
