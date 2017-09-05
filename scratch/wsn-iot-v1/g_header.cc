@@ -16,9 +16,25 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("extra-functions");
 
+    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth) {
+        int max_tries = briteth.GetNLeafNodes();
+        Ptr<Node> sel_leaf;
+        
+        for (int idx = 0; idx <= max_tries; max_tries++) {
+            NS_ASSERT_MSG(idx<max_tries, "Tried max_tries to find consumer(!) leafnode. No luck.");
+            sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
+            if(briteth.IsConnectedLeaf(sel_leaf) == false)
+            {
+                break;
+            }
+        }
+        std::cout << "Selected leafnode is (consumer): " << sel_leaf->GetId() << std::endl;
+        return sel_leaf;
+    }
+
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
         Ptr<Node> sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
-        std::cout<<"Selected leafnode is: "<< sel_leaf->GetId()<<std::endl;
+        std::cout << "Selected leafnode is (general): " << sel_leaf->GetId() << std::endl;
         return sel_leaf;
     }
 

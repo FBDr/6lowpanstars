@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include "ns3/channel.h"
 #include "ns3/node-container.h"
@@ -136,6 +137,24 @@ namespace ns3 {
          */
 
         NodeContainer GetLeafNodeContainer();
+
+        /**
+         * Set a leafnode to be connected.
+         *
+         * 
+         *
+         */
+        void SetConnectedLeaf(Ptr<Node> connectleaf);
+        /**
+         * Returns wheter leafnode is connected to subnetwork.
+         *
+         * 
+         * \returns bool
+         *
+         */
+
+        bool IsConnectedLeaf(Ptr<Node> leaf);
+
 
         /**
          * Returns a given router leaf node from a given AS
@@ -296,6 +315,9 @@ namespace ns3 {
 
         /// stores all leafnodes in a single NodeContainer
         NodeContainer m_leafnodes;
+
+        /// stores leafnodes connected to subnetwork.
+        std::set<Ptr<Node>> m_connectLeaf;
 
         /// stores the netdevices created for each AS
         std::vector<NetDeviceContainer*> m_netDevices;

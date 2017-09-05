@@ -33,10 +33,12 @@
 #include "src/core/model/log.h"
 #include <string>
 #include <vector>
+#include <set>
 
 #ifndef G_HEADER_H
 #define G_HEADER_H
 namespace ns3 {
+    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth);
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth);
 
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container);

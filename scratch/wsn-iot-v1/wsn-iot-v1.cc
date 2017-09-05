@@ -123,6 +123,7 @@ namespace ns3
         // - routers:               NodeContainer with all nodes doing routing = backhaul + br.
         // - endnodes:              NodeContainer with all IoT sensor nodes in all bubbles.
         // - all                    NodeContainer with all nodes.
+        // - bubble_leafnode        Std::set with all leafnodes associated to IoT bubbles. 
 
         NS_LOG_INFO("Creating NodeContainers.");
         NodeContainer iot[node_head];
@@ -132,6 +133,7 @@ namespace ns3
         NodeContainer border_backhaul[node_head];
         NodeContainer backhaul;
         NodeContainer all;
+        std::set<Ptr<Node>> bubble_leafnode;
 
         //Brite
         //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
@@ -159,9 +161,12 @@ namespace ns3
         Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
 
         for (int jdx = 0; jdx < node_head; jdx++) {
+            Ptr<Node> cur_blnode;
             //Add BR and master to csma-NodeContainers
             border_backhaul[jdx].Add(br.Get(jdx));
-            border_backhaul[jdx].Add(SelectRandomLeafNode(bth));
+            cur_blnode = SelectRandomLeafNode(bth);
+            border_backhaul[jdx].Add(cur_blnode);
+            bth.SetConnectedLeaf(cur_blnode);
             //Add BR and WSN nodes to IoT[] domain
             iot[jdx].Create(node_periph);
             endnodes.Add(iot[jdx]); // Add iot[] container to endnodes container before adding br.

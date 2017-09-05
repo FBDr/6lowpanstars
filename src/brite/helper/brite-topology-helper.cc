@@ -280,12 +280,27 @@ namespace ns3 {
         for (uint32_t idx = 0; idx < m_numAs; idx++) {
             m_leafnodes.Add(*(m_asLeafNodes[idx]));
         }
-        std::cout<< "Leafnode contains: "<< m_leafnodes.GetN()<<std::endl;
+        std::cout << "Leafnode contains: " << m_leafnodes.GetN() << std::endl;
     }
 
     NodeContainer
     BriteTopologyHelper::GetLeafNodeContainer() {
         return m_leafnodes;
+    }
+
+    void 
+    BriteTopologyHelper::SetConnectedLeaf(Ptr<Node> connectleaf){     
+        m_connectLeaf.insert(connectleaf);
+    }
+
+
+    bool 
+    BriteTopologyHelper::IsConnectedLeaf(Ptr<Node> leaf){
+        if(m_connectLeaf.find(leaf) == m_connectLeaf.end())
+        {
+            return false;
+        }
+        return true;
     }
 
     uint32_t
