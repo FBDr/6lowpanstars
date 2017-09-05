@@ -1,3 +1,4 @@
+callgrind.*
 last_seed_file
 *.run
 *.png
