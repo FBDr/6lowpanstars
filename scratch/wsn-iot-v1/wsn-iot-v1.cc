@@ -25,8 +25,7 @@
 #include "stacks_header.h"
 #include "g_function_header.h"
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
@@ -68,6 +67,7 @@ namespace ns3
         double min_freq = 0.0166;
         double max_freq = 5;
         int csma_delay = 20;
+        int dtracefreq = 10000;
         std::string zm_q = "0.7";
         std::string zm_s = "0.7";
 
@@ -94,6 +94,7 @@ namespace ns3
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.AddValue("csma_delay", "Set the delay for the Br <-> Backhaul connection.", csma_delay);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
+        cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -106,11 +107,11 @@ namespace ns3
         remove("pktloss.txt");
         remove("bytes.txt");
 
-/*
-        LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
-        LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
-        LogComponentEnable("wsn-iot-v1", LOG_LEVEL_ALL);
-*/
+        /*
+                LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
+                LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
+                LogComponentEnable("wsn-iot-v1", LOG_LEVEL_ALL);
+         */
 
         //Paramter settings
         //GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true)); //Calculate checksums for Wireshark
@@ -133,7 +134,7 @@ namespace ns3
         NodeContainer border_backhaul[node_head];
         NodeContainer backhaul;
         NodeContainer all;
-        std::set<Ptr<Node>> bubble_leafnode;
+        std::set<Ptr < Node>> bubble_leafnode;
 
         //Brite
         //BriteTopologyHelper bth(std::string("src/brite/examples/conf_files/RTBarabasi20.conf"));
@@ -251,7 +252,7 @@ namespace ns3
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
-            L2RateTracer::InstallAll("drop-trace.txt", Seconds(0.5));
+            L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
         }
 
 
@@ -290,6 +291,7 @@ namespace ns3
 
         if (!ndn) {
             flowMonitor = flowHelper.InstallAll();
+            Simulator::Schedule(Seconds(120), &ReduceRouteFreq, routers);
         }
 
 
@@ -305,7 +307,6 @@ namespace ns3
 
 
         NS_LOG_INFO("Run Simulation.");
-        Simulator::Schedule (Seconds(100) , &ReduceRouteFreq, routers);
         Simulator::Stop(Seconds(simtime));
         Simulator::Run();
         if (!ndn) {
