@@ -27,6 +27,11 @@ namespace ns3
 
         int subn = 0;
         RipNgHelper ripNgRouting;
+/*
+        ripNgRouting.Set("UnsolicitedRoutingUpdate", TimeValue(Seconds(300)));
+        ripNgRouting.Set("TimeoutDelay", TimeValue(Seconds(400)));
+        ripNgRouting.Set("GarbageCollectionDelay", TimeValue(Seconds(500)));
+*/
         Ipv6ListRoutingHelper listRH;
         InternetStackHelper internetv6;
         SixLowPanHelper sixlowpan;

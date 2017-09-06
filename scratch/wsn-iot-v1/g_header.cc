@@ -12,9 +12,22 @@
  */
 
 #include "g_function_header.h"
+#include "ns3/object.h"
 
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("extra-functions");
+    
+    void ReduceRouteFreq(NodeContainer routers){
+        std::cout<<"BLIEP BLIEP" <<std::endl;
+        for(int idx=0; idx< ( (int) routers.GetN()); idx++)
+        {
+            Ptr<RipNg> ripcur = routers.Get(idx)->GetObject<RipNg>();
+            ripcur->SetAttribute("UnsolicitedRoutingUpdate", TimeValue(Seconds(500)));
+            ripcur->SetAttribute("TimeoutDelay", TimeValue(Seconds(600)));
+            ripcur->SetAttribute("GarbageCollectionDelay", TimeValue(Seconds(700)));
+        }
+        
+    }
 
     Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth) {
         int max_tries = briteth.GetNLeafNodes();
@@ -41,6 +54,7 @@ namespace ns3 {
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
         Ptr<Node> selNode;
         Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+        std::cout<<(double) (container.GetN() - 1)<<std::endl;
         selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
 
         return selNode;

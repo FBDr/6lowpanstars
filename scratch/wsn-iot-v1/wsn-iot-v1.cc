@@ -305,6 +305,7 @@ namespace ns3
 
 
         NS_LOG_INFO("Run Simulation.");
+        Simulator::Schedule (Seconds(100) , &ReduceRouteFreq, routers);
         Simulator::Stop(Seconds(simtime));
         Simulator::Run();
         if (!ndn) {

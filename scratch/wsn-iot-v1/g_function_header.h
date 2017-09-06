@@ -38,6 +38,7 @@
 #ifndef G_HEADER_H
 #define G_HEADER_H
 namespace ns3 {
+    void ReduceRouteFreq(NodeContainer routers);
     Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth);
     Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth);
 
