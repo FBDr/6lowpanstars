@@ -22,9 +22,9 @@ namespace ns3 {
         for(int idx=0; idx< ( (int) routers.GetN()); idx++)
         {
             Ptr<RipNg> ripcur = routers.Get(idx)->GetObject<RipNg>();
-            ripcur->SetAttribute("UnsolicitedRoutingUpdate", TimeValue(Seconds(500)));
-            ripcur->SetAttribute("TimeoutDelay", TimeValue(Seconds(600)));
-            ripcur->SetAttribute("GarbageCollectionDelay", TimeValue(Seconds(700)));
+            ripcur->SetAttribute("UnsolicitedRoutingUpdate", TimeValue(Seconds(50000)));
+            ripcur->SetAttribute("TimeoutDelay", TimeValue(Seconds(50600)));
+            ripcur->SetAttribute("GarbageCollectionDelay", TimeValue(Seconds(50700)));
         }
         
     }
