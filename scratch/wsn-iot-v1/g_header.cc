@@ -54,7 +54,6 @@ namespace ns3 {
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
         Ptr<Node> selNode;
         Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-        std::cout<<(double) (container.GetN() - 1)<<std::endl;
         selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
 
         return selNode;
