@@ -23,6 +23,7 @@
 #include "ns3/event-id.h"
 #include "ns3/ptr.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/ipv6-address.h"
 #include "ns3/traced-callback.h"
 #include "ns3/string.h"
 #include "ns3/random-variable-stream.h"
@@ -221,6 +222,7 @@ namespace ns3 {
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ptr<UniformRandomVariable> m_seqRng; // RNG
         std::set<uint32_t> m_PenSeqSet; //Pending sequences 
+        Ipv6Address m_ownip;
     };
 
 } // namespace ns3

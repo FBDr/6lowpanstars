@@ -33,11 +33,19 @@
 #include "src/network/model/node.h"
 #include <fstream>
 #include "ns3/node.h"
+#include "ns3/address-utils.h"
+#include "ns3/udp-socket.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/applications-module.h"
+#include <string>
 
 
 
-namespace ns3
-{
+
+
+
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
 
@@ -93,10 +101,10 @@ namespace ns3
     }
 
     CoapClient::CoapClient()
-            : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
-            , m_q(0.7)
-            , m_s(0.7)
-            , m_seqRng(CreateObject<UniformRandomVariable>()) {
+    : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+    , m_q(0.7)
+    , m_s(0.7)
+    , m_seqRng(CreateObject<UniformRandomVariable>()) {
         NS_LOG_FUNCTION(this);
         m_sent = 0;
         m_received = 0;
@@ -202,7 +210,11 @@ namespace ns3
     void
     CoapClient::StartApplication(void) {
         NS_LOG_FUNCTION(this);
-
+        Ptr <Node> PtrNode = this->GetNode();
+        Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
+        Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
+        m_ownip = ownaddr.GetAddress();
+        
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -339,8 +351,11 @@ namespace ns3
     CoapClient::Send(void) {
         NS_LOG_FUNCTION(this);
         CoapPacketTag coaptag;
+        uint32_t nxtsq;
         NS_ASSERT(m_sendEvent.IsExpired());
-        uint32_t nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
+        do {
+            nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
+        } while (m_IPv6Bucket[nxtsq] == m_ownip);
         coaptag.SetReq(nxtsq);
         coaptag.SetSeq(m_sent);
         SetFill("Sensordata/" + std::to_string(nxtsq));
