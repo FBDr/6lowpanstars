@@ -355,6 +355,7 @@ namespace ns3 {
         NS_ASSERT(m_sendEvent.IsExpired());
         do {
             nxtsq = GetNextSeq() - 1; //Next sequence spans from [1, N];
+            NS_LOG_DEBUG("IP from bucket:" << m_IPv6Bucket[nxtsq] << " My own ip: " << m_ownip);
         } while (m_IPv6Bucket[nxtsq] == m_ownip);
         coaptag.SetReq(nxtsq);
         coaptag.SetSeq(m_sent);
