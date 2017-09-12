@@ -60,8 +60,8 @@ namespace ns3
     const uint8_t Icmpv6L4Protocol::MAX_UNICAST_SOLICIT = 3;
     const uint8_t Icmpv6L4Protocol::MAX_ANYCAST_DELAY_TIME = 1;
     const uint8_t Icmpv6L4Protocol::MAX_NEIGHBOR_ADVERTISEMENT = 3;
-    const uint32_t Icmpv6L4Protocol::REACHABLE_TIME = 30000;
-    const uint32_t Icmpv6L4Protocol::RETRANS_TIMER = 1000;
+    const uint32_t Icmpv6L4Protocol::REACHABLE_TIME = 30000000;
+    const uint32_t Icmpv6L4Protocol::RETRANS_TIMER = 1000; // When set to 100, problem solved.
     const uint8_t Icmpv6L4Protocol::DELAY_FIRST_PROBE_TIME = 5;
     const double Icmpv6L4Protocol::MIN_RANDOM_FACTOR = 0.5;
     const double Icmpv6L4Protocol::MAX_RANDOM_FACTOR = 1.5;

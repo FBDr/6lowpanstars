@@ -278,7 +278,6 @@ namespace ns3 {
 
             NS_LOG_INFO("Creating Applications.");
             sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq);
-            Config::SetDefault ("ns3::Icmpv6L4Protocol::RetransmissionTime", TimeValue(Seconds(0.01)));
         }
 
 
