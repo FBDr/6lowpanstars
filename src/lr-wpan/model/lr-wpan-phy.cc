@@ -39,8 +39,7 @@
 #include <ns3/double.h>
 #include <ns3/node.h>
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("LrWpanPhy");
 
@@ -126,8 +125,8 @@ namespace ns3
     }
 
     LrWpanPhy::LrWpanPhy(void)
-            : m_edRequest(),
-            m_setTRXState() {
+    : m_edRequest(),
+    m_setTRXState() {
         m_trxState = IEEE_802_15_4_PHY_TRX_OFF;
         m_trxStatePending = IEEE_802_15_4_PHY_IDLE;
 
@@ -200,13 +199,13 @@ namespace ns3
     }
 
     Ptr<NetDevice>
-            LrWpanPhy::GetDevice(void) const {
+    LrWpanPhy::GetDevice(void) const {
         NS_LOG_FUNCTION(this);
         return m_device;
     }
 
     Ptr<MobilityModel>
-            LrWpanPhy::GetMobility(void) {
+    LrWpanPhy::GetMobility(void) {
         NS_LOG_FUNCTION(this);
         return m_mobility;
     }
@@ -230,13 +229,13 @@ namespace ns3
     }
 
     Ptr<SpectrumChannel>
-            LrWpanPhy::GetChannel(void) {
+    LrWpanPhy::GetChannel(void) {
         NS_LOG_FUNCTION(this);
         return m_channel;
     }
 
     Ptr<const SpectrumModel>
-            LrWpanPhy::GetRxSpectrumModel(void) const {
+    LrWpanPhy::GetRxSpectrumModel(void) const {
         NS_LOG_FUNCTION(this);
         if (m_txPsd) {
             return m_txPsd->GetSpectrumModel();
@@ -246,7 +245,7 @@ namespace ns3
     }
 
     Ptr<AntennaModel>
-            LrWpanPhy::GetRxAntenna(void) {
+    LrWpanPhy::GetRxAntenna(void) {
         NS_LOG_FUNCTION(this);
         return m_antenna;
     }
@@ -405,7 +404,6 @@ namespace ns3
     void
     LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par) {
         NS_LOG_FUNCTION(this);
-
         Ptr<LrWpanSpectrumSignalParameters> params = DynamicCast<LrWpanSpectrumSignalParameters> (par);
 
         if (!m_edRequest.IsExpired()) {
@@ -445,6 +443,7 @@ namespace ns3
                 }
             } else {
                 // The packet was destroyed, drop it.
+                NS_LOG_INFO("Dropped!");
                 m_phyRxDropTrace(currentPacket);
             }
             Ptr<LrWpanSpectrumSignalParameters> none = 0;
@@ -463,7 +462,15 @@ namespace ns3
                     }
                 }
             } else {
-                ChangeTrxState(IEEE_802_15_4_PHY_RX_ON);
+                if (m_trxState != IEEE_802_15_4_PHY_BUSY_TX) {
+                    ChangeTrxState(IEEE_802_15_4_PHY_RX_ON);
+                }
+
+                //Hier gaat het fout. De functie starttx heeft de RX afgebroken zonder daarbij iets met de gescheduelde RX te doen. De state wordt wel veranderd terwijl de RX is afgebroken.
+
+
+
+
             }
         }
     }
@@ -1040,9 +1047,8 @@ namespace ns3
     void
     LrWpanPhy::EndTx(void) {
         NS_LOG_FUNCTION(this);
-        if((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF))
-        {
-            std::cout<<"My node number is: " << m_device->GetNode()->GetId() <<std::endl;
+        if ((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF)) {
+            std::cout << "My node number is: " << m_device->GetNode()->GetId() << std::endl;
         }
 
         NS_ABORT_IF((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF));
@@ -1184,7 +1190,7 @@ namespace ns3
     }
 
     Ptr<const SpectrumValue>
-            LrWpanPhy::GetNoisePowerSpectralDensity(void) {
+    LrWpanPhy::GetNoisePowerSpectralDensity(void) {
         NS_LOG_FUNCTION(this);
         return m_noise;
     }
@@ -1197,7 +1203,7 @@ namespace ns3
     }
 
     Ptr<LrWpanErrorModel>
-            LrWpanPhy::GetErrorModel(void) const {
+    LrWpanPhy::GetErrorModel(void) const {
         NS_LOG_FUNCTION(this);
         return m_errorModel;
     }
