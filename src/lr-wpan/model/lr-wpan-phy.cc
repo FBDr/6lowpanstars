@@ -37,6 +37,7 @@
 #include <ns3/net-device.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/double.h>
+#include <ns3/node.h>
 
 namespace ns3
 {
@@ -1039,6 +1040,10 @@ namespace ns3
     void
     LrWpanPhy::EndTx(void) {
         NS_LOG_FUNCTION(this);
+        if((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF))
+        {
+            std::cout<<"My node number is: " << m_device->GetNode()->GetId() <<std::endl;
+        }
 
         NS_ABORT_IF((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (m_trxState != IEEE_802_15_4_PHY_TRX_OFF));
 
