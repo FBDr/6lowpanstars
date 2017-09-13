@@ -158,6 +158,7 @@ namespace ns3 {
         m_currentRxPacket = std::make_pair(none_params, true);
         m_currentTxPacket = std::make_pair(none_packet, true);
         m_errorModel = 0;
+        m_forcedrop = false;
 
         m_random = CreateObject<UniformRandomVariable> ();
         m_random->SetAttribute("Min", DoubleValue(0.0));
@@ -260,7 +261,7 @@ namespace ns3 {
     LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams) {
         NS_LOG_FUNCTION(this << spectrumRxParams);
         LrWpanSpectrumValueHelper psdHelper;
-
+        //m_forcedrop = 0;
         if (!m_edRequest.IsExpired()) {
             // Update the average receive power during ED.
             Time now = Simulator::Now();
@@ -320,6 +321,7 @@ namespace ns3 {
             if (10 * log10(sinr) > -5) {
                 ChangeTrxState(IEEE_802_15_4_PHY_BUSY_RX);
                 m_currentRxPacket = std::make_pair(lrWpanRxParams, false);
+                //m_forcedrop = false;
                 m_phyRxBeginTrace(p);
 
                 m_rxLastUpdate = Simulator::Now();
@@ -404,6 +406,14 @@ namespace ns3 {
     void
     LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par) {
         NS_LOG_FUNCTION(this);
+
+        if(m_forcedrop)
+        {
+            NS_LOG_INFO("FORCE DROPPING ENDING ENDRX PREMATURELY.");
+            m_forcedrop =false;
+            return;
+        }
+
         Ptr<LrWpanSpectrumSignalParameters> params = DynamicCast<LrWpanSpectrumSignalParameters> (par);
 
         if (!m_edRequest.IsExpired()) {
@@ -462,9 +472,9 @@ namespace ns3 {
                     }
                 }
             } else {
-                if (m_trxState != IEEE_802_15_4_PHY_BUSY_TX) {
+                //if ((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (!m_forcedrop)) {
                     ChangeTrxState(IEEE_802_15_4_PHY_RX_ON);
-                }
+                //}
 
                 //Hier gaat het fout. De functie starttx heeft de RX afgebroken zonder daarbij iets met de gescheduelde RX te doen. De state wordt wel veranderd terwijl de RX is afgebroken.
 
@@ -682,6 +692,8 @@ namespace ns3 {
                     //incomplete reception -- force packet discard
                     NS_LOG_DEBUG("force TX_ON, terminate reception");
                     m_currentRxPacket.second = true;
+                    m_forcedrop = true;
+                    NS_LOG_INFO("Setting forcedrop!!!!.");
                 }
 
                 // If CCA is in progress, cancel CCA and return BUSY.
@@ -698,6 +710,7 @@ namespace ns3 {
                 // TODO: Does it also take aTurnaroundTime to switch the transceiver state,
                 //       even when the receiver is not busy? (6.9.2)
                 Time setTime = Seconds((double) aTurnaroundTime / GetDataOrSymbolRate(false));
+                NS_LOG_INFO("Scheduling time: "<< setTime);
                 m_setTRXState = Simulator::Schedule(setTime, &LrWpanPhy::EndSetTRXState, this);
                 NotifyListenersTransition(IEEE_802_15_4_PHY_TX_ON);
                 return;

@@ -894,6 +894,12 @@ namespace ns3 {
          * due to interference.
          */
         std::pair<Ptr<LrWpanSpectrumSignalParameters>, bool> m_currentRxPacket;
+        
+         /**
+         * Bool current packet dropped due to forced transmission.
+         */
+        bool m_forcedrop;
+        
 
         /**
          * Statusinformation of the currently transmitted packet. The first parameter
