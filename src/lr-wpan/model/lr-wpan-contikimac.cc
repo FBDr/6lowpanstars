@@ -27,6 +27,7 @@
 #include <ns3/packet.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/double.h>
+#include <ns3/lr-wpan-helper.h>
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT                                   \
@@ -59,13 +60,13 @@ namespace ns3
                 MakeTimeChecker())
                 .AddAttribute("PktInterval",
                 "The interval between each packet transmission",
-                //TimeValue (Seconds (0.00055)),
-                TimeValue(Seconds(0.00055)),
+                TimeValue (Seconds (0.00055)),
+                //TimeValue(Seconds(0.01)),
                 MakeTimeAccessor(&LrWpanContikiMac::m_pktInterval),
                 MakeTimeChecker())
                 .AddAttribute("RdcMaxRetries",
                 "The maximum number of retries for ContikiMAC RDC",
-                UintegerValue(4),
+                UintegerValue(5000),
                 MakeUintegerAccessor(&LrWpanContikiMac::m_rdcMaxFrameRetries),
                 MakeUintegerChecker<uint8_t> ())
                 .AddAttribute("FastSleep",
@@ -448,6 +449,7 @@ namespace ns3
             m_rdcRetries++;
             ChangeMacState(MAC_SENDING);
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+            NS_LOG_DEBUG("Unicast tx...");
         } else {
             NS_LOG_DEBUG("Inform MAC");
             m_rdcRetries = 0;
@@ -570,7 +572,7 @@ namespace ns3
 
     void
     LrWpanContikiMac::PlmeSetTRXStateConfirm(LrWpanPhyEnumeration status) {
-        NS_LOG_FUNCTION(this << status);
+        NS_LOG_FUNCTION(this << LrWpanHelper::LrWpanPhyEnumerationPrinter(status));
         if (status == IEEE_802_15_4_PHY_SUCCESS) //state change
         {
             if (m_wakeUp.IsRunning()) //If woke up to send packet, cancel pending wakeup

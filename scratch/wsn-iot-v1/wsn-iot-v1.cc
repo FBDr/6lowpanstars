@@ -301,7 +301,7 @@ namespace ns3 {
         if (pcaptracing) {
             csma.EnablePcapAll(std::string("traces/csma"), true);
 
-            for (int jdx = node_head-4; jdx < node_head; jdx++) {
+            for (int jdx = 0; jdx < node_head; jdx++) {
                 lrWpanHelper[jdx].EnablePcapAll(std::string("traces/6lowpan/wsn"), true);
             }
 

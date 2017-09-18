@@ -38,6 +38,7 @@
 #include <ns3/random-variable-stream.h>
 #include <ns3/double.h>
 #include <ns3/node.h>
+#include <ns3/lr-wpan-helper.h>
 
 namespace ns3 {
 
@@ -449,6 +450,7 @@ namespace ns3 {
             if (!m_currentRxPacket.second) {
                 // The packet was successfully received, push it up the stack.
                 if (!m_pdDataIndicationCallback.IsNull()) {
+                    NS_LOG_INFO("Forwarding to m_pdDataIndicationCallback");
                     m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
                 }
             } else {
@@ -630,7 +632,7 @@ namespace ns3 {
                 && (state != IEEE_802_15_4_PHY_FORCE_TRX_OFF)
                 && (state != IEEE_802_15_4_PHY_TX_ON));
 
-        NS_LOG_LOGIC("Trying to set m_trxState from " << m_trxState << " to " << state);
+        NS_LOG_LOGIC("Trying to set m_trxState from " << LrWpanHelper::LrWpanPhyEnumerationPrinter(m_trxState) << " to " << LrWpanHelper::LrWpanPhyEnumerationPrinter(state));
         // this method always overrides previous state setting attempts
         if (!m_setTRXState.IsExpired()) {
             if (m_trxStatePending == state) {
@@ -926,7 +928,7 @@ namespace ns3 {
 
     void
     LrWpanPhy::ChangeTrxState(LrWpanPhyEnumeration newState) {
-        NS_LOG_LOGIC(this << " state: " << m_trxState << " -> " << newState);
+        NS_LOG_LOGIC(this << " state: " << LrWpanHelper::LrWpanPhyEnumerationPrinter(m_trxState) << " -> " << LrWpanHelper::LrWpanPhyEnumerationPrinter(newState));
         m_trxStateLogger(Simulator::Now(), m_trxState, newState);
         m_trxState = newState;
 

@@ -105,7 +105,7 @@ namespace ns3
         uint64_t current = t.GetMicroSeconds();
         uint64_t s = current / 1000000;
         uint64_t us = current % 1000000;
-
+        
         m_file.Write(s, us, p);
     }
 
