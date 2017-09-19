@@ -66,7 +66,7 @@ namespace ns3
                 MakeTimeChecker())
                 .AddAttribute("RdcMaxRetries",
                 "The maximum number of retries for ContikiMAC RDC",
-                UintegerValue(5000),
+                UintegerValue(4),
                 MakeUintegerAccessor(&LrWpanContikiMac::m_rdcMaxFrameRetries),
                 MakeUintegerChecker<uint8_t> ())
                 .AddAttribute("FastSleep",

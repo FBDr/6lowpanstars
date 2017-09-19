@@ -261,6 +261,7 @@ namespace ns3 {
     void
     LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams) {
         NS_LOG_FUNCTION(this << spectrumRxParams);
+        m_forcedrop = false;
         LrWpanSpectrumValueHelper psdHelper;
         //m_forcedrop = 0;
         if (!m_edRequest.IsExpired()) {
@@ -320,6 +321,7 @@ namespace ns3 {
             // At SNR < -5 the BER is less than 10e-1.
             // It's useless to even *try* to decode the packet.
             if (10 * log10(sinr) > -5) {
+                NS_LOG_INFO("Clearing m_currentRxpacket.");
                 ChangeTrxState(IEEE_802_15_4_PHY_BUSY_RX);
                 m_currentRxPacket = std::make_pair(lrWpanRxParams, false);
                 //m_forcedrop = false;
@@ -396,6 +398,7 @@ namespace ns3 {
                 if (m_random->GetValue() < per) {
                     // The packet was destroyed, drop the packet after reception.
                     m_currentRxPacket.second = true;
+                    NS_LOG_INFO("Packet dropped due to error model...");
                 }
             } else {
                 NS_LOG_WARN("Missing ErrorModel");
@@ -407,13 +410,6 @@ namespace ns3 {
     void
     LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par) {
         NS_LOG_FUNCTION(this);
-
-        if(m_forcedrop)
-        {
-            NS_LOG_INFO("FORCE DROPPING ENDING ENDRX PREMATURELY.");
-            m_forcedrop =false;
-            return;
-        }
 
         Ptr<LrWpanSpectrumSignalParameters> params = DynamicCast<LrWpanSpectrumSignalParameters> (par);
 
@@ -461,6 +457,12 @@ namespace ns3 {
             Ptr<LrWpanSpectrumSignalParameters> none = 0;
             m_currentRxPacket = std::make_pair(none, true);
 
+            if (m_forcedrop) {
+                NS_LOG_INFO("FORCE DROPPING ENDING ENDRX PREMATURELY.");
+                m_forcedrop = false;
+                return;
+            }
+
             // We may be waiting to apply a pending state change.
             if (m_trxStatePending != IEEE_802_15_4_PHY_IDLE) {
                 // Only change the state immediately, if the transceiver is not already
@@ -475,7 +477,7 @@ namespace ns3 {
                 }
             } else {
                 //if ((m_trxState != IEEE_802_15_4_PHY_BUSY_TX) && (!m_forcedrop)) {
-                    ChangeTrxState(IEEE_802_15_4_PHY_RX_ON);
+                ChangeTrxState(IEEE_802_15_4_PHY_RX_ON);
                 //}
 
                 //Hier gaat het fout. De functie starttx heeft de RX afgebroken zonder daarbij iets met de gescheduelde RX te doen. De state wordt wel veranderd terwijl de RX is afgebroken.
@@ -556,6 +558,7 @@ namespace ns3 {
         if (m_trxState == IEEE_802_15_4_PHY_RX_ON || m_trxState == IEEE_802_15_4_PHY_BUSY_RX) {
             m_ccaPeakPower = 0.0;
             Time ccaTime = Seconds(8.0 / GetDataOrSymbolRate(false));
+            NS_LOG_INFO("CCA time (s): " << ccaTime);
             m_ccaRequest = Simulator::Schedule(ccaTime, &LrWpanPhy::EndCca, this);
         } else {
             if (!m_plmeCcaConfirmCallback.IsNull()) {
@@ -712,7 +715,7 @@ namespace ns3 {
                 // TODO: Does it also take aTurnaroundTime to switch the transceiver state,
                 //       even when the receiver is not busy? (6.9.2)
                 Time setTime = Seconds((double) aTurnaroundTime / GetDataOrSymbolRate(false));
-                NS_LOG_INFO("Scheduling time: "<< setTime);
+                NS_LOG_INFO("Scheduling time: " << setTime);
                 m_setTRXState = Simulator::Schedule(setTime, &LrWpanPhy::EndSetTRXState, this);
                 NotifyListenersTransition(IEEE_802_15_4_PHY_TX_ON);
                 return;
@@ -1008,6 +1011,7 @@ namespace ns3 {
             // -- ED threshold at most 10 dB above receiver sensitivity.
             if (10 * log10(m_ccaPeakPower / m_rxSensitivity) >= 10.0) {
                 sensedChannelState = IEEE_802_15_4_PHY_BUSY;
+                NS_LOG_INFO("BUSY 1");
             } else {
                 sensedChannelState = IEEE_802_15_4_PHY_IDLE;
             }
@@ -1020,6 +1024,7 @@ namespace ns3 {
                 // already lead to a channel busy condition.
                 // TODO: Change this, if we also model preamble and SFD detection.
                 sensedChannelState = IEEE_802_15_4_PHY_BUSY;
+                NS_LOG_INFO("BUSY 2");
             } else {
                 sensedChannelState = IEEE_802_15_4_PHY_IDLE;
             }
@@ -1030,6 +1035,7 @@ namespace ns3 {
                 // a packet, as PhyIsBusy() would already lead to a channel busy condition.
                 // TODO: Change this, if we also model preamble and SFD detection.
                 sensedChannelState = IEEE_802_15_4_PHY_BUSY;
+                NS_LOG_INFO("BUSY 3");
             } else {
                 sensedChannelState = IEEE_802_15_4_PHY_IDLE;
             }

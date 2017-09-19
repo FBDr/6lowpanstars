@@ -38,8 +38,7 @@
 #define NS_LOG_APPEND_CONTEXT                                   \
   std::clog << "[address " << m_shortAddress << "] ";
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("LrWpanMac");
 
@@ -370,7 +369,7 @@ namespace ns3
     }
 
     Ptr<LrWpanCsmaCa>
-            LrWpanMac::GetCsmaCa(void) {
+    LrWpanMac::GetCsmaCa(void) {
         return m_csmaCa;
     }
 
@@ -381,7 +380,7 @@ namespace ns3
     }
 
     Ptr<LrWpanPhy>
-            LrWpanMac::GetPhy(void) {
+    LrWpanMac::GetPhy(void) {
         return m_phy;
     }
 
@@ -644,6 +643,7 @@ namespace ns3
         NS_LOG_FUNCTION(this);
 
         if (m_retransmission >= m_macMaxFrameRetries) {
+            NS_LOG_INFO("Maximum number of retransmissions has been reached: " << (int) m_macMaxFrameRetries);
             // Maximum number of retransmissions has been reached.
             // remove the copy of the packet that was just sent
             TxQueueElement *txQElement = m_txQueue.front();
@@ -658,6 +658,7 @@ namespace ns3
             return false;
         } else {
             m_retransmission++;
+            NS_LOG_INFO("Mac RETRY: " << (int) m_retransmission);
             m_numCsmacaRetry += m_csmaCa->GetNB() + 1;
             // Start next CCA process for this packet.
             return true;
