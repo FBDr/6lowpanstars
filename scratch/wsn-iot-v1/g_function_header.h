@@ -48,6 +48,10 @@ namespace ns3 {
 
     std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain);
 
+    template<typename _RandomAccessIterator>
+    inline void
+    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last);
+
 }
 #endif /* G_HEADER_H */
 

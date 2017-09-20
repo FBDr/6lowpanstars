@@ -100,6 +100,20 @@ namespace ns3 {
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
+/*
+        for (int jdx = 0; jdx < 10; jdx++) {
+            RngSeedManager::SetSeed(1);
+            RngSeedManager::SetRun(2);
+            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+            Rnode->SetStream(1);
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<std::endl;
+        }
+*/
 
         //Clean up old files
         remove("energy.txt");

@@ -96,8 +96,11 @@ namespace ns3
         double interval_sel;
         double start_delay; //Prevent nodes from starting at the same time.
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> ();
+        Rinterval->SetStream(3);
+/*
         Ptr<UniformRandomVariable> Rcon = CreateObject<UniformRandomVariable> ();
-
+        Rcon->SetStream(4);
+*/
         CoapClientHelper client(port);
         CoapServerHelper server(port);
 

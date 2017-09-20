@@ -19,6 +19,7 @@ namespace ns3 {
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
+        Rinterval->SetStream(3);
         ApplicationContainer apps;
 
         //Set default route / in FIBs

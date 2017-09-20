@@ -16,28 +16,26 @@
 
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("extra-functions");
-    
-    void ReduceRouteFreq(NodeContainer routers){
-        std::cout<<"BLIEP BLIEP" <<std::endl;
-        for(int idx=0; idx< ( (int) routers.GetN()); idx++)
-        {
+
+    void ReduceRouteFreq(NodeContainer routers) {
+        std::cout << "BLIEP BLIEP" << std::endl;
+        for (int idx = 0; idx < ((int) routers.GetN()); idx++) {
             Ptr<RipNg> ripcur = routers.Get(idx)->GetObject<RipNg>();
             ripcur->SetAttribute("UnsolicitedRoutingUpdate", TimeValue(Seconds(50000)));
             ripcur->SetAttribute("TimeoutDelay", TimeValue(Seconds(50600)));
             ripcur->SetAttribute("GarbageCollectionDelay", TimeValue(Seconds(50700)));
         }
-        
+
     }
 
     Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth) {
         int max_tries = briteth.GetNLeafNodes();
         Ptr<Node> sel_leaf;
-        
+
         for (int idx = 0; idx <= max_tries; max_tries++) {
             NS_ASSERT_MSG(idx<max_tries, "Tried max_tries to find consumer(!) leafnode. No luck.");
             sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
-            if(briteth.IsConnectedLeaf(sel_leaf) == false)
-            {
+            if (briteth.IsConnectedLeaf(sel_leaf) == false) {
                 break;
             }
         }
@@ -54,8 +52,9 @@ namespace ns3 {
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
         Ptr<Node> selNode;
         Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+        Rnode->SetStream(1);
         selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
-
+        NS_LOG_DEBUG("Selected: " << selNode->GetId());
         return selNode;
     }
 
@@ -64,12 +63,13 @@ namespace ns3 {
         //Shuffles std::vector array a random number of times.
 
         Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
+        shuffles->SetStream(2);
         shuffles->SetAttribute("Min", DoubleValue(2));
         shuffles->SetAttribute("Max", DoubleValue(20));
 
         for (int cnt = 0; cnt < (int) (shuffles->GetValue()); cnt++) {
 
-            std::random_shuffle(arrayf.begin(), arrayf.end());
+            random_shuffle_ns3(arrayf.begin(), arrayf.end());
         }
     };
 
@@ -80,6 +80,29 @@ namespace ns3 {
 
         // For the smart home case we use one content per producer node.
         return arrayf;
+    }
+    
+    //This function is copied form std::random_shuffle.
+    template<typename _RandomAccessIterator>
+    inline void
+    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last) {
+
+        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
+        shuffles->SetStream(5);
+
+        // concept requirements
+        __glibcxx_function_requires(_Mutable_RandomAccessIteratorConcept<
+                _RandomAccessIterator>)
+                __glibcxx_requires_valid_range(__first, __last);
+
+        if (__first != __last)
+            for (_RandomAccessIterator __i = __first + 1; __i != __last; ++__i) {
+                // XXX rand() % N is not uniformly distributed
+                _RandomAccessIterator __j = __first
+                        + ((int) shuffles->GetValue( 0, 2147483647)) % ((__i - __first) + 1);
+                if (__i != __j)
+                    std::iter_swap(__i, __j);
+            }
     }
 }
 
