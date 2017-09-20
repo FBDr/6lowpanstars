@@ -75,6 +75,12 @@ namespace ns3 {
             void
             SetNumberOfContents(uint32_t numOfContents);
 
+            void
+            SetRngStream(uint32_t stream);
+
+            uint32_t
+            GetRngStream() const;
+
             uint32_t
             GetNumberOfContents() const;
 

@@ -20,6 +20,7 @@
  **/
 
 #include "ndn-consumer-zipf-mandelbrot-v2.hpp"
+#include "src/core/model/integer.h"
 
 #include <math.h>
 
@@ -41,6 +42,11 @@ namespace ns3 {
                     .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
                     MakeUintegerAccessor(&ConsumerZipfMandelbrotV2::SetNumberOfContents,
                     &ConsumerZipfMandelbrotV2::GetNumberOfContents),
+                    MakeUintegerChecker<uint32_t>())
+
+                    .AddAttribute("RngStream", "Set Rng stream.", StringValue("-1"),
+                    MakeUintegerAccessor(&ConsumerZipfMandelbrotV2::SetRngStream,
+                    &ConsumerZipfMandelbrotV2::GetRngStream),
                     MakeUintegerChecker<uint32_t>())
 
                     .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
@@ -90,6 +96,17 @@ namespace ns3 {
         uint32_t
         ConsumerZipfMandelbrotV2::GetNumberOfContents() const {
             return m_N;
+        }
+
+        void
+        ConsumerZipfMandelbrotV2::SetRngStream(uint32_t stream) {
+            m_seqRng->SetStream((int64_t) stream);
+
+        }
+
+        uint32_t
+        ConsumerZipfMandelbrotV2::GetRngStream() const {
+            return (uint32_t) m_seqRng->GetStream();
         }
 
         void
