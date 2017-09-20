@@ -167,7 +167,7 @@ namespace ns3 {
                     }
                 }
 
-                seq = ConsumerZipfMandelbrotV2::GetNextSeq();
+                seq = ConsumerZipfMandelbrotV2::GetNextSeq()-1; //-1 because of IP implm.
                 m_seq++;
             }
 

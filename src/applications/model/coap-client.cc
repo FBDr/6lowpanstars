@@ -94,9 +94,13 @@ namespace ns3 {
                 .AddAttribute("NumberOfContents", "Number of the Contents in total", StringValue("100"),
                 MakeUintegerAccessor(&CoapClient::SetNumberOfContents,
                 &CoapClient::GetNumberOfContents),
+                MakeUintegerChecker<uint32_t>())
+                .AddAttribute("RngStream", "Set Rng stream.", StringValue("-1"),
+                MakeUintegerAccessor(&CoapClient::SetRngStream,
+                &CoapClient::GetRngStream),
                 MakeUintegerChecker<uint32_t>());
 
-        ;
+                ;
         return tid;
     }
 
@@ -146,6 +150,17 @@ namespace ns3 {
             m_Pcum[i] = m_Pcum[i] / m_Pcum[m_N];
             NS_LOG_LOGIC("Cumulative probability [" << i << "]=" << m_Pcum[i]);
         }
+    }
+
+    void
+    CoapClient::SetRngStream(uint32_t stream) {
+        m_seqRng->SetStream((int64_t) stream);
+
+    }
+
+    uint32_t
+    CoapClient::GetRngStream() const {
+        return (uint32_t) m_seqRng->GetStream();
     }
 
     void
@@ -214,7 +229,7 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-        
+
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);

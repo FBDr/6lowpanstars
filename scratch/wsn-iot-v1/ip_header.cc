@@ -135,6 +135,7 @@ namespace ns3 {
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(briteth, Rleafnodecon);
+                client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = client.Install(sel_node);
                 std::cout<<"sel_node_leaf "<< sel_node->GetId()<<std::endl;
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
@@ -155,6 +156,7 @@ namespace ns3 {
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
+                client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = client.Install(sel_node);
                 std::cout<<"sel_node_inside "<< sel_node->GetId()<<std::endl;
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
@@ -171,7 +173,9 @@ namespace ns3 {
                 start_delay = Rinterval->GetValue(0.1, 5.0);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
-                apps = client.Install(iot[idx].Get(node_periph));
+                Ptr<Node> sel_node = iot[idx].Get(node_periph);
+                client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
+                apps = client.Install(sel_node);
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
