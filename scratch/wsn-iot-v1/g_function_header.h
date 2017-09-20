@@ -39,10 +39,10 @@
 #define G_HEADER_H
 namespace ns3 {
     void ReduceRouteFreq(NodeContainer routers);
-    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth);
-    Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth);
+    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth, Ptr<UniformRandomVariable> Rnode);
+    Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth, Ptr<UniformRandomVariable> Rnode);
 
-    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container);
+    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode);
 
     void shuffle_array(std::vector<int>& arrayf);
 

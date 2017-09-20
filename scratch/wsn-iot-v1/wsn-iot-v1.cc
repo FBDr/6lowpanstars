@@ -174,12 +174,13 @@ namespace ns3 {
         NetDeviceContainer LrWpanDevice[node_head];
         NetDeviceContainer CSMADevice[node_head];
         Ptr<ListPositionAllocator> BorderRouterPositionAlloc = CreateObject<ListPositionAllocator> ();
-
+        Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> (); //Random number for selecting random leafnode.
+        Rnode->SetStream(1);
         for (int jdx = 0; jdx < node_head; jdx++) {
             Ptr<Node> cur_blnode;
             //Add BR and master to csma-NodeContainers
             border_backhaul[jdx].Add(br.Get(jdx));
-            cur_blnode = SelectRandomLeafNode(bth);
+            cur_blnode = SelectRandomLeafNode(bth, Rnode);
             border_backhaul[jdx].Add(cur_blnode);
             bth.SetConnectedLeaf(cur_blnode);
             //Add BR and WSN nodes to IoT[] domain

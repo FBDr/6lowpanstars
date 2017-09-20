@@ -20,6 +20,8 @@ namespace ns3 {
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
         Rinterval->SetStream(3);
+        Ptr<UniformRandomVariable> Rstartdelay = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
+        Rstartdelay->SetStream(5);
         ApplicationContainer apps;
 
         //Set default route / in FIBs
@@ -86,6 +88,8 @@ namespace ns3 {
         consumerHelper.SetAttribute("q", StringValue(zm_q));
         consumerHelper.SetAttribute("s", StringValue(zm_s));
         consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(node_periph)));
+        Ptr<UniformRandomVariable> Rleafnodecon = CreateObject<UniformRandomVariable> ();
+        Rleafnodecon->SetStream(3);
 
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_leaf; jdx++) {
@@ -93,9 +97,10 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rinterval->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth);
+                Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth, Rleafnodecon);
+                std::cout<<"sel_node_leaf "<< sel_node->GetId()<<std::endl;
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
                 if (ipbackhaul) {
                     Ptr<ndn::L3Protocol> L3Prot = sel_node->GetObject<ns3::ndn::L3Protocol>();
@@ -105,6 +110,9 @@ namespace ns3 {
                 apps.Stop(Seconds(simtime - 5));
             }
         }
+        Ptr<UniformRandomVariable> Rinsidenodecon = CreateObject<UniformRandomVariable> ();
+        Rinsidenodecon->SetStream(4);
+
         //Consumer inside install
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_inside; jdx++) {
@@ -113,9 +121,11 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rinterval->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                apps = consumerHelper.Install(SelectRandomNodeFromContainer(iot[idx])); //Consumers are at leaf nodes.
+                Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
+                apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
+                std::cout<<"sel_node_inside "<< sel_node->GetId()<<std::endl;
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
@@ -130,7 +140,7 @@ namespace ns3 {
                 NS_LOG_INFO("Setting prefix to: " << cur_prefix);
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rinterval->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 apps = consumerHelper.Install((iot[idx].Get(node_periph))); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + start_delay));

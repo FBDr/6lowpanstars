@@ -199,7 +199,6 @@ namespace ns3
         NetDeviceContainer devices;
 
         for (int idx = 0; idx < (node_periph + 1); idx++) {
-            std::cout << idx << std::endl;
             Ptr<LrWpanNetDevice> netDevice;
             Ptr<Node> node = c.Get(idx);
             if (idx == gtw_num) {

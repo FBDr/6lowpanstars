@@ -75,11 +75,11 @@ namespace ns3
         NS_LOG_FUNCTION(this);
         if (useContiki) {
             m_mac = CreateObject<LrWpanContikiMac> ();
-            std::cout << "Installed ContikiMac." << std::endl;
+            NS_LOG_INFO("Installed ContikiMac.");
         } else {
             //m_mac = CreateObject<LrWpanNullMac> ();
             m_mac = CreateObject<LrWpanNullMac> ();
-            std::cout << "Installed nullMac." << std::endl;
+            NS_LOG_INFO("Installed nullMac.");
         }
         m_phy = CreateObject<LrWpanPhy> ();
         m_csmaca = CreateObject<LrWpanCsmaCa> ();

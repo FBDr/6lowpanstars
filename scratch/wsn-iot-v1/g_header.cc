@@ -28,13 +28,13 @@ namespace ns3 {
 
     }
 
-    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth) {
+    Ptr<Node> SelectRandomLeafNodeConsumer(BriteTopologyHelper & briteth, Ptr<UniformRandomVariable> Rnode) {
         int max_tries = briteth.GetNLeafNodes();
         Ptr<Node> sel_leaf;
 
         for (int idx = 0; idx <= max_tries; max_tries++) {
             NS_ASSERT_MSG(idx<max_tries, "Tried max_tries to find consumer(!) leafnode. No luck.");
-            sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
+            sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer(), Rnode);
             if (briteth.IsConnectedLeaf(sel_leaf) == false) {
                 break;
             }
@@ -43,16 +43,14 @@ namespace ns3 {
         return sel_leaf;
     }
 
-    Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth) {
-        Ptr<Node> sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer());
+    Ptr<Node> SelectRandomLeafNode(BriteTopologyHelper & briteth, Ptr<UniformRandomVariable> Rnode) {
+        Ptr<Node> sel_leaf = SelectRandomNodeFromContainer(briteth.GetLeafNodeContainer(), Rnode);
         std::cout << "Selected leafnode is (general): " << sel_leaf->GetId() << std::endl;
         return sel_leaf;
     }
 
-    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container) {
+    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode ) {
         Ptr<Node> selNode;
-        Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-        Rnode->SetStream(1);
         selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
         NS_LOG_DEBUG("Selected: " << selNode->GetId());
         return selNode;
