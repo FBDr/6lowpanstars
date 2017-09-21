@@ -80,6 +80,11 @@ namespace ns3 {
             }
         }
         AddrResBucket = CreateAddrResBucket(IPv6Bucket, node_periph);
+        
+        //Shuffelen
+        Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
+        Rpro->SetStream(6);
+        shuffle_array_ip(AddrResBucket, Rpro, 6);
     }
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all,
@@ -138,7 +143,7 @@ namespace ns3 {
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(briteth, Rleafnodecon);
                 client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = client.Install(sel_node);
-                std::cout<<"sel_node_leaf "<< sel_node->GetId()<<std::endl;
+                std::cout << "sel_node_leaf " << sel_node->GetId() << std::endl;
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 NS_LOG_INFO("Size of generated bucket: " << AddrResBucket[idx].size());
                 apps.Start(Seconds(120.0 + start_delay));
@@ -159,7 +164,7 @@ namespace ns3 {
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
                 client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = client.Install(sel_node);
-                std::cout<<"sel_node_inside "<< sel_node->GetId()<<std::endl;
+                std::cout << "sel_node_inside " << sel_node->GetId() << std::endl;
                 client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));

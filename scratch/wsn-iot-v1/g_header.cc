@@ -49,25 +49,51 @@ namespace ns3 {
         return sel_leaf;
     }
 
-    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode ) {
+    Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode) {
         Ptr<Node> selNode;
         selNode = container.Get(round(Rnode->GetValue((double) (0), (double) (container.GetN() - 1))));
         NS_LOG_DEBUG("Selected: " << selNode->GetId());
         return selNode;
     }
 
-    void shuffle_array(std::vector<int>& arrayf) {
+    void shuffle_array(std::vector<int>& arrayf, Ptr<UniformRandomVariable> shuffles) {
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            std::cout << arrayf[idx] << std::endl;
+        }
 
         //Shuffles std::vector array a random number of times.
+        double max = shuffles->GetValue(2, 20);
+        std::cout << "NDN: Max is: " << max << std::endl;
+        for (int cnt = 0; cnt < (int) max; cnt++) {
 
-        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
-        shuffles->SetStream(2);
-        shuffles->SetAttribute("Min", DoubleValue(2));
-        shuffles->SetAttribute("Max", DoubleValue(20));
+            random_shuffle_ns3(arrayf.begin(), arrayf.end(), shuffles);
+        }
+        std::cout << std::endl;
+        std::cout << std::endl;
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            std::cout << arrayf[idx] << std::endl;
+        }
+    };
 
-        for (int cnt = 0; cnt < (int) (shuffles->GetValue()); cnt++) {
+    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream) {
+        //Shuffles std::vector array a random number of times.
+        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
+            std::cout << arrayf[0][idx] << std::endl;
+        }
 
-            random_shuffle_ns3(arrayf.begin(), arrayf.end());
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            shuffles->SetStream(stream);
+            double max = shuffles->GetValue(2, 20);
+            std::cout << "IP: Max is: " << max << std::endl;
+            for (int cnt = 0; cnt < (int) (max); cnt++) {
+                random_shuffle_ns3(arrayf[idx].begin(), arrayf[idx].end(), shuffles);
+            }
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
+            std::cout << arrayf[0][idx] << std::endl;
         }
     };
 
@@ -79,15 +105,12 @@ namespace ns3 {
         // For the smart home case we use one content per producer node.
         return arrayf;
     }
-    
+
     //This function is copied form std::random_shuffle.
+
     template<typename _RandomAccessIterator>
     inline void
-    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last) {
-
-        Ptr<UniformRandomVariable> shuffles = CreateObject<UniformRandomVariable> ();
-        shuffles->SetStream(5);
-
+    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last, Ptr<UniformRandomVariable> shuffles) {
         // concept requirements
         __glibcxx_function_requires(_Mutable_RandomAccessIteratorConcept<
                 _RandomAccessIterator>)
@@ -97,7 +120,7 @@ namespace ns3 {
             for (_RandomAccessIterator __i = __first + 1; __i != __last; ++__i) {
                 // XXX rand() % N is not uniformly distributed
                 _RandomAccessIterator __j = __first
-                        + ((int) shuffles->GetValue( 0, 2147483647)) % ((__i - __first) + 1);
+                        + ((int) shuffles->GetValue(0, 2147483647)) % ((__i - __first) + 1);
                 if (__i != __j)
                     std::iter_swap(__i, __j);
             }

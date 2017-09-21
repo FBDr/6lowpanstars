@@ -103,10 +103,10 @@ namespace ns3 {
 
         for (unsigned int idx = 0; idx < m_IPv6Bucket.size(); idx++) {
             //NS_LOG_INFO("AddSeq: " << idx << " of " << m_ownip);
-            //NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
+            NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
             if (m_IPv6Bucket[idx] == m_ownip) {
                 m_regSeqSet.insert(idx);
-                //NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip);
+                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip<< ". At node: "<< GetNode()->GetId());
             }
         }
     }

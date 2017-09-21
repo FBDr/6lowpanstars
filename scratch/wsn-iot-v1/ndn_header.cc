@@ -69,13 +69,16 @@ namespace ns3 {
         //Producer install
         std::vector<int> content_chunks(node_periph);
         std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
-        shuffle_array(content_chunks);
-        shuffle_array(content_chunks);
+        Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
+        Rpro->SetStream(6);
+        shuffle_array(content_chunks, Rpro);
 
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 std::string cur_prefix;
-                cur_prefix = "/Home_" + std::to_string(idx) + prefix + "/" + std::to_string(content_chunks[jdx]-1); //-1
+                
+                cur_prefix = "/Home_" + std::to_string(idx) + prefix + "/" + std::to_string(content_chunks[jdx] - 1); //-1
+                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " <<content_chunks[jdx] << " "<< content_chunks[jdx]-1 );
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
                 producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
@@ -101,7 +104,7 @@ namespace ns3 {
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth, Rleafnodecon);
                 consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
-                std::cout<<"sel_node_leaf "<< sel_node->GetId()<<std::endl;
+                std::cout << "sel_node_leaf " << sel_node->GetId() << std::endl;
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
                 if (ipbackhaul) {
                     Ptr<ndn::L3Protocol> L3Prot = sel_node->GetObject<ns3::ndn::L3Protocol>();
@@ -127,7 +130,7 @@ namespace ns3 {
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
                 consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
-                std::cout<<"sel_node_inside "<< sel_node->GetId()<<std::endl;
+                std::cout << "sel_node_inside " << sel_node->GetId() << std::endl;
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }

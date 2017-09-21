@@ -44,14 +44,14 @@ namespace ns3 {
 
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode);
 
-    void shuffle_array(std::vector<int>& arrayf);
+    void shuffle_array(std::vector<int>& arrayf, Ptr<UniformRandomVariable> shuffles);
+    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream);
 
     std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain);
 
     template<typename _RandomAccessIterator>
     inline void
-    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last);
-
+    random_shuffle_ns3(_RandomAccessIterator __first, _RandomAccessIterator __last, Ptr<UniformRandomVariable> shuffles);
 }
 #endif /* G_HEADER_H */
 
