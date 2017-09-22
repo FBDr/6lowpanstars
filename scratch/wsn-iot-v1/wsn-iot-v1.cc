@@ -29,7 +29,7 @@ namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
-
+        
         double nodenum = std::stoi(context);
         std::ofstream outfile;
         outfile.open("energy.txt", std::ios_base::app);
