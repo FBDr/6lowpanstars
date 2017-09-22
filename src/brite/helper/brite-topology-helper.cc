@@ -504,7 +504,7 @@ namespace ns3 {
             // The brite value for delay is given in milliseconds
             m_britePointToPointHelper.SetChannelAttribute("Delay",
                     TimeValue(Seconds((*it).delay / 1000.0)));
-
+            
             // The brite value for data rate is given in Mbps
             m_britePointToPointHelper.SetDeviceAttribute("DataRate",
                     DataRateValue(DataRate((*it).bandwidth * mbpsToBps)));
