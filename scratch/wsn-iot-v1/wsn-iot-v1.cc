@@ -30,10 +30,10 @@ namespace ns3 {
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
-        double nodenum = std::stoi(context);
-        std::ofstream outfile;
-        outfile.open("energy.txt", std::ios_base::app);
-        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
+        //double nodenum = std::stoi(context);
+        //std::ofstream outfile;
+        //outfile.open("energy.txt", std::ios_base::app);
+        //outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
     }
 
     int main(int argc, char **argv) {
