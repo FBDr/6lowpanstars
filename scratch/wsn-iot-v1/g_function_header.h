@@ -45,7 +45,7 @@ namespace ns3 {
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode);
 
     void shuffle_array(std::vector<int>& arrayf, Ptr<UniformRandomVariable> shuffles);
-    void shuffle_array_ip(std::vector<Ipv6Address>& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream);
+    void shuffle_array_ip(std::vector<Ipv6Address>& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream, int size);
 
     std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain);
 

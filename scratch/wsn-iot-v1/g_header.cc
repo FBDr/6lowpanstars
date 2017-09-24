@@ -75,24 +75,22 @@ namespace ns3 {
         }
     };
 
-    void shuffle_array_ip(std::vector<Ipv6Address> & arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream) {
+    void shuffle_array_ip(std::vector<Ipv6Address> & arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream, int size) {
         //Shuffles std::vector array a random number of times.
+        std::vector<int> content_chunks(size);
+        std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
+        Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
+        Rpro->SetStream(6);
+        shuffle_array(content_chunks, Rpro);
+        vector<Ipv6Address> array_(arrayf);
         for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
-            std::cout << arrayf[idx] << std::endl;
+            arrayf[content_chunks[idx]-1] = array_[idx];
+        }
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            std::cout<<arrayf[idx]<<std::endl;
         }
 
-        shuffles->SetStream(stream);
-        double max = shuffles->GetValue(2, 20);
-        std::cout << "IP: Max is: " << max << std::endl;
-        for (int cnt = 0; cnt < (int) (max); cnt++) {
-            random_shuffle_ns3(arrayf.begin(), arrayf.end(), shuffles);
-        }
 
-        std::cout << std::endl;
-        std::cout << std::endl;
-        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
-            std::cout << arrayf[idx] << std::endl;
-        }
     };
 
     std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain) {
