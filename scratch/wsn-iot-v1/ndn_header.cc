@@ -103,7 +103,7 @@ namespace ns3 {
                 start_delay = Rstartdelay->GetValue(0.1, 5.0);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth, Rleafnodecon);
-                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
+                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId()))); //Select for every node an unique stream.
                 std::cout << "sel_node_leaf " << sel_node->GetId() << std::endl;
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
                 if (ipbackhaul) {
