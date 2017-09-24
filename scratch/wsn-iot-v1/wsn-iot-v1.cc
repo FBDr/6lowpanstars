@@ -60,6 +60,7 @@ namespace ns3 {
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
+        bool node_cache = true;
         double freshness = 0;
         bool ipbackhaul = false;
         bool useContiki = false;
@@ -87,6 +88,7 @@ namespace ns3 {
         cmd.AddValue("simtime", "Simulation duration in seconds", simtime);
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.AddValue("cache", "Enable caching. Set the number of items in caches", cache);
+        cmd.AddValue("node_cache","Disable caching on end nodes.", node_cache);
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
         cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
@@ -265,7 +267,7 @@ namespace ns3 {
 
         if (ndn) {
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
-                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
+                    cache, node_cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
         }
