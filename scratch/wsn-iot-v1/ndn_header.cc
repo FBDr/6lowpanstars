@@ -78,7 +78,7 @@ namespace ns3 {
                 std::string cur_prefix;
                 int cur_pro = idx * node_periph + jdx;
                 cur_prefix = "/SF/" + std::to_string(content_chunks[cur_pro] - 1); //-1
-                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " << content_chunks[cur_chunk] << " " << content_chunks[cur_chunk] - 1);
+                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " << content_chunks[cur_pro] - 1);
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
                 producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
