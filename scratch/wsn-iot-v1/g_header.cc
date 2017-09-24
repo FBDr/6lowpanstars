@@ -75,25 +75,23 @@ namespace ns3 {
         }
     };
 
-    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream) {
+    void shuffle_array_ip(std::vector<Ipv6Address> & arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream) {
         //Shuffles std::vector array a random number of times.
-        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
-            std::cout << arrayf[0][idx] << std::endl;
-        }
-
         for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
-            shuffles->SetStream(stream);
-            double max = shuffles->GetValue(2, 20);
-            std::cout << "IP: Max is: " << max << std::endl;
-            for (int cnt = 0; cnt < (int) (max); cnt++) {
-                random_shuffle_ns3(arrayf[idx].begin(), arrayf[idx].end(), shuffles);
-            }
+            std::cout << arrayf[idx] << std::endl;
+        }
+
+        shuffles->SetStream(stream);
+        double max = shuffles->GetValue(2, 20);
+        std::cout << "IP: Max is: " << max << std::endl;
+        for (int cnt = 0; cnt < (int) (max); cnt++) {
+            random_shuffle_ns3(arrayf.begin(), arrayf.end(), shuffles);
         }
 
         std::cout << std::endl;
         std::cout << std::endl;
-        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
-            std::cout << arrayf[0][idx] << std::endl;
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            std::cout << arrayf[idx] << std::endl;
         }
     };
 

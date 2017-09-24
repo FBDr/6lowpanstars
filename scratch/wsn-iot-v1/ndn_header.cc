@@ -67,7 +67,7 @@ namespace ns3 {
         ndnGlobalRoutingHelper.InstallAll();
 
         //Producer install
-        std::vector<int> content_chunks(node_periph*node_head);
+        std::vector<int> content_chunks(node_periph * node_head);
         std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
         Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
         Rpro->SetStream(6);
@@ -76,9 +76,9 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 std::string cur_prefix;
-                int cur_chunk = idx*node_periph+jdx;
-                cur_prefix = "/SF/" + std::to_string(content_chunks[cur_chunk] - 1); //-1
-                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " <<content_chunks[cur_chunk] << " "<< content_chunks[cur_chunk]-1 );
+                int cur_pro = idx * node_periph + jdx;
+                cur_prefix = "/SF/" + std::to_string(content_chunks[cur_pro] - 1); //-1
+                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " << content_chunks[cur_chunk] << " " << content_chunks[cur_chunk] - 1);
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
                 producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
@@ -90,72 +90,27 @@ namespace ns3 {
         //Consumer leafnode install
         consumerHelper.SetAttribute("q", StringValue(zm_q));
         consumerHelper.SetAttribute("s", StringValue(zm_s));
-        consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(node_periph*node_head)));
-        Ptr<UniformRandomVariable> Rleafnodecon = CreateObject<UniformRandomVariable> ();
-        Rleafnodecon->SetStream(3);
+        consumerHelper.SetAttribute("NumberOfContents", StringValue(std::to_string(node_periph * node_head)));
 
-        for (int idx = 0; idx < node_head; idx++) {
-            for (int jdx = 0; jdx < con_leaf; jdx++) {
-                std::string cur_prefix;
-                cur_prefix ="/SF/"; //Placeholder
-                consumerHelper.SetPrefix(cur_prefix);
-                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
-                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth, Rleafnodecon);
-                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId()))); //Select for every node an unique stream.
-                std::cout << "sel_node_leaf " << sel_node->GetId() << std::endl;
-                apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
-                if (ipbackhaul) {
-                    Ptr<ndn::L3Protocol> L3Prot = sel_node->GetObject<ns3::ndn::L3Protocol>();
-                    L3Prot->setRole(2);
-                }
-                apps.Start(Seconds(120.0 + start_delay));
-                apps.Stop(Seconds(simtime - 5));
-            }
-        }
         Ptr<UniformRandomVariable> Rinsidenodecon = CreateObject<UniformRandomVariable> ();
         Rinsidenodecon->SetStream(4);
 
         //Consumer inside install
-        for (int idx = 0; idx < node_head; idx++) {
-            for (int jdx = 0; jdx < con_inside; jdx++) {
 
-                std::string cur_prefix;
-                cur_prefix ="/SF/";;
-                consumerHelper.SetPrefix(cur_prefix);
-                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
-                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
-                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
-                apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
-                std::cout << "sel_node_inside " << sel_node->GetId() << std::endl;
-                apps.Start(Seconds(120.0 + start_delay));
-                apps.Stop(Seconds(simtime - 5));
-            }
+        for (int jdx = 0; jdx < con_inside; jdx++) {
+            std::string cur_prefix;
+            cur_prefix = "/SF/";
+            consumerHelper.SetPrefix(cur_prefix);
+            interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
+            start_delay = Rstartdelay->GetValue(0.1, 5.0);
+            consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
+            Ptr<Node> sel_node = SelectRandomNodeFromContainer(endnodes, Rinsidenodecon);
+            consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
+            apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
+            std::cout << "sel_node_inside " << sel_node->GetId() << std::endl;
+            apps.Start(Seconds(120.0 + start_delay));
+            apps.Stop(Seconds(simtime - 5));
         }
-
-        //Consumer gtw install
-        for (int idx = 0; idx < node_head; idx++) {
-            for (int jdx = 0; jdx < con_gtw; jdx++) {
-
-                std::string cur_prefix;
-                cur_prefix ="/SF/";;
-                consumerHelper.SetPrefix(cur_prefix);
-                Ptr<Node> sel_node = iot[idx].Get(node_periph);
-                interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
-                consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
-                apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
-                apps.Start(Seconds(120.0 + start_delay));
-                apps.Stop(Seconds(simtime - 5));
-            }
-        }
-
-
-
         std::cout << "Filling routing tables..." << std::endl;
         ndn::GlobalRoutingHelper::CalculateRoutes();
         std::cout << "Done, now starting simulator..." << std::endl;
