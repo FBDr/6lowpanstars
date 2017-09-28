@@ -14,7 +14,7 @@ install:
 	./waf install
 
 clean:
-	./waf clean
+	./waf
 
 distclean:
 	./waf distclean

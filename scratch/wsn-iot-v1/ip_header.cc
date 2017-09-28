@@ -84,7 +84,7 @@ namespace ns3 {
         //Shuffelen
         Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
         Rpro->SetStream(6);
-        shuffle_array_ip(AddrResBucket, Rpro, 6);
+        shuffle_array_ip(AddrResBucket, Rpro, 6, node_periph);
     }
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all,

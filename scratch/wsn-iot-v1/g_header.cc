@@ -53,7 +53,7 @@ namespace ns3 {
         Ptr<Node> selNode;
         double rn = Rnode->GetValue((double) (0), (double) (container.GetN() - 1));
         int node = round(rn);
-        std::cout<< "Chosen node: "<<node<<" From max of: "<<(double) (container.GetN() - 1)<< " from container "<< container.GetN() << " " << rn << std::endl;
+        std::cout << "Chosen node: " << node << " From max of: " << (double) (container.GetN() - 1) << " from container " << container.GetN() << " " << rn << std::endl;
         selNode = container.Get(node);
         NS_LOG_DEBUG("Selected: " << selNode->GetId());
         return selNode;
@@ -78,25 +78,19 @@ namespace ns3 {
         }
     };
 
-    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream) {
+    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream, int size) {
         //Shuffles std::vector array a random number of times.
-        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
-            std::cout << arrayf[0][idx] << std::endl;
-        }
-
-        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
-            shuffles->SetStream(stream);
-            double max = shuffles->GetValue(2, 20);
-            std::cout << "IP: Max is: " << max << std::endl;
-            for (int cnt = 0; cnt < (int) (max); cnt++) {
-                random_shuffle_ns3(arrayf[idx].begin(), arrayf[idx].end(), shuffles);
+        std::vector< std::vector<Ipv6Address> > array_;
+        array_ = arrayf;
+        std::vector<int> content_chunks(size);
+        std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
+        Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
+        Rpro->SetStream(stream);
+        shuffle_array(content_chunks, Rpro);
+        for (int jdx = 0; jdx < ((int) arrayf.size()); jdx++) {
+            for (int idx = 0; idx < ((int) arrayf[jdx].size()); idx++) {
+                arrayf[jdx][content_chunks[idx] - 1] = array_[jdx][idx];
             }
-        }
-
-        std::cout << std::endl;
-        std::cout << std::endl;
-        for (int idx = 0; idx < ((int) arrayf[0].size()); idx++) {
-            std::cout << arrayf[0][idx] << std::endl;
         }
     };
 
