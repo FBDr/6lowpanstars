@@ -87,6 +87,11 @@ namespace ns3 {
             App::StopApplication();
         }
 
+        Name
+        Producer::GetPrefix() {
+            return m_prefix;
+        }
+
         void
         Producer::OnInterest(shared_ptr<const Interest> interest) {
             App::OnInterest(interest); // tracing inside

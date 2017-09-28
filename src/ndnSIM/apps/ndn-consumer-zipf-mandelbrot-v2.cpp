@@ -21,7 +21,7 @@
 
 #include "ndn-consumer-zipf-mandelbrot-v2.hpp"
 #include "src/core/model/integer.h"
-
+#include "ndn-producer.hpp"
 #include <math.h>
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerZipfMandelbrotV2");
@@ -66,6 +66,7 @@ namespace ns3 {
         : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
         , m_q(0.7)
         , m_s(0.7)
+        , m_own_seq(std::numeric_limits<uint32_t>::max())
         , m_seqRng(CreateObject<UniformRandomVariable>()) {
             // SetNumberOfContents is called by NS-3 object system during the initialization
         }
@@ -135,8 +136,22 @@ namespace ns3 {
         ConsumerZipfMandelbrotV2::SendPacket() {
             if (!m_active)
                 return;
-
             NS_LOG_FUNCTION_NOARGS();
+
+            //Check if this node has a producer application running also.
+
+            if (m_own_seq == std::numeric_limits<uint32_t>::max()) //First time
+            {
+                for (uint32_t idx = 0; idx < (GetNode()->GetNApplications()); idx++) {
+                    if (GetNode()->GetApplication(idx)->GetInstanceTypeId().GetName() == "ns3::ndn::Producer") {
+                        Name own_name_pro = GetNode()->GetApplication(idx)->GetObject<Producer>()->GetPrefix();
+                        int curseq = atoi(own_name_pro.at(-1).toUri().c_str());
+                        m_own_seq = (uint32_t) curseq;
+                        break;
+                    }
+                    m_own_seq = std::numeric_limits<uint32_t>::max() - 1337;
+                }
+            }
 
             uint32_t seq = std::numeric_limits<uint32_t>::max(); // invalid
 
@@ -166,9 +181,18 @@ namespace ns3 {
                         return; // we are totally done
                     }
                 }
+                NS_LOG_INFO(m_own_seq);
+                if (m_own_seq != (std::numeric_limits<uint32_t>::max() - 1337)) {
+                    do {
+                        NS_LOG_INFO("Next sequence...");
+                        seq = ConsumerZipfMandelbrotV2::GetNextSeq() - 1; //-1 because of IP implm.
+                    } while (seq == m_own_seq);
+                    m_seq++;
+                } else {
+                    seq = ConsumerZipfMandelbrotV2::GetNextSeq() - 1; //-1 because of IP implm.
+                    m_seq++;
+                }
 
-                seq = ConsumerZipfMandelbrotV2::GetNextSeq()-1; //-1 because of IP implm.
-                m_seq++;
             }
 
             // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";

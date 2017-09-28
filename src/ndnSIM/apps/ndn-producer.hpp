@@ -46,6 +46,9 @@ namespace ns3 {
             GetTypeId(void);
 
             Producer();
+            
+            Name
+            GetPrefix();
 
             // inherited from NdnApp
             virtual void

@@ -100,6 +100,7 @@ namespace ns3 {
             uint32_t m_N; // number of the contents
             double m_q; // q in (k+q)^s
             double m_s; // s in (k+q)^s
+            uint32_t m_own_seq;
             std::vector<double> m_Pcum; // cumulative probability
 
             Ptr<UniformRandomVariable> m_seqRng; // RNG
