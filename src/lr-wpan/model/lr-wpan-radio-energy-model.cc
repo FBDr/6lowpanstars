@@ -44,7 +44,7 @@ namespace ns3{
         MakeDoubleChecker<double> ())
         .AddAttribute("RxCurrentA",
         "The radio Rx current in Ampere.",
-        DoubleValue(0.0188), // receive mode = 18.8 mA
+        DoubleValue(0.000426), // receive mode = 18.8 mA
         MakeDoubleAccessor(&LrWpanRadioEnergyModel::SetRxCurrentA,
         &LrWpanRadioEnergyModel::GetRxCurrentA),
         MakeDoubleChecker<double> ())

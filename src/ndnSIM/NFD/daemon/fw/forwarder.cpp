@@ -560,23 +560,19 @@ namespace nfd {
                         outData->setName(*nameWithOvrhd);
                         NFD_LOG_DEBUG(nameWithOvrhd->toUri());
                         m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
-                        // send Data to every m_trnsoverhead node
-                        outFace.sendData(*outData);
-                        ++m_counters.nOutData;
+                        break;
                     }
-                    //Throw assertion if no entry is found.
+                    //Throw assertion if now entry is found.
                     assert(idx < ((int) m_trnsoverhead.size()));
                 }
             }
 
-        } else {
-            // send Data
-            outFace.sendData(*outData);
-            ++m_counters.nOutData;
         }
         //**End new part
 
-
+        // send Data
+        outFace.sendData(*outData);
+        ++m_counters.nOutData;
     }
 
     void
