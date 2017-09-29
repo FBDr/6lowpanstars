@@ -30,10 +30,10 @@ namespace ns3 {
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
-        //double nodenum = std::stoi(context);
-        //std::ofstream outfile;
-        //outfile.open("energy.txt", std::ios_base::app);
-        //outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
+        double nodenum = std::stoi(context);
+        std::ofstream outfile;
+        outfile.open("energy.txt", std::ios_base::app);
+        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
     }
 
     int main(int argc, char **argv) {
@@ -243,7 +243,8 @@ namespace ns3 {
                 es[endN] = CreateObject<BasicEnergySource> ();
                 mac[endN] = CreateObject<LrWpanContikiMac> ();
                 es[endN]->SetSupplyVoltage(3.3);
-                es[endN]->SetInitialEnergy(5400); //1 AA battery
+                es[endN]->SetInitialEnergy(10800); //1 AA battery
+                es[endN]->SetEnergyUpdateInterval(Time(Seconds(100)));
                 es[endN]->SetNode(iot[jdx].Get(idx));
                 es[endN]->AppendDeviceEnergyModel(em[endN]);
                 em[endN]->SetEnergySource(es[endN]);
