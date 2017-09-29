@@ -52,10 +52,8 @@ namespace ns3 {
     Ptr<Node> SelectRandomNodeFromContainer(NodeContainer container, Ptr<UniformRandomVariable> Rnode) {
         Ptr<Node> selNode;
         double rn = Rnode->GetValue((double) (0), (double) (container.GetN() - 1));
-        int node = round(rn);
-        std::cout << "Chosen node: " << node << " From max of: " << (double) (container.GetN() - 1) << " from container " << container.GetN() << " " << rn << std::endl;
+        int node = round(rn);        
         selNode = container.Get(node);
-        NS_LOG_DEBUG("Selected: " << selNode->GetId());
         return selNode;
     }
 

@@ -337,7 +337,7 @@ namespace nfd {
         // This should only be done if the incoming interest already had an overhead component.
         // Also check that outface is not a broadcast domain.
         if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0) && ((outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")
-                && (outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1){
+                && (outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
                     NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a backhaulnode. " << "Adding overhead component.");
@@ -374,6 +374,15 @@ namespace nfd {
     void
     Forwarder::onInterestUnsatisfied(const shared_ptr<pit::Entry>& pitEntry) {
         NFD_LOG_DEBUG("onInterestUnsatisfied interest=" << pitEntry->getName());
+
+        std::string pitName = pitEntry->getName().toUri();
+        for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
+            if (m_trnsoverhead[idx].first == pitName) {
+                NFD_LOG_DEBUG("Found trans-entry for Pit: " << idx);
+                m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
+                break;
+            }
+        }
 
         // invoke PIT unsatisfied callback
         beforeExpirePendingInterest(*pitEntry);
@@ -551,29 +560,32 @@ namespace nfd {
                         outData->setName(*nameWithOvrhd);
                         NFD_LOG_DEBUG(nameWithOvrhd->toUri());
                         m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
-                        
-                        break;
+                        // send Data to every m_trnsoverhead node
+                        outFace.sendData(*outData);
+                        ++m_counters.nOutData;
                     }
-                    //Throw assertion if now entry is found.
-                    assert(idx < ((int) m_trnsoverhead.size())); 
+                    //Throw assertion if no entry is found.
+                    assert(idx < ((int) m_trnsoverhead.size()));
                 }
             }
 
+        } else {
+            // send Data
+            outFace.sendData(*outData);
+            ++m_counters.nOutData;
         }
         //**End new part
-        
-        // send Data
-        outFace.sendData(*outData);
-                ++m_counters.nOutData;
+
+
     }
 
     void
     Forwarder::onIncomingNack(Face& inFace, const lp::Nack& nack) {
         // receive Nack
         nack.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
-                ++m_counters.nInNacks;
+        ++m_counters.nInNacks;
 
-                // if multi-access face, drop
+        // if multi-access face, drop
         if (inFace.getLinkType() == ndn::nfd::LINK_TYPE_MULTI_ACCESS) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -583,7 +595,7 @@ namespace nfd {
 
         // PIT match
         shared_ptr<pit::Entry> pitEntry = m_pit.find(nack.getInterest());
-                // if no PIT entry found, drop
+        // if no PIT entry found, drop
         if (pitEntry == nullptr) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -593,7 +605,7 @@ namespace nfd {
 
         // has out-record?
         pit::OutRecordCollection::iterator outRecord = pitEntry->getOutRecord(inFace);
-                // if no out-record found, drop
+        // if no out-record found, drop
         if (outRecord == pitEntry->out_end()) {
             NFD_LOG_DEBUG("onIncomingNack face=" << inFace.getId() <<
                     " nack=" << nack.getInterest().getName() <<
@@ -614,11 +626,11 @@ namespace nfd {
                 " nack=" << nack.getInterest().getName() <<
                 "~" << nack.getReason() << " OK");
 
-                // record Nack on out-record
-                outRecord->setIncomingNack(nack);
+        // record Nack on out-record
+        outRecord->setIncomingNack(nack);
 
-                // trigger strategy: after receive NACK
-                this->dispatchToStrategy(*pitEntry,
+        // trigger strategy: after receive NACK
+        this->dispatchToStrategy(*pitEntry,
                 [&] (fw::Strategy & strategy) {
 
                     strategy.afterReceiveNack(inFace, nack, pitEntry); });
@@ -637,7 +649,7 @@ namespace nfd {
         // has in-record?
         pit::InRecordCollection::iterator inRecord = pitEntry->getInRecord(outFace);
 
-                // if no in-record found, drop
+        // if no in-record found, drop
         if (inRecord == pitEntry->in_end()) {
             NFD_LOG_DEBUG("onOutgoingNack face=" << outFace.getId() <<
                     " nack=" << pitEntry->getInterest().getName() <<
@@ -660,16 +672,16 @@ namespace nfd {
                 " nack=" << pitEntry->getInterest().getName() <<
                 "~" << nack.getReason() << " OK");
 
-                // create Nack packet with the Interest from in-record
-                lp::Nack nackPkt(inRecord->getInterest());
-                nackPkt.setHeader(nack);
+        // create Nack packet with the Interest from in-record
+        lp::Nack nackPkt(inRecord->getInterest());
+        nackPkt.setHeader(nack);
 
-                // erase in-record
-                pitEntry->deleteInRecord(outFace);
+        // erase in-record
+        pitEntry->deleteInRecord(outFace);
 
-                // send Nack on face
-                const_cast<Face&> (outFace).sendNack(nackPkt);
-                ++m_counters.nOutNacks;
+        // send Nack on face
+        const_cast<Face&> (outFace).sendNack(nackPkt);
+        ++m_counters.nOutNacks;
     }
 
     static inline bool
@@ -683,14 +695,14 @@ namespace nfd {
         pit::InRecordCollection::iterator lastExpiring =
                 std::max_element(pitEntry->in_begin(), pitEntry->in_end(), &compare_InRecord_expiry);
 
-                time::steady_clock::TimePoint lastExpiry = lastExpiring->getExpiry();
-                time::nanoseconds lastExpiryFromNow = lastExpiry - time::steady_clock::now();
+        time::steady_clock::TimePoint lastExpiry = lastExpiring->getExpiry();
+        time::nanoseconds lastExpiryFromNow = lastExpiry - time::steady_clock::now();
         if (lastExpiryFromNow <= time::seconds::zero()) {
             // TODO all in-records are already expired; will this happen?
         }
 
         scheduler::cancel(pitEntry->m_unsatisfyTimer);
-                pitEntry->m_unsatisfyTimer = scheduler::schedule(lastExpiryFromNow,
+        pitEntry->m_unsatisfyTimer = scheduler::schedule(lastExpiryFromNow,
                 bind(&Forwarder::onInterestUnsatisfied, this, pitEntry));
     }
 
@@ -700,8 +712,8 @@ namespace nfd {
 
         time::nanoseconds stragglerTime = time::milliseconds(100);
 
-                scheduler::cancel(pitEntry->m_stragglerTimer);
-                pitEntry->m_stragglerTimer = scheduler::schedule(stragglerTime,
+        scheduler::cancel(pitEntry->m_stragglerTimer);
+        pitEntry->m_stragglerTimer = scheduler::schedule(stragglerTime,
                 bind(&Forwarder::onInterestFinalize, this, pitEntry, isSatisfied, dataFreshnessPeriod));
     }
 
@@ -709,7 +721,7 @@ namespace nfd {
     Forwarder::cancelUnsatisfyAndStragglerTimer(pit::Entry& pitEntry) {
 
         scheduler::cancel(pitEntry.m_unsatisfyTimer);
-                scheduler::cancel(pitEntry.m_stragglerTimer);
+        scheduler::cancel(pitEntry.m_stragglerTimer);
     }
 
     static inline void
@@ -726,8 +738,8 @@ namespace nfd {
         bool needDnl = false;
         if (isSatisfied) {
             bool hasFreshnessPeriod = dataFreshnessPeriod >= time::milliseconds::zero();
-                    // Data never becomes stale if it doesn't have FreshnessPeriod field
-                    needDnl = static_cast<bool> (pitEntry.getInterest().getMustBeFresh()) &&
+            // Data never becomes stale if it doesn't have FreshnessPeriod field
+            needDnl = static_cast<bool> (pitEntry.getInterest().getMustBeFresh()) &&
                     (hasFreshnessPeriod && dataFreshnessPeriod < m_deadNonceList.getLifetime());
         } else {
             needDnl = true;
@@ -741,7 +753,7 @@ namespace nfd {
         if (upstream == 0) {
             // insert all outgoing Nonces
             const pit::OutRecordCollection& outRecords = pitEntry.getOutRecords();
-                    std::for_each(outRecords.begin(), outRecords.end(),
+            std::for_each(outRecords.begin(), outRecords.end(),
                     bind(&insertNonceToDnl, ref(m_deadNonceList), cref(pitEntry), _1));
         } else {
             // insert outgoing Nonce of a specific face
