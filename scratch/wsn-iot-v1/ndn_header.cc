@@ -28,14 +28,15 @@ namespace ns3 {
         ndnHelper.SetDefaultRoutes(true);
 
         //Scenario specific functions
-        if (!cache) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
-        }
         if (freshness) {
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
         } else {
             //Then the default CS is being used.
             ndnHelper.setCsSize(cache);
+        }
+        
+        if (!cache) {
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
         }
 
         // Install NDN stack on iot endnodes
@@ -76,9 +77,9 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 std::string cur_prefix;
-                
+
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix + "/" + std::to_string(content_chunks[jdx] - 1); //-1
-                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " <<content_chunks[jdx] << " "<< content_chunks[jdx]-1 );
+                NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " << content_chunks[jdx] << " " << content_chunks[jdx] - 1);
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
                 producerHelper.SetAttribute("Freshness", TimeValue(Seconds(freshness)));
