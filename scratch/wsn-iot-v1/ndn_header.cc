@@ -19,7 +19,7 @@ namespace ns3 {
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
         Ptr<UniformRandomVariable> Rinterval = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
-        Rinterval->SetStream(3);
+        Rinterval->SetStream(2);
         Ptr<UniformRandomVariable> Rstartdelay = CreateObject<UniformRandomVariable> (); //Random variable for transmission interval
         Rstartdelay->SetStream(5);
         ApplicationContainer apps;
