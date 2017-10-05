@@ -40,7 +40,7 @@
 namespace ns3 {
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
-            int &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
+            int &cache, bool &node_cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq);
 
     void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,

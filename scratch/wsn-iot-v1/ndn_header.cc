@@ -5,7 +5,7 @@ namespace ns3 {
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
             BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
-            int &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
+            int &cache, bool &node_cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq) {
 
         //This function installs NDN stack on nodes if ndn is selected as networking protocol.
@@ -14,7 +14,9 @@ namespace ns3 {
         std::string prefix = "/SensorData";
         double interval_sel;
         double start_delay; //Prevent nodes from starting at the same time.
-        ndn::StackHelper ndnHelper;
+        ndn::StackHelper ndnHelper_endn;
+        ndn::StackHelper ndnHelper_gtw;
+        ndn::StackHelper ndnHelper_bh;
         ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
         ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrotV2");
         ndn::AppHelper producerHelper("ns3::ndn::Producer");
@@ -24,31 +26,51 @@ namespace ns3 {
         Rstartdelay->SetStream(5);
         ApplicationContainer apps;
 
-        //Set default route / in FIBs
-        ndnHelper.SetDefaultRoutes(true);
-
-        //Scenario specific functions
+        //NDN stack endnodes
+        ndnHelper_endn.SetDefaultRoutes(true);
         if (freshness) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+            ndnHelper_endn.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
         } else {
             //Then the default CS is being used.
-            ndnHelper.setCsSize(cache);
+            ndnHelper_endn.setCsSize(cache);
         }
-        
+
+        if (!cache || !node_cache) {
+            ndnHelper_endn.SetOldContentStore("ns3::ndn::cs::Nocache");
+        }
+        ndnHelper_endn.Install(endnodes);
+
+
+        //NDN stack GTW
+        ndnHelper_gtw.SetDefaultRoutes(true);
+        if (freshness) {
+            ndnHelper_gtw.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+        } else {
+            //Then the default CS is being used.
+            ndnHelper_gtw.setCsSize(cache);
+        }
         if (!cache) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
+            ndnHelper_gtw.SetOldContentStore("ns3::ndn::cs::Nocache");
         }
-
-        // Install NDN stack on iot endnodes
+        // Install NDN stack on iot border gtw
         for (int jdx = 0; jdx < node_head; jdx++) {
-            ndnHelper.Install(iot[jdx]);
+            ndnHelper_gtw.Install(iot[jdx].Get(node_periph));
         }
 
-        //Install NDN stack on backhaul nodes
-        if (ipbackhaul) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in an IP based backhaul network.  
+
+        //NDN stack backhaul
+        ndnHelper_bh.SetDefaultRoutes(true);
+        if (freshness) {
+            ndnHelper_bh.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+        } else {
+            //Then the default CS is being used.
+            ndnHelper_bh.setCsSize(cache);
         }
-        ndnHelper.Install(backhaul);
+
+        if (ipbackhaul) {
+            ndnHelper_bh.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in an IP based backhaul network.  
+        }
+        ndnHelper_bh.Install(backhaul);
 
         if (ipbackhaul) {
             for (int idx = 0; idx < (int) backhaul.GetN(); idx++) {

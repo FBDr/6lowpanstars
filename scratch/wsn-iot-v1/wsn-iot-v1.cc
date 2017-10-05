@@ -60,6 +60,7 @@ namespace ns3 {
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
+        bool node_cache = true;
         double freshness = 0;
         bool ipbackhaul = false;
         bool useContiki = false;
@@ -95,6 +96,7 @@ namespace ns3 {
         cmd.AddValue("csma_delay", "Set the delay for the Br <-> Backhaul connection.", csma_delay);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
+        cmd.AddValue("node_cache","Disable caching on end nodes.", node_cache);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -266,7 +268,7 @@ namespace ns3 {
 
         if (ndn) {
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
-                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
+                    cache, node_cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
         }
