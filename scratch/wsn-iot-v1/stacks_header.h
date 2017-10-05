@@ -46,11 +46,11 @@ namespace ns3 {
     void sixlowpan_stack(int &node_periph, int &node_head, int &totnumcontents, BriteTopologyHelper &bth,
             NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
             Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
-            std::vector< std::vector<Ipv6Address> > &IPv6Bucket, std::vector< std::vector<Ipv6Address> > &AddrResBucket,
+            std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
             NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul);
 
-    void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all,
-            std::vector< std::vector<Ipv6Address> > &AddrResBucket, ApplicationContainer &apps,
+    void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all, NodeContainer endnodes,
+            std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
             double &min_freq, double &max_freq);
