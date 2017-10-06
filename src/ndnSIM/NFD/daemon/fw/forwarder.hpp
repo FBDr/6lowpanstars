@@ -317,9 +317,9 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         StrategyChoice m_strategyChoice;
         DeadNonceList m_deadNonceList;
         NetworkRegionTable m_networkRegionTable;
-        shared_ptr<Face> m_csFace;
         uint64_t m_tx_data_bytes;
         uint64_t m_tx_interest_bytes;
+        shared_ptr<Face> m_csFace;
         ns3::Ptr<ns3::ndn::ContentStore> m_csFromNdnSim;
 
         // allow Strategy (base class) to enter pipelines

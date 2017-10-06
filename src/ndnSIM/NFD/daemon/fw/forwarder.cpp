@@ -48,11 +48,11 @@ namespace nfd {
     Forwarder::Forwarder()
     : m_unsolicitedDataPolicy(new fw::DefaultUnsolicitedDataPolicy())
     , m_fib(m_nameTree)
-    , m_tx_data_bytes(0)
-    , m_tx_interest_bytes(0)
     , m_pit(m_nameTree)
     , m_measurements(m_nameTree)
     , m_strategyChoice(m_nameTree, fw::makeDefaultStrategy(*this))
+    , m_tx_data_bytes(0)
+    , m_tx_interest_bytes(0)
     , m_csFace(face::makeNullFace(FaceUri("contentstore://"))) {
         m_node = NULL;
         fw::installStrategies(*this);
@@ -337,7 +337,7 @@ namespace nfd {
         //**New part for backhaul modeling
         auto outInterest = make_shared<Interest>(interest);
         // Size is the total size of the extra overhead component.
-        int size = 10;
+        int size =48 -2;
         uint8_t * buff = new uint8_t [size];
         shared_ptr<Name> nameWithSequence;
         std::string extra = "ovrhd";
