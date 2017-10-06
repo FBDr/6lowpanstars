@@ -55,6 +55,7 @@
 #include "ns3/ndnSIM/NFD/core/config-file.hpp"
 
 #include <ndn-cxx/mgmt/dispatcher.hpp>
+#include <fstream>
 
 NS_LOG_COMPONENT_DEFINE("ndn.L3Protocol");
 
@@ -236,8 +237,7 @@ namespace ns3 {
 
             void
             operator()(const std::string& filename, const std::string& sectionName,
-                    const nfd::ConfigSection& section, bool isDryRun)
- {
+                    const nfd::ConfigSection& section, bool isDryRun) {
                 if (std::find(m_ignored.begin(), m_ignored.end(), sectionName) == m_ignored.end()) {
                     nfd::ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
                 }
@@ -400,6 +400,12 @@ namespace ns3 {
         void
         L3Protocol::DoDispose(void) {
             NS_LOG_FUNCTION(this);
+
+            std::ofstream outfile2;
+            outfile2.open("bytes2.txt", std::ios_base::app);
+            uint64_t TotalTxDataBytes = getForwarder()->getTx_data_bytes();
+            uint64_t TotalTxInterestBytes = getForwarder()->getTx_interest_bytes();
+            outfile2 << m_node->GetId() << " " <<TotalTxInterestBytes <<" " << TotalTxDataBytes << std::endl;
 
             // MUST HAPPEN BEFORE Simulator IS DESTROYED
             m_impl.reset();

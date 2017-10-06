@@ -48,6 +48,8 @@ namespace nfd {
     Forwarder::Forwarder()
     : m_unsolicitedDataPolicy(new fw::DefaultUnsolicitedDataPolicy())
     , m_fib(m_nameTree)
+    , m_tx_data_bytes(0)
+    , m_tx_interest_bytes(0)
     , m_pit(m_nameTree)
     , m_measurements(m_nameTree)
     , m_strategyChoice(m_nameTree, fw::makeDefaultStrategy(*this))
@@ -86,6 +88,16 @@ namespace nfd {
     ns3::Ptr<ns3::Node>
     Forwarder::getNode() {
         return m_node;
+    }
+
+    uint64_t
+    Forwarder::getTx_data_bytes() {
+        return m_tx_data_bytes;
+    }
+
+    uint64_t
+    Forwarder::getTx_interest_bytes() {
+        return m_tx_interest_bytes;
     }
 
     uint8_t
@@ -350,6 +362,11 @@ namespace nfd {
                 NFD_LOG_DEBUG("Sending overhead interest: " << outInterest->getName());
             }
         }
+
+        if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+            m_tx_interest_bytes += (uint64_t) (outInterest->wireEncode().size());
+        }
+
         //**End of part for backhaul modeling.
         outFace.sendInterest(*outInterest);
         ++m_counters.nOutInterests;
@@ -570,6 +587,9 @@ namespace nfd {
         }
         //**End new part
 
+        if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+            m_tx_data_bytes += (uint64_t) (outData->wireEncode().size());
+        }
         // send Data
         outFace.sendData(*outData);
         ++m_counters.nOutData;

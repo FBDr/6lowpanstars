@@ -63,6 +63,10 @@ namespace nfd {
         VIRTUAL_WITH_TESTS
         ~Forwarder();
 
+        uint64_t getTx_data_bytes();
+
+        uint64_t getTx_interest_bytes();
+
         void setNode(ns3::Ptr<ns3::Node> node);
         ns3::Ptr<ns3::Node> getNode();
 
@@ -73,7 +77,7 @@ namespace nfd {
 
         uint8_t
         iamGTW();
-        
+
         std::string
         genRandomString(int len);
 
@@ -304,7 +308,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
         bool m_conOvrhd_int; //Flag to indicate if current interest contained overhead component.
         bool m_conOvrhd_data; //Flag to indicate if current interest contained overhead component.
-        std::vector<std::pair<std::string,std::string>> m_trnsoverhead;
+        std::vector<std::pair<std::string, std::string>> m_trnsoverhead;
         NameTree m_nameTree;
         Fib m_fib;
         Pit m_pit;
@@ -314,7 +318,8 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         DeadNonceList m_deadNonceList;
         NetworkRegionTable m_networkRegionTable;
         shared_ptr<Face> m_csFace;
-
+        uint64_t m_tx_data_bytes;
+        uint64_t m_tx_interest_bytes;
         ns3::Ptr<ns3::ndn::ContentStore> m_csFromNdnSim;
 
         // allow Strategy (base class) to enter pipelines

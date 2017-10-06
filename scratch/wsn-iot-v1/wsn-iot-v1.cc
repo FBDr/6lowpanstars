@@ -120,7 +120,7 @@ namespace ns3 {
         remove("hopdelay.txt");
         remove("pktloss.txt");
         remove("bytes.txt");
-
+        remove("bytes2.txt");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
