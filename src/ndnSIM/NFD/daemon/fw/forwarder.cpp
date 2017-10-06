@@ -337,7 +337,7 @@ namespace nfd {
         //**New part for backhaul modeling
         auto outInterest = make_shared<Interest>(interest);
         // Size is the total size of the extra overhead component.
-        int size =48 -2;
+        int size = 48 - 2;
         uint8_t * buff = new uint8_t [size];
         shared_ptr<Name> nameWithSequence;
         std::string extra = "ovrhd";
@@ -364,7 +364,7 @@ namespace nfd {
         }
 
         if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-            m_tx_interest_bytes += (uint64_t) (outInterest->wireEncode().size());
+            m_tx_interest_bytes += (uint64_t) (outInterest->wireEncode().size()) + 7;
         }
 
         //**End of part for backhaul modeling.
@@ -588,7 +588,7 @@ namespace nfd {
         //**End new part
 
         if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-            m_tx_data_bytes += (uint64_t) (outData->wireEncode().size());
+            m_tx_data_bytes += (uint64_t) (outData->wireEncode().size()) + 7;
         }
         // send Data
         outFace.sendData(*outData);
