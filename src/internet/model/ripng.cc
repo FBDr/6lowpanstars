@@ -584,7 +584,7 @@ namespace ns3
         for (RoutesI it = m_routes.begin(); it != m_routes.end(); it++) {
             if (it->first == route) {
                 route->SetRouteStatus(RipNgRoutingTableEntry::RIPNG_INVALID);
-                route->SetRouteMetric(16);
+                route->SetRouteMetric(20);
                 route->SetRouteChanged(true);
                 if (it->second.IsRunning()) {
                     it->second.Cancel();
@@ -669,7 +669,7 @@ namespace ns3
         if (rtes.size() == 1 && senderAddress.IsLinkLocal()) {
             if (rtes.begin()->GetPrefix() == Ipv6Address::GetAny() &&
                     rtes.begin()->GetPrefixLen() == 0 &&
-                    rtes.begin()->GetRouteMetric() == 16) {
+                    rtes.begin()->GetRouteMetric() == 20) {
                 // Output whole thing. Use Split Horizon
                 if (m_interfaceExclusions.find(incomingInterface) == m_interfaceExclusions.end()) {
                     // we use one of the sending sockets, as they're bound to the right interface
@@ -710,7 +710,7 @@ namespace ns3
                             rte.SetPrefix(rtIter->first->GetDestNetwork());
                             rte.SetPrefixLen(rtIter->first->GetDestNetworkPrefix().GetPrefixLength());
                             if (m_splitHorizonStrategy == POISON_REVERSE && splitHorizoning) {
-                                rte.SetRouteMetric(16);
+                                rte.SetRouteMetric(20);
                             } else {
                                 rte.SetRouteMetric(rtIter->first->GetRouteMetric());
                             }
@@ -782,7 +782,7 @@ namespace ns3
                     }
                 }
                 if (!found) {
-                    iter->SetRouteMetric(16);
+                    iter->SetRouteMetric(20);
                     iter->SetRouteTag(0);
                     hdr.AddRte(*iter);
                 }
@@ -817,7 +817,7 @@ namespace ns3
         // validate the RTEs before processing
         for (std::list<RipNgRte>::iterator iter = rtes.begin();
                 iter != rtes.end(); iter++) {
-            if (iter->GetRouteMetric() == 0 || iter->GetRouteMetric() > 16) {
+            if (iter->GetRouteMetric() == 0 || iter->GetRouteMetric() > 20) {
                 NS_LOG_LOGIC("Ignoring an update message with malformed metric: " << int (iter->GetRouteMetric()));
                 return;
             }
@@ -846,7 +846,7 @@ namespace ns3
             if (m_interfaceMetrics.find(incomingInterface) != m_interfaceMetrics.end()) {
                 interfaceMetric = m_interfaceMetrics[incomingInterface];
             }
-            uint8_t rteMetric = std::min(iter->GetRouteMetric() + interfaceMetric, 16);
+            uint8_t rteMetric = std::min(iter->GetRouteMetric() + interfaceMetric, 20);
             RoutesI it;
             bool found = false;
             for (it = m_routes.begin(); it != m_routes.end(); it++) {
@@ -886,7 +886,7 @@ namespace ns3
                         }
                     } else if (rteMetric > it->first->GetRouteMetric() && senderAddress == it->first->GetGateway()) {
                         it->second.Cancel();
-                        if (rteMetric < 16) {
+                        if (rteMetric < 20) {
                             it->first->SetRouteMetric(rteMetric);
                             it->first->SetRouteStatus(RipNgRoutingTableEntry::RIPNG_VALID);
                             it->first->SetRouteTag(iter->GetRouteTag());
@@ -900,7 +900,7 @@ namespace ns3
                     }
                 }
             }
-            if (!found && rteMetric != 16) {
+            if (!found && rteMetric != 20) {
                 NS_LOG_LOGIC("Received a RTE with new route, adding.");
 
                 RipNgRoutingTableEntry* route = new RipNgRoutingTableEntry(rteAddr, rtePrefix, senderAddress, incomingInterface, Ipv6Address::GetAny());
@@ -954,7 +954,7 @@ namespace ns3
                         rte.SetPrefix(rtIter->first->GetDestNetwork());
                         rte.SetPrefixLen(rtIter->first->GetDestNetworkPrefix().GetPrefixLength());
                         if (m_splitHorizonStrategy == POISON_REVERSE && splitHorizoning) {
-                            rte.SetRouteMetric(16);
+                            rte.SetRouteMetric(20);
                         } else {
                             rte.SetRouteMetric(rtIter->first->GetRouteMetric());
                         }
@@ -1049,7 +1049,7 @@ namespace ns3
     void RipNg::SetInterfaceMetric(uint32_t interface, uint8_t metric) {
         NS_LOG_FUNCTION(this << interface << int (metric));
 
-        if (metric < 16) {
+        if (metric < 20) {
             m_interfaceMetrics[interface] = metric;
         }
     }
@@ -1069,7 +1069,7 @@ namespace ns3
         RipNgRte rte;
         rte.SetPrefix(Ipv6Address::GetAny());
         rte.SetPrefixLen(0);
-        rte.SetRouteMetric(16);
+        rte.SetRouteMetric(20);
 
         hdr.AddRte(rte);
         p->AddHeader(hdr);
@@ -1095,17 +1095,17 @@ namespace ns3
      */
 
     RipNgRoutingTableEntry::RipNgRoutingTableEntry()
-            : m_tag(0), m_metric(16), m_status(RIPNG_INVALID), m_changed(false) {
+            : m_tag(0), m_metric(20), m_status(RIPNG_INVALID), m_changed(false) {
     }
 
     RipNgRoutingTableEntry::RipNgRoutingTableEntry(Ipv6Address network, Ipv6Prefix networkPrefix, Ipv6Address nextHop, uint32_t interface, Ipv6Address prefixToUse)
             : Ipv6RoutingTableEntry(RipNgRoutingTableEntry::CreateNetworkRouteTo(network, networkPrefix, nextHop, interface, prefixToUse)),
-            m_tag(0), m_metric(16), m_status(RIPNG_INVALID), m_changed(false) {
+            m_tag(0), m_metric(20), m_status(RIPNG_INVALID), m_changed(false) {
     }
 
     RipNgRoutingTableEntry::RipNgRoutingTableEntry(Ipv6Address network, Ipv6Prefix networkPrefix, uint32_t interface)
             : Ipv6RoutingTableEntry(Ipv6RoutingTableEntry::CreateNetworkRouteTo(network, networkPrefix, interface)),
-            m_tag(0), m_metric(16), m_status(RIPNG_INVALID), m_changed(false) {
+            m_tag(0), m_metric(20), m_status(RIPNG_INVALID), m_changed(false) {
     }
 
     RipNgRoutingTableEntry::~RipNgRoutingTableEntry() {
