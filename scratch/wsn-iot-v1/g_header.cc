@@ -76,20 +76,22 @@ namespace ns3 {
         }
     };
 
-    void shuffle_array_ip(std::vector< std::vector<Ipv6Address> >& arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream, int size) {
+    void shuffle_array_ip(std::vector<Ipv6Address> & arrayf, Ptr<UniformRandomVariable> shuffles, int64_t stream, int size) {
         //Shuffles std::vector array a random number of times.
-        std::vector< std::vector<Ipv6Address> > array_;
-        array_ = arrayf;
         std::vector<int> content_chunks(size);
         std::iota(std::begin(content_chunks), std::end(content_chunks), 1);
         Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
         Rpro->SetStream(stream);
         shuffle_array(content_chunks, Rpro);
-        for (int jdx = 0; jdx < ((int) arrayf.size()); jdx++) {
-            for (int idx = 0; idx < ((int) arrayf[jdx].size()); idx++) {
-                arrayf[jdx][content_chunks[idx] - 1] = array_[jdx][idx];
-            }
+        vector<Ipv6Address> array_(arrayf);
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            arrayf[content_chunks[idx]-1] = array_[idx];
         }
+        for (int idx = 0; idx < ((int) arrayf.size()); idx++) {
+            std::cout<<arrayf[idx]<<std::endl;
+        }
+
+
     };
 
     std::vector< std::vector<Ipv6Address> > CreateAddrResBucket(std::vector< std::vector<Ipv6Address> > &arrayf, int numContentsPerDomain) {
