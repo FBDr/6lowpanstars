@@ -155,7 +155,6 @@ namespace ns3 {
         BriteTopologyHelper bth(std::string("./TD_ASBarabasi_RTWaxman.conf"));
         bth.AssignStreams(3);
         backhaul = bth.BuildBriteTopology2();
-
         br.Create(node_head);
         routers.Add(backhaul);
         routers.Add(br);
