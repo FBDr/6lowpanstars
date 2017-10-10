@@ -67,7 +67,7 @@ namespace ns3 {
             ndnHelper_bh.setCsSize(cache);
         }
 
-        if (ipbackhaul) {
+        if (ipbackhaul || !cache) {
             ndnHelper_bh.SetOldContentStore("ns3::ndn::cs::Nocache"); //We don't want caching in an IP based backhaul network.  
         }
         ndnHelper_bh.Install(backhaul);
