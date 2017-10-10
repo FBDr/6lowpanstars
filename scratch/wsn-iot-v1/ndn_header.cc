@@ -78,7 +78,7 @@ namespace ns3 {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 std::string cur_prefix;
                 int cur_pro = idx * node_periph + jdx;
-                cur_prefix = "/SF/" + std::to_string(content_chunks[cur_pro] - 1); //-1
+                cur_prefix = "/Sensordata/" + std::to_string(content_chunks[cur_pro] - 1); //-1
                 NS_LOG_INFO("Im node: " << iot[idx].Get(jdx)->GetId() << "with prefix: " << content_chunks[cur_pro] - 1);
                 producerHelper.SetPrefix(cur_prefix);
                 producerHelper.SetAttribute("PayloadSize", StringValue(boost::lexical_cast<std::string>(payloadsize))); //Should we make this random?
@@ -100,7 +100,7 @@ namespace ns3 {
 
         for (int jdx = 0; jdx < con_inside; jdx++) {
             std::string cur_prefix;
-            cur_prefix = "/SF/";
+            cur_prefix = "/Sensordata/";
             consumerHelper.SetPrefix(cur_prefix);
             interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             start_delay = Rstartdelay->GetValue(0.1, 5.0);
