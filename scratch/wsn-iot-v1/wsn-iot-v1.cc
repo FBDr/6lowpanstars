@@ -66,7 +66,6 @@ namespace ns3 {
         int payloadsize = 10;
         double min_freq = 0.0166;
         double max_freq = 5;
-        int csma_delay = 20;
         int dtracefreq = 10000;
         std::string zm_q = "0.7";
         std::string zm_s = "0.7";
@@ -92,7 +91,6 @@ namespace ns3 {
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
         cmd.AddValue("zm_q", "Set the alpha parameter of the ZM distribution", zm_q);
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
-        cmd.AddValue("csma_delay", "Set the delay for the Br <-> Backhaul connection.", csma_delay);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.Parse(argc, argv);
@@ -210,11 +208,7 @@ namespace ns3 {
         //Create and install CSMA and LrWpan channels.
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
-        if (ndn && ipbackhaul) {
-            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(csma_delay)));
-        } else {
-            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
-        }
+        csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
 
         LrWpanHelper lrWpanHelper[node_head];
 
