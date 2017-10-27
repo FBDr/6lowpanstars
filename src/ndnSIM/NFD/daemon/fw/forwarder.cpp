@@ -390,15 +390,6 @@ namespace nfd {
     Forwarder::onInterestUnsatisfied(const shared_ptr<pit::Entry>& pitEntry) {
         NFD_LOG_DEBUG("onInterestUnsatisfied interest=" << pitEntry->getName());
 
-        std::string pitName = pitEntry->getName().toUri();
-        for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
-            if (m_trnsoverhead[idx].first == pitName) {
-                NFD_LOG_DEBUG("Found trans-entry for Pit: " << idx);
-                m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
-                break;
-            }
-        }
-
         // invoke PIT unsatisfied callback
         beforeExpirePendingInterest(*pitEntry);
         this->dispatchToStrategy(*pitEntry,
@@ -443,9 +434,9 @@ namespace nfd {
             // (drop)
             return;
         }
-
+        std::cout << getNode()->GetId() << " " << data.getContentType() << std::endl;
         // Set flag if data pkt already contains overhead.
-        if (data.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
+        if (data.getContentType() == (uint32_t) 1337) {
             m_conOvrhd_data = true;
             NFD_LOG_DEBUG("Data contains overhead");
         } else {
@@ -456,10 +447,11 @@ namespace nfd {
         // remove overhead component.
         if (m_conOvrhd_data && (iamGTW() == 2)) {
             //Remove last segment
-            std::string ovrhd = data.getName().at(-1).toUri();
-            Name subname = data.getName().getSubName(0, data.getName().size() - 1);
-            outData->setName(subname);
-            NFD_LOG_DEBUG("Removed overhead component, name is now: " << outData->getName());
+            NFD_LOG_DEBUG("Removing overhead component");
+            NFD_LOG_DEBUG("Size of content before overhead removal " << data.getContent().size());
+            outData->setContent(make_shared< ::ndn::Buffer>(data.getContent().size() - 48 - 2));
+            NFD_LOG_DEBUG("Size of content after overhead removal " << outData->getContent().size());
+
         }
 
         //**End of new part
@@ -518,6 +510,7 @@ namespace nfd {
         // foreach pending downstream
         for (Face* pendingDownstream : pendingDownstreams) {
             if (pendingDownstream == &inFace) {
+
                 continue;
             }
             // goto outgoing Data pipeline
@@ -533,6 +526,7 @@ namespace nfd {
             // CS insert
             if (m_csFromNdnSim == nullptr)
                 m_cs.insert(data, true);
+
             else
                 m_csFromNdnSim->Add(data.shared_from_this());
         }
@@ -565,33 +559,22 @@ namespace nfd {
         shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
 
         //If this node is gateway, add overhead component to data name.
-        if ((iamGTW() == 2)) {
+        if ((iamGTW() == 2) && !m_conOvrhd_data) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
-                //Find overhead sequence corresponding to current data name.
-                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
-                    NFD_LOG_DEBUG("Looking for correct overhead flag: " << dataName << " " << m_trnsoverhead[idx].first << " " << m_trnsoverhead[idx].second);
-                }
-
-                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
-                    if (m_trnsoverhead[idx].first == dataName) {
-                        NFD_LOG_DEBUG("Found entry for data package: " << idx);
-                        nameWithOvrhd->append(m_trnsoverhead[idx].second);
-                        outData->setName(*nameWithOvrhd);
-                        NFD_LOG_DEBUG(nameWithOvrhd->toUri());
-                        NFD_LOG_DEBUG("Size of overhead container before : " << m_trnsoverhead.size());
-                        m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
-                        NFD_LOG_DEBUG("Size of overhead container after: " << m_trnsoverhead.size());
-                        break;
-                    }
-                    //Throw assertion if now entry is found.
-                    assert(idx < ((int) m_trnsoverhead.size()));
-                }
+                NFD_LOG_DEBUG("Adding overhead component!");
+                NFD_LOG_DEBUG("Size of content before overhead removal " << outData->getContent().size());
+                uint32_t newsize = data.getContent().size() + 48 - 2; //-2 because tlv
+                NFD_LOG_DEBUG("Newsize must be: +48 " << newsize); 
+                outData->setContent(make_shared< ::ndn::Buffer>(newsize));
+                outData->setContentType(1337);
+                NFD_LOG_DEBUG("Size of content after overhead removal " << outData->getContent().size());
             }
 
         }
         //**End new part
 
         if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+
             m_tx_data_bytes += (uint64_t) (outData->wireEncode().size()) + 7;
         }
         // send Data

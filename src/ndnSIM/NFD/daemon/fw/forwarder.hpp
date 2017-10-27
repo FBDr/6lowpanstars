@@ -308,7 +308,6 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE:
         unique_ptr<fw::UnsolicitedDataPolicy> m_unsolicitedDataPolicy;
         bool m_conOvrhd_int; //Flag to indicate if current interest contained overhead component.
         bool m_conOvrhd_data; //Flag to indicate if current interest contained overhead component.
-        std::vector<std::pair<std::string, std::string>> m_trnsoverhead;
         NameTree m_nameTree;
         Fib m_fib;
         Pit m_pit;
