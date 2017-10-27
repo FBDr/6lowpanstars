@@ -571,12 +571,18 @@ namespace nfd {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 //Find overhead sequence corresponding to current data name.
                 for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
+                    NFD_LOG_DEBUG("Looking for correct overhead flag: " << dataName << " " << m_trnsoverhead[idx].first << " " << m_trnsoverhead[idx].second);
+                }
+
+                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
                     if (m_trnsoverhead[idx].first == dataName) {
                         NFD_LOG_DEBUG("Found entry for data package: " << idx);
                         nameWithOvrhd->append(m_trnsoverhead[idx].second);
                         outData->setName(*nameWithOvrhd);
                         NFD_LOG_DEBUG(nameWithOvrhd->toUri());
+                        NFD_LOG_DEBUG("Size of overhead container before : " << m_trnsoverhead.size());
                         m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
+                        NFD_LOG_DEBUG("Size of overhead container after: " << m_trnsoverhead.size());
                         break;
                     }
                     //Throw assertion if now entry is found.
@@ -596,7 +602,7 @@ namespace nfd {
     }
 
     void
-    Forwarder::onIncomingNack(Face& inFace, const lp::Nack& nack) {
+    Forwarder::onIncomingNack(Face& inFace, const lp::Nack & nack) {
         // receive Nack
         nack.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
         ++m_counters.nInNacks;
@@ -654,7 +660,7 @@ namespace nfd {
 
     void
     Forwarder::onOutgoingNack(const shared_ptr<pit::Entry>& pitEntry, const Face& outFace,
-            const lp::NackHeader& nack) {
+            const lp::NackHeader & nack) {
         if (outFace.getId() == face::INVALID_FACEID) {
             NFD_LOG_WARN("onOutgoingNack face=invalid" <<
                     " nack=" << pitEntry->getInterest().getName() <<
@@ -701,7 +707,7 @@ namespace nfd {
     }
 
     static inline bool
-    compare_InRecord_expiry(const pit::InRecord& a, const pit::InRecord& b) {
+    compare_InRecord_expiry(const pit::InRecord& a, const pit::InRecord & b) {
 
         return a.getExpiry() < b.getExpiry();
     }
@@ -734,7 +740,7 @@ namespace nfd {
     }
 
     void
-    Forwarder::cancelUnsatisfyAndStragglerTimer(pit::Entry& pitEntry) {
+    Forwarder::cancelUnsatisfyAndStragglerTimer(pit::Entry & pitEntry) {
 
         scheduler::cancel(pitEntry.m_unsatisfyTimer);
         scheduler::cancel(pitEntry.m_stragglerTimer);
@@ -742,14 +748,14 @@ namespace nfd {
 
     static inline void
     insertNonceToDnl(DeadNonceList& dnl, const pit::Entry& pitEntry,
-            const pit::OutRecord& outRecord) {
+            const pit::OutRecord & outRecord) {
 
         dnl.add(pitEntry.getName(), outRecord.getLastNonce());
     }
 
     void
     Forwarder::insertDeadNonceList(pit::Entry& pitEntry, bool isSatisfied,
-            time::milliseconds dataFreshnessPeriod, Face* upstream) {
+            time::milliseconds dataFreshnessPeriod, Face * upstream) {
         // need Dead Nonce List insert?
         bool needDnl = false;
         if (isSatisfied) {

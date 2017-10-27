@@ -244,6 +244,7 @@ namespace ns3 {
             entry = m_seqFullDelay.find(seq);
             if (entry != m_seqFullDelay.end()) {
                 m_firstInterestDataDelay(this, seq, Simulator::Now() - entry->time, m_seqRetxCounts[seq], hopCount);
+                NS_LOG_DEBUG("Delay: "<< (Simulator::Now() - entry->time));
             }
             m_rx_bytes += (uint64_t) (data->wireEncode().size());
             m_rx_packets++;
