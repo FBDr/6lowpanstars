@@ -172,9 +172,8 @@ namespace nfd {
 
         // Make copy of interest in order to be able to change it.
         auto outInterest = make_shared<Interest>(interest);
-
         //If interest name contains "ovrhd" keyword, set m_conOvrhd flag.
-        if (interest.getName().at(-1).toUri().find("ovrhd") != std::string::npos) {
+        if (!(interest.getExclude().empty())) {
             m_conOvrhd_int = true;
             NFD_LOG_DEBUG("Contains overhead");
         } else {
@@ -184,12 +183,10 @@ namespace nfd {
         // If Name contains overhead component and this node is configured as gateway,
         // then remove this component.
         if (m_conOvrhd_int && (iamGTW() == 2)) {
-            std::string ovrhd = interest.getName().at(-1).toUri();
-            Name subname = interest.getName().getSubName(0, interest.getName().size() - 1);
-            //Place ovrhd label into m_trnsoverhead translation vector.
-            m_trnsoverhead.push_back(std::make_pair(subname.toUri(), ovrhd));
-            outInterest->setName(subname);
-            NFD_LOG_DEBUG("Removed overhead component, name is now: " << outInterest->getName());
+            auto curExclude = make_shared<Exclude>(interest.getExclude());
+            curExclude->clear();
+            outInterest->setExclude(*curExclude);
+            NFD_LOG_DEBUG("Removed overhead component");
         }
 
         //**End of new part.
@@ -339,27 +336,28 @@ namespace nfd {
         // Size is the total size of the extra overhead component.
         int size = 48 - 2;
         uint8_t * buff = new uint8_t [size];
-        shared_ptr<Name> nameWithSequence;
+        shared_ptr<Name> Sequence = make_shared<Name>();
+        shared_ptr<Exclude> ov_ex;
         std::string extra = "ovrhd";
         extra.append(genRandomString(size - 5));
         FaceUri oerie = outFace.getLocalUri();
         memcpy(buff, extra.c_str(), size);
+        Sequence->append(buff, size);
 
         // If this node is either a gateway or a backhaul node, add overhead name. 
         // This should only be done if the incoming interest already had an overhead component.
         // Also check that outface is not a broadcast domain.
         if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0) && ((outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")
-                && (outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1) {
+                && (outFace.getLocalUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
                     NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a backhaulnode. " << "Adding overhead component.");
                 } else if (iamGTW() == 2) {
                     NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a gateway node." << "Adding overhead component.");
                 }
-                nameWithSequence = make_shared<Name>(outInterest->getName());
-                nameWithSequence->append(buff, size);
-                outInterest->setName(*nameWithSequence);
-                NFD_LOG_DEBUG("Sending overhead interest: " << outInterest->getName());
+                ov_ex = make_shared<Exclude>();
+                ov_ex->excludeOne(Sequence->get(0));
+                outInterest->setExclude(*ov_ex);
             }
         }
 
