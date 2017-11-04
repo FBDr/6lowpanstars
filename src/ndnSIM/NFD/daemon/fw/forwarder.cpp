@@ -349,7 +349,7 @@ namespace nfd {
         // This should only be done if the incoming interest already had an overhead component.
         // Also check that outface is not a broadcast domain.
         if ((iamGTW() == 1 || (iamGTW() == 2)) && (m_conOvrhd_int == 0) && ((outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")
-                && (outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1) {
+                && (outFace.getLocalUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 if (iamGTW() == 1) {
                     NFD_LOG_DEBUG("Node: " << m_node->GetId() << " is configured as a backhaulnode. " << "Adding overhead component.");
