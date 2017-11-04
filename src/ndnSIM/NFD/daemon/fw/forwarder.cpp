@@ -495,7 +495,9 @@ namespace nfd {
 
             // remember pending downstreams
             for (const pit::InRecord& inRecord : pitEntry->getInRecords()) {
+                NFD_LOG_DEBUG("Found inrecord! " << inRecord.getFace().getId());
                 if (inRecord.getExpiry() > now) {
+                    NFD_LOG_DEBUG("Is valid");
                     pendingDownstreams.insert(&inRecord.getFace());
                 }
             }
@@ -544,6 +546,63 @@ namespace nfd {
                 " decision=" << decision);
     }
 
+    //    void
+    //    Forwarder::onOutgoingData(const Data& data, Face& outFace) {
+    //        if (outFace.getId() == face::INVALID_FACEID) {
+    //            NFD_LOG_WARN("onOutgoingData face=invalid data=" << data.getName());
+    //            return;
+    //        }
+    //        NFD_LOG_DEBUG("onOutgoingData face=" << outFace.getId() << " data=" << data.getName());
+    //        // /localhost scope control
+    //        bool isViolatingLocalhost = outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL &&
+    //                scope_prefix::LOCALHOST.isPrefixOf(data.getName());
+    //        if (isViolatingLocalhost) {
+    //            NFD_LOG_DEBUG("onOutgoingData face=" << outFace.getId() <<
+    //                    " data=" << data.getName() << " violates /localhost");
+    //            // (drop)
+    //            return;
+    //        }
+    //        //**New part for backhaul modeling.
+    //        shared_ptr<Data> outData = make_shared<Data>(data);
+    //        FaceUri oerie = outFace.getLocalUri();
+    //        std::string dataName = data.getName().toUri();
+    //        shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
+    //
+    //        //If this node is gateway, add overhead component to data name.
+    //        if ((iamGTW() == 2)) {
+    //            if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+    //                //Find overhead sequence corresponding to current data name.
+    //                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
+    //                    NFD_LOG_DEBUG("Looking for correct overhead flag: " << dataName << " " << m_trnsoverhead[idx].first << " " << m_trnsoverhead[idx].second);
+    //                }
+    //
+    //                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
+    //                    if (m_trnsoverhead[idx].first == dataName) {
+    //                        NFD_LOG_DEBUG("Found entry for data package: " << idx);
+    //                        nameWithOvrhd->append(m_trnsoverhead[idx].second);
+    //                        outData->setName(*nameWithOvrhd);
+    //                        NFD_LOG_DEBUG(nameWithOvrhd->toUri());
+    //                        NFD_LOG_DEBUG("Size of overhead container before : " << m_trnsoverhead.size());
+    //                        m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
+    //                        NFD_LOG_DEBUG("Size of overhead container after: " << m_trnsoverhead.size());
+    //                        break;
+    //                    }
+    //                    //Throw assertion if no entry is found.
+    //                    assert(idx < ((int) m_trnsoverhead.size()));
+    //                }
+    //            }
+    //
+    //        }
+    //        //**End new part
+    //
+    //        if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+    //            m_tx_data_bytes += (uint64_t) (outData->wireEncode().size()) + 7;
+    //        }
+    //        // send Data
+    //        outFace.sendData(*outData);
+    //        ++m_counters.nOutData;
+    //    }
+
     void
     Forwarder::onOutgoingData(const Data& data, Face& outFace) {
         if (outFace.getId() == face::INVALID_FACEID) {
@@ -564,30 +623,38 @@ namespace nfd {
         shared_ptr<Data> outData = make_shared<Data>(data);
         FaceUri oerie = outFace.getLocalUri();
         std::string dataName = data.getName().toUri();
-        shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
 
-        //If this node is gateway, add overhead component to data name.
-        if ((iamGTW() == 2)) {
+
+        //If this node is gateway, add overhead component to data name. Data comes from other domain
+        if ((iamGTW() == 2) && !m_conOvrhd_data) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 //Find overhead sequence corresponding to current data name.
+
                 for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
                     NFD_LOG_DEBUG("Looking for correct overhead flag: " << dataName << " " << m_trnsoverhead[idx].first << " " << m_trnsoverhead[idx].second);
                 }
 
-                for (int idx = 0; idx < ((int) m_trnsoverhead.size()); idx++) {
-                    if (m_trnsoverhead[idx].first == dataName) {
-                        NFD_LOG_DEBUG("Found entry for data package: " << idx);
-                        nameWithOvrhd->append(m_trnsoverhead[idx].second);
+                std::vector<std::pair < std::string, std::string>>::iterator itr = m_trnsoverhead.begin();
+                while (itr != m_trnsoverhead.end()) {
+                    if (itr->first == dataName) {
+                        shared_ptr<Name> nameWithOvrhd = make_shared<Name>(data.getName());
+                        NFD_LOG_DEBUG("Found entry for data package: " << itr->first << " " << itr->second);
+                        nameWithOvrhd->append(itr->second);
                         outData->setName(*nameWithOvrhd);
                         NFD_LOG_DEBUG(nameWithOvrhd->toUri());
-                        NFD_LOG_DEBUG("Size of overhead container before : " << m_trnsoverhead.size());
-                        m_trnsoverhead.erase(m_trnsoverhead.begin() + idx);
-                        NFD_LOG_DEBUG("Size of overhead container after: " << m_trnsoverhead.size());
-                        break;
-                    }
-                    //Throw assertion if now entry is found.
-                    assert(idx < ((int) m_trnsoverhead.size()));
+                        itr = m_trnsoverhead.erase(itr);
+
+                        if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
+                            m_tx_data_bytes += (uint64_t) (outData->wireEncode().size()) + 7;
+                        }
+                        // send Data
+                        outFace.sendData(*outData);
+                        ++m_counters.nOutData;
+                    } else
+                        ++itr;
                 }
+                return;
+
             }
 
         }
@@ -599,6 +666,7 @@ namespace nfd {
         // send Data
         outFace.sendData(*outData);
         ++m_counters.nOutData;
+        m_conOvrhd_data = 0;
     }
 
     void
