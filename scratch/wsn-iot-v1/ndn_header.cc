@@ -123,7 +123,7 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(bth, Rleafnodecon);
                 consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId()))); //Select for every node an unique stream.
@@ -148,7 +148,7 @@ namespace ns3 {
                 cur_prefix = "/Home_" + std::to_string(idx) + prefix;
                 consumerHelper.SetPrefix(cur_prefix);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
                 consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
@@ -169,7 +169,7 @@ namespace ns3 {
                 consumerHelper.SetPrefix(cur_prefix);
                 Ptr<Node> sel_node = iot[idx].Get(node_periph);
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
                 consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.

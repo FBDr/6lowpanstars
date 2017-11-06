@@ -29,7 +29,7 @@ namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
-        
+
         double nodenum = std::stoi(context);
         std::ofstream outfile;
         outfile.open("energy.txt", std::ios_base::app);
@@ -96,26 +96,26 @@ namespace ns3 {
         cmd.AddValue("csma_delay", "Set the delay for the Br <-> Backhaul connection.", csma_delay);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
-        cmd.AddValue("node_cache","Disable caching on end nodes.", node_cache);
+        cmd.AddValue("node_cache", "Disable caching on end nodes.", node_cache);
         cmd.Parse(argc, argv);
 
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-/*
-        for (int jdx = 0; jdx < 10; jdx++) {
-            RngSeedManager::SetSeed(1);
-            RngSeedManager::SetRun(2);
-            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-            Rnode->SetStream(1);
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<std::endl;
-        }
-*/
+        /*
+                for (int jdx = 0; jdx < 10; jdx++) {
+                    RngSeedManager::SetSeed(1);
+                    RngSeedManager::SetRun(2);
+                    Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+                    Rnode->SetStream(1);
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<std::endl;
+                }
+         */
 
         //Clean up old files
         remove("energy.txt");
@@ -212,11 +212,8 @@ namespace ns3 {
         //Create and install CSMA and LrWpan channels.
         CsmaHelper csma;
         csma.SetChannelAttribute("DataRate", DataRateValue(5000000));
-        if (ndn && ipbackhaul) {
-            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(csma_delay)));
-        } else {
-            csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
-        }
+        csma.SetChannelAttribute("Delay", TimeValue(MilliSeconds(2)));
+
 
         LrWpanHelper lrWpanHelper[node_head];
 
