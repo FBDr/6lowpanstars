@@ -104,6 +104,7 @@ namespace ns3
 
         NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
         std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), size);
+        NS_LOG_INFO(Rdatastr);
         std::size_t pos = Rdatastr.find("/"); // Find position of "/" leading the sequence number.
         std::string str3 = Rdatastr.substr(pos + 1); // filter this sequence number to the end.
         return std::stoi(str3);
@@ -222,16 +223,18 @@ namespace ns3
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
             NS_LOG_INFO("Currently received packet delay " << delay);
-
+            m_Rdata = new uint8_t [received_packet->GetSize()];
+            received_packet->CopyData(m_Rdata, received_packet->GetSize());
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
             // Check if in cache.
             if (m_cache.find(received_Req) != m_cache.end()) {
                 CacheHit(socket);
             } else {
-                CacheMiss(socket, received_packet, received_Req);
+                CacheMiss(socket, received_packet, received_Req, coaptag);
             }
 
 
+/*
 
 
             if (CheckReqAv(received_Req)) {
@@ -247,7 +250,7 @@ namespace ns3
             response_packet->AddPacketTag(coaptag);
 
             NS_LOG_LOGIC("Echoing packet");
-            socket->SendTo(response_packet, 0, from);
+            //socket->SendTo(response_packet, 0, from);
 
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
@@ -258,6 +261,7 @@ namespace ns3
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
                         Inet6SocketAddress::ConvertFrom(from).GetPort());
             }
+*/
         }
     }
 
@@ -267,9 +271,12 @@ namespace ns3
     }
 
     void
-    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq) {
-        NS_LOG_INFO("Cache miss!");
-        socket->SendTo(received_packet, 0, m_IPv6Bucket[sq]);
+    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag &coaptag) {
+        
+        NS_LOG_INFO("Cache miss! Transmitting to: "<< m_IPv6Bucket[sq]<< " SEQ: "<< sq);
+        Packet repsonsep(*received_packet);
+        repsonsep.AddPacketTag(coaptag);
+        NS_LOG_INFO("Succes?: "<<socket->SendTo(&repsonsep, 0,Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
     }
 
 

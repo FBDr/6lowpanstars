@@ -13,6 +13,7 @@
 
 #include "stacks_header.h"
 #include "src/network/utils/ipv6-address.h"
+#include "src/applications/helper/coap-helper.h"
 
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ip-stack");
@@ -110,9 +111,19 @@ namespace ns3 {
          */
         CoapClientHelper client(port);
         CoapServerHelper server(port);
+        CoapCacheGtwHelper gtw_cache(port);
 
         //Server
         for (int itr = 0; itr < node_head; itr++) {
+            //Install cache gtw application on the gateway.
+            gtw_cache.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
+            apps = gtw_cache.Install(iot[itr].Get(node_periph));
+            gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
+            //interval_sel = Rstartdelay->GetValue(0.1, 5);
+            //apps.Start(Seconds(1.0 + interval_sel));
+            apps.Start(Seconds(1.0));
+            apps.Stop(Seconds(simtime));
+
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 //Install server application on every node, in every IoT domain.
                 server.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
@@ -134,20 +145,22 @@ namespace ns3 {
 
         Ptr<UniformRandomVariable> Rleafnodecon = CreateObject<UniformRandomVariable> ();
         Rleafnodecon->SetStream(3);
-        std::vector<Ipv6Address> AddrResBucketLeaf;
+
 
 
 
         for (int idx = 0; idx < node_head; idx++) {
             Ipv6Address gtw_ip = i_6lowpan[idx].GetAddress(node_periph, 1);
+            std::vector<Ipv6Address> AddrResBucketLeaf;
             for (int cnt = 0; cnt < (int) AddrResBucket[idx].size(); cnt++) {
                 AddrResBucketLeaf.push_back(gtw_ip);
+                NS_LOG_INFO("Address size: " << AddrResBucket[idx].size());
             }
 
-            
+
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1,  1/max_freq);
+                start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucketLeaf.size()));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(briteth, Rleafnodecon);
@@ -168,7 +181,7 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_inside; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1,  1/max_freq);
+                start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
@@ -186,7 +199,7 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_gtw; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
+                start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = iot[idx].Get(node_periph);
