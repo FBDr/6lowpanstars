@@ -56,6 +56,10 @@ namespace ns3
                 UintegerValue(9),
                 MakeUintegerAccessor(&CoapCacheGtw::m_port),
                 MakeUintegerChecker<uint16_t> ())
+                .AddAttribute("Freshness", "Freshness setting cache in seconds.",
+                UintegerValue(1),
+                MakeUintegerAccessor(&CoapCacheGtw::m_fresh),
+                MakeUintegerChecker<uint32_t> ())
                 .AddAttribute("Payload", "Response data packet payload size.",
                 UintegerValue(100),
                 MakeUintegerAccessor(&CoapCacheGtw::m_packet_payload_size),
@@ -113,16 +117,15 @@ namespace ns3
         }
     }
 
-    bool
-    CoapCacheGtw::CheckReqAv(uint32_t reqnumber) {
-        /*
-                if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
-                    return true;
-                }
-         */
-
-        return false;
-
+    void
+    CoapCacheGtw::UpdateCache() {
+        Time fresh(std::to_string(m_fresh)+"s");
+        for (auto f : m_cache) {
+            if (Simulator::Now() - f.second >= fresh )
+            {
+                
+            }
+        }
     }
 
     void
@@ -202,7 +205,7 @@ namespace ns3
 
         Ptr<Packet> received_packet;
         Ptr<Packet> response_packet;
-
+        UpdateCache();
         Address from;
 
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
@@ -243,7 +246,7 @@ namespace ns3
                         NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
 
-                        m_cache.insert(std::get<2>(m_pendingreqs[idx]));
+                        m_cache.insert(std::make_pair(std::get<2>(m_pendingreqs[idx]), Simulator::Now()));
                         NS_LOG_INFO("Cache insert! " << std::get<2>(m_pendingreqs[idx]) << " Size: " << m_cache.size());
                         break;
                     }
@@ -266,7 +269,7 @@ namespace ns3
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
 
-        NS_LOG_LOGIC("Sending packet: " << socket->SendTo(response_packet, 0, from));
+        NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
 
 
     }

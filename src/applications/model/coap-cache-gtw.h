@@ -92,16 +92,18 @@ namespace ns3 {
          */
         uint32_t FilterReqNum(uint32_t size);
         /**
-         * \brief Check whether requested data is available at this server.
+         * \brief Update cache contents by checking for expired freshness.
          */
-        bool CheckReqAv(uint32_t);
+        void UpdateCache(void);
         /**
          * \brief Fill data buffers for response packet with std::string.
          * \param string A string containing the packet content.
          */
         void CreateResponsePkt(std::string fill, uint32_t);
+        
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
+        uint32_t m_fresh;
         Ptr<Socket> m_socket; //!< IPv4 Socket
         Ptr<Socket> m_socket6; //!< IPv6 Socket
         Address m_local; //!< local multicast address
@@ -114,7 +116,7 @@ namespace ns3 {
         uint8_t *m_Rdata; //!< packet payload data
 
 
-        std::set<uint32_t> m_cache;
+        std::set<std::pair<uint32_t,Time>> m_cache;
         std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs;
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;
