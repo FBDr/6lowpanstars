@@ -12,6 +12,7 @@
  */
 
 #include "stacks_header.h"
+#include "src/network/utils/ipv6-address.h"
 
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ip-stack");
@@ -80,7 +81,7 @@ namespace ns3 {
             }
         }
         AddrResBucket = CreateAddrResBucket(IPv6Bucket, node_periph);
-        
+
         //Shuffelen
         Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
         Rpro->SetStream(6);
@@ -133,19 +134,28 @@ namespace ns3 {
 
         Ptr<UniformRandomVariable> Rleafnodecon = CreateObject<UniformRandomVariable> ();
         Rleafnodecon->SetStream(3);
+        std::vector<Ipv6Address> AddrResBucketLeaf;
+
+
 
         for (int idx = 0; idx < node_head; idx++) {
+            Ipv6Address gtw_ip = i_6lowpan[idx].GetAddress(node_periph, 1);
+            for (int cnt = 0; cnt < (int) AddrResBucket[idx].size(); cnt++) {
+                AddrResBucketLeaf.push_back(gtw_ip);
+            }
+
+            
             for (int jdx = 0; jdx < con_leaf; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1,  1/max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
-                client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
+                client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucketLeaf.size()));
                 Ptr<Node> sel_node = SelectRandomLeafNodeConsumer(briteth, Rleafnodecon);
                 client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
                 apps = client.Install(sel_node);
                 std::cout << "sel_node_leaf " << sel_node->GetId() << std::endl;
-                client.SetIPv6Bucket(apps.Get(0), AddrResBucket[idx]);
-                NS_LOG_INFO("Size of generated bucket: " << AddrResBucket[idx].size());
+                client.SetIPv6Bucket(apps.Get(0), AddrResBucketLeaf);
+                NS_LOG_INFO("Size of generated bucket: " << AddrResBucketLeaf.size());
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
             }
@@ -158,7 +168,7 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_inside; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1,  1/max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = SelectRandomNodeFromContainer(iot[idx], Rinsidenodecon);
@@ -176,7 +186,7 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             for (int jdx = 0; jdx < con_gtw; jdx++) {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq);
-                start_delay = Rstartdelay->GetValue(0.1, 5.0);
+                start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = iot[idx].Get(node_periph);
