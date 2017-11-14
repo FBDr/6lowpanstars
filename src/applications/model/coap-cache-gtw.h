@@ -65,7 +65,7 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
-        void CacheHit(Ptr<Socket> socket);
+        void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
         CoapCacheGtw();
         virtual ~CoapCacheGtw();
@@ -115,7 +115,7 @@ namespace ns3 {
 
 
         std::set<uint32_t> m_cache;
-        std::vector<std::pair<Address, uint64_t>> m_pendingreqs;
+        std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs;
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;
     };

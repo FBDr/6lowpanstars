@@ -39,7 +39,8 @@
 #include <string>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapCacheGtwApplication");
 
@@ -103,7 +104,6 @@ namespace ns3 {
 
         NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
         std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), size);
-        NS_LOG_INFO(Rdatastr);
         if (Rdatastr.find("POST") != std::string::npos) {
             return std::numeric_limits<uint32_t>::max();
         } else {
@@ -232,66 +232,49 @@ namespace ns3 {
 
             // Check if in cache and message type
             if (received_Req == std::numeric_limits<uint32_t>::max()) {
-                
+
                 //Its a returning data packet
+
+                //Add data seq to cache
                 for (int idx = 0; idx < ((int) m_pendingreqs.size()); idx++) {
-                    if (m_pendingreqs[idx].second == coaptag.GetT()) {
+                    if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
                         received_packet->AddPacketTag(coaptag);
-                        NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, m_pendingreqs[idx].first));
+                        NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
+
+                        m_cache.insert(std::get<2>(m_pendingreqs[idx]));
+                        NS_LOG_INFO("Cache insert! " << std::get<2>(m_pendingreqs[idx]) << " Size: " << m_cache.size());
                         break;
                     }
                 }
-                
-                
             } else if (m_cache.find(received_Req) != m_cache.end()) {
-                CacheHit(socket);
+                CacheHit(socket, received_packet, received_Req, coaptag, from);
             } else {
                 CacheMiss(socket, received_packet, received_Req, coaptag, from);
             }
-
-
-            /*
-
-
-                        if (CheckReqAv(received_Req)) {
-                            NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
-                            CreateResponsePkt("POST", m_packet_payload_size);
-
-                        } else {
-                            NS_LOG_ERROR("Data not available");
-                            CreateResponsePkt("Unavailable", sizeof ("Unavailable"));
-                        }
-
-                        response_packet = Create<Packet> (m_data, m_dataSize);
-                        response_packet->AddPacketTag(coaptag);
-
-                        NS_LOG_LOGIC("Echoing packet");
-                        //socket->SendTo(response_packet, 0, from);
-
-                        if (InetSocketAddress::IsMatchingType(from)) {
-                            NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
-                                    InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
-                                    InetSocketAddress::ConvertFrom(from).GetPort());
-                        } else if (Inet6SocketAddress::IsMatchingType(from)) {
-                            NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
-                                    Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
-                                    Inet6SocketAddress::ConvertFrom(from).GetPort());
-                        }
-             */
         }
     }
 
     void
-    CoapCacheGtw::CacheHit(Ptr<Socket> socket) {
+    CoapCacheGtw::CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address & from) {
         NS_LOG_INFO("Cache hit!");
+        Ptr<Packet> response_packet;
+
+        NS_LOG_INFO("Transmitting data from gateway cache: " << sq);
+        CreateResponsePkt("POST", m_packet_payload_size);
+        response_packet = Create<Packet> (m_data, m_dataSize);
+        response_packet->AddPacketTag(coaptag);
+
+        NS_LOG_LOGIC("Sending packet: " << socket->SendTo(response_packet, 0, from));
+
+
     }
 
     void
-    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from) {
+    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address & from) {
         NS_LOG_INFO("Cache miss! Transmitting to: " << m_IPv6Bucket[sq] << " SEQ: " << sq);
-        m_pendingreqs.push_back(std::make_pair(from, coaptag.GetT()));
+        m_pendingreqs.push_back(std::make_tuple(from, coaptag.GetT(), sq));
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
         NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
