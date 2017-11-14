@@ -230,8 +230,6 @@ namespace ns3 {
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
 
-            uint32_t currentSequenceNumber = coaptag.GetSeq();
-            uint64_t currentDelay = coaptag.GetT();
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
             NS_LOG_INFO("Currently received packet delay " << delay);

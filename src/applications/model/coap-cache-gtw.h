@@ -64,8 +64,8 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
-
-
+        void CacheHit(Ptr<Socket> socket);
+        void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq);
         CoapCacheGtw();
         virtual ~CoapCacheGtw();
 
@@ -76,7 +76,7 @@ namespace ns3 {
 
         virtual void StartApplication(void);
         virtual void StopApplication(void);
-        void AddSeq();
+
 
         /**
          * \brief Handle a packet reception.
@@ -111,9 +111,9 @@ namespace ns3 {
         TracedCallback<Ptr<const Packet> > m_txTrace;
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_Rdata; //!< packet payload data
-        //        uint32_t *m_regSeq; //!< Available sequence numbers.
-        //        uint32_t m_regNum; //!< Available sequence numbers.
-        std::set<uint32_t> m_regSeqSet;
+
+
+        std::set<uint32_t> m_cache;
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;
     };

@@ -39,7 +39,8 @@
 #include <string>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3 {
+namespace ns3
+{
 
     NS_LOG_COMPONENT_DEFINE("CoapCacheGtwApplication");
 
@@ -96,21 +97,6 @@ namespace ns3 {
         Application::DoDispose();
     }
 
-    void
-    CoapCacheGtw::AddSeq() {
-
-        //This function reads in the AddrResBucket and searches for its own producer IP. Corresponding sequences are copied into m_regSeqSet-set.
-
-        for (unsigned int idx = 0; idx < m_IPv6Bucket.size(); idx++) {
-            //NS_LOG_INFO("AddSeq: " << idx << " of " << m_ownip);
-            NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
-            if (m_IPv6Bucket[idx] == m_ownip) {
-                m_regSeqSet.insert(idx);
-                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip<< ". At node: "<< GetNode()->GetId());
-            }
-        }
-    }
-
     uint32_t
     CoapCacheGtw::FilterReqNum(uint32_t size) {
 
@@ -125,10 +111,14 @@ namespace ns3 {
 
     bool
     CoapCacheGtw::CheckReqAv(uint32_t reqnumber) {
-        if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
-            return true;
-        }
+        /*
+                if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
+                    return true;
+                }
+         */
+
         return false;
+
     }
 
     void
@@ -150,7 +140,6 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-        AddSeq();
 
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
@@ -230,15 +219,21 @@ namespace ns3 {
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
 
-            uint32_t currentSequenceNumber = coaptag.GetSeq();
-            uint64_t currentDelay = coaptag.GetT();
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
             NS_LOG_INFO("Currently received packet delay " << delay);
-            // Copy data from current received packet into buffer. 
-            m_Rdata = new uint8_t [received_packet->GetSize()];
-            received_packet->CopyData(m_Rdata, received_packet->GetSize());
+
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
+            // Check if in cache.
+            if (m_cache.find(received_Req) != m_cache.end()) {
+                CacheHit(socket);
+            } else {
+                CacheMiss(socket, received_packet, received_Req);
+            }
+
+
+
+
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
                 CreateResponsePkt("POST", m_packet_payload_size);
@@ -265,5 +260,18 @@ namespace ns3 {
             }
         }
     }
+
+    void
+    CoapCacheGtw::CacheHit(Ptr<Socket> socket) {
+        NS_LOG_INFO("Cache hit!");
+    }
+
+    void
+    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq) {
+        NS_LOG_INFO("Cache miss!");
+        socket->SendTo(received_packet, 0, m_IPv6Bucket[sq]);
+    }
+
+
 
 } // Namespace ns3
