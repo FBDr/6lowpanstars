@@ -63,6 +63,7 @@ namespace ns3 {
         double freshness = 0;
         bool ipbackhaul = false;
         bool useContiki = false;
+        bool useIPCache = false;
         int payloadsize = 10;
         double min_freq = 0.0166;
         double max_freq = 5;
@@ -93,6 +94,7 @@ namespace ns3 {
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
+        cmd.AddValue("ipcache", "Enable IP caching on gateway", dtracefreq);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -286,7 +288,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq);
+            sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache);
         }
 
 

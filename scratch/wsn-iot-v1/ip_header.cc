@@ -93,7 +93,8 @@ namespace ns3 {
             std::vector< std::vector<Ipv6Address> > &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq) {
+            double &min_freq, double &max_freq, bool &useIPCache, double &freshness,
+            int &cache) {
 
         //This function installs the specific IP applications. 
 
@@ -116,13 +117,17 @@ namespace ns3 {
         //Server
         for (int itr = 0; itr < node_head; itr++) {
             //Install cache gtw application on the gateway.
-            gtw_cache.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
-            apps = gtw_cache.Install(iot[itr].Get(node_periph));
-            gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
-            //interval_sel = Rstartdelay->GetValue(0.1, 5);
-            //apps.Start(Seconds(1.0 + interval_sel));
-            apps.Start(Seconds(1.0));
-            apps.Stop(Seconds(simtime));
+
+            if (useIPCache) {
+                gtw_cache.SetAttribute("Payload", UintegerValue((uint32_t) payloadsize));
+                gtw_cache.SetAttribute("Freshness", UintegerValue((uint32_t) freshness));
+                gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
+                apps = gtw_cache.Install(iot[itr].Get(node_periph));
+                gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
+                apps.Start(Seconds(1.0));
+                apps.Stop(Seconds(simtime));
+            }
+
 
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 //Install server application on every node, in every IoT domain.
@@ -152,10 +157,15 @@ namespace ns3 {
         for (int idx = 0; idx < node_head; idx++) {
             Ipv6Address gtw_ip = i_6lowpan[idx].GetAddress(node_periph, 1);
             std::vector<Ipv6Address> AddrResBucketLeaf;
-            for (int cnt = 0; cnt < (int) AddrResBucket[idx].size(); cnt++) {
-                AddrResBucketLeaf.push_back(gtw_ip);
-                NS_LOG_INFO("Address size: " << AddrResBucket[idx].size());
+            if (useIPCache) {
+                for (int cnt = 0; cnt < (int) AddrResBucket[idx].size(); cnt++) {
+                    AddrResBucketLeaf.push_back(gtw_ip);
+                    NS_LOG_INFO("Address size: " << AddrResBucket[idx].size());
+                }
+            } else {
+                AddrResBucketLeaf = AddrResBucket[idx];
             }
+
 
 
             for (int jdx = 0; jdx < con_leaf; jdx++) {

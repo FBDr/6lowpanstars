@@ -53,7 +53,8 @@ namespace ns3 {
             std::vector< std::vector<Ipv6Address> > &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq);
+            double &min_freq, double &max_freq, bool &useIPCache, double &freshness, 
+            int &cache);
 
 }
 #endif /* NDN_HEADER_H */
