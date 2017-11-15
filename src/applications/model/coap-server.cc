@@ -183,7 +183,9 @@ namespace ns3 {
                 }
             }
         }
-
+        
+        //Nasty hack to uniformize IP and ICN
+        //m_socket6->SetIpv6HopLimit(63);
         m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
         m_socket6->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
 

@@ -94,7 +94,7 @@ namespace ns3 {
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
-        cmd.AddValue("ipcache", "Enable IP caching on gateway", dtracefreq);
+        cmd.AddValue("ipcache", "Enable IP caching on gateway", useIPCache);
         cmd.Parse(argc, argv);
 
         //Random variables
