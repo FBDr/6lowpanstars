@@ -106,6 +106,7 @@ namespace ns3 {
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
         uint32_t m_fresh;
+        uint32_t m_cache_size;
         Ptr<Socket> m_socket; //!< IPv4 Socket
         Ptr<Socket> m_socket6; //!< IPv6 Socket
         Address m_local; //!< local multicast address
@@ -118,7 +119,8 @@ namespace ns3 {
         uint8_t *m_Rdata; //!< packet payload data
 
 
-        std::vector<std::pair<uint32_t, Time>> m_cache;
+
+        std::vector<std::pair<uint32_t, Time>> m_cache; //Sequence, time
         std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs; //Adress, time, sequence
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;

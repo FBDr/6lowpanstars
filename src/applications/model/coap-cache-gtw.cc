@@ -59,6 +59,10 @@ namespace ns3 {
                 UintegerValue(1),
                 MakeUintegerAccessor(&CoapCacheGtw::m_fresh),
                 MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("CacheSize", "Size of cache defined in number of items.",
+                UintegerValue(3),
+                MakeUintegerAccessor(&CoapCacheGtw::m_cache_size),
+                MakeUintegerChecker<uint32_t> ())
                 .AddAttribute("Payload", "Response data packet payload size.",
                 UintegerValue(100),
                 MakeUintegerAccessor(&CoapCacheGtw::m_packet_payload_size),
@@ -128,9 +132,7 @@ namespace ns3 {
             if (Simulator::Now() - itr->second >= fresh) {
                 itr = m_cache.erase(itr);
                 //NS_LOG_DEBUG("Deleting entry");
-            }
-            else
-            {
+            } else {
                 itr++;
                 //NS_LOG_DEBUG("Valid entry");
             }
@@ -142,17 +144,30 @@ namespace ns3 {
     CoapCacheGtw::InCache(uint32_t in_seq) {
         //Simnple function to check is sequence is currently in cache.
         UpdateCache();
-        for (int idx = 0; idx < (int) m_cache.size(); idx++) {
-            if (m_cache[idx].first == in_seq) {
+        for (auto itr = m_cache.begin(); itr != m_cache.end(); itr++) {
+            if (itr->first == in_seq) {
+                std::rotate(itr, itr + 1, m_cache.end());
+                for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
+                    NS_LOG_INFO("Cache reordered: " << itr2->first);
+                }
                 return true;
             }
         }
+
         return false;
     }
 
     void
     CoapCacheGtw::AddToCache(uint32_t cache_seq) {
+        if ((int) m_cache.size() >= (int) m_cache_size) {
+            //The cache is full.
+            NS_LOG_DEBUG("Cache full, deleting first entry.");
+            m_cache.erase(m_cache.begin()); //Delete first entry
+        }
         m_cache.push_back(std::make_pair(cache_seq, Simulator::Now()));
+        for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
+            NS_LOG_INFO("After deletion: " << itr2->first);
+        }
     }
 
     void
