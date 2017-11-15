@@ -128,13 +128,13 @@ namespace ns3 {
 
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
-            //NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
             if (Simulator::Now() - itr->second >= fresh) {
                 itr = m_cache.erase(itr);
-                //NS_LOG_DEBUG("Deleting entry");
+                NS_LOG_DEBUG("Deleting entry");
             } else {
                 itr++;
-                //NS_LOG_DEBUG("Valid entry");
+                NS_LOG_DEBUG("Valid entry");
             }
 
         }
@@ -153,7 +153,6 @@ namespace ns3 {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -166,7 +165,7 @@ namespace ns3 {
         }
         m_cache.push_back(std::make_pair(cache_seq, Simulator::Now()));
         for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
-            NS_LOG_INFO("After deletion: " << itr2->first);
+            NS_LOG_INFO("Entry in cache: " << itr2->first);
         }
     }
 
