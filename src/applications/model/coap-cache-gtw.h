@@ -68,6 +68,8 @@ namespace ns3 {
         void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
         CoapCacheGtw();
+        bool InCache(uint32_t in_seq);
+        void AddToCache(uint32_t cache_seq);
         virtual ~CoapCacheGtw();
 
     protected:
@@ -100,7 +102,7 @@ namespace ns3 {
          * \param string A string containing the packet content.
          */
         void CreateResponsePkt(std::string fill, uint32_t);
-        
+
 
         uint16_t m_port; //!< Port on which we listen for incoming packets.
         uint32_t m_fresh;
@@ -116,8 +118,8 @@ namespace ns3 {
         uint8_t *m_Rdata; //!< packet payload data
 
 
-        std::set<std::pair<uint32_t,Time>> m_cache;
-        std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs;
+        std::vector<std::pair<uint32_t, Time>> m_cache;
+        std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs; //Adress, time, sequence
         std::vector<Ipv6Address> m_IPv6Bucket;
         Ipv6Address m_ownip;
     };

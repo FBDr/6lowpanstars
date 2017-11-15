@@ -39,8 +39,7 @@
 #include <string>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3
-{
+namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapCacheGtwApplication");
 
@@ -119,13 +118,41 @@ namespace ns3
 
     void
     CoapCacheGtw::UpdateCache() {
-        Time fresh(std::to_string(m_fresh)+"s");
-        for (auto f : m_cache) {
-            if (Simulator::Now() - f.second >= fresh )
+        Time fresh(std::to_string(m_fresh) + "s");
+
+        std::vector<std::pair<uint32_t, Time>>::iterator itr = m_cache.begin();
+
+        while (itr != m_cache.end()) {
+            Time lifetime = Simulator::Now() - itr->second;
+            //NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            if (Simulator::Now() - itr->second >= fresh) {
+                itr = m_cache.erase(itr);
+                //NS_LOG_DEBUG("Deleting entry");
+            }
+            else
             {
-                
+                itr++;
+                //NS_LOG_DEBUG("Valid entry");
+            }
+
+        }
+    }
+
+    bool
+    CoapCacheGtw::InCache(uint32_t in_seq) {
+        //Simnple function to check is sequence is currently in cache.
+        UpdateCache();
+        for (int idx = 0; idx < (int) m_cache.size(); idx++) {
+            if (m_cache[idx].first == in_seq) {
+                return true;
             }
         }
+        return false;
+    }
+
+    void
+    CoapCacheGtw::AddToCache(uint32_t cache_seq) {
+        m_cache.push_back(std::make_pair(cache_seq, Simulator::Now()));
     }
 
     void
@@ -205,7 +232,6 @@ namespace ns3
 
         Ptr<Packet> received_packet;
         Ptr<Packet> response_packet;
-        UpdateCache();
         Address from;
 
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
@@ -246,12 +272,12 @@ namespace ns3
                         NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
 
-                        m_cache.insert(std::make_pair(std::get<2>(m_pendingreqs[idx]), Simulator::Now()));
+                        AddToCache(std::get<2>(m_pendingreqs[idx]));
                         NS_LOG_INFO("Cache insert! " << std::get<2>(m_pendingreqs[idx]) << " Size: " << m_cache.size());
                         break;
                     }
                 }
-            } else if (m_cache.find(received_Req) != m_cache.end()) {
+            } else if (InCache(received_Req)) {
                 CacheHit(socket, received_packet, received_Req, coaptag, from);
             } else {
                 CacheMiss(socket, received_packet, received_Req, coaptag, from);
