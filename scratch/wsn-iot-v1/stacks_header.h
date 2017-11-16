@@ -50,11 +50,10 @@ namespace ns3 {
             NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul);
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all, NodeContainer endnodes,
-             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
+            std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq, bool &useIPCache, double &freshness, 
-            int &cache);
+            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache);
 
 }
 #endif /* NDN_HEADER_H */

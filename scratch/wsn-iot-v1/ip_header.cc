@@ -91,7 +91,7 @@ namespace ns3 {
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq) {
+            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache) {
 
         //This function installs the specific IP applications. 
 
@@ -120,7 +120,7 @@ namespace ns3 {
                 gtw_cache.SetAttribute("Freshness", UintegerValue((uint32_t) freshness));
                 gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
                 apps = gtw_cache.Install(iot[itr].Get(node_periph));
-                gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
+                //gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]); TODO
                 apps.Start(Seconds(1.0));
                 apps.Stop(Seconds(simtime));
             }
