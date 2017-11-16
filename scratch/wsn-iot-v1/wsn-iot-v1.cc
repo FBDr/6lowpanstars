@@ -21,6 +21,7 @@
 #include "src/core/model/log.h"
 #include <string>
 #include <vector>
+#include <map>
 
 #include "stacks_header.h"
 #include "g_function_header.h"
@@ -279,15 +280,15 @@ namespace ns3 {
         Ipv6InterfaceContainer i_backhaul;
         std::vector<Ipv6Address> IPv6Bucket; //Vector containing all producer IPv6 addresses.
         std::vector<Ipv6Address> AddrResBucket; //Content address lookup vector.
-
+        std::map<Ipv6Address, Ipv6Address> gtw_to_node_map;
         ApplicationContainer apps;
 
         if (!ndn) {
             NS_LOG_INFO("Installing 6lowpan stack.");
-            sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
+            sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul, gtw_to_node_map);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, all, endnodes, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache);
+            sixlowpan_apps(node_periph, node_head, iot, all, endnodes, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache, gtw_to_node_map);
         }
 
 
