@@ -91,6 +91,11 @@ namespace ns3 {
     }
 
     void
+    CoapServer::SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        m_gtw_to_node = gtw_to_node;
+    }
+
+    void
     CoapServer::DoDispose(void) {
         NS_LOG_FUNCTION(this);
         Application::DoDispose();
@@ -106,7 +111,7 @@ namespace ns3 {
             //NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
             if (m_IPv6Bucket[idx] == m_ownip) {
                 m_regSeqSet.insert(idx);
-                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip<< ". At node: "<< GetNode()->GetId());
+                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip << ". At node: " << GetNode()->GetId());
             }
         }
     }
@@ -183,7 +188,7 @@ namespace ns3 {
                 }
             }
         }
-        
+
         //Nasty hack to uniformize IP and ICN
         //m_socket6->SetIpv6HopLimit(63);
         m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));

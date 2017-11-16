@@ -48,13 +48,13 @@ namespace ns3 {
             NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
             Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
             std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
-            NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul, std::map<Ipv6Address, Ipv6Address> gtw_to_node_map);
+            NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul, std::map<Ipv6Address, Ipv6Address> &gtw_to_node_map);
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all, NodeContainer endnodes,
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache, std::map<Ipv6Address, Ipv6Address> gtw_to_node_map);
+            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache, std::map<Ipv6Address, Ipv6Address> &gtw_to_node_map);
 
 }
 #endif /* NDN_HEADER_H */

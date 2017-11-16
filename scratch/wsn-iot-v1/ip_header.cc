@@ -22,7 +22,7 @@ namespace ns3 {
             NetDeviceContainer LrWpanDevice[], NetDeviceContainer SixLowpanDevice[], NetDeviceContainer CSMADevice[],
             Ipv6InterfaceContainer i_6lowpan[], Ipv6InterfaceContainer i_csma[],
             std::vector<Ipv6Address> &IPv6Bucket, std::vector<Ipv6Address> &AddrResBucket,
-            NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul, std::map<Ipv6Address, Ipv6Address> gtw_to_node_map) {
+            NodeContainer &endnodes, NodeContainer &br, NodeContainer & backhaul, std::map<Ipv6Address, Ipv6Address> &gtw_to_node_map) {
 
         //This function installs 6LowPAN stack on nodes if IP is selected as networking protocol.
 
@@ -79,6 +79,7 @@ namespace ns3 {
                 IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
                 gtw_to_node_map.insert(std::make_pair(i_6lowpan[idx].GetAddress(jdx, 1), i_6lowpan[idx].GetAddress(node_periph, 1)));
                 NS_LOG_INFO("Node: " << i_6lowpan[idx].GetAddress(jdx, 1) << " at GTW: "<< gtw_to_node_map[i_6lowpan[idx].GetAddress(jdx, 1)]);
+                NS_LOG_INFO("Map currently is of size: "<< gtw_to_node_map.size());
             }
         }
         //AddrResBucket = CreateAddrResBucket(IPv6Bucket, node_periph);
@@ -93,7 +94,7 @@ namespace ns3 {
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
             Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
-            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache, std::map<Ipv6Address, Ipv6Address> gtw_to_node_map) {
+            double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache, std::map<Ipv6Address, Ipv6Address> &gtw_to_node_map) {
 
         //This function installs the specific IP applications. 
 
@@ -123,6 +124,8 @@ namespace ns3 {
                 gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
                 apps = gtw_cache.Install(iot[itr].Get(node_periph));
                 //gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]); TODO
+                NS_LOG_INFO("Map currently is of size: "<< gtw_to_node_map.size());
+                gtw_cache.SetNodeToGtwMap(apps.Get(0), gtw_to_node_map);
                 apps.Start(Seconds(1.0));
                 apps.Stop(Seconds(simtime));
             }

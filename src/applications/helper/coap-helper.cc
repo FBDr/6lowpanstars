@@ -64,6 +64,11 @@ namespace ns3 {
         app->GetObject<CoapServer>()->SetIPv6Bucket(bucket);
     }
 
+    void
+    CoapServerHelper::SetNodeToGtwMap(Ptr<Application> app, std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        app->GetObject<CoapServer>()->SetNodeToGtwMap(gtw_to_node);
+    }
+
     Ptr<Application>
     CoapServerHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapServer> ();
@@ -110,6 +115,11 @@ namespace ns3 {
         app->GetObject<CoapCacheGtw>()->SetIPv6Bucket(bucket);
     }
 
+    void
+    CoapCacheGtwHelper::SetNodeToGtwMap(Ptr<Application> app, std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        app->GetObject<CoapCacheGtw>()->SetNodeToGtwMap(gtw_to_node);
+    }
+
     Ptr<Application>
     CoapCacheGtwHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapCacheGtw> ();
@@ -133,6 +143,11 @@ namespace ns3 {
     void
     CoapClientHelper::SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket) {
         app->GetObject<CoapClient>()->SetIPv6Bucket(bucket);
+    }
+
+    void
+    CoapClientHelper::SetNodeToGtwMap(Ptr<Application> app, std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        app->GetObject<CoapClient>()->SetNodeToGtwMap(gtw_to_node);
     }
 
     void

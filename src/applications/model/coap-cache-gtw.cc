@@ -99,6 +99,12 @@ namespace ns3 {
     }
 
     void
+    CoapCacheGtw::SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        m_gtw_to_node = gtw_to_node;
+        NS_LOG_INFO("Map received, number of contents: "<<m_gtw_to_node.size());
+    }
+
+    void
     CoapCacheGtw::DoDispose(void) {
         NS_LOG_FUNCTION(this);
         Application::DoDispose();
@@ -128,7 +134,7 @@ namespace ns3 {
 
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
-            NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            NS_LOG_DEBUG("Lifetime of current cached item: " << itr->first << " " << lifetime.GetMilliSeconds());
             if (Simulator::Now() - itr->second >= fresh) {
                 itr = m_cache.erase(itr);
                 NS_LOG_DEBUG("Deleting entry");

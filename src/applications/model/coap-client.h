@@ -149,6 +149,7 @@ namespace ns3 {
         void SetRngStream(uint32_t stream);
         uint32_t GetRngStream() const;
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        void SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node);
 
 
         uint32_t
@@ -221,6 +222,7 @@ namespace ns3 {
         double m_s; // s in (k+q)^s
         std::vector<double> m_Pcum; // cumulative probability
         std::vector<Ipv6Address> m_IPv6Bucket;
+        std::map<Ipv6Address, Ipv6Address> m_gtw_to_node;
         Ptr<UniformRandomVariable> m_seqRng; // RNG
         std::set<uint32_t> m_PenSeqSet; //Pending sequences 
         Ipv6Address m_ownip;

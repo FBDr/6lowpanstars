@@ -27,6 +27,8 @@
 #include "ns3/callback.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/traced-callback.h"
+#include <map>
+
 
 namespace ns3 {
 
@@ -64,6 +66,7 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        void SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node);
 
 
         CoapServer();
@@ -115,6 +118,7 @@ namespace ns3 {
         //        uint32_t m_regNum; //!< Available sequence numbers.
         std::set<uint32_t> m_regSeqSet;
         std::vector<Ipv6Address> m_IPv6Bucket;
+        std::map<Ipv6Address, Ipv6Address> m_gtw_to_node;
         Ipv6Address m_ownip;
     };
 

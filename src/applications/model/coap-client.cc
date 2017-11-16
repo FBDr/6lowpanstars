@@ -100,7 +100,7 @@ namespace ns3 {
                 &CoapClient::GetRngStream),
                 MakeUintegerChecker<uint32_t>());
 
-                ;
+        ;
         return tid;
     }
 
@@ -169,6 +169,11 @@ namespace ns3 {
         m_IPv6Bucket = bucket;
         // SetNumberOfContents((uint32_t)bucket.size());
 
+    }
+
+    void
+    CoapClient::SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+        m_gtw_to_node = gtw_to_node;
     }
 
     uint32_t

@@ -28,6 +28,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/traced-callback.h"
 #include "ns3/coap-packet-tag.h"
+#include <map>
 
 namespace ns3 {
 
@@ -65,6 +66,7 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        void SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node);
         void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
         CoapCacheGtw();
@@ -123,6 +125,7 @@ namespace ns3 {
         std::vector<std::pair<uint32_t, Time>> m_cache; //Sequence, time
         std::vector<std::tuple<Address, uint64_t, uint32_t>> m_pendingreqs; //Adress, time, sequence
         std::vector<Ipv6Address> m_IPv6Bucket;
+        std::map<Ipv6Address, Ipv6Address> m_gtw_to_node;
         Ipv6Address m_ownip;
     };
 
