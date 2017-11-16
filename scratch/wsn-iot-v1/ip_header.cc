@@ -152,7 +152,7 @@ namespace ns3 {
         //Client inside nodes
         for (int jdx = 0; jdx < con_inside; jdx++) {
             interval_sel = Rinterval->GetValue(min_freq, max_freq);
-            start_delay = Rstartdelay->GetValue(0.1, 5.0);
+            start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
             client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket.size()));
             Ptr<Node> sel_node = SelectRandomNodeFromContainer(endnodes, Rinsidenodecon);
