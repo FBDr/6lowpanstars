@@ -78,8 +78,8 @@ namespace ns3 {
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 IPv6Bucket.push_back(i_6lowpan[idx].GetAddress(jdx, 1));
                 gtw_to_node_map.insert(std::make_pair(i_6lowpan[idx].GetAddress(jdx, 1), i_6lowpan[idx].GetAddress(node_periph, 1)));
-                NS_LOG_INFO("Node: " << i_6lowpan[idx].GetAddress(jdx, 1) << " at GTW: "<< gtw_to_node_map[i_6lowpan[idx].GetAddress(jdx, 1)]);
-                NS_LOG_INFO("Map currently is of size: "<< gtw_to_node_map.size());
+                NS_LOG_INFO("Node: " << i_6lowpan[idx].GetAddress(jdx, 1) << " at GTW: " << gtw_to_node_map[i_6lowpan[idx].GetAddress(jdx, 1)]);
+                NS_LOG_INFO("Map currently is of size: " << gtw_to_node_map.size());
             }
         }
         //AddrResBucket = CreateAddrResBucket(IPv6Bucket, node_periph);
@@ -87,7 +87,7 @@ namespace ns3 {
         //Shuffelen
         Ptr<UniformRandomVariable> Rpro = CreateObject<UniformRandomVariable> ();
         Rpro->SetStream(6);
-        shuffle_array_ip(AddrResBucket, Rpro, 6, node_head*node_periph);
+        shuffle_array_ip(AddrResBucket, Rpro, 6, node_head * node_periph);
     }
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all, NodeContainer endnodes,
@@ -123,8 +123,8 @@ namespace ns3 {
                 gtw_cache.SetAttribute("Freshness", UintegerValue((uint32_t) freshness));
                 gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
                 apps = gtw_cache.Install(iot[itr].Get(node_periph));
-                //gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]); TODO
-                NS_LOG_INFO("Map currently is of size: "<< gtw_to_node_map.size());
+                gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+                NS_LOG_INFO("Map currently is of size: " << gtw_to_node_map.size());
                 gtw_cache.SetNodeToGtwMap(apps.Get(0), gtw_to_node_map);
                 apps.Start(Seconds(1.0));
                 apps.Stop(Seconds(simtime));
@@ -136,6 +136,7 @@ namespace ns3 {
                 server.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
                 apps = server.Install(iot[itr].Get(jdx));
                 server.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+                server.SetNodeToGtwMap(apps.Get(0), gtw_to_node_map);
                 //interval_sel = Rstartdelay->GetValue(0.1, 5);
                 //apps.Start(Seconds(1.0 + interval_sel));
                 apps.Start(Seconds(1.0));
@@ -155,7 +156,7 @@ namespace ns3 {
         //Client inside nodes
         for (int jdx = 0; jdx < con_inside; jdx++) {
             interval_sel = Rinterval->GetValue(min_freq, max_freq);
-            start_delay = Rstartdelay->GetValue(0.1, 1/max_freq);
+            start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
             client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket.size()));
             Ptr<Node> sel_node = SelectRandomNodeFromContainer(endnodes, Rinsidenodecon);
@@ -163,6 +164,7 @@ namespace ns3 {
             apps = client.Install(sel_node);
             std::cout << "sel_node_inside " << sel_node->GetId() << std::endl;
             client.SetIPv6Bucket(apps.Get(0), AddrResBucket);
+            client.SetNodeToGtwMap(apps.Get(0), gtw_to_node_map);
             apps.Start(Seconds(120.0 + start_delay));
             apps.Stop(Seconds(simtime - 5));
         }

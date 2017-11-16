@@ -173,6 +173,7 @@ namespace ns3 {
 
     void
     CoapClient::SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
+
         m_gtw_to_node = gtw_to_node;
     }
 
@@ -234,7 +235,7 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-
+        m_ownGTW = m_gtw_to_node[m_ownip];
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -407,9 +408,17 @@ namespace ns3 {
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
 
-        if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
-            NS_LOG_INFO("SendTo ERROR! Trying to send to " << m_IPv6Bucket[nxtsq]);
-        };
+        if (m_gtw_to_node[m_IPv6Bucket[nxtsq]] == m_ownGTW) {
+            NS_LOG_INFO("Transmitting to internal node." << m_gtw_to_node[m_IPv6Bucket[nxtsq]] << " " << m_ownGTW);
+            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
+                NS_LOG_INFO("SendTo ERROR! Trying to send to: " << m_IPv6Bucket[nxtsq]);
+            };
+        } else {
+            NS_LOG_INFO("Transmitting to external gateway.");
+            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[nxtsq]], m_peerPort)) == -1) {
+                NS_LOG_INFO("SendTo ERROR! Trying to send to GTW:" << m_gtw_to_node[m_IPv6Bucket[nxtsq]]);
+            };
+        }
 
 
         ++m_sent;

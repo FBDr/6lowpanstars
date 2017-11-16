@@ -101,7 +101,7 @@ namespace ns3 {
     void
     CoapCacheGtw::SetNodeToGtwMap(std::map<Ipv6Address, Ipv6Address> gtw_to_node) {
         m_gtw_to_node = gtw_to_node;
-        NS_LOG_INFO("Map received, number of contents: "<<m_gtw_to_node.size());
+        NS_LOG_INFO("Map received, number of contents: " << m_gtw_to_node.size());
     }
 
     void
@@ -194,7 +194,7 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-
+        m_ownGTW = m_gtw_to_node[m_ownip];
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -326,7 +326,12 @@ namespace ns3 {
         m_pendingreqs.push_back(std::make_tuple(from, coaptag.GetT(), sq));
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
-        NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+        if (m_gtw_to_node[m_IPv6Bucket[sq]] == m_ownGTW) {
+            NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+        } else {
+            NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[sq]], m_port)));
+        }
+
     }
 
 
