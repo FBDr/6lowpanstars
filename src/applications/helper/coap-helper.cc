@@ -20,11 +20,11 @@
 #include "coap-helper.h"
 #include "ns3/coap-server.h"
 #include "ns3/coap-client.h"
+#include "ns3/coap-cache-gtw.h"
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
 
-namespace ns3
-{
+namespace ns3 {
 
     CoapServerHelper::CoapServerHelper(uint16_t port) {
         m_factory.SetTypeId(CoapServer::GetTypeId());
@@ -65,8 +65,54 @@ namespace ns3
     }
 
     Ptr<Application>
-            CoapServerHelper::InstallPriv(Ptr<Node> node) const {
+    CoapServerHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapServer> ();
+        node->AddApplication(app);
+
+        return app;
+    }
+
+    CoapCacheGtwHelper::CoapCacheGtwHelper(uint16_t port) {
+        m_factory.SetTypeId(CoapCacheGtw::GetTypeId());
+        SetAttribute("Port", UintegerValue(port));
+    }
+
+    void
+    CoapCacheGtwHelper::SetAttribute(
+            std::string name,
+            const AttributeValue & value) {
+        m_factory.Set(name, value);
+    }
+
+    ApplicationContainer
+    CoapCacheGtwHelper::Install(Ptr<Node> node) const {
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    CoapCacheGtwHelper::Install(std::string nodeName) const {
+        Ptr<Node> node = Names::Find<Node> (nodeName);
+        return ApplicationContainer(InstallPriv(node));
+    }
+
+    ApplicationContainer
+    CoapCacheGtwHelper::Install(NodeContainer c) const {
+        ApplicationContainer apps;
+        for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+            apps.Add(InstallPriv(*i));
+        }
+
+        return apps;
+    }
+
+    void
+    CoapCacheGtwHelper::SetIPv6Bucket(Ptr<Application> app, std::vector<Ipv6Address> &bucket) {
+        app->GetObject<CoapCacheGtw>()->SetIPv6Bucket(bucket);
+    }
+
+    Ptr<Application>
+    CoapCacheGtwHelper::InstallPriv(Ptr<Node> node) const {
+        Ptr<Application> app = m_factory.Create<CoapCacheGtw> ();
         node->AddApplication(app);
 
         return app;
@@ -126,7 +172,7 @@ namespace ns3
     }
 
     Ptr<Application>
-            CoapClientHelper::InstallPriv(Ptr<Node> node) const {
+    CoapClientHelper::InstallPriv(Ptr<Node> node) const {
         Ptr<Application> app = m_factory.Create<CoapClient> ();
         node->AddApplication(app);
 

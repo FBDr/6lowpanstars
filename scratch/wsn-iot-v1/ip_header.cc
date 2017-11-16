@@ -12,6 +12,8 @@
  */
 
 #include "stacks_header.h"
+#include "src/network/utils/ipv6-address.h"
+#include "src/applications/helper/coap-helper.h"
 
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ip-stack");
@@ -107,9 +109,23 @@ namespace ns3 {
          */
         CoapClientHelper client(port);
         CoapServerHelper server(port);
+        CoapCacheGtwHelper gtw_cache(port);
 
         //Server
         for (int itr = 0; itr < node_head; itr++) {
+            //Install cache gtw application on the gateway.
+
+            if (useIPCache) {
+                gtw_cache.SetAttribute("Payload", UintegerValue((uint32_t) payloadsize));
+                gtw_cache.SetAttribute("Freshness", UintegerValue((uint32_t) freshness));
+                gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
+                apps = gtw_cache.Install(iot[itr].Get(node_periph));
+                gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
+                apps.Start(Seconds(1.0));
+                apps.Stop(Seconds(simtime));
+            }
+
+
             for (int jdx = 0; jdx < node_periph; jdx++) {
                 //Install server application on every node, in every IoT domain.
                 server.SetAttribute("Payload", UintegerValue((uint16_t) payloadsize));
