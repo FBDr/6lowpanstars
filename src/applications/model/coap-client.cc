@@ -459,7 +459,7 @@ namespace ns3 {
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
-                    int hops = 64 - (int) hoplimitTag.GetHopLimit();
+                    int hops = (int) (64 - coaptag.GetHop());
                     NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                             Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "

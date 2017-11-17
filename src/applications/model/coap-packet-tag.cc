@@ -25,13 +25,12 @@
 #include <iostream>
 #include "ns3/coap-packet-tag.h"
 
-namespace ns3
-{
+namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("CoapPacketTag");
 
     CoapPacketTag::CoapPacketTag()
-            : m_seq(0), m_req(0),
-            m_ts(Simulator::Now().GetTimeStep()) {
+    : m_seq(0), m_req(0),
+    m_ts(Simulator::Now().GetTimeStep()) {
         NS_LOG_FUNCTION(this);
     }
 
@@ -52,7 +51,7 @@ namespace ns3
     uint32_t
     CoapPacketTag::GetSerializedSize(void) const {
         NS_LOG_FUNCTION(this);
-        return 4 + 8 + 4;
+        return 4 + 8 + 4 + 1;
     }
 
     void
@@ -60,6 +59,7 @@ namespace ns3
         i.WriteU32(m_seq);
         i.WriteU32(m_req);
         i.WriteU64(m_ts);
+        i.WriteU8(m_hops);
     }
 
     void
@@ -67,6 +67,7 @@ namespace ns3
         m_seq = i.ReadU32();
         m_req = i.ReadU32();
         m_ts = i.ReadU64();
+        m_hops = i.ReadU8();
     }
 
     void
@@ -97,6 +98,19 @@ namespace ns3
     CoapPacketTag::GetReq(void) const {
         NS_LOG_FUNCTION(this);
         return m_req;
+    }
+
+    void 
+    CoapPacketTag::SetHop(uint8_t hops) {
+        NS_LOG_FUNCTION(this << hops);
+        m_hops = hops;
+    }
+
+    uint8_t 
+    CoapPacketTag::GetHop(void) const {
+        NS_LOG_FUNCTION(this);
+        return m_hops;
+
     }
 
     Time

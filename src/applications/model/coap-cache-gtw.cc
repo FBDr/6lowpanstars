@@ -250,6 +250,7 @@ namespace ns3 {
 
         m_socket->SetRecvCallback(MakeCallback(&CoapCacheGtw::HandleRead, this));
         m_socket6->SetRecvCallback(MakeCallback(&CoapCacheGtw::HandleRead, this));
+        m_socket6->SetIpv6RecvHopLimit(true);
 
     }
 
@@ -288,14 +289,18 @@ namespace ns3 {
             }
 
             CoapPacketTag coaptag;
+            SocketIpv6HopLimitTag hoplimitTag;
 
             received_packet->RemovePacketTag(coaptag);
+            received_packet->RemovePacketTag(hoplimitTag);
             received_packet->RemoveAllPacketTags();
             received_packet->RemoveAllByteTags();
 
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
-            NS_LOG_INFO("Currently received packet delay " << delay);
+            int hops = 64 - (int) hoplimitTag.GetHopLimit();
+            coaptag.SetHop( (uint8_t) hoplimitTag.GetHopLimit());
+            NS_LOG_INFO("Currently received packet delay " << delay << " ms. With hops: "<< hops);
             m_Rdata = new uint8_t [received_packet->GetSize()];
             received_packet->CopyData(m_Rdata, received_packet->GetSize());
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
@@ -339,8 +344,6 @@ namespace ns3 {
         response_packet->AddPacketTag(coaptag);
 
         NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
-
-
     }
 
     void

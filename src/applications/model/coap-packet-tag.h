@@ -46,12 +46,15 @@ namespace ns3 {
         uint32_t GetSeq(void) const;
         void SetReq(uint32_t);
         uint32_t GetReq(void) const;
+        void SetHop(uint8_t);
+        uint8_t GetHop(void) const;
         Time GetTs(void) const;
         uint64_t GetT(void) const;
     private:
         uint32_t m_seq; //!< Sequence number
         uint32_t m_req; //!< Request number
         uint64_t m_ts; //!< Timestamp
+        uint8_t m_hops; //!<Hops
     };
 
 }
