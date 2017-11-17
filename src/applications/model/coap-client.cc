@@ -45,6 +45,7 @@
 
 
 
+
 namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
@@ -80,6 +81,11 @@ namespace ns3 {
                 .AddTraceSource("Tx", "A new packet is created and is sent",
                 MakeTraceSourceAccessor(&CoapClient::m_txTrace),
                 "ns3::Packet::TracedCallback")
+                .AddAttribute("useIPCache",
+                "Must be set if IP caching is used",
+                BooleanValue(false),
+                MakeBooleanAccessor(&CoapClient::m_useIPcache),
+                MakeBooleanChecker())
 
                 //ZM
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
@@ -408,8 +414,8 @@ namespace ns3 {
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
 
-        if (m_gtw_to_node[m_IPv6Bucket[nxtsq]] == m_ownGTW) {
-            NS_LOG_INFO("Transmitting to internal node." << m_gtw_to_node[m_IPv6Bucket[nxtsq]] << " " << m_ownGTW);
+        if (m_gtw_to_node[m_IPv6Bucket[nxtsq]] == m_ownGTW || !m_useIPcache) {
+            NS_LOG_INFO("Transmitting directly/internal node." << m_gtw_to_node[m_IPv6Bucket[nxtsq]] << " " << m_ownGTW);
             if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
                 NS_LOG_INFO("SendTo ERROR! Trying to send to: " << m_IPv6Bucket[nxtsq]);
             };
@@ -465,7 +471,8 @@ namespace ns3 {
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
                             << hops);
 
-                    PrintToFile(hops, delay);
+                    PrintToFile(coaptag.GetTs().GetSeconds(), hops, delay);
+
                     m_received++;
                     m_PenSeqSet.erase(m_PenSeqSet.find(coaptag.GetReq()));
                 }
@@ -475,12 +482,12 @@ namespace ns3 {
     }
 
     void
-    CoapClient::PrintToFile(int &hops, int64_t & delay) {
+    CoapClient::PrintToFile(double txtime, int &hops, int64_t & delay) {
         Ptr <Node> PtrNode = this->GetNode();
         uint32_t nodenum = PtrNode->GetId();
         std::ofstream outfile;
         outfile.open("hopdelay.txt", std::ios_base::app);
-        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
+        outfile << nodenum << " " << txtime << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
 
     }
 

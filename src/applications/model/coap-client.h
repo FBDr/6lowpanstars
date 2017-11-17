@@ -198,7 +198,7 @@ namespace ns3 {
         GetS() const;
 
         void
-        PrintToFile(int &hops, int64_t &delay);
+        PrintToFile(double txtime, int &hops, int64_t &delay);
 
         uint32_t m_count; //!< Maximum number of packets the application will send
         Time m_interval; //!< Packet inter-send time
@@ -216,7 +216,8 @@ namespace ns3 {
 
         /// Callbacks for tracing the packet Tx events
         TracedCallback<Ptr<const Packet> > m_txTrace;
-
+        
+        bool m_useIPcache;
         uint32_t m_N; // number of the contents
         double m_q; // q in (k+q)^s
         double m_s; // s in (k+q)^s
@@ -227,6 +228,7 @@ namespace ns3 {
         std::set<uint32_t> m_PenSeqSet; //Pending sequences 
         Ipv6Address m_ownip;
         Ipv6Address m_ownGTW;
+
     };
 
 } // namespace ns3

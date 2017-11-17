@@ -159,6 +159,9 @@ namespace ns3 {
             start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
             client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
             client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket.size()));
+            if (useIPCache) {
+                client.SetAttribute("useIPCache", BooleanValue(true));
+            }
             Ptr<Node> sel_node = SelectRandomNodeFromContainer(endnodes, Rinsidenodecon);
             client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
             apps = client.Install(sel_node);
