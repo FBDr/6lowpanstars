@@ -414,9 +414,9 @@ namespace ns3 {
                 NS_LOG_INFO("SendTo ERROR! Trying to send to: " << m_IPv6Bucket[nxtsq]);
             };
         } else {
-            NS_LOG_INFO("Transmitting to external gateway.");
-            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[nxtsq]], m_peerPort)) == -1) {
-                NS_LOG_INFO("SendTo ERROR! Trying to send to GTW:" << m_gtw_to_node[m_IPv6Bucket[nxtsq]]);
+            NS_LOG_INFO("Node is at different gateway, transmitting to own GTW.  ");
+            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_ownGTW, m_peerPort)) == -1) {
+                NS_LOG_INFO("SendTo ERROR! Trying to send to ownGTW:" << m_ownGTW);
             };
         }
 

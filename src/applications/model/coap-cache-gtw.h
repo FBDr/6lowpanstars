@@ -127,7 +127,6 @@ namespace ns3 {
         std::vector<Ipv6Address> m_IPv6Bucket;
         std::map<Ipv6Address, Ipv6Address> m_gtw_to_node;
         Ipv6Address m_ownip;
-        Ipv6Address m_ownGTW;
     };
 
 } // namespace ns3

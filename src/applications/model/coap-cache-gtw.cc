@@ -194,7 +194,11 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-        m_ownGTW = m_gtw_to_node[m_ownip];
+/*
+        for (auto elem : m_gtw_to_node) {
+            NS_LOG_INFO(elem.first << " " << elem.second);
+        }
+*/
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -326,9 +330,12 @@ namespace ns3 {
         m_pendingreqs.push_back(std::make_tuple(from, coaptag.GetT(), sq));
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
-        if (m_gtw_to_node[m_IPv6Bucket[sq]] == m_ownGTW) {
+
+        if (m_gtw_to_node[m_IPv6Bucket[sq]] == m_ownip) {
+            NS_LOG_INFO("Dest in my domain! ");
             NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
         } else {
+            NS_LOG_INFO("Dest in NOT in my domain! Forwarding to GTW ");
             NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[sq]], m_port)));
         }
 
