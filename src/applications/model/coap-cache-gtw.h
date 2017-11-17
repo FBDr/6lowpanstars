@@ -99,6 +99,8 @@ namespace ns3 {
          * \brief Update cache contents by checking for expired freshness.
          */
         void UpdateCache(void);
+        
+        void UpdatePendingVector(void);
         /**
          * \brief Fill data buffers for response packet with std::string.
          * \param string A string containing the packet content.

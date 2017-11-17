@@ -130,7 +130,7 @@ namespace ns3 {
     CoapCacheGtw::UpdateCache() {
         Time fresh(std::to_string(m_fresh) + "s");
 
-        std::vector<std::pair<uint32_t, Time>>::iterator itr = m_cache.begin();
+        auto itr = m_cache.begin();
 
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
@@ -143,6 +143,23 @@ namespace ns3 {
                 NS_LOG_DEBUG("Valid entry");
             }
 
+        }
+    }
+
+    void
+    CoapCacheGtw::UpdatePendingVector() {
+        auto itr = m_pendingreqs.begin();
+        Time del_int("500ms");
+        while (itr != m_pendingreqs.end()) {
+            Time cur_penreq = TimeStep(std::get<1>(*itr));
+            if (Simulator::Now() - cur_penreq >= del_int) {
+                NS_LOG_INFO("Found stale pending entry. Busy deleting. Number of items in vector before deletion:  " << m_pendingreqs.size() << " time of entry: " << cur_penreq.GetSeconds());
+                itr = m_pendingreqs.erase(itr);
+
+            } else {
+                itr++;
+                NS_LOG_DEBUG("Valid pending entry");
+            }
         }
     }
 
@@ -290,16 +307,7 @@ namespace ns3 {
 
                 //Add data seq to cache
                 for (int idx = 0; idx < ((int) m_pendingreqs.size()); idx++) {
-                    //Update m_pendingreqs by removing stale entries.
-                    Time del_int("500ms");
-                    Time cur_penreq = TimeStep(std::get<1>(m_pendingreqs[idx]));
-                    if (Simulator::Now() - cur_penreq >= del_int) {
-                        NS_LOG_INFO("Found stale pending entry. Busy deleting. Number of items in vector before deletion:  " << m_pendingreqs.size() << " time of entry: "<< cur_penreq.GetSeconds() );
-                        m_pendingreqs.erase(m_pendingreqs.begin() + idx);
-
-                        continue;
-                    }
-
+                    UpdatePendingVector();
                     //Search pending vector for return entry.
                     if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
