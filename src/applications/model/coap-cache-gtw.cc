@@ -135,7 +135,7 @@ namespace ns3 {
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
             NS_LOG_DEBUG("Lifetime of current cached item: " << itr->first << " " << lifetime.GetMilliSeconds());
-            if (Simulator::Now() - itr->second >= fresh) {
+            if (lifetime >= fresh) {
                 itr = m_cache.erase(itr);
                 NS_LOG_DEBUG("Deleting entry");
             } else {
@@ -194,11 +194,11 @@ namespace ns3 {
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-/*
-        for (auto elem : m_gtw_to_node) {
-            NS_LOG_INFO(elem.first << " " << elem.second);
-        }
-*/
+        /*
+                for (auto elem : m_gtw_to_node) {
+                    NS_LOG_INFO(elem.first << " " << elem.second);
+                }
+         */
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -261,11 +261,11 @@ namespace ns3 {
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
 
             if (InetSocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
                         Inet6SocketAddress::ConvertFrom(from).GetPort());
             }
@@ -290,6 +290,17 @@ namespace ns3 {
 
                 //Add data seq to cache
                 for (int idx = 0; idx < ((int) m_pendingreqs.size()); idx++) {
+                    //Update m_pendingreqs by removing stale entries.
+                    Time del_int("500ms");
+                    Time cur_penreq = TimeStep(std::get<1>(m_pendingreqs[idx]));
+                    if (Simulator::Now() - cur_penreq >= del_int) {
+                        NS_LOG_INFO("Found stale pending entry. Busy deleting. Number of items in vector before deletion:  " << m_pendingreqs.size() << " time of entry: "<< cur_penreq.GetSeconds() );
+                        m_pendingreqs.erase(m_pendingreqs.begin() + idx);
+
+                        continue;
+                    }
+
+                    //Search pending vector for return entry.
                     if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
                         received_packet->AddPacketTag(coaptag);

@@ -222,11 +222,11 @@ namespace ns3 {
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
 
             if (InetSocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
                         Inet6SocketAddress::ConvertFrom(from).GetPort());
             }
@@ -260,11 +260,11 @@ namespace ns3 {
             socket->SendTo(response_packet, 0, from);
 
             if (InetSocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
             } else if (Inet6SocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
                         Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
                         Inet6SocketAddress::ConvertFrom(from).GetPort());
             }

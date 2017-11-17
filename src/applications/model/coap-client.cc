@@ -425,7 +425,7 @@ namespace ns3 {
         //std::cout<<"s: "<< m_sent<<std::endl;
         m_PenSeqSet.insert(nxtsq);
         if (Ipv6Address::IsMatchingType(m_IPv6Bucket[nxtsq])) {
-            NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client sent " << m_size << " bytes to " <<
+            NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client sent " << m_size << " bytes to " <<
                     m_IPv6Bucket[nxtsq] << " port " << m_peerPort);
         }
         if (m_sent < m_count) {
@@ -443,7 +443,7 @@ namespace ns3 {
 
         while ((packet = socket->RecvFrom(from))) {
             if (InetSocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
+                NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
                         InetSocketAddress::ConvertFrom(from).GetPort());
                 m_received++;
@@ -460,7 +460,7 @@ namespace ns3 {
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
                     int hops = 64 - (int) hoplimitTag.GetHopLimit();
-                    NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
+                    NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                             Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
                             << hops);
