@@ -113,9 +113,8 @@ namespace ns3 {
 
                         inline void updateFile() {
                             std::ofstream outfile;
-                            outfile.open("CU/cache_util" +std::to_string(Simulator::GetContext()) + ".txt", std::ios_base::app);
-                            
-                            outfile << Simulator::GetContext() << " " << policy_container::size() << std::endl;
+                            outfile.open("CU_ICN/cache_util" +std::to_string(Simulator::GetContext()) + ".txt", std::ios_base::app);
+                            outfile << policy_container::size() << std::endl;
                         }
 
                     private:

@@ -19,6 +19,7 @@
 #include "src/network/helper/node-container.h"
 #include "src/network/utils/output-stream-wrapper.h"
 #include "src/core/model/log.h"
+#include "boost/filesystem.hpp" 
 #include <string>
 #include <vector>
 
@@ -28,7 +29,7 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
-/*
+    /*
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
         double nodenum = std::stoi(context);
@@ -36,7 +37,7 @@ namespace ns3 {
         outfile.open("energy.txt", std::ios_base::app);
         outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
     }
-*/
+     */
 
     int main(int argc, char **argv) {
 
@@ -102,20 +103,20 @@ namespace ns3 {
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-/*
-        for (int jdx = 0; jdx < 10; jdx++) {
-            RngSeedManager::SetSeed(1);
-            RngSeedManager::SetRun(2);
-            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-            Rnode->SetStream(1);
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<std::endl;
-        }
-*/
+        /*
+                for (int jdx = 0; jdx < 10; jdx++) {
+                    RngSeedManager::SetSeed(1);
+                    RngSeedManager::SetRun(2);
+                    Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+                    Rnode->SetStream(1);
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<std::endl;
+                }
+         */
 
         //Clean up old files
         remove("energy.txt");
@@ -124,7 +125,10 @@ namespace ns3 {
         remove("bytes.txt");
         remove("bytes2.txt");
         remove("cache_hits.txt");
-
+        boost::filesystem::remove_all("CU_ICN");
+        boost::filesystem::remove_all("CU_IP");
+        boost::filesystem::create_directory("CU_ICN");
+        boost::filesystem::create_directory("CU_IP");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
@@ -229,36 +233,36 @@ namespace ns3 {
 
         //Energy framework
 
-/*
-        int size = node_head * node_periph + 1;
-        Ptr<LrWpanRadioEnergyModel> em[size];
-        Ptr<BasicEnergySource> es[size];
-        Ptr<LrWpanContikiMac> mac[size]; //Change Mac
+        /*
+                int size = node_head * node_periph + 1;
+                Ptr<LrWpanRadioEnergyModel> em[size];
+                Ptr<BasicEnergySource> es[size];
+                Ptr<LrWpanContikiMac> mac[size]; //Change Mac
 
-        int endN = 0;
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            for (int idx = 0; idx < node_periph; idx++) {
-                endN++;
-                em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
-                es[endN] = CreateObject<BasicEnergySource> ();
-                mac[endN] = CreateObject<LrWpanContikiMac> ();
-                es[endN]->SetSupplyVoltage(3.3);
-                es[endN]->SetInitialEnergy(10800); //1 AA battery
-                es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
-                es[endN]->SetNode(iot[jdx].Get(idx));
-                es[endN]->AppendDeviceEnergyModel(em[endN]);
-                em[endN]->SetEnergySource(es[endN]);
+                int endN = 0;
+                for (int jdx = 0; jdx < node_head; jdx++) {
+                    for (int idx = 0; idx < node_periph; idx++) {
+                        endN++;
+                        em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
+                        es[endN] = CreateObject<BasicEnergySource> ();
+                        mac[endN] = CreateObject<LrWpanContikiMac> ();
+                        es[endN]->SetSupplyVoltage(3.3);
+                        es[endN]->SetInitialEnergy(10800); //1 AA battery
+                        es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
+                        es[endN]->SetNode(iot[jdx].Get(idx));
+                        es[endN]->AppendDeviceEnergyModel(em[endN]);
+                        em[endN]->SetEnergySource(es[endN]);
 
-                Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
-                em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-                es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+                        Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
+                        em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
+                        es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
 
-                //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
-                //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
-            }
-        }
-*/
+                        //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
+                        //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
+                        //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
+                    }
+                }
+         */
 
         /*
          NDN 

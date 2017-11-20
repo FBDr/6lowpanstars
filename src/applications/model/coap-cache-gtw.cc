@@ -168,6 +168,9 @@ namespace ns3 {
         for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
             NS_LOG_INFO("Entry in cache: " << itr2->first);
         }
+        std::ofstream outfile;
+        outfile.open("CU_IP/cache_util" + std::to_string(Simulator::GetContext()) + ".txt", std::ios_base::app);
+        outfile << m_cache.size() << std::endl;
     }
 
     void
@@ -329,7 +332,7 @@ namespace ns3 {
         Ptr <Node> PtrNode = this->GetNode();
         std::ofstream outfile;
         outfile.open("cache_hits.txt", std::ios_base::app);
-        outfile << PtrNode->GetId()<< " " << ns3::Simulator::Now().GetSeconds() << std::endl;
+        outfile << PtrNode->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
     }
 
 
