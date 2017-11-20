@@ -28,15 +28,15 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
-/*
-    static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
+        /*
+        static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
-        double nodenum = std::stoi(context);
-        std::ofstream outfile;
-        outfile.open("energy.txt", std::ios_base::app);
-        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
-    }
-*/
+            double nodenum = std::stoi(context);
+            std::ofstream outfile;
+            outfile.open("energy.txt", std::ios_base::app);
+            outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
+        }
+     */
 
     int main(int argc, char **argv) {
 
@@ -62,6 +62,7 @@ namespace ns3 {
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
+        bool node_cache = true;
         double freshness = 0;
         bool ipbackhaul = false;
         bool useContiki = false;
@@ -94,7 +95,7 @@ namespace ns3 {
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
         cmd.AddValue("zm_q", "Set the alpha parameter of the ZM distribution", zm_q);
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
-      
+        cmd.AddValue("node_cache", "Disable caching on end nodes.", node_cache);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.AddValue("ipcache", "Enable IP caching on gateway", useIPCache);
@@ -103,20 +104,20 @@ namespace ns3 {
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-/*
-        for (int jdx = 0; jdx < 10; jdx++) {
-            RngSeedManager::SetSeed(1);
-            RngSeedManager::SetRun(2);
-            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-            Rnode->SetStream(1);
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<Rnode->GetValue(0,1) <<std::endl;
-            std::cout<<std::endl;
-        }
-*/
+        /*
+                for (int jdx = 0; jdx < 10; jdx++) {
+                    RngSeedManager::SetSeed(1);
+                    RngSeedManager::SetRun(2);
+                    Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+                    Rnode->SetStream(1);
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
+                    std::cout<<std::endl;
+                }
+         */
 
         //Clean up old files
         remove("energy.txt");
@@ -228,36 +229,36 @@ namespace ns3 {
 
         //Energy framework
 
-/*
-        int size = node_head * node_periph + 1;
-        Ptr<LrWpanRadioEnergyModel> em[size];
-        Ptr<BasicEnergySource> es[size];
-        Ptr<LrWpanContikiMac> mac[size]; //Change Mac
+        /*
+                int size = node_head * node_periph + 1;
+                Ptr<LrWpanRadioEnergyModel> em[size];
+                Ptr<BasicEnergySource> es[size];
+                Ptr<LrWpanContikiMac> mac[size]; //Change Mac
 
-        int endN = 0;
-        for (int jdx = 0; jdx < node_head; jdx++) {
-            for (int idx = 0; idx < node_periph; idx++) {
-                endN++;
-                em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
-                es[endN] = CreateObject<BasicEnergySource> ();
-                mac[endN] = CreateObject<LrWpanContikiMac> ();
-                es[endN]->SetSupplyVoltage(3.3);
-                es[endN]->SetInitialEnergy(10800); //1 AA battery
-                es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
-                es[endN]->SetNode(iot[jdx].Get(idx));
-                es[endN]->AppendDeviceEnergyModel(em[endN]);
-                em[endN]->SetEnergySource(es[endN]);
+                int endN = 0;
+                for (int jdx = 0; jdx < node_head; jdx++) {
+                    for (int idx = 0; idx < node_periph; idx++) {
+                        endN++;
+                        em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
+                        es[endN] = CreateObject<BasicEnergySource> ();
+                        mac[endN] = CreateObject<LrWpanContikiMac> ();
+                        es[endN]->SetSupplyVoltage(3.3);
+                        es[endN]->SetInitialEnergy(10800); //1 AA battery
+                        es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
+                        es[endN]->SetNode(iot[jdx].Get(idx));
+                        es[endN]->AppendDeviceEnergyModel(em[endN]);
+                        em[endN]->SetEnergySource(es[endN]);
 
-                Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
-                em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-                es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+                        Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
+                        em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
+                        es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
 
-                //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
-                //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
-            }
-        }
-*/
+                        //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
+                        //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
+                        //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
+                    }
+                }
+         */
 
         /*
          NDN 
@@ -266,7 +267,7 @@ namespace ns3 {
 
         if (ndn) {
             NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
-                    cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
+                    cache, node_cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
         }
