@@ -35,6 +35,7 @@
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "src/network/model/node.h"
+#include "ns3/node.h"
 #include "src/core/model/log.h"
 #include <string>
 #include "ns3/coap-packet-tag.h"
@@ -128,7 +129,7 @@ namespace ns3 {
 
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
-            NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            NS_LOG_DEBUG("Lifetime of current cached item: " << itr->first << " " << lifetime.GetMilliSeconds());
             if (Simulator::Now() - itr->second >= fresh) {
                 itr = m_cache.erase(itr);
                 NS_LOG_DEBUG("Deleting entry");
@@ -308,7 +309,7 @@ namespace ns3 {
         CreateResponsePkt("POST", m_packet_payload_size);
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
-
+        PrintToFile();
         NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
 
 
@@ -321,6 +322,14 @@ namespace ns3 {
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
         NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+    }
+
+    void
+    CoapCacheGtw::PrintToFile() {
+        Ptr <Node> PtrNode = this->GetNode();
+        std::ofstream outfile;
+        outfile.open("cache_hits.txt", std::ios_base::app);
+        outfile << PtrNode->GetId()<< " " << ns3::Simulator::Now().GetSeconds() << std::endl;
     }
 
 

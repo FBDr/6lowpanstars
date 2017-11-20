@@ -67,6 +67,7 @@ namespace ns3 {
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
         void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
+        void PrintToFile(void);
         CoapCacheGtw();
         bool InCache(uint32_t in_seq);
         void AddToCache(uint32_t cache_seq);
