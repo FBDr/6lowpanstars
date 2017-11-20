@@ -473,7 +473,6 @@ namespace ns3 {
         std::ofstream outfile;
         outfile.open("hopdelay.txt", std::ios_base::app);
         outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
-
     }
 
 
