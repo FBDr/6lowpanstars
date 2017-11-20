@@ -488,12 +488,7 @@ namespace ns3 {
         uint32_t nodenum = PtrNode->GetId();
         std::ofstream outfile;
         outfile.open("hopdelay.txt", std::ios_base::app);
-<<<<<<< HEAD
         outfile << nodenum << " " << txtime << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
-
-=======
-        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << hops << " " << delay << std::endl;
->>>>>>> 47c29e4... Satisfied from cache implmentation
     }
 
 
