@@ -24,6 +24,8 @@
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
+#include <fstream>
+#include <string>
 
 namespace ns3 {
     namespace ndn {
@@ -78,6 +80,7 @@ namespace ns3 {
                             }
 
                             policy_container::push_back(*item);
+                            updateFile();
                             return true;
                         }
 
@@ -106,6 +109,13 @@ namespace ns3 {
                         inline size_t
                         get_max_size() const {
                             return max_size_;
+                        }
+
+                        inline void updateFile() {
+                            std::ofstream outfile;
+                            outfile.open("CU/cache_util" +std::to_string(Simulator::GetContext()) + ".txt", std::ios_base::app);
+                            
+                            outfile << Simulator::GetContext() << " " << policy_container::size() << std::endl;
                         }
 
                     private:

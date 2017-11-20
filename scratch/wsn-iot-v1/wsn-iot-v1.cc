@@ -124,6 +124,7 @@ namespace ns3 {
         remove("bytes.txt");
         remove("bytes2.txt");
         remove("cache_hits.txt");
+
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
