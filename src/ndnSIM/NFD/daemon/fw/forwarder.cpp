@@ -35,7 +35,9 @@
 #include "ns3/pointer.h"
 #include "ns3/core-module.h"
 #include "ns3/object.h"
-#include  "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
+#include "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
+#include "ns3/simulator.h"
+#include "ns3/nstime.h"
 #include "src/ndnSIM/ndn-cxx/src/interest.hpp"
 #include "ns3/random-variable-stream.h"
 #include "logger.hpp"
@@ -79,6 +81,13 @@ namespace nfd {
     }
 
     Forwarder::~Forwarder() = default;
+
+    void
+    Forwarder::PrintToFile() {
+        std::ofstream outfile;
+        outfile.open("cache_hits.txt", std::ios_base::app);
+        outfile << m_node->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
+    }
 
     void
     Forwarder::setNode(ns3::Ptr<ns3::Node> node) {
@@ -318,6 +327,9 @@ namespace nfd {
 
         // goto outgoing Data pipeline
         this->onOutgoingData(data, *const_pointer_cast<Face>(inFace.shared_from_this()));
+        //Write to file if satisfied from cache
+        PrintToFile();
+    
     }
 
     void

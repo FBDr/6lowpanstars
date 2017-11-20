@@ -123,6 +123,7 @@ namespace ns3 {
         remove("pktloss.txt");
         remove("bytes.txt");
         remove("bytes2.txt");
+        remove("cache_hits.txt");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
@@ -268,6 +269,7 @@ namespace ns3 {
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
+            ndn::CsTracer::InstallAll("cs-trace.txt", Seconds(10));
         }
 
 
