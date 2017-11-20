@@ -100,7 +100,7 @@ namespace ns3 {
                 &CoapClient::GetRngStream),
                 MakeUintegerChecker<uint32_t>());
 
-                ;
+        ;
         return tid;
     }
 
@@ -445,7 +445,13 @@ namespace ns3 {
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
-                    int hops = 64 - (int) hoplimitTag.GetHopLimit();
+                    int hops;
+                    if (hoplimitTag.GetHopLimit() < 64) {
+                        //It crossed the backhaul, add two hops. Patch for bw-compatibility with parser.  
+                        hops = (int) (64 - (hoplimitTag.GetHopLimit() - 1)); //-1 Because we need to add one gateway hop.
+                    } else {
+                        hops = (int) (64 - hoplimitTag.GetHopLimit());
+                    }
                     NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                             Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "

@@ -31,7 +31,7 @@
 #include "ns3/uinteger.h"
 #include <fstream>
 #include "ns3/core-module.h"
-#include "coap-server.h"
+#include "coap-cache-gtw.h"
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "src/network/model/node.h"
@@ -41,98 +41,136 @@
 
 namespace ns3 {
 
-    NS_LOG_COMPONENT_DEFINE("CoapServerApplication");
+    NS_LOG_COMPONENT_DEFINE("CoapCacheGtwApplication");
 
-    NS_OBJECT_ENSURE_REGISTERED(CoapServer);
+    NS_OBJECT_ENSURE_REGISTERED(CoapCacheGtw);
 
     TypeId
-    CoapServer::GetTypeId(void) {
-        static TypeId tid = TypeId("ns3::CoapServer")
+    CoapCacheGtw::GetTypeId(void) {
+        static TypeId tid = TypeId("ns3::CoapCacheGtw")
                 .SetParent<Application> ()
                 .SetGroupName("Applications")
-                .AddConstructor<CoapServer> ()
+                .AddConstructor<CoapCacheGtw> ()
                 .AddAttribute("Port", "Port on which we listen for incoming packets.",
                 UintegerValue(9),
-                MakeUintegerAccessor(&CoapServer::m_port),
+                MakeUintegerAccessor(&CoapCacheGtw::m_port),
                 MakeUintegerChecker<uint16_t> ())
+                .AddAttribute("Freshness", "Freshness setting cache in seconds.",
+                UintegerValue(1),
+                MakeUintegerAccessor(&CoapCacheGtw::m_fresh),
+                MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("CacheSize", "Size of cache defined in number of items.",
+                UintegerValue(3),
+                MakeUintegerAccessor(&CoapCacheGtw::m_cache_size),
+                MakeUintegerChecker<uint32_t> ())
                 .AddAttribute("Payload", "Response data packet payload size.",
                 UintegerValue(100),
-                MakeUintegerAccessor(&CoapServer::m_packet_payload_size),
+                MakeUintegerAccessor(&CoapCacheGtw::m_packet_payload_size),
                 MakeUintegerChecker<uint32_t> ())
                 .AddTraceSource("Tx", "A new packet is created and is sent",
-                MakeTraceSourceAccessor(&CoapServer::m_txTrace),
+                MakeTraceSourceAccessor(&CoapCacheGtw::m_txTrace),
                 "ns3::Packet::TracedCallback")
                 /*
                                 .AddAttribute("DataNum", "Number of data pieces available at producer ", 
                                 StringValue("0.7"),
-                                MakeUintegerAccessor(&CoapServer::SetDataNum,
-                                &CoapServer::GetDataNum),
+                                MakeUintegerAccessor(&CoapCacheGtw::SetDataNum,
+                                &CoapCacheGtw::GetDataNum),
                                 MakeUintegerChecker<uint32_t> ())
                  */
                 ;
         return tid;
     }
 
-    CoapServer::CoapServer() {
+    CoapCacheGtw::CoapCacheGtw() {
         NS_LOG_FUNCTION(this);
     }
 
-    CoapServer::~CoapServer() {
+    CoapCacheGtw::~CoapCacheGtw() {
         NS_LOG_FUNCTION(this);
         m_socket = 0;
         m_socket6 = 0;
     }
 
     void
-    CoapServer::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
+    CoapCacheGtw::SetIPv6Bucket(std::vector<Ipv6Address> bucket) {
         m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
         m_IPv6Bucket = bucket;
 
     }
 
     void
-    CoapServer::DoDispose(void) {
+    CoapCacheGtw::DoDispose(void) {
         NS_LOG_FUNCTION(this);
         Application::DoDispose();
     }
 
-    void
-    CoapServer::AddSeq() {
-
-        //This function reads in the AddrResBucket and searches for its own producer IP. Corresponding sequences are copied into m_regSeqSet-set.
-
-        for (unsigned int idx = 0; idx < m_IPv6Bucket.size(); idx++) {
-            //NS_LOG_INFO("AddSeq: " << idx << " of " << m_ownip);
-            NS_LOG_INFO("m_IPv6Bucket[idx] == m_ownip? " << m_IPv6Bucket[idx] << " " << m_ownip << " --> " << (m_IPv6Bucket[idx] == m_ownip));
-            if (m_IPv6Bucket[idx] == m_ownip) {
-                m_regSeqSet.insert(idx);
-                NS_LOG_INFO("AddSeq: Adding seq " << idx << "To collection of " << m_ownip<< ". At node: "<< GetNode()->GetId());
-            }
-        }
-    }
-
     uint32_t
-    CoapServer::FilterReqNum(uint32_t size) {
+    CoapCacheGtw::FilterReqNum(uint32_t size) {
 
         // This function filters the request number from the received payload.
 
         NS_ASSERT_MSG(m_Rdata, "Udp message is empty.");
         std::string Rdatastr(reinterpret_cast<char*> (m_Rdata), size);
-        std::size_t pos = Rdatastr.find("/"); // Find position of "/" leading the sequence number.
-        std::string str3 = Rdatastr.substr(pos + 1); // filter this sequence number to the end.
-        return std::stoi(str3);
+        if (Rdatastr.find("POST") != std::string::npos) {
+            return std::numeric_limits<uint32_t>::max();
+        } else {
+            std::size_t pos = Rdatastr.find("/"); // Find position of "/" leading the sequence number.
+            std::string str3 = Rdatastr.substr(pos + 1); // filter this sequence number to the end.
+            return std::stoi(str3);
+        }
+    }
+
+    void
+    CoapCacheGtw::UpdateCache() {
+        Time fresh(std::to_string(m_fresh) + "s");
+
+        std::vector<std::pair<uint32_t, Time>>::iterator itr = m_cache.begin();
+
+        while (itr != m_cache.end()) {
+            Time lifetime = Simulator::Now() - itr->second;
+            NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            if (Simulator::Now() - itr->second >= fresh) {
+                itr = m_cache.erase(itr);
+                NS_LOG_DEBUG("Deleting entry");
+            } else {
+                itr++;
+                NS_LOG_DEBUG("Valid entry");
+            }
+
+        }
     }
 
     bool
-    CoapServer::CheckReqAv(uint32_t reqnumber) {
-        if (m_regSeqSet.find(reqnumber) != m_regSeqSet.end()) {
-            return true;
+    CoapCacheGtw::InCache(uint32_t in_seq) {
+        //Simnple function to check is sequence is currently in cache.
+        UpdateCache();
+        for (auto itr = m_cache.begin(); itr != m_cache.end(); itr++) {
+            if (itr->first == in_seq) {
+                std::rotate(itr, itr + 1, m_cache.end());
+                for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
+                    NS_LOG_INFO("Cache reordered: " << itr2->first);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     void
-    CoapServer::CreateResponsePkt(std::string fill, uint32_t length) {
+    CoapCacheGtw::AddToCache(uint32_t cache_seq) {
+        if ((int) m_cache.size() >= (int) m_cache_size) {
+            //The cache is full.
+            NS_LOG_DEBUG("Cache full, deleting first entry.");
+            m_cache.erase(m_cache.begin()); //Delete first entry
+        }
+        m_cache.push_back(std::make_pair(cache_seq, Simulator::Now()));
+        for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
+            NS_LOG_INFO("Entry in cache: " << itr2->first);
+        }
+    }
+
+    void
+    CoapCacheGtw::CreateResponsePkt(std::string fill, uint32_t length) {
 
         //When a Coap request is correctly received, this function will generate a response packet.
         NS_LOG_FUNCTION(this << fill);
@@ -144,13 +182,12 @@ namespace ns3 {
     }
 
     void
-    CoapServer::StartApplication(void) {
+    CoapCacheGtw::StartApplication(void) {
         NS_LOG_FUNCTION(this);
         Ptr <Node> PtrNode = this->GetNode();
         Ptr<Ipv6> ipv6 = PtrNode->GetObject<Ipv6> ();
         Ipv6InterfaceAddress ownaddr = ipv6->GetAddress(1, 1);
         m_ownip = ownaddr.GetAddress();
-        AddSeq();
 
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
@@ -184,13 +221,13 @@ namespace ns3 {
             }
         }
 
-        m_socket->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
-        m_socket6->SetRecvCallback(MakeCallback(&CoapServer::HandleRead, this));
+        m_socket->SetRecvCallback(MakeCallback(&CoapCacheGtw::HandleRead, this));
+        m_socket6->SetRecvCallback(MakeCallback(&CoapCacheGtw::HandleRead, this));
 
     }
 
     void
-    CoapServer::StopApplication() {
+    CoapCacheGtw::StopApplication() {
         NS_LOG_FUNCTION(this);
 
         if (m_socket != 0) {
@@ -204,12 +241,11 @@ namespace ns3 {
     }
 
     void
-    CoapServer::HandleRead(Ptr<Socket> socket) {
+    CoapCacheGtw::HandleRead(Ptr<Socket> socket) {
         NS_LOG_FUNCTION(this << socket);
 
         Ptr<Packet> received_packet;
         Ptr<Packet> response_packet;
-
         Address from;
 
         while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
@@ -233,35 +269,60 @@ namespace ns3 {
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
             NS_LOG_INFO("Currently received packet delay " << delay);
-            // Copy data from current received packet into buffer. 
             m_Rdata = new uint8_t [received_packet->GetSize()];
             received_packet->CopyData(m_Rdata, received_packet->GetSize());
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
-            if (CheckReqAv(received_Req)) {
-                NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
-                CreateResponsePkt("POST", m_packet_payload_size);
 
+            // Check if in cache and message type
+            if (received_Req == std::numeric_limits<uint32_t>::max()) {
+
+                //Its a returning data packet
+
+                //Add data seq to cache
+                for (int idx = 0; idx < ((int) m_pendingreqs.size()); idx++) {
+                    if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
+                        //Found entry
+                        received_packet->AddPacketTag(coaptag);
+                        NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
+                        m_pendingreqs.erase(m_pendingreqs.begin() + idx);
+
+                        AddToCache(std::get<2>(m_pendingreqs[idx]));
+                        NS_LOG_INFO("Cache insert! " << std::get<2>(m_pendingreqs[idx]) << " Size: " << m_cache.size());
+                        break;
+                    }
+                }
+            } else if (InCache(received_Req)) {
+                CacheHit(socket, received_packet, received_Req, coaptag, from);
             } else {
-                NS_LOG_ERROR("Data not available");
-                CreateResponsePkt("Unavailable", sizeof ("Unavailable"));
-            }
-
-            response_packet = Create<Packet> (m_data, m_dataSize);
-            response_packet->AddPacketTag(coaptag);
-
-            NS_LOG_LOGIC("Echoing packet");
-            socket->SendTo(response_packet, 0, from);
-
-            if (InetSocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
-                        InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<
-                        InetSocketAddress::ConvertFrom(from).GetPort());
-            } else if (Inet6SocketAddress::IsMatchingType(from)) {
-                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetIpv6() << " port " <<
-                        Inet6SocketAddress::ConvertFrom(from).GetPort());
+                CacheMiss(socket, received_packet, received_Req, coaptag, from);
             }
         }
     }
+
+    void
+    CoapCacheGtw::CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address & from) {
+        NS_LOG_INFO("Cache hit!");
+        Ptr<Packet> response_packet;
+
+        NS_LOG_INFO("Transmitting data from gateway cache: " << sq);
+        CreateResponsePkt("POST", m_packet_payload_size);
+        response_packet = Create<Packet> (m_data, m_dataSize);
+        response_packet->AddPacketTag(coaptag);
+
+        NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
+
+
+    }
+
+    void
+    CoapCacheGtw::CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address & from) {
+        NS_LOG_INFO("Cache miss! Transmitting to: " << m_IPv6Bucket[sq] << " SEQ: " << sq);
+        m_pendingreqs.push_back(std::make_tuple(from, coaptag.GetT(), sq));
+        Packet repsonsep(*received_packet);
+        repsonsep.AddPacketTag(coaptag);
+        NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+    }
+
+
 
 } // Namespace ns3
