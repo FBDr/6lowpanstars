@@ -28,6 +28,7 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
+/*
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
         double nodenum = std::stoi(context);
@@ -35,6 +36,7 @@ namespace ns3 {
         outfile.open("energy.txt", std::ios_base::app);
         outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
     }
+*/
 
     int main(int argc, char **argv) {
 
@@ -225,6 +227,7 @@ namespace ns3 {
 
         //Energy framework
 
+/*
         int size = node_head * node_periph + 1;
         Ptr<LrWpanRadioEnergyModel> em[size];
         Ptr<BasicEnergySource> es[size];
@@ -253,6 +256,7 @@ namespace ns3 {
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
             }
         }
+*/
 
         /*
          NDN 
