@@ -386,6 +386,7 @@ namespace ns3 {
         } while (m_IPv6Bucket[nxtsq] == m_ownip);
         coaptag.SetReq(nxtsq);
         coaptag.SetSeq(m_sent);
+        coaptag.SetHop(64);
         SetFill("Sensordata/" + std::to_string(nxtsq));
         NS_LOG_INFO("Added REQ to label: " << coaptag.GetReq());
         Ptr<Packet> p;
@@ -415,12 +416,12 @@ namespace ns3 {
         m_txTrace(p);
 
         if (m_gtw_to_node[m_IPv6Bucket[nxtsq]] == m_ownGTW || !m_useIPcache) {
-            NS_LOG_INFO("Transmitting directly/internal node." << m_gtw_to_node[m_IPv6Bucket[nxtsq]] << " " << m_ownGTW);
+            NS_LOG_INFO("Transmitting directly/internal node.");
             if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
                 NS_LOG_INFO("SendTo ERROR! Trying to send to: " << m_IPv6Bucket[nxtsq]);
             };
         } else {
-            NS_LOG_INFO("Node is at different gateway, transmitting to own GTW.  ");
+            NS_LOG_INFO("Node is at different gateway, transmitting to own GTW.");
             if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_ownGTW, m_peerPort)) == -1) {
                 NS_LOG_INFO("SendTo ERROR! Trying to send to ownGTW:" << m_ownGTW);
             };
@@ -465,7 +466,7 @@ namespace ns3 {
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
-                    int hops = (int) (64 - coaptag.GetHop());
+                    int hops = (int) (64 - coaptag.GetHop()) + (int) (64 -  hoplimitTag.GetHopLimit());
                     NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                             Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "

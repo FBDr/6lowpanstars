@@ -29,6 +29,7 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
+/*
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
 
         double nodenum = std::stoi(context);
@@ -36,6 +37,7 @@ namespace ns3 {
         outfile.open("energy.txt", std::ios_base::app);
         outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
     }
+*/
 
     int main(int argc, char **argv) {
 
@@ -226,8 +228,9 @@ namespace ns3 {
 
 
         //Energy framework
-
+/*
         int size = node_head * node_periph + 1;
+
         Ptr<LrWpanRadioEnergyModel> em[size];
         Ptr<BasicEnergySource> es[size];
         Ptr<LrWpanContikiMac> mac[size]; //Change Mac
@@ -248,13 +251,14 @@ namespace ns3 {
 
                 Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
                 em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-                es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+                //es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
 
                 //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
                 //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
                 //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
             }
         }
+*/
 
         /*
          NDN 

@@ -299,8 +299,14 @@ namespace ns3 {
             Time e2edelay = Simulator::Now() - coaptag.GetTs();
             int64_t delay = e2edelay.GetMilliSeconds();
             int hops = 64 - (int) hoplimitTag.GetHopLimit();
-            coaptag.SetHop( (uint8_t) hoplimitTag.GetHopLimit());
-            NS_LOG_INFO("Currently received packet delay " << delay << " ms. With hops: "<< hops);
+
+            if (hoplimitTag.GetHopLimit() < 64) {
+                //It crossed the backhaul, add two hops.   
+                coaptag.SetHop((uint8_t) hoplimitTag.GetHopLimit() - 2); //-2 Because we need to add two gateway hops.
+            } else {
+                coaptag.SetHop((uint8_t) hoplimitTag.GetHopLimit());
+            }
+            NS_LOG_INFO("Currently received packet delay " << delay << " ms. With hops: " << hops);
             m_Rdata = new uint8_t [received_packet->GetSize()];
             received_packet->CopyData(m_Rdata, received_packet->GetSize());
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
