@@ -119,7 +119,6 @@ namespace ns3 {
 
                         inline void
                         Set_Report_Time(int time) {
-                            std::cout << "TIME#$%*(#$%*(#$%*#GDGGDGDGDGDGDGD:  " << time << std::endl;
                             r_time = time;
                             Time r_time_c(std::to_string(time) + "s");
                             r_time_t = r_time_c;
@@ -141,7 +140,7 @@ namespace ns3 {
                             mov_av = mov_av + ((double) cur_size - mov_av) / count;
                             count++;
                             if (Simulator::Now() >= r_time_t && written_flag == false) {
-                                outfile << Simulator::Now() << " " << r_time_t.GetSeconds() << " " << r_time << " " << Simulator::GetContext() << " " << mov_av << " " << cur_max << std::endl;
+                                outfile <<Simulator::GetContext() << " " << mov_av << " " << cur_max << std::endl;
                                 written_flag = true;
                             }
 
