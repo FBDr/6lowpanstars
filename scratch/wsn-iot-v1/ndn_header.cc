@@ -29,12 +29,12 @@ namespace ns3 {
 
         //Scenario specific functions
         if (freshness) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(100));
         } else {
             //Then the default CS is being used.
             ndnHelper.setCsSize(cache);
         }
-        
+
         if (!cache) {
             ndnHelper.SetOldContentStore("ns3::ndn::cs::Nocache");
         }

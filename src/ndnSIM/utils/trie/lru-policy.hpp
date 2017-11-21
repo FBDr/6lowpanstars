@@ -24,6 +24,8 @@
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
+#include "ns3/node.h"
+#include "ns3/application.h"
 #include <fstream>
 #include <string>
 
@@ -63,7 +65,11 @@ namespace ns3 {
 
                         type(Base& base)
                         : base_(base)
-                        , max_size_(100) {
+                        , max_size_(100)
+                        , mov_av(0)
+                        , cur_max(0)
+                        , count(1)
+                        , written_flag(0){
                         }
 
                         inline void
@@ -111,10 +117,34 @@ namespace ns3 {
                             return max_size_;
                         }
 
+                        inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                            Time r_time_c(std::to_string(time) + "s");
+                            r_time_t = r_time_c;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
                         inline void updateFile() {
                             std::ofstream outfile;
-                            outfile.open("CU_ICN/cache_util" +std::to_string(Simulator::GetContext()) + ".txt", std::ios_base::app);
-                            outfile << policy_container::size() << std::endl;
+                            size_t cur_size = policy_container::size();
+                            outfile.open("CU_ICN.txt", std::ios_base::app);
+
+                            if (cur_size > cur_max) {
+                                cur_max = policy_container::size();
+                            }
+                            mov_av = mov_av + ((double) cur_size - mov_av) / count;
+                            count++;
+                            if (Simulator::Now() >= r_time_t && written_flag == false) {
+                                outfile << Simulator::GetContext() << mov_av << cur_max << std::endl;
+                                written_flag = true;
+                            }
+
+
                         }
 
                     private:
@@ -126,6 +156,12 @@ namespace ns3 {
                     private:
                         Base& base_;
                         size_t max_size_;
+                        double mov_av;
+                        size_t cur_max;
+                        double count;
+                        int r_time;
+                        Time r_time_t;
+                        bool written_flag;
                     };
                 };
             };

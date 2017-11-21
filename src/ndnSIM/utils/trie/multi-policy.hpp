@@ -132,6 +132,7 @@ namespace ns3 {
                         private:
                             policy_container& m_container;
                             size_t m_size;
+
                         };
 
                         inline void
@@ -146,6 +147,18 @@ namespace ns3 {
                             // as max size should be the same everywhere, get the value from the first available policy
                             return policy_container::template get<0>().get_max_size();
                         }
+
+                        inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+                    private:
+                        int r_time;
                     };
                 };
 

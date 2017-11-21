@@ -92,6 +92,19 @@ namespace ns3 {
          * time has come.
          */
         void SetStopTime(Time stop);
+         /**
+         * \brief Retrieve stop time.
+         * 
+         *       
+         *
+         * Once an application has started, it is sometimes useful
+         * to stop the application.  The Stop method specifies when an
+         * application is to stop.  The application subclasses should override
+         * the private StopApplication method, to be notified when that
+         * time has come.
+         */
+        
+        Time GetStopTime(void);
 
         /**
          * \returns the Node to which this Application object is attached.
