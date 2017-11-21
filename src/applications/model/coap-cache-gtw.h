@@ -65,6 +65,8 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        void SetReportTime(int time);
+        int GetReportTime(void) const;
         void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
         void PrintToFile(void);
@@ -118,6 +120,12 @@ namespace ns3 {
         TracedCallback<Ptr<const Packet> > m_txTrace;
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_Rdata; //!< packet payload data
+        uint32_t m_cur_max;
+        double m_mov_av;
+        double m_count;
+        int m_report_time;
+        bool m_w_flag;
+        Time m_report_time_T;
 
 
 

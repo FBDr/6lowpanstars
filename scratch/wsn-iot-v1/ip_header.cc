@@ -91,7 +91,7 @@ namespace ns3 {
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all,
             std::vector< std::vector<Ipv6Address> > &AddrResBucket, ApplicationContainer &apps,
-            Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
+            Ipv6InterfaceContainer i_6lowpan[], int &simtime, int &report_time_cu, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
             double &min_freq, double &max_freq, bool &useIPCache, double &freshness,
             int &cache) {
@@ -122,6 +122,7 @@ namespace ns3 {
                 gtw_cache.SetAttribute("Payload", UintegerValue((uint32_t) payloadsize));
                 gtw_cache.SetAttribute("Freshness", UintegerValue((uint32_t) freshness));
                 gtw_cache.SetAttribute("CacheSize", UintegerValue((uint32_t) cache));
+                gtw_cache.SetAttribute("ReportTime", IntegerValue(report_time_cu));
                 apps = gtw_cache.Install(iot[itr].Get(node_periph));
                 gtw_cache.SetIPv6Bucket(apps.Get(0), AddrResBucket[itr]);
                 apps.Start(Seconds(1.0));
