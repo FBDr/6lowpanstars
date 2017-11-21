@@ -60,6 +60,7 @@ namespace ns3 {
         int totnumcontents = 100;
         int totalleafs = 0;
         int simtime = 60;
+        int report_time_cu = 1000;
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
@@ -98,6 +99,7 @@ namespace ns3 {
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.AddValue("ipcache", "Enable IP caching on gateway", useIPCache);
+        cmd.AddValue("report_time_cu", "Report time for CU metric", report_time_cu);
         cmd.Parse(argc, argv);
 
         //Random variables
@@ -125,10 +127,7 @@ namespace ns3 {
         remove("bytes.txt");
         remove("bytes2.txt");
         remove("cache_hits.txt");
-        boost::filesystem::remove_all("CU_ICN");
-        boost::filesystem::remove_all("CU_IP");
-        boost::filesystem::create_directory("CU_ICN");
-        boost::filesystem::create_directory("CU_IP");
+        remove("cu_icn.txt");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
@@ -270,7 +269,7 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
+            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, report_time_cu, con_leaf, con_inside, con_gtw,
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));

@@ -144,6 +144,16 @@ namespace ns3 {
                             return max_size_;
                         }
 
+                        inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
                     private:
 
                         type()
@@ -153,6 +163,7 @@ namespace ns3 {
                     private:
                         Base& base_;
                         size_t max_size_;
+                        int r_time;
                     };
                 };
             };

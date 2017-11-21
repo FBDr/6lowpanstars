@@ -148,17 +148,36 @@ namespace ns3 {
                             return policy_container::template get<0>().get_max_size();
                         }
 
+                        struct report_time_setter {
+
+                            report_time_setter(policy_container& container, int time)
+                            : m_container(container)
+                            , r_time(time) {
+                            }
+
+                            template<typename U>
+                            void
+                            operator()(U index) {
+                                m_container.template get<U::value>().Set_Report_Time(r_time);
+                            }
+
+                        private:
+                            policy_container& m_container;
+                            int r_time;
+
+                        };
+
                         inline void
                         Set_Report_Time(int time) {
-                            r_time = time;
+                            boost::mpl::for_each<boost::mpl::range_c<int, 0,
+                                    boost::mpl::size<policy_traits>::type::value >> (
+                                    report_time_setter(*this, time));
                         }
 
                         inline int
                         Get_Report_Time() const {
-                            return r_time;
+                            return policy_container::template get<0>().Get_Report_Time();
                         }
-                    private:
-                        int r_time;
                     };
                 };
 

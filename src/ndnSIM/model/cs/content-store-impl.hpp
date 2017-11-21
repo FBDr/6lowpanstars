@@ -282,6 +282,7 @@ namespace ns3 {
             template<class Policy>
             void
             ContentStoreImpl<Policy>::SetReportTime(int time) {
+                std::cout << "2TIME#$%*(#$%*(#$%*#GDGGDGDGDGDGDGD:  " << time << std::endl;
                 this->getPolicy().Set_Report_Time(time);
             }
 
