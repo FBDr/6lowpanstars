@@ -29,7 +29,7 @@ namespace ns3 {
         //NDN stack endnodes
         ndnHelper_endn.SetDefaultRoutes(true);
         if (freshness) {
-            ndnHelper_endn.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+            ndnHelper_endn.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(report_time_cu));
         } else {
             //Then the default CS is being used.
             ndnHelper_endn.setCsSize(cache);
@@ -44,7 +44,7 @@ namespace ns3 {
         //NDN stack GTW
         ndnHelper_gtw.SetDefaultRoutes(true);
         if (freshness) {
-            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(report_time_cu));
+            ndnHelper_gtw.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(report_time_cu));
         } else {
             //Then the default CS is being used.
             ndnHelper_gtw.setCsSize(cache);
@@ -62,7 +62,7 @@ namespace ns3 {
         //NDN stack backhaul
         ndnHelper_bh.SetDefaultRoutes(true);
         if (freshness) {
-            ndnHelper_bh.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+            ndnHelper_bh.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(report_time_cu));
         } else {
             //Then the default CS is being used.
             ndnHelper_bh.setCsSize(cache);
