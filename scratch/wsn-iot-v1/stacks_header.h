@@ -40,7 +40,7 @@
 #define NDN_HEADER_H
 namespace ns3 {
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
-            BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
+            BriteTopologyHelper &bth, int &simtime, int &report_time_cu, int &con_leaf, int &con_inside, int &con_gtw,
             int &cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq);
 
@@ -52,7 +52,7 @@ namespace ns3 {
 
     void sixlowpan_apps(int &node_periph, int &node_head, NodeContainer iot[], NodeContainer all, NodeContainer endnodes,
             std::vector<Ipv6Address> &AddrResBucket, ApplicationContainer &apps,
-            Ipv6InterfaceContainer i_6lowpan[], int &simtime, BriteTopologyHelper & briteth, int &payloadsize,
+            Ipv6InterfaceContainer i_6lowpan[], int &simtime, int &report_time_cu, BriteTopologyHelper & briteth, int &payloadsize,
             std::string zm_q, std::string zm_s, int &con_leaf, int &con_inside, int &con_gtw,
             double &min_freq, double &max_freq, bool useIPCache, double freshness, int cache, std::map<Ipv6Address, Ipv6Address> &gtw_to_node_map);
 

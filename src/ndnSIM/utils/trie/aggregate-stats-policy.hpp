@@ -100,6 +100,16 @@ namespace ns3 {
                         }
 
                         inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
+                        inline void
                         clear() {
                             // is called only at the end of simulation
                         }
@@ -145,6 +155,7 @@ namespace ns3 {
                         uint64_t m_inserts;
                         uint64_t m_lookups;
                         uint64_t m_erases;
+                        int r_time;
                     };
                 };
             };

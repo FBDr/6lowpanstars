@@ -29,6 +29,7 @@
 
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
+#include "ns3/integer.h"
 #include "ns3/string.h"
 
 #include "../../utils/trie/trie-with-policy.hpp"
@@ -147,6 +148,12 @@ namespace ns3 {
                 uint32_t
                 GetMaxSize() const;
 
+                void
+                SetReportTime(int time);
+
+                int
+                GetReportTime() const;
+
                 private:
                 static LogComponent g_log; ///< @brief Logging variable
 
@@ -175,6 +182,11 @@ namespace ns3 {
                         StringValue("100"), MakeUintegerAccessor(&ContentStoreImpl<Policy>::GetMaxSize,
                         &ContentStoreImpl<Policy>::SetMaxSize),
                         MakeUintegerChecker<uint32_t>())
+                        .AddAttribute("ReportTime",
+                        "Time at which CS statistics report must be written",
+                        StringValue("100"), MakeIntegerAccessor(&ContentStoreImpl<Policy>::GetReportTime,
+                        &ContentStoreImpl<Policy>::SetReportTime),
+                        MakeIntegerChecker<int>())
 
                         .AddTraceSource("DidAddEntry",
                         "Trace fired every time entry is successfully added to the cache",
@@ -265,6 +277,18 @@ namespace ns3 {
             uint32_t
             ContentStoreImpl<Policy>::GetMaxSize() const {
                 return this->getPolicy().get_max_size();
+            }
+
+            template<class Policy>
+            void
+            ContentStoreImpl<Policy>::SetReportTime(int time) {
+                this->getPolicy().Set_Report_Time(time);
+            }
+
+            template<class Policy>
+            int
+            ContentStoreImpl<Policy>::GetReportTime() const {
+                return this->getPolicy().Get_Report_Time();
             }
 
             template<class Policy>

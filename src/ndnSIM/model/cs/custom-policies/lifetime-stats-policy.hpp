@@ -127,6 +127,16 @@ namespace ns3 {
                             return max_size_;
                         }
 
+                        inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
                         void
                         set_traced_callback(
                                 TracedCallback<typename parent_trie::payload_traits::const_base_type, Time>* callback) {
@@ -142,7 +152,7 @@ namespace ns3 {
                     private:
                         Base& base_;
                         size_t max_size_;
-
+                        int r_time;
                         TracedCallback<typename parent_trie::payload_traits::const_base_type, Time>*
                         m_willRemoveEntry;
                     };

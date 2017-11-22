@@ -45,7 +45,6 @@
 
 
 
-
 namespace ns3 {
 
     NS_LOG_COMPONENT_DEFINE("CoapClientApplication");
@@ -81,11 +80,6 @@ namespace ns3 {
                 .AddTraceSource("Tx", "A new packet is created and is sent",
                 MakeTraceSourceAccessor(&CoapClient::m_txTrace),
                 "ns3::Packet::TracedCallback")
-                .AddAttribute("useIPCache",
-                "Must be set if IP caching is used",
-                BooleanValue(false),
-                MakeBooleanAccessor(&CoapClient::m_useIPcache),
-                MakeBooleanChecker())
 
                 //ZM
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
@@ -106,7 +100,7 @@ namespace ns3 {
                 &CoapClient::GetRngStream),
                 MakeUintegerChecker<uint32_t>());
 
-        ;
+                ;
         return tid;
     }
 

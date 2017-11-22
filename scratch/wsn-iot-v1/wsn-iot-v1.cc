@@ -19,6 +19,7 @@
 #include "src/network/helper/node-container.h"
 #include "src/network/utils/output-stream-wrapper.h"
 #include "src/core/model/log.h"
+#include "boost/filesystem.hpp" 
 #include <string>
 #include <vector>
 #include <map>
@@ -31,7 +32,7 @@ namespace ns3 {
 
 /*
     static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
-
+        
         double nodenum = std::stoi(context);
         std::ofstream outfile;
         outfile.open("energy.txt", std::ios_base::app);
@@ -60,6 +61,7 @@ namespace ns3 {
         int totnumcontents = 100;
         int totalleafs = 0;
         int simtime = 60;
+        int report_time_cu = 1000;
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
@@ -91,32 +93,33 @@ namespace ns3 {
         cmd.AddValue("pcap", "Enable or disable pcap tracing", pcaptracing);
         cmd.AddValue("cache", "Enable caching. Set the number of items in caches", cache);
         cmd.AddValue("freshness", "Enable freshness checking, by setting freshness duration.", freshness);
-        cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul);
+        cmd.AddValue("ipbackhaul", "Use IP model for backhaul network.", ipbackhaul); //Not implemented
         cmd.AddValue("payloadsize", "Set the default payloadsize", payloadsize);
         cmd.AddValue("zm_q", "Set the alpha parameter of the ZM distribution", zm_q);
         cmd.AddValue("zm_s", "Set the alpha parameter of the ZM distribution", zm_s);
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.AddValue("ipcache", "Enable IP caching on gateway", useIPCache);
+        cmd.AddValue("report_time_cu", "Report time for CU metric", report_time_cu);
         cmd.Parse(argc, argv);
 
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-        /*
-                for (int jdx = 0; jdx < 10; jdx++) {
-                    RngSeedManager::SetSeed(1);
-                    RngSeedManager::SetRun(2);
-                    Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-                    Rnode->SetStream(1);
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<std::endl;
-                }
-         */
+/*
+        for (int jdx = 0; jdx < 10; jdx++) {
+            RngSeedManager::SetSeed(1);
+            RngSeedManager::SetRun(2);
+            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+            Rnode->SetStream(1);
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<std::endl;
+        }
+*/
 
         //Clean up old files
         remove("energy.txt");
@@ -125,6 +128,8 @@ namespace ns3 {
         remove("bytes.txt");
         remove("bytes2.txt");
         remove("cache_hits.txt");
+        remove("cu_icn.txt");
+        remove("cu_ip.txt");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
@@ -267,11 +272,10 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
+            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, report_time_cu, con_leaf, con_inside, con_gtw,
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
-            ndn::CsTracer::InstallAll("cs-trace.txt", Seconds(10));
         }
 
 
@@ -294,7 +298,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul, gtw_to_node_map);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, all, endnodes, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache, gtw_to_node_map);
+            sixlowpan_apps(node_periph, node_head, iot, all, endnodes, AddrResBucket, apps, i_6lowpan, simtime, report_time_cu, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache, gtw_to_node_map);
         }
 
 
