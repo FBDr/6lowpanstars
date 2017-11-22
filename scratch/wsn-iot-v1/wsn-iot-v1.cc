@@ -274,7 +274,6 @@ namespace ns3 {
                     cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
-            ndn::CsTracer::InstallAll("cs-trace.txt", Seconds(10));
         }
 
 
