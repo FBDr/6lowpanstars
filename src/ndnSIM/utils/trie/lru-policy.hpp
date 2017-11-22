@@ -132,19 +132,22 @@ namespace ns3 {
                         inline void updateFile() {
                             std::ofstream outfile;
                             size_t cur_size = policy_container::size();
-                            outfile.open("cu_icn.txt", std::ios_base::app);
+
 
                             if (cur_size > cur_max) {
                                 cur_max = policy_container::size();
                             }
                             mov_av = mov_av + ((double) cur_size - mov_av) / count;
                             count++;
-                            if (Simulator::Now() >= r_time_t && written_flag == false) {
-                                outfile <<Simulator::GetContext() << " " << mov_av << " " << cur_max << std::endl;
-                                written_flag = true;
+                            if (m_event_save.GetTs() == 0) {
+                                m_event_save = Simulator::Schedule(r_time_t - Simulator::Now(), &type::SaveToFile, this, Simulator::GetContext());
                             }
+                        }
 
-
+                        inline void SaveToFile(uint32_t context) {
+                            std::ofstream outfile;
+                            outfile.open("cu_icn.txt", std::ios_base::app);
+                            outfile << context << " " << mov_av << " " << cur_max << std::endl;
                         }
 
                     private:
@@ -162,6 +165,7 @@ namespace ns3 {
                         int r_time;
                         Time r_time_t;
                         bool written_flag;
+                        EventId m_event_save;
                     };
                 };
             };

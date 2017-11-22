@@ -39,6 +39,7 @@
 #include "src/core/model/log.h"
 #include <string>
 #include "ns3/coap-packet-tag.h"
+#include "src/core/model/simulator.h"
 
 namespace ns3 {
 
@@ -70,7 +71,7 @@ namespace ns3 {
                 MakeUintegerChecker<uint32_t> ())
                 .AddAttribute("ReportTime",
                 "Time at which CS statistics report must be written",
-                StringValue("100"), MakeIntegerAccessor(&CoapCacheGtw::GetReportTime, 
+                StringValue("100"), MakeIntegerAccessor(&CoapCacheGtw::GetReportTime,
                 &CoapCacheGtw::SetReportTime),
                 MakeIntegerChecker<int>())
 
@@ -192,9 +193,8 @@ namespace ns3 {
             //NS_LOG_INFO("Entry in cache: " << itr2->first);
         }
 
-        std::ofstream outfile;
+
         long unsigned int cur_size = m_cache.size();
-        outfile.open("cu_ip.txt", std::ios_base::app);
 
         if (cur_size > m_cur_max) {
             m_cur_max = cur_size;
@@ -202,10 +202,18 @@ namespace ns3 {
         m_mov_av = m_mov_av + ((double) cur_size - m_mov_av) / m_count;
         m_count++;
 
-        if ((Simulator::Now() >= m_report_time_T) && m_w_flag == false) {
-            outfile << Simulator::GetContext() << " " << m_mov_av << " " << m_cur_max << std::endl;
-            m_w_flag = true;
+        std::cout << "%%%%%%%%%%%%%%" << TimeStep(m_event_save.GetTs()).GetSeconds() << " " << m_report_time_T.GetSeconds() << std::endl;
+        if (m_event_save.GetTs() == 0) {
+            std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Scheduled!" << std::endl;
+            m_event_save = Simulator::Schedule(m_report_time_T - Simulator::Now(), &CoapCacheGtw::SaveToFile, this, Simulator::GetContext());
         }
+    }
+
+    void
+    CoapCacheGtw::SaveToFile(uint32_t context) {
+        std::ofstream outfile;
+        outfile.open("cu_ip.txt", std::ios_base::app);
+        outfile << context << " " << m_mov_av << " " << m_cur_max << std::endl;
     }
 
     void

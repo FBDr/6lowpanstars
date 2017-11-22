@@ -101,6 +101,10 @@ namespace ns3 {
          */
         void UpdateCache(void);
         /**
+         * \brief Save CU metric to file.
+         */        
+        void SaveToFile(uint32_t context);
+        /**
          * \brief Fill data buffers for response packet with std::string.
          * \param string A string containing the packet content.
          */
@@ -126,6 +130,7 @@ namespace ns3 {
         int m_report_time;
         bool m_w_flag;
         Time m_report_time_T;
+        EventId m_event_save;
 
 
 
