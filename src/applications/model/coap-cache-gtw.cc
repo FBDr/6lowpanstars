@@ -224,9 +224,7 @@ namespace ns3 {
         m_mov_av = m_mov_av + ((double) cur_size - m_mov_av) / m_count;
         m_count++;
 
-        std::cout << "%%%%%%%%%%%%%%" << TimeStep(m_event_save.GetTs()).GetSeconds() << " " << m_report_time_T.GetSeconds() << std::endl;
         if (m_event_save.GetTs() == 0) {
-            std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Scheduled!" << std::endl;
             m_event_save = Simulator::Schedule(m_report_time_T - Simulator::Now(), &CoapCacheGtw::SaveToFile, this, Simulator::GetContext());
         }
     }

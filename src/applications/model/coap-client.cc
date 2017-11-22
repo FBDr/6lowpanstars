@@ -80,6 +80,11 @@ namespace ns3 {
                 .AddTraceSource("Tx", "A new packet is created and is sent",
                 MakeTraceSourceAccessor(&CoapClient::m_txTrace),
                 "ns3::Packet::TracedCallback")
+                .AddAttribute("useIPCache",
+                "Must be set if IP caching is used",
+                BooleanValue(false),
+                MakeBooleanAccessor(&CoapClient::m_useIPcache),
+                MakeBooleanChecker())
 
                 //ZM
                 .AddAttribute("q", "parameter of improve rank", StringValue("0.7"),
@@ -100,7 +105,7 @@ namespace ns3 {
                 &CoapClient::GetRngStream),
                 MakeUintegerChecker<uint32_t>());
 
-                ;
+        ;
         return tid;
     }
 
@@ -460,7 +465,7 @@ namespace ns3 {
                 if (m_PenSeqSet.find(coaptag.GetReq()) != m_PenSeqSet.end()) { //Check whether this packet was requested by this client application.
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
-                    int hops = (int) (64 - coaptag.GetHop()) + (int) (64 -  hoplimitTag.GetHopLimit());
+                    int hops = (int) (64 - coaptag.GetHop()) + (int) (64 - hoplimitTag.GetHopLimit());
                     NS_LOG_INFO("At time " << Simulator::Now().GetNanoSeconds() << "s client received " << packet->GetSize() << " bytes from " <<
                             Inet6SocketAddress::ConvertFrom(from).GetIpv6() << ", port " <<
                             Inet6SocketAddress::ConvertFrom(from).GetPort() << ", E2E Delay:" << e2edelay.GetMilliSeconds() << " ms, Hopcount (64): "
