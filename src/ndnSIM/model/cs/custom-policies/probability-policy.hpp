@@ -111,6 +111,16 @@ namespace ns3 {
                         }
 
                         inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
+                        inline void
                         set_probability(double probability) {
                             probability_ = probability;
                         }
@@ -130,6 +140,7 @@ namespace ns3 {
                         Base& base_;
                         size_t max_size_;
                         double probability_;
+                        int r_time;
                         Ptr<UniformRandomVariable> ns3_rand_;
                     };
                 };

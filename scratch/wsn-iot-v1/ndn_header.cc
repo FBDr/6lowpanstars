@@ -4,7 +4,7 @@ namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("ndn-stack");
 
     void NDN_stack(int &node_head, int &node_periph, NodeContainer iot[], NodeContainer & backhaul, NodeContainer &endnodes,
-            BriteTopologyHelper &bth, int &simtime, int &con_leaf, int &con_inside, int &con_gtw,
+            BriteTopologyHelper &bth, int &simtime, int &report_time_cu, int &con_leaf, int &con_inside, int &con_gtw,
             int &cache, bool &node_cache, double &freshness, bool &ipbackhaul, int &payloadsize, std::string zm_q, std::string zm_s,
             double &min_freq, double &max_freq) {
 
@@ -44,11 +44,12 @@ namespace ns3 {
         //NDN stack GTW
         ndnHelper_gtw.SetDefaultRoutes(true);
         if (freshness) {
-            ndnHelper_gtw.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache));
+            ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize", std::to_string(cache), "ReportTime", std::to_string(report_time_cu));
         } else {
             //Then the default CS is being used.
             ndnHelper_gtw.setCsSize(cache);
         }
+        
         if (!cache) {
             ndnHelper_gtw.SetOldContentStore("ns3::ndn::cs::Nocache");
         }

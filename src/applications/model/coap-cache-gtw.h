@@ -65,8 +65,11 @@ namespace ns3 {
 
 
         void SetIPv6Bucket(std::vector<Ipv6Address> bucket);
+        void SetReportTime(int time);
+        int GetReportTime(void) const;
         void CacheHit(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t & sq, CoapPacketTag & coaptag, Address &from);
         void CacheMiss(Ptr<Socket> socket, Ptr<Packet> received_packet, uint32_t &sq, CoapPacketTag &coaptag, Address &from);
+        void PrintToFile(void);
         CoapCacheGtw();
         bool InCache(uint32_t in_seq);
         void AddToCache(uint32_t cache_seq);
@@ -98,6 +101,10 @@ namespace ns3 {
          */
         void UpdateCache(void);
         /**
+         * \brief Save CU metric to file.
+         */        
+        void SaveToFile(uint32_t context);
+        /**
          * \brief Fill data buffers for response packet with std::string.
          * \param string A string containing the packet content.
          */
@@ -117,6 +124,13 @@ namespace ns3 {
         TracedCallback<Ptr<const Packet> > m_txTrace;
         uint32_t m_RdataSize; //!< packet payload size (must be equal to m_size)
         uint8_t *m_Rdata; //!< packet payload data
+        uint32_t m_cur_max;
+        double m_mov_av;
+        double m_count;
+        int m_report_time;
+        bool m_w_flag;
+        Time m_report_time_T;
+        EventId m_event_save;
 
 
 

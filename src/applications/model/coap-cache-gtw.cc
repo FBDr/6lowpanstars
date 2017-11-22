@@ -35,9 +35,11 @@
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
 #include "src/network/model/node.h"
+#include "ns3/node.h"
 #include "src/core/model/log.h"
 #include <string>
 #include "ns3/coap-packet-tag.h"
+#include "src/core/model/simulator.h"
 
 namespace ns3 {
 
@@ -67,9 +69,16 @@ namespace ns3 {
                 UintegerValue(100),
                 MakeUintegerAccessor(&CoapCacheGtw::m_packet_payload_size),
                 MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("ReportTime",
+                "Time at which CS statistics report must be written",
+                StringValue("100"), MakeIntegerAccessor(&CoapCacheGtw::GetReportTime,
+                &CoapCacheGtw::SetReportTime),
+                MakeIntegerChecker<int>())
+
                 .AddTraceSource("Tx", "A new packet is created and is sent",
                 MakeTraceSourceAccessor(&CoapCacheGtw::m_txTrace),
                 "ns3::Packet::TracedCallback")
+
                 /*
                                 .AddAttribute("DataNum", "Number of data pieces available at producer ", 
                                 StringValue("0.7"),
@@ -81,7 +90,11 @@ namespace ns3 {
         return tid;
     }
 
-    CoapCacheGtw::CoapCacheGtw() {
+    CoapCacheGtw::CoapCacheGtw()
+    : m_cur_max(0)
+    , m_mov_av(0)
+    , m_count(1)
+    , m_w_flag(0) {
         NS_LOG_FUNCTION(this);
     }
 
@@ -96,6 +109,18 @@ namespace ns3 {
         m_IPv6Bucket = std::vector<Ipv6Address> (bucket.size() + 1);
         m_IPv6Bucket = bucket;
 
+    }
+
+    void
+    CoapCacheGtw::SetReportTime(int time) {
+        m_report_time = time;
+        Time temptime(std::to_string(time) + "s");
+        m_report_time_T = temptime;
+    }
+
+    int
+    CoapCacheGtw::GetReportTime() const {
+        return m_report_time;
     }
 
     void
@@ -128,13 +153,13 @@ namespace ns3 {
 
         while (itr != m_cache.end()) {
             Time lifetime = Simulator::Now() - itr->second;
-            NS_LOG_DEBUG("Lifetime of current cached item: "<< itr->first << " " << lifetime.GetMilliSeconds());
+            //NS_LOG_DEBUG("Lifetime of current cached item: " << itr->first << " " << lifetime.GetMilliSeconds());
             if (Simulator::Now() - itr->second >= fresh) {
                 itr = m_cache.erase(itr);
-                NS_LOG_DEBUG("Deleting entry");
+                //NS_LOG_DEBUG("Deleting entry");
             } else {
                 itr++;
-                NS_LOG_DEBUG("Valid entry");
+                //NS_LOG_DEBUG("Valid entry");
             }
 
         }
@@ -148,7 +173,7 @@ namespace ns3 {
             if (itr->first == in_seq) {
                 std::rotate(itr, itr + 1, m_cache.end());
                 for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
-                    NS_LOG_INFO("Cache reordered: " << itr2->first);
+                    //NS_LOG_INFO("Cache reordered: " << itr2->first);
                 }
                 return true;
             }
@@ -160,13 +185,35 @@ namespace ns3 {
     CoapCacheGtw::AddToCache(uint32_t cache_seq) {
         if ((int) m_cache.size() >= (int) m_cache_size) {
             //The cache is full.
-            NS_LOG_DEBUG("Cache full, deleting first entry.");
+            //NS_LOG_DEBUG("Cache full, deleting first entry.");
             m_cache.erase(m_cache.begin()); //Delete first entry
         }
         m_cache.push_back(std::make_pair(cache_seq, Simulator::Now()));
         for (auto itr2 = m_cache.begin(); itr2 != m_cache.end(); itr2++) {
-            NS_LOG_INFO("Entry in cache: " << itr2->first);
+            //NS_LOG_INFO("Entry in cache: " << itr2->first);
         }
+
+
+        long unsigned int cur_size = m_cache.size();
+
+        if (cur_size > m_cur_max) {
+            m_cur_max = cur_size;
+        }
+        m_mov_av = m_mov_av + ((double) cur_size - m_mov_av) / m_count;
+        m_count++;
+
+        std::cout << "%%%%%%%%%%%%%%" << TimeStep(m_event_save.GetTs()).GetSeconds() << " " << m_report_time_T.GetSeconds() << std::endl;
+        if (m_event_save.GetTs() == 0) {
+            std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Scheduled!" << std::endl;
+            m_event_save = Simulator::Schedule(m_report_time_T - Simulator::Now(), &CoapCacheGtw::SaveToFile, this, Simulator::GetContext());
+        }
+    }
+
+    void
+    CoapCacheGtw::SaveToFile(uint32_t context) {
+        std::ofstream outfile;
+        outfile.open("cu_ip.txt", std::ios_base::app);
+        outfile << context << " " << m_mov_av << " " << m_cur_max << std::endl;
     }
 
     void
@@ -308,7 +355,7 @@ namespace ns3 {
         CreateResponsePkt("POST", m_packet_payload_size);
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
-
+        PrintToFile();
         NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
 
 
@@ -321,6 +368,14 @@ namespace ns3 {
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
         NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+    }
+
+    void
+    CoapCacheGtw::PrintToFile() {
+        Ptr <Node> PtrNode = this->GetNode();
+        std::ofstream outfile;
+        outfile.open("cache_hits.txt", std::ios_base::app);
+        outfile << PtrNode->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
     }
 
 

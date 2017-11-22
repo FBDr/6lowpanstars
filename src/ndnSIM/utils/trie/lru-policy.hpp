@@ -24,6 +24,10 @@
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
+#include "ns3/node.h"
+#include "ns3/application.h"
+#include <fstream>
+#include <string>
 
 namespace ns3 {
     namespace ndn {
@@ -61,7 +65,11 @@ namespace ns3 {
 
                         type(Base& base)
                         : base_(base)
-                        , max_size_(100) {
+                        , max_size_(100)
+                        , mov_av(0)
+                        , cur_max(0)
+                        , count(1)
+                        , written_flag(0) {
                         }
 
                         inline void
@@ -78,6 +86,7 @@ namespace ns3 {
                             }
 
                             policy_container::push_back(*item);
+                            updateFile();
                             return true;
                         }
 
@@ -108,6 +117,39 @@ namespace ns3 {
                             return max_size_;
                         }
 
+                        inline void
+                        Set_Report_Time(int time) {
+                            r_time = time;
+                            Time r_time_c(std::to_string(time) + "s");
+                            r_time_t = r_time_c;
+                        }
+
+                        inline int
+                        Get_Report_Time() const {
+                            return r_time;
+                        }
+
+                        inline void updateFile() {
+                            std::ofstream outfile;
+                            size_t cur_size = policy_container::size();
+
+
+                            if (cur_size > cur_max) {
+                                cur_max = policy_container::size();
+                            }
+                            mov_av = mov_av + ((double) cur_size - mov_av) / count;
+                            count++;
+                            if (m_event_save.GetTs() == 0) {
+                                m_event_save = Simulator::Schedule(r_time_t - Simulator::Now(), &type::SaveToFile, this, Simulator::GetContext());
+                            }
+                        }
+
+                        inline void SaveToFile(uint32_t context) {
+                            std::ofstream outfile;
+                            outfile.open("cu_icn.txt", std::ios_base::app);
+                            outfile << context << " " << mov_av << " " << cur_max << std::endl;
+                        }
+
                     private:
 
                         type()
@@ -117,6 +159,13 @@ namespace ns3 {
                     private:
                         Base& base_;
                         size_t max_size_;
+                        double mov_av;
+                        size_t cur_max;
+                        double count;
+                        int r_time;
+                        Time r_time_t;
+                        bool written_flag;
+                        EventId m_event_save;
                     };
                 };
             };

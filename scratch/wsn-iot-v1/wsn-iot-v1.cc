@@ -19,6 +19,7 @@
 #include "src/network/helper/node-container.h"
 #include "src/network/utils/output-stream-wrapper.h"
 #include "src/core/model/log.h"
+#include "boost/filesystem.hpp" 
 #include <string>
 #include <vector>
 
@@ -28,15 +29,15 @@
 namespace ns3 {
     NS_LOG_COMPONENT_DEFINE("wsn-iot-v1");
 
-        /*
-        static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
+/*
+    static void GetTotalEnergyConsumption(std::string context, double oldValue, double newValue) {
         
-            double nodenum = std::stoi(context);
-            std::ofstream outfile;
-            outfile.open("energy.txt", std::ios_base::app);
-            outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
-        }
-     */
+        double nodenum = std::stoi(context);
+        std::ofstream outfile;
+        outfile.open("energy.txt", std::ios_base::app);
+        outfile << nodenum << " " << Simulator::Now().GetSeconds() << " " << newValue << std::endl;
+    }
+*/
 
     int main(int argc, char **argv) {
 
@@ -59,6 +60,7 @@ namespace ns3 {
         int totnumcontents = 100;
         int totalleafs = 0;
         int simtime = 60;
+        int report_time_cu = 1000;
         bool ndn = true;
         bool pcaptracing = true;
         int cache = 100;
@@ -99,25 +101,26 @@ namespace ns3 {
         cmd.AddValue("contiki", "Enable contikimac on nodes.", useContiki);
         cmd.AddValue("dtracefreq", "Averaging period for droptrace file.", dtracefreq);
         cmd.AddValue("ipcache", "Enable IP caching on gateway", useIPCache);
+        cmd.AddValue("report_time_cu", "Report time for CU metric", report_time_cu);
         cmd.Parse(argc, argv);
 
         //Random variables
         RngSeedManager::SetSeed(1);
         RngSeedManager::SetRun(rngfeed);
-        /*
-                for (int jdx = 0; jdx < 10; jdx++) {
-                    RngSeedManager::SetSeed(1);
-                    RngSeedManager::SetRun(2);
-                    Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
-                    Rnode->SetStream(1);
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<Rnode->GetValue(0,1) <<std::endl;
-                    std::cout<<std::endl;
-                }
-         */
+/*
+        for (int jdx = 0; jdx < 10; jdx++) {
+            RngSeedManager::SetSeed(1);
+            RngSeedManager::SetRun(2);
+            Ptr<UniformRandomVariable> Rnode = CreateObject<UniformRandomVariable> ();
+            Rnode->SetStream(1);
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<Rnode->GetValue(0,1) <<std::endl;
+            std::cout<<std::endl;
+        }
+*/
 
         //Clean up old files
         remove("energy.txt");
@@ -126,6 +129,8 @@ namespace ns3 {
         remove("bytes.txt");
         remove("bytes2.txt");
         remove("cache_hits.txt");
+        remove("cu_icn.txt");
+        remove("cu_ip.txt");
         /*
                 LogComponentEnable("CoapClientApplication", LOG_LEVEL_ALL);
                 LogComponentEnable("CoapServerApplication", LOG_LEVEL_ALL);
@@ -230,36 +235,36 @@ namespace ns3 {
 
         //Energy framework
 
-        /*
-                int size = node_head * node_periph + 1;
-                Ptr<LrWpanRadioEnergyModel> em[size];
-                Ptr<BasicEnergySource> es[size];
-                Ptr<LrWpanContikiMac> mac[size]; //Change Mac
+/*
+        int size = node_head * node_periph + 1;
+        Ptr<LrWpanRadioEnergyModel> em[size];
+        Ptr<BasicEnergySource> es[size];
+        Ptr<LrWpanContikiMac> mac[size]; //Change Mac
 
-                int endN = 0;
-                for (int jdx = 0; jdx < node_head; jdx++) {
-                    for (int idx = 0; idx < node_periph; idx++) {
-                        endN++;
-                        em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
-                        es[endN] = CreateObject<BasicEnergySource> ();
-                        mac[endN] = CreateObject<LrWpanContikiMac> ();
-                        es[endN]->SetSupplyVoltage(3.3);
-                        es[endN]->SetInitialEnergy(10800); //1 AA battery
-                        es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
-                        es[endN]->SetNode(iot[jdx].Get(idx));
-                        es[endN]->AppendDeviceEnergyModel(em[endN]);
-                        em[endN]->SetEnergySource(es[endN]);
+        int endN = 0;
+        for (int jdx = 0; jdx < node_head; jdx++) {
+            for (int idx = 0; idx < node_periph; idx++) {
+                endN++;
+                em[endN] = CreateObject<LrWpanRadioEnergyModel> ();
+                es[endN] = CreateObject<BasicEnergySource> ();
+                mac[endN] = CreateObject<LrWpanContikiMac> ();
+                es[endN]->SetSupplyVoltage(3.3);
+                es[endN]->SetInitialEnergy(10800); //1 AA battery
+                es[endN]->SetEnergyUpdateInterval(Time(Seconds(3000)));
+                es[endN]->SetNode(iot[jdx].Get(idx));
+                es[endN]->AppendDeviceEnergyModel(em[endN]);
+                em[endN]->SetEnergySource(es[endN]);
 
-                        Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
-                        em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
-                        es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
+                Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice> (iot[jdx].Get(idx)->GetDevice(0));
+                em[endN]->AttachPhy(device->GetPhy()); //Loopback=0?
+                es[endN]->TraceConnect("RemainingEnergy", std::to_string(iot[jdx].Get(idx)->GetId()), MakeCallback(&GetTotalEnergyConsumption));
 
-                        //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
-                        //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
-                        //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
-                    }
-                }
-         */
+                //device->SetMac(mac[endN]); //Meerdere devices hebben hetzelfde mac address!
+                //device->GetMac ()->SetAttribute ("SleepTime", DoubleValue (0.05));
+                //device->GetPhy()->TraceConnect("TrxState", std::string("phy0"), MakeCallback(&StateChangeNotification));
+            }
+        }
+*/
 
         /*
          NDN 
@@ -267,11 +272,10 @@ namespace ns3 {
 
 
         if (ndn) {
-            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, con_leaf, con_inside, con_gtw,
+            NDN_stack(node_head, node_periph, iot, backhaul, endnodes, bth, simtime, report_time_cu, con_leaf, con_inside, con_gtw,
                     cache, node_cache, freshness, ipbackhaul, payloadsize, zm_q, zm_s, min_freq, max_freq);
             ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
             L2RateTracer::InstallAll("drop-trace.txt", Seconds(dtracefreq));
-            ndn::CsTracer::InstallAll("cs-trace.txt", Seconds(10));
         }
 
 
@@ -296,7 +300,7 @@ namespace ns3 {
             sixlowpan_stack(node_periph, node_head, totnumcontents, bth, LrWpanDevice, SixLowpanDevice, CSMADevice, i_6lowpan, i_csma, IPv6Bucket, AddrResBucket, endnodes, br, backhaul);
 
             NS_LOG_INFO("Creating Applications.");
-            sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache);
+            sixlowpan_apps(node_periph, node_head, iot, all, AddrResBucket, apps, i_6lowpan, simtime, report_time_cu, bth, payloadsize, zm_q, zm_s, con_leaf, con_inside, con_gtw, min_freq, max_freq, useIPCache, freshness, cache);
         }
 
 
