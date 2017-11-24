@@ -288,8 +288,8 @@ namespace ns3 {
     CoapClient::SetFill(std::string fill) {
         NS_LOG_FUNCTION(this << fill);
 
-        uint32_t dataSize = 20; //CoAp GET message is 20 bytes long.
-
+        uint32_t dataSize = 8 + fill.size(); //CoAp GET message header is 8 bytes long. 
+        //NS_LOG_INFO("Datasize of: " << fill <<" is: " << fill.size() << " + 8= " << dataSize);
         if (dataSize != m_dataSize) {
             delete [] m_data;
             m_data = new uint8_t [dataSize];
