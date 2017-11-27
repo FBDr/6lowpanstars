@@ -242,7 +242,7 @@ namespace ns3 {
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
                 CreateResponsePkt("POST", m_packet_payload_size + 9); //CoAP header is 9 bytes long.
-
+                
             } else {
                 NS_LOG_ERROR("Data not available");
                 CreateResponsePkt("Unavailable", sizeof ("Unavailable"));
@@ -253,7 +253,6 @@ namespace ns3 {
 
             NS_LOG_LOGIC("Echoing packet");
             socket->SendTo(response_packet, 0, from);
-
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<
                         InetSocketAddress::ConvertFrom(from).GetIpv4() << " port " <<

@@ -330,11 +330,11 @@ namespace ns3 {
                     if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
                         received_packet->AddPacketTag(coaptag);
-                        NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
+                        socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx]));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
 
                         AddToCache(std::get<2>(m_pendingreqs[idx]));
-                        NS_LOG_INFO("Cache insert! " << std::get<2>(m_pendingreqs[idx]) << " Size: " << m_cache.size());
+                        std::get<2>(m_pendingreqs[idx]);
                         break;
                     }
                 }
@@ -356,7 +356,7 @@ namespace ns3 {
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
         PrintToFile();
-        NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
+        socket->SendTo(response_packet, 0, from);
 
 
     }
@@ -367,7 +367,7 @@ namespace ns3 {
         m_pendingreqs.push_back(std::make_tuple(from, coaptag.GetT(), sq));
         Packet repsonsep(*received_packet);
         repsonsep.AddPacketTag(coaptag);
-        NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+        socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port));
     }
 
     void
