@@ -246,7 +246,7 @@ namespace ns3 {
             uint32_t received_Req = FilterReqNum(received_packet->GetSize());
             if (CheckReqAv(received_Req)) {
                 NS_LOG_INFO("Well formed request received for available content number: " << received_Req);
-                CreateResponsePkt("POST", m_packet_payload_size);
+                CreateResponsePkt("POST", m_packet_payload_size + 9); //CoAP header is 9 bytes long.
 
             } else {
                 NS_LOG_ERROR("Data not available");

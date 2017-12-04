@@ -361,7 +361,7 @@ namespace ns3 {
                     if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
                         received_packet->AddPacketTag(coaptag);
-                        NS_LOG_INFO("Found return entry transmission Succes?: " << socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx])));
+                        socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx]));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
 
                         AddToCache(std::get<2>(m_pendingreqs[idx]));
@@ -387,7 +387,7 @@ namespace ns3 {
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
 
-        NS_LOG_LOGIC("Sending packet: Succes?" << socket->SendTo(response_packet, 0, from));
+        socket->SendTo(response_packet, 0, from);
 
 
     }
@@ -401,10 +401,10 @@ namespace ns3 {
 
         if (m_gtw_to_node[m_IPv6Bucket[sq]] == m_ownip) {
             NS_LOG_INFO("Dest in my domain! ");
-            NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port)));
+            socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_IPv6Bucket[sq], m_port));
         } else {
             NS_LOG_INFO("Dest in NOT in my domain! Forwarding to GTW ");
-            NS_LOG_INFO("Succes?: " << socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[sq]], m_port)));
+            socket->SendTo(&repsonsep, 0, Inet6SocketAddress(m_gtw_to_node[m_IPv6Bucket[sq]], m_port));
         }
 
     }
