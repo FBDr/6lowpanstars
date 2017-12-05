@@ -67,7 +67,7 @@ namespace nfd {
 
         uint64_t getTx_interest_bytes();
 
-        void PrintToFile(void);
+        void PrintToFile(std::string name);
         void setNode(ns3::Ptr<ns3::Node> node);
         ns3::Ptr<ns3::Node> getNode();
 

@@ -77,6 +77,10 @@ namespace ns3 {
                 MakeUintegerAccessor(&CoapClient::SetDataSize,
                 &CoapClient::GetDataSize),
                 MakeUintegerChecker<uint32_t> ())
+                .AddAttribute("GTW", "This node is configured as gateway",
+                BooleanValue(false),
+                MakeBooleanAccessor(&CoapClient::iamgtw),
+                MakeBooleanChecker())
                 .AddTraceSource("Tx", "A new packet is created and is sent",
                 MakeTraceSourceAccessor(&CoapClient::m_txTrace),
                 "ns3::Packet::TracedCallback")
@@ -161,6 +165,7 @@ namespace ns3 {
     uint32_t
     CoapClient::GetRngStream() const {
         return (uint32_t) m_seqRng->GetStream();
+
     }
 
     void
@@ -402,9 +407,16 @@ namespace ns3 {
         // so that tags added to the packet can be sent as well
         m_txTrace(p);
 
-        if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
-            NS_LOG_INFO("SendTo ERROR! Trying to send to " << m_IPv6Bucket[nxtsq]);
-        };
+        if (iamgtw) {
+            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_ownip, m_peerPort)) == -1) {
+                NS_LOG_INFO("SendTo ERROR! Trying to send to " << m_ownip);
+            }
+        } else {
+            if (m_socket->SendTo(p, 0, Inet6SocketAddress(m_IPv6Bucket[nxtsq], m_peerPort)) == -1) {
+                NS_LOG_INFO("SendTo ERROR! Trying to send to " << m_IPv6Bucket[nxtsq]);
+            };
+        }
+
 
 
         ++m_sent;

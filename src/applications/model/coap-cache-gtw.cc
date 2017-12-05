@@ -202,7 +202,7 @@ namespace ns3 {
         m_mov_av = m_mov_av + ((double) cur_size - m_mov_av) / m_count;
         m_count++;
 
-        std::cout << "%%%%%%%%%%%%%%" << TimeStep(m_event_save.GetTs()).GetSeconds() << " " << m_report_time_T.GetSeconds() << std::endl;
+        //std::cout << "%%%%%%%%%%%%%%" << TimeStep(m_event_save.GetTs()).GetSeconds() << " " << m_report_time_T.GetSeconds() << std::endl;
         if (m_event_save.GetTs() == 0) {
             std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Scheduled!" << std::endl;
             m_event_save = Simulator::Schedule(m_report_time_T - Simulator::Now(), &CoapCacheGtw::SaveToFile, this, Simulator::GetContext());
@@ -295,7 +295,8 @@ namespace ns3 {
         Ptr<Packet> response_packet;
         Address from;
 
-        while ((received_packet = socket->RecvFrom(from))&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)) {
+        //&& (Inet6SocketAddress::ConvertFrom(from).GetIpv6() != m_ownip)
+        while ((received_packet = socket->RecvFrom(from))) {
 
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server received " << received_packet->GetSize() << " bytes from " <<

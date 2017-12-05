@@ -224,6 +224,7 @@ namespace ns3 {
         Ptr<UniformRandomVariable> m_seqRng; // RNG
         std::set<uint32_t> m_PenSeqSet; //Pending sequences 
         Ipv6Address m_ownip;
+        bool iamgtw = false;
     };
 
 } // namespace ns3

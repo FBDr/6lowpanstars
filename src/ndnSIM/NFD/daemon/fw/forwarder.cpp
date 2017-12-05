@@ -83,10 +83,10 @@ namespace nfd {
     Forwarder::~Forwarder() = default;
 
     void
-    Forwarder::PrintToFile() {
+    Forwarder::PrintToFile(std::string name) {
         std::ofstream outfile;
         outfile.open("cache_hits.txt", std::ios_base::app);
-        outfile << m_node->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
+        outfile << m_node->GetId() << " " << ns3::Simulator::Now().GetSeconds() << name << std::endl;
     }
 
     void
@@ -328,8 +328,12 @@ namespace nfd {
         // goto outgoing Data pipeline
         this->onOutgoingData(data, *const_pointer_cast<Face>(inFace.shared_from_this()));
         //Write to file if satisfied from cache
-        PrintToFile();
-    
+
+
+        if (interest.getName().get(0).toUri() != "localhost") {
+            PrintToFile(interest.getName().toUri());
+        }
+
     }
 
     void
