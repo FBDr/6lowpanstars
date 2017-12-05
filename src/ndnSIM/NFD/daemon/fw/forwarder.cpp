@@ -83,10 +83,10 @@ namespace nfd {
     Forwarder::~Forwarder() = default;
 
     void
-    Forwarder::PrintToFile(std::string name) {
+    Forwarder::PrintToFile() {
         std::ofstream outfile;
         outfile.open("cache_hits.txt", std::ios_base::app);
-        outfile << m_node->GetId() << " " << ns3::Simulator::Now().GetSeconds() << name << std::endl;
+        outfile << m_node->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
     }
 
     void
@@ -331,7 +331,7 @@ namespace nfd {
 
 
         if (interest.getName().get(0).toUri() != "localhost") {
-            PrintToFile(interest.getName().toUri());
+            PrintToFile();
         }
 
     }
