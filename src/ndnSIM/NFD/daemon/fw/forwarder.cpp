@@ -329,7 +329,7 @@ namespace nfd {
         this->onOutgoingData(data, *const_pointer_cast<Face>(inFace.shared_from_this()));
         //Write to file if satisfied from cache
         PrintToFile();
-    
+
     }
 
     void
@@ -635,10 +635,14 @@ namespace nfd {
         shared_ptr<Data> outData = make_shared<Data>(data);
         FaceUri oerie = outFace.getLocalUri();
         std::string dataName = data.getName().toUri();
+        if (iamGTW() == 2) {
+            NS_LOG_INFO("Outface: " << outFace.getRemoteUri().toString() << " " << outFace.getLocalUri().toString() << "True?" << (((outFace.getRemoteUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")
+                    && (outFace.getLocalUri().toString() == "netdev://[ff:ff:ff:ff:ff:ff]")) != 1));
+        }
 
 
         //If this node is gateway, add overhead component to data name. Data comes from other domain
-        if ((iamGTW() == 2) && !m_conOvrhd_data) {
+        if ((iamGTW() == 2) && (outFace.getLocalUri().toString() != "netdev://")) {
             if ((oerie.getScheme() != "AppFace") && (outFace.getScope() == ndn::nfd::FACE_SCOPE_NON_LOCAL)) {
                 //Find overhead sequence corresponding to current data name.
 
@@ -678,7 +682,6 @@ namespace nfd {
         // send Data
         outFace.sendData(*outData);
         ++m_counters.nOutData;
-        m_conOvrhd_data = 0;
     }
 
     void
