@@ -353,7 +353,7 @@ namespace ns3 {
         Ptr<Packet> response_packet;
 
         NS_LOG_INFO("Transmitting data from gateway cache: " << sq);
-        CreateResponsePkt("POST", m_packet_payload_size);
+        CreateResponsePkt("POST", m_packet_payload_size + 9 );  //CoAP header is 9 bytes long.
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
         PrintToFile();
