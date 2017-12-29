@@ -116,6 +116,7 @@ namespace ns3 {
         m_gtw_to_node = gtw_to_node;
         NS_LOG_INFO("Map received, number of contents: " << m_gtw_to_node.size());
     }
+
     void
     CoapCacheGtw::SetReportTime(int time) {
         m_report_time = time;
@@ -386,7 +387,7 @@ namespace ns3 {
         CreateResponsePkt("POST", m_packet_payload_size);
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
-
+        PrintToFile();
         socket->SendTo(response_packet, 0, from);
 
 
@@ -408,6 +409,15 @@ namespace ns3 {
         }
 
     }
+
+    void
+    CoapCacheGtw::PrintToFile() {
+        Ptr <Node> PtrNode = this->GetNode();
+        std::ofstream outfile;
+        outfile.open("cache_hits.txt", std::ios_base::app);
+        outfile << PtrNode->GetId() << " " << ns3::Simulator::Now().GetSeconds() << std::endl;
+    }
+
 
 
 
