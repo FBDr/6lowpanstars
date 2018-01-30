@@ -108,7 +108,7 @@ namespace ns3 {
             auto data = make_shared<Data>();
             data->setName(dataName);
             data->setFreshnessPeriod(::ndn::time::milliseconds(m_freshness.GetMilliSeconds()));
-
+            std::cout<<::ndn::time::milliseconds(m_freshness.GetMilliSeconds()) <<std::endl;
             data->setContent(make_shared< ::ndn::Buffer>(m_virtualPayloadSize));
 
             Signature signature;
