@@ -21,7 +21,7 @@ for flow in flowxml.findall("FlowStats/Flow"):
         if tpl.get('flowId') == flow.get('flowId'):
             break
 
-    if tpl.get("destinationPort") == '9':
+    if (tpl.get("destinationPort") == '9') and (tpl.get("sourceAddress") != tpl.get("destinationAddress")):
         print "C->P: Tx packets", int(flow.get('rxPackets')), "Src: ", tpl.get('sourceAddress'), "Dst: ", tpl.get('destinationAddress')
         if int(flow.get('timesForwarded')) != 0:
             print "---Times forwarded: ", flow.get('timesForwarded')
@@ -31,7 +31,8 @@ for flow in flowxml.findall("FlowStats/Flow"):
                     flow.get('rxBytes')))
         else:
             print "TxNWUCoAP0",int(flow.get('rxBytes'))
-    if tpl.get("sourcePort") == '9':
+
+    if (tpl.get("sourcePort") == '9') and (tpl.get("sourceAddress") != tpl.get("destinationAddress")):
         print "P->C: Rx packets", int(flow.get('rxPackets')), "Src: ", tpl.get('sourceAddress'), "Dst: ", tpl.get('destinationAddress')
 
         if int(flow.get('timesForwarded')) != 0:
@@ -51,7 +52,7 @@ for flow in flowxml.findall("FlowStats/Flow"):
         if tpl.get('flowId') == flow.get('flowId'):
             break
 
-    if (tpl.get("destinationPort") == '9') or (tpl.get("sourcePort") == '9'):
+    if ((tpl.get("destinationPort") == '9') or (tpl.get("sourcePort") == '9'))  and (tpl.get("sourceAddress") != tpl.get("destinationAddress")):
         # lostpkts_coap.append(int(flow.get('lostPackets')))
         # txPackets_coap.append(int(flow.get('rxPackets')))
         if int(flow.get('timesForwarded')) != 0:

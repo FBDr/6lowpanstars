@@ -252,6 +252,7 @@ namespace ns3 {
             response_packet->AddPacketTag(coaptag);
 
             NS_LOG_LOGIC("Echoing packet");
+            //socket->SetIpv6HopLimit(63);
             socket->SendTo(response_packet, 0, from);
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds() << "s server sent " << response_packet->GetSize() << " bytes to " <<

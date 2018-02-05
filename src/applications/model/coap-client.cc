@@ -458,9 +458,8 @@ namespace ns3 {
                     Time e2edelay = Simulator::Now() - coaptag.GetTs();
                     int64_t delay = e2edelay.GetMilliSeconds();
                     int hops;
-                    if (hoplimitTag.GetHopLimit() < 64) {
-                        //It crossed the backhaul, add two hops. Patch for bw-compatibility with parser.  
-                        hops = (int) (64 - (hoplimitTag.GetHopLimit() - 1)); //-1 Because we need to add one gateway hop.
+                    if (iamgtw) {
+                        hops = 0;
                     } else {
                         hops = (int) (64 - hoplimitTag.GetHopLimit());
                     }

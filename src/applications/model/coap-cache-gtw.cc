@@ -331,6 +331,7 @@ namespace ns3 {
                     if (std::get<1>(m_pendingreqs[idx]) == coaptag.GetT()) {
                         //Found entry
                         received_packet->AddPacketTag(coaptag);
+                        socket->SetIpv6HopLimit(63);
                         socket->SendTo(received_packet, 0, std::get<0>(m_pendingreqs[idx]));
                         m_pendingreqs.erase(m_pendingreqs.begin() + idx);
 
@@ -357,6 +358,7 @@ namespace ns3 {
         response_packet = Create<Packet> (m_data, m_dataSize);
         response_packet->AddPacketTag(coaptag);
         PrintToFile();
+        socket->SetIpv6HopLimit(64);
         socket->SendTo(response_packet, 0, from);
 
 
