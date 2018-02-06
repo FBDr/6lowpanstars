@@ -214,7 +214,7 @@ namespace ns3 {
                 client.SetAttribute("Interval", TimeValue(Seconds(1.0 / interval_sel))); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 client.SetAttribute("NumberOfContents", UintegerValue(AddrResBucket[idx].size()));
                 Ptr<Node> sel_node = iot[idx].Get(node_periph);
-                client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
+                client.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId() + 100 + jdx)));
                 if (useIPCache) {
                     client.SetAttribute("GTW", StringValue("1"));
                 }

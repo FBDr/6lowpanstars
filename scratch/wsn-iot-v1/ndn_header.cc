@@ -149,7 +149,7 @@ namespace ns3 {
                 interval_sel = Rinterval->GetValue(min_freq, max_freq); //Constant frequency ranging from 5 requests per second to 1 request per minute.
                 start_delay = Rstartdelay->GetValue(0.1, 1 / max_freq);
                 consumerHelper.SetAttribute("Frequency", StringValue(boost::lexical_cast<std::string>(interval_sel)));
-                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId())));
+                consumerHelper.SetAttribute("RngStream", StringValue(std::to_string(sel_node->GetId() + 100 + jdx)));
                 apps = consumerHelper.Install(sel_node); //Consumers are at leaf nodes.
                 apps.Start(Seconds(120.0 + start_delay));
                 apps.Stop(Seconds(simtime - 5));
