@@ -6,7 +6,7 @@ The branches used for my thesis-work are the 'master' branch for the 'smart home
 The simualtion set-up files can be found in the [wns-iot-v1 folder](scratch/wsn-iot-v1) folder. The implmented CoAP files are included in 
 [applications folder](src/applications/model). All files start with coap-.. and are based on the [udp-client](src/applications/model/udp-client.cc)  and [udp-server](src/applications/model/udp-server.cc) apps. 
 
-The customised ndn Zipf-Mandelbrot application can be found in the [ndn/apps folder] (src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot-v2.cpp). 
+The customised ndn Zipf-Mandelbrot application can be found in the [ndn/apps folder](src/ndnSIM/apps/ndn-consumer-zipf-mandelbrot-v2.cpp). 
 
 # Installation
 Install NS-3 according to the instructions in https://github.com/nsnam/ns-3-dev-git.
