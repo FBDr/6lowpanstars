@@ -10,7 +10,7 @@ The customised ndn Zipf-Mandelbrot application can be found in the [ndn/apps fol
 
 # Installation
 Install NS-3 according to the instructions in https://github.com/nsnam/ns-3-dev-git.
-Clone this repository into the NS-3 folder.
+Merge this repository with the NS-3 folder.
 
 
 
